@@ -8,13 +8,47 @@ for drawio in "$@"; do
   png="${drawio%.drawio}.drawio.png"
   echo "Converting $drawio to $png..."
 
-  # drawio CLI export to PNG with 2x scale for high quality
-  if ! drawio -x -f png -s 2 -t -o "$png" "$drawio" 2>/dev/null; then
+  # DRAWIO_BACKGROUND=transparent|light|dark|#rrggbb|file
+  # transparent: pass -t. light/dark/#rrggbb: rewrite background on a temp copy, no -t.
+  # file (default): export the file as stored, no -t.
+  mode="${DRAWIO_BACKGROUND:-file}"
+  src="$drawio"
+  tmp=""
+  bg=""
+  extra=()
+  case "$mode" in
+    transparent) extra+=(-t) ;;
+    file) ;;
+    light) bg="#ffffff" ;;
+    dark) bg="#1e1e1e" ;;
+    \#*) bg="$mode" ;;
+    *) echo "DRAWIO_BACKGROUND must be transparent, light, dark, file, or #rrggbb" >&2; exit 1 ;;
+  esac
+  if [ -n "${bg:-}" ]; then
+    tmp="$(mktemp "${TMPDIR:-/tmp}/drawio.XXXXXX")"
+    cp "$drawio" "$tmp"
+    python3 - "$tmp" "$bg" << 'PY'
+import sys
+from pathlib import Path
+path, bg = sys.argv[1], sys.argv[2]
+text = Path(path).read_text()
+if "background=" in text:
+    import re
+    text = re.sub(r'background="[^"]*"', f'background="{bg}"', text, count=1)
+else:
+    text = text.replace("<mxGraphModel", f'<mxGraphModel background="{bg}"', 1)
+Path(path).write_text(text)
+PY
+    src="$tmp"
+  fi
+  if ! drawio -x -f png -s 2 "${extra[@]}" -o "$png" "$src" 2>/dev/null; then
+    [ -n "$tmp" ] && rm -f "$tmp"
     echo "✗ drawio PNG export failed for $drawio" >&2
     continue
   fi
 
   generated_files+=("$png")
+  [ -n "${tmp:-}" ] && rm -f "$tmp"
   echo "✓ Generated $png"
 done
 

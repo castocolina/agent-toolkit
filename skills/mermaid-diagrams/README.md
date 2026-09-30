@@ -27,7 +27,7 @@ The skill activates when you mention:
 
 ## How It Works
 
-1. **Choose the right diagram type** based on what you want to communicate
+1. **Classify the diagram type first** - Do not default to a flowchart. Sequence, C4, class, and ERD come first when they answer the question. See SKILL.md.
 2. **Start with core elements** - entities, actors, or components
 3. **Add relationships** - connections, flows, interactions
 4. **Refine incrementally** - add details, styling, notes
@@ -53,6 +53,8 @@ diagramType
 7. **Git Graphs** - Branching strategies, version control flows
 8. **Gantt Charts** - Project timelines, scheduling
 9. **Pie/Bar Charts** - Data visualization, metrics
+
+Do not default to a flowchart. Classify the question first (sequence, C4, class, ERD, state). A flowchart is only for a process someone walks, with decisions.
 
 ### Advanced Capabilities
 

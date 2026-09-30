@@ -9,14 +9,15 @@ Add YAML configuration at the top of diagrams:
 ```mermaid
 ---
 config:
-  theme: dark
+  theme: neutral
   themeVariables:
-    primaryColor: "#ff6b6b"
-    primaryTextColor: "#fff"
-    primaryBorderColor: "#333"
-    lineColor: "#666"
-    secondaryColor: "#4ecdc4"
-    tertiaryColor: "#ffe66d"
+    primaryColor: "#e3f2fd"
+    primaryTextColor: "#111111"
+    textColor: "#111111"
+    primaryBorderColor: "#1565c0"
+    lineColor: "#455a64"
+    secondaryColor: "#ede7f6"
+    tertiaryColor: "#e8f5e9"
 ---
 flowchart TD
     A --> B
@@ -85,16 +86,16 @@ Override specific colors:
 config:
   theme: base
   themeVariables:
-    primaryColor: "#ff6b6b"
-    primaryTextColor: "#fff"
-    primaryBorderColor: "#d63031"
-    lineColor: "#74b9ff"
-    secondaryColor: "#00b894"
-    tertiaryColor: "#fdcb6e"
-    background: "#f0f0f0"
-    mainBkg: "#ffffff"
-    textColor: "#333333"
-    nodeBorder: "#333333"
+    primaryColor: "#e3f2fd"
+    primaryTextColor: "#111111"
+    textColor: "#111111"
+    primaryBorderColor: "#1565c0"
+    lineColor: "#455a64"
+    secondaryColor: "#ede7f6"
+    tertiaryColor: "#e8f5e9"
+    background: "#ffffff"
+    mainBkg: "#f5f5f5"
+    nodeBorder: "#1565c0"
     clusterBkg: "#f9f9f9"
     clusterBorder: "#666666"
 ---
@@ -174,12 +175,13 @@ config:
   look: handDrawn
   layout: dagre
   themeVariables:
-    primaryColor: "#ff6b6b"
-    primaryTextColor: "#fff"
-    primaryBorderColor: "#d63031"
-    lineColor: "#74b9ff"
-    secondaryColor: "#00b894"
-    tertiaryColor: "#fdcb6e"
+    primaryColor: "#e3f2fd"
+    primaryTextColor: "#111111"
+    textColor: "#111111"
+    primaryBorderColor: "#1565c0"
+    lineColor: "#455a64"
+    secondaryColor: "#ede7f6"
+    tertiaryColor: "#e8f5e9"
 ---
 flowchart TD
     Start([Begin Process]) --> Input[Gather Data]
@@ -195,18 +197,23 @@ flowchart TD
 
 ### Flowchart Styling
 
+Color by role. Copy palette A, B, or C from [authoring-rules.md](authoring-rules.md). Status stays `success` / `warning` / `error` — keep those names, use the sober fills, and write the word in the label. Per-node `style` is the exception. Do not use saturated fills (`#ff6b6b`, `#00b894`).
+
 **Class-based styling:**
 ```mermaid
 flowchart TD
-    A[Normal]:::success
+    A[Step]:::base
     B[Warning]:::warning
-    C[Error]:::error
-    
-    classDef success fill:#00b894,stroke:#00a383,color:#fff
-    classDef warning fill:#fdcb6e,stroke:#e8b923,color:#333
-    classDef error fill:#ff6b6b,stroke:#ee5253,color:#fff
-    
+    C{Error?}:::error
+    D[Success]:::success
+
+    classDef base    fill:#f5f5f5,stroke:#616161,color:#111111
+    classDef success fill:#e8f5e9,stroke:#2e7d32,color:#111111
+    classDef warning fill:#fff8e1,stroke:#b26a00,color:#111111
+    classDef error   fill:#fdecea,stroke:#c62828,color:#111111
+
     A --> B --> C
+    C -->|yes| D
 ```
 
 **Node-specific styling:**
@@ -216,9 +223,9 @@ flowchart LR
     B[Node B]
     C[Node C]
     
-    style A fill:#ff6b6b,stroke:#333,stroke-width:4px
-    style B fill:#4ecdc4,stroke:#333,stroke-width:2px
-    style C fill:#ffe66d,stroke:#333,stroke-width:2px
+    style A fill:#e3f2fd,stroke:#1565c0,color:#111111
+    style B fill:#ede7f6,stroke:#4527a0,color:#111111
+    style C fill:#e8f5e9,stroke:#2e7d32,color:#111111
     
     A --> B --> C
 ```
@@ -230,9 +237,9 @@ flowchart LR
     B --> C
     C --> D
     
-    linkStyle 0 stroke:#ff6b6b,stroke-width:4px
-    linkStyle 1 stroke:#4ecdc4,stroke-width:2px
-    linkStyle 2 stroke:#ffe66d,stroke-width:2px
+    linkStyle 0 stroke:#b26a00,stroke-width:2px
+    linkStyle 1 stroke:#1565c0,stroke-width:2px
+    linkStyle 2 stroke:#455a64,stroke-width:1px
 ```
 
 ### Sequence Diagram Styling
@@ -335,7 +342,7 @@ flowchart TB
     C --> D
     
     style Frontend fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
-    style Backend fill:#fff3e0,stroke:#ff9800,stroke-width:2px
+    style Backend fill:#fff8e1,stroke:#b26a00,stroke-width:2px
 ```
 
 ## Comments and Documentation
@@ -356,7 +363,7 @@ flowchart TD
     B --> C
     
     %% Add styling
-    style A fill:#90EE90
+    style A fill:#e8f5e9
     style C fill:#FFB6C1
 ```
 
@@ -391,7 +398,7 @@ flowchart TB
     logs --> metrics
     
     style production fill:#e8f5e9,stroke:#4caf50,stroke-width:3px
-    style servers fill:#fff3e0,stroke:#ff9800,stroke-width:2px
+    style servers fill:#fff8e1,stroke:#b26a00,stroke-width:2px
     style monitoring fill:#e3f2fd,stroke:#2196f3,stroke-width:2px
     
     style lb fill:#ffeb3b,stroke:#fbc02d,stroke-width:2px
@@ -402,7 +409,7 @@ flowchart TB
     class app1,app2,app3 serverClass
     
     linkStyle 0,1,2,3 stroke:#4caf50,stroke-width:2px
-    linkStyle 4,5,6,7,8,9 stroke:#ff9800,stroke-width:1px
+    linkStyle 4,5,6,7,8,9 stroke:#b26a00,stroke-width:1px
 ```
 
 ## Responsive Sizing
@@ -435,14 +442,11 @@ mmdc -i diagram.mmd -o output.svg -b "transparent"
 
 ## Best Practices for Advanced Features
 
-1. **Use themes consistently** - Pick one theme for related diagrams
-2. **Don't over-style** - Too many colors can reduce clarity
-3. **Test hand-drawn look** - Some diagrams work better with classic look
+1. **Copy a palette** - Use A, B, or C in [authoring-rules.md](authoring-rules.md). Do not invent saturated hex.
+2. **Color by role** - Same role, same `classDef`. More than six fills is garish. Red and green are not a sufficient distinction on their own.
+3. **Use themes consistently** - Pick one theme for related diagrams
 4. **Use ELK for complex layouts** - When dagre creates crossed lines
-5. **Comment complex configurations** - Explain non-obvious styling choices
-6. **Keep it accessible** - Ensure sufficient color contrast
-7. **Test exports** - Verify diagrams render correctly in target format
-8. **Version control configs** - Track theme changes in your repository
+5. **Test exports** - Verify diagrams render correctly in the ~900px reading column, not only at full width
 
 ## Accessibility Considerations
 
@@ -451,12 +455,13 @@ mmdc -i diagram.mmd -o output.svg -b "transparent"
 config:
   theme: base
   themeVariables:
-    primaryColor: "#0066cc"
-    primaryTextColor: "#ffffff"
-    primaryBorderColor: "#003d7a"
+    primaryColor: "#e3f2fd"
+    primaryTextColor: "#111111"
+    textColor: "#111111"
+    primaryBorderColor: "#1565c0"
     lineColor: "#333333"
     background: "#ffffff"
-    mainBkg: "#f0f0f0"
+    mainBkg: "#f5f5f5"
 ---
 flowchart TD
     A[High Contrast Text] --> B[Clear Labels]
@@ -464,7 +469,7 @@ flowchart TD
 ```
 
 **Accessibility tips:**
-- Use high contrast color combinations
+- Contrast is harmony of the whole diagram, not a fixed ink color. Dark ink on a light fill, light ink on a dark fill. The page background is the user's choice.
 - Don't rely solely on color to convey meaning
 - Include descriptive text labels
 - Test with color blindness simulators

@@ -1,6 +1,6 @@
 ---
 name: draw-io
-description: draw.io diagram creation, editing, and review. Use for .drawio XML editing, PNG conversion, layout adjustment, and AWS icon usage.
+description: Create and edit uncompressed .drawio diagrams and export PNG. Use when the user asks for a draw.io file, an architecture diagram, an AWS icon diagram, a Quarto or reveal.js slide figure, or a layout fix in mxGraph XML. Keywords include .drawio, mxCell, mxgraph.aws4, and diagram export.
 ---
 
 # draw.io Diagram Skill
@@ -41,10 +41,18 @@ mise exec -- pre-commit run convert-drawio-to-png --files assets/my-diagram.draw
 bash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram1.drawio
 ```
 
-Internal command used:
+Export matches the page background the user chose. Pass `-t` only for a transparent page. Do not add `-t` for a light, dark, or custom plate.
 
 ```sh
-drawio -x -f png -s 2 -t -o output.drawio.png input.drawio
+# Transparent, only if the user asked for it
+DRAWIO_BACKGROUND=transparent bash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram1.drawio
+
+# Light or dark plate: the script rewrites background on a temp copy, then exports without -t
+DRAWIO_BACKGROUND=light bash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram1.drawio
+DRAWIO_BACKGROUND=dark bash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram1.drawio
+
+# File as stored, no -t
+bash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram1.drawio
 ```
 
 | Option | Description |
@@ -85,13 +93,13 @@ drawio -x -f png -s 2 -t -o output.drawio.png input.drawio
 
 - Label all elements
 - Use arrows to indicate direction
-  (prefer 2 unidirectional arrows over bidirectional)
+  Prefer two unidirectional arrows over one bidirectional arrow. A single double-headed arrow hides which call is which. `references/layout-guidelines.md` uses the same rule.
 - Use latest official icons
 - Add legend to explain custom symbols
 
 ### 5.3. Accessibility
 
-- Ensure sufficient color contrast
+- Ensure sufficient color contrast. Contrast is harmony of the whole diagram, not a fixed ink color. Text must separate from its component fill. The component must separate from its container. The container and the arrows must separate from the page. Black, gray, or white can all be correct.
 - Use patterns in addition to colors
 
 ### 5.4. Progressive Disclosure
@@ -115,8 +123,14 @@ Include title, description, last updated, author, and version in diagrams.
 
 ### 6.1. Background Color
 
-- Remove `background="#ffffff"`
-- Transparent background adapts to various themes
+Ask which page background the user wants: transparent, light, dark, or another color. `#ffffff` and `#1e1e1e` are suggestions, not a closed default. Do not strip `background` just to force transparency.
+
+- Transparent: every stroke, icon, and fill must still read on both a light slide and a dark slide. If it will not, ask for the theme before export.
+- Light plate: `background="#ffffff"` with dark ink on light fills.
+- Dark plate: `background="#1e1e1e"` with light ink on dark fills.
+- Other: use the user's color, then retune component fill, `fontColor`, and arrow `strokeColor` so the set stays harmonious.
+
+`-t` on the PNG export keeps the page transparent. Use it only when the user asked for a transparent background.
 
 ### 6.2. Font Size
 
@@ -134,18 +148,34 @@ Include title, description, last updated, author, and version in diagrams.
 
 ### 6.4. Arrow Placement
 
-- Always place arrows at back (position in XML right after Title)
-- Position arrows to avoid overlapping with labels
-- Keep arrow start/end at least 20px from label bottom edge
+Do not draw a straight line from A to B unless they share an axis and the span is empty. If they are not aligned, or a box sits between them, a straight line cuts the diagram.
+
+Default style:
+
+```xml
+style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;"
+```
+
+Decide the target per arrow. This is not the Mermaid subgraph rule.
+
+- The message is "this block talks to that block": end on the parent container.
+- The message is "this call enters this service": end on that node.
+- Leave and enter from the side that faces the other end (`exitX`/`exitY`, `entryX`/`entryY`). The elbow runs through the gutter between groups, not through a container.
+- The edge `parent` is the common ancestor (usually the page, `1`), not a buried child.
+- Do not put every arrow on the back layer. A back-layer arrow hides its label under a container. Route it in the gap. If it must cross, divert it. Do not bury it.
+
+Keep the label in that gutter, more than 20px from the line and from any box or text. Never under a container. Position arrows so they do not overlap labels. Keep the arrow start and end at least 20px from a label edge.
+
+Do not bury arrows behind boxes. This layering hides the label under the container:
 
 ```xml
 <!-- Title -->
 <mxCell id="title" value="..." .../>
 
-<!-- Arrows (back layer) -->
-<mxCell id="arrow1" style="edgeStyle=..." .../>
+<!-- Don't: arrows forced to the back layer -->
+<mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;curved=1;..." edge="1"/>
 
-<!-- Other elements (front layer) -->
+<!-- Other elements (front layer) cover the arrow and its label -->
 <mxCell id="box1" .../>
 ```
 
@@ -191,54 +221,69 @@ Adjust offset attribute to distance arrow labels from arrows:
 - Redundant notation (e.g., ECR Container Registry): shorten to 1 line
 - Use `&lt;br&gt;` tag for line breaks
 
-### 6.9. Background Frame and Internal Element Placement
+### 6.9. Containers Are Parents
 
-When placing elements inside background frames (grouping boxes),
-ensure sufficient margin.
+A container is the `parent` of its components, not a rectangle drawn behind siblings. Children use coordinates relative to the container. The user can then drag the block and redistribute it.
 
-- YOU MUST: Internal elements must have at least 30px margin from frame boundary
+- YOU MUST: At least 30px margin inside the parent, measured from the container origin
 - YOU MUST: Account for rounded corners (`rounded=1`) and stroke width
-- YOU MUST: Always visually verify PNG output for overflow
+- YOU MUST: The container stroke must read against the page background
+- YOU MUST: Visually verify the PNG
 
-Coordinate calculation verification:
+Proportion is the slide canvas (16:9), not a GitHub column. One idea per diagram. Do not stretch horizontally so that text has to shrink.
+
+Coordinate check, measured inside the parent:
 
 ```text
-Background frame: y=20, height=400 -> range is y=20-420
-Internal element top: frame y + 30 or more (e.g., y=50)
-Internal element bottom: frame y + height - 30 or less (e.g., up to y=390)
+Container origin y=0, height=400 -> inner range is y=0-400
+Internal element top: 30 or more
+Internal element bottom: height - 30 or less (e.g., up to y=370)
 ```
 
-Bad example (may overflow):
+Bad example (overflow: the label starts 10px inside a frame whose top is y=20, and it is not a child, so the block cannot be dragged together):
+
+```xml
+<mxCell id="bg" value="VPC" style="rounded=1;strokeWidth=3;" vertex="1" parent="1">
+  <mxGeometry x="500" y="20" width="560" height="400" as="geometry"/>
+</mxCell>
+<mxCell id="label" value="Title" style="text;" vertex="1" parent="1">
+  <mxGeometry x="510" y="30" width="540" height="35" as="geometry"/>
+</mxCell>
+```
+
+Margin alone is not enough if the title is still a sibling on the page. This keeps the 30px inset but does not group:
 
 ```xml
 <!-- Background frame -->
-<mxCell id="bg" style="rounded=1;strokeWidth=3;...">
-  <mxGeometry x="500" y="20" width="560" height="400" />
+<mxCell id="bg" style="rounded=1;strokeWidth=3;..." vertex="1" parent="1">
+  <mxGeometry x="500" y="20" width="560" height="430" as="geometry"/>
 </mxCell>
-<!-- Text: y=30 is too close to frame top (y=20) -->
-<mxCell id="label" value="Title" style="text;...">
-  <mxGeometry x="510" y="30" width="540" height="35" />
+<!-- y=50 is 30px from frame top (y=20), but parent is still the page -->
+<mxCell id="label" value="Title" style="text;..." vertex="1" parent="1">
+  <mxGeometry x="510" y="50" width="540" height="35" as="geometry"/>
 </mxCell>
 ```
 
-Good example (sufficient margin):
+Good example (child of the container, 30px inside it, moves with the block):
 
 ```xml
-<!-- Background frame -->
-<mxCell id="bg" style="rounded=1;strokeWidth=3;...">
-  <mxGeometry x="500" y="20" width="560" height="430" />
+<mxCell id="vpc" value="VPC" style="rounded=1;strokeWidth=3;fillColor=#E6F2F8;fontColor=#111111;strokeColor=#1565c0;" vertex="1" parent="1">
+  <mxGeometry x="40" y="40" width="560" height="400" as="geometry"/>
 </mxCell>
-<!-- Text: y=50 is 30px from frame top (y=20) -->
-<mxCell id="label" value="Title" style="text;...">
-  <mxGeometry x="510" y="50" width="540" height="35" />
+<mxCell id="alb" value="ALB" style="rounded=1;fillColor=#ffffff;fontColor=#111111;" vertex="1" parent="vpc">
+  <mxGeometry x="30" y="40" width="120" height="60" as="geometry"/>
 </mxCell>
 ```
+
+`fontColor=#111111` here is dark ink on a light fill, not the only legal text color. On a dark fill, use a light `fontColor`. For an AWS group, use `shape=mxgraph.aws4.group` and still parent the services to that cell.
 
 ## 7. Reference
 
-- [Layout Guidelines](references/layout-guidelines.md)
-- [AWS Icons](references/aws-icons.md)
-- [AWS Icon Search Script](scripts/find_aws_icon.py)
+Load only what the task needs.
+
+- **MANDATORY** before placing groups or arrows: [references/layout-guidelines.md](references/layout-guidelines.md)
+- **MANDATORY** for an AWS icon: run [scripts/find_aws_icon.py](scripts/find_aws_icon.py). **Do NOT load** [references/aws-icons.md](references/aws-icons.md) unless that script misses the service.
+- **Do NOT load** `aws-icons.md` for a non-AWS diagram.
 
 AWS icon search examples:
 
@@ -249,14 +294,19 @@ python ~/.claude/skills/draw-io/scripts/find_aws_icon.py lambda
 
 ## 8. Checklist
 
-- [ ] No background color set (page="0")
+- [ ] Page background matches the user's choice. Transparent is `page="0"` plus `-t`. Light or dark sets `background` and does not pass `-t`
+- [ ] Arrows do not penetrate boxes or icons (verify in PNG)
+- [ ] Text contrasts with its component fill; components, arrows, and containers contrast with the page
 - [ ] Font size appropriate (larger recommended)
-- [ ] Arrows placed at back layer
+- [ ] Arrows are curved orthogonal unless A and B share an axis and the span is empty
+- [ ] Each arrow ends on the container or the node, chosen per message
+- [ ] Arrow labels sit in the gutter, 20px+ from the line and from any box or text
 - [ ] Arrows not overlapping labels (verify in PNG)
-- [ ] Arrow start/end sufficiently distant from labels (at least 20px)
-- [ ] Arrows not penetrating boxes or icons (verify in PNG)
-- [ ] Internal elements not overflowing background frame (verify in PNG)
-- [ ] 30px+ margin between background frame and internal elements
+- [ ] Arrow start/end at least 20px from label edges
+- [ ] Arrows do not cut through containers (verify in PNG)
+- [ ] Container children use `parent` of that container, coordinates relative to it
+- [ ] Internal elements not overflowing the container (verify in PNG)
+- [ ] 30px+ margin inside the container
 - [ ] AWS service names are official names/correct abbreviations
 - [ ] AWS icons are latest version (mxgraph.aws4.*)
 - [ ] No unnecessary elements remaining

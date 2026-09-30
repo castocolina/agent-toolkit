@@ -1,6 +1,6 @@
 ---
 name: mermaid-diagrams
-description: Comprehensive guide for creating software diagrams using Mermaid syntax. Use when users need to create, visualize, or document software through diagrams including class diagrams (domain modeling, object-oriented design), sequence diagrams (application flows, API interactions, code execution), flowcharts (processes, algorithms, user journeys), entity relationship diagrams (database schemas), C4 architecture diagrams (system context, containers, components), state diagrams, git graphs, pie charts, gantt charts, or any other diagram type. Triggers include requests to "diagram", "visualize", "model", "map out", "show the flow", or when explaining system architecture, database design, code structure, or user/application flows.
+description: Comprehensive guide for creating software diagrams using Mermaid syntax. Use when users need to create, visualize, or document software through diagrams including class diagrams (domain modeling, object-oriented design), sequence diagrams (application flows, API interactions, code execution), flowcharts (processes, algorithms, user journeys), entity relationship diagrams (database schemas), C4 architecture diagrams (system context, containers, components), state diagrams, git graphs, pie charts, gantt charts, or any other diagram type. Before drawing, classify the type — do not default to a flowchart when a sequence, C4, class, ERD, or architecture diagram answers the question. Triggers include requests to "diagram", "visualize", "model", "map out", "show the flow", or when explaining system architecture, database design, code structure, or user/application flows.
 ---
 
 # Mermaid Diagramming
@@ -22,42 +22,24 @@ diagramType
 - Line breaks and indentation improve readability but aren't required
 - Unknown words break diagrams; parameters fail silently
 
-## Diagram Type Selection Guide
+## Classify before you draw
 
-**Choose the right diagram type:**
+Read **[references/authoring-rules.md](references/authoring-rules.md)** and apply section 1 before any node. A flowchart is not the default.
 
-1. **Class Diagrams** - Domain modeling, OOP design, entity relationships
-   - Domain-driven design documentation
-   - Object-oriented class structures
-   - Entity relationships and dependencies
+Write one sentence: what question does this diagram answer? Then pick the type that owns that question. Two questions means two diagrams.
 
-2. **Sequence Diagrams** - Temporal interactions, message flows
-   - API request/response flows
-   - User authentication flows
-   - System component interactions
-   - Method call sequences
+| If the question is… | Draw | Not a flowchart |
+|---|---|---|
+| Who calls whom, in order? | Sequence | API, login, call chain |
+| What types exist and how do they relate? | Class | Domain model, OOP |
+| What tables and cardinality? | ERD | Schema |
+| What systems, containers, or components exist? | C4 | "The architecture" with no walked procedure |
+| What states and legal transitions? | State | Lifecycle |
+| A process someone walks, with yes/no branches? | Flowchart | Only after the rows above lose |
 
-3. **Flowcharts** - Processes, algorithms, decision trees
-   - User journeys and workflows
-   - Business processes
-   - Algorithm logic
-   - Deployment pipelines
+"Show the flow" and "how does X work" are not evidence for a flowchart. Reject it when a sequence, C4, class, or ERD answers the question more honestly.
 
-4. **Entity Relationship Diagrams (ERD)** - Database schemas
-   - Table relationships
-   - Data modeling
-   - Schema design
-
-5. **C4 Diagrams** - Software architecture at multiple levels
-   - System Context (systems and users)
-   - Container (applications, databases, services)
-   - Component (internal structure)
-   - Code (class/interface level)
-
-6. **State Diagrams** - State machines, lifecycle states
-7. **Git Graphs** - Version control branching strategies
-8. **Gantt Charts** - Project timelines, scheduling
-9. **Pie/Bar Charts** - Data visualization
+After the type is chosen, apply the rest of `authoring-rules.md`: reading-column proportions, subgraph boundary connections, role shapes, and a palette from that file. Do not invent hex colors.
 
 ## Quick Start Examples
 
@@ -109,6 +91,11 @@ flowchart TD
     Validate -->|Yes| Dashboard
     Validate -->|No| Error[Show error]
     Error --> Login
+
+    classDef step fill:#f5f5f5,stroke:#616161,color:#111111
+    classDef decision fill:#fff8e1,stroke:#b26a00,color:#111111
+    class Start,Login,Creds,Dashboard,Error step
+    class Auth,Validate decision
 ```
 
 ### ERD (Database Schema)
@@ -135,25 +122,35 @@ erDiagram
 
 ## Detailed References
 
-For in-depth guidance on specific diagram types, see:
+**MANDATORY** before the first node: read [references/authoring-rules.md](references/authoring-rules.md).
 
-- **[references/class-diagrams.md](references/class-diagrams.md)** - Domain modeling, relationships (association, composition, aggregation, inheritance), multiplicity, methods/properties
-- **[references/sequence-diagrams.md](references/sequence-diagrams.md)** - Actors, participants, messages (sync/async), activations, loops, alt/opt/par blocks, notes
-- **[references/flowcharts.md](references/flowcharts.md)** - Node shapes, connections, decision logic, subgraphs, styling
-- **[references/erd-diagrams.md](references/erd-diagrams.md)** - Entities, relationships, cardinality, keys, attributes
-- **[references/c4-diagrams.md](references/c4-diagrams.md)** - System context, container, component diagrams, boundaries
-- **[references/architecture-diagrams.md](references/architecture-diagrams.md)** - Cloud services, infrastructure, CI/CD deployments
-- **[references/advanced-features.md](references/advanced-features.md)** - Themes, styling, configuration, layout options
+Then load only the file for the type you chose. **Do NOT load** the others.
+
+| Type chosen | Read | Do NOT load |
+|---|---|---|
+| Class | [references/class-diagrams.md](references/class-diagrams.md) | sequence, flowchart, erd, c4, architecture, advanced-features |
+| Sequence | [references/sequence-diagrams.md](references/sequence-diagrams.md) | class, flowchart, erd, c4, architecture, advanced-features |
+| Flowchart | [references/flowcharts.md](references/flowcharts.md) | class, sequence, erd, c4, architecture, advanced-features |
+| ERD | [references/erd-diagrams.md](references/erd-diagrams.md) | class, sequence, flowchart, c4, architecture, advanced-features |
+| C4 | [references/c4-diagrams.md](references/c4-diagrams.md) | class, sequence, flowchart, erd, architecture, advanced-features |
+| Cloud services or CI/CD boxes, and the user did not ask for C4 | [references/architecture-diagrams.md](references/architecture-diagrams.md) | the other type files. Warn that `aws:` and `logos:` icons render as `?` on GitHub and in the VS Code preview. Built-in icons are `cloud`, `database`, `disk`, `internet`, `server`. |
+| Theming or export failed | [references/advanced-features.md](references/advanced-features.md) | the type files you already used |
+
+Do not use architecture-diagrams as the default for "the architecture". That question is C4. Use the architecture file only for cloud or CI/CD boxes.
 
 ## Best Practices
 
-1. **Start Simple** - Begin with core entities/components, add details incrementally
-2. **Use Meaningful Names** - Clear labels make diagrams self-documenting
-3. **Comment Extensively** - Use `%%` comments to explain complex relationships
-4. **Keep Focused** - One diagram per concept; split large diagrams into multiple focused views
-5. **Version Control** - Store `.mmd` files alongside code for easy updates
-6. **Add Context** - Include titles and notes to explain diagram purpose
-7. **Iterate** - Refine diagrams as understanding evolves
+1. **Classify first** - Name the question, then the type. Do not open with `flowchart`.
+2. **Fit the column** - Docs render in ~900px and scale to fit. Prefer top-down. Do not widen a diagram or switch to `LR` to "fix" crowding.
+3. **Connect groups at the boundary** - Subgraph to subgraph. An inner-to-inner edge silently drops that subgraph's `direction`.
+4. **Shapes are roles** - Diamond for a branch, cylinder for a store, stadium for start/end, rectangle for a step.
+5. **Color by role** - Copy a palette from `authoring-rules.md`. Same role, same `classDef`. No more than six fills.
+6. **One idea** - Split architecture, sequence, and schema into separate diagrams.
+7. **Use Meaningful Names** - Clear labels make diagrams self-documenting
+8. **Comment with `%%`** - Explain a non-obvious relationship in the diagram, not in a separate note the renderer drops
+9. **Add context** - A title or a note states what question this diagram answers
+10. **Keep the source** - Store the `.mmd` next to the code when the diagram is maintained with it
+11. **Validate before you ship** - Render in [Mermaid Live](https://mermaid.live) or `mmdc`. A clean-looking fence can still be a syntax bomb on GitHub
 
 ## Configuration and Theming
 
@@ -164,9 +161,12 @@ Configure diagrams using frontmatter:
 config:
   theme: base
   themeVariables:
-    primaryColor: "#ff6b6b"
+    primaryColor: "#e3f2fd"
+    primaryBorderColor: "#1565c0"
+    primaryTextColor: "#111111"
+    textColor: "#111111"
 ---
-flowchart LR
+flowchart TD
     A --> B
 ```
 
@@ -194,10 +194,12 @@ flowchart LR
 
 ## Common Pitfalls
 
-- **Breaking characters** - Avoid `{}` in comments, use proper escape sequences for special characters
-- **Syntax errors** - Misspellings break diagrams; validate syntax in Mermaid Live
-- **Overcomplexity** - Split complex diagrams into multiple focused views
-- **Missing relationships** - Document all important connections between entities
+- **Defaulting to a flowchart** - Classify first. Sequence, C4, class, and ERD are the usual correct types.
+- **Unquoted special characters** - `( ) [ ] { } < > " | ; #` in a label must be inside quotes: `A["Deploy (prod)"]`
+- **Reserved `end`** - Lowercase `end` is reserved. Write `End` or quote it.
+- **Inner-to-inner subgraph edges** - They drop `direction` with no error. Connect subgraph to subgraph.
+- **Wide `LR` in docs** - The column scales the SVG down and the text becomes illegible. Prefer `TD`.
+- **Garish or per-node color** - Copy a palette. Color by role. Red and green are not enough on their own.
 
 ## When to Create Diagrams
 

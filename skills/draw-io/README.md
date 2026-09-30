@@ -11,7 +11,7 @@ This skill enables AI-assisted creation and maintenance of draw.io architecture 
 Use this skill when you need to:
 
 - Create or edit `.drawio` XML diagram files
-- Convert diagrams to PNG format with transparent backgrounds
+- Convert diagrams to PNG. Transparent only if the user asks; otherwise keep the page background they chose.
 - Adjust element positions and layouts programmatically
 - Ensure consistent font families (especially for Quarto slides)
 - Work with AWS architecture diagrams using official icons
@@ -92,9 +92,9 @@ Enforces professional standards:
 
 Automated validation ensures:
 
-- No background color (transparent)
+- Page background matches the user's choice (transparent, light, dark, or other)
 - Appropriate font sizes (1.5x standard for readability)
-- Arrows on back layer (no overlaps)
+- Curved orthogonal arrows unless the span is empty and aligned
 - 30px+ margins from container boundaries
 - Official AWS service names and latest icons
 - Visual verification of PNG output
@@ -107,18 +107,17 @@ Automated validation ensures:
 <!-- Set font family -->
 <mxGraphModel defaultFontFamily="Noto Sans JP" ...>
 
-  <!-- Background frame with proper margins -->
-  <mxCell id="vpc" style="rounded=1;strokeWidth=3;...">
-    <mxGeometry x="500" y="20" width="560" height="430" />
+  <!-- Container is the parent. Child coordinates are relative to it. -->
+  <mxCell id="vpc" value="VPC" style="rounded=1;strokeWidth=3;fillColor=#E6F2F8;fontColor=#111111;strokeColor=#1565c0;" vertex="1" parent="1">
+    <mxGeometry x="40" y="40" width="560" height="430" as="geometry"/>
   </mxCell>
 
-  <!-- Title with 30px margin from frame top -->
-  <mxCell id="title" value="VPC" style="text;fontSize=18;fontFamily=Noto Sans JP;">
-    <mxGeometry x="510" y="50" width="540" height="35" />
+  <mxCell id="title" value="VPC" style="text;fontSize=18;fontFamily=Noto Sans JP;fontColor=#111111;" vertex="1" parent="vpc">
+    <mxGeometry x="30" y="30" width="500" height="35" as="geometry"/>
   </mxCell>
 
   <!-- Arrow with explicit coordinates -->
-  <mxCell id="arrow1" style="edgeStyle=..." edge="1">
+  <mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" edge="1" parent="1">
     <mxGeometry relative="1" as="geometry">
       <mxPoint x="100" y="200" as="sourcePoint"/>
       <mxPoint x="500" y="200" as="targetPoint"/>
@@ -179,34 +178,39 @@ Japanese text requires 30-40px per character:
 
 ### Arrow Layering
 
-Always place arrows immediately after title in XML:
+Do not force arrows to the back layer. This XML is the pattern that hides the label under the box:
 
 ```xml
 <mxCell id="title" value="..." .../>
-<mxCell id="arrow1" style="edgeStyle=..." .../> <!-- Back layer -->
-<mxCell id="box1" .../> <!-- Front layer -->
+<mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;curved=1;..." .../> <!-- Don't: back layer -->
+<mxCell id="box1" .../> <!-- Front layer covers the arrow and its label -->
 ```
 
 ### Container Margins
 
-Ensure sufficient spacing inside grouping boxes:
+Measure the 30px margin inside the parent, not on the page:
 
 ```text
-Frame: y=20, height=400 → range 20-420
-Element top: y ≥ 50 (30px margin)
-Element bottom: y ≤ 390 (30px margin)
+Container origin y=0, height=400
+Element top: y ≥ 30
+Element bottom: y ≤ 370
 ```
 
-### Transparent Backgrounds
+The old page math (frame y=20, element y≥50) is the sibling pattern. It insets correctly and still does not group.
 
-Remove background color for theme adaptability:
+### Page Background
+
+Do not force a transparent page. Ask: transparent, light, dark, or another color. `#ffffff` and `#1e1e1e` are suggestions. Contrast is harmony of text, component, container, arrow, and page — not a fixed ink color.
+
+Transparent is still a valid choice when the user asks for it:
 
 ```xml
-<!-- Remove this -->
-<mxGraphModel background="#ffffff" ...>
-
-<!-- Use this -->
+<!-- One option, not the only option -->
 <mxGraphModel page="0" ...>
+
+<!-- Also valid when the user wants a light or dark plate -->
+<mxGraphModel background="#ffffff" ...>
+<mxGraphModel background="#1e1e1e" ...>
 ```
 
 ## File Structure
@@ -242,11 +246,12 @@ This ensures correct image sizing on mobile devices.
 
 Before finalizing any diagram:
 
-- [ ] No background color set (`page="0"`)
+- [ ] Page background matches the user's choice
 - [ ] Font size appropriate (18px+ for readability)
-- [ ] Arrows placed at back layer
+- [ ] Arrows are curved orthogonal unless A and B share an axis and the span is empty
 - [ ] Arrows not overlapping labels (verified in PNG)
 - [ ] Arrow endpoints 20px+ from labels
+- [ ] Internal elements not overflowing the container
 - [ ] Arrows not penetrating boxes/icons
 - [ ] Internal elements have 30px+ margins from frames
 - [ ] AWS service names are official/correct

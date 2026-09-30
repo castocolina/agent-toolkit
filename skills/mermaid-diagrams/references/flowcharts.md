@@ -1,6 +1,6 @@
 # Flowcharts
 
-Flowcharts visualize processes, algorithms, decision trees, and user journeys. They show step-by-step progression through a system or workflow.
+Flowcharts visualize a process someone walks, with decisions. They are not the default diagram. If the question is a call chain, schema, domain model, lifecycle, or architecture, use sequence, ERD, class, state, or C4 instead. Rules for proportion, connections, shapes, and color: [authoring-rules.md](authoring-rules.md).
 
 ## Basic Syntax
 
@@ -138,22 +138,25 @@ flowchart LR
 
 ## Subgraphs
 
-Group related nodes:
+A flowchart is only the right type when someone walks a process with decisions. If the picture is a call chain, a schema, a domain model, or an architecture, stop and use sequence, ERD, class, or C4 instead. See [authoring-rules.md](authoring-rules.md).
+
+Group related nodes once there are about ten or more. Connect groups at the boundary. Do not link a node inside one subgraph to a node inside another: Mermaid then ignores that subgraph's `direction` and inherits the parent's, with no error.
 
 ```mermaid
-flowchart TB
-    A[Start]
-    
-    subgraph Processing
-        B[Step 1]
-        C[Step 2]
-        D[Step 3]
+flowchart TD
+    subgraph SG_INGEST
+        direction TB
+        NODE_INGEST_fetch[Fetch]
+        NODE_INGEST_parse[Parse]
+        NODE_INGEST_fetch --> NODE_INGEST_parse
     end
-    
-    E[End]
-    
-    A --> B
-    D --> E
+
+    subgraph SG_STORE
+        direction TB
+        NODE_STORE_write[(Write)]
+    end
+
+    SG_INGEST --> SG_STORE
 ```
 
 ### Nested Subgraphs
@@ -193,7 +196,7 @@ flowchart LR
     A[Normal]
     B[Styled]
     
-    style B fill:#ff6b6b,stroke:#333,stroke-width:4px,color:#fff
+    style B fill:#fff8e1,stroke:#b26a00,color:#111111
 ```
 
 ### Class-based Styling
@@ -203,14 +206,14 @@ flowchart LR
     B[Node 2]:::className
     C[Node 3]
     
-    classDef className fill:#f9f,stroke:#333,stroke-width:2px
+    classDef className fill:#ede7f6,stroke:#4527a0,color:#111111
 ```
 
 ### Link Styling
 ```mermaid
 flowchart LR
     A --> B
-    linkStyle 0 stroke:#ff3,stroke-width:4px,color:red
+    linkStyle 0 stroke:#1565c0,stroke-width:2px
 ```
 
 ## Comprehensive Example: User Registration Flow
@@ -237,10 +240,10 @@ flowchart TD
     SendEmail --> ShowSuccess[Show success message]
     ShowSuccess --> End([Redirect to login])
     
-    style Start fill:#90EE90,stroke:#333,stroke-width:2px
-    style End fill:#90EE90,stroke:#333,stroke-width:2px
-    style CreateAccount fill:#87CEEB,stroke:#333,stroke-width:2px
-    style SaveDB fill:#FFD700,stroke:#333,stroke-width:2px
+    style Start fill:#e8f5e9,stroke:#333,stroke-width:2px
+    style End fill:#e8f5e9,stroke:#333,stroke-width:2px
+    style CreateAccount fill:#e3f2fd,stroke:#333,stroke-width:2px
+    style SaveDB fill:#fff8e1,stroke:#333,stroke-width:2px
 ```
 
 ## Algorithm Example: Binary Search
@@ -267,10 +270,10 @@ flowchart TD
     CheckLess -->|No| MoveHigh[high = mid - 1]
     MoveHigh --> Check
     
-    style Start fill:#90EE90
-    style End fill:#90EE90
-    style Found fill:#FFD700
-    style NotFound fill:#FF6B6B
+    style Start fill:#e8f5e9
+    style End fill:#e8f5e9
+    style Found fill:#fff8e1
+    style NotFound fill:#fdecea,stroke:#c62828,color:#111111
 ```
 
 ## CI/CD Pipeline
@@ -354,10 +357,10 @@ flowchart TD
     ReduceStock --> SendConfirmation[Send confirmation email]
     SendConfirmation --> Success([Order complete - Show confirmation])
     
-    style Start fill:#90EE90
-    style Success fill:#90EE90
-    style Cancel fill:#FF6B6B
-    style CreateOrder fill:#FFD700
+    style Start fill:#e8f5e9
+    style Success fill:#e8f5e9
+    style Cancel fill:#fdecea,stroke:#c62828,color:#111111
+    style CreateOrder fill:#fff8e1
 ```
 
 ## Decision Matrix Example
@@ -401,15 +404,12 @@ flowchart TD
 
 ## Best Practices
 
-1. **Use meaningful labels** - Node text should be clear and action-oriented
-2. **Consistent node shapes** - Same shapes for same types of actions
-3. **Decision nodes as diamonds** - Standard convention for yes/no decisions
-4. **Flow top-to-bottom or left-to-right** - Natural reading direction
-5. **Start and end nodes** - Use stadium/pill shapes to mark entry/exit
-6. **Group related steps** - Use subgraphs for logical groupings
-7. **Color code** - Use colors to highlight different types of actions
-8. **Minimize crossing lines** - Reorganize for clarity
-9. **Keep it focused** - One process per diagram
+1. **Confirm this is a flowchart** - A walked process with decisions. Otherwise switch type.
+2. **Fit the reading column** - Prefer `TD`. Height/width at least 0.4. Do not switch to `LR` to uncrowd a diagram; the column will shrink the text.
+3. **Shapes are roles** - Rectangle = step, diamond = any node with two or more outgoing branches, cylinder = store, stadium = start/end.
+4. **Connect subgraphs at the boundary** - Never inner node to inner node. See [authoring-rules.md](authoring-rules.md).
+5. **Color by role** - Copy palette A, B, or C from `authoring-rules.md`. Six or more nodes need a `classDef`. No more than six fills.
+6. **One process** - Split a diagram taller than about three pages.
 
 ## Common Patterns
 
