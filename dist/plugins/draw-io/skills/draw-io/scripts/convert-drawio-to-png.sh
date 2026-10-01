@@ -26,19 +26,11 @@ for drawio in "$@"; do
   esac
   if [ -n "${bg:-}" ]; then
     tmp="$(mktemp "${TMPDIR:-/tmp}/drawio.XXXXXX")"
-    cp "$drawio" "$tmp"
-    python3 - "$tmp" "$bg" << 'PY'
-import sys
-from pathlib import Path
-path, bg = sys.argv[1], sys.argv[2]
-text = Path(path).read_text()
-if "background=" in text:
-    import re
-    text = re.sub(r'background="[^"]*"', f'background="{bg}"', text, count=1)
-else:
-    text = text.replace("<mxGraphModel", f'<mxGraphModel background="{bg}"', 1)
-Path(path).write_text(text)
-PY
+    if grep -q 'background="' "$drawio"; then
+      sed "s|background=\"[^\"]*\"|background=\"${bg}\"|" "$drawio" > "$tmp"
+    else
+      sed "s|<mxGraphModel|<mxGraphModel background=\"${bg}\"|" "$drawio" > "$tmp"
+    fi
     src="$tmp"
   fi
   if ! drawio -x -f png -s 2 "${extra[@]}" -o "$png" "$src" 2>/dev/null; then
