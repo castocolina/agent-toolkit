@@ -1,6 +1,8 @@
-# Softaworks Agent Skills
+# Agent Toolkit
 
 Opinionated skills shared by [@leonardocouy](https://github.com/leonardocouy) for improving daily work efficiency with Claude Code. Skills are packaged instructions and scripts that extend agent capabilities across development, documentation, planning, and professional workflows.
+
+Fork of [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
 
 Skills follow the [Agent Skills](https://agentskills.io/) format.
 
@@ -14,51 +16,41 @@ Skills follow the [Agent Skills](https://agentskills.io/) format.
 
 ## 🚀 Installation
 
-### Quick Install (Recommended)
+### Claude Code (skills, agents, commands)
 
 ```bash
-npx skills add softaworks/agent-toolkit
-```
+claude plugin marketplace add castocolina/agent-toolkit
 
-This method works with multiple AI coding agents (Claude Code, Codex, Cursor, AdaL, etc.)
-
-### Register as Plugin Marketplace
-
-Run the following commands in Claude Code:
-
-```bash
-/plugin marketplace add softaworks/agent-toolkit
-/plugin
-```
-
-### Install Plugins
-
-**Option 1: Via Browse UI**
-
-1. Switch to **Marketplaces** tab (use arrow keys or Tab)
-2. Select **agent-toolkit**, press Enter
-3. Browse and select the plugin(s) you want to install
-4. Select **Install now**
-
-**Option 2: Direct Install**
-
-```bash
 # Install specific skill
-/plugin install codex@agent-toolkit
-/plugin install humanizer@agent-toolkit
+claude plugin install humanizer@agent-toolkit
+claude plugin install codex@agent-toolkit
 
 # Install specific agent
-/plugin install agent-codebase-pattern-finder@agent-toolkit
+claude plugin install agent-codebase-pattern-finder@agent-toolkit
 
 # Install specific command
-/plugin install command-codex-plan@agent-toolkit
+claude plugin install command-codex-plan@agent-toolkit
 ```
 
-**Option 3: Ask the Agent**
+Interactive alternative: run `/plugin` inside Claude Code.
 
-Simply tell Claude Code:
+### Switching from the upstream marketplace
 
-> Please install Skills from github.com/softaworks/agent-toolkit
+Both marketplaces are named `agent-toolkit`, so remove the old one first: `claude plugin marketplace remove agent-toolkit`, then run the add command above. Plugins you installed from the old marketplace are uninstalled by the remove; reinstall the ones you want with `claude plugin install <plugin>@agent-toolkit`.
+
+### Codex, Cursor, GitHub Copilot CLI, opencode, pi (skills only)
+
+| Harness | Project scope | User scope |
+|---------|---------------|------------|
+| Codex | `npx -y skills add castocolina/agent-toolkit --skill <skill-name> -a codex -y` | `npx -y skills add castocolina/agent-toolkit --skill <skill-name> -a codex -g -y` |
+| Cursor | `npx -y skills add castocolina/agent-toolkit --skill <skill-name> -a cursor -y` | `npx -y skills add castocolina/agent-toolkit --skill <skill-name> -a cursor -g -y` |
+| GitHub Copilot CLI | `npx -y skills add castocolina/agent-toolkit --skill <skill-name> -a github-copilot -y` | `npx -y skills add castocolina/agent-toolkit --skill <skill-name> -a github-copilot -g -y` |
+| opencode | `npx -y skills add castocolina/agent-toolkit --skill <skill-name> -a opencode -y` | `npx -y skills add castocolina/agent-toolkit --skill <skill-name> -a opencode -g -y` |
+| pi | `npx -y skills add castocolina/agent-toolkit --skill <skill-name> -a pi -y` | `npx -y skills add castocolina/agent-toolkit --skill <skill-name> -a pi -g -y` |
+
+Install every skill at once: `npx -y skills add castocolina/agent-toolkit --skill '*' -a codex -y`
+
+Agents and commands are Claude Code-only.
 
 ### Available Plugins
 
@@ -70,21 +62,33 @@ Each skill, agent, and command is an individual plugin that can be installed sep
 
 ### Update Plugins
 
-To update plugins to the latest version:
-
-1. Run `/plugin` in Claude Code
-2. Switch to **Marketplaces** tab
-3. Select **agent-toolkit**
-4. Choose **Update marketplace**
+```bash
+claude plugin marketplace update agent-toolkit
+```
 
 You can also **Enable auto-update** to get the latest versions automatically.
 
-### Manual Installation
+### Manual install (skills only)
 
-**For Claude Code (Manual)** — Skills only
+**Claude Code** — from a clone of the repo:
+
 ```bash
-cp -r skills/<skill-name> ~/.claude/skills/
+mkdir -p ~/.claude/skills && cp -r skills/<skill-name> ~/.claude/skills/
 ```
+
+**Other harnesses** — replace `<dir>` with the harness directory from the table:
+
+```bash
+T=$(mktemp -d) && git clone --depth 1 https://github.com/castocolina/agent-toolkit.git "$T" && mkdir -p ~/<dir> && cp -r "$T"/skills/. ~/<dir>/ && rm -rf "$T"
+```
+
+| Harness | `<dir>` |
+|---------|---------|
+| Codex | ~/.agents/skills |
+| Cursor | ~/.agents/skills |
+| GitHub Copilot CLI | ~/.agents/skills |
+| opencode | ~/.agents/skills |
+| pi | ~/.agents/skills |
 
 **For claude.ai** — Skills only
 
@@ -148,8 +152,8 @@ Add skills to project knowledge or paste SKILL.md contents into the conversation
 >
 > For full access, add the marketplace and install plugins:
 > ```bash
-> /plugin marketplace add softaworks/agent-toolkit
-> /plugin install codex@agent-toolkit
+> claude plugin marketplace add castocolina/agent-toolkit
+> claude plugin install codex@agent-toolkit
 > ```
 
 ### Agents
@@ -212,4 +216,4 @@ MIT
 
 - [Agent Skills Format](https://agentskills.io/)
 - [Claude Code Documentation](https://docs.anthropic.com/claude/docs)
-- [GitHub Repository](https://github.com/softaworks/agent-toolkit)
+- [GitHub Repository](https://github.com/castocolina/agent-toolkit)
