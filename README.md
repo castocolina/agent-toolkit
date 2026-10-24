@@ -84,11 +84,13 @@ T=$(mktemp -d) && git clone --depth 1 https://github.com/castocolina/agent-toolk
 
 | Harness | `<dir>` |
 |---------|---------|
-| Codex | ~/.agents/skills |
-| Cursor | ~/.agents/skills |
-| GitHub Copilot CLI | ~/.agents/skills |
-| opencode | ~/.agents/skills |
-| pi | ~/.agents/skills |
+| Codex | `.agents/skills` |
+| Cursor | `.agents/skills` |
+| GitHub Copilot CLI | `.agents/skills` |
+| opencode | `.agents/skills` |
+| pi | `.agents/skills` |
+
+Today the `skills` CLI installs every harness above into the shared `.agents/skills` directory (verified 2026-10-24).
 
 **For claude.ai** — Skills only
 
