@@ -36,7 +36,11 @@ Interactive alternative: run `/plugin` inside Claude Code.
 
 ### Switching from the upstream marketplace
 
-Both marketplaces are named `agent-toolkit`, so remove the old one first: `claude plugin marketplace remove agent-toolkit`, then run the add command above. Plugins you installed from the old marketplace are uninstalled by the remove; reinstall the ones you want with `claude plugin install <plugin>@agent-toolkit`.
+Both marketplaces are named `agent-toolkit`, so remove the old one first.
+
+> **Warning:** removing a marketplace uninstalls the plugins you installed from it and deletes their saved options, secrets and data where it can. Note any plugin settings you need before you run it.
+
+`claude plugin marketplace remove agent-toolkit`, then run the add command above. Plugins you installed from the old marketplace are uninstalled by the remove; reinstall the ones you want with `claude plugin install <plugin>@agent-toolkit`.
 
 ### Codex, Cursor, GitHub Copilot CLI, opencode, pi (skills only)
 
@@ -66,7 +70,7 @@ Each skill, agent, and command is an individual plugin that can be installed sep
 claude plugin marketplace update agent-toolkit
 ```
 
-You can also **Enable auto-update** to get the latest versions automatically.
+You can also **Enable auto-update** to get the latest versions automatically (in `/plugin` → Marketplaces → agent-toolkit).
 
 ### Manual install (skills only)
 
@@ -76,7 +80,7 @@ You can also **Enable auto-update** to get the latest versions automatically.
 mkdir -p ~/.claude/skills && cp -r skills/<skill-name> ~/.claude/skills/
 ```
 
-**Other harnesses** — replace `<dir>` with the harness directory from the table:
+**Other harnesses** — replace `<dir>` with the harness directory from the table. The command installs every skill and replaces any same-named skill already in that directory; to install one skill, use `cp -r "$T"/skills/<skill-name> ~/<dir>/` instead of the `cp -r "$T"/skills/. ~/<dir>/` step.
 
 ```bash
 T=$(mktemp -d) && git clone --depth 1 https://github.com/castocolina/agent-toolkit.git "$T" && mkdir -p ~/<dir> && cp -r "$T"/skills/. ~/<dir>/ && rm -rf "$T"
