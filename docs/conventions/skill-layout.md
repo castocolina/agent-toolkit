@@ -11,6 +11,10 @@ Where skill files, evals and tests live, what ships in `dist/`, and how to run e
 
 Nothing else test-related goes in a skill. Script tests and their fixtures live under `tests/`.
 
+## Command evals
+
+Command output evals live in `commands/evals/<command>.json` and use the evals.json shape with `skill_name`, `subject`, optional `context`, and `evals` headers. Their fixture files live in `commands/evals/files/`. Run one with `audit.py run-evals --eval-file commands/evals/<command>.json --runner CMD`; command evals do not support trigger queries.
+
 ## What lives in `tests/`
 
 - `tests/skills/<name>/`: runnable script tests (`test-*.sh` or `test_*.py`) and their fixtures, for example `fixtures/`. Fixtures that need a mutable copy are copied into a `mktemp -d` directory at run time.
@@ -66,7 +70,7 @@ Output evals and trigger queries (see `python3 scripts/audit/audit.py run-evals 
 python3 scripts/audit/audit.py run-evals --skills <a,b> --runner "$(python3 scripts/audit/audit.py pi-cmd runner)" [--triggers] [--runs N] [--timeout S] [--out DIR] [--fail-under 0.8]
 ```
 
-`run-evals` looks for an eval's `files` under `skills/<name>/`, then under `skills/<name>/evals/files/`.
+`run-evals --skills` looks for an eval's `files` under `skills/<name>/`, then under `skills/<name>/evals/files/`. `run-evals --eval-file` resolves fixture files only under `commands/evals/files/` and inlines its declared subject and context documents.
 
 Build check:
 

@@ -919,6 +919,117 @@ class EvalBase(Base):
         files = sorted(d.glob(f"*.{ext}"), key=lambda f: int(f.stem)) if d.is_dir() else []
         return [f.read_text() for f in files]
 
+    def cli(self, argv):
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
+            try:
+                code = audit.main(["--root", str(self.root), *argv])
+            except SystemExit as exc:
+                code = exc.code
+        return code, err.getvalue()
+
+    def command_eval(self, data=None, name="explain-pr-changes"):
+        return self.write(f"commands/evals/{name}.json", json.dumps(data or {
+            "skill_name": name, "subject": "commands/explain-pr-changes.md",
+            "context": ["skills/pr-diagrams/SKILL.md"],
+            "evals": [{"id": "e1", "prompt": "TASK", "assertions": ["A"], "files": ["input.txt"]}],
+        }))
+
+    def eval_file_cli(self, path=None, *extra):
+        return self.cli(["run-evals", "--eval-file", str(path or self.command_eval()), "--runner",
+                         shlex.quote(str(STUB)), "--out", str(self.out), *extra])
+
+
+class EvalFileTests(EvalBase):
+    def test_run_evals_eval_file_inlines_subject_context_and_files(self):
+        self.mk()
+        self.write("commands/explain-pr-changes.md", "SUBJECT-TEXT")
+        self.write("skills/pr-diagrams/SKILL.md", "CONTEXT-TEXT")
+        self.write("commands/evals/files/input.txt", "FILE-TEXT")
+        self.answer("output", "explain-pr-changes/e1", "output")
+        self.answer("grade", "explain-pr-changes/e1", grade(["A"]))
+        code, err = self.eval_file_cli()
+        self.assertEqual((code, err), (0, ""))
+        prompt = self.calls()[0]
+        for text in ("SUBJECT-TEXT", "CONTEXT-TEXT", "FILE-TEXT"):
+            self.assertIn(text, prompt)
+
+    def test_run_evals_eval_file_grades_and_writes_summary(self):
+        self.mk()
+        self.write("commands/explain-pr-changes.md", "SUBJECT")
+        self.write("skills/pr-diagrams/SKILL.md", "CONTEXT")
+        self.write("commands/evals/files/input.txt", "INPUT")
+        self.answer("output", "explain-pr-changes/e1", "output")
+        self.answer("grade", "explain-pr-changes/e1", grade(["A"]))
+        self.assertEqual(self.eval_file_cli()[0], 0)
+        summary = self.out / "explain-pr-changes/summary-output.json"
+        self.assertEqual(json.loads(summary.read_text())["skill"], "explain-pr-changes")
+        self.assertEqual(self.eval_file_cli(None, "--fail-under", "1.1")[0], 1)
+        summary.write_text("stale")
+        data = {"skill_name": "explain-pr-changes", "subject": "missing.md",
+                "evals": [{"id": "e1", "prompt": "P", "assertions": ["A"]}]}
+        code, err = self.eval_file_cli(self.command_eval(data))
+        self.assertEqual(code, 2)
+        self.assertIn("does not exist", err)
+        self.assertFalse(summary.exists())
+
+    def test_run_evals_eval_file_rejects_triggers(self):
+        self.command_eval()
+        code, err = self.eval_file_cli(None, "--triggers")
+        self.assertEqual(code, 2)
+        self.assertIn("trigger queries are not supported for command eval files", err)
+
+    def test_run_evals_eval_file_rejects_escape(self):
+        cases = [
+            ("files", {"files": ["../escape"]}, "outside the root"),
+            ("subject", {"subject": "../escape.md"}, "outside the root"),
+            ("context", {"context": ["../escape.md"]}, "outside the root"),
+            ("missing subject", {"subject": "missing.md"}, "does not exist"),
+            ("missing context", {"context": ["missing.md"]}, "does not exist"),
+            ("name", {"skill_name": "wrong"}, "skill_name must equal the file stem"),
+        ]
+        for label, override, message in cases:
+            with self.subTest(label=label):
+                data = {"skill_name": "explain-pr-changes", "subject": "commands/explain-pr-changes.md",
+                        "context": [], "evals": [{"id": "e1", "prompt": "P", "assertions": ["A"], "files": []}]}
+                data.update(override)
+                if "files" in override:
+                    data["evals"][0]["files"] = override["files"]
+                path = self.command_eval(data)
+                (self.root / "commands/explain-pr-changes.md").write_text("SUBJECT")
+                self.assertEqual(self.eval_file_cli(path)[0], 2)
+                self.assertIn(message, self.eval_file_cli(path)[1])
+        outside = self.write("elsewhere.json", "{}")
+        code, err = self.eval_file_cli(outside)
+        self.assertEqual(code, 2)
+        self.assertIn("eval file must be under commands/evals/", err)
+
+    def test_run_evals_eval_file_rejects_stem_escape(self):
+        out = Path(self._tmp.name) / "out"
+        out.mkdir()
+        sentinel = out.parent / "summary-output.json"
+        sentinel.write_text("safe")
+        bad = Path(str(self.root / "commands/evals") + "/...")
+        code, err = self.cli(["run-evals", "--eval-file", str(bad), "--runner", "true", "--out", str(out)])
+        self.assertEqual(code, 2)
+        self.assertIn("outside --out", err)
+        self.assertTrue(sentinel.is_file())
+
+    def test_run_evals_skills_and_eval_file_are_exclusive(self):
+        for args, expected in ((["--skills", "x", "--eval-file", "x.json"], "not allowed with argument"),
+                               ([], "one of the arguments --skills --eval-file is required")):
+            code, err = self.cli(["run-evals", *args, "--runner", "true"])
+            self.assertEqual(code, 2)
+            self.assertIn(expected, err)
+
+    def test_build_output_prompt_skills_unchanged(self):
+        self.mk()
+        ev = {"id": "e1", "prompt": "do the thing", "assertions": ["A one", "A two"]}
+        expected = ("MODE: output\nKEY: s/e1\n\n" + audit.SANDBOX_PREAMBLE + "\n\n"
+                    + "=== SKILL.md of s ===\n---\nname: s\ndescription: Does s things\n---\nBODY-OF-s\n\n"
+                    + "=== TASK ===\ndo the thing\n")
+        self.assertEqual(audit.build_output_prompt(self.root, "s", ev, ""), expected)
+
 
 class RunEvalsTests(EvalBase):
     def test_run_evals_grades_assertions(self):

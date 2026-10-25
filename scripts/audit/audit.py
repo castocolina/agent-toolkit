@@ -620,12 +620,10 @@ def nonempty_str(v) -> bool:
     return isinstance(v, str) and bool(v.strip())
 
 
-def load_evals(root: Path, name: str) -> list[dict]:
-    path = root / "skills" / name / "evals" / "evals.json"
-    data = read_json(path)
+def validate_evals(path: Path, data, expected_name: str) -> list[dict]:
     evals = data.get("evals") if isinstance(data, dict) else None
-    if not isinstance(data, dict) or data.get("skill_name") != name:
-        raise HarnessError(f"{path}: skill_name must equal {name!r}")
+    if not isinstance(data, dict) or data.get("skill_name") != expected_name:
+        raise HarnessError(f"{path}: skill_name must equal the file stem ({expected_name!r})")
     if not isinstance(evals, list) or not evals:
         raise HarnessError(f"{path}: evals must be a non-empty list")
     seen: set[str] = set()
@@ -651,6 +649,25 @@ def load_evals(root: Path, name: str) -> list[dict]:
     return evals
 
 
+def load_evals(root: Path, name: str) -> list[dict]:
+    path = root / "skills" / name / "evals" / "evals.json"
+    return validate_evals(path, read_json(path), name)
+
+
+def load_eval_file(root: Path, eval_file: Path) -> tuple[dict, list[dict]]:
+    root = root.resolve()
+    path = (root / eval_file).resolve() if not eval_file.is_absolute() else eval_file.resolve()
+    try:
+        in_commands = path.is_relative_to((root / "commands" / "evals").resolve())
+    except OSError:
+        in_commands = False
+    if not in_commands:
+        raise HarnessError("eval file must be under commands/evals/")
+    data = read_json(path)
+    name = path.name.rsplit(".", 1)[0]
+    return data, validate_evals(path, data, name)
+
+
 def load_trigger_queries(root: Path, name: str) -> list[dict]:
     path = root / "skills" / name / "evals" / "trigger-queries.json"
     data = read_json(path)
@@ -662,25 +679,27 @@ def load_trigger_queries(root: Path, name: str) -> list[dict]:
     return data
 
 
-def file_blocks(root: Path, name: str, files: list[str]) -> str:
-    """One '=== FILE p ===' block per entry, read on the host after a canonical containment check."""
-    sdir = (root / "skills" / name).resolve()
+def file_blocks(root: Path, name: str, files: list[str], base_dir: Path | None = None) -> str:
+    """Read eval fixtures after a canonical containment check."""
+    root = root.resolve()
+    sdir = (base_dir or (root / "skills" / name)).resolve()
     out = []
     for f in files:
         if os.path.isabs(f) or ".." in Path(f).parts:
-            raise HarnessError(f"eval file {f!r}: absolute paths and '..' are not allowed")
-        for base in (sdir, sdir / "evals" / "files"):
-            cand = (base / f).resolve()
-            if not cand.is_relative_to(sdir):
-                raise HarnessError(f"eval file {f!r} resolves outside skills/{name}")
+            raise HarnessError(f"eval file {f!r} resolves outside the root")
+        candidates = [sdir / f] if base_dir is not None else [sdir / f, sdir / "evals" / "files" / f]
+        for candidate in candidates:
+            cand = candidate.resolve()
+            if not cand.is_relative_to(root) or not cand.is_relative_to(sdir):
+                raise HarnessError(f"eval file {f!r} resolves outside the root")
             if cand.is_file():
-                try:
-                    out.append(f"=== FILE {f} ===\n{cand.read_text(encoding='utf-8')}\n")
-                except (OSError, ValueError) as e:
-                    raise HarnessError(f"eval file {f!r}: {e}") from e
                 break
         else:
-            raise HarnessError(f"eval file {f!r} not found under skills/{name}/ or evals/files/")
+            raise HarnessError(f"eval file {f!r} not found under {sdir}")
+        try:
+            out.append(f"=== FILE {f} ===\n{cand.read_text(encoding='utf-8')}\n")
+        except (OSError, ValueError) as e:
+            raise HarnessError(f"eval file {f!r}: {e}") from e
     return "".join(out)
 
 
@@ -688,12 +707,16 @@ def header(mode: str, key: str) -> str:
     return f"MODE: {mode}\nKEY: {key}\n\n{SANDBOX_PREAMBLE}\n\n"
 
 
-def build_output_prompt(root: Path, name: str, ev: dict, blocks: str) -> str:
-    skill_md = (root / "skills" / name / "SKILL.md").read_text(encoding="utf-8")
-    return (
-        header("output", f"{name}/{ev['id']}")
-        + f"=== SKILL.md of {name} ===\n{skill_md}\n{blocks}=== TASK ===\n{ev['prompt']}\n"
-    )
+def build_output_prompt(root: Path, name: str, ev: dict, blocks: str,
+                        subject_label: str | None = None, extra_documents: list[tuple[str, str]] | None = None,
+                        subject_text: str | None = None) -> str:
+    content = subject_text if subject_text is not None else (root / "skills" / name / "SKILL.md").read_text(encoding="utf-8")
+    if subject_label is None:
+        subject = f"=== SKILL.md of {name} ===\n{content}\n"
+    else:
+        subject = f"=== SUBJECT {subject_label} ===\n{content}\n"
+    contexts = "".join(f"=== CONTEXT {label} ===\n{text}\n" for label, text in (extra_documents or []))
+    return header("output", f"{name}/{ev['id']}") + subject + contexts + f"{blocks}=== TASK ===\n{ev['prompt']}\n"
 
 
 def build_grade_prompt(name: str, ev: dict, blocks: str, output: str) -> str:
@@ -766,13 +789,7 @@ def summarise(skill: str, mode: str, passed: int, total: int, failures: list) ->
             "passed": passed, "total": total, "failures": failures}
 
 
-def eval_output_mode(root, name, runner, timeout, out) -> dict:
-    evals = load_evals(root, name)
-    prompts = []  # everything that can fail on the host is built before the first model call
-    for ev in evals:
-        ev["id"] = str(ev["id"])
-        blocks = file_blocks(root, name, ev.get("files", []))
-        prompts.append((ev, blocks, build_output_prompt(root, name, ev, blocks)))
+def run_output_evals(name, evals, prompts, runner, timeout, out) -> dict:
     per_eval = out / name / "output"
     passed = total = 0
     failures = []
@@ -792,6 +809,58 @@ def eval_output_mode(root, name, runner, timeout, out) -> dict:
             else:
                 failures.append({"eval": ev["id"], "assertion": r["assertion"], "evidence": r["evidence"]})
     return summarise(name, "output", passed, total, failures)
+
+
+def eval_output_mode(root, name, runner, timeout, out) -> dict:
+    evals = load_evals(root, name)
+    prompts = []  # everything that can fail on the host is built before the first model call
+    for ev in evals:
+        ev["id"] = str(ev["id"])
+        blocks = file_blocks(root, name, ev.get("files", []))
+        prompts.append((ev, blocks, build_output_prompt(root, name, ev, blocks)))
+    return run_output_evals(name, evals, prompts, runner, timeout, out)
+
+
+def run_eval_file(root: Path, eval_file: Path, runner: str, timeout: float, out: Path, fail_under: float) -> int:
+    root = root.resolve()
+    name = eval_file.name.rsplit(".", 1)[0]
+    out = out.resolve()
+    stale = out / name / "summary-output.json"
+    if not stale.resolve().is_relative_to(out):
+        raise HarnessError(f"refusing to remove {stale} outside --out {out}")
+    path = (root / eval_file).resolve() if not eval_file.is_absolute() else eval_file.resolve()
+    stale.unlink(missing_ok=True)
+    data, evals = load_eval_file(root, eval_file)
+    docs = []
+    for key in ("subject", "context"):
+        values = [data.get(key)] if key == "subject" else data.get(key, [])
+        if key == "subject" and not isinstance(values[0], str):
+            raise HarnessError(f"{path}: subject must be a repo-relative path")
+        if key == "context" and (not isinstance(values, list) or not all(isinstance(v, str) for v in values)):
+            raise HarnessError(f"{path}: context must be a list of repo-relative paths")
+        for value in values:
+            if os.path.isabs(value) or ".." in Path(value).parts:
+                raise HarnessError(f"{path}: {key} path {value!r} resolves outside the root")
+            document = (root / value).resolve()
+            if not document.is_relative_to(root):
+                raise HarnessError(f"{path}: {key} path {value!r} resolves outside the root")
+            if not document.is_file():
+                raise HarnessError(f"{path}: {key} document {value!r} does not exist")
+            docs.append((key, value, document.read_text(encoding="utf-8")))
+    subject = next((text for kind, _, text in docs if kind == "subject"), "")
+    contexts = [(label, text) for kind, label, text in docs if kind == "context"]
+    prompts = []
+    fixtures = path.parent / "files"
+    for ev in evals:
+        ev["id"] = str(ev["id"])
+        blocks = file_blocks(root, name, ev.get("files", []), fixtures)
+        prompt = build_output_prompt(root, name, ev, blocks, data["subject"], contexts, subject)
+        prompts.append((ev, blocks, prompt))
+    argv = resolve_runner(runner)
+    summary = run_output_evals(name, evals, prompts, argv, timeout, out)
+    write_inside(out / name, stale, json.dumps(summary, indent=2) + "\n")
+    print(json.dumps([summary], indent=2))
+    return 1 if summary["passed"] / summary["total"] < fail_under else 0
 
 
 def eval_trigger_mode(root, name, runner, timeout, runs) -> dict:
@@ -878,7 +947,9 @@ def build_parser() -> argparse.ArgumentParser:
     m.add_argument("--rubric", type=Path, default=None)
     m.add_argument("--upstream-findings", type=Path, default=None)
     e = sub.add_parser("run-evals")
-    e.add_argument("--skills", type=csv, required=True)
+    group = e.add_mutually_exclusive_group(required=True)
+    group.add_argument("--skills", type=csv)
+    group.add_argument("--eval-file", type=Path)
     e.add_argument("--runner", required=True)
     e.add_argument("--timeout", type=float, default=600)
     e.add_argument("--triggers", action="store_true")
@@ -929,8 +1000,13 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "run-evals":
         try:
+            output = args.out or root / "docs" / "audit" / "evals"
+            if args.eval_file is not None:
+                if args.triggers:
+                    raise HarnessError("trigger queries are not supported for command eval files")
+                return run_eval_file(root, args.eval_file, args.runner, args.timeout, output, args.fail_under)
             return run_evals(root, args.skills, args.runner, args.timeout, args.triggers, args.runs,
-                             args.out or root / "docs" / "audit" / "evals", args.fail_under)
+                             output, args.fail_under)
         except (HarnessError, OSError, ValueError, RecursionError) as e:  # UnicodeDecodeError is a ValueError; a crash must never read as exit 1
             print(f"harness error: {e}", file=sys.stderr)
             return 2
