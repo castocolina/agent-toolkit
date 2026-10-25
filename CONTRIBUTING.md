@@ -1,4 +1,4 @@
-# Contributing to Softaworks Agent Skills
+# Contributing to Agent Toolkit
 
 Thank you for your interest in contributing! Here's how to get started.
 
@@ -13,7 +13,7 @@ Thank you for your interest in contributing! Here's how to get started.
 
 ```bash
 # Clone the repository
-git clone https://github.com/softaworks/agent-toolkit.git
+git clone https://github.com/castocolina/agent-toolkit.git
 cd agent-toolkit
 
 # Test a skill locally
