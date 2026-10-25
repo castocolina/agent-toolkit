@@ -47,23 +47,15 @@ init_repo() {
 
 # Stub gh: logs every invocation, serves scripted JSON per endpoint, and on an
 # HTTP error writes the body to stdout and "gh: <message> (HTTP NNN)" to stderr.
+# Failure is env-only (GH_STUB_FAIL_CODE/MSG/BODY) so the shipping script never
+# grows test flags that real gh would reject.
 write_gh_stub() {
   local root=$1
   mkdir -p "$root/bin" "$root/fixtures"
   cat > "$root/bin/gh" << 'EOF'
 #!/bin/bash
 printf '%s\n' "$*" >> "$GH_LOG"
-code="" msg="" body=""
-args=("$@")
-i=0
-while [ $i -lt ${#args[@]} ]; do
-  case "${args[$i]}" in
-    --fail-code) i=$((i + 1)); code=${args[$i]} ;;
-    --fail-msg) i=$((i + 1)); msg=${args[$i]} ;;
-    --fail-body) i=$((i + 1)); body=${args[$i]} ;;
-  esac
-  i=$((i + 1))
-done
+code=${GH_STUB_FAIL_CODE:-} msg=${GH_STUB_FAIL_MSG:-} body=${GH_STUB_FAIL_BODY:-}
 if [ -n "$code" ]; then
   printf '%s\n' "$body"
   printf 'gh: %s (HTTP %s)\n' "$msg" "$code" >&2
@@ -225,14 +217,14 @@ test_related_rate_limited() {
   init_repo
   local s=$STUB; write_gh_stub "$s"
   # shellcheck disable=SC2046
-  run_in "$REPO" $(gh_env "$s") -- related main feature --fail-code 429 --fail-msg 'rate limit' --fail-body '{"message":"rate"}'
+  run_in "$REPO" $(gh_env "$s") GH_STUB_FAIL_CODE=429 GH_STUB_FAIL_MSG='rate limit' GH_STUB_FAIL_BODY='{"message":"rate"}' -- related main feature
   check exit429 "$CODE" 1
   check stderr429 "$(grep -c 'rate limited' "$REPO/err")" 1
   check names429 "$(grep -c "$SHA_A" "$REPO/err")" 1
   check stdout429 "$OUT" ""
   : > "$s/gh.log"
   # shellcheck disable=SC2046
-  run_in "$REPO" $(gh_env "$s") -- related main feature --fail-code 403 --fail-msg 'forbidden' --fail-body '{"message":"nope"}'
+  run_in "$REPO" $(gh_env "$s") GH_STUB_FAIL_CODE=403 GH_STUB_FAIL_MSG='forbidden' GH_STUB_FAIL_BODY='{"message":"nope"}' -- related main feature
   check exit403 "$CODE" 1
   check stderr403 "$(grep -c 'rate limited' "$REPO/err")" 1
   check stdout403 "$OUT" ""
@@ -242,7 +234,7 @@ test_related_other_failure_names_commit() {
   init_repo
   local s=$STUB; write_gh_stub "$s"
   # shellcheck disable=SC2046
-  run_in "$REPO" $(gh_env "$s") -- related main feature --fail-code 500 --fail-msg 'boom' --fail-body '{"message":"boom"}'
+  run_in "$REPO" $(gh_env "$s") GH_STUB_FAIL_CODE=500 GH_STUB_FAIL_MSG='boom' GH_STUB_FAIL_BODY='{"message":"boom"}' -- related main feature
   check exit "$CODE" 1
   check names "$(grep -c "$SHA_A" "$REPO/err")" 1
   check no_rate "$(grep -c 'rate limited' "$REPO/err")" 0
@@ -451,12 +443,12 @@ test_stdout_clean_on_http_errors() {
   init_repo
   local s=$STUB; write_gh_stub "$s"
   # shellcheck disable=SC2046
-  run_in "$REPO" $(gh_env "$s") -- related main feature --fail-code 429 --fail-msg 'rate limit' --fail-body '{"message":"API rate limit exceeded"}'
+  run_in "$REPO" $(gh_env "$s") GH_STUB_FAIL_CODE=429 GH_STUB_FAIL_MSG='rate limit' GH_STUB_FAIL_BODY='{"message":"API rate limit exceeded"}' -- related main feature
   check related_exit "$CODE" 1
   check related_stdout "$OUT" ""
   : > "$s/gh.log"
   # shellcheck disable=SC2046
-  run_in "$REPO" $(gh_env "$s") -- reviewers 404 --fail-code 404 --fail-msg 'not found' --fail-body '{"message":"Not Found"}'
+  run_in "$REPO" $(gh_env "$s") GH_STUB_FAIL_CODE=404 GH_STUB_FAIL_MSG='not found' GH_STUB_FAIL_BODY='{"message":"Not Found"}' -- reviewers 404
   check reviewers_exit "$CODE" 1
   check reviewers_stdout "$OUT" ""
 }

@@ -44,9 +44,6 @@ cmd_related() {
   while [ $# -gt 0 ]; do
     case "$1" in
       --exclude-pr) shift; exclude=$1 ;;
-      --fail-code) shift; FAIL_CODE=$1 ;;
-      --fail-msg) shift; FAIL_MSG=$1 ;;
-      --fail-body) shift; FAIL_BODY=$1 ;;
       *)
         if [ -z "$base" ]; then base=$1
         elif [ -z "$head" ]; then head=$1
@@ -71,9 +68,7 @@ cmd_related() {
   : > "$acc"
   for sha in $shas; do
     err=$(mktemp); TMPS+=("$err")
-    local extra=()
-    [ -n "${FAIL_CODE:-}" ] && extra+=(--fail-code "$FAIL_CODE" --fail-msg "${FAIL_MSG:-}" --fail-body "${FAIL_BODY:-}")
-    if ! out=$("$GH" api --paginate --jq '.[]' "${extra[@]}" "repos/$repo/commits/$sha/pulls" 2>"$err"); then
+    if ! out=$("$GH" api --paginate --jq '.[]' "repos/$repo/commits/$sha/pulls" 2>"$err"); then
       cat "$err" >&2
       if grep -q -E '\(HTTP (403|429)\)' "$err"; then
         die "rate limited on commit $sha"
@@ -95,9 +90,6 @@ cmd_reviewers() {
   while [ $# -gt 0 ]; do
     case "$1" in
       --exclude) shift; exclude=$1 ;;
-      --fail-code) shift; FAIL_CODE=$1 ;;
-      --fail-msg) shift; FAIL_MSG=$1 ;;
-      --fail-body) shift; FAIL_BODY=$1 ;;
       *) prs+=("$1") ;;
     esac
     shift
@@ -108,18 +100,16 @@ cmd_reviewers() {
   local acc
   acc=$(mktemp); TMPS+=("$acc")
   : > "$acc"
-  local pr out err extra
+  local pr out err
   for pr in "${prs[@]}"; do
     err=$(mktemp); TMPS+=("$err")
-    extra=()
-    [ -n "${FAIL_CODE:-}" ] && extra+=(--fail-code "$FAIL_CODE" --fail-msg "${FAIL_MSG:-}" --fail-body "${FAIL_BODY:-}")
-    if ! out=$("$GH" api --paginate --jq '.[]' "${extra[@]}" "repos/$repo/pulls/$pr/reviews" 2>"$err"); then
+    if ! out=$("$GH" api --paginate --jq '.[]' "repos/$repo/pulls/$pr/reviews" 2>"$err"); then
       cat "$err" >&2
       die "PR $pr: reviews lookup failed"
     fi
     printf '%s\n' "$out" | jq -c 'select(.user != null and .user.type == "User") | {login: .user.login, type: .user.type}' >> "$acc"
     err=$(mktemp); TMPS+=("$err")
-    if ! out=$("$GH" api --jq '.users[]' "${extra[@]}" "repos/$repo/pulls/$pr/requested_reviewers" 2>"$err"); then
+    if ! out=$("$GH" api --jq '.users[]' "repos/$repo/pulls/$pr/requested_reviewers" 2>"$err"); then
       cat "$err" >&2
       die "PR $pr: requested reviewers lookup failed"
     fi
