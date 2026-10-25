@@ -1,0 +1,86 @@
+{
+  "skill": "skill-judge",
+  "judge": "opus",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 59,
+      "evidence": "Each finding has a unique non-empty `id` ..., a `severity` of `critical`, `high`, `medium` or `low`, ... `line` as an integer of 1 or more or `null` ... All four text fields are non-empty strings.",
+      "fix": "Cut the constraints that references/verdict.schema.json and the line 50 example already carry (the severity enum, non-empty strings, line >= 1). Keep only the rules the schema cannot express: the root `file` paths are relative to, when `line` is null, and that every score below its max needs a finding."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 19,
+      "evidence": "Then classify each H2 section for D1 and weight it by line count: the D1 ratio is in lines, not sections.",
+      "fix": "Add a two-line worked example, for example 'Workflow 30 lines expert, Overview 6 lines redundant, Setup 4 lines activation -> 75% expert, 10% activation, 15% redundant -> 11-15 band', so two judges compute the same ratio."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 62,
+      "evidence": "The Gotchas cover SKILL.md.txt fixtures, exemptions, file paths and body-only triggers, but not the D7 allocation trap",
+      "fix": "Add a gotcha: 'A skill without scripts/ is scored 8/7 for D7, not 5/5/5; never deduct for a missing script test there. Judges who apply 5/5/5 lose 3-5 points the rubric does not take.'"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/skill-judge/evals/evals.json",
+      "line": null,
+      "evidence": "All 9 evals use single-file fixtures (pdf-form-filler, doc-helper, big-skill, missing-ref SKILL.md.txt); none targets a skill with scripts/, so the 5/5/5 allocation, the tests/skills/<name>/ lookup and the directory-only branch of step 3 are never exercised",
+      "fix": "Add a fixture directory with scripts/ and a matching tests/skills/<name>/ entry, plus an eval asserting the 5/5/5 split. Add a second eval for the case where only the skill directory is supplied, asserting the D7 finding states that the script test was not checked."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 36,
+      "evidence": "Rule 1 fires when \"The prompt comes from `references/judge-prompt.md`\", but step 3 (line 16) says \"Unless skill-judge itself is the target, do not read `references/judge-prompt.md`\", so the judge must recognise a template it is told not to read",
+      "fix": "Key rule 1 on something the judge can see: 'The prompt says \"Output contract rule 1 applies\" (as references/judge-prompt.md does), or the request asks for only the verdict or JSON line.'"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 16,
+      "evidence": "Step 3 puts about nine conditional rules (eval files, script tests, validator, schema, judge-prompt exclusion, fixtures, SKILL.md-only, directory-only) into one paragraph",
+      "fix": "Split step 3 into a short decision list keyed by what was supplied: a directory with scripts/, a directory without scripts/, SKILL.md only, pasted content, or an evals/files fixture. Give each case its reads and its D7 handling."
+    }
+  ]
+}

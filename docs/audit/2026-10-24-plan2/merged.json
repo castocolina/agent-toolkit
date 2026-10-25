@@ -1,0 +1,213 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "agentskills-research",
+      "percent": 94.8,
+      "grade": "A",
+      "judges": {
+        "opus": 93.6,
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": true,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/agentskills-research/SKILL.md",
+          "line": 35,
+          "evidence": "The pin `sha` is also what `uvx --from \"git+https://github.com/agentskills/agentskills@<sha>#subdirectory=skills-ref\" skills-ref validate <dir>` should use.",
+          "fix": "Delete this aside or move it to README.md: the refresh workflow never runs skills-ref validate, so the line costs context on every run and does nothing for the task."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/agentskills-research/SKILL.md",
+          "line": 29,
+          "evidence": "a new hard limit goes in the dimension's criteria paragraph and caps its bottom band; a new SHOULD goes in the middle-band criteria; a removed rule means deleting its criterion.",
+          "fix": "Add the missing cases: a changed limit (for example 1024 -> 512) edits the existing criterion and its band cap in place, and a new recommended pattern or section goes into that dimension's green flags or checklist line, not into a band."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/agentskills-research/SKILL.md",
+          "line": 46,
+          "evidence": "The fetcher needs bash 4+.",
+          "fix": "Give the symptom and the way out: 'macOS /bin/bash is 3.2, so declare -A fails with \"invalid option\" before any download; run it with a bash 4+ binary (for example Homebrew bash) or on Linux.'"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/agentskills-research/evals/evals.json",
+          "line": null,
+          "evidence": "The 7 evals cover unchanged, changed-doc, validator-only, stale-rubric, casual-unchanged, repair-only and recovery-failed; none covers branch 3.1 (rubric.md missing) or the 'If `BASE` is empty' fallback (SKILL.md line 23)",
+          "fix": "Add one eval where rubric.md is missing (assert: git checkout restores it, then step 1 runs again) and one where BASE is empty (assert: compares each rubric source section with the current references and says so)."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/agentskills-research/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "Several negatives are terse and give no context: \"write me a new skill from scratch\", \"install the agentskills CLI\", \"bump the version of a vendored dependency\"",
+          "fix": "Rewrite these as realistic near-misses with context, for example 'our vendored skills-ref copy under tools/ is two versions behind, bump it in requirements.txt', so they test the description's boundary and not just keyword absence."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/agentskills-research/SKILL.md",
+          "line": 16,
+          "evidence": "Branch 3.2: \"Report the repair, leave the rubric alone, and commit the restored references.\" It does not say whether steps 4-6 (build_plugins.py, rubric-check) still run. The rule-change path (3.3 then steps 4-6) never says to commit, yet Failures line 42 says \"stop before committing\".",
+          "fix": "End each branch with an explicit finish: 3.2 -> run build_plugins.py and rubric-check, then commit the references and dist/; 3.3 -> steps 4-6, then commit the references, rubric.md and dist/ together (or say explicitly to leave them uncommitted for the user)."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/agentskills-research/SKILL.md",
+          "line": 8,
+          "evidence": "The introduction says the skill \"keeps `skills/skill-judge/references/agentskills/` ... and `skills/skill-judge/references/rubric.md` in step with github.com/agentskills/agentskills,\" largely repeating the description rather than adding a decision or constraint.",
+          "fix": "Shorten the introduction to the root-directory prerequisite and the location of the pin; start the substantive guidance at the workflow."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/agentskills-research/evals/evals.json",
+          "line": 18,
+          "evidence": "The changed-doc prompt supplies \"git diff on them is in best-practices.diff,\" while its expected output requires the agent to \"take the BASE diff\"; that BASE diff is not supplied as an eval input for this case.",
+          "fix": "Supply a BASE-to-current diff fixture and identify it in the prompt, so the assertion tests the prescribed baseline rather than relying on unavailable history."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/agentskills-research/SKILL.md",
+          "line": 34,
+          "evidence": "The successful rule-change path proceeds from updating the rubric to \"Run `python3 scripts/build_plugins.py`\" and a final `rubric-check`; only the repair-only branch explicitly says to \"commit the restored references.\"",
+          "fix": "On a successful changed-rule or changed-pin path, instruct the agent to commit the refreshed references and rubric after building and before the final rubric-check, or explicitly require reporting why a commit was not made."
+        }
+      ]
+    },
+    {
+      "name": "skill-judge",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "opus": 93.6,
+        "router-env-my-referee-one": 93.6
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": true,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 59,
+          "evidence": "Each finding has a unique non-empty `id` ..., a `severity` of `critical`, `high`, `medium` or `low`, ... `line` as an integer of 1 or more or `null` ... All four text fields are non-empty strings.",
+          "fix": "Cut the constraints that references/verdict.schema.json and the line 50 example already carry (the severity enum, non-empty strings, line >= 1). Keep only the rules the schema cannot express: the root `file` paths are relative to, when `line` is null, and that every score below its max needs a finding."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 19,
+          "evidence": "Then classify each H2 section for D1 and weight it by line count: the D1 ratio is in lines, not sections.",
+          "fix": "Add a two-line worked example, for example 'Workflow 30 lines expert, Overview 6 lines redundant, Setup 4 lines activation -> 75% expert, 10% activation, 15% redundant -> 11-15 band', so two judges compute the same ratio."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 62,
+          "evidence": "The Gotchas cover SKILL.md.txt fixtures, exemptions, file paths and body-only triggers, but not the D7 allocation trap",
+          "fix": "Add a gotcha: 'A skill without scripts/ is scored 8/7 for D7, not 5/5/5; never deduct for a missing script test there. Judges who apply 5/5/5 lose 3-5 points the rubric does not take.'"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/skill-judge/evals/evals.json",
+          "line": null,
+          "evidence": "All 9 evals use single-file fixtures (pdf-form-filler, doc-helper, big-skill, missing-ref SKILL.md.txt); none targets a skill with scripts/, so the 5/5/5 allocation, the tests/skills/<name>/ lookup and the directory-only branch of step 3 are never exercised",
+          "fix": "Add a fixture directory with scripts/ and a matching tests/skills/<name>/ entry, plus an eval asserting the 5/5/5 split. Add a second eval for the case where only the skill directory is supplied, asserting the D7 finding states that the script test was not checked."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 36,
+          "evidence": "Rule 1 fires when \"The prompt comes from `references/judge-prompt.md`\", but step 3 (line 16) says \"Unless skill-judge itself is the target, do not read `references/judge-prompt.md`\", so the judge must recognise a template it is told not to read",
+          "fix": "Key rule 1 on something the judge can see: 'The prompt says \"Output contract rule 1 applies\" (as references/judge-prompt.md does), or the request asks for only the verdict or JSON line.'"
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 16,
+          "evidence": "Step 3 puts about nine conditional rules (eval files, script tests, validator, schema, judge-prompt exclusion, fixtures, SKILL.md-only, directory-only) into one paragraph",
+          "fix": "Split step 3 into a short decision list keyed by what was supplied: a directory with scripts/, a directory without scripts/, SKILL.md only, pasted content, or an evals/files fixture. Give each case its reads and its D7 handling."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 73,
+          "evidence": "\"NEVER invent facts about files you have not read\" restates a general requirement the agent already knows, unlike the skill-specific scoring and path rules.",
+          "fix": "Remove this generic sentence; retain the concrete rule for handling unreadable files in the mandatory protocol."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 71,
+          "evidence": "\"NEVER reward polish, length or self-praise\" names a relevant anti-pattern, but much of the NEVER list repeats broad review discipline rather than explaining additional judge-specific failure modes.",
+          "fix": "Replace generic warnings with concrete scoring traps and their consequences, such as how an apparently helpful tutorial can inflate D1 or how one missing trigger can be deducted twice."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 51,
+          "evidence": "The verdict example gives the D4 finding a fix of \"Add 'flatten' to the description,\" contradicting the mandatory instruction that a D4 finding's fix \"is the full replacement description text.\"",
+          "fix": "Replace the example fix with a complete, compliant replacement description so an agent copying the template follows the mandatory rule."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 16,
+          "evidence": "The protocol first directs the agent to inspect `tests/skills/<name>/` when scripts exist, then says that when \"only its directory is supplied,\" those tests \"were not checked.\" It does not clearly distinguish an isolated directory from a directory in a supplied repository root.",
+          "fix": "Specify that repository script tests must be checked whenever their repository path is available; apply the unchecked-tests exception only when the target is supplied without access to its repository."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

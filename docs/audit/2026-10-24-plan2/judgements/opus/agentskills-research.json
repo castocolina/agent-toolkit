@@ -1,0 +1,86 @@
+{
+  "skill": "agentskills-research",
+  "judge": "opus",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 35,
+      "evidence": "The pin `sha` is also what `uvx --from \"git+https://github.com/agentskills/agentskills@<sha>#subdirectory=skills-ref\" skills-ref validate <dir>` should use.",
+      "fix": "Delete this aside or move it to README.md: the refresh workflow never runs skills-ref validate, so the line costs context on every run and does nothing for the task."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 29,
+      "evidence": "a new hard limit goes in the dimension's criteria paragraph and caps its bottom band; a new SHOULD goes in the middle-band criteria; a removed rule means deleting its criterion.",
+      "fix": "Add the missing cases: a changed limit (for example 1024 -> 512) edits the existing criterion and its band cap in place, and a new recommended pattern or section goes into that dimension's green flags or checklist line, not into a band."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 46,
+      "evidence": "The fetcher needs bash 4+.",
+      "fix": "Give the symptom and the way out: 'macOS /bin/bash is 3.2, so declare -A fails with \"invalid option\" before any download; run it with a bash 4+ binary (for example Homebrew bash) or on Linux.'"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/agentskills-research/evals/evals.json",
+      "line": null,
+      "evidence": "The 7 evals cover unchanged, changed-doc, validator-only, stale-rubric, casual-unchanged, repair-only and recovery-failed; none covers branch 3.1 (rubric.md missing) or the 'If `BASE` is empty' fallback (SKILL.md line 23)",
+      "fix": "Add one eval where rubric.md is missing (assert: git checkout restores it, then step 1 runs again) and one where BASE is empty (assert: compares each rubric source section with the current references and says so)."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/agentskills-research/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "Several negatives are terse and give no context: \"write me a new skill from scratch\", \"install the agentskills CLI\", \"bump the version of a vendored dependency\"",
+      "fix": "Rewrite these as realistic near-misses with context, for example 'our vendored skills-ref copy under tools/ is two versions behind, bump it in requirements.txt', so they test the description's boundary and not just keyword absence."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 16,
+      "evidence": "Branch 3.2: \"Report the repair, leave the rubric alone, and commit the restored references.\" It does not say whether steps 4-6 (build_plugins.py, rubric-check) still run. The rule-change path (3.3 then steps 4-6) never says to commit, yet Failures line 42 says \"stop before committing\".",
+      "fix": "End each branch with an explicit finish: 3.2 -> run build_plugins.py and rubric-check, then commit the references and dist/; 3.3 -> steps 4-6, then commit the references, rubric.md and dist/ together (or say explicitly to leave them uncommitted for the user)."
+    }
+  ]
+}
