@@ -881,6 +881,9 @@ class ValidateGradingTests(unittest.TestCase):
         ]}
         self.assertEqual(audit.validate_grading(data, assertions), [])
 
+    def test_validate_grading_accepts_curly_quote_normalization(self):
+        self.assertEqual(audit.normalize_assertion("keep ‘the’ “diagram”"), "keep the diagram")
+
     def test_validate_grading_rejects_genuinely_different_assertion(self):
         data = {"results": [{"assertion": "a different claim entirely", "passed": True, "evidence": "e"}]}
         self.assertTrue(audit.validate_grading(data, ["the declared assertion"]))

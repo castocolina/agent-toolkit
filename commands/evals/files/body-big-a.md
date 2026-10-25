@@ -401,3 +401,8 @@ The exporter worker polls the queue for pending jobs, serializes each report to 
 The exporter worker polls the queue for pending jobs, serializes each report to CSV, uploads the archive to the tenant prefix, and records the outcome in the jobs table. Backoff doubles on every transient failure and resets on the first success. Section 198.
 
 The exporter worker polls the queue for pending jobs, serializes each report to CSV, uploads the archive to the tenant prefix, and records the outcome in the jobs table. Backoff doubles on every transient failure and resets on the first success. Section 199.
+
+```mermaid
+flowchart LR
+  A --> B
+```

@@ -766,7 +766,7 @@ def normalize_assertion(text: str) -> str:
     The grader echoes the assertions in its own words, so quoting and
     whitespace drift must not fail validation.
     """
-    return " ".join("".join(ch for ch in text.casefold() if ch not in "'\"`").split())
+    return " ".join("".join(ch for ch in text.casefold() if ch not in "'\"`’‘“”").split())
 
 
 def validate_grading(data, assertions: list[str]) -> list[str]:
