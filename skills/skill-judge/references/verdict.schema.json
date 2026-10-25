@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "skill-judge verdict",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["skill", "judge", "rubric_version", "spec_sha", "scores", "max", "total", "max_total", "percent", "grade", "findings"],
+  "properties": {
+    "skill": {"type": "string", "minLength": 1},
+    "judge": {"type": "string", "minLength": 1},
+    "rubric_version": {"type": "integer"},
+    "spec_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "scores": {"$ref": "#/$defs/dims"},
+    "max": {"$ref": "#/$defs/dims"},
+    "total": {"type": "integer"},
+    "max_total": {"type": "integer"},
+    "percent": {"type": "number"},
+    "grade": {"enum": ["A", "B", "C", "D", "F"]},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "dimension", "severity", "file", "line", "evidence", "fix"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "dimension": {"enum": ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8"]},
+          "severity": {"enum": ["critical", "high", "medium", "low"]},
+          "file": {"type": "string", "minLength": 1},
+          "line": {"type": ["integer", "null"], "minimum": 1},
+          "evidence": {"type": "string", "minLength": 1},
+          "fix": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "dims": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8"],
+      "properties": {
+        "D1": {"type": "integer", "minimum": 0}, "D2": {"type": "integer", "minimum": 0}, "D3": {"type": "integer", "minimum": 0}, "D4": {"type": "integer", "minimum": 0},
+        "D5": {"type": "integer", "minimum": 0}, "D6": {"type": "integer", "minimum": 0}, "D7": {"type": "integer", "minimum": 0}, "D8": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

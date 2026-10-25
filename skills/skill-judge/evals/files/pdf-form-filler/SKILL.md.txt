@@ -1,0 +1,54 @@
+---
+name: pdf-form-filler
+description: Fill and flatten PDF forms with pypdf; use when the user supplies a PDF with form fields, mentions AcroForm, or asks to batch-fill forms. Not for creating PDFs.
+---
+
+# PDF Form Filler
+
+Fill AcroForm fields with `pypdf`, then optionally flatten. Read the whole file before starting.
+
+## Workflow
+
+1. Inspect fields first. Field names are rarely what the visible labels say.
+
+   ```python
+   from pypdf import PdfReader
+   fields = PdfReader("form.pdf").get_fields()
+   for name, f in fields.items():
+       print(name, f.get("/FT"), f.get("/V"), f.get("/_States_", ""))
+   ```
+
+2. Build a `{field_name: value}` map. Checkboxes and radio groups take the exact export value from `/_States_` (often `/Yes`, `/On` or `/1`), never `True`.
+3. Fill with `auto_regenerate=False` and set `NeedAppearances` so viewers redraw the fields.
+
+   ```python
+   from pypdf import PdfWriter
+
+   writer = PdfWriter(clone_from="form.pdf")
+   for page in writer.pages:
+       writer.update_page_form_field_values(page, values, auto_regenerate=False)
+   writer.set_need_appearances_writer(True)
+   writer.write("filled.pdf")
+   ```
+
+4. Verify: reread `filled.pdf` and compare each `/V` with the intended value. Report any field that did not take.
+5. Flatten only when the user asks for a non-editable result. Flattening is irreversible, so keep the unflattened copy and write the flattened file under a new name.
+
+## Gotchas
+
+- XFA forms (Adobe LiveCycle) show a "please wait" page in non-Adobe viewers and `get_fields()` returns nothing useful. Tell the user; do not try to fill them.
+- Fields with the same name on different pages share one value. Setting one sets all; this is intended for repeated headers and surprising for everything else.
+- Dates are plain text unless the field has a JavaScript format action. Match the format the form's own placeholder shows.
+- Encrypted PDFs with an empty user password open fine but need `reader.decrypt("")` before writing.
+- Poppler-based viewers ignore `NeedAppearances`; if the output looks blank there, flatten a copy for preview.
+
+## Common pitfalls
+
+- NEVER overwrite the user's original file. A failed fill then cannot be recovered.
+- NEVER assume a text field accepts unlimited text: check `/MaxLen` and truncate loudly, not silently.
+- NEVER flatten before the user has seen the filled copy.
+- NEVER pass `True` or `"yes"` for a checkbox; unmatched values leave it unchecked without an error.
+
+## Batch mode
+
+For many rows, build the values map per row from a CSV header that equals the field names, write each output as `<row-id>.pdf`, and print a summary of fields that were missing from the form. Stop on the first row with an unknown field rather than skipping it.
