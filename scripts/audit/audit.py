@@ -760,6 +760,15 @@ def parse_object(text: str, what: str):
         raise HarnessError(f"{what}: answer is not JSON: {text.strip()[:200]!r}") from e
 
 
+def normalize_assertion(text: str) -> str:
+    """Casefold, drop quote/backtick characters and collapse whitespace runs.
+
+    The grader echoes the assertions in its own words, so quoting and
+    whitespace drift must not fail validation.
+    """
+    return " ".join("".join(ch for ch in text.casefold() if ch not in "'\"`").split())
+
+
 def validate_grading(data, assertions: list[str]) -> list[str]:
     """Reasons the grader's parsed answer is invalid (empty = ok)."""
     results = data.get("results") if isinstance(data, dict) else None
@@ -772,7 +781,8 @@ def validate_grading(data, assertions: list[str]) -> list[str]:
         if not (isinstance(r, dict) and isinstance(r.get("assertion"), str) and isinstance(r.get("passed"), bool)
                 and nonempty_str(r.get("evidence"))):
             errs.append(f"results[{i}]: needs assertion (str), passed (bool), evidence (non-empty str)")
-    if not errs and Counter(r["assertion"] for r in results) != Counter(assertions):
+    if not errs and Counter(normalize_assertion(r["assertion"]) for r in results) != \
+            Counter(normalize_assertion(a) for a in assertions):
         errs.append("assertion texts do not match the declared assertions exactly once each")
     return errs
 

@@ -872,6 +872,24 @@ def grade(assertions, passed=(True,), evidence="because"):
         for i, a in enumerate(assertions)]})
 
 
+class ValidateGradingTests(unittest.TestCase):
+    def test_validate_grading_accepts_quoting_and_whitespace_drift(self):
+        assertions = ['the body holds "pr-pending" image', "A  second\tassertion"]
+        data = {"results": [
+            {"assertion": "  the body holds 'pr-pending' image ", "passed": True, "evidence": "e"},
+            {"assertion": "`A` second   assertion", "passed": True, "evidence": "e"},
+        ]}
+        self.assertEqual(audit.validate_grading(data, assertions), [])
+
+    def test_validate_grading_rejects_genuinely_different_assertion(self):
+        data = {"results": [{"assertion": "a different claim entirely", "passed": True, "evidence": "e"}]}
+        self.assertTrue(audit.validate_grading(data, ["the declared assertion"]))
+
+    def test_validate_grading_keeps_count_check(self):
+        data = {"results": [{"assertion": "A", "passed": True, "evidence": "e"}]}
+        self.assertTrue(audit.validate_grading(data, ["A", "B"]))
+
+
 class EvalBase(Base):
     def setUp(self):
         super().setUp()
