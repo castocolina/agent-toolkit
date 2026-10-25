@@ -33,7 +33,7 @@ for drawio in "$@"; do
     fi
     src="$tmp"
   fi
-  if ! drawio -x -f png -s 2 "${extra[@]}" -o "$png" "$src" 2>/dev/null; then
+  if ! drawio -x -f png -e -s 2 "${extra[@]}" -o "$png" "$src" 2>/dev/null; then
     [ -n "$tmp" ] && rm -f "$tmp"
     echo "✗ drawio PNG export failed for $drawio" >&2
     continue
