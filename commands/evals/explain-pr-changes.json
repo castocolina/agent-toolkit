@@ -35,7 +35,7 @@
     },
     {
       "id": "related-read-fails",
-      "prompt": "Scenario: head `staging` (a promotion branch per PR_PROMOTION_BRANCHES), base `main`, mermaid mode. `git fetch origin staging` succeeds and local staging equals origin/staging. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists. The open-PR lookup returns nothing. `pr-diagrams.sh related main staging` exits 1 with stderr naming commit abcdef1234567890abcdef1234567890abcdef12 (see related-failed.stderr.txt). Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: head `staging` (a promotion branch per PR_PROMOTION_BRANCHES), base `main`, mermaid mode. `git fetch origin staging` succeeds and local staging equals origin/staging.  The open-PR lookup returns nothing. `pr-diagrams.sh related main staging` exits 1 with stderr naming commit abcdef1234567890abcdef1234567890abcdef12 (see related-failed.stderr.txt). Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-failed.stderr.txt"
       ],
@@ -47,7 +47,7 @@
     },
     {
       "id": "related-rate-limited",
-      "prompt": "Scenario: head `staging` (promotion branch), base `main`, mermaid mode. Local staging equals origin/staging, the script exists, the open-PR lookup returns nothing. `pr-diagrams.sh related main staging` exits 1 with the stderr in related-rate-limit.stderr.txt. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: head `staging` (promotion branch), base `main`, mermaid mode. Local staging equals origin/staging, the script exists, the open-PR lookup returns nothing. `pr-diagrams.sh related main staging` exits 1 with the stderr in related-rate-limit.stderr.txt. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-rate-limit.stderr.txt"
       ],
@@ -76,7 +76,7 @@
     },
     {
       "id": "no-diagram-drawio",
-      "prompt": "Scenario: feature head `feature/typo`, base `main`, `--diagrams=drawio`. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists and `gh --version` prints 2.101.0. The diff only fixes a typo in a comment; no diagram is warranted. No open PR exists. The script exists. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: feature head `feature/typo`, base `main`, `--diagrams=drawio`. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists and `gh --version` prints 2.101.0. The diff only fixes a typo in a comment; no diagram is warranted. No open PR exists.  Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "assertions": [
         "No 'pr-diagrams.sh render' call and no '--attach' happens",
         "The body has no image and no Mermaid fallback block",
@@ -85,7 +85,7 @@
     },
     {
       "id": "promotion-behind",
-      "prompt": "Scenario: head `develop` (promotion branch), base `main`, mermaid mode. `git fetch origin develop` succeeds; local develop is 2 commits behind origin/develop. The script exists. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: head `develop` (promotion branch), base `main`, mermaid mode. `git fetch origin develop` succeeds; local develop is 2 commits behind origin/develop.  Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "assertions": [
         "No git push of any kind happens",
         "The command stops with the named error 'local develop differs from origin/develop (behind or ahead)'",
@@ -94,7 +94,7 @@
     },
     {
       "id": "promotion-ahead",
-      "prompt": "Scenario: head `develop` (promotion branch), base `main`, mermaid mode. `git fetch origin develop` succeeds; local develop is 1 commit ahead of origin/develop. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: head `develop` (promotion branch), base `main`, mermaid mode. `git fetch origin develop` succeeds; local develop is 1 commit ahead of origin/develop. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "assertions": [
         "No git push of any kind happens",
         "The command stops with the named error 'local develop differs from origin/develop (behind or ahead)'",
@@ -103,7 +103,7 @@
     },
     {
       "id": "promotion-equal",
-      "prompt": "Scenario: head `staging` (promotion branch), base `main`, mermaid mode. `git fetch origin staging` succeeds and local staging equals origin/staging. The script exists. `pr-diagrams.sh related main staging` prints `[]` (see related-empty.json). No open PR exists for staging. The diff `origin/main...HEAD` warrants no diagram. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: head `staging` (promotion branch), base `main`, mermaid mode. `git fetch origin staging` succeeds and local staging equals origin/staging.  `pr-diagrams.sh related main staging` prints `[]` (see related-empty.json). No open PR exists for staging. The diff `origin/main...HEAD` warrants no diagram. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-empty.json"
       ],
@@ -114,7 +114,7 @@
     },
     {
       "id": "drawio-new-pr",
-      "prompt": "Scenario: feature head `feature/diagrams`, base `main`, `--diagrams=drawio`. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists, `gh --version` prints `gh version 2.101.0`, and the render call prints render-ok.json. The diff introduces a new data flow that warrants a diagram. No open PR exists for the head. Show the exact ordered commands, the files written under the scratch directory $AD, and the final user-facing message.",
+      "prompt": "Scenario: feature head `feature/diagrams`, base `main`, `--diagrams=drawio`. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists, `gh --version` prints `gh version 2.101.0`, and the render call prints render-ok.json. The diff introduces a new data flow that warrants a diagram. No open PR exists for the head. Show the exact ordered commands, the files written under the scratch directory $AD, and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "render-ok.json"
       ],
@@ -131,7 +131,7 @@
     },
     {
       "id": "drawio-existing-pr",
-      "prompt": "Scenario: feature head `feature/diagrams`, base `main`, `--diagrams=drawio`. The open-PR lookup returns PR 17 with baseRefName main. The script exists, gh is 2.101.0, render prints render-ok.json. The PR warrants a diagram; the existing PR body currently holds an older diagram image. Show the exact ordered commands, the files written under $AD, and the final user-facing message.",
+      "prompt": "Scenario: feature head `feature/diagrams`, base `main`, `--diagrams=drawio`. The open-PR lookup returns PR 17 with baseRefName main. The script exists, gh is 2.101.0, render prints render-ok.json. The PR warrants a diagram; the existing PR body currently holds an older diagram image. Show the exact ordered commands, the files written under $AD, and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "render-ok.json"
       ],
@@ -143,7 +143,7 @@
     },
     {
       "id": "drawio-reuse-image-url",
-      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=drawio`. Local staging equals origin/staging, the script exists. `pr-diagrams.sh related main staging` prints related-one-source.json (a single source PR 41 titled `[release → staging] Export service`). `gh pr view 41 --repo acme/widgets --json title,body` returns the body in body-with-image.md. The author of the new promotion PR will be `dora`. Show the exact ordered commands, the files written under $AD, and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=drawio`. Local staging equals origin/staging, the script exists. `pr-diagrams.sh related main staging` prints related-one-source.json (a single source PR 41 titled `[release → staging] Export service`). `gh pr view 41 --repo acme/widgets --json title,body` returns the body in body-with-image.md. The author of the new promotion PR will be `dora`. Show the exact ordered commands, the files written under $AD, and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-one-source.json",
         "body-with-image.md"
@@ -158,7 +158,7 @@
     },
     {
       "id": "drawio-reuse-mermaid-block",
-      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=drawio`. Local staging equals origin/staging, the script exists. `pr-diagrams.sh related main staging` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns title `[release → staging] Retry policy` and the body in body-with-mermaid.md. The author will be `dora`. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=drawio`. Local staging equals origin/staging, the script exists. `pr-diagrams.sh related main staging` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns title `[release → staging] Retry policy` and the body in body-with-mermaid.md. The author will be `dora`. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-one-source.json",
         "body-with-mermaid.md"
@@ -171,7 +171,7 @@
     },
     {
       "id": "drawio-render-fails",
-      "prompt": "Scenario: feature head `feature/diagrams`, base `main`, `--diagrams=drawio`. The script exists, gh is 2.101.0, the diff warrants a diagram, no open PR exists, but `pr-diagrams.sh render \"$AD/diagram.drawio\"` exits 1 with the stderr in render-failed.stderr.txt. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: feature head `feature/diagrams`, base `main`, `--diagrams=drawio`. The script exists, gh is 2.101.0, the diff warrants a diagram, no open PR exists, but `pr-diagrams.sh render \"$AD/diagram.drawio\"` exits 1 with the stderr in render-failed.stderr.txt. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "render-failed.stderr.txt"
       ],
@@ -191,7 +191,7 @@
     },
     {
       "id": "drawio-old-gh",
-      "prompt": "Scenario: feature head `feature/diagrams`, base `main`, `--diagrams=drawio`. The script exists but `gh --version` prints `gh version 2.100.0`. The diff warrants a diagram. No open PR exists. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: feature head `feature/diagrams`, base `main`, `--diagrams=drawio`. The script exists but `gh --version` prints `gh version 2.100.0`. The diff warrants a diagram. No open PR exists. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "assertions": [
         "No 'render' call is made because gh is older than 2.101",
         "The PR body carries an inline Mermaid block and no '--attach'",
@@ -200,9 +200,12 @@
     },
     {
       "id": "attach-partial-failure",
-      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=drawio`. The script exists, gh is 2.101.0, render succeeds (render-ok.json), the related source has no diagram and the promotion diff warrants a diagram; no open PR exists. `pr-diagrams.sh related main staging` identifies PR 41 as a source. `gh pr view 41 --repo acme/widgets --json title,body` returns body-plain.md (no diagram). `gh api user --jq .login` prints `dora`; `pr-diagrams.sh reviewers 41 --exclude dora` returns alice and bob. `gh pr create --repo acme/widgets --base main --head staging ... --attach ...` exits non-zero with an attach error on stderr BUT still prints `https://github.com/acme/widgets/pull/42` on stdout. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=drawio`. The script exists, gh is 2.101.0, render succeeds (render-ok.json), the related source has no diagram and the promotion diff warrants a diagram; no open PR exists. `pr-diagrams.sh related main staging` identifies PR 41 as a source. `gh pr view 41 --repo acme/widgets --json title,body` returns body-plain.md (no diagram). `gh api user --jq .login` prints `dora`; `pr-diagrams.sh reviewers 41 --exclude dora` returns alice and bob. `gh pr create --repo acme/widgets --base main --head staging ... --attach ...` exits non-zero with an attach error on stderr BUT still prints `https://github.com/acme/widgets/pull/42` on stdout. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
-        "render-ok.json"
+        "render-ok.json",
+        "related-one-source.json",
+        "body-plain.md",
+        "reviewers-ok.json"
       ],
       "assertions": [
         "The final message begins with gh's error",
@@ -213,9 +216,12 @@
     },
     {
       "id": "attach-total-failure",
-      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=drawio`. The script exists, gh is 2.101.0, render succeeds (render-ok.json) so the PNG already exists in $AD. An open PR 17 exists for the head, with author dora. `pr-diagrams.sh related main staging` identifies PR 41 as a source. `gh pr view 41 --repo acme/widgets --json title,body` returns body-plain.md (no diagram), and reviewers excluding dora are alice and bob. `gh pr edit 17 --repo acme/widgets ... --attach ...` exits non-zero with an HTTP error and prints no PR URL. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=drawio`. The script exists, gh is 2.101.0, render succeeds (render-ok.json) so the PNG already exists in $AD. An open PR 17 exists for the head, with author dora. `pr-diagrams.sh related main staging` identifies PR 41 as a source. `gh pr view 41 --repo acme/widgets --json title,body` returns body-plain.md (no diagram), and reviewers excluding dora are alice and bob. `gh pr edit 17 --repo acme/widgets ... --attach ...` exits non-zero with an HTTP error and prints no PR URL. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
-        "render-ok.json"
+        "render-ok.json",
+        "related-one-source.json",
+        "body-plain.md",
+        "reviewers-ok.json"
       ],
       "assertions": [
         "The command stops immediately: no '--add-reviewer' call runs after the failed gh write",
@@ -225,7 +231,7 @@
     },
     {
       "id": "consolidated-three-sources",
-      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. Local staging equals origin/staging, the script exists, no open PR exists for staging. `pr-diagrams.sh related main staging` prints related-three-sources.json. The source bodies from `gh pr view <n> --repo acme/widgets --json title,body` are: PR 30 = body-plain.md, PR 22 = body-with-image.md, PR 15 = body-with-mermaid.md. `gh api user --jq .login` prints `dora`. `pr-diagrams.sh reviewers 30 22 15 --exclude dora` prints reviewers-ok.json. The diff is substantial. Show the exact ordered commands, the composed title and body files under $AD, and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. Local staging equals origin/staging, the script exists, no open PR exists for staging. `pr-diagrams.sh related main staging` prints related-three-sources.json. The source bodies from `gh pr view <n> --repo acme/widgets --json title,body` are: PR 30 = body-plain.md, PR 22 = body-with-image.md, PR 15 = body-with-mermaid.md. `gh api user --jq .login` prints `dora`. `pr-diagrams.sh reviewers 30 22 15 --exclude dora` prints reviewers-ok.json. The diff is substantial. Show the exact ordered commands, the composed title and body files under $AD, and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-three-sources.json",
         "body-plain.md",
@@ -248,7 +254,7 @@
     },
     {
       "id": "reuse-single-source-mermaid",
-      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. Local staging equals origin/staging, the script exists, no open PR for staging. `pr-diagrams.sh related main staging` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns body-with-image.md. `gh api user --jq .login` prints `dora`; reviewers for PR 41 excluding dora are alice, bob and carol (reviewers-ok.json). Show the exact ordered commands, the composed title and body, and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. Local staging equals origin/staging, the script exists, no open PR for staging. `pr-diagrams.sh related main staging` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns body-with-image.md. `gh api user --jq .login` prints `dora`; reviewers for PR 41 excluding dora are alice, bob and carol (reviewers-ok.json). Show the exact ordered commands, the composed title and body, and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-one-source.json",
         "body-with-image.md",
@@ -265,7 +271,7 @@
     },
     {
       "id": "reuse-single-source-drawio",
-      "prompt": "Scenario: same as a single-source promotion reuse but with `--diagrams=drawio`: promotion head `staging`, base `main`. Local staging equals origin/staging, the script exists, no open PR for staging. `pr-diagrams.sh related main staging` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns body-with-image.md. The author is `dora`. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: same as a single-source promotion reuse but with `--diagrams=drawio`: promotion head `staging`, base `main`. Local staging equals origin/staging, the script exists, no open PR for staging. `pr-diagrams.sh related main staging` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns body-with-image.md. The author is `dora`. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-one-source.json",
         "body-with-image.md"
@@ -278,7 +284,7 @@
     },
     {
       "id": "consolidated-two-prefix",
-      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. `pr-diagrams.sh related main staging` prints related-two-sources.json (both source titles already carry a `[release → staging] ` prefix). The source bodies: PR 51 = body-plain.md, PR 44 = body-with-mermaid.md. Author `dora`. Show the exact ordered commands, the composed title and body, and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. `pr-diagrams.sh related main staging` prints related-two-sources.json (both source titles already carry a `[release → staging] ` prefix). The source bodies: PR 51 = body-plain.md, PR 44 = body-with-mermaid.md. Author `dora`. Show the exact ordered commands, the composed title and body, and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-two-sources.json",
         "body-plain.md",
@@ -293,7 +299,7 @@
     },
     {
       "id": "hotfix-included",
-      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. `pr-diagrams.sh related main staging` prints related-hotfix.json: a hotfix PR 33 that was merged directly into staging (its base_ref is staging). `gh pr view 33 --repo acme/widgets --json title,body` returns body-plain.md. Author `dora`. Show the exact ordered commands, the composed title and body, and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. `pr-diagrams.sh related main staging` prints related-hotfix.json: a hotfix PR 33 that was merged directly into staging (its base_ref is staging). `gh pr view 33 --repo acme/widgets --json title,body` returns body-plain.md. Author `dora`. Show the exact ordered commands, the composed title and body, and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-hotfix.json",
         "body-plain.md"
@@ -306,7 +312,7 @@
     },
     {
       "id": "related-not-a-source",
-      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. `pr-diagrams.sh related main staging` prints related-not-source.json: PR 9 has base_ref `develop`, not the current head. No other related PRs. The diff `origin/main...HEAD` warrants no diagram. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. `pr-diagrams.sh related main staging` prints related-not-source.json: PR 9 has base_ref `develop`, not the current head. No other related PRs. The diff `origin/main...HEAD` warrants no diagram. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-not-source.json"
       ],
@@ -317,7 +323,7 @@
     },
     {
       "id": "promotion-zero-sources",
-      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. Local staging equals origin/staging, the script exists, no open PR for staging. `pr-diagrams.sh related main staging` prints `[]` (related-empty.json). The diff warrants no diagram. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. Local staging equals origin/staging, the script exists, no open PR for staging. `pr-diagrams.sh related main staging` prints `[]` (related-empty.json). The diff warrants no diagram. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-empty.json"
       ],
@@ -329,7 +335,7 @@
     },
     {
       "id": "mermaid-reuse-image-and-mermaid",
-      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. `pr-diagrams.sh related main staging` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns title `[release → staging] Billing export` and body-image-and-mermaid.md (a user-attachments image and a Mermaid block). Author `dora`. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. `pr-diagrams.sh related main staging` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns title `[release → staging] Billing export` and body-image-and-mermaid.md (a user-attachments image and a Mermaid block). Author `dora`. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-one-source.json",
         "body-image-and-mermaid.md"
@@ -342,7 +348,7 @@
     },
     {
       "id": "promotion-rerun-existing",
-      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode, a RE-RUN. Local staging equals origin/staging, the script exists. The open-PR lookup via `gh pr list --head staging --repo acme/widgets --state open --limit 100 --json number,baseRefName,author,headRepository,headRepositoryOwner` returns lookup-existing-60.json (PR 60, base main, author dora). `pr-diagrams.sh related main staging --exclude-pr 60` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns body-with-image.md. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode, a RE-RUN. Local staging equals origin/staging, the script exists. The open-PR lookup via `gh pr list --head staging --repo acme/widgets --state open --limit 100 --json number,baseRefName,author,headRepository,headRepositoryOwner` returns lookup-existing-60.json (PR 60, base main, author dora). `pr-diagrams.sh related main staging --exclude-pr 60` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns body-with-image.md. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "lookup-existing-60.json",
         "related-one-source.json",
@@ -424,7 +430,7 @@
     },
     {
       "id": "stacked-staging-drawio",
-      "prompt": "Scenario: feature head `feature/api-v2` with an existing open PR 70 whose baseRefName is `staging`; `--diagrams=drawio`, no `--base` argument. The script exists, gh is 2.101.0, render succeeds (render-ok.json), the diff warrants a diagram. `gh api user --jq .login` prints `dora`. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: feature head `feature/api-v2` with an existing open PR 70 whose baseRefName is `staging`; `--diagrams=drawio`, no `--base` argument. The script exists, gh is 2.101.0, render succeeds (render-ok.json), the diff warrants a diagram. `gh api user --jq .login` prints `dora`. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "render-ok.json"
       ],
@@ -437,7 +443,7 @@
     },
     {
       "id": "promotion-no-lookup-author",
-      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode, first run (no open PR for staging). Local staging equals origin/staging, the script exists. `pr-diagrams.sh related main staging` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns body-with-image.md. No lookup author exists, so `gh api user --jq .login` prints `dora`. `pr-diagrams.sh reviewers 41 --exclude dora` prints reviewers-ok.json. The script exists. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode, first run (no open PR for staging). Local staging equals origin/staging, the script exists. `pr-diagrams.sh related main staging` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns body-with-image.md. No lookup author exists, so `gh api user --jq .login` prints `dora`. `pr-diagrams.sh reviewers 41 --exclude dora` prints reviewers-ok.json.  Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-one-source.json",
         "body-with-image.md",
@@ -451,7 +457,7 @@
     },
     {
       "id": "reuse-from-happy",
-      "prompt": "Scenario: feature head `feature/api-v2`, base `main`, mermaid mode, with `--reuse-from=41`. `gh pr view 41 --repo acme/widgets --json title,body,mergedAt` returns title `Add export service`, body-with-image.md as the body, and a non-null mergedAt. The author of the current PR is `dora`. `pr-diagrams.sh reviewers 41 --exclude dora` prints reviewers-ok.json. No open PR exists for the head. The script exists. Show the exact ordered commands, the composed title and body, and the final user-facing message.",
+      "prompt": "Scenario: feature head `feature/api-v2`, base `main`, mermaid mode, with `--reuse-from=41`. `gh pr view 41 --repo acme/widgets --json title,body,mergedAt` returns title `Add export service`, body-with-image.md as the body, and a non-null mergedAt. The author of the current PR is `dora`. `pr-diagrams.sh reviewers 41 --exclude dora` prints reviewers-ok.json. No open PR exists for the head.  Show the exact ordered commands, the composed title and body, and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "body-with-image.md",
         "reviewers-ok.json"
@@ -464,21 +470,21 @@
     },
     {
       "id": "reuse-from-current-pr",
-      "prompt": "Scenario: feature head `feature/api-v2`, base `main`, mermaid mode, with `--reuse-from=41`. The open-PR lookup finds PR 41 for the current head. The script exists. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: feature head `feature/api-v2`, base `main`, mermaid mode, with `--reuse-from=41`. The open-PR lookup finds PR 41 for the current head.  Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "assertions": [
         "The command stops before any PR write, naming that the reuse source is the current PR itself"
       ]
     },
     {
       "id": "reuse-from-open-pr",
-      "prompt": "Scenario: feature head `feature/api-v2`, base `main`, mermaid mode, with `--reuse-from=42`. `gh pr view 42 --repo acme/widgets --json title,body,mergedAt` returns mergedAt null (the PR is still open). No open PR exists for the head. The script exists. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: feature head `feature/api-v2`, base `main`, mermaid mode, with `--reuse-from=42`. `gh pr view 42 --repo acme/widgets --json title,body,mergedAt` returns mergedAt null (the PR is still open). No open PR exists for the head.  Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "assertions": [
         "The command stops before any PR write because the source PR is not merged (mergedAt is null)"
       ]
     },
     {
       "id": "reuse-from-closed-unmerged",
-      "prompt": "Scenario: feature head `feature/api-v2`, base `main`, mermaid mode, with `--reuse-from=43`. `gh pr view 43 --repo acme/widgets --json title,body,mergedAt` returns mergedAt null (the PR was closed unmerged). No open PR exists for the head. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: feature head `feature/api-v2`, base `main`, mermaid mode, with `--reuse-from=43`. `gh pr view 43 --repo acme/widgets --json title,body,mergedAt` returns mergedAt null (the PR was closed unmerged). No open PR exists for the head. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "assertions": [
         "The command stops before any PR write because the source PR is not merged (mergedAt is null)"
       ]
@@ -517,7 +523,7 @@
     },
     {
       "id": "none-existing-pr-mermaid-block",
-      "prompt": "Scenario: feature head `feature/api-v2` with an existing open PR 17 whose current body is body-existing-mermaid.md. `--diagrams=none` is passed, base `main`. The diff no longer warrants a diagram. The script exists. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: feature head `feature/api-v2` with an existing open PR 17 whose current body is body-existing-mermaid.md. `--diagrams=none` is passed, base `main`. The diff no longer warrants a diagram.  Show the exact ordered commands and the final user-facing message.",
       "files": [
         "body-existing-mermaid.md"
       ],
@@ -529,7 +535,7 @@
     },
     {
       "id": "none-reuse-from",
-      "prompt": "Scenario: feature head `feature/api-v2`, base `main`, `--diagrams=none`, with `--reuse-from=41`. `gh pr view 41 --repo acme/widgets --json title,body,mergedAt` returns title `Billing export`, body-image-and-mermaid.md as the body, and a non-null mergedAt. The author is `dora`. The script exists. Show the exact ordered commands, the composed body, and the final user-facing message.",
+      "prompt": "Scenario: feature head `feature/api-v2`, base `main`, `--diagrams=none`, with `--reuse-from=41`. `gh pr view 41 --repo acme/widgets --json title,body,mergedAt` returns title `Billing export`, body-image-and-mermaid.md as the body, and a non-null mergedAt. The author is `dora`.  Show the exact ordered commands, the composed body, and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "body-image-and-mermaid.md"
       ],
@@ -541,7 +547,7 @@
     },
     {
       "id": "reviewer-one-rejected",
-      "prompt": "Scenario: reuse path (`--reuse-from=41`, merged), feature head `feature/api-v2`, base `main`, mermaid mode. `pr-diagrams.sh reviewers 41 --exclude dora` prints reviewers-ok.json (alice, bob, carol). After the PR 24 is created, `gh pr edit 24 --repo acme/widgets --add-reviewer alice` exits non-zero (422), while the calls for bob and carol succeed. Show the exact ordered commands and the final user-facing message.",
+      "prompt": "Scenario: reuse path (`--reuse-from=41`, merged), feature head `feature/api-v2`, base `main`, mermaid mode. `pr-diagrams.sh reviewers 41 --exclude dora` prints reviewers-ok.json (alice, bob, carol). After the PR 24 is created, `gh pr edit 24 --repo acme/widgets --add-reviewer alice` exits non-zero (422), while the calls for bob and carol succeed. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "reviewers-ok.json"
       ],
@@ -600,7 +606,7 @@
     },
     {
       "id": "size-consolidated-over-limit",
-      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. `pr-diagrams.sh related main staging` prints related-two-sources.json. The source bodies are body-big-a.md (PR 51) and body-big-b.md (PR 44); together with the template they exceed 65,000 characters. Author `dora`. The diff is substantial and would warrant a diagram. Show the exact ordered commands, the composed title and body, and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. `pr-diagrams.sh related main staging` prints related-two-sources.json. The source bodies are body-big-a.md (PR 51) and body-big-b.md (PR 44); together with the template they exceed 65,000 characters. Author `dora`. The diff is substantial and would warrant a diagram. Show the exact ordered commands, the composed title and body, and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-two-sources.json",
         "body-big-a.md",
@@ -615,7 +621,7 @@
     },
     {
       "id": "size-single-source-over-limit",
-      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. `pr-diagrams.sh related main staging` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns body-huge.md whose copied text alone exceeds 65,000 characters. Author `dora`. Show the exact ordered commands, the composed title and body, and the final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, mermaid mode. `pr-diagrams.sh related main staging` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns body-huge.md whose copied text alone exceeds 65,000 characters. Author `dora`. Show the exact ordered commands, the composed title and body, and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-one-source.json",
         "body-huge.md"
@@ -628,7 +634,7 @@
     },
     {
       "id": "script-resolution-order",
-      "prompt": "Scenario: any run that needs pr-diagrams.sh (for example a promotion head). Describe the exact path resolution the command performs before calling the script, including the order of the candidate paths and when each is used or skipped. Also state what a mermaid or none-mode feature PR does about the script and how it derives REPO.",
+      "prompt": "Scenario: any run that needs pr-diagrams.sh (for example a promotion head). Describe the exact path resolution the command performs before calling the script, including the order of the candidate paths and when each is used or skipped. Also state what a mermaid or none-mode feature PR does about the script and how it derives REPO. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "assertions": [
         "The command first tries the literal path ${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh",
         "A candidate still containing the literal text ${CLAUDE_PLUGIN_ROOT} is skipped; the fallback candidate is ~/.claude/skills/pr-diagrams/scripts/pr-diagrams.sh",
@@ -638,7 +644,7 @@
     },
     {
       "id": "drawio-rules-paths",
-      "prompt": "Scenario: a drawio run that authors a diagram. Describe exactly where the command reads the draw.io authoring rules from, in which order, and what happens when the first location is unsubstituted or missing. Show both candidate paths as the command references them.",
+      "prompt": "Scenario: a drawio run that authors a diagram. Describe exactly where the command reads the draw.io authoring rules from, in which order, and what happens when the first location is unsubstituted or missing. Show both candidate paths as the command references them. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "assertions": [
         "The draw.io authoring rules are read from the literal '${CLAUDE_PLUGIN_ROOT}/skills/draw-io/SKILL.md' first",
         "When that text is unsubstituted or missing, '~/.claude/skills/draw-io/SKILL.md' is used instead",
@@ -647,7 +653,7 @@
     },
     {
       "id": "other-host-image-mermaid",
-      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=mermaid`. `pr-diagrams.sh related main staging` returns one source PR 41. `gh pr view 41 --repo acme/widgets --json title,body` returns title `[release → staging] Export service` and body-other-host-image.md, containing only a static.example.com image and no diagram. The promotion diff warrants a diagram. The script exists. Show the exact ordered commands, composed body and final message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=mermaid`. `pr-diagrams.sh related main staging` returns one source PR 41. `gh pr view 41 --repo acme/widgets --json title,body` returns title `[release → staging] Export service` and body-other-host-image.md, containing only a static.example.com image and no diagram. The promotion diff warrants a diagram.  Show the exact ordered commands, composed body and final message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-one-source.json",
         "body-other-host-image.md"
@@ -660,7 +666,7 @@
     },
     {
       "id": "other-host-image-none",
-      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=none`. `pr-diagrams.sh related main staging` returns one source PR 41. `gh pr view 41 --repo acme/widgets --json title,body` returns title `[release → staging] Export service` and body-other-host-image.md, containing only a static.example.com image and no diagram. The promotion diff warrants a diagram. The script exists. Show the exact ordered commands, composed body and final message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=none`. `pr-diagrams.sh related main staging` returns one source PR 41. `gh pr view 41 --repo acme/widgets --json title,body` returns title `[release → staging] Export service` and body-other-host-image.md, containing only a static.example.com image and no diagram. The promotion diff warrants a diagram.  Show the exact ordered commands, composed body and final message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
         "related-one-source.json",
         "body-other-host-image.md"
@@ -688,9 +694,12 @@
     },
     {
       "id": "attach-create-failure-no-url",
-      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=drawio`. The script exists, gh is 2.101.0, a source body has no diagram, the diff warrants a diagram, and rendering succeeds (render-ok.json). `pr-diagrams.sh related main staging` identifies PR 41 as a source; `gh pr view 41 --repo acme/widgets --json title,body` returns body-plain.md (no diagram). Reviewers excluding dora are alice and bob. No open PR exists. `gh pr create --repo acme/widgets --base main --head staging ... --attach ...` exits non-zero with `HTTP 500` and prints no PR URL. Show exact ordered commands and final user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=drawio`. The script exists, gh is 2.101.0, a source body has no diagram, the diff warrants a diagram, and rendering succeeds (render-ok.json). `pr-diagrams.sh related main staging` identifies PR 41 as a source; `gh pr view 41 --repo acme/widgets --json title,body` returns body-plain.md (no diagram). Reviewers excluding dora are alice and bob. No open PR exists. `gh pr create --repo acme/widgets --base main --head staging ... --attach ...` exits non-zero with `HTTP 500` and prints no PR URL. Show exact ordered commands and final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.",
       "files": [
-        "render-ok.json"
+        "render-ok.json",
+        "related-one-source.json",
+        "body-plain.md",
+        "reviewers-ok.json"
       ],
       "assertions": [
         "The final message begins with gh's HTTP 500 error",
