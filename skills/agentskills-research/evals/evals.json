@@ -1,0 +1,107 @@
+{
+  "skill_name": "agentskills-research",
+  "evals": [
+    {
+      "id": "unchanged",
+      "prompt": "I ran fetch-spec.sh; its output is in fetch-unchanged.json. What do you do next?",
+      "files": [
+        "evals/files/fetch-unchanged.json"
+      ],
+      "assertions": [
+        "Reports that the spec is unchanged at the pinned sha",
+        "Stops without editing rubric.md"
+      ],
+      "expected_output": "Reports 'spec unchanged at bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' and stops; rubric.md is not edited and nothing is built."
+    },
+    {
+      "id": "changed-doc",
+      "prompt": "I ran fetch-spec.sh; its output is in fetch-changed.json. The references are uncommitted and git diff on them is in best-practices.diff. The head of the current rubric is in rubric-head.txt. What do you do next?",
+      "files": [
+        "evals/files/fetch-changed.json",
+        "evals/files/best-practices.diff",
+        "evals/files/rubric-head.txt"
+      ],
+      "assertions": [
+        "Lists the added rule from best-practices.diff",
+        "Sets rubric_version to 4",
+        "Sets spec_sha in rubric.md to the sha in fetch-changed.json",
+        "Finishes by running audit.py rubric-check and expecting exit 0"
+      ],
+      "expected_output": "Lists the new best-practices rule (first paragraph must state what the skill does and when to use it) as a rule change; takes the BASE diff for old spec_sha aaaa...; edits the rubric dimension citing best-practices.md, then sets rubric_version 4 and spec_sha bbbb...; finishes with build_plugins.py, then audit.py rubric-check (exit 0)."
+    },
+    {
+      "id": "validator-only",
+      "prompt": "I ran fetch-spec.sh; its output is in fetch-validator-only.json. The docs did not change but the validator did; git diff on the references is in validator.diff. The head of the current rubric is in rubric-head.txt. What do you do next?",
+      "files": [
+        "evals/files/fetch-validator-only.json",
+        "evals/files/validator.diff",
+        "evals/files/rubric-head.txt"
+      ],
+      "assertions": [
+        "Does not stop because the docs are unchanged",
+        "Lists the added validator check from validator.diff",
+        "Sets rubric_version to 4",
+        "Sets spec_sha in rubric.md to the sha in fetch-validator-only.json"
+      ],
+      "expected_output": "Does not stop at 'docs unchanged'; lists the added validator check as a rule change; edits the affected rubric dimension, sets rubric_version 4 and spec_sha bbbb...; build_plugins.py, then rubric-check (exit 0)."
+    },
+    {
+      "id": "stale-rubric",
+      "prompt": "I ran fetch-spec.sh; its output is in fetch-stale-rubric.json. An earlier refresh was interrupted. stale-rubric.diff is the diff of the references from the commit that introduced the rubric's old spec_sha to now. The head of the current rubric is in rubric-head.txt. What do you do next?",
+      "files": [
+        "evals/files/fetch-stale-rubric.json",
+        "evals/files/stale-rubric.diff",
+        "evals/files/rubric-head.txt"
+      ],
+      "assertions": [
+        "Does not stop at unchanged",
+        "Lists the added rule from stale-rubric.diff",
+        "Obtains the rule changes by diffing from the commit that introduced the rubric's old spec_sha, not from the working-tree git diff",
+        "Sets rubric_version to 4 even though changed is empty",
+        "Sets spec_sha in rubric.md to the sha in fetch-stale-rubric.json"
+      ],
+      "expected_output": "Diffs from the BASE commit that introduced the old spec_sha (not the working-tree diff), lists the added rule from stale-rubric.diff, sets rubric_version 4 and spec_sha bbbb... although changed is empty; build_plugins.py, then rubric-check (exit 0)."
+    },
+    {
+      "id": "casual-unchanged",
+      "prompt": "is the agentskills spec stuff still current? Here is what came back when I checked upstream: fetch-unchanged.json",
+      "files": [
+        "evals/files/fetch-unchanged.json"
+      ],
+      "expected_output": "Says the spec is unchanged at the pinned sha bbbb... and stops; no rubric edit.",
+      "assertions": [
+        "Reports that the spec is unchanged at the pinned sha",
+        "Stops without editing rubric.md"
+      ]
+    },
+    {
+      "id": "repair-only",
+      "prompt": "I ran fetch-spec.sh; its output is in fetch-repair.json. Somebody had hand-edited specification.md in the references and the fetcher restored it. The head of the current rubric is in rubric-head.txt. What do you do next?",
+      "files": [
+        "evals/files/fetch-repair.json",
+        "evals/files/rubric-head.txt"
+      ],
+      "expected_output": "Reports that specification.md was repaired to the pin the rubric already matches (rubric_stale is false); no rule change, rubric.md is not edited (rubric_version stays 3, spec_sha stays aaaa...); the restored references still need committing.",
+      "assertions": [
+        "Reports the repair of specification.md as a restored reference, not as a rule change",
+        "Does not edit rubric.md and does not bump rubric_version",
+        "Says the restored references still need committing",
+        "Does not diff from a BASE commit"
+      ]
+    },
+    {
+      "id": "recovery-failed",
+      "prompt": "I ran fetch-spec.sh and it exited 1. Its stderr is in fetch-recovery-failed.stderr.txt. git status shows no local changes under skills/skill-judge/references. What do you do next?",
+      "files": [
+        "evals/files/fetch-recovery-failed.stderr.txt"
+      ],
+      "expected_output": "Restores the references from the backup directory named in stderr (/tmp/tmp.k3Xq9aLm2v/backup) rather than git checkout; does not edit rubric.md or run build_plugins.py until the references match SOURCE.json again; reports the stderr.",
+      "assertions": [
+        "Restores the references from the backup directory named in stderr",
+        "Does not edit rubric.md",
+        "Does not run build_plugins.py before the references match SOURCE.json",
+        "Does not use git checkout as the default restore"
+      ]
+    }
+  ]
+}
