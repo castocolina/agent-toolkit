@@ -1,0 +1,59 @@
+{
+  "skill": "pr-diagrams",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/pr-diagrams/evals/trigger-queries.json",
+      "line": 2,
+      "evidence": "\"attach this draw.io diagram to the pull request as a PNG\" exemplifies a trigger suite dominated by short, explicit domain requests. Near-miss coverage is useful, but indirect, casual, and context-heavy positive requests are sparse.",
+      "fix": "Add realistic positive queries describing reviewer or promotion needs without naming the helper or its operations, including casual phrasing and a diagram attachment request embedded in a larger task."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+      "line": 203,
+      "evidence": "The default dispatch branch is `*) die \"usage: pr-diagrams.sh repo|related|reviewers|render ...\" ;;`; `--help` therefore exits unsuccessfully and does not explain subcommand flags or prerequisites. The repository does supply extensive runnable script tests.",
+      "fix": "Implement successful top-level and subcommand --help handlers documenting arguments, dependencies, output formats, overrides, and failure behavior; add help smoke tests."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 10,
+      "evidence": "\"A harness that does not substitute `${CLAUDE_SKILL_DIR}` uses `bash ~/.claude/skills/pr-diagrams/scripts/pr-diagrams.sh`.\" This fallback assumes a particular installation directory rather than using the directory containing the loaded skill.",
+      "fix": "Resolve the skill directory from the actual loaded SKILL.md path, assign it to a quoted absolute-path variable, and invoke the helper through that variable. Retain CLAUDE_SKILL_DIR only when the harness actually supplies it."
+    }
+  ]
+}

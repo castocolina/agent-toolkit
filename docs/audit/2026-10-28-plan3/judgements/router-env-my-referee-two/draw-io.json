@@ -1,0 +1,113 @@
+{
+  "skill": "draw-io",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 13,
+    "D2": 11,
+    "D3": 12,
+    "D4": 13,
+    "D5": 13,
+    "D6": 13,
+    "D7": 6,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 93,
+  "max_total": 125,
+  "percent": 74.4,
+  "grade": "C",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 91,
+      "evidence": "- Clarity: Create simple, visually clean diagrams \u2014 plus the \u00a75.4 Context/System/Component/Deployment/Data Flow/Sequence taxonomy (lines 108-119) and the \u00a74 coordinate tutorial, all of which the model already knows",
+      "fix": "Delete \u00a75.1 generic principles, the \u00a75.4 diagram-type table and the \u00a74 open/find/edit steps; keep only rules the model would not derive (arrow-target choice, container parenting, font and width specifics already in \u00a76)"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 73,
+      "evidence": "1. Open `.drawio` file in text editor (plain XML format) \u2014 a checkbox procedure with no thinking behind it",
+      "fix": "Replace \u00a74 with the expert residue only: the center-alignment rule plus the caution that child coordinates are relative to the parent container origin"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 11,
+      "evidence": "- Do not directly edit `.drawio.png` files \u2014 stated without the reason, and the scattered NEVERs have no consolidated Gotchas section",
+      "fix": "Add the reason (the PNG is a generated artifact; the pre-commit hook or script regenerates it and manual edits are lost) and gather the environment landmines (exitX/exitY ignored on text elements, per-element fontFamily needed for Quarto, 30-40px per Japanese character) under a Gotchas heading"
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 3,
+      "evidence": "description: Create and edit uncompressed .drawio diagrams and export PNG. Use when the user asks for a draw.io file, an architecture diagram, an AWS icon diagram, a Quarto or reveal.js slide figure, or a layout fix in mxGraph XML. Keywords include .drawio, mxCell, mxgraph.aws4, and diagram export. \u2014 no not-for boundary although near-miss neighbours exist (pr-diagrams, Mermaid)",
+      "fix": "Create and edit uncompressed .drawio diagram XML and export PNG with the diagram embedded. Use when the user asks for a draw.io file, an architecture or AWS icon diagram, a Quarto or reveal.js slide figure, or a layout fix in mxGraph XML (keywords: .drawio, mxCell, mxgraph.aws4, diagram export). Not for Mermaid or other diagram formats, and not for attaching rendered PNGs to pull requests or finding promotion PRs (pr-diagrams)."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 287,
+      "evidence": "**MANDATORY** before placing groups or arrows: [references/layout-guidelines.md] \u2014 yet layout-guidelines.md restates the arrow-target, gutter-label, 30px-margin and background rules already in SKILL.md \u00a75.5/\u00a76.4/\u00a76.9, so nearly every run pays duplicate tokens",
+      "fix": "Deduplicate: keep the rules in one place \u2014 either slim the body sections to a summary and keep detail in layout-guidelines.md, or drop the mandatory load for the rules the body already carries"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 129,
+      "evidence": "Ask which page background the user wants: transparent, light, dark, or another color. `#ffffff` and `#1e1e1e` are suggestions, not a closed default.",
+      "fix": "Provide a default (export the file as stored, DRAWIO_BACKGROUND unset) and ask only when the diagram targets slides of unknown theme; likewise replace the \u00a75.4 diagram-type menu with a default (one System diagram) plus escalation"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "skills/draw-io/SKILL.md",
+      "line": null,
+      "evidence": "No evals/ directory: the skill ships neither evals/evals.json nor evals/trigger-queries.json",
+      "fix": "Add evals/evals.json with 3 realistic prompts (create an AWS architecture diagram, fix arrow routing per \u00a76.4, export a transparent-background PNG) with verifiable assertions, and evals/trigger-queries.json with about 20 queries: 8-10 should-trigger including slide-figure asks that never say draw.io, 8-10 near-miss negatives such as Mermaid requests and pr-diagrams attach requests"
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/draw-io/scripts/find_aws_icon.py",
+      "line": null,
+      "evidence": "tests/skills/draw-io/ contains only test-convert-drawio-to-png.sh; the icon-search script, which carries the aws-icons.md parsing regex, ships with no test",
+      "fix": "Add tests/skills/draw-io/test-find-aws-icon.sh asserting a hit for ec2 and lambda, a miss exiting 1, and the emitted Style: shape=mxgraph.aws4.resourceIcon line format"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 300,
+      "evidence": "Transparent is `page=\"0\"` plus `-t` \u2014 page=\"0\" is never explained anywhere in the skill, and \u00a73 never states the drawio CLI prerequisite for the commands it prescribes",
+      "fix": "Explain the transparent-page mechanism (page/background attribute on mxGraphModel) where backgrounds are discussed, and state 'requires the drawio desktop CLI on PATH, plus mise and pre-commit for the hook path' next to the \u00a73 commands"
+    }
+  ]
+}

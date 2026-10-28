@@ -1,0 +1,292 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "pr-diagrams",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.8,
+        "router-env-my-referee-two": 92.0
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": true,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/pr-diagrams/evals/trigger-queries.json",
+          "line": 2,
+          "evidence": "\"attach this draw.io diagram to the pull request as a PNG\" exemplifies a trigger suite dominated by short, explicit domain requests. Near-miss coverage is useful, but indirect, casual, and context-heavy positive requests are sparse.",
+          "fix": "Add realistic positive queries describing reviewer or promotion needs without naming the helper or its operations, including casual phrasing and a diagram attachment request embedded in a larger task."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+          "line": 203,
+          "evidence": "The default dispatch branch is `*) die \"usage: pr-diagrams.sh repo|related|reviewers|render ...\" ;;`; `--help` therefore exits unsuccessfully and does not explain subcommand flags or prerequisites. The repository does supply extensive runnable script tests.",
+          "fix": "Implement successful top-level and subcommand --help handlers documenting arguments, dependencies, output formats, overrides, and failure behavior; add help smoke tests."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/pr-diagrams/SKILL.md",
+          "line": 10,
+          "evidence": "\"A harness that does not substitute `${CLAUDE_SKILL_DIR}` uses `bash ~/.claude/skills/pr-diagrams/scripts/pr-diagrams.sh`.\" This fallback assumes a particular installation directory rather than using the directory containing the loaded skill.",
+          "fix": "Resolve the skill directory from the actual loaded SKILL.md path, assign it to a quoted absolute-path variable, and invoke the helper through that variable. Retain CLAUDE_SKILL_DIR only when the harness actually supplies it."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/pr-diagrams/SKILL.md",
+          "line": 17,
+          "evidence": "gh pr create --repo \"$REPO\" --base \"$BASE\" --head \"$HEAD\" --title \"$TITLE\" --body-file \"$AD/body.md\" --attach \"$PNG\"",
+          "fix": "Keep only the non-obvious pairing rule (one gh call, --attach path must equal the body image path character-for-character) and drop the standard flag-by-flag invocation the model already knows"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/pr-diagrams/SKILL.md",
+          "line": 24,
+          "evidence": "## Reuse \u2014 the attach-versus-reuse routing exists only implicitly in the Reuse paragraph",
+          "fix": "Add a one-line decision under the intro: promotion (copying merged PRs forward) \u2192 Reuse; any new diagram \u2192 Attach"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/pr-diagrams/SKILL.md",
+          "line": 8,
+          "evidence": "(gh >= 2.101) \u2014 the environment landmines (gh >= 2.101 for --attach, duplicate basenames failing pre-conversion, empty stdout on failure) are buried mid-paragraph instead of a Gotchas section",
+          "fix": "Collect the environment-specific landmines under a Gotchas heading so the agent reads them before hitting the situation"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+          "line": 203,
+          "evidence": "*) die \"usage: pr-diagrams.sh repo|related|reviewers|render ...\" \u2014 usage is only printed on error; there is no --help",
+          "fix": "Add a help subcommand or --help flag printing each subcommand, its arguments, output shape and exit semantics"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/pr-diagrams/SKILL.md",
+          "line": 19,
+          "evidence": "gh pr edit \"$N\" --repo \"$REPO\" --body-file \"$AD/body.md\" --attach \"$PNG\" \u2014 $AD, $N, $REPO, $BASE, $HEAD are never defined",
+          "fix": "Define the placeholders at first use: $AD is a scratch directory holding body.md, $N the PR number, $REPO from the repo subcommand, $BASE/$HEAD/$TITLE from the task"
+        }
+      ]
+    },
+    {
+      "name": "draw-io",
+      "percent": 73.2,
+      "grade": "C",
+      "judges": {
+        "router-env-my-referee-one": 72.0,
+        "router-env-my-referee-two": 74.4
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": true,
+      "skills_ref_valid": true,
+      "check_issues": [
+        {
+          "code": "non_latin",
+          "detail": "skills/draw-io/references/aws-icons.md:1,3,5,11,12,14,16,22,28,30,31,33,35,37,67,69,84,86,113,115,157,159,186,202,204,207,236,238,261,274,276,318,320,322,345,347,385,387,407,409,418,420,429,431,440,442,454,492,494,512,514,533,535,542,544,554,556,561,563,567,569,573,575,583,585,617,619,625,627,648,667,669,671",
+          "ignored": true
+        },
+        {
+          "code": "non_latin",
+          "detail": "skills/draw-io/scripts/find_aws_icon.py:2,4,5,20,30,45",
+          "ignored": true
+        },
+        {
+          "code": "missing_evals",
+          "detail": "absent or invalid: evals/evals.json, evals/trigger-queries.json",
+          "ignored": true
+        }
+      ],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 73,
+          "evidence": "\"Open `.drawio` file in text editor\", definitions of x/y/width/height, \"Element center coordinate = `y + (height / 2)`\", and \"Clarity: Create simple, visually clean diagrams\" dilute the valuable format-specific instructions with elementary editing, arithmetic, and generic design advice.",
+          "fix": "Delete the elementary coordinate tutorial and generic clarity/consistency declarations. Retain the parent-relative coordinate rules, connector-target decisions, background behavior, and concrete rendering pitfalls."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 80,
+          "evidence": "\"Run conversion and verify\" concludes the editing procedure, while the detailed checks appear later as a separate checklist. There is no explicit create/edit sequence that gates export on structural validation and loops failed visual checks back into correction.",
+          "fix": "Add a short workflow: identify diagram intent and target medium, select semantic groups and connector targets, create or edit XML, validate IDs and parent/source/target references, export, inspect against the checklist, and revise/re-export until checks pass."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 3,
+          "evidence": "The description includes \"an architecture diagram\" and \"a Quarto or reveal.js slide figure\" but gives no boundary against Mermaid diagrams, general slide editing, or PR attachment and promotion work handled by pr-diagrams.",
+          "fix": "Create and edit uncompressed .drawio XML diagrams, fix mxCell layout and mxGraph containers/connectors, select mxgraph.aws4 AWS icons, and export editable diagram-embedded PNGs. Use when a user requests a draw.io architecture diagram, a .drawio layout fix, or a diagram figure for Quarto/reveal.js slides, even without naming draw.io. Not for Mermaid-only diagrams, general slide editing, or attaching/reusing images and reviewers in pull requests; use pr-diagrams for those PR workflows."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "high",
+          "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+          "line": 59,
+          "evidence": "`git add \"${generated_files[@]}\"` unconditionally stages successful exports, including when the script is invoked directly using the documented conversion command. A rendering operation therefore changes the caller's index without an explicit staging choice.",
+          "fix": "Make direct conversion render-only by default and add an explicit --stage option for pre-commit integration. Document the side effect and test that normal conversion leaves an existing index unchanged."
+        },
+        {
+          "id": "D6-2",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 236,
+          "evidence": "\"Proportion is the slide canvas (16:9), not a GitHub column.\" This unconditional constraint also applies to the general architecture and layout-editing tasks advertised by the description.",
+          "fix": "Apply 16:9 proportions only to slide-targeted diagrams. Otherwise preserve the existing canvas or use dimensions appropriate to the user's requested output medium."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "high",
+          "file": "skills/draw-io/SKILL.md",
+          "line": null,
+          "evidence": "The skill directory has no evals/evals.json or evals/trigger-queries.json. Repository tests cover converter embedding and failure cases, but there is no output-eval or trigger-eval suite.",
+          "fix": "Add realistic output evals with fixtures and verifiable assertions for creation, nested-container editing, background selection, and AWS group icons. Add roughly 20 balanced trigger queries with Mermaid, general slide editing, and PR-attachment near-misses."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/draw-io/scripts/find_aws_icon.py",
+          "line": 70,
+          "evidence": "`print(f\"Found {len(results)} icon(s) for '{query}':\\n\")` introduces free-form stdout rather than structured results. Neither bundled script implements --help, and the supplied tests exercise only the converter, not the mandatory AWS lookup helper or background modes.",
+          "fix": "Implement --help for both scripts, emit structured lookup and conversion results with diagnostics on stderr, and add tests for icon hits/misses, group styles, and transparent/light/dark/custom background exports."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/draw-io/scripts/find_aws_icon.py",
+          "line": 74,
+          "evidence": "The lookup always prints `Style: shape=mxgraph.aws4.resourceIcon;resIcon=...;`, but its table-row regex also reads the catalog's grIcon group rows. Following the mandatory lookup for a VPC group therefore produces a resourceIcon style for mxgraph.aws4.group_vpc instead of a group style.",
+          "fix": "Preserve resource/product/group type while parsing the catalog, keep same-named entries distinct, and emit shape=mxgraph.aws4.group;grIcon=... for group matches. Test VPC and AWS Cloud group searches against the emitted style."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 41,
+          "evidence": "`bash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram1.drawio` assumes a user-level Claude installation. The AWS lookup examples make the same assumption, so project-local and other-harness installations require guessing replacement paths.",
+          "fix": "Resolve both scripts relative to the actual loaded skill directory and use quoted absolute script paths in the invocation examples."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 91,
+          "evidence": "- Clarity: Create simple, visually clean diagrams \u2014 plus the \u00a75.4 Context/System/Component/Deployment/Data Flow/Sequence taxonomy (lines 108-119) and the \u00a74 coordinate tutorial, all of which the model already knows",
+          "fix": "Delete \u00a75.1 generic principles, the \u00a75.4 diagram-type table and the \u00a74 open/find/edit steps; keep only rules the model would not derive (arrow-target choice, container parenting, font and width specifics already in \u00a76)"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 73,
+          "evidence": "1. Open `.drawio` file in text editor (plain XML format) \u2014 a checkbox procedure with no thinking behind it",
+          "fix": "Replace \u00a74 with the expert residue only: the center-alignment rule plus the caution that child coordinates are relative to the parent container origin"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 11,
+          "evidence": "- Do not directly edit `.drawio.png` files \u2014 stated without the reason, and the scattered NEVERs have no consolidated Gotchas section",
+          "fix": "Add the reason (the PNG is a generated artifact; the pre-commit hook or script regenerates it and manual edits are lost) and gather the environment landmines (exitX/exitY ignored on text elements, per-element fontFamily needed for Quarto, 30-40px per Japanese character) under a Gotchas heading"
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 3,
+          "evidence": "description: Create and edit uncompressed .drawio diagrams and export PNG. Use when the user asks for a draw.io file, an architecture diagram, an AWS icon diagram, a Quarto or reveal.js slide figure, or a layout fix in mxGraph XML. Keywords include .drawio, mxCell, mxgraph.aws4, and diagram export. \u2014 no not-for boundary although near-miss neighbours exist (pr-diagrams, Mermaid)",
+          "fix": "Create and edit uncompressed .drawio diagram XML and export PNG with the diagram embedded. Use when the user asks for a draw.io file, an architecture or AWS icon diagram, a Quarto or reveal.js slide figure, or a layout fix in mxGraph XML (keywords: .drawio, mxCell, mxgraph.aws4, diagram export). Not for Mermaid or other diagram formats, and not for attaching rendered PNGs to pull requests or finding promotion PRs (pr-diagrams)."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 287,
+          "evidence": "**MANDATORY** before placing groups or arrows: [references/layout-guidelines.md] \u2014 yet layout-guidelines.md restates the arrow-target, gutter-label, 30px-margin and background rules already in SKILL.md \u00a75.5/\u00a76.4/\u00a76.9, so nearly every run pays duplicate tokens",
+          "fix": "Deduplicate: keep the rules in one place \u2014 either slim the body sections to a summary and keep detail in layout-guidelines.md, or drop the mandatory load for the rules the body already carries"
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 129,
+          "evidence": "Ask which page background the user wants: transparent, light, dark, or another color. `#ffffff` and `#1e1e1e` are suggestions, not a closed default.",
+          "fix": "Provide a default (export the file as stored, DRAWIO_BACKGROUND unset) and ask only when the diagram targets slides of unknown theme; likewise replace the \u00a75.4 diagram-type menu with a default (one System diagram) plus escalation"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "high",
+          "file": "skills/draw-io/SKILL.md",
+          "line": null,
+          "evidence": "No evals/ directory: the skill ships neither evals/evals.json nor evals/trigger-queries.json",
+          "fix": "Add evals/evals.json with 3 realistic prompts (create an AWS architecture diagram, fix arrow routing per \u00a76.4, export a transparent-background PNG) with verifiable assertions, and evals/trigger-queries.json with about 20 queries: 8-10 should-trigger including slide-figure asks that never say draw.io, 8-10 near-miss negatives such as Mermaid requests and pr-diagrams attach requests"
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/draw-io/scripts/find_aws_icon.py",
+          "line": null,
+          "evidence": "tests/skills/draw-io/ contains only test-convert-drawio-to-png.sh; the icon-search script, which carries the aws-icons.md parsing regex, ships with no test",
+          "fix": "Add tests/skills/draw-io/test-find-aws-icon.sh asserting a hit for ec2 and lambda, a miss exiting 1, and the emitted Style: shape=mxgraph.aws4.resourceIcon line format"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 300,
+          "evidence": "Transparent is `page=\"0\"` plus `-t` \u2014 page=\"0\" is never explained anywhere in the skill, and \u00a73 never states the drawio CLI prerequisite for the commands it prescribes",
+          "fix": "Explain the transparent-page mechanism (page/background attribute on mxGraphModel) where backgrounds are discussed, and state 'requires the drawio desktop CLI on PATH, plus mise and pre-commit for the hook path' next to the \u00a73 commands"
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

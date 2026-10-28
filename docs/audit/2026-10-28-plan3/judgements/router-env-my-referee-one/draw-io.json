@@ -1,0 +1,113 @@
+{
+  "skill": "draw-io",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 13,
+    "D2": 12,
+    "D3": 15,
+    "D4": 12,
+    "D5": 15,
+    "D6": 10,
+    "D7": 3,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 90,
+  "max_total": 125,
+  "percent": 72.0,
+  "grade": "C",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 73,
+      "evidence": "\"Open `.drawio` file in text editor\", definitions of x/y/width/height, \"Element center coordinate = `y + (height / 2)`\", and \"Clarity: Create simple, visually clean diagrams\" dilute the valuable format-specific instructions with elementary editing, arithmetic, and generic design advice.",
+      "fix": "Delete the elementary coordinate tutorial and generic clarity/consistency declarations. Retain the parent-relative coordinate rules, connector-target decisions, background behavior, and concrete rendering pitfalls."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 80,
+      "evidence": "\"Run conversion and verify\" concludes the editing procedure, while the detailed checks appear later as a separate checklist. There is no explicit create/edit sequence that gates export on structural validation and loops failed visual checks back into correction.",
+      "fix": "Add a short workflow: identify diagram intent and target medium, select semantic groups and connector targets, create or edit XML, validate IDs and parent/source/target references, export, inspect against the checklist, and revise/re-export until checks pass."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 3,
+      "evidence": "The description includes \"an architecture diagram\" and \"a Quarto or reveal.js slide figure\" but gives no boundary against Mermaid diagrams, general slide editing, or PR attachment and promotion work handled by pr-diagrams.",
+      "fix": "Create and edit uncompressed .drawio XML diagrams, fix mxCell layout and mxGraph containers/connectors, select mxgraph.aws4 AWS icons, and export editable diagram-embedded PNGs. Use when a user requests a draw.io architecture diagram, a .drawio layout fix, or a diagram figure for Quarto/reveal.js slides, even without naming draw.io. Not for Mermaid-only diagrams, general slide editing, or attaching/reusing images and reviewers in pull requests; use pr-diagrams for those PR workflows."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "line": 59,
+      "evidence": "`git add \"${generated_files[@]}\"` unconditionally stages successful exports, including when the script is invoked directly using the documented conversion command. A rendering operation therefore changes the caller's index without an explicit staging choice.",
+      "fix": "Make direct conversion render-only by default and add an explicit --stage option for pre-commit integration. Document the side effect and test that normal conversion leaves an existing index unchanged."
+    },
+    {
+      "id": "D6-2",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 236,
+      "evidence": "\"Proportion is the slide canvas (16:9), not a GitHub column.\" This unconditional constraint also applies to the general architecture and layout-editing tasks advertised by the description.",
+      "fix": "Apply 16:9 proportions only to slide-targeted diagrams. Otherwise preserve the existing canvas or use dimensions appropriate to the user's requested output medium."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "skills/draw-io/SKILL.md",
+      "line": null,
+      "evidence": "The skill directory has no evals/evals.json or evals/trigger-queries.json. Repository tests cover converter embedding and failure cases, but there is no output-eval or trigger-eval suite.",
+      "fix": "Add realistic output evals with fixtures and verifiable assertions for creation, nested-container editing, background selection, and AWS group icons. Add roughly 20 balanced trigger queries with Mermaid, general slide editing, and PR-attachment near-misses."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/draw-io/scripts/find_aws_icon.py",
+      "line": 70,
+      "evidence": "`print(f\"Found {len(results)} icon(s) for '{query}':\\n\")` introduces free-form stdout rather than structured results. Neither bundled script implements --help, and the supplied tests exercise only the converter, not the mandatory AWS lookup helper or background modes.",
+      "fix": "Implement --help for both scripts, emit structured lookup and conversion results with diagnostics on stderr, and add tests for icon hits/misses, group styles, and transparent/light/dark/custom background exports."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/draw-io/scripts/find_aws_icon.py",
+      "line": 74,
+      "evidence": "The lookup always prints `Style: shape=mxgraph.aws4.resourceIcon;resIcon=...;`, but its table-row regex also reads the catalog's grIcon group rows. Following the mandatory lookup for a VPC group therefore produces a resourceIcon style for mxgraph.aws4.group_vpc instead of a group style.",
+      "fix": "Preserve resource/product/group type while parsing the catalog, keep same-named entries distinct, and emit shape=mxgraph.aws4.group;grIcon=... for group matches. Test VPC and AWS Cloud group searches against the emitted style."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 41,
+      "evidence": "`bash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram1.drawio` assumes a user-level Claude installation. The AWS lookup examples make the same assumption, so project-local and other-harness installations require guessing replacement paths.",
+      "fix": "Resolve both scripts relative to the actual loaded skill directory and use quoted absolute script paths in the invocation examples."
+    }
+  ]
+}
