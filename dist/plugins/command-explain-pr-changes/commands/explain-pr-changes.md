@@ -115,7 +115,16 @@ jq -r .title "$AD/source-<PR>.json"
 jq -r .body "$AD/source-<PR>.json" > "$AD/source-<PR>.md"
 ```
 
-This is the only view of this source: retain the JSON, take the title and body from that file, and do not call `gh pr view` for this PR again. If `<PR>` equals the current PR number from the open-PR lookup, stop before any PR write, naming that the reuse source is the current PR itself. If `mergedAt` is null (the PR is still open, or was closed unmerged; only a merged PR is a source), stop before any PR write because the source PR is not merged (`mergedAt` is null). Otherwise this is single-source reuse: `SRC=[<PR>]`. When assembling its body, write the new heading line with `printf` into `"$AD/body.md"`, then append the saved source body without its first line with `tail -n +2 "$AD/source-<PR>.md" >> "$AD/body.md"`. The first line of the saved source file is its `# PR Summary:` heading.
+This is the only view of this source: retain the JSON, take the title and body from that file, and do not call `gh pr view` for this PR again. If `<PR>` equals the current PR number from the open-PR lookup, stop before any PR write, naming that the reuse source is the current PR itself. If `mergedAt` is null (the PR is still open, or was closed unmerged; only a merged PR is a source), stop before any PR write because the source PR is not merged (`mergedAt` is null). Otherwise this is single-source reuse: `SRC=[<PR>]`. When assembling its body, the drop-first-line step applies only when the first line of the saved source file starts with `# PR Summary:`; otherwise append the whole saved body unchanged (no heading rewrite):
+
+```bash
+if head -n 1 "$AD/source-<PR>.md" | rg -q '^# PR Summary:'; then
+  printf '%s\n' "# PR Summary: <new title>" > "$AD/body.md"
+  tail -n +2 "$AD/source-<PR>.md" >> "$AD/body.md"
+else
+  cat "$AD/source-<PR>.md" > "$AD/body.md"
+fi
+```
 
 ### 4.2 (b) Promotion head
 
@@ -151,13 +160,35 @@ A feature PR title has no `[<head> → <base>]` prefix. It states the change in 
 
 ### 4.5 Reuse body (single source)
 
-Copy the source body verbatim, rewriting only its `# PR Summary:` heading to the new title: write the new heading line with `printf` into `"$AD/body.md"`, then append the source body without its first line with `tail -n +2 "$AD/source-<n>.md" >> "$AD/body.md"`. The first line of the saved source file is its `# PR Summary:` heading. Add no "Close" line. The size bound in 4.7 applies. Use the one source view specified in 4.1 (for reuse-from) or 4.2 (for a related source): extract `.body` from its saved JSON with `jq -r .body "$AD/source-<n>.json" > "$AD/source-<n>.md"`. Never make a second view, retype, or reconstruct source-body content. Do not use `awk`, `sed`, or `perl`, or otherwise edit or transform the source body text.
+Copy the source body verbatim, rewriting only its `# PR Summary:` heading to the new title. The drop-first-line step applies only when the first line of the saved source file starts with `# PR Summary:`; otherwise append the whole saved body unchanged (no heading rewrite):
+
+```bash
+if head -n 1 "$AD/source-<n>.md" | rg -q '^# PR Summary:'; then
+  printf '%s\n' "# PR Summary: <new title>" > "$AD/body.md"
+  tail -n +2 "$AD/source-<n>.md" >> "$AD/body.md"
+else
+  cat "$AD/source-<n>.md" > "$AD/body.md"
+fi
+```
+
+Add no "Close" line. The size bound in 4.7 applies. Use the one source view specified in 4.1 (for reuse-from) or 4.2 (for a related source): extract `.body` from its saved JSON with `jq -r .body "$AD/source-<n>.json" > "$AD/source-<n>.md"`. Never make a second view, retype, or reconstruct source-body content. In `mermaid` and `drawio` modes, do not use `awk`, `sed`, or `perl`, or otherwise edit or transform the source body text; in `none` mode the only allowed edit is the diagram-content filter in 4.8.
 
 In `mermaid` and `drawio` modes, image URLs and Mermaid blocks already in the source body carry over, including an ordinary image on another host. Nothing is uploaded again. This is how a B→C promotion keeps diagrams an A→B promotion reused. `drawio` never renders or attaches a diagram it reuses. `mermaid` uploads nothing. When no diagram is authored, `mermaid` and `drawio` keep the copied body exactly as is. When 4.9 says to author a diagram onto a copied body (the source holds no diagram, and the changes warrant one), keep every other line verbatim and append the new diagram section. The ordinary image stays.
 
 ### 4.6 Consolidated body
 
-Use the PR template in section 8, with a fresh one-paragraph overview under the summary heading, then an "Included PRs" section. One subsection per source PR, in `related`'s order (`merged_at` descending). Head each subsection `### [#<n> <title>](https://github.com/$REPO/pull/<n>)` (the heading links the PR) and put that source body inside it verbatim minus its own `# PR Summary:` heading. Use each source's single view from 4.2, extracting `.title` with `jq -r .title "$AD/source-<n>.json"` and `.body` with `jq -r .body "$AD/source-<n>.json" > "$AD/source-<n>.md"`. Assemble `$AD/body.md` with the subsection headings around those `.md` files using `cat` or heredoc composition. For each source subsection, write its heading with `printf`/heredoc, then append only that source body without its first line with `tail -n +2 "$AD/source-<n>.md" >> "$AD/body.md"`; each saved source file's first line is its `# PR Summary:` heading. Do not make a second view or retype/reconstruct source content; preserve it byte-for-byte except the explicitly removed heading. Do not use `awk`, `sed`, or `perl`, or otherwise edit or transform source body text. Nothing substantive is dropped, and conflicting content stays attributed to its PR. No other merging rules. No "Close" line.
+Use the PR template in section 8, with a fresh one-paragraph overview under the summary heading, then an "Included PRs" section. One subsection per source PR, in `related`'s order (`merged_at` descending). Head each subsection `### [#<n> <title>](https://github.com/$REPO/pull/<n>)` (the heading links the PR) and put that source body inside it verbatim, minus its own `# PR Summary:` heading line when the body starts with one. Use each source's single view from 4.2, extracting `.title` with `jq -r .title "$AD/source-<n>.json"` and `.body` with `jq -r .body "$AD/source-<n>.json" > "$AD/source-<n>.md"`. Assemble `$AD/body.md` from the template shell in section 8 and the saved source files: for each source subsection, write its heading with `printf`, then append the source body by the per-source rule below. The drop-first-line step applies only when the first line of the saved source file starts with `# PR Summary:`; otherwise append the whole saved body unchanged (no heading rewrite):
+
+```bash
+printf '%s\n' "### [#<n> <title>](https://github.com/$REPO/pull/<n>)" >> "$AD/body.md"
+if head -n 1 "$AD/source-<n>.md" | rg -q '^# PR Summary:'; then
+  tail -n +2 "$AD/source-<n>.md" >> "$AD/body.md"
+else
+  cat "$AD/source-<n>.md" >> "$AD/body.md"
+fi
+```
+
+Do not make a second view or retype/reconstruct source content; preserve it byte-for-byte except the explicitly removed heading. In `mermaid` and `drawio` modes, do not use `awk`, `sed`, or `perl`, or otherwise edit or transform source body text; in `none` mode the only allowed edit is the diagram-content filter in 4.8. Nothing substantive is dropped, and conflicting content stays attributed to its PR. No other merging rules. No "Close" line.
 
 In `mermaid` and `drawio` modes, image URLs and Mermaid blocks in the source bodies stay inside their own source subsections. `mermaid` keeps the consolidated body exactly as composed and uploads nothing.
 
@@ -172,7 +203,16 @@ The run continues. The final message says the body was reduced to links. The bod
 
 ### 4.8 `--diagrams=none`
 
-Applies on top of every branch above. No diagram is authored. Strip diagram links and Mermaid blocks from the copied or consolidated body; other images stay. No `render` and no `--attach`. The body is regenerated whole for a feature PR, so a diagram left by an earlier run on the same PR is dropped.
+Applies on top of every branch above. No diagram is authored. Strip diagram content — Mermaid fenced blocks, image links whose URL contains `github.com/user-attachments/`, and links to a `.drawio` source — from the copied or consolidated body with this single filter; other images stay, and it is the only edit allowed to the body in `none` mode:
+
+````bash
+rg --multiline -v -e '(?s)```mermaid.*?```' \
+  -e '!\[[^]]*\]\([^)]*github\.com/user-attachments/[^)]*\)' \
+  -e '\[[^]]*\]\([^)]*\.drawio\)' "$AD/body.md" > "$AD/body.filtered.md" \
+  && mv "$AD/body.filtered.md" "$AD/body.md"
+````
+
+No `render` and no `--attach`. The body is regenerated whole for a feature PR, so a diagram left by an earlier run on the same PR is dropped.
 
 ### 4.9 Diagram reuse and authoring
 
@@ -227,7 +267,7 @@ Then, in this order:
 1. The open-PR lookup (3.7). A non-zero `gh pr list` stops the command quoting gh's stderr; no PR write. For a feature head this is the first `gh` call, and it comes after the push.
 2. Resolve the base (3.7), including the `--base` disagreement stop, then `git fetch origin <base>`. On the feature path this fetch comes after the push and after the lookup. Read `git diff origin/<base>...HEAD` for the feature summary and promotion diagram decision. A failure stops the command quoting git's stderr; no PR write.
 3. Mode reads. A promotion head runs `bash "$PRD" related <base> <head> [--exclude-pr <N>]`. A feature head runs no `related` call. Any failed read, a rate-limited `related` included, stops the command before any PR write. The final message names the failing call (`pr-diagrams.sh related`, `pr-diagrams.sh reviewers`, `gh pr view`, `gh pr list`, `gh api user`, or `git fetch`) and quotes its stderr. When `related` exits 1 with `rate limited` in its message, the final message contains `rate limited` and names the failing `pr-diagrams.sh related` call. No `gh pr create` and no `gh pr edit` runs.
-4. For each PR in `SRC`, and for no other PR, make exactly one source view and save its JSON. For (a), 4.1 runs `gh pr view <PR> --repo "$REPO" --json title,body,mergedAt > "$AD/source-<PR>.json"`; title and body come from that file. For related sources, run `gh pr view <n> --repo "$REPO" --json title,body > "$AD/source-<n>.json"`. In both cases write the body using `jq -r .body "$AD/source-<n>.json" > "$AD/source-<n>.md"` and read title using `jq -r .title "$AD/source-<n>.json"`. Never view a source twice. For a single source, write the new heading line with `printf` into `"$AD/body.md"`, then append `tail -n +2 "$AD/source-<n>.md" >> "$AD/body.md"`. For consolidated sources, apply the same drop-first-line rule to each source inside its subsection, as specified in 4.6. The first line of each saved source file is its `# PR Summary:` heading. Never retype source content; do not use `awk`, `sed`, `perl`, or otherwise edit or transform source body text. `SRC` empty means no `gh pr view` of a source at all.
+4. For each PR in `SRC`, and for no other PR, make exactly one source view and save its JSON. For (a), 4.1 runs `gh pr view <PR> --repo "$REPO" --json title,body,mergedAt > "$AD/source-<PR>.json"`; title and body come from that file. For related sources, run `gh pr view <n> --repo "$REPO" --json title,body > "$AD/source-<n>.json"`. In both cases write the body using `jq -r .body "$AD/source-<n>.json" > "$AD/source-<n>.md"` and read title using `jq -r .title "$AD/source-<n>.json"`. Never view a source twice. For a single source, assemble `$AD/body.md` exactly as 4.5 specifies; for consolidated sources, apply the per-source rule of 4.6 inside each subsection. In both cases the drop-first-line step applies only when the first line of the saved source file starts with `# PR Summary:`; otherwise append the whole saved body unchanged (no heading rewrite). Never retype source content; in `mermaid` and `drawio` modes, do not use `awk`, `sed`, `perl`, or otherwise edit or transform source body text; in `none` mode the only allowed edit is the diagram-content filter in 4.8. `SRC` empty means no `gh pr view` of a source at all.
 5. Reviewers, only on a reuse path (section 6): the author lookup, then `bash "$PRD" reviewers <SRC...> --exclude <author>`. Write the logins to `$AD/reviewers.txt`, one per line.
 
 End the Bash call by writing `$AD/state.env` with every value later calls read: `REPO`, `PRD` (empty when unused), `head`, `base`, `author` (empty when there is no reuse path), the source PR numbers, and `N` once known (`N` is empty for a new PR and is appended after `gh pr create`). `$AD` also holds the title and body files and, in drawio mode, the authoring and render files.
@@ -440,7 +480,7 @@ A consolidated body uses the same summary heading and overview, then replaces th
 
 ### [#<n> <title>](https://github.com/$REPO/pull/<n>)
 
-<that source body verbatim, minus its own "# PR Summary:" heading>
+<that source body verbatim, minus its own "# PR Summary:" heading line when the body starts with one>
 ```
 
 Repeat the subsection once per source, in `related`'s order. When the size bound fires, "Included PRs" is instead one `- [#<n> <title>](https://github.com/$REPO/pull/<n>)` line per source, and the overview says the source bodies are listed by link only.
