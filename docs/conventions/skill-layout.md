@@ -11,6 +11,10 @@ Where skill files, evals and tests live, what ships in `dist/`, and how to run e
 
 Nothing else test-related goes in a skill. Script tests and their fixtures live under `tests/`.
 
+## Command evals
+
+Command output evals live in `commands/evals/<command>.json` and use the evals.json shape with `skill_name`, `subject`, optional `context`, and `evals` headers. Their fixture files live in `commands/evals/files/`. Run one with `audit.py run-evals --eval-file commands/evals/<command>.json --runner CMD`; command evals do not support trigger queries. For diagnosis, add `--only ID[,ID...]` to run selected ids only. This writes `summary-output.only.json` instead of `summary-output.json`, so a partial run cannot be mistaken for a full gate result; `--only` is not supported with `--skills`. A diagnosis run still rewrites the per-eval `output/` files under the same `--out` tree, so give it a different `--out` directory than the gate run to keep the committed gate summary consistent with its per-eval files.
+
 ## What lives in `tests/`
 
 - `tests/skills/<name>/`: runnable script tests (`test-*.sh` or `test_*.py`) and their fixtures, for example `fixtures/`. Fixtures that need a mutable copy are copied into a `mktemp -d` directory at run time.
@@ -23,7 +27,7 @@ Nothing else test-related goes in a skill. Script tests and their fixtures live 
 
 ## Where eval run outputs go
 
-Never inside a skill. `audit.py run-evals` writes to its `--out` directory, for example `docs/audit/<date>-<plan>/evals/<skill>/`. Under `docs/audit/` only `summary-*.json`, `prompt-*.txt`, `merged.json`, `report.md`, `check.json` and `judgements/` are committed. Per-eval `output/` trees are git-ignored (`docs/audit/**/output/`).
+Never inside a skill. `audit.py run-evals` writes to its `--out` directory, for example `docs/audit/<date>-<plan>/evals/<skill>/`. Under `docs/audit/` only `summary-*.json`, `prompt-*.txt`, `merged.json`, `report.md`, `check.json`, `baseline-check.json`, `waivers.json` and `judgements/` are committed. Per-eval `output/` trees are git-ignored (`docs/audit/**/output/`).
 
 ## How to run each layer
 
@@ -66,7 +70,7 @@ Output evals and trigger queries (see `python3 scripts/audit/audit.py run-evals 
 python3 scripts/audit/audit.py run-evals --skills <a,b> --runner "$(python3 scripts/audit/audit.py pi-cmd runner)" [--triggers] [--runs N] [--timeout S] [--out DIR] [--fail-under 0.8]
 ```
 
-`run-evals` looks for an eval's `files` under `skills/<name>/`, then under `skills/<name>/evals/files/`.
+`run-evals --skills` looks for an eval's `files` under `skills/<name>/`, then under `skills/<name>/evals/files/`. `run-evals --eval-file` resolves fixture files only under `commands/evals/files/` and inlines its declared subject and context documents.
 
 Build check:
 

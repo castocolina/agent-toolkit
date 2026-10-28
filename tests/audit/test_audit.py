@@ -872,6 +872,27 @@ def grade(assertions, passed=(True,), evidence="because"):
         for i, a in enumerate(assertions)]})
 
 
+class ValidateGradingTests(unittest.TestCase):
+    def test_validate_grading_accepts_quoting_and_whitespace_drift(self):
+        assertions = ['the body holds "pr-pending" image', "A  second\tassertion"]
+        data = {"results": [
+            {"assertion": "  the body holds 'pr-pending' image ", "passed": True, "evidence": "e"},
+            {"assertion": "`A` second   assertion", "passed": True, "evidence": "e"},
+        ]}
+        self.assertEqual(audit.validate_grading(data, assertions), [])
+
+    def test_validate_grading_accepts_curly_quote_normalization(self):
+        self.assertEqual(audit.normalize_assertion("keep ‘the’ “diagram”"), "keep the diagram")
+
+    def test_validate_grading_rejects_genuinely_different_assertion(self):
+        data = {"results": [{"assertion": "a different claim entirely", "passed": True, "evidence": "e"}]}
+        self.assertTrue(audit.validate_grading(data, ["the declared assertion"]))
+
+    def test_validate_grading_keeps_count_check(self):
+        data = {"results": [{"assertion": "A", "passed": True, "evidence": "e"}]}
+        self.assertTrue(audit.validate_grading(data, ["A", "B"]))
+
+
 class EvalBase(Base):
     def setUp(self):
         super().setUp()
@@ -918,6 +939,174 @@ class EvalBase(Base):
         d = self.state / "calls"
         files = sorted(d.glob(f"*.{ext}"), key=lambda f: int(f.stem)) if d.is_dir() else []
         return [f.read_text() for f in files]
+
+    def cli(self, argv):
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
+            try:
+                code = audit.main(["--root", str(self.root), *argv])
+            except SystemExit as exc:
+                code = exc.code
+        return code, err.getvalue()
+
+    def command_eval(self, data=None, name="explain-pr-changes"):
+        return self.write(f"commands/evals/{name}.json", json.dumps(data or {
+            "skill_name": name, "subject": "commands/explain-pr-changes.md",
+            "context": ["skills/pr-diagrams/SKILL.md"],
+            "evals": [{"id": "e1", "prompt": "TASK", "assertions": ["A"], "files": ["input.txt"]}],
+        }))
+
+    def eval_file_cli(self, path=None, *extra):
+        return self.cli(["run-evals", "--eval-file", str(path or self.command_eval()), "--runner",
+                         shlex.quote(str(STUB)), "--out", str(self.out), *extra])
+
+
+class EvalFileTests(EvalBase):
+    def test_run_evals_eval_file_only_selects_ids_and_uses_separate_summary(self):
+        self.mk()
+        self.write("commands/explain-pr-changes.md", "SUBJECT")
+        self.write("commands/evals/files/input.txt", "INPUT")
+        eval_path = self.command_eval({"skill_name": "explain-pr-changes", "subject": "commands/explain-pr-changes.md",
+                                       "context": [], "evals": [
+                                           {"id": "one", "prompt": "P1", "assertions": ["A"]},
+                                           {"id": "two", "prompt": "P2", "assertions": ["B"]}]})
+        self.answer("output", "explain-pr-changes/one", "output")
+        self.answer("grade", "explain-pr-changes/one", grade(["A"]))
+        code, err = self.eval_file_cli(eval_path, "--only", "one")
+        self.assertEqual((code, err), (0, ""))
+        self.assertEqual(len(self.calls()), 2)
+        scoped = self.out / "explain-pr-changes/summary-output.only.json"
+        self.assertEqual(json.loads(scoped.read_text())["total"], 1)
+        self.assertFalse((self.out / "explain-pr-changes/summary-output.json").exists())
+
+    def test_run_evals_eval_file_only_rejects_unknown_id(self):
+        self.mk()
+        self.write("commands/explain-pr-changes.md", "SUBJECT")
+        self.command_eval()
+        code, err = self.eval_file_cli(None, "--only", "missing")
+        self.assertEqual(code, 2)
+        self.assertIn("unknown eval id", err)
+
+    def test_run_evals_eval_file_only_rejects_empty_list(self):
+        self.mk()
+        self.write("commands/explain-pr-changes.md", "SUBJECT")
+        self.command_eval()
+        code, err = self.eval_file_cli(None, "--only", ",")
+        self.assertEqual(code, 2)
+        self.assertIn("no eval ids", err)
+
+    def test_run_evals_only_rejected_with_skills(self):
+        self.mk()
+        code, err = self.cli(["run-evals", "--skills", "s", "--runner", shlex.quote(str(STUB)),
+                              "--only", "one"])
+        self.assertEqual(code, 2)
+        self.assertIn("--only is supported only with --eval-file", err)
+
+    def test_run_evals_eval_file_inlines_subject_context_and_files(self):
+        self.mk()
+        self.write("commands/explain-pr-changes.md", "SUBJECT-TEXT")
+        self.write("skills/pr-diagrams/SKILL.md", "CONTEXT-TEXT")
+        self.write("commands/evals/files/input.txt", "FILE-TEXT")
+        self.answer("output", "explain-pr-changes/e1", "output")
+        self.answer("grade", "explain-pr-changes/e1", grade(["A"]))
+        code, err = self.eval_file_cli()
+        self.assertEqual((code, err), (0, ""))
+        prompt = self.calls()[0]
+        for text in ("SUBJECT-TEXT", "CONTEXT-TEXT", "FILE-TEXT"):
+            self.assertIn(text, prompt)
+
+    def test_run_evals_eval_file_grades_and_writes_summary(self):
+        self.mk()
+        self.write("commands/explain-pr-changes.md", "SUBJECT")
+        self.write("skills/pr-diagrams/SKILL.md", "CONTEXT")
+        self.write("commands/evals/files/input.txt", "INPUT")
+        self.answer("output", "explain-pr-changes/e1", "output")
+        self.answer("grade", "explain-pr-changes/e1", grade(["A"]))
+        self.assertEqual(self.eval_file_cli()[0], 0)
+        summary = self.out / "explain-pr-changes/summary-output.json"
+        self.assertEqual(json.loads(summary.read_text())["skill"], "explain-pr-changes")
+        self.assertEqual(self.eval_file_cli(None, "--fail-under", "1.1")[0], 1)
+        summary.write_text("stale")
+        data = {"skill_name": "explain-pr-changes", "subject": "missing.md",
+                "evals": [{"id": "e1", "prompt": "P", "assertions": ["A"]}]}
+        code, err = self.eval_file_cli(self.command_eval(data))
+        self.assertEqual(code, 2)
+        self.assertIn("does not exist", err)
+        self.assertFalse(summary.exists())
+
+    def test_run_evals_eval_file_rejects_triggers(self):
+        self.command_eval()
+        code, err = self.eval_file_cli(None, "--triggers")
+        self.assertEqual(code, 2)
+        self.assertIn("trigger queries are not supported for command eval files", err)
+
+    def test_run_evals_eval_file_rejects_escape(self):
+        cases = [
+            ("files", {"files": ["../escape"]}, "outside the root"),
+            ("subject", {"subject": "../escape.md"}, "outside the root"),
+            ("context", {"context": ["../escape.md"]}, "outside the root"),
+            ("missing subject", {"subject": "missing.md"}, "does not exist"),
+            ("missing context", {"context": ["missing.md"]}, "does not exist"),
+            ("name", {"skill_name": "wrong"}, "skill_name must equal the file stem"),
+        ]
+        for label, override, message in cases:
+            with self.subTest(label=label):
+                data = {"skill_name": "explain-pr-changes", "subject": "commands/explain-pr-changes.md",
+                        "context": [], "evals": [{"id": "e1", "prompt": "P", "assertions": ["A"], "files": []}]}
+                data.update(override)
+                if "files" in override:
+                    data["evals"][0]["files"] = override["files"]
+                path = self.command_eval(data)
+                (self.root / "commands/explain-pr-changes.md").write_text("SUBJECT")
+                self.assertEqual(self.eval_file_cli(path)[0], 2)
+                self.assertIn(message, self.eval_file_cli(path)[1])
+        outside = self.write("elsewhere.json", "{}")
+        code, err = self.eval_file_cli(outside)
+        self.assertEqual(code, 2)
+        self.assertIn("eval file must be under commands/evals/", err)
+
+    def test_run_evals_eval_file_rejects_symlinked_evals_dir(self):
+        # commands/evals itself must resolve inside the repo: a symlinked
+        # evals directory pointing outside must be rejected (exit 2) before
+        # any runner call.
+        self.mk()
+        self.write("commands/explain-pr-changes.md", "SUBJECT")
+        external = Path(self._tmp.name) / "external-evals"
+        external.mkdir()
+        (external / "explain-pr-changes.json").write_text(json.dumps({
+            "skill_name": "explain-pr-changes", "subject": "commands/explain-pr-changes.md",
+            "context": [], "evals": [{"id": "e1", "prompt": "P", "assertions": ["A"]}]}))
+        (self.root / "commands" / "evals").symlink_to(external, target_is_directory=True)
+        code, err = self.eval_file_cli("commands/evals/explain-pr-changes.json")
+        self.assertEqual(code, 2)
+        self.assertIn("eval file must be under commands/evals/", err)
+        self.assertEqual(self.calls(), [])
+
+    def test_run_evals_eval_file_rejects_stem_escape(self):
+        out = Path(self._tmp.name) / "out"
+        out.mkdir()
+        sentinel = out.parent / "summary-output.json"
+        sentinel.write_text("safe")
+        bad = Path(str(self.root / "commands/evals") + "/...")
+        code, err = self.cli(["run-evals", "--eval-file", str(bad), "--runner", "true", "--out", str(out)])
+        self.assertEqual(code, 2)
+        self.assertIn("outside --out", err)
+        self.assertTrue(sentinel.is_file())
+
+    def test_run_evals_skills_and_eval_file_are_exclusive(self):
+        for args, expected in ((["--skills", "x", "--eval-file", "x.json"], "not allowed with argument"),
+                               ([], "one of the arguments --skills --eval-file is required")):
+            code, err = self.cli(["run-evals", *args, "--runner", "true"])
+            self.assertEqual(code, 2)
+            self.assertIn(expected, err)
+
+    def test_build_output_prompt_skills_unchanged(self):
+        self.mk()
+        ev = {"id": "e1", "prompt": "do the thing", "assertions": ["A one", "A two"]}
+        expected = ("MODE: output\nKEY: s/e1\n\n" + audit.SANDBOX_PREAMBLE + "\n\n"
+                    + "=== SKILL.md of s ===\n---\nname: s\ndescription: Does s things\n---\nBODY-OF-s\n\n"
+                    + "=== TASK ===\ndo the thing\n")
+        self.assertEqual(audit.build_output_prompt(self.root, "s", ev, ""), expected)
 
 
 class RunEvalsTests(EvalBase):
@@ -1210,14 +1399,38 @@ class RunnerTests(EvalBase):
         self.assertEqual(self.run_evals(runner="./no/such/runner")[0], 2)
 
 
+class ParseObjectTests(Base):
+    def test_parse_object_accepts(self):
+        obj = {"results": [{"assertion": "a", "passed": True, "evidence": "e"}]}
+        raw = json.dumps(obj)
+        inner = {"results": [{"assertion": "a", "passed": True,
+                              "evidence": "the body has a ```mermaid\nflow TD\n``` block"}]}
+        fenced_inner = f"```json\n{json.dumps(inner)}\n```"
+        for text, want in ((raw, obj), (f"```\n{raw}\n```", obj),
+                           (f"```json\n{raw}\n```", obj), (fenced_inner, inner)):
+            with self.subTest(text=text[:20]):
+                self.assertEqual(audit.parse_object(text, "t"), want)
+
+    def test_parse_object_rejects(self):
+        raw = '{"results":[]}'
+        for text in (f"Sure:\n```json\n{raw}\n```", f"```json\n{raw}\n```.\nHope that helps",
+                     f"```json\n{raw}\n```\n```json\n{raw}\n```", "```json\nnot json\n```"):
+            with self.subTest(text=text[:20]):
+                with self.assertRaises(audit.HarnessError) as cm:
+                    audit.parse_object(text, "t")
+                self.assertIn("answer is not JSON", str(cm.exception))
+
+
 class GraderTests(EvalBase):
-    def check_bad(self, answer):
+    def check_bad(self, answer, err_contains=None):
         self.mk()
         self.answer("output", "s/e1", "model output")
         self.raw_answer("grade", "s/e1", answer)
         code, res, err = self.run_evals()
         self.assertEqual((code, res), (2, None), err)
         self.assertFalse((self.out / "s/summary-output.json").exists())
+        if err_contains is not None:
+            self.assertIn(err_contains, err)
 
     def entry(self, a="A one", passed=True, evidence="because"):
         return {"assertion": a, "passed": passed, "evidence": evidence}
@@ -1245,6 +1458,13 @@ class GraderTests(EvalBase):
             with self.subTest(bad=bad):
                 self.check_bad(bad)
 
+    def test_grader_accepts_raw_answer(self):
+        self.mk()
+        self.answer("output", "s/e1", "model output")
+        self.raw_answer("grade", "s/e1", grade(["A one", "A two"]))
+        code, res, err = self.run_evals()
+        self.assertEqual((code, res[0]["passed"]), (0, 2), err)
+
     def test_grader_accepts_one_fenced_answer(self):
         body = grade(["A one", "A two"])
         for fenced in (f"```json\n{body}\n```", f"```\n{body}\n```", f"\n```json\n{body}\n```\n"):
@@ -1255,10 +1475,26 @@ class GraderTests(EvalBase):
                 code, res, err = self.run_evals()
                 self.assertEqual((code, res[0]["passed"]), (0, 2), err)
 
+    def test_grader_accepts_fence_with_backticks_in_strings(self):
+        body = json.dumps({"results": [
+            self.entry("A one", evidence="the body has a ```mermaid\nflow TD\n``` block"),
+            self.entry("A two"),
+        ]})
+        self.mk()
+        self.answer("output", "s/e1", "model output")
+        self.raw_answer("grade", "s/e1", f"```json\n{body}\n```")
+        code, res, err = self.run_evals()
+        self.assertEqual((code, res[0]["passed"]), (0, 2), err)
+
     def test_grader_fence_only_when_it_wraps_the_whole_answer(self):
         body = grade(["A one", "A two"])
-        self.check_bad(f"Here you go:\n```json\n{body}\n```")
-        self.check_bad(f"```json\n{body}\n```\n```json\n{body}\n```")
+        self.check_bad(f"Here you go:\n```json\n{body}\n```", err_contains="answer is not JSON")
+        self.check_bad(f"```json\n{body}\n```\n```json\n{body}\n```", err_contains="answer is not JSON")
+
+    def test_grader_fence_with_invalid_json_exits_2(self):
+        for bad in ("```json\nnot json\n```", "```\n{'results': []}\n```"):
+            with self.subTest(bad=bad):
+                self.check_bad(bad, err_contains="answer is not JSON")
 
 
 class TriggerTests(EvalBase):
