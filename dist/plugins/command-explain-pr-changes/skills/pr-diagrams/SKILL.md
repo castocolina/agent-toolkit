@@ -23,7 +23,7 @@ gh pr edit "$N" --repo "$REPO" --body-file "$AD/body.md" --attach "$PNG"
 
 ## Reuse
 
-A promotion copies the image URLs already in the source PR bodies. It does not render or attach again. Drop one leading `[<from> -> <to>] ` prefix from a source title, then prefix `[<head> -> <base>] `.
+A promotion copies the image URLs already in the source PR bodies. It does not render or attach again. Drop one leading `[<from> → <to>] ` prefix from a source title, then prefix `[<head> → <base>] `.
 
 ## Rendering
 
