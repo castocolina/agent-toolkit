@@ -831,16 +831,25 @@ def eval_output_mode(root, name, runner, timeout, out) -> dict:
     return run_output_evals(name, evals, prompts, runner, timeout, out)
 
 
-def run_eval_file(root: Path, eval_file: Path, runner: str, timeout: float, out: Path, fail_under: float) -> int:
+def run_eval_file(root: Path, eval_file: Path, runner: str, timeout: float, out: Path, fail_under: float,
+                  only: list[str] | None = None) -> int:
     root = root.resolve()
     name = eval_file.name.rsplit(".", 1)[0]
     out = out.resolve()
-    stale = out / name / "summary-output.json"
+    summary_name = "summary-output.only.json" if only is not None else "summary-output.json"
+    stale = out / name / summary_name
     if not stale.resolve().is_relative_to(out):
         raise HarnessError(f"refusing to remove {stale} outside --out {out}")
     path = (root / eval_file).resolve() if not eval_file.is_absolute() else eval_file.resolve()
     stale.unlink(missing_ok=True)
     data, evals = load_eval_file(root, eval_file)
+    if only is not None:
+        available = {str(ev["id"]) for ev in evals}
+        unknown = [eid for eid in only if eid not in available]
+        if unknown:
+            raise HarnessError(f"unknown eval id(s): {', '.join(unknown)}")
+        selected = set(only)
+        evals = [ev for ev in evals if str(ev["id"]) in selected]
     docs = []
     for key in ("subject", "context"):
         values = [data.get(key)] if key == "subject" else data.get(key, [])
@@ -966,6 +975,8 @@ def build_parser() -> argparse.ArgumentParser:
     e.add_argument("--runs", type=int, default=3)
     e.add_argument("--out", type=Path, default=None)
     e.add_argument("--fail-under", type=float, default=0.8)
+    e.add_argument("--only", type=csv, default=None,
+                   help="run only these comma-separated eval ids (command eval files only)")
     pc = sub.add_parser("pi-cmd")
     pc.add_argument("kind", choices=["runner", "judge"])
     pc.add_argument("--model", default=DEFAULT_JUDGE_MODEL)
@@ -1014,7 +1025,10 @@ def main(argv: list[str] | None = None) -> int:
             if args.eval_file is not None:
                 if args.triggers:
                     raise HarnessError("trigger queries are not supported for command eval files")
-                return run_eval_file(root, args.eval_file, args.runner, args.timeout, output, args.fail_under)
+                return run_eval_file(root, args.eval_file, args.runner, args.timeout, output, args.fail_under,
+                                     args.only)
+            if args.only is not None:
+                raise HarnessError("--only is supported only with --eval-file")
             return run_evals(root, args.skills, args.runner, args.timeout, args.triggers, args.runs,
                              output, args.fail_under)
         except (HarnessError, OSError, ValueError, RecursionError) as e:  # UnicodeDecodeError is a ValueError; a crash must never read as exit 1

@@ -962,6 +962,31 @@ class EvalBase(Base):
 
 
 class EvalFileTests(EvalBase):
+    def test_run_evals_eval_file_only_selects_ids_and_uses_separate_summary(self):
+        self.mk()
+        self.write("commands/explain-pr-changes.md", "SUBJECT")
+        self.write("commands/evals/files/input.txt", "INPUT")
+        eval_path = self.command_eval({"skill_name": "explain-pr-changes", "subject": "commands/explain-pr-changes.md",
+                                       "context": [], "evals": [
+                                           {"id": "one", "prompt": "P1", "assertions": ["A"]},
+                                           {"id": "two", "prompt": "P2", "assertions": ["B"]}]})
+        self.answer("output", "explain-pr-changes/one", "output")
+        self.answer("grade", "explain-pr-changes/one", grade(["A"]))
+        code, err = self.eval_file_cli(eval_path, "--only", "one")
+        self.assertEqual((code, err), (0, ""))
+        self.assertEqual(len(self.calls()), 2)
+        scoped = self.out / "explain-pr-changes/summary-output.only.json"
+        self.assertEqual(json.loads(scoped.read_text())["total"], 1)
+        self.assertFalse((self.out / "explain-pr-changes/summary-output.json").exists())
+
+    def test_run_evals_eval_file_only_rejects_unknown_id(self):
+        self.mk()
+        self.write("commands/explain-pr-changes.md", "SUBJECT")
+        self.command_eval()
+        code, err = self.eval_file_cli(None, "--only", "missing")
+        self.assertEqual(code, 2)
+        self.assertIn("unknown eval id", err)
+
     def test_run_evals_eval_file_inlines_subject_context_and_files(self):
         self.mk()
         self.write("commands/explain-pr-changes.md", "SUBJECT-TEXT")
