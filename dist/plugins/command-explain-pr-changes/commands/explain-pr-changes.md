@@ -209,7 +209,7 @@ Do not create `$AD` in this phase. A stop here writes nothing.
 - A feature head is pushed with `git push -u origin <head>`. `gh pr create --head` never pushes. `git push -u origin <head>` runs before `git fetch origin <base>` and before any `gh` call. If `gh pr list` itself fails, the push already happened; the command then stops quoting gh's stderr, and no PR write follows.
 - A promotion head is not pushed. No git push of any kind runs. Run `git fetch origin <head>`, then require local `<head>` to equal `origin/<head>` (3.6).
 
-For every failure path, the final message begins with the failing tool's error text verbatim (the gh or git stderr line); when a named guard error has no tool stderr, begin with that named error. A failure stops the command with the git stderr or the named error (`local <head> differs from origin/<head> (behind or ahead)`). Quote git's stderr in the final message. Nothing else runs: no read and no PR write.
+Final-message ordering depends on whether the command stops or recovers. For terminal failures—the command stops, including push failure, failed reads, PR create/edit failure, guard errors, and a missing script for `--reuse-from` or a promotion head—the final message begins with the failing tool's error text verbatim (the gh or git stderr line), or with the named guard error when there is no tool stderr. For recoverable fallbacks—the command still opens or updates the PR, including drawio render failure, missing script or gh older than 2.101 for a feature PR in drawio mode, and partial `--attach` failure that restores the Mermaid body—the final message begins with one warning line naming the failure and quoting the tool's error text when available, then continues with the outcome. For the partial `--attach` fallback, the opening warning line quotes gh's stderr text verbatim first, then names the partial attach failure; the final message then explains that the PR was created and its Mermaid body restored. A terminal failure stops the command with the git stderr or the named error (`local <head> differs from origin/<head> (behind or ahead)`). Quote git's stderr in the final message. Nothing else runs: no read and no PR write.
 
 ### Phase 3: All reads
 
@@ -277,12 +277,12 @@ Every `gh pr create` passes `--base <base> --head <head>`, `--title`, and `--bod
 
 Failure:
 
-- If gh exits non-zero and prints a PR URL (a partial `--attach` failure: the PR exists), take `N` from the last path segment of that URL and immediately append `N=<number>` to `$AD/state.env`, then run exactly one `gh pr edit <N> --repo "$REPO" --body-file "$AD/body-fallback.md"` (no `--attach`, no `--title`) so the Mermaid fallback replaces the body, continue to reviewers, and begin the final message with gh's error text verbatim from gh's stderr line.
+- If gh exits non-zero and prints a PR URL (a partial `--attach` failure: the PR exists), take `N` from the last path segment of that URL and immediately append `N=<number>` to `$AD/state.env`, then run exactly one `gh pr edit <N> --repo "$REPO" --body-file "$AD/body-fallback.md"` (no `--attach`, no `--title`) so the Mermaid fallback replaces the body, and continue to reviewers. Begin the final message with one warning line that starts with gh's stderr verbatim, identifies the partial attach failure, and explains that the Mermaid fallback was restored.
 - If `gh pr create` or `gh pr edit` exits non-zero and prints no PR URL (HTTP rejection, including a body over the size limit, auth, network), even when the PNG was already rendered in `$AD`, stop immediately. Add no reviewers: no `--add-reviewer` call runs. Begin the final message with gh's stderr line verbatim (for example `HTTP 500`). Then run the phase 6 cleanup: `rm -rf "$AD"` and remove the pointer file.
 
 ### Phase 6: Reviewers, the final message, cleanup
 
-Add reviewers (section 6), one login per call. Then print the final message. It begins with any warning or failure, so it is not mistaken for success, and only then the PR URL and what changed. Then remove the scratch directory and the pointer file:
+Add reviewers (section 6), one login per call. Then print the final message. For a terminal failure it begins with the tool error verbatim or named guard error; for a recoverable fallback it begins with one warning line naming the failure and quoting the tool error when available. Only then give the PR URL and what changed. Then remove the scratch directory and the pointer file:
 
 ```bash
 rm -rf "$AD"
@@ -373,7 +373,7 @@ An empty list makes no call. A rejected login (the PR's own author is rejected w
 
 ## 8. The Output Template
 
-Generate the body as one markdown document and write it to `$AD/body.md`. Do not add conversational text inside the body. The final user-facing message is separate, and it begins with any warning or failure.
+Generate the body as one markdown document and write it to `$AD/body.md`. Do not add conversational text inside the body. The final user-facing message is separate: terminal failures begin with the tool error verbatim or named guard error; recoverable fallbacks begin with one warning line that names the failure and quotes the tool error when available.
 
 Once the body is written, create or update the PR as phase 5 specifies, passing the title from `$AD/title.txt` in the same call: `--title "$(cat "$AD/title.txt")"`.
 
