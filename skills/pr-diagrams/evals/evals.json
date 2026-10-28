@@ -1,0 +1,72 @@
+{
+  "skill_name": "pr-diagrams",
+  "evals": [
+    {
+      "id": "attach-no-branch",
+      "prompt": "The PNG is at /tmp/ad/diagram.drawio.png and render-ok.json is the render output. Write the gh invocation and the body line that attaches it to a new PR. Do not push the image anywhere.",
+      "files": ["evals/files/render-ok.json"],
+      "expected_output": "One gh pr create call with --attach /tmp/ad/diagram.drawio.png and a body line ![diagram](/tmp/ad/diagram.drawio.png) using that exact path. No branch push and no raw GitHub URL.",
+      "assertions": [
+        "Uses one gh pr create or gh pr edit call with --attach",
+        "The body image reference uses the exact path passed to --attach",
+        "Does not push the PNG to a branch and does not invent a raw.githubusercontent.com URL"
+      ]
+    },
+    {
+      "id": "embedded-png-render",
+      "prompt": "I need a PNG of diagrams/flow.drawio with the diagram embedded so draw.io can reopen it. What do you run, and what proves the PNG embeds the diagram?",
+      "files": ["evals/files/render-ok.json"],
+      "expected_output": "Runs pr-diagrams.sh render on diagrams/flow.drawio. The PNG is diagrams/flow.drawio.png because the converter passes drawio -e, so the file embeds the diagram and stays editable.",
+      "assertions": [
+        "Runs pr-diagrams.sh render on the .drawio file",
+        "States that the PNG embeds the diagram because the converter passes drawio -e",
+        "Places the PNG next to the source .drawio"
+      ]
+    },
+    {
+      "id": "related-paginate-and-rate-limit",
+      "prompt": "related-page.json is the stdout of pr-diagrams.sh related main release. Which PRs are promotion sources into release, and in what order? Then related-rate-limit.stderr.txt is the stderr from a second run that exited 1 with no stdout. What do you do?",
+      "files": ["evals/files/related-page.json", "evals/files/related-rate-limit.stderr.txt"],
+      "expected_output": "Sources whose base_ref is release, newest merged_at first: PR 40 then PR 12. On the rate-limit failure, stop and report rate limited for the named commit; do not continue the range and do not treat empty stdout as no related PRs.",
+      "assertions": [
+        "Selects only related PRs whose base_ref equals the promotion head",
+        "Orders those PRs by merged_at descending",
+        "On the rate-limit stderr, stops and reports rate limited instead of continuing or treating it as an empty result"
+      ]
+    },
+    {
+      "id": "render-failure",
+      "prompt": "pr-diagrams.sh render exited 1. Its stderr is render-failed.stderr.txt and it printed nothing on stdout. Is there a PNG to attach?",
+      "files": ["evals/files/render-failed.stderr.txt"],
+      "expected_output": "No PNG was copied. Report the stderr (drawio CLI not found, or the named file produced no valid PNG) and do not attach anything.",
+      "assertions": [
+        "Says no PNG was produced and nothing should be attached",
+        "Reports the cause from stderr",
+        "Does not invent a png path or retry by copying a partial file"
+      ]
+    },
+    {
+      "id": "promotion-reuse-preserves-images-and-title",
+      "prompt": "Promote this PR: the source PR title is [main → staging] Add the new dashboard, and its body contains ![preview](https://github.com/user-attachments/assets/a1b2c3) plus ![flow](https://github.com/user-attachments/assets/d4e5f6). Prepare the title and body for promotion to production. Reuse these existing diagrams.",
+      "expected_output": "Title: [staging → production] Add the new dashboard. Body retains the two exact image URLs. Reuse the source PR body images; do not render, upload, or attach them again.",
+      "assertions": [
+        "Preserves https://github.com/user-attachments/assets/a1b2c3 byte-for-byte in the body",
+        "Preserves https://github.com/user-attachments/assets/d4e5f6 byte-for-byte in the body",
+        "Replaces the existing [main → staging] title prefix with [staging → production] exactly once rather than stacking prefixes",
+        "Reuses the source PR images without rendering or attaching images"
+      ]
+    },
+    {
+      "id": "reviewers-drop-bot",
+      "prompt": "reviews.json and requested.json are the REST reads for PR 12. Which logins does pr-diagrams.sh reviewers 12 --exclude alice keep, and which does it drop?",
+      "files": ["evals/files/reviews.json", "evals/files/requested.json"],
+      "expected_output": "Keeps bob only. Drops alice (the excluded login), copilot-pull-request-reviewer (Bot), the review whose user is null, and dependabot (Bot).",
+      "assertions": [
+        "Keeps the User login that is not excluded",
+        "Drops the Bot reviewer copilot-pull-request-reviewer",
+        "Drops the review with a null user and the Bot in requested reviewers",
+        "Drops the excluded login case-insensitively"
+      ]
+    }
+  ]
+}
