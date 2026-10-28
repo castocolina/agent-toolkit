@@ -844,6 +844,8 @@ def run_eval_file(root: Path, eval_file: Path, runner: str, timeout: float, out:
     stale.unlink(missing_ok=True)
     data, evals = load_eval_file(root, eval_file)
     if only is not None:
+        if not only:
+            raise HarnessError("--only selects no eval ids")
         available = {str(ev["id"]) for ev in evals}
         unknown = [eid for eid in only if eid not in available]
         if unknown:

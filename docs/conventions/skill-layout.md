@@ -13,7 +13,7 @@ Nothing else test-related goes in a skill. Script tests and their fixtures live 
 
 ## Command evals
 
-Command output evals live in `commands/evals/<command>.json` and use the evals.json shape with `skill_name`, `subject`, optional `context`, and `evals` headers. Their fixture files live in `commands/evals/files/`. Run one with `audit.py run-evals --eval-file commands/evals/<command>.json --runner CMD`; command evals do not support trigger queries. For diagnosis, add `--only ID[,ID...]` to run selected ids only. This writes `summary-output.only.json` instead of `summary-output.json`, so a partial run cannot be mistaken for a full gate result; `--only` is not supported with `--skills`.
+Command output evals live in `commands/evals/<command>.json` and use the evals.json shape with `skill_name`, `subject`, optional `context`, and `evals` headers. Their fixture files live in `commands/evals/files/`. Run one with `audit.py run-evals --eval-file commands/evals/<command>.json --runner CMD`; command evals do not support trigger queries. For diagnosis, add `--only ID[,ID...]` to run selected ids only. This writes `summary-output.only.json` instead of `summary-output.json`, so a partial run cannot be mistaken for a full gate result; `--only` is not supported with `--skills`. A diagnosis run still rewrites the per-eval `output/` files under the same `--out` tree, so give it a different `--out` directory than the gate run to keep the committed gate summary consistent with its per-eval files.
 
 ## What lives in `tests/`
 

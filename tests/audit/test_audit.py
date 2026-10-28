@@ -987,6 +987,21 @@ class EvalFileTests(EvalBase):
         self.assertEqual(code, 2)
         self.assertIn("unknown eval id", err)
 
+    def test_run_evals_eval_file_only_rejects_empty_list(self):
+        self.mk()
+        self.write("commands/explain-pr-changes.md", "SUBJECT")
+        self.command_eval()
+        code, err = self.eval_file_cli(None, "--only", ",")
+        self.assertEqual(code, 2)
+        self.assertIn("no eval ids", err)
+
+    def test_run_evals_only_rejected_with_skills(self):
+        self.mk()
+        code, err = self.cli(["run-evals", "--skills", "s", "--runner", shlex.quote(str(STUB)),
+                              "--only", "one"])
+        self.assertEqual(code, 2)
+        self.assertIn("--only is supported only with --eval-file", err)
+
     def test_run_evals_eval_file_inlines_subject_context_and_files(self):
         self.mk()
         self.write("commands/explain-pr-changes.md", "SUBJECT-TEXT")
