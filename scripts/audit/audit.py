@@ -751,9 +751,12 @@ def build_trigger_prompt(name: str, index: int, query: str, cat: dict[str, str])
 
 def parse_object(text: str, what: str):
     body = text.strip()
-    m = re.fullmatch(r"```[\w-]*\n((?:(?!```).)*)```", body, re.S)  # one fenced block wrapping the whole answer
-    if m:
-        body = m.group(1)
+    # One fenced block wrapping the whole answer, located by position (first
+    # line up to the first newline, final three characters) so that triple
+    # backticks inside JSON string values (e.g. quoted Mermaid fences) survive.
+    m = re.match(r"```[\w-]*\n", body)
+    if m and body.endswith("```") and len(body) - 3 > m.end():
+        body = body[m.end():-3]
     try:
         return json.loads(body)
     except ValueError as e:

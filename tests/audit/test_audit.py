@@ -1382,6 +1382,28 @@ class RunnerTests(EvalBase):
         self.assertEqual(self.run_evals(runner="./no/such/runner")[0], 2)
 
 
+class ParseObjectTests(Base):
+    def test_parse_object_accepts(self):
+        obj = {"results": [{"assertion": "a", "passed": True, "evidence": "e"}]}
+        raw = json.dumps(obj)
+        inner = {"results": [{"assertion": "a", "passed": True,
+                              "evidence": "the body has a ```mermaid\nflow TD\n``` block"}]}
+        fenced_inner = f"```json\n{json.dumps(inner)}\n```"
+        for text, want in ((raw, obj), (f"```\n{raw}\n```", obj),
+                           (f"```json\n{raw}\n```", obj), (fenced_inner, inner)):
+            with self.subTest(text=text[:20]):
+                self.assertEqual(audit.parse_object(text, "t"), want)
+
+    def test_parse_object_rejects(self):
+        raw = '{"results":[]}'
+        for text in (f"Sure:\n```json\n{raw}\n```", f"```json\n{raw}\n```.\nHope that helps",
+                     f"```json\n{raw}\n```\n```json\n{raw}\n```", "```json\nnot json\n```"):
+            with self.subTest(text=text[:20]):
+                with self.assertRaises(audit.HarnessError) as cm:
+                    audit.parse_object(text, "t")
+                self.assertIn("answer is not JSON", str(cm.exception))
+
+
 class GraderTests(EvalBase):
     def check_bad(self, answer, err_contains=None):
         self.mk()
@@ -1435,6 +1457,17 @@ class GraderTests(EvalBase):
                 self.raw_answer("grade", "s/e1", fenced)
                 code, res, err = self.run_evals()
                 self.assertEqual((code, res[0]["passed"]), (0, 2), err)
+
+    def test_grader_accepts_fence_with_backticks_in_strings(self):
+        body = json.dumps({"results": [
+            self.entry("A one", evidence="the body has a ```mermaid\nflow TD\n``` block"),
+            self.entry("A two"),
+        ]})
+        self.mk()
+        self.answer("output", "s/e1", "model output")
+        self.raw_answer("grade", "s/e1", f"```json\n{body}\n```")
+        code, res, err = self.run_evals()
+        self.assertEqual((code, res[0]["passed"]), (0, 2), err)
 
     def test_grader_fence_only_when_it_wraps_the_whole_answer(self):
         body = grade(["A one", "A two"])
