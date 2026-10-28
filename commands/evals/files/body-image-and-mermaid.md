@@ -4,9 +4,7 @@
 
 Bills tenants for completed exports.
 
-![billing](https://github.com/user-attachments/assets/dddd4444eeee5555ffff6666)
-
-![architecture](https://static.example.com/architecture.png)
+Keeps invoices in sync. ![billing](https://github.com/user-attachments/assets/dddd4444eeee5555ffff6666) See also ![architecture](https://static.example.com/architecture.png) for the layout.
 
 ```mermaid
 flowchart LR

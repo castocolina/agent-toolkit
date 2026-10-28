@@ -118,7 +118,7 @@ jq -r .body "$AD/source-<PR>.json" > "$AD/source-<PR>.md"
 This is the only view of this source: retain the JSON, take the title and body from that file, and do not call `gh pr view` for this PR again. If `<PR>` equals the current PR number from the open-PR lookup, stop before any PR write, naming that the reuse source is the current PR itself. If `mergedAt` is null (the PR is still open, or was closed unmerged; only a merged PR is a source), stop before any PR write because the source PR is not merged (`mergedAt` is null). Otherwise this is single-source reuse: `SRC=[<PR>]`. When assembling its body, the drop-first-line step applies only when the first line of the saved source file starts with `# PR Summary:`; otherwise append the whole saved body unchanged (no heading rewrite):
 
 ```bash
-if head -n 1 "$AD/source-<PR>.md" | rg -q '^# PR Summary:'; then
+if head -n 1 "$AD/source-<PR>.md" | grep -q '^# PR Summary:'; then
   printf '%s\n' "# PR Summary: <new title>" > "$AD/body.md"
   tail -n +2 "$AD/source-<PR>.md" >> "$AD/body.md"
 else
@@ -163,7 +163,7 @@ A feature PR title has no `[<head> → <base>]` prefix. It states the change in 
 Copy the source body verbatim, rewriting only its `# PR Summary:` heading to the new title. The drop-first-line step applies only when the first line of the saved source file starts with `# PR Summary:`; otherwise append the whole saved body unchanged (no heading rewrite):
 
 ```bash
-if head -n 1 "$AD/source-<n>.md" | rg -q '^# PR Summary:'; then
+if head -n 1 "$AD/source-<n>.md" | grep -q '^# PR Summary:'; then
   printf '%s\n' "# PR Summary: <new title>" > "$AD/body.md"
   tail -n +2 "$AD/source-<n>.md" >> "$AD/body.md"
 else
@@ -181,7 +181,7 @@ Use the PR template in section 8, with a fresh one-paragraph overview under the 
 
 ```bash
 printf '%s\n' "### [#<n> <title>](https://github.com/$REPO/pull/<n>)" >> "$AD/body.md"
-if head -n 1 "$AD/source-<n>.md" | rg -q '^# PR Summary:'; then
+if head -n 1 "$AD/source-<n>.md" | grep -q '^# PR Summary:'; then
   tail -n +2 "$AD/source-<n>.md" >> "$AD/body.md"
 else
   cat "$AD/source-<n>.md" >> "$AD/body.md"
@@ -203,12 +203,11 @@ The run continues. The final message says the body was reduced to links. The bod
 
 ### 4.8 `--diagrams=none`
 
-Applies on top of every branch above. No diagram is authored. Strip diagram content — Mermaid fenced blocks, image links whose URL contains `github.com/user-attachments/`, and links to a `.drawio` source — from the copied or consolidated body with this single filter; other images stay, and it is the only edit allowed to the body in `none` mode:
+Applies on top of every branch above. No diagram is authored. Strip diagram content from the copied or consolidated body with this single filter, using portable tools only. A diagram is exactly what 3.3 defines: a Mermaid fenced block, or an image link whose URL contains `github.com/user-attachments/`. The awk step drops each ```mermaid fenced block; the sed step removes only the `![alt](...)` span, so prose and other-host images on the same line stay. It is the only edit allowed to the body in `none` mode. Limit, as in 3.3: a screenshot pasted into a PR is also a user-attachments image and is removed.
 
 ````bash
-rg --multiline -v -e '(?s)```mermaid.*?```' \
-  -e '!\[[^]]*\]\([^)]*github\.com/user-attachments/[^)]*\)' \
-  -e '\[[^]]*\]\([^)]*\.drawio\)' "$AD/body.md" > "$AD/body.filtered.md" \
+awk '/^```mermaid/{skip=1; next} skip && /^```/{skip=0; next} !skip' "$AD/body.md" \
+  | sed -E 's#!\[[^]]*\]\([^)]*github\.com/user-attachments/[^)]*\)##g' > "$AD/body.filtered.md" \
   && mv "$AD/body.filtered.md" "$AD/body.md"
 ````
 
@@ -417,7 +416,7 @@ Generate the body as one markdown document and write it to `$AD/body.md`. Do not
 
 Once the body is written, create or update the PR as phase 5 specifies, passing the title from `$AD/title.txt` in the same call: `--title "$(cat "$AD/title.txt")"`.
 
-A feature body, and the outer shell of a consolidated body, strictly follows this template. A single-source body is the source body with only the `# PR Summary:` heading rewritten, so it does not pass through this template unless the size bound reduced it to links.
+A feature body, and the outer shell of a consolidated body, strictly follows this template. A single-source body is the source body with a leading `# PR Summary:` heading rewritten when present (otherwise the whole body is preserved unchanged), so it does not pass through this template unless the size bound reduced it to links.
 
 ````markdown
 # PR Summary: $title

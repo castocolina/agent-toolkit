@@ -67,7 +67,7 @@
     },
     {
       "id": "no-diagram-mermaid",
-      "prompt": "Scenario: feature head `feature/typo`, base `main`, mermaid mode. The diff `origin/main...HEAD` only fixes a typo in a code comment; no diagram is warranted. No open PR exists. Show the exact ordered commands and the final user-facing message.  Facts: origin is git@github.com:acme/widgets.git; the diff is `M src/login.ts` and changes only the comment `// validate login`; lookup file is an empty array; use title `Clarify login comment` and write a complete textual PR body. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "prompt": "Scenario: feature head `feature/typo`, base `main`, mermaid mode. The diff `origin/main...HEAD` only fixes a typo in a code comment; no diagram is warranted. No open PR exists. Show the exact ordered commands and the final user-facing message.  Facts: origin is git@github.com:acme/widgets.git; the diff is `M src/login.ts` and changes only the comment `// validate login`; lookup file is an empty array; use title `Clarify login comment`. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
       "assertions": [
         "The PR body contains no Mermaid diagram block and no image",
         "No 'render' and no '--attach' happens, and no diagram fallback warning appears",
@@ -131,7 +131,7 @@
     },
     {
       "id": "drawio-existing-pr",
-      "prompt": "Scenario: feature head `feature/diagrams`, base `main`, `--diagrams=drawio`. The open-PR lookup returns PR 17 with baseRefName main. The script exists, gh is 2.101.0, render prints render-ok.json. The PR warrants a diagram; the existing PR body currently holds an older diagram image. Show the exact ordered commands, the files written under $AD, and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.  Facts: `git remote get-url origin` prints `git@github.com:acme/widgets.git`; lookup fixture gives PR 17 with base main; diff summary is `M src/flow.ts: add request validation flow`; use literal scratch path `/tmp/explain-pr-changes.Ab12Cd`. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "prompt": "Scenario: feature head `feature/diagrams`, base `main`, `--diagrams=drawio`. The open-PR lookup returns PR 17 with baseRefName main. The script exists, gh is 2.101.0, render prints render-ok.json. The PR warrants a diagram; the existing PR body currently holds an older diagram image. Show the exact ordered commands, the files written under $AD, and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists.  Facts: `git remote get-url origin` prints `git@github.com:acme/widgets.git`; the open PR is PR 17 with base main; diff summary is `M src/flow.ts: add request validation flow`; use literal scratch path `/tmp/explain-pr-changes.Ab12Cd`. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
       "files": [
         "render-ok.json"
       ],
@@ -158,15 +158,15 @@
     },
     {
       "id": "drawio-reuse-mermaid-block",
-      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=drawio`. Local staging equals origin/staging, the script exists. `pr-diagrams.sh related main staging` prints related-one-source.json. `gh pr view 41 --repo acme/widgets --json title,body` returns title `[release → staging] Retry policy` and the body in body-with-mermaid.md. The author will be `dora`. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "prompt": "Scenario: promotion head `staging`, base `main`, `--diagrams=drawio`. Local staging equals origin/staging, the script exists. `pr-diagrams.sh related main staging` prints related-retry.json. `gh pr view 41 --repo acme/widgets --json title,body` returns title `[release → staging] Retry policy` and the body in body-with-mermaid.md. The author will be `dora`. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
       "files": [
-        "related-one-source.json",
+        "related-retry.json",
         "body-with-mermaid.md"
       ],
       "assertions": [
         "No diagram is authored: no 'render' call and no '--attach'",
         "The source's Mermaid block appears unchanged in the new body",
-        "The body is assembled from the saved file: the new heading written with printf into \"$AD/body.md\", then 'tail -n +2 \"$AD/source-41.md\"' appended; no awk, sed, perl, retyping, or cat/heredoc composition",
+        "The body is assembled from the saved file: the '# PR Summary:' branch runs printf of the new heading into \"$AD/body.md\" and then 'tail -n +2 \"$AD/source-41.md\"' appended; no awk, sed, perl, and no retyping of body content (a 'cat' in the unexecuted else branch is allowed)",
         "The title is exactly '[staging → main] Retry policy'"
       ]
     },
@@ -468,7 +468,7 @@
         "The new body is the saved source body unchanged except its leading '# PR Summary:' heading, which is rewritten to the new title",
         "The body's user-attachments image URL is carried over unchanged",
         "No new 'Close' line is added",
-        "The body is assembled from the saved file: the new heading written with printf into \"$AD/body.md\", then 'tail -n +2 \"$AD/source-41.md\"' appended; no awk, sed, perl, retyping, or cat/heredoc composition",
+        "The body is assembled from the saved file: the '# PR Summary:' branch runs printf of the new heading into \"$AD/body.md\" and then 'tail -n +2 \"$AD/source-41.md\"' appended; no awk, sed, perl, and no retyping of body content (a 'cat' in the unexecuted else branch is allowed)",
         "Reviewers come from 'pr-diagrams.sh reviewers 41 --exclude dora', one '--add-reviewer' call per login, and dora is never added"
       ]
     },
@@ -543,7 +543,7 @@
     },
     {
       "id": "none-existing-pr-mermaid-block",
-      "prompt": "Scenario: feature head `feature/api-v2` with an existing open PR 17 whose current body is body-existing-mermaid.md. `--diagrams=none` is passed, base `main`. The diff no longer warrants a diagram.  Show the exact ordered commands and the final user-facing message.  Facts: origin is git@github.com:acme/widgets.git; lookup fixture gives PR 17 with base main and author dora; diff is `M src/auth.ts` removing a deprecated login branch. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "prompt": "Scenario: feature head `feature/api-v2` with an existing open PR 17 whose current body is body-existing-mermaid.md. `--diagrams=none` is passed, base `main`. The diff no longer warrants a diagram.  Show the exact ordered commands and the final user-facing message.  Facts: origin is git@github.com:acme/widgets.git; the open PR is PR 17 with base main and author dora; diff is `M src/auth.ts` removing a deprecated login branch. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
       "files": [
         "body-existing-mermaid.md"
       ],
@@ -561,7 +561,8 @@
       ],
       "assertions": [
         "User-attachments image links and Mermaid blocks are stripped from the reused body",
-        "The image on the other host (static.example.com) is kept",
+        "The prose on the line that held the images (\"Keeps invoices in sync.\", \"See also\" and \"for the layout.\") survives, and the other-host image (static.example.com) on that same line is kept",
+        "The user-attachments image and the Mermaid block are gone while the rest of the line is intact (span-level removal, not whole-line deletion)",
         "No render and no '--attach' happens"
       ]
     },
