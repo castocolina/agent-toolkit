@@ -3,6 +3,7 @@ set -e
 
 # Convert .drawio files to .drawio.png
 generated_files=()
+export_failures=0
 
 for drawio in "$@"; do
   png="${drawio%.drawio}.drawio.png"
@@ -33,9 +34,18 @@ for drawio in "$@"; do
     fi
     src="$tmp"
   fi
-  if ! drawio -x -f png -s 2 "${extra[@]}" -o "$png" "$src" 2>/dev/null; then
+  if ! drawio -x -f png -e -s 2 "${extra[@]}" -o "$png" "$src"; then
     [ -n "$tmp" ] && rm -f "$tmp"
+    rm -f "$png"
     echo "✗ drawio PNG export failed for $drawio" >&2
+    export_failures=1
+    continue
+  fi
+  [ -n "$tmp" ] && rm -f "$tmp"
+  if [ ! -s "$png" ] || [ "$(od -An -t x1 -N 8 "$png" | tr -d '[:space:]')" != "89504e470d0a1a0a" ]; then
+    rm -f "$png"
+    echo "✗ $drawio output is not a non-empty PNG" >&2
+    export_failures=1
     continue
   fi
 
@@ -49,3 +59,5 @@ if [ ${#generated_files[@]} -gt 0 ]; then
   git add "${generated_files[@]}"
   echo "Staged ${#generated_files[@]} file(s)"
 fi
+
+[ "$export_failures" -eq 0 ]
