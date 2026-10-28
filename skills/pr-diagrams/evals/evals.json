@@ -46,6 +46,17 @@
       ]
     },
     {
+      "id": "promotion-reuse-preserves-images-and-title",
+      "prompt": "Promote this PR: the source PR title is [main → staging] Add the new dashboard, and its body contains ![preview](https://github.com/user-attachments/assets/a1b2c3) plus ![flow](https://github.com/user-attachments/assets/d4e5f6). Prepare the title and body for promotion to production. Reuse these existing diagrams.",
+      "expected_output": "Title: [staging → production] Add the new dashboard. Body retains the two exact image URLs. Reuse the source PR body images; do not render, upload, or attach them again.",
+      "assertions": [
+        "Preserves https://github.com/user-attachments/assets/a1b2c3 byte-for-byte in the body",
+        "Preserves https://github.com/user-attachments/assets/d4e5f6 byte-for-byte in the body",
+        "Replaces the existing [main → staging] title prefix with [staging → production] exactly once rather than stacking prefixes",
+        "Reuses the source PR images without rendering or attaching images"
+      ]
+    },
+    {
       "id": "reviewers-drop-bot",
       "prompt": "reviews.json and requested.json are the REST reads for PR 12. Which logins does pr-diagrams.sh reviewers 12 --exclude alice keep, and which does it drop?",
       "files": ["evals/files/reviews.json", "evals/files/requested.json"],

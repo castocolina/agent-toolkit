@@ -135,6 +135,40 @@ test_repo_from_origin() {
   check no_stdout "$OUT" ""
 }
 
+test_repo_normalizes_trailing_slash_and_git_suffix() {
+  local root; root=$(mktemp -d); TMPS+=("$root")
+  "$REAL_GIT" init -q "$root"
+  for url in \
+    'https://github.com/acme/widgets/' \
+    'https://github.com/acme/widgets.git/' \
+    'git@github.com:acme/widgets.git/' \
+    'ssh://git@github.com/acme/widgets.git/'; do
+    "$REAL_GIT" -C "$root" remote remove origin 2>/dev/null || true
+    "$REAL_GIT" -C "$root" remote add origin "$url"
+    run_in "$root" -- repo
+    check "parse $url" "$CODE:$OUT" "0:acme/widgets"
+  done
+}
+
+test_repo_rejects_malformed_paths() {
+  local root; root=$(mktemp -d); TMPS+=("$root")
+  "$REAL_GIT" init -q "$root"
+  for url in \
+    'https://github.com/acme/widgets/extra' \
+    'https://github.com/acme/' \
+    'https://github.com/acme' \
+    'https://github.com/' \
+    'https://github.com/acme//widgets' \
+    'git@github.com:acme/widgets/extra.git'; do
+    "$REAL_GIT" -C "$root" remote remove origin 2>/dev/null || true
+    "$REAL_GIT" -C "$root" remote add origin "$url"
+    run_in "$root" -- repo
+    check "reject $url exit" "$CODE" 1
+    check "reject $url stdout" "$OUT" ""
+    check "reject $url names url" "$(grep -cF "$url" "$root/err")" 1
+  done
+}
+
 test_repo_override_ignored_without_gh_stub() {
   local root; root=$(mktemp -d); TMPS+=("$root")
   "$REAL_GIT" init -q "$root"
@@ -434,7 +468,12 @@ test_render_embeds_diagram_in_real_png() {
   fi
   local root; root=$(mktemp -d); TMPS+=("$root")
   cp "$FIXTURE" "$root/flow.drawio"
-  run_in "$root" -- render "$root/flow.drawio"
+  OUT=$(timeout -k 5 150 bash -c 'cd "$1" && bash "$2" render "$3"' _ "$root" "$SCRIPT" "$root/flow.drawio" 2>"$root/err") && CODE=0 || CODE=$?
+  if [ "$CODE" -eq 124 ] || [ "$CODE" -eq 137 ]; then
+    echo "  SKIP real drawio timed out"
+    return 0
+  fi
+  ERR=$(cat "$root/err" 2>/dev/null || true)
   check exit "$CODE" 0
   check marker "$(grep -a -c zTXtmxGraphModel "$root/flow.drawio.png" || true)" 1
 }

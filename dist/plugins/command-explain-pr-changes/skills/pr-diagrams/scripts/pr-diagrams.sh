@@ -31,12 +31,13 @@ repo_of() {
     git@github.com:*) path=${url#git@github.com:} ;;
     *) die "origin is not a GitHub URL: $url" ;;
   esac
-  path=${path%.git}
   path=${path%/}
-  case "$path" in
-    */*) printf '%s\n' "$path" ;;
-    *) die "origin is not a GitHub URL: $url" ;;
-  esac
+  path=${path%.git}
+  if [[ "$path" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+    printf '%s\n' "$path"
+  else
+    die "origin is not a GitHub URL: $url"
+  fi
 }
 
 cmd_related() {
