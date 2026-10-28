@@ -1383,13 +1383,15 @@ class RunnerTests(EvalBase):
 
 
 class GraderTests(EvalBase):
-    def check_bad(self, answer):
+    def check_bad(self, answer, err_contains=None):
         self.mk()
         self.answer("output", "s/e1", "model output")
         self.raw_answer("grade", "s/e1", answer)
         code, res, err = self.run_evals()
         self.assertEqual((code, res), (2, None), err)
         self.assertFalse((self.out / "s/summary-output.json").exists())
+        if err_contains is not None:
+            self.assertIn(err_contains, err)
 
     def entry(self, a="A one", passed=True, evidence="because"):
         return {"assertion": a, "passed": passed, "evidence": evidence}
@@ -1417,6 +1419,13 @@ class GraderTests(EvalBase):
             with self.subTest(bad=bad):
                 self.check_bad(bad)
 
+    def test_grader_accepts_raw_answer(self):
+        self.mk()
+        self.answer("output", "s/e1", "model output")
+        self.raw_answer("grade", "s/e1", grade(["A one", "A two"]))
+        code, res, err = self.run_evals()
+        self.assertEqual((code, res[0]["passed"]), (0, 2), err)
+
     def test_grader_accepts_one_fenced_answer(self):
         body = grade(["A one", "A two"])
         for fenced in (f"```json\n{body}\n```", f"```\n{body}\n```", f"\n```json\n{body}\n```\n"):
@@ -1429,8 +1438,13 @@ class GraderTests(EvalBase):
 
     def test_grader_fence_only_when_it_wraps_the_whole_answer(self):
         body = grade(["A one", "A two"])
-        self.check_bad(f"Here you go:\n```json\n{body}\n```")
-        self.check_bad(f"```json\n{body}\n```\n```json\n{body}\n```")
+        self.check_bad(f"Here you go:\n```json\n{body}\n```", err_contains="answer is not JSON")
+        self.check_bad(f"```json\n{body}\n```\n```json\n{body}\n```", err_contains="answer is not JSON")
+
+    def test_grader_fence_with_invalid_json_exits_2(self):
+        for bad in ("```json\nnot json\n```", "```\n{'results': []}\n```"):
+            with self.subTest(bad=bad):
+                self.check_bad(bad, err_contains="answer is not JSON")
 
 
 class TriggerTests(EvalBase):
