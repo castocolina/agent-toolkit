@@ -75,11 +75,9 @@ The head == base guard fires when the head equals `--base`, or equals `main` whe
 ```bash
 git checkout -b "pr/<short-slug>"
 git switch -c "pr/<short-slug>"
-
-Derive `<short-slug>` from the head name or the latest commit subject.
 ```
 
-Re-read the head after creating it. Promoting from `main` needs `--base`: `main` without `--base` trips this guard.
+Derive `<short-slug>` from the head name or the latest commit subject. Re-read the head after creating it. Promoting from `main` needs `--base`: `main` without `--base` trips this guard.
 
 After the guard, a promotion head is still never pushed. In phase 2, `git fetch origin <head>`; a failure stops the command with git's stderr and nothing else runs. Local `<head>` must then equal `origin/<head>` (compare `git rev-parse <head>` with `git rev-parse origin/<head>`). Otherwise stop with the named error `local <head> differs from origin/<head> (behind or ahead)` before any PR write. No git push of any kind happens for a promotion head.
 
@@ -105,17 +103,19 @@ Then `git fetch origin <base>`. A failure stops the command with git's stderr an
 
 ## 4. Mode decision
 
-Decide the mode during phase 3, after the related-PR read when applicable and before fetching any selected source views, in this order.
+Decide the mode during phase 3 immediately after the `related` read when applicable. For (a), the 4.1 view itself makes the mode decision. In either case, decide before any other source view.
 
 ### 4.1 (a) `--reuse-from=<PR>`
 
 Read the source:
 
 ```bash
-gh pr view <PR> --repo "$REPO" --json title,body,mergedAt
+gh pr view <PR> --repo "$REPO" --json title,body,mergedAt > "$AD/source-<PR>.json"
+jq -r .title "$AD/source-<PR>.json"
+jq -r .body "$AD/source-<PR>.json" > "$AD/source-<PR>.md"
 ```
 
-If `<PR>` equals the current PR number from the open-PR lookup, stop before any PR write, naming that the reuse source is the current PR itself. If `mergedAt` is null (the PR is still open, or was closed unmerged; only a merged PR is a source), stop before any PR write because the source PR is not merged (`mergedAt` is null). Otherwise this is single-source reuse: `SRC=[<PR>]`.
+This is the only view of this source: retain the JSON, take the title and body from that file, and do not call `gh pr view` for this PR again. If `<PR>` equals the current PR number from the open-PR lookup, stop before any PR write, naming that the reuse source is the current PR itself. If `mergedAt` is null (the PR is still open, or was closed unmerged; only a merged PR is a source), stop before any PR write because the source PR is not merged (`mergedAt` is null). Otherwise this is single-source reuse: `SRC=[<PR>]`.
 
 ### 4.2 (b) Promotion head
 
@@ -135,7 +135,7 @@ Omit `--exclude-pr` when the lookup found no current PR. Pass it with the curren
 
 This range logic assumes merge commits. With squash or rebase merges an older cycle's commits stay in the range and the detection may pick wrong sources. This command does not handle that case.
 
-Fetch every selected PR, and only those, with `gh pr view <PR> --repo "$REPO" --json title,body`. A related PR whose `base_ref` is not the current head is not selected: do not run `gh pr view` on it. With no selected PR the command takes the feature path.
+Fetch every selected PR, and only those, exactly once with `gh pr view <n> --repo "$REPO" --json title,body > "$AD/source-<n>.json"`; take the title with `jq -r .title "$AD/source-<n>.json"` and write the body with `jq -r .body "$AD/source-<n>.json" > "$AD/source-<n>.md"`. A related PR whose `base_ref` is not the current head is not selected: do not run `gh pr view` on it. With no selected PR the command takes the feature path.
 
 ### 4.3 (c) Feature PR
 
@@ -151,13 +151,13 @@ A feature PR title has no `[<head> → <base>]` prefix. It states the change in 
 
 ### 4.5 Reuse body (single source)
 
-Copy the source body verbatim, rewriting only its `# PR Summary:` heading to the new title. Add no "Close" line. The size bound in 4.7 applies. Fetch each body directly to `$AD/source-<n>.md` with `gh pr view <n> --repo "$REPO" --json body --jq .body > "$AD/source-<n>.md"`; never retype or reconstruct source-body content.
+Copy the source body verbatim, rewriting only its `# PR Summary:` heading to the new title. Add no "Close" line. The size bound in 4.7 applies. Use the one source view specified in 4.1 (for reuse-from) or 4.2 (for a related source): extract `.body` from its saved JSON with `jq -r .body "$AD/source-<n>.json" > "$AD/source-<n>.md"`. Never make a second view, retype, or reconstruct source-body content.
 
 In `mermaid` and `drawio` modes, image URLs and Mermaid blocks already in the source body carry over, including an ordinary image on another host. Nothing is uploaded again. This is how a B→C promotion keeps diagrams an A→B promotion reused. `drawio` never renders or attaches a diagram it reuses. `mermaid` uploads nothing. When no diagram is authored, `mermaid` and `drawio` keep the copied body exactly as is. When 4.9 says to author a diagram onto a copied body (the source holds no diagram, and the changes warrant one), keep every other line verbatim and append the new diagram section. The ordinary image stays.
 
 ### 4.6 Consolidated body
 
-Use the PR template in section 8, with a fresh one-paragraph overview under the summary heading, then an "Included PRs" section. One subsection per source PR, in `related`'s order (`merged_at` descending). Head each subsection `### [#<n> <title>](https://github.com/$REPO/pull/<n>)` (the heading links the PR) and put that source body inside it verbatim minus its own `# PR Summary:` heading. Fetch every body directly to `$AD/source-<n>.md` with `gh pr view <n> --repo "$REPO" --json body --jq .body > "$AD/source-<n>.md"`, then assemble `$AD/body.md` with the subsection headings around those files using `cat` or heredoc composition. Do not retype or reconstruct source-body content; preserve it byte-for-byte except the explicitly removed `# PR Summary:` heading. Nothing substantive is dropped, and conflicting content stays attributed to its PR. No other merging rules. No "Close" line.
+Use the PR template in section 8, with a fresh one-paragraph overview under the summary heading, then an "Included PRs" section. One subsection per source PR, in `related`'s order (`merged_at` descending). Head each subsection `### [#<n> <title>](https://github.com/$REPO/pull/<n>)` (the heading links the PR) and put that source body inside it verbatim minus its own `# PR Summary:` heading. Use each source's single view from 4.2, extracting `.title` with `jq -r .title "$AD/source-<n>.json"` and `.body` with `jq -r .body "$AD/source-<n>.json" > "$AD/source-<n>.md"`. Assemble `$AD/body.md` with the subsection headings around those `.md` files using `cat` or heredoc composition. Do not make a second view or retype/reconstruct source content; preserve it byte-for-byte except the explicitly removed heading. Nothing substantive is dropped, and conflicting content stays attributed to its PR. No other merging rules. No "Close" line.
 
 In `mermaid` and `drawio` modes, image URLs and Mermaid blocks in the source bodies stay inside their own source subsections. `mermaid` keeps the consolidated body exactly as composed and uploads nothing.
 
@@ -209,7 +209,7 @@ Do not create `$AD` in this phase. A stop here writes nothing.
 - A feature head is pushed with `git push -u origin <head>`. `gh pr create --head` never pushes. `git push -u origin <head>` runs before `git fetch origin <base>` and before any `gh` call. If `gh pr list` itself fails, the push already happened; the command then stops quoting gh's stderr, and no PR write follows.
 - A promotion head is not pushed. No git push of any kind runs. Run `git fetch origin <head>`, then require local `<head>` to equal `origin/<head>` (3.6).
 
-A failure stops the command with the git stderr or the named error (`local <head> differs from origin/<head> (behind or ahead)`). Quote git's stderr in the final message. Nothing else runs: no read and no PR write.
+For every failure path, the final message begins with the failing tool's error text verbatim (the gh or git stderr line); when a named guard error has no tool stderr, begin with that named error. A failure stops the command with the git stderr or the named error (`local <head> differs from origin/<head> (behind or ahead)`). Quote git's stderr in the final message. Nothing else runs: no read and no PR write.
 
 ### Phase 3: All reads
 
@@ -227,7 +227,7 @@ Then, in this order:
 1. The open-PR lookup (3.7). A non-zero `gh pr list` stops the command quoting gh's stderr; no PR write. For a feature head this is the first `gh` call, and it comes after the push.
 2. Resolve the base (3.7), including the `--base` disagreement stop, then `git fetch origin <base>`. On the feature path this fetch comes after the push and after the lookup. Read `git diff origin/<base>...HEAD` for the feature summary and promotion diagram decision. A failure stops the command quoting git's stderr; no PR write.
 3. Mode reads. A promotion head runs `bash "$PRD" related <base> <head> [--exclude-pr <N>]`. A feature head runs no `related` call. Any failed read, a rate-limited `related` included, stops the command before any PR write. The final message names the failing call (`pr-diagrams.sh related`, `pr-diagrams.sh reviewers`, `gh pr view`, `gh pr list`, `gh api user`, or `git fetch`) and quotes its stderr. When `related` exits 1 with `rate limited` in its message, the final message contains `rate limited` and names the failing `pr-diagrams.sh related` call. No `gh pr create` and no `gh pr edit` runs.
-4. For each PR in `SRC`, and for no other PR, `gh pr view <PR> --repo "$REPO" --json title,body` (for (a), the view in 4.1 already returned `title,body,mergedAt`; do not view it twice). Write each source body to `$AD/source-<n>.md`. `SRC` empty means no `gh pr view` of a source at all.
+4. For each PR in `SRC`, and for no other PR, make exactly one source view and save its JSON. For (a), 4.1 runs `gh pr view <PR> --repo "$REPO" --json title,body,mergedAt > "$AD/source-<PR>.json"`; title and body come from that file. For related sources, run `gh pr view <n> --repo "$REPO" --json title,body > "$AD/source-<n>.json"`. In both cases write the body using `jq -r .body "$AD/source-<n>.json" > "$AD/source-<n>.md"` and read title using `jq -r .title "$AD/source-<n>.json"`. Never view a source twice. Assemble body.md from the `.md` files with cat/heredoc headings; never retype source content. `SRC` empty means no `gh pr view` of a source at all.
 5. Reviewers, only on a reuse path (section 6): the author lookup, then `bash "$PRD" reviewers <SRC...> --exclude <author>`. Write the logins to `$AD/reviewers.txt`, one per line.
 
 End the Bash call by writing `$AD/state.env` with every value later calls read: `REPO`, `PRD` (empty when unused), `head`, `base`, `author` (empty when there is no reuse path), the source PR numbers, and `N` once known (`N` is empty for a new PR and is appended after `gh pr create`). `$AD` also holds the title and body files and, in drawio mode, the authoring and render files.
@@ -278,7 +278,7 @@ Every `gh pr create` passes `--base <base> --head <head>`, `--title`, and `--bod
 Failure:
 
 - If gh exits non-zero and prints a PR URL (a partial `--attach` failure: the PR exists), take `N` from the last path segment of that URL and immediately append `N=<number>` to `$AD/state.env`, then run exactly one `gh pr edit <N> --repo "$REPO" --body-file "$AD/body-fallback.md"` (no `--attach`, no `--title`) so the Mermaid fallback replaces the body, continue to reviewers, and begin the final message with gh's error text verbatim from gh's stderr line.
-- If `gh pr create` or `gh pr edit` exits non-zero and prints no PR URL (HTTP rejection, including a body over the size limit, auth, network), even when the PNG was already rendered in `$AD`, stop immediately. Add no reviewers: no `--add-reviewer` call runs. Begin the final message with gh's error, quoting gh's stderr (for example `HTTP 500`). Then run the phase 6 cleanup: `rm -rf "$AD"` and remove the pointer file.
+- If `gh pr create` or `gh pr edit` exits non-zero and prints no PR URL (HTTP rejection, including a body over the size limit, auth, network), even when the PNG was already rendered in `$AD`, stop immediately. Add no reviewers: no `--add-reviewer` call runs. Begin the final message with gh's stderr line verbatim (for example `HTTP 500`). Then run the phase 6 cleanup: `rm -rf "$AD"` and remove the pointer file.
 
 ### Phase 6: Reviewers, the final message, cleanup
 
