@@ -1,81 +1,32 @@
 ---
 name: reducing-entropy
-description: Manual-only skill for minimizing total codebase size. Only activate when explicitly requested by user. Measures success by final code amount, not effort. Bias toward deletion.
+description: "Use only when users explicitly ask to reduce entropy, delete code, shrink/simplify a codebase, or choose the smallest implementation. Bias toward deletion and measure the final end state, not effort. Not for general refactoring, readability, or performance reviews."
 ---
 
 # Reducing Entropy
 
-More code begets more code. Entropy accumulates. This skill biases toward the smallest possible codebase.
+This is a manual-only skill: use it only after an explicit user request to minimize code or reduce entropy; do not invoke it as a default refactoring lens. Optimize authorized behavior for the smallest maintainable first-party codebase at the end, not the smallest patch.
 
-**Core question:** "What does the codebase look like *after*?"
+## Scope and decision
 
-## Before You Begin
+Open the answer by stating that this is an explicit, manual-only reduce-entropy request, and name the reference mindset and principle you apply (for example the data-over-abstractions mindset: prefer plain data and one shared function over wrapper layers; or the PAGNI principle for safeguards that are costly to add later). Ask the smallest-codebase question: what is the least code that still meets the need, and what can be deleted?
 
-**Load at least one mindset from `references/`**
+First name behavior, public contracts, and data-retention obligations that must remain. Removing user-visible features, public APIs, schema/data, or retention behavior requires explicit approval and a rollback path. Correctness, security, compliance, and approved behavior outrank deletion; PAGNI may justify a safeguard that costs code.
 
-1. List the files in the reference directory
-2. Read frontmatter descriptions to pick which applies
-3. Load at least one
-4. State which you loaded and its core principle
+Load the relevant reference before deciding:
+- Wrapper/custom type/plain-data decisions: read [data-over-abstractions](references/data-over-abstractions.md) and apply its data-over-abstractions mindset.
+- Coupled responsibilities or composition boundaries: read [design-is-taking-apart](references/design-is-taking-apart.md).
+- Hidden coupling or interface convenience: read [simplicity vs easy](references/simplicity-vs-easy.md).
+- Safeguards costly to retrofit (timestamps, audit/security records, versioning): read [PAGNI](references/expensive-to-add-later.md) and apply its principle.
 
-**Do not proceed until you've done this.**
+## Procedure
 
-## The Goal
+If repository evidence or file access is unavailable, do not stop at requesting it. State assumptions, name a likely deletion/consolidation candidate as a hypothesis, ask for the missing evidence only as a follow-up, and provide the smallest-codebase decision framework now. Do not claim an unmeasured size reduction, but when the request supplies counts, state the projected end state from those facts (for example 14 wrappers around one formatter → keep one, delete 13) and label it projected. Always specify how before and after totals will be measured (same directories and exclusions, for example `wc -l` over first-party sources).
 
-The goal is **less total code in the final codebase** - not less code to write right now.
+1. Inventory consumers and contracts. For potentially shared logic, identify its rule owner, compare input/output contracts and reasons for change, and merge only if consumers require the same invariant. Similar code that changes for different reasons stays separate.
+2. Propose deletion and consolidation candidates, plus what becomes obsolete and any dependency/generated/migration costs.
+3. Count first-party implementation lines consistently before and after the proposed changes, using the same directories and exclusions; count moved or renamed files at their new location only. State the initial and final counts and net change. If no changes have been made yet, report the measured baseline and mark the final count as pending rather than promising a comparison. Report test/dependency costs separately.
+4. Validate behavior, compatibility, tests, and safety. Add code when justified by correctness or safeguards even if net lines rise.
+5. Report before/after counts and files made obsolete; state any trade-off that prevents deletion.
 
-- Writing 50 lines that delete 200 lines = net win
-- Keeping 14 functions to avoid writing 2 = net loss
-- "No churn" is not a goal. Less code is the goal.
-
-**Measure the end state, not the effort.**
-
-## Three Questions
-
-### 1. What's the smallest codebase that solves this?
-
-Not "what's the smallest change" - what's the smallest *result*.
-
-- Could this be 2 functions instead of 14?
-- Could this be 0 functions (delete the feature)?
-- What would we delete if we did this?
-
-### 2. Does the proposed change result in less total code?
-
-Count lines before and after. If after > before, reject it.
-
-- "Better organized" but more code = more entropy
-- "More flexible" but more code = more entropy
-- "Cleaner separation" but more code = more entropy
-
-### 3. What can we delete?
-
-Every change is an opportunity to delete. Ask:
-
-- What does this make obsolete?
-- What was only needed because of what we're replacing?
-- What's the maximum we could remove?
-
-## Red Flags
-
-- **"Keep what exists"** - Status quo bias. The question is total code, not churn.
-- **"This adds flexibility"** - Flexibility for what? YAGNI.
-- **"Better separation of concerns"** - More files/functions = more code. Separation isn't free.
-- **"Type safety"** - Worth how many lines? Sometimes runtime checks in less code wins.
-- **"Easier to understand"** - 14 things are not easier than 2 things.
-
-## When This Doesn't Apply
-
-- The codebase is already minimal for what it does
-- You're in a framework with strong conventions (don't fight it)
-- Regulatory/compliance requirements mandate certain structures
-
-## Reference Mindsets
-
-See `references/` for philosophical grounding.
-
-To add new mindsets, see `adding-reference-mindsets.md`.
-
----
-
-**Bias toward deletion. Measure the end state.**
+NEVER delete tests or move complexity to generated/vendor code to improve counts. NEVER drop schema columns, migrations, or data as entropy reduction; treat that as a separately approved data-retention change with rollback plan.

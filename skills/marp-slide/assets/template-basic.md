@@ -115,32 +115,32 @@ section.lead p {
 
 <!-- _class: lead -->
 
-# プレゼンテーションタイトル
+# Presentation Title
 
-あなたの名前
-2024年XX月XX日
-
----
-
-## アジェンダ
-
-- トピック1
-- トピック2
-- トピック3
-- トピック4
+Your Name
+Month XX, 2024
 
 ---
 
-## スライドタイトル
+## Agenda
 
-- ポイント1
-- ポイント2
-- ポイント3
+- Topic1
+- Topic2
+- Topic3
+- Topic4
 
 ---
 
-## まとめ
+## Slide Title
 
-- 要点1
-- 要点2
-- ご清聴ありがとうございました
+- Point1
+- Point2
+- Point3
+
+---
+
+## Conclusion
+
+- Key Point1
+- Key Point2
+- Thank you for your attention

@@ -220,7 +220,7 @@ plugin-name/
 ├── commands/                 # Optional: Custom slash commands
 │   ├── simple.md            # → /simple
 │   └── namespace/
-│       └── action.md        # → /namespace:action
+│       └── action.md        # discover installed name, e.g. /plugin-name:action
 ├── agents/                   # Optional: Agent definitions
 ├── skills/                   # Optional: Agent Skills
 │   └── skill-name/

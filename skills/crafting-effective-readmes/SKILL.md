@@ -1,78 +1,28 @@
 ---
 name: crafting-effective-readmes
-description: Use when writing or improving README files. Not all READMEs are the same — provides templates and guidance matched to your audience and project type.
+description: Write, update, or audit README.md files using audience-appropriate guidance for open-source, internal, personal, and config repositories. Use for project introductions, quick-start paths, capability updates, or checking claims against repository behavior, even when asked to fix the docs. Not for standalone API references, user manuals, changelogs, contributor guides, or general prose outside a README.
 ---
 
 # Crafting Effective READMEs
 
-## Overview
+A README should get its intended reader to a supported first success, then route secondary readers to the right detail.
 
-READMEs answer questions your audience will have. Different audiences need different information - a contributor to an OSS project needs different context than future-you opening a config folder.
+## Workflow
 
-**Always ask:** Who will read this, and what do they need to know?
+1. Infer task from the request: create/write → Creating; add → Adding; update → Updating; review/audit → Reviewing. Ask only if ambiguity materially changes the result.
+2. Identify project type from evidence: target under `~/.config` or dotfiles repo → Config; LICENSE and CI → likely OSS; private employer remote → Internal; no remote → Personal. If signals conflict, ask rather than assuming.
+3. Identify reader roles and each role's first successful outcome. Derive prerequisites from repository evidence (manifests, scripts, CI, source, configuration); present the shortest supported path first. Move maintainer/operator detail out of the first-use path.
+4. For type-specific sections, read `references/section-checklist.md`; choose the corresponding `templates/` file only when creating or substantially restructuring. Before presenting a draft, read `references/style-guide.md`. Read `references/using-references.md` only when deeper guidance is requested.
+5. Verify all commands, versions, badges, links, and capability claims against source. Do not invent missing facts. Creating: fill each chosen template section or mark it N/A. Updating: show the changed sections/diff. Reviewing: flag each unsupported or stale claim with evidence and a suggested correction.
+6. Ask a closing question only when a consequential fact remains unresolved; otherwise deliver the result directly.
 
-## Process
+## Boundaries
 
-### Step 1: Identify the Task
-
-**Ask:** "What README task are you working on?"
-
-| Task | When |
-|------|------|
-| **Creating** | New project, no README yet |
-| **Adding** | Need to document something new |
-| **Updating** | Capabilities changed, content is stale |
-| **Reviewing** | Checking if README is still accurate |
-
-### Step 2: Task-Specific Questions
-
-**Creating initial README:**
-1. What type of project? (see Project Types below)
-2. What problem does this solve in one sentence?
-3. What's the quickest path to "it works"?
-4. Anything notable to highlight?
-
-**Adding a section:**
-1. What needs documenting?
-2. Where should it go in the existing structure?
-3. Who needs this info most?
-
-**Updating existing content:**
-1. What changed?
-2. Read current README, identify stale sections
-3. Propose specific edits
-
-**Reviewing/refreshing:**
-1. Read current README
-2. Check against actual project state (package.json, main files, etc.)
-3. Flag outdated sections
-4. Update "Last reviewed" date if present
-
-### Step 3: Always Ask
-
-After drafting, ask: **"Anything else to highlight or include that I might have missed?"**
-
-## Project Types
-
-| Type | Audience | Key Sections | Template |
-|------|----------|--------------|----------|
-| **Open Source** | Contributors, users worldwide | Install, Usage, Contributing, License | `templates/oss.md` |
-| **Personal** | Future you, portfolio viewers | What it does, Tech stack, Learnings | `templates/personal.md` |
-| **Internal** | Teammates, new hires | Setup, Architecture, Runbooks | `templates/internal.md` |
-| **Config** | Future you (confused) | What's here, Why, How to extend, Gotchas | `templates/xdg-config.md` |
-
-**Ask the user** if unclear. Don't assume OSS defaults for everything.
-
-## Essential Sections (All Types)
-
-Every README needs at minimum:
-
-1. **Name** - Self-explanatory title
-2. **Description** - What + why in 1-2 sentences  
-3. **Usage** - How to use it (examples help)
+Never use badges or links to projects/packages that do not exist. Select badges for the actual ecosystem, verify license before stating it, and include contribution links only if their targets exist. Do not document install steps you have not run or verified against project configuration. Check generated-region markers before editing; preserve regions maintained by another tool.
 
 ## References
 
-- `section-checklist.md` - Which sections to include by project type
-- `style-guide.md` - Common README mistakes and prose guidance
-- `using-references.md` - Guide to deeper reference materials
+- `references/section-checklist.md`: after identifying project type, when choosing sections.
+- `references/style-guide.md`: before presenting a draft or audit.
+- `references/using-references.md`: only for deeper README guidance requested or needed.
+- `templates/oss.md`, `templates/personal.md`, `templates/internal.md`, `templates/xdg-config.md`: only when creating or restructuring that project type.

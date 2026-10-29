@@ -131,16 +131,18 @@ const StyledCard = styled(Card)(({ theme }) => ({
 
 // With props
 interface StyledButtonProps {
-  variant: 'primary' | 'secondary';
+  tone: 'primary' | 'secondary';
 }
 
-const StyledButton = styled(Button)<StyledButtonProps>(({ theme, variant }) => ({
-  backgroundColor: variant === 'primary'
+const StyledButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== 'tone',
+})<StyledButtonProps>(({ theme, tone }) => ({
+  backgroundColor: tone === 'primary'
     ? theme.palette.primary.main
     : theme.palette.secondary.main,
   color: theme.palette.primary.contrastText,
   '&:hover': {
-    backgroundColor: variant === 'primary'
+    backgroundColor: tone === 'primary'
       ? theme.palette.primary.dark
       : theme.palette.secondary.dark
   }
@@ -198,7 +200,7 @@ const theme = createTheme({
 // Use in CSS
 .custom-element {
   background-color: var(--mui-palette-background-paper);
-  padding: var(--mui-spacing-2);
+  padding: calc(2 * var(--mui-spacing));
 }
 ```
 
@@ -256,19 +258,15 @@ const theme = createTheme({
 
 - **Use sx prop for dynamic styles** - Better tree-shaking
 - **Use styled() for static reusable components** - Better performance
-- **Avoid inline functions in sx** - Can cause re-renders
 - **Leverage theme tokens** - Consistent and performant
+- An `sx` callback does not itself trigger React renders. Prop identity matters when a changing callback/object is passed to a memoized consumer; profile before memoizing. React rendering, Emotion style generation, and the cost of generating highly dynamic style values are distinct concerns.
 
 ```typescript
-// ❌ Bad: Inline function in sx
-<Box sx={() => ({ p: 2 })} />
+// Theme callback is useful when values depend on the theme.
+<Box sx={(theme) => ({ p: theme.spacing(2) })} />
 
-// ✅ Good: Direct object
+// A direct object is sufficient for static values.
 <Box sx={{ p: 2 }} />
-
-// ✅ Good: Memoized function for complex logic
-const getSx = useMemo(() => ({ p: 2, /* complex logic */ }), [deps]);
-<Box sx={getSx} />
 ```
 
 ## Debugging Styles

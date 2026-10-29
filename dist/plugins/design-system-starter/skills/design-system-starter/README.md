@@ -1,13 +1,13 @@
 # Design System Starter
 
-A comprehensive Claude Code skill for creating and evolving production-ready design systems with design tokens, component architecture, accessibility guidelines, and documentation templates.
+A Claude Code skill for creating and evolving shared design-system contracts, tokens, component guidance, accessibility checks, and adoption documentation.
 
 ## Purpose
 
 This skill helps you build robust, scalable design systems that ensure visual consistency and exceptional user experiences across your products. It provides structured guidance for:
 
 - Defining and organizing design tokens (colors, typography, spacing, shadows)
-- Architecting components using atomic design methodology
+- Deriving reusable component hierarchies from real product use
 - Implementing theming and dark mode support
 - Ensuring WCAG 2.1 Level AA accessibility compliance
 - Creating comprehensive component documentation
@@ -20,7 +20,7 @@ Use this skill when you need to:
 - Create a new design system from scratch
 - Standardize UI patterns across multiple products
 - Implement design tokens for consistent styling
-- Structure components using atomic design principles
+- Define reusable component contracts from real product patterns
 - Ensure accessibility compliance (WCAG 2.1 AA)
 - Set up theming and dark mode support
 - Document component libraries effectively
@@ -28,7 +28,7 @@ Use this skill when you need to:
 
 ## How It Works
 
-The skill provides comprehensive guidance and templates organized around five core areas:
+The skill provides a workflow, a token output template, a component source scaffold, an audit checklist, and component API examples:
 
 ### 1. Design Tokens
 Structured JSON templates for defining foundational design decisions:
@@ -39,12 +39,7 @@ Structured JSON templates for defining foundational design decisions:
 - **Shadows**: Elevation system for depth
 
 ### 2. Component Architecture
-Atomic design methodology for building UI:
-- **Atoms**: Primitive components (Button, Input, Label, Icon)
-- **Molecules**: Simple compositions (FormField, SearchBar, Card)
-- **Organisms**: Complex compositions (Navigation, Modal, ProductGrid)
-- **Templates**: Page layouts
-- **Pages**: Specific instances with real content
+A reusable component hierarchy based on observed use, with foundational tokens/primitives, composed patterns, and product-level modules only where needed.
 
 ### 3. Accessibility
 Built-in WCAG 2.1 Level AA compliance:
@@ -54,10 +49,7 @@ Built-in WCAG 2.1 Level AA compliance:
 - Focus management
 
 ### 4. Theming
-Multiple approaches for light/dark mode:
-- CSS custom properties
-- Tailwind CSS dark mode utilities
-- Styled Components ThemeProvider
+Defaults to semantic CSS custom properties switched by a `data-theme` attribute, while reusing an existing styling system where appropriate.
 
 ### 5. Documentation
 Standards for component documentation:
@@ -75,22 +67,20 @@ Standards for component documentation:
 - Consistent spacing based on mathematical scale
 - Shadow system for elevation
 
-### Component Templates
-- TypeScript-first component templates
-- Polymorphic component patterns
-- Compound component API design
-- Variant and size systems
-- Complete accessibility support
+### Component Guidance
+- Semantic component contracts and props
+- Composition and slots for genuine variation
+- Accessible interaction patterns and validation
 
 ### Bundled Resources
 The skill includes ready-to-use templates and references:
 - `templates/design-tokens-template.json` - Complete token structure
-- `templates/component-template.tsx` - React component boilerplate
-- `references/component-examples.md` - Full implementations with variants
+- `templates/component-template.tsx` - Component source scaffold
+- `references/component-examples.md` - Field composition, semantic CSS, and token/variant examples
 - `checklists/design-system-checklist.md` - Audit checklist
 
 ### Accessibility First
-- WCAG 2.1 Level AA compliance by default
+- Contrast checks for actual foreground/background pairs
 - Color contrast guidelines and testing recommendations
 - Keyboard navigation patterns
 - ARIA best practices
@@ -106,7 +96,7 @@ Create a design system for my React app with dark mode support
 
 The skill will guide you through:
 1. Setting up design tokens (colors, typography, spacing)
-2. Creating atomic components (Button, Input, Card)
+2. Deriving reusable component contracts for high-frequency patterns
 3. Implementing dark mode with CSS variables
 4. Ensuring accessibility compliance
 5. Setting up documentation structure
@@ -120,20 +110,19 @@ Set up design tokens for colors and spacing using the 8px scale
 Provides:
 - Color token structure (primitive + semantic)
 - Spacing scale based on 8px units
-- JSON format compatible with Style Dictionary
+- W3C design-token JSON structure (see the template's `$schema`)
 - CSS variable implementation
 
 ### Example 3: Component Architecture
 
 ```
-Design component structure using atomic design for my dashboard
+Design reusable component contracts for the patterns in my dashboard
 ```
 
 Delivers:
-- Breakdown of atoms, molecules, organisms needed
-- Component hierarchy and relationships
-- Props API design patterns
-- Composition guidelines
+- A hierarchy based on observed reuse
+- Component contracts and composition guidance
+- Accessibility and theme considerations
 
 ### Example 4: Accessibility Audit
 
@@ -168,7 +157,7 @@ The skill activates on these common phrases:
 |---------------|--------------|
 | "Create a design system" | Full design system setup |
 | "Set up design tokens" | Token structure and implementation |
-| "Design component structure" | Atomic design architecture |
+| "Design component structure" | Reusable component hierarchy |
 | "Ensure WCAG compliance" | Accessibility guidelines and patterns |
 | "Implement dark mode" | Theming and dark mode support |
 | "Component architecture" | Component organization patterns |
@@ -185,8 +174,7 @@ Complete JSON structure with:
 - Border radius and shadow tokens
 
 ### Component Architecture Output
-- Atomic design hierarchy diagram
-- Component inventory by category
+- Component hierarchy and inventory based on observed patterns
 - Props interface definitions
 - Implementation examples with TypeScript
 - Accessibility notes for each component
@@ -216,22 +204,6 @@ The skill is built on four core principles:
 3. **Scalable and Maintainable**: Design tokens enable global changes, component composition reduces duplication
 
 4. **Developer-Friendly**: Clear API contracts, comprehensive documentation, easy to integrate and customize
-
-## Integration
-
-Works seamlessly with popular tools and frameworks:
-- **React/TypeScript**: Primary target with complete TypeScript support
-- **Style Dictionary**: Compatible token format for multi-platform output
-- **Tailwind CSS**: Design token mapping to Tailwind config
-- **Styled Components**: Theme provider integration
-- **Storybook**: Documentation templates and story patterns
-- **Figma**: Token naming aligned with Figma variables
-
-## Related Skills
-
-- `landing-page-guide-v2`: Uses design system principles for landing pages
-- `nextjs15-init`: Can initialize projects with design system structure
-- `mui`: Material-UI specific patterns (alternative approach)
 
 ## License
 

@@ -10,7 +10,7 @@ Full-featured table with typed columns, custom rendering, sorting.
 type Column<T> = {
   key: keyof T;
   header: string;
-  render?: (value: T[keyof T], item: T) => React.ReactNode;
+  render?: (item: T) => React.ReactNode;
   sortable?: boolean;
 };
 
@@ -63,7 +63,7 @@ function Table<T>({
             {columns.map((col) => (
               <td key={String(col.key)}>
                 {col.render
-                  ? col.render(item[col.key], item)
+                  ? col.render(item)
                   : String(item[col.key])}
               </td>
             ))}
@@ -106,21 +106,21 @@ function UserTable({ users }: { users: User[] }) {
         {
           key: 'email',
           header: 'Email',
-          render: (email) => <a href={`mailto:${email}`}>{email}</a>,
+          render: (user) => <a href={`mailto:${user.email}`}>{user.email}</a>,
         },
         {
           key: 'role',
           header: 'Role',
-          render: (role) => (
-            <span className={role === 'admin' ? 'badge-admin' : 'badge-user'}>
-              {role}
+          render: (user) => (
+            <span className={user.role === 'admin' ? 'badge-admin' : 'badge-user'}>
+              {user.role}
             </span>
           ),
         },
         {
           key: 'createdAt',
           header: 'Created',
-          render: (date) => new Date(date).toLocaleDateString(),
+          render: (user) => user.createdAt.toLocaleDateString(),
           sortable: true,
         },
       ]}
@@ -417,17 +417,17 @@ const metrics: Array<[MetricKey, MetricValue]> = [
 Reusable form field with type-safe value handling.
 
 ```typescript
-type FieldProps<T> = {
+type FieldProps = {
   name: string;
   label: string;
-  value: T;
-  onChange: (value: T) => void;
-  type: 'text' | 'number' | 'email' | 'password';
   error?: string;
   required?: boolean;
-};
+} & (
+  | { type: 'number'; value: number; onChange: (value: number) => void }
+  | { type: 'text' | 'email' | 'password'; value: string; onChange: (value: string) => void }
+);
 
-function FormField<T extends string | number>({
+function FormField({
   name,
   label,
   value,
@@ -435,11 +435,16 @@ function FormField<T extends string | number>({
   type,
   error,
   required = false,
-}: FieldProps<T>) {
+}: FieldProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue =
-      type === 'number' ? (Number(e.target.value) as T) : (e.target.value as T);
-    onChange(newValue);
+    const raw = e.target.value;
+    if (type !== 'number') {
+      onChange(raw);
+      return;
+    }
+    if (raw.trim() === '') return;
+    const parsed = e.target.valueAsNumber;
+    if (Number.isFinite(parsed)) onChange(parsed);
   };
 
   return (

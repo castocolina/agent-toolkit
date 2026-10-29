@@ -127,17 +127,13 @@ Users add via absolute path:
 
 ## Command Naming Convention
 
-Commands use subdirectory-based namespacing:
-
-- File: `commands/namespace/command.md`
-- Invoked as: `/namespace:command`
-- The `:` represents directory separator `/`
+Commands are invoked with the installed plugin's namespace, for example `/plugin-name:simple`. Discover installed command names after installation; do not infer the namespace solely from nested command directories. Nested command paths may affect the command name, so verify them through installed command discovery.
 
 **Examples:**
 
-- `commands/prime/vue.md` → `/prime:vue`
-- `commands/docs/generate.md` → `/docs:generate`
-- `commands/simple.md` → `/simple`
+- `commands/prime/vue.md` → discover the installed command name (for example `/plugin-name:vue`)
+- `commands/docs/generate.md` → discover the installed command name (for example `/plugin-name:generate`)
+- `commands/simple.md` → `/plugin-name:simple`
 
 ## Common Plugin Patterns
 

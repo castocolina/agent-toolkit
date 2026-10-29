@@ -68,11 +68,11 @@ The skill follows a four-phase process:
 - **Normalization** - Automatic application of 1NF, 2NF, and 3NF rules
 - **Data Types** - Appropriate type selection (DECIMAL for money, proper VARCHAR sizing)
 - **Constraints** - Foreign keys with ON DELETE strategies, CHECK constraints, UNIQUE constraints
-- **Indexes** - B-Tree, Hash, Full-text, and Partial index recommendations
+- **Indexes** - Planned from query patterns, selectivity, and execution plans, not by reflex
 
 ### NoSQL Schema Design (MongoDB)
 - **Embedding vs Referencing** - Guidance on when to embed documents vs use references
-- **Index Strategies** - Single field, composite, text search, and geospatial indexes
+- **Index Strategies** - Chosen from the access patterns the collection must serve
 - **Document Structure** - Optimal document design based on access patterns
 
 ### Relationship Patterns
@@ -99,17 +99,19 @@ Output:
 
 ```sql
 CREATE TABLE users (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   email VARCHAR(255) UNIQUE NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMPTZ DEFAULT now()
 );
 
 CREATE TABLE orders (
-  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   user_id BIGINT NOT NULL REFERENCES users(id),
-  total DECIMAL(10,2) NOT NULL,
-  INDEX idx_orders_user (user_id)
+  total DECIMAL(10,2) NOT NULL
 );
+
+-- Only if "orders by user" is a real query:
+CREATE INDEX idx_orders_user ON orders (user_id);
 ```
 
 ### Available Commands
@@ -159,7 +161,7 @@ After designing a schema, verify:
 - [ ] Every table has a primary key
 - [ ] All relationships have foreign key constraints
 - [ ] ON DELETE strategy defined for each FK
-- [ ] Indexes exist on all foreign keys
+- [ ] Indexes support representative queries and integrity operations where needed
 - [ ] Indexes exist on frequently queried columns
 - [ ] Appropriate data types (DECIMAL for money, etc.)
 - [ ] NOT NULL on required fields
@@ -177,10 +179,10 @@ After designing a schema, verify:
 - Normalize to 3NF first, then selectively denormalize
 - Use DECIMAL for money (never FLOAT)
 - Always define foreign key constraints
-- Index every foreign key column
+- Plan indexes from query patterns; do not index every foreign key or low-selectivity field by reflex
 - Size VARCHAR columns appropriately
 - Store dates in DATE/TIMESTAMP types
-- Always write reversible migrations
+- Plan a tested rollback or recovery path; a DOWN script alone is not proof of reversibility
 - Test migrations on staging with production-like data
 
 ### Avoid
@@ -190,9 +192,9 @@ After designing a schema, verify:
 | VARCHAR(255) everywhere | Wastes storage, hides intent | Size appropriately per field |
 | FLOAT for money | Rounding errors | DECIMAL(10,2) |
 | Missing FK constraints | Orphaned data | Always define foreign keys |
-| No indexes on FKs | Slow JOINs | Index every foreign key |
+| Unplanned indexes | Write amplification and unnecessary maintenance | Check query patterns, selectivity, existing composite prefixes, and execution plans |
 | Storing dates as strings | Cannot compare/sort properly | Use DATE/TIMESTAMP types |
-| Non-reversible migrations | Cannot rollback safely | Always write DOWN migration |
+| Untested rollback | Cannot recover safely | Plan and test a rollback or recovery path and state any data loss |
 
 ## Key Terminology
 

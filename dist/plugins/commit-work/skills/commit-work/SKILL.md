@@ -1,55 +1,27 @@
 ---
 name: commit-work
-description: "Create high-quality git commits: review/stage intended changes, split into logical commits, and write clear commit messages (including Conventional Commits). Use when the user asks to commit, craft a commit message, stage changes, or split work into multiple commits."
+description: Create or prepare reviewable Git commits by inspecting intended changes, selectively staging coherent units, reviewing the index, and writing Conventional Commit messages. Use when asked to commit work, stage selected changes, split a mixed tree, review staged content, or draft a commit message. Not for rebasing, squashing or force-pushing history, opening pull requests, or general code review unrelated to a commit.
 ---
 
 # Commit work
 
-## Goal
-Make commits that are easy to review and safe to ship:
-- only intended changes are included
-- commits are logically scoped (split when needed)
-- commit messages describe what changed and why
+Make each commit a coherent, independently buildable and testable change. Keep implementation and required tests together; separate tests only when they independently characterize existing behavior or form another self-contained change.
 
-## Inputs to ask for (if missing)
-- Single commit or multiple commits? (If unsure: default to multiple small commits when there are unrelated changes.)
-- Commit style: Conventional Commits are required.
-- Any rules: max subject length, required scopes.
+## Workflow
 
-## Workflow (checklist)
-1) Inspect the working tree before staging
-   - `git status`
-   - `git diff` (unstaged)
-   - If many changes: `git diff --stat`
-2) Decide commit boundaries (split if needed)
-   - Split by: feature vs refactor, backend vs frontend, formatting vs logic, tests vs prod code, dependency bumps vs behavior changes.
-   - If changes are mixed in one file, plan to use patch staging.
-3) Stage only what belongs in the next commit
-   - Prefer patch staging for mixed changes: `git add -p`
-   - To unstage a hunk/file: `git restore --staged -p` or `git restore --staged <path>`
-4) Review what will actually be committed
-   - `git diff --cached`
-   - Sanity checks:
-     - no secrets or tokens
-     - no accidental debug logging
-     - no unrelated formatting churn
-5) Describe the staged change in 1-2 sentences (before writing the message)
-   - "What changed?" + "Why?"
-   - If you cannot describe it cleanly, the commit is probably too big or mixed; go back to step 2.
-6) Write the commit message
-   - Use Conventional Commits (required):
-     - `type(scope): short summary`
-     - blank line
-     - body (what/why, not implementation diary)
-     - footer (BREAKING CHANGE) if needed
-   - Prefer an editor for multi-line messages: `git commit -v`
-   - Use `references/commit-message-template.md` if helpful.
-7) Run the smallest relevant verification
-   - Run the repo's fastest meaningful check (unit tests, lint, or build) before moving on.
-8) Repeat for the next commit until the working tree is clean
+1. Establish which changes are approved for this task. Inspect status, staged diff, and working-tree diff; treat pre-existing index content as user-owned unless explicitly included. If unrelated staged content exists, stop and request authorization for an index-isolation strategy. Never proceed with an ordinary commit that would include unrelated staged content.
+2. Define logical boundaries by behavior and independent verification, not by file category. Stop if merge conflicts remain unresolved.
+3. Stage unmixed files by path. For mixed files, construct reviewed per-change patches and use `git apply --cached <patch>` in non-interactive shells; use `git add -p` only when an interactive human terminal is available. Do not stage broad repository paths indiscriminately.
+4. Review the exact index (`git diff --cached`) and ensure it contains only the approved commit. Check secrets, generated artifacts, lockfile churn mixed with unrelated logic, and scope accuracy against current paths.
+5. Run the fastest meaningful verification for the staged change: tests touching staged paths, then repository lint, then build; run the first applicable check. If it fails, stop, report the failure, and get direction. After verification-driven edits, review the staged diff again.
+6. Write a Conventional Commit message. Use non-interactive `git commit -m` for a single-line message or `git commit -F <message-file>` for a body/footer. Read `references/commit-message-template.md` when the repository defines custom types/scopes, the user asks about format, or a multi-line body/breaking-change footer is needed. Do not retry a failed/empty commit blindly; inspect status and the index first.
+7. After a commit, report its hash/message and verification. If verification after committing fails, stop and ask before repair; do not amend or add commits without authorization.
+8. Stop when the approved intended-change set is exhausted, not when the whole tree is clean. Report remaining unrelated staged and unstaged changes without committing, discarding, or unstaging them.
 
-## Deliverable
-Provide:
-- the final commit message(s)
-- a short summary per commit (what/why)
-- the commands used to stage/review (at minimum: `git diff --cached`, plus any tests run)
+## Git-specific gotchas
+
+- Hooks can change the index after review; inspect status and the new staged diff before any retry.
+- Never commit an unresolved merge: conflict markers can produce a syntactically valid but semantically partial result.
+- During partial staging, working-tree content and index content differ; commands that read the file may test a version different from what will be committed. Verify the intended staged patch.
+- Never stage repository-wide with `git add -A` when unrelated/untracked artifacts exist; they can enter the commit unnoticed.
+- Never copy an old scope without checking current paths; monorepo moves make scopes misleading.

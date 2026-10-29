@@ -1,93 +1,30 @@
 ---
 name: writing-clearly-and-concisely
-description: Use when writing prose humans will read—documentation, commit messages, error messages, explanations, reports, or UI text. Applies Strunk's timeless rules for clearer, stronger, more professional writing.
+description: Draft or copyedit English prose for clarity and concision in READMEs, documentation, commit messages, error messages, UI copy, help text, reports, and explanations. Use when asked to tighten, rewrite, remove puffery, or improve reader-facing text, even a single sentence. Preserve meaning, quotations, technical terms, and requested style. Not for technical diagnosis, code changes, translation, or verbatim extraction.
 ---
 
 # Writing Clearly and Concisely
 
-## Overview
+Apply to expository and technical prose. For fiction, dialogue, or an established brand voice, flag suggestions rather than silently rewriting the voice.
 
-Write with clarity and force. This skill covers what to do (Strunk) and what not to do (AI patterns).
+## Revision sequence
 
-## When to Use This Skill
+1. Mark semantic invariants before editing: facts, requirements, uncertainty, quotations, identifiers, negation, qualifiers, technical terms, and normative force (`must`/`should`/`may`). Preserve each unless explicitly asked to change it.
+2. Remove unsupported abstractions and repetition; never add examples, metrics, capabilities, or factual claims absent from the source. Replace vague language only with supported specifics; otherwise preserve its scope or ask for evidence.
+3. Resolve ambiguity only when context establishes the intended actor, scope, timing, or condition. Otherwise retain the ambiguity or flag the missing fact; do not silently turn a possibility into a commitment or an unknown into an assertion.
+4. Preserve technical distinctions and control-flow conditions when tightening. Passive voice may be essential when the actor is unknown; active voice must not invent responsibility. Historical style references are advisory: follow contemporary usage, current pronouns, and repository/user house style.
+5. Compare against the original for meaning and normative force. For a requested tightening, keep the rewrite shorter without deleting a condition that changes behavior. Make the rewrite shorter than the original when the requested edit is to tighten or make prose concise, then provide the rewrite first, followed by a one-line check quoting the original and both word counts (for example “21 → 9 words”), and keep any explanation to one brief sentence, clearly separate from the rewrite. Do not shorten away a condition that changes behavior. If source text is absent, do not pretend to rewrite it; if the supplied text is too vague to support a factual rewrite, provide concise neutral wording that preserves only its verified scope and briefly note the limitation.
 
-Use this skill whenever you write prose for humans:
+## High-yield reference routing
 
-- Documentation, README files, technical explanations
-- Commit messages, pull request descriptions
-- Error messages, UI copy, help text, comments
-- Reports, summaries, or any explanation
-- Editing to improve clarity
+- For concision, paragraph structure, active voice, or emphatic endings, load `elements-of-style/03-elementary-principles-of-composition.md`.
+- For a specific grammar or punctuation question, load `elements-of-style/02-elementary-rules-of-usage.md`.
+- For headings, quotations, or formatting, load `elements-of-style/04-a-few-matters-of-form.md`.
+- For disputed word choice, load `elements-of-style/05-words-and-expressions-commonly-misused.md`, but apply contemporary usage, stated pronouns, and user/repository house style over historical prescriptions.
+- Load `signs-of-ai-writing.md` only for explicit AI-style/Wikipedia-pattern analysis. Ordinary copyediting should not load it; its Wikipedia-specific conventions do not transfer automatically to general prose.
 
-**If you're writing sentences for a human to read, use this skill.**
+## Safeguards
 
-## Limited Context Strategy
+Never delete meaningful qualifiers or negation; they often carry the safety or legal boundary. Never alter quotations, code, API identifiers, or schema keys while editing surrounding prose. Do not treat vocabulary as proof of AI authorship; keep a precise technical term when a simpler substitute weakens meaning. Preserve modern pronouns such as singular “they” and follow the user's house style.
 
-When context is tight:
-
-1. Write your draft using judgment
-2. Dispatch a subagent with your draft and the relevant section file
-3. Have the subagent copyedit and return the revision
-
-Loading a single section (~1,000-4,500 tokens) instead of everything saves significant context.
-
-## Elements of Style
-
-William Strunk Jr.'s *The Elements of Style* (1918) teaches you to write clearly and cut ruthlessly.
-
-### Rules
-
-**Elementary Rules of Usage (Grammar/Punctuation)**:
-
-1. Form possessive singular by adding 's
-2. Use comma after each term in series except last
-3. Enclose parenthetic expressions between commas
-4. Comma before conjunction introducing co-ordinate clause
-5. Don't join independent clauses by comma
-6. Don't break sentences in two
-7. Participial phrase at beginning refers to grammatical subject
-
-**Elementary Principles of Composition**:
-
-8. One paragraph per topic
-9. Begin paragraph with topic sentence
-10. **Use active voice**
-11. **Put statements in positive form**
-12. **Use definite, specific, concrete language**
-13. **Omit needless words**
-14. Avoid succession of loose sentences
-15. Express co-ordinate ideas in similar form
-16. **Keep related words together**
-17. Keep to one tense in summaries
-18. **Place emphatic words at end of sentence**
-
-### Reference Files
-
-The rules above are summarized from Strunk's original text. For complete explanations with examples:
-
-| Section | File | ~Tokens |
-|---------|------|---------|
-| Grammar, punctuation, comma rules | `02-elementary-rules-of-usage.md` | 2,500 |
-| Paragraph structure, active voice, concision | `03-elementary-principles-of-composition.md` | 4,500 |
-| Headings, quotations, formatting | `04-a-few-matters-of-form.md` | 1,000 |
-| Word choice, common errors | `05-words-and-expressions-commonly-misused.md` | 4,000 |
-
-**Most tasks need only `03-elementary-principles-of-composition.md`** — it covers active voice, positive form, concrete language, and omitting needless words.
-
-## AI Writing Patterns to Avoid
-
-LLMs regress to statistical means, producing generic, puffy prose. Avoid:
-
-- **Puffery:** pivotal, crucial, vital, testament, enduring legacy
-- **Empty "-ing" phrases:** ensuring reliability, showcasing features, highlighting capabilities
-- **Promotional adjectives:** groundbreaking, seamless, robust, cutting-edge
-- **Overused AI vocabulary:** delve, leverage, multifaceted, foster, realm, tapestry
-- **Formatting overuse:** excessive bullets, emoji decorations, bold on every other word
-
-Be specific, not grandiose. Say what it actually does.
-
-For comprehensive research on why these patterns occur, see `signs-of-ai-writing.md`. Wikipedia editors developed this guide to detect AI-generated submissions — their patterns are well-documented and field-tested.
-
-## Bottom Line
-
-Writing for humans? Load the relevant section from `elements-of-style/` and apply the rules. For most tasks, `03-elementary-principles-of-composition.md` covers what matters most.
+When context is constrained, use an available subagent only if one exists; otherwise read just the relevant section and edit locally, preserving a short list of semantic invariants.

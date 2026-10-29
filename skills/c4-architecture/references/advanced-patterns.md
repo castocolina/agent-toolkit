@@ -433,8 +433,9 @@ C4Dynamic
 C4Dynamic
   title Error Handling - Circuit Breaker
 
-  Container(api, "API", "Node.js")
-  Container(circuitBreaker, "Circuit Breaker", "Resilience4j")
+  Container(api, "API", "Node.js") {
+    Component(circuitBreaker, "Circuit Breaker", "Resilience4j")
+  }
   System_Ext(payment, "Payment Service", "Stripe")
   ContainerDb(fallback, "Fallback Cache", "Redis")
 

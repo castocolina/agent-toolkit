@@ -5,7 +5,10 @@ Bump plugin version in both plugin.json and marketplace.json.
 
 import argparse
 import json
+import os
+import re
 import sys
+import tempfile
 from pathlib import Path
 from typing import Literal
 
@@ -39,9 +42,15 @@ def bump_version(version: str, part: VersionPart) -> str:
 
 
 def update_plugin_version(plugin_name: str, marketplace_root: Path, part: VersionPart) -> None:
-    """Update version in both plugin.json and marketplace.json."""
+    """Update both manifests after validating names, paths, and contents."""
+    if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", plugin_name):
+        raise ValueError("plugin_name must be a kebab-case identifier")
+    plugins_root = (marketplace_root / "plugins").resolve()
+    plugin_dir = (plugins_root / plugin_name).resolve()
+    if not plugin_dir.is_relative_to(plugins_root):
+        raise ValueError("plugin_name escapes plugins directory")
 
-    # Update plugin.json
+    # Load and validate both manifests before any write.
     plugin_json_path = marketplace_root / "plugins" / plugin_name / ".claude-plugin" / "plugin.json"
 
     if not plugin_json_path.exists():
@@ -55,12 +64,7 @@ def update_plugin_version(plugin_name: str, marketplace_root: Path, part: Versio
     new_version = bump_version(old_version, part)
     plugin_data["version"] = new_version
 
-    with open(plugin_json_path, "w") as f:
-        json.dump(plugin_data, f, indent=2)
-
-    print(f"✅ Updated plugin.json: {old_version} → {new_version}")
-
-    # Update marketplace.json
+    # Validate marketplace prerequisites before writing either manifest.
     marketplace_json_path = marketplace_root / ".claude-plugin" / "marketplace.json"
 
     if not marketplace_json_path.exists():
@@ -81,11 +85,28 @@ def update_plugin_version(plugin_name: str, marketplace_root: Path, part: Versio
         print(f"❌ Plugin '{plugin_name}' not found in marketplace manifest")
         sys.exit(1)
 
-    with open(marketplace_json_path, "w") as f:
-        json.dump(marketplace_data, f, indent=2)
-
-    print(f"✅ Updated marketplace.json: {old_version} → {new_version}")
-    print(f"\n🎉 Version bumped successfully: {old_version} → {new_version}")
+    replacements = {plugin_json_path: json.dumps(plugin_data, indent=2) + "\n", marketplace_json_path: json.dumps(marketplace_data, indent=2) + "\n"}
+    originals = {path: path.read_bytes() for path in replacements}
+    staged = {}
+    try:
+        for path, content in replacements.items():
+            with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, delete=False) as temp:
+                temp.write(content)
+                staged[path] = Path(temp.name)
+        # Validate staged JSON before replacing either target.
+        for temp in staged.values():
+            json.loads(temp.read_text())
+        try:
+            for path, temp in staged.items():
+                os.replace(temp, path)
+        except OSError:
+            for path, original in originals.items():
+                path.write_bytes(original)
+            raise
+    finally:
+        for temp in staged.values():
+            temp.unlink(missing_ok=True)
+    print(json.dumps({"status": "updated", "plugin": plugin_name, "old_version": old_version, "new_version": new_version, "paths": [str(p) for p in replacements]}))
 
 
 def main():
@@ -106,4 +127,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (ValueError, FileNotFoundError, FileExistsError) as exc:
+        print(str(exc), file=sys.stderr)
+        sys.exit(2)

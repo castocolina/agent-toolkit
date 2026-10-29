@@ -100,10 +100,10 @@ Generates: https://api.memegen.link/images/drake/manual_testing/automated_testin
 ### Production Issues
 
 ```
-/meme-factory fine memory_usage_at_99~ this_is_fine
+/meme-factory fine memory_usage_at_99% this_is_fine
 ```
 
-Generates: https://api.memegen.link/images/fine/memory_usage_at_99~/this_is_fine.png
+Generates: https://api.memegen.link/images/fine/memory_usage_at_99~p/this_is_fine.png
 
 ### With Custom Dimensions
 

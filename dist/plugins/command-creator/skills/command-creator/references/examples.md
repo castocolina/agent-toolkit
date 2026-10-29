@@ -59,28 +59,19 @@ else
 fi
 \`\`\`
 
-If `.PLAN.md` exists:
-
-- Read the plan file to understand what was implemented
-- Use the plan's summary and goals to create the commit message
-
-If no `.PLAN.md`:
-
-- Run `git status` and `git diff HEAD` to see changes
-- Review the changes to create an accurate summary
+If `.PLAN.md` exists, read it as supplemental context. Always run `git status` and `git diff HEAD` to inspect actual changes, review them, and select only intended files, whether or not a plan exists.
 
 ### 2. Create Git Commit
 
 Based on the analysis:
 
 - If user provided an argument, use it as the basis for the commit message
-- If `.PLAN.md` exists, summarize what was implemented from the plan
-- Otherwise, analyze the git changes and create a descriptive single-sentence summary
+- Use `.PLAN.md` only as supplemental context; base file selection and the commit message on inspected git changes
 - Ensure the commit message follows the repository's commit style (check `git log` for patterns)
 - **DO NOT include any Claude Code footer or co-authorship attribution**
 
 \`\`\`bash
-git add .
+git add path/to/intended-file
 git commit -m "[Single sentence summary of what was done]"
 \`\`\`
 
@@ -117,9 +108,10 @@ After submission, show:
 
 ## Important Notes
 
-- **Check for .PLAN.md FIRST** before analyzing git changes
+- **Always inspect `git status` and `git diff HEAD`** before selecting files or constructing a commit, whether or not `.PLAN.md` exists; the plan is supplemental context, not evidence of actual changes
+- Preserve explicit authorization for stack-wide publication
 - **NEVER run additional exploration commands** beyond checking .PLAN.md, git status/diff/log
-- **Stage all changes** with `git add .` before committing
+- Stage only reviewed, intended paths; never use `git add .` as a shortcut
 - **Single sentence summary**: Keep commit message concise and focused
 - **Follow repo patterns**: Check recent commits with `git log` to match style
 - **NO Claude footer**: Do not add any attribution or generated-by footer

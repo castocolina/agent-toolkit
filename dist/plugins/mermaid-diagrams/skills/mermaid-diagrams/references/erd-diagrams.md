@@ -39,7 +39,6 @@ erDiagram
 - `PK` - Primary Key
 - `FK` - Foreign Key
 - `UK` - Unique Key
-- `NN` - Not Null
 
 ## Relationships
 
@@ -52,8 +51,8 @@ erDiagram
 - `}o` - Zero or many
 
 **Relationship line:**
-- `--` - Non-identifying relationship
-- `..` - Identifying relationship (rare in practice)
+- `--` - Identifying relationship
+- `..` - Non-identifying relationship
 
 ### Common Relationships
 
@@ -432,8 +431,8 @@ erDiagram
     }
     
     ENROLLMENT {
-        uuid student_id FK PK
-        uuid course_id FK PK
+        uuid student_id PK, FK
+        uuid course_id PK, FK
         date enrolled_date
         varchar grade
     }

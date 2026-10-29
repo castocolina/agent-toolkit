@@ -29,10 +29,10 @@ prompt_input() {
         read -r input
         
         if [ -n "$input" ]; then
-            eval "$var_name=\"$input\""
+            printf -v "$var_name" '%s' "$input"
             break
         elif [ "$required" != "true" ]; then
-            eval "$var_name=\"\""
+            printf -v "$var_name" '%s' ''
             break
         else
             echo -e "${RED}This field is required.${NC}"
@@ -115,7 +115,7 @@ while true; do
     if [ -z "$line" ]; then
         break
     fi
-    REPRO_STEPS="${REPRO_STEPS}${STEP_NUM}. ${line}\n"
+    REPRO_STEPS+="${STEP_NUM}. ${line}"$'\n'
     ((STEP_NUM++))
 done
 
@@ -166,7 +166,7 @@ cat > "$OUTPUT_FILE" << EOF
 
 - **OS:** ${OS}
 - **Browser:** ${BROWSER}
-- **Device:** ${DEVICE:-Desktop}
+- **Device:** ${DEVICE:-Unknown}
 - **Build:** ${BUILD}
 - **URL:** ${URL:-N/A}
 
@@ -204,7 +204,7 @@ ${ACTUAL}
 
 **Console Errors:**
 \`\`\`
-${CONSOLE_ERRORS:-None}
+${CONSOLE_ERRORS:-Not provided (whether console errors were observed is unknown)}
 \`\`\`
 
 ---
@@ -213,7 +213,7 @@ ${CONSOLE_ERRORS:-None}
 
 - **Frequency:** ${FREQUENCY:-Unknown}
 - **User Impact:** ${USER_IMPACT:-Unknown}
-- **Workaround:** ${WORKAROUND:-None available}
+- **Workaround:** ${WORKAROUND:-Not provided (availability is unknown)}
 
 ---
 

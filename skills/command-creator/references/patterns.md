@@ -130,10 +130,9 @@ This document describes the common patterns for slash commands, helping you choo
    - Set expectations for iterative process
    - Mention that user can refine the output
 
-2. Invoke subagent agent
-   - Use Task tool with subagent_type="subagent"
-   - Pass task description and context
-   - Do NOT attempt to write plan yourself
+2. Inspect the execution environment's registered agent types before generating delegation instructions.
+   - If an available type is appropriate, invoke it with the task description and context.
+   - Otherwise, provide a direct planning path that preserves the user's approval boundary; do not assume a custom agent type exists.
 
 3. Agent works autonomously
    - Creates initial plan
@@ -258,11 +257,9 @@ Otherwise:
 **Pattern:**
 
 ```markdown
-**IMPORTANT:** Always use Bash tool for pytest/pyright/ruff/prettier/make/gt commands
+Run pytest, pyright, ruff, prettier, make, and gt directly with the available shell tool; do not wrap them in a Task/subagent.
 
-1. Use Bash tool directly
-   - Run commands like: "make all-ci", "pytest tests/", "pyright", etc.
-   - Bash tool will execute and return output
+1. Run the shell command directly (for example, `make all-ci`, `pytest tests/`, or `pyright`).
 
 2. Process command results
    - Check exit code
@@ -350,8 +347,8 @@ When implementing a pattern, include these elements:
 
 **Agent Delegation:**
 
-- Exact Task tool invocation syntax
-- Context to pass to agent
+- Inspect registered agent types and use an available type when appropriate; otherwise provide a direct planning path
+- Context to pass to the agent or use in the direct planning path
 - User review checkpoints
 - Save-to-disk instructions
 

@@ -159,22 +159,22 @@ code {
 
 <!-- _class: lead -->
 
-# プレゼンテーション
+# Presentation
 
-ビジネスライク
-
----
-
-## アジェンダ
-
-- トピック1
-- トピック2
-- トピック3
+Business-style
 
 ---
 
-## スライド
+## Agenda
 
-- ポイント1
-- ポイント2
-- ポイント3
+- Topic1
+- Topic2
+- Topic3
+
+---
+
+## Slide
+
+- Point1
+- Point2
+- Point3

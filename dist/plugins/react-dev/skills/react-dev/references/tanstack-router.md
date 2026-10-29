@@ -5,7 +5,7 @@ TanStack Router provides full type safety for routes, params, search params, and
 ## Basic Route Definition
 
 ```typescript
-import { createRoute, createRootRoute } from '@tanstack/react-router';
+import { createRoute, createRootRoute, createRootRouteWithContext } from '@tanstack/react-router';
 
 // Root route
 const rootRoute = createRootRoute({
@@ -148,11 +148,12 @@ const productsRoute = createRoute({
     category: z.string().optional(),
     page: z.number().default(1),
   }),
-  loader: async ({ search }) => {
-    // search is typed from validateSearch
+  loaderDeps: ({ search }) => ({ category: search.category, page: search.page }),
+  loader: async ({ deps }) => {
+    // deps contains only the validated search values selected above
     const products = await fetchProducts({
-      category: search.category,
-      page: search.page,
+      category: deps.category,
+      page: deps.page,
     });
 
     return { products };
@@ -322,8 +323,8 @@ const protectedRoute = createRoute({
 });
 
 function Dashboard() {
-  const { user } = useLoaderData({ from: protectedRoute.id });
-  // user available from beforeLoad
+  const { user } = useRouteContext({ from: protectedRoute.id });
+  // user is returned by beforeLoad
 
   return <div>Welcome, {user.name}</div>;
 }
@@ -391,7 +392,7 @@ type RouterContext = {
   queryClient: QueryClient;
 };
 
-const rootRoute = createRootRoute<RouterContext>({
+const rootRoute = createRootRouteWithContext<RouterContext>()({
   component: RootLayout,
 });
 

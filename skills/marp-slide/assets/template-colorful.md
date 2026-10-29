@@ -134,22 +134,22 @@ strong {
 
 <!-- _class: lead -->
 
-# プレゼンテーション
+# Presentation
 
-カラフル＆ポップ
-
----
-
-## アジェンダ
-
-- トピック1
-- トピック2
-- トピック3
+Colorful & Pop
 
 ---
 
-## スライド
+## Agenda
 
-- ポイント1
-- ポイント2
-- ポイント3
+- Topic1
+- Topic2
+- Topic3
+
+---
+
+## Slide
+
+- Point1
+- Point2
+- Point3

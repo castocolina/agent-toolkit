@@ -319,9 +319,9 @@ flowchart LR
     
     A -.->|REST API| B
     
-    %% Tooltips are defined with links
-    link A: API Documentation @ https://api.example.com
-    link B: Service Dashboard @ https://dashboard.example.com
+    %% Flowchart node links use click declarations
+    click A "https://api.example.com" "API Documentation"
+    click B "https://dashboard.example.com" "Service Dashboard"
 ```
 
 ## Subgraph Styling

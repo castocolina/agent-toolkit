@@ -103,22 +103,22 @@ hr {
 
 <!-- _class: lead -->
 
-# プレゼンテーション
+# Presentation
 
-シンプル＆ミニマル
-
----
-
-## アジェンダ
-
-- トピック1
-- トピック2
-- トピック3
+Simple & Minimal
 
 ---
 
-## スライドタイトル
+## Agenda
 
-- ポイント1
-- ポイント2
-- ポイント3
+- Topic1
+- Topic2
+- Topic3
+
+---
+
+## Slide Title
+
+- Point1
+- Point2
+- Point3

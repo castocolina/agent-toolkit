@@ -62,8 +62,8 @@ git log --oneline -10
 # Check for any running processes mentioned
 ps aux | grep [process-name]
 
-# Verify environment
-env | grep [relevant-var]
+# Check whether named variables are set without revealing their values
+python3 -c 'import os; names = ["RELEVANT_VAR"]; [print("{}: {}".format(name, "set" if name in os.environ else "unset")) for name in names]'
 ```
 
 ## Handoff Quality Assessment

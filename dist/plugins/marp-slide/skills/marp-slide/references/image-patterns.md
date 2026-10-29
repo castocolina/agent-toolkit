@@ -232,11 +232,11 @@ White text placed on darkened background.
 ### Pattern 3: Multiple Image Comparison
 
 ```markdown
-![bg left:50%](before.png)
-![bg right:50%](after.png)
+![bg](before.png)
+![bg](after.png)
 ```
 
-Place Before/After side by side.
+Two ordinary background declarations split the slide equally. `left`/`right` directives reserve a shared image region beside text; they do not independently allocate halves for a two-image comparison.
 
 ### Pattern 4: Vertical Comparison
 

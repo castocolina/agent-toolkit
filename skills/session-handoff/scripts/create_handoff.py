@@ -49,6 +49,7 @@ def get_git_info(project_path: str) -> dict:
         "recent_commits": [],
         "modified_files": [],
         "staged_files": [],
+        "baseline_commit": None,
     }
 
     # Check if git repo
@@ -57,6 +58,9 @@ def get_git_info(project_path: str) -> dict:
         return info
 
     info["is_git_repo"] = True
+    success, baseline = run_cmd(["git", "rev-parse", "HEAD"], cwd=project_path)
+    if success and baseline:
+        info["baseline_commit"] = baseline
 
     # Get current branch
     success, branch = run_cmd(["git", "branch", "--show-current"], cwd=project_path)
@@ -136,26 +140,15 @@ def get_previous_handoff_info(project_path: str, continues_from: str = None) -> 
     handoffs = find_previous_handoffs(project_path)
 
     if continues_from:
-        # Find specific handoff
-        for h in handoffs:
-            if continues_from in h["filename"]:
-                return {
-                    "exists": True,
-                    "filename": h["filename"],
-                    "title": h["title"],
-                }
+        matches = [h for h in handoffs if continues_from == h["filename"]]
+        if len(matches) == 1:
+            h = matches[0]
+            return {"exists": True, "filename": h["filename"], "title": h["title"]}
         return {"exists": False, "filename": continues_from, "title": "Not found"}
 
-    elif handoffs:
-        # Suggest most recent
-        most_recent = handoffs[0]
-        return {
-            "exists": True,
-            "filename": most_recent["filename"],
-            "title": most_recent["title"],
-            "suggested": True,
-        }
-
+    # Unlinked by default; expose a suggestion without selecting it.
+    if handoffs:
+        return {"exists": False, "suggested": handoffs[0]["filename"]}
     return {"exists": False}
 
 
@@ -189,8 +182,10 @@ def generate_handoff(
     # Gather git info
     git_info = get_git_info(project_path)
 
-    # Get previous handoff info for chaining
+    # Get previous handoff info for chaining; reject invalid explicit links.
     prev_handoff = get_previous_handoff_info(project_path, continues_from)
+    if continues_from and not prev_handoff.get("exists"):
+        raise ValueError(f"No handoff with exact filename {continues_from!r}; provide an existing filename.")
 
     # Build pre-filled sections
     branch_line = git_info["branch"] if git_info["branch"] else "[not a git repo or detached HEAD]"
@@ -220,12 +215,14 @@ def generate_handoff(
 
 > Review the previous handoff for full context before filling this one."""
     else:
-        chain_section = """## Handoff Chain
+        suggestion = prev_handoff.get("suggested")
+        note = f"Recent handoff suggestion (not linked): `{suggestion}`. Use --continues-from with its exact filename if this work continues it." if suggestion else "No previous handoff found."
+        chain_section = f"""## Handoff Chain
 
 - **Continues from**: None (fresh start)
 - **Supersedes**: None
 
-> This is the first handoff for this task."""
+> {note}"""
 
     # Generate the document
     content = f"""# Handoff: [TASK_TITLE - replace this]
@@ -234,6 +231,7 @@ def generate_handoff(
 - Created: {timestamp}
 - Project: {project_path}
 - Branch: {branch_line}
+- Baseline commit: {git_info['baseline_commit'] or '[unavailable]'}
 - Session duration: [estimate how long you worked]
 
 ### Recent Commits (for context)
@@ -356,8 +354,8 @@ def main():
 
     args = parser.parse_args()
 
-    # Get project path (current working directory)
-    project_path = os.getcwd()
+    # This script is resolved from its installation path; retain caller cwd as project root.
+    project_path = os.path.realpath(os.getcwd())
 
     # Check for existing handoffs to suggest chaining
     if not args.continues_from:
@@ -368,7 +366,10 @@ def main():
             print(f"Use --continues-from <filename> to link handoffs.\n")
 
     # Generate handoff
-    filepath = generate_handoff(project_path, args.slug, args.continues_from)
+    try:
+        filepath = generate_handoff(project_path, args.slug, args.continues_from)
+    except ValueError as error:
+        parser.error(str(error))
 
     print(f"Created handoff document: {filepath}")
     print(f"\nNext steps:")

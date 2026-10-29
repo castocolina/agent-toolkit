@@ -39,9 +39,12 @@ service {serviceId}({icon})[{title}] (in {parentId})?
 
 ```mermaid
 architecture-beta
-    service api(server)[API Server]
+    group api(cloud)[API tier]
+    service api_server(server)[API Server] in api
+    service cache(server)[Cache] in api
     service db(database)[Database]
-    service cache(redis)[Cache] in api
+
+    api_server:R --> L:db
 ```
 
 ### Edges
@@ -91,13 +94,7 @@ architecture-beta
 
 **Default icons:** `cloud`, `database`, `disk`, `internet`, `server`
 
-**Custom icons:** Use any of 200,000+ icons from iconify.design:
-
-```mermaid
-architecture-beta
-    service web(aws:ec2)[Web Server]
-    service storage(aws:s3)[Storage]
-```
+**Custom icons:** Use a custom icon only after registering its icon pack in the rendering host. Unregistered icons may render as missing glyphs; validate the diagram in the target renderer. Default examples above use built-in icons.
 
 ### Using @iconify-json Icon Packs
 

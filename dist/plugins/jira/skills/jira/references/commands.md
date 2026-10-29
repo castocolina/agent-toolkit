@@ -85,8 +85,8 @@ jira issue list --paginate 10:50 # start:limit
 # Interactive creation
 jira issue create
 
-# Non-interactive with all fields
-jira issue create \
+# Non-interactive: discover required fields first, then provide all of them
+jira issue create --no-input \
     -tBug \
     -s"Login button not working" \
     -b"Users cannot click the login button on Safari" \
@@ -115,10 +115,12 @@ jira issue create -tStory -s"Summary" --template /path/to/template.md
 echo "Description here" | jira issue create -tTask -s"Summary"
 ```
 
-**Multi-line content:** The CLI chokes on multi-line strings. Write to `/tmp` first:
+**Multi-line content:** Pass a file with the documented `--template` option to preserve line breaks without shell reconstruction. Use a unique temporary file and remove it afterward:
 
 ```bash
-cat > /tmp/jira_body.md <<'EOF'
+body_file=$(mktemp)
+trap 'rm -f "$body_file"' EXIT
+cat > "$body_file" <<'EOF'
 ## Description
 User needs ability to export data...
 
@@ -131,7 +133,7 @@ jira issue create --no-input \
   -tStory \
   -pPROJ \
   -s"Add export functionality" \
-  -b"$(cat /tmp/jira_body.md)"
+  --template "$body_file"
 ```
 
 ---

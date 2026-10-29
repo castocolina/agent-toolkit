@@ -30,7 +30,7 @@ Use this skill when you are:
 ## How It Works
 
 1. **Identify the MUI task** - Recognize when MUI patterns are relevant to the current work
-2. **Apply appropriate patterns** - Use the correct styling approach based on component complexity
+2. **Apply appropriate patterns** - Choose `sx`, `styled`, or theme overrides by how widely the style is reused
 3. **Leverage theme tokens** - Use MUI's built-in theme values instead of hardcoded styles
 4. **Ensure type safety** - Apply proper TypeScript types for sx props
 5. **Build responsively** - Use MUI's breakpoint system for adaptive layouts
@@ -42,23 +42,15 @@ Use this skill when you are:
 The skill includes guidance on v7-specific changes:
 - Deep imports no longer work (use package exports)
 - `onBackdropClick` removed from Modal (use `onClose` instead)
-- Standardized `slots` and `slotProps` pattern for all components
-- CSS layers support via `enableCssLayer` config (Tailwind v4 compatible)
+- Use `slots` and `slotProps` where the target component supports them; check its v7 API
 
 ### Styling Patterns
 
-Two approaches based on component complexity:
-- **Inline styles (< 100 lines)** - Define styles at component top
-- **Separate styles file (>= 100 lines)** - Create `ComponentName.styles.ts`
+Choose `sx` for one-off styling, `styled` for reusable component-level styles, and theme overrides for system-wide defaults. Extract colocated styles when reuse or readability warrants it; there is no fixed line-count rule.
 
-### Complete Component Coverage
+### Component Guidance
 
-- Layout: Box, Paper, Container, Stack
-- Grid system: 12-column responsive grid
-- Typography: All variants with custom styling
-- Forms: TextField, validation, error states
-- Feedback: Dialog, Snackbar, Loading states
-- Navigation: Cards, Buttons, Icons
+The skill provides migration and styling guidance for MUI v7. Check the target component's current prop types or documentation before relying on a specific API.
 
 ### Theme Integration
 
@@ -131,10 +123,10 @@ function MyComponent() {
 import { Grid } from '@mui/material';
 
 <Grid container spacing={3}>
-  <Grid item xs={12} sm={6} md={4} lg={3}>
+  <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
     <Card>...</Card>
   </Grid>
-  <Grid item xs={12} sm={6} md={4} lg={3}>
+  <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
     <Card>...</Card>
   </Grid>
 </Grid>
@@ -205,10 +197,9 @@ const styles: Record<string, SxProps<Theme>> = {
 <Box sx={{ padding: '17px', marginBottom: '25px' }} />
 ```
 
-### 4. Organize Styles by Component Complexity
+### 4. Choose Style Organization by Need
 
-- Small components: Define styles at the top of the file
-- Large components: Create separate `ComponentName.styles.ts` file
+Keep styles colocated when that suits the component. Extract them when reuse or readability warrants it.
 
 ### 5. Use Semantic Color Names
 
@@ -222,7 +213,7 @@ Access palette colors by their semantic names:
 
 The skill includes supplementary documentation:
 - `resources/styling-guide.md` - Advanced styling patterns
-- `resources/component-library.md` - Extended component examples
+- `resources/component-library.md` - Component migration checks and v7 Grid patterns
 - `resources/theme-customization.md` - Theme setup and customization
 
 ## Related Documentation

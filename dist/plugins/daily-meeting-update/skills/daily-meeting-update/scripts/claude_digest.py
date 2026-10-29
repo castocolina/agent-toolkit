@@ -33,7 +33,7 @@ import json
 import re
 import sys
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
@@ -56,10 +56,8 @@ def get_claude_projects_dir() -> Path:
 
 
 def decode_project_path(encoded: str) -> str:
-    """Decode encoded project path from directory name."""
-    if encoded.startswith('-'):
-        return '/' + encoded[1:].replace('-', '/')
-    return encoded.replace('-', '/')
+    """Return the encoded identifier without inventing path separators."""
+    return f"[unresolved project: {encoded}]"
 
 
 def parse_timestamp(timestamp: str) -> Optional[datetime]:
@@ -68,11 +66,9 @@ def parse_timestamp(timestamp: str) -> Optional[datetime]:
         return None
     try:
         if 'T' in timestamp:
-            timestamp = timestamp.split('+')[0].split('Z')[0]
-            if '.' in timestamp:
-                return datetime.strptime(timestamp[:26], '%Y-%m-%dT%H:%M:%S.%f')
-            return datetime.strptime(timestamp[:19], '%Y-%m-%dT%H:%M:%S')
-        return datetime.strptime(timestamp[:10], '%Y-%m-%d')
+            value = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+            return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+        return datetime.strptime(timestamp[:10], '%Y-%m-%d').replace(tzinfo=timezone.utc)
     except (ValueError, IndexError):
         return None
 
@@ -110,6 +106,7 @@ def parse_session_file(file_path: Path) -> Optional[dict]:
     project_path = decode_project_path(file_path.parent.name)
     git_branch = None
     first_timestamp = None
+    cwd = None
     first_user_message = None
 
     try:
@@ -133,6 +130,9 @@ def parse_session_file(file_path: Path) -> Optional[dict]:
 
                 if git_branch is None:
                     git_branch = entry.get('gitBranch')
+                if entry.get('cwd'):
+                    cwd = entry['cwd']
+                    project_path = cwd
 
                 timestamp = entry.get('timestamp', '')
                 if first_timestamp is None:
@@ -150,6 +150,7 @@ def parse_session_file(file_path: Path) -> Optional[dict]:
 
                 messages.append({
                     'role': entry_type,
+                    'timestamp': timestamp,
                     'content': text_content,
                     'tool_uses': tool_uses
                 })
@@ -165,7 +166,7 @@ def parse_session_file(file_path: Path) -> Optional[dict]:
         'session_id': session_id,
         'summary': summary,
         'messages': messages,
-        'project_path': project_path,
+        'project_path': cwd or project_path,
         'git_branch': git_branch,
         'timestamp': first_timestamp or '',
         'first_user_message': first_user_message
@@ -173,19 +174,9 @@ def parse_session_file(file_path: Path) -> Optional[dict]:
 
 
 def extract_title(session_data: dict) -> str:
-    """Extract a title from session data."""
-    if session_data.get('summary'):
-        return session_data['summary'][:80]
-
-    if session_data.get('first_user_message'):
-        msg = session_data['first_user_message'].strip()
-        # Clean up and truncate
-        msg = re.sub(r'\s+', ' ', msg)
-        if len(msg) > 80:
-            return msg[:77] + '...'
-        return msg
-
-    return 'Untitled session'
+    """Return a metadata-only title; never expose session text as a title."""
+    session_id = session_data.get('session_id', '')
+    return f"Session {session_id[:8]}" if session_id else 'Untitled session'
 
 
 def extract_files(messages: list) -> list:
@@ -225,8 +216,8 @@ def get_sessions_for_date(
     if not projects_dir.exists():
         return []
 
-    start = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
-    end = start + timedelta(days=1)
+    requested_day = target_date.date()
+    local_tz = datetime.now().astimezone().tzinfo
 
     # Get project directories
     if project_path:
@@ -245,22 +236,31 @@ def get_sessions_for_date(
             if session_data is None:
                 continue
 
-            # Check date range
-            session_date = parse_timestamp(session_data['timestamp'])
-            if session_date is None:
+            # Keep only activity whose timestamp falls on the requested local calendar day.
+            day_messages = []
+            for message in session_data['messages']:
+                timestamp = parse_timestamp(message.get('timestamp', ''))
+                if timestamp is not None and timestamp.astimezone(local_tz).date() == requested_day:
+                    day_messages.append(message)
+            if not day_messages:
                 continue
 
-            if not (start <= session_date < end):
-                continue
-
+            day_session_data = dict(session_data)
+            day_session_data['summary'] = None
+            day_session_data['first_user_message'] = next(
+                (m['content'] for m in day_messages if m['role'] == 'user' and m['content']), None
+            )
             session = Session(
                 id=session_data['session_id'][:8],
-                title=extract_title(session_data),
+                title=extract_title(day_session_data),
                 project=session_data['project_path'],
                 branch=session_data['git_branch'],
-                files=extract_files(session_data['messages']),
-                commands_count=count_commands(session_data['messages']),
-                timestamp=session_data['timestamp']
+                files=extract_files(day_messages),
+                commands_count=count_commands(day_messages),
+                timestamp=min(
+                    (parse_timestamp(m['timestamp']) for m in day_messages if m.get('timestamp')),
+                    key=lambda value: value,
+                ).isoformat()
             )
             sessions.append(session)
 

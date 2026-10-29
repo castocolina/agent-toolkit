@@ -70,11 +70,9 @@ Complete checklist for designing and reviewing database schemas.
 ### Index Strategy
 
 - [ ] **Primary Key Indexed**: Automatic, verify
-- [ ] **Foreign Keys Indexed**: All FKs have indexes
-- [ ] **WHERE Columns**: Columns in WHERE clauses indexed
-- [ ] **ORDER BY Columns**: Sort columns indexed
-- [ ] **Composite Indexes**: Multi-column queries optimized
-- [ ] **Column Order**: Most selective column first
+- [ ] **Workload Fit**: Check existing leading-prefix coverage and equality/range/order requirements against representative queries
+- [ ] **Foreign-Key Costs**: Evaluate join and parent-delete costs, engine behavior, and write amplification before adding indexes
+- [ ] **Composite Order**: Choose column order from predicates, ordering, and representative execution plans; selectivity alone is insufficient
 
 ### Index Limits
 

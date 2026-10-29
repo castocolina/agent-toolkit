@@ -451,12 +451,18 @@ Ensure code never runs on server.
 import 'client-only';
 
 export function useLocalStorage(key: string) {
-  // localStorage only available in browser
-  const [value, setValue] = useState(() => localStorage.getItem(key));
+  // Client Components may still render on the server: use a stable fallback.
+  const [value, setValue] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem(key, value || '');
-  }, [key, value]);
+    setValue(window.localStorage.getItem(key));
+    setInitialized(true);
+  }, [key]);
+
+  useEffect(() => {
+    if (initialized) window.localStorage.setItem(key, value ?? '');
+  }, [initialized, key, value]);
 
   return [value, setValue] as const;
 }
