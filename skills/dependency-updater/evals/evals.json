@@ -1,0 +1,35 @@
+{
+  "skill_name": "dependency-updater",
+  "evals": [
+    {
+      "id": "casual-safe-updates",
+      "prompt": "my deps are kinda old, can you update the safe ones and flag anything risky?",
+      "expected_output": "A dependency update plan that identifies the ecosystem, applies only safe minor/patch updates, preserves pinned versions, and asks before majors.",
+      "assertions": [
+        "Separates patch/minor updates from major updates",
+        "Does not auto-approve major version changes",
+        "Preserves dependencies pinned to exact versions"
+      ]
+    },
+    {
+      "id": "python-audit-plan",
+      "prompt": "In a Python project using pyproject.toml and poetry.lock, outline how to identify outdated packages, update compatible versions, check vulnerabilities, and verify the lockfile without silently taking breaking majors.",
+      "expected_output": "A Python-specific workflow with an outdated scan, conservative updates, vulnerability audit, and lockfile/test verification.",
+      "assertions": [
+        "Identifies pyproject.toml/Poetry as the project context",
+        "Includes a vulnerability audit step",
+        "Includes lockfile and test verification after updates"
+      ]
+    },
+    {
+      "id": "conflicting-node-deps",
+      "prompt": "npm install fails with a peer dependency conflict after a recent change. Don’t recommend deleting the lockfile as a first step; give a diagnosis-first response.",
+      "expected_output": "A diagnosis-first troubleshooting sequence that inspects dependency relationships and versions, then proposes targeted remedies without destructive reset.",
+      "assertions": [
+        "Starts by inspecting the dependency tree or package requirements",
+        "Avoids deleting the lockfile as the initial action",
+        "Suggests a targeted resolution and subsequent install/test verification"
+      ]
+    }
+  ]
+}

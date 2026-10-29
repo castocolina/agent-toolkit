@@ -1,0 +1,36 @@
+{
+  "skill_name": "openapi-to-typescript",
+  "evals": [
+    {
+      "id": "spec-types",
+      "prompt": "Convert `{\"openapi\":\"3.0.2\",\"paths\":{\"/pets\":{\"get\":{\"responses\":{\"200\":{\"description\":\"ok\"}}}}},\"components\":{\"schemas\":{\"Pet\":{\"type\":\"object\",\"required\":[\"id\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"name\":{\"type\":\"string\"}}}}}}` to TS.",
+      "expected_output": "Pet required numeric id, optional name, ApiError and guard; no invented GET response type.",
+      "assertions": [
+        "`Pet.id` required `number`",
+        "`Pet.name` optional `string`",
+        "Includes the documented `Pet` type and a runtime guard; includes `ApiError` only if defined by the supplied spec",
+        "Does not invent a GET response type or alias an undocumented response to `unknown`"
+      ]
+    },
+    {
+      "id": "union-ref",
+      "prompt": "OpenAPI 3.0 Pet oneOf refs Cat and Dog; explain $ref.",
+      "expected_output": "Pet union Cat | Dog; refs are direct named types.",
+      "assertions": [
+        "oneOf union",
+        "Uses Cat and Dog types",
+        "Explains direct `$ref` mapping"
+      ]
+    },
+    {
+      "id": "unsupported-version",
+      "prompt": "Spec is OpenAPI 3.1.0; generate types anyway?",
+      "expected_output": "Stop: only 3.0.x supported.",
+      "assertions": [
+        "Identifies 3.1 unsupported",
+        "States 3.0.x support",
+        "Does not fabricate types"
+      ]
+    }
+  ]
+}

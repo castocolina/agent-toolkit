@@ -1,0 +1,38 @@
+{
+  "skill_name": "draw-io",
+  "evals": [
+    {
+      "id": "casual-api-map",
+      "prompt": "Can you make a draw.io diagram of our web app: browser to API, API to Postgres, and API to an email service? Keep the page light.",
+      "expected_output": "A plan or XML-ready diagram with labeled components, directional relationships, a light page background, and readable layout.",
+      "assertions": [
+        "Includes browser, API, Postgres, and email service as labeled elements",
+        "Shows directional connections from browser to API and API to both dependencies",
+        "Preserves a light background instead of forcing transparency"
+      ]
+    },
+    {
+      "id": "quarto-aws-figure",
+      "prompt": "Use the supplied `find_aws_icon.py` results fixture to create an AWS architecture .drawio XML for Quarto: CloudFront serves a public S3 site; API Gateway invokes Lambda, which reads DynamoDB. Use official icon names, orthogonal routed arrows, Noto Sans JP, and PNG export guidance for a dark plate. Give XML and the export command; do not claim execution.",
+      "expected_output": "Draw.io XML using service identifiers from the provided search output, correct service flow, font declarations, dark background, and a proposed export command.",
+      "assertions": [
+        "Uses the fixture `resIcon` identifiers for CloudFront, S3, API Gateway, Lambda, and DynamoDB.",
+        "Sets `defaultFontFamily=\"Noto Sans JP\"` and `fontFamily=Noto Sans JP` on text elements.",
+        "Uses a dark background and proposes export without `-t`; does not claim it ran."
+      ],
+      "files": [
+        "evals/files/aws-icon-results.txt"
+      ]
+    },
+    {
+      "id": "layout-overlap-fix",
+      "prompt": "My draw.io diagram has a frame around a group, but moving the frame leaves its services behind and the connector label is hidden. Explain the XML layout fix and verification.",
+      "expected_output": "A correction using true parent-child containment with relative coordinates, correctly layered/routed connectors and visual PNG verification.",
+      "assertions": [
+        "Makes contained services actual children of the frame with relative coordinates",
+        "Addresses connector routing/layering so its label is not obscured",
+        "Requires visual verification of the exported PNG"
+      ]
+    }
+  ]
+}

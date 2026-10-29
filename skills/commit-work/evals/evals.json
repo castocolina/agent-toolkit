@@ -1,0 +1,35 @@
+{
+  "skill_name": "commit-work",
+  "evals": [
+    {
+      "id": "review-and-commit",
+      "prompt": "Please commit the intended fix. `git status` shows only `src/auth.ts` modified, and `git diff` shows the token-expiry correction. Conventional Commits required; propose the ordered command sequence and commit message, but do not claim execution.",
+      "expected_output": "Proposed ordered status/diff/stage/cached-diff/commit commands scoped to src/auth.ts and a type(scope): subject message.",
+      "assertions": [
+        "Shows ordered `git status`, `git diff`, `git add src/auth.ts` (or `git add -p`), `git diff --cached`, and `git commit` commands.",
+        "Proposes a message matching `type(scope): subject`, such as `fix(auth): correct token expiry`.",
+        "Clearly presents commands as proposed, not executed."
+      ]
+    },
+    {
+      "id": "split-mixed-work",
+      "prompt": "I have formatting changes in README.md, a production feature in src/api.ts, and tests in tests/api.test.ts. Help me organize these into reviewable commits.",
+      "expected_output": "Keeps the implementation and required tests together as one independently verifiable feature commit, while separating unrelated documentation formatting if appropriate.",
+      "assertions": [
+        "Does not split required feature tests away from implementation solely because they are in a tests directory.",
+        "Separates unrelated README formatting only if independently reviewable.",
+        "Recommends selective staging and `git diff --cached` review for each commit."
+      ]
+    },
+    {
+      "id": "no-changes",
+      "prompt": "Can you make a commit for me? The working tree is clean and I have not made any changes yet.",
+      "expected_output": "Stop before staging/committing, verify clean state and explain there are no changes to commit rather than creating an empty or fabricated commit.",
+      "assertions": [
+        "Checks or recognizes the clean working tree",
+        "Does not invent files or create an empty commit",
+        "Explains no commit can be made until intended changes exist"
+      ]
+    }
+  ]
+}

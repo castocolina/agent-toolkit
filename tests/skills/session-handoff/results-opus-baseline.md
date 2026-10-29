@@ -70,7 +70,7 @@ Sample handoffs: 3 (fresh, stale, incomplete)
 
 1. Set up test environment:
    ```bash
-   python /Users/galihcitta/.claude/skills/session-handoff/evals/setup_test_env.py
+   python tests/skills/session-handoff/setup_test_env.py
    ```
 
 2. Start Claude Code with desired model:
@@ -83,6 +83,6 @@ Sample handoffs: 3 (fresh, stale, incomplete)
    cd /tmp/handoff-eval-project
    ```
 
-4. Run scenarios from `test-scenarios.md`
+4. Run scenarios from `tests/skills/session-handoff/test-scenarios.md`
 
 5. Record results using this template
