@@ -1,0 +1,95 @@
+{
+  "skill": "openapi-to-typescript",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 10,
+    "D2": 15,
+    "D3": 12,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 9,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 100,
+  "max_total": 125,
+  "percent": 80.0,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 21,
+      "evidence": "\"oneOf maps to a union, allOf generally to an intersection, and enums to literal unions\" is standard mapping knowledge. By line count, substantial portions of the schema and guard sections are activation, while the Gotchas section repeats earlier requiredness, reference, and response rules.",
+      "fix": "Consolidate repeated warnings and elementary mappings. Preserve the 3.0-specific nullable rules, named recursive references, media/status distinctions, and refusal policies; add concrete context-sensitive transformations rather than repeating basic TypeScript mappings."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 36,
+      "evidence": "\"Never conflate absent and nullable properties\" has a useful reason, but the Gotchas list omits OpenAPI 3.0 traps involving Reference Object siblings and request-versus-response property visibility.",
+      "fix": "Add explicit warnings that OpenAPI 3.0 Reference Object siblings are ignored, and that readOnly/writeOnly affect request/response projection and requiredness. Explain the incorrect contracts produced when these distinctions are ignored."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 23,
+      "evidence": "\"Model additional properties/dictionaries explicitly\" leaves a fragile representation choice unspecified. Fixed properties combined with typed additionalProperties cannot always be represented faithfully by a straightforward TypeScript index signature.",
+      "fix": "Provide a default representation for pure dictionaries and an explicit policy for mixed fixed/additional properties. Require a diagnostic rather than an incompatible index signature when exact representation is unavailable, and identify any deliberately approximate representation as such."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/evals/evals.json",
+      "line": 7,
+      "evidence": "\"Pet required numeric id, optional name, ApiError and guard\" expects ApiError although the supplied document defines only Pet. The assertions make ApiError conditional, while also requiring a guard that the prompt does not request and the body says to emit when requested.",
+      "fix": "Make the prompt, expected output, and assertions agree: define ApiError in the input or omit it, and explicitly request runtime guards when asserting their presence. Add complete operation and schema inputs for composition, parameter-location, and response-variant cases."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/evals/trigger-queries.json",
+      "line": 23,
+      "evidence": "\"Generate TS and report unresolved refs.\" is labeled should_trigger=true without identifying an OpenAPI document; it could describe standalone JSON Schema or another excluded conversion task.",
+      "fix": "Add realistic OpenAPI 3.0 context to ambiguous positives and pair them with closely matched standalone JSON Schema, non-TypeScript, and unsupported-version negatives."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 32,
+      "evidence": "The output procedure ends with \"Summarize unsupported or unresolved constructs, naming collisions and chosen output path.\" It never requires compiling the generated declarations or checking runtime guards against positive and negative payloads.",
+      "fix": "Add a validation loop using the repository's TypeScript check, plus guard cases covering present malformed optionals, nullable branches, array elements, and compositions. Fix failures before reporting completion; explicitly report when validation cannot run."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 14,
+      "evidence": "\"stripping braces and PascalCasing segments\" does not produce the example \"GET /users/{id}/orders \u2192 GetUserByIdOrders\": the example also singularizes users and inserts By.",
+      "fix": "Define one deterministic naming algorithm, including parameter markers and any singularization policy, and make the example match it. Include a collision example demonstrating the specified disambiguation rule."
+    }
+  ]
+}

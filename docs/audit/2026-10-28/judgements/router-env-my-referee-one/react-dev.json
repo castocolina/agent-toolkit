@@ -1,0 +1,95 @@
+{
+  "skill": "react-dev",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 12,
+    "D2": 12,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 11,
+    "D8": 8
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 103,
+  "max_total": 125,
+  "percent": 82.4,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/react-dev/SKILL.md",
+      "line": 14,
+      "evidence": "\"Extend native props with `ComponentPropsWithoutRef<'button'>`\" and \"`ReactNode` covers text, numbers, null, and elements\" restate familiar React typing knowledge. Core-contract and routing activation material dilutes the stronger generic-correlation and execution-boundary guidance.",
+      "fix": "Reduce native-prop, ReactNode, nullable-state, and tuple reminders to a brief activation checklist. Concentrate the main instructions on correlated generics, version-sensitive Action contracts, promise ownership, and server/client execution traps."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/react-dev/SKILL.md",
+      "line": 16,
+      "evidence": "\"property-specific renderers should capture `K` in a builder\" names the desired solution but does not transfer the construction procedure; the linked generic example instead implements whole-row renderers.",
+      "fix": "Show the reusable derivation: capture K in a builder, tie its value and callback to T[K], package the renderer without widening that relationship, and demonstrate a valid pairing and a rejected mismatched pairing."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/react-dev/evals/evals.json",
+      "line": 10,
+      "evidence": "\"Uses ComponentPropsWithoutRef<'button'>\" tests a particular implementation rather than the native-prop guarantee; ComponentPropsWithRef can also be correct. The three output cases do not exercise rejected generic combinations, router-mode differences, or SSR/storage boundaries, and trigger queries are predominantly terse feature labels.",
+      "fix": "Grade accepted props, ref compatibility, and rejected invalid inputs rather than exact helper names. Add minimal TSX fixtures with positive and negative type checks, a router-mode case, and an SSR/storage edge case; include realistic file paths and failure context in several trigger queries."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/react-dev/examples/server-components.md",
+      "line": 161,
+      "evidence": "\"export async function deleteUser(userId: string)\" immediately calls \"await db.user.delete({ where: { id: userId } });\" without authenticating the caller or authorizing access to that identifier. The updateUser example has the same exposed mutation boundary.",
+      "fix": "Authenticate within each Server Action and authorize the requested userId before accessing the database. Derive the identifier from the session where appropriate, otherwise check ownership or role explicitly and return a controlled authorization failure."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/react-dev/examples/server-components.md",
+      "line": 464,
+      "evidence": "\"if (initialized) window.localStorage.setItem(key, value ?? '');\" uses initialization state that is not associated with key. After key changes, the write Effect can write the previous key's value under the new key before the read-triggered state update commits; storage failures are also uncaught.",
+      "fix": "Associate loaded state with its key and skip persistence until the current key has been read successfully. Guard both storage operations, define missing-key behavior explicitly, and verify that switching keys never writes a value belonging to another key."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/react-dev/references/react-19-patterns.md",
+      "line": 438,
+      "evidence": "\"await fetch('/api/messages', {\" sends the optimistic message, but MessageThread never commits the confirmed message to its base state or refreshes the messages prop. With an unchanged parent prop, the optimistic message disappears after a successful Action as well as after failure.",
+      "fix": "Check response.ok, obtain the confirmed message, and update the authoritative message state or refresh its owner before the Action completes. Use unique temporary identifiers and demonstrate distinct success-commit and failure-rollback outcomes."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/react-dev/references/react-19-patterns.md",
+      "line": 540,
+      "evidence": "\"startTransition(() => {\" contains \"const filtered = hugeDataset.filter((item) =>\". The transition callback runs synchronously, so the expensive filtering itself still blocks the input handler despite the example's responsiveness claim.",
+      "fix": "Keep the input update urgent and move filtering into a deferred or transition-driven render, with a memoized results boundary where needed. Use a worker for genuinely long synchronous computation; do not present wrapping the computation in startTransition as deferring that computation."
+    }
+  ]
+}

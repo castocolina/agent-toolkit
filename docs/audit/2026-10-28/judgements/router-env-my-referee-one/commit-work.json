@@ -1,0 +1,68 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 12,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 111,
+  "max_total": 125,
+  "percent": 88.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 17,
+      "evidence": "'Use non-interactive git commit -m for a single-line message or git commit -F <message-file> for a body/footer' explains common CLI usage already known to models and commit helpers. Standard staging, diff-review, and message-format guidance also occupies appreciable space alongside the stronger index-ownership and hook corrections.",
+      "fix": "Compress standard Git and Conventional Commit instructions. Prioritize the non-obvious constraints: user-owned index content, non-interactive mixed-hunk staging, index-versus-worktree verification, hook mutations, and stopping at the approved change set."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 25,
+      "evidence": "'During partial staging, working-tree content and index content differ' correctly identifies the risk, but 'Verify the intended staged patch' supplies no safe procedure for testing that version. Step 5's ordinary tests may still execute unstaged content.",
+      "fix": "Specify a safe verification branch when index and working tree differ: export the index tree to a disposable directory, run applicable checks there without changing the user's index or worktree, or stop and explicitly report that the staged version could not be verified. Do not silently stash or reset user changes."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/commit-work/evals/evals.json",
+      "line": 6,
+      "evidence": "'git status shows only src/auth.ts modified' tests a straightforward unmixed change. The other cases cover file-level grouping and a clean tree, but none verifies preservation of unrelated staged content, mixed hunks, or hook-induced index changes.",
+      "fix": "Add disposable-repository or explicit state fixtures with pre-existing unrelated staged content, mixed intended and unrelated hunks, and a hook that changes the index. Assert that unrelated state is preserved and that retries require a fresh index review."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 14,
+      "evidence": "'Stage unmixed files by path' leads into a workflow that later invokes git commit, but the description also supports drafting a commit message and reviewing staged content. There is no explicit branch that stops those read-only requests before staging or committing.",
+      "fix": "Route by requested intent before the workflow: message-only returns a proposed message without mutation; review-only reports findings without mutation; staging-only stops after index review; only an authorized commit request proceeds to git commit."
+    }
+  ]
+}

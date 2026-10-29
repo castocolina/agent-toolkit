@@ -1,0 +1,86 @@
+{
+  "skill": "plugin-forge",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/plugin-forge/references/workflows.md",
+      "line": 59,
+      "evidence": "**Major (x.0.0)**: Breaking changes",
+      "fix": "Delete the semantic-versioning tutorial and the conventional-commit examples; the model knows both. Keep the plugin-specific rule (both manifests must match) and the testing steps."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 16,
+      "evidence": "The script updates an existing marketplace manifest and generates the plugin's `.claude-plugin/plugin.json` plus `README.md`. It requires the marketplace manifest to exist",
+      "fix": "This script contract is stated three times (lines 8, 12, 15, 16); state it once at the scaffold step and drop the repetitions to save body tokens."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 27,
+      "evidence": "Reinstalling may leave cached plugin files active; restart Claude Code and verify the loaded version before trusting tests.",
+      "fix": "Add the missing gotcha: when marketplace.json sets `pluginRoot`, relative `source` values resolve against it, so create_plugin.py's unconditional `./plugins/<name>` source can double-prefix; document the interaction or make the script respect an existing pluginRoot."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 15,
+      "evidence": "Run `python3 scripts/create_plugin.py ...`; the script requires an existing marketplace manifest.",
+      "fix": "The script mutates a shared marketplace manifest with no preview; add a --dry-run flag or instruct the agent to show the planned manifest entry before running against a shared marketplace root."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/plugin-forge/scripts/bump_version.py",
+      "line": 61,
+      "evidence": "print(f\"\u274c Plugin manifest not found: {plugin_json_path}\"); sys.exit(1)",
+      "fix": "Error diagnostics print to stdout although SKILL.md documents stdout as the JSON channel (the test even asserts them in r.stdout); route errors to stderr like create_plugin.py does and document exit codes in --help."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/plugin-forge/references/workflows.md",
+      "line": 124,
+      "evidence": "Discover installed command names after installation; do not infer the namespace solely from nested command directories.",
+      "fix": "Name the concrete discovery method (type `/` and autocomplete the plugin-prefixed command, or inspect the installed plugin's commands directory) so the agent is not left guessing how to verify."
+    }
+  ]
+}

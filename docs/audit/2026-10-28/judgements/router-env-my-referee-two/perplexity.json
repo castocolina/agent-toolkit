@@ -1,0 +1,86 @@
+{
+  "skill": "perplexity",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 12,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 111,
+  "max_total": 125,
+  "percent": 88.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 30,
+      "evidence": "Search result snippets can be stale or incomplete; open and verify source pages, dates, and claim support.",
+      "fix": "Trim to one clause ('verify cited pages support claims') \u2014 the model already knows snippets can be stale"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 22,
+      "evidence": "Check the requested integration is actually available before calling it.",
+      "fix": "Say how: inspect the exposed tool list for mcp__context7__*, mcp__graphite__*, etc., and check /research exists as a command before routing to it"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 30,
+      "evidence": "Do not use `mcp__perplexity__perplexity_research` ... \u2014 the only tool-specific landmine stated",
+      "fix": "Add gotchas for the tools that are allowed: perplexity_search rate limits, stale cache on breaking news, and Ask answers with thin citations"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 32,
+      "evidence": "For Ask follow-ups, include the prior user/assistant turns needed for context; use a fresh messages array for an unrelated topic.",
+      "fix": "Give Ask a default guardrail like Search's (e.g., cap follow-up history to the turns needed and prefer one Ask per subquestion) so token spend stays bounded on both tools"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/perplexity/evals/evals.json",
+      "line": null,
+      "evidence": "No eval covers the confidentiality rule 'Ask before sending confidential identifiers, unreleased details, or private data'",
+      "fix": "Add an eval whose prompt embeds an internal codename/API key and assert the skill asks or redacts before any external call"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 22,
+      "evidence": "If unavailable, use an available appropriate tool; otherwise report the limitation.",
+      "fix": "Name the fallback chain when Perplexity itself is unavailable (built-in WebSearch/WebFetch if exposed, else ask the user to configure one)"
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 13,
+    "D6": 14,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/references/schema-design-checklist.md",
+      "line": 107,
+      "evidence": "\"- [ ] **Parameterized Queries**: SQL injection prevented\" \u2014 the checklist carries generic DB hygiene (parameterized queries, least privilege, SELECT * avoided) that is off-topic for schema design and already known",
+      "fix": "Prune the Security, Performance and Documentation sections to schema-relevant checks only"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 13,
+      "evidence": "\"identify engine/version, workload, scale, tenancy, retention, consistency needs\" \u2014 a default is given only for engine (PostgreSQL); no labeled default assumptions when the user states none",
+      "fix": "Add default labeled assumptions (e.g. single-tenant, moderate scale, new schema) to state when context is missing"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 28,
+      "evidence": "\"Never change token-like schema semantics silently\" \u2014 'token-like' is undefined and no example is given",
+      "fix": "Define it (columns whose values are opaque tokens or secrets) and add a one-line example"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 34,
+      "evidence": "\"load only the relevant sections of an engine-specific reference if present\" \u2014 no engine-specific reference exists in references/ (only migrations.md and schema-design-checklist.md)",
+      "fix": "Delete the pointer or add the engine-specific reference files it names"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 17,
+      "evidence": "\"Check selectivity, column order, write amplification, and execution plans before adding one\" \u2014 no default command is named for checking execution plans",
+      "fix": "Default to EXPLAIN (ANALYZE) on PostgreSQL and name the per-engine equivalents"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/database-schema-designer/references/schema-design-checklist.md",
+      "line": 57,
+      "evidence": "\"- [ ] **Indexes on Foreign Keys**: All FKs are indexed\" contradicts SKILL.md step 5 \"Do not index every foreign key or low-selectivity field by reflex\"; an agent validating per step 7 would add the indexes step 5 forbids",
+      "fix": "Reword to 'FK indexes justified by join/parent-delete cost and write impact' to match the SKILL.md policy"
+    }
+  ]
+}

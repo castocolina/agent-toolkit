@@ -1,0 +1,95 @@
+{
+  "skill": "mermaid-diagrams",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 5,
+    "D2": 12,
+    "D3": 15,
+    "D4": 13,
+    "D5": 15,
+    "D6": 10,
+    "D7": 11,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 90,
+  "max_total": 125,
+  "percent": 72.0,
+  "grade": "C",
+  "findings": [
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 3,
+      "evidence": "The description includes \u201cor any other diagram type\u201d and broad architecture/modeling triggers, but supplies no boundaries for prose-only explanations, other diagram formats, or interactive diagram applications.",
+      "fix": "Create, edit, and repair Mermaid diagrams in Markdown or .mmd files. Use when users ask to diagram, visualize, model, map out, or show software interactions, schemas, architecture, lifecycles, processes, schedules, proportions, or Git history, even without naming Mermaid. Classify the question before choosing sequenceDiagram, classDiagram, erDiagram, C4, stateDiagram-v2, flowchart, architecture-beta, gantt, pie, or gitGraph. Not for prose-only explanations, PlantUML or draw.io editing, matplotlib data charts, or interactive diagram-canvas components."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 44,
+      "evidence": "\u201cCore Syntax Structure\u201d, \u201cQuick Start Examples\u201d, and \u201cWhen to Create Diagrams\u201d occupy approximately 110 of the 180 H2-section lines, about 61%. These are predominantly basic syntax tutorials and familiar diagramming rationale rather than expert-only knowledge.",
+      "fix": "Remove the basic syntax introduction, four inline tutorials, and generic reasons to diagram. Keep the classification gate, host constraints, subgraph-direction trap, and renderer-specific failures; leave syntax examples in the already-gated type references."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 29,
+      "evidence": "\u201cWrite one sentence: what question does this diagram answer? Then pick the type that owns that question\u201d supplies a useful type-selection mindset, but the procedure jumps to drawing without establishing authoritative entities, relationships, assumptions, or the required architecture abstraction level.",
+      "fix": "Add a brief grounding checkpoint before drawing: identify the audience and abstraction level, extract entities and relationships from supplied code/schema or facts, and distinguish confirmed relationships from assumptions before choosing notation."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 176,
+      "evidence": "\u201cAlways diagram when\u201d includes starting projects, planning refactors, and onboarding. This mandates an output format regardless of user intent and conflicts with the trigger suite's prose-only negative cases.",
+      "fix": "Make diagrams conditional on the user's requested deliverable or a clear explanatory benefit. Explicitly respect prose-only requests and avoid creating diagrams merely because a task involves architecture, schemas, or refactoring."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/evals/evals.json",
+      "line": 9,
+      "evidence": "Assertions such as \u201cUses sequenceDiagram\u201d establish diagram-type selection, but all three output evals are straightforward creation cases. None tests malformed source, unsupported host features, missing icon registration, or successful rendering of the bundled examples.",
+      "fix": "Add realistic repair and renderer-boundary cases, including special-character labels, GitHub architecture icons, and a larger C4 example. Assert successful parsing/rendering and correct entity relationships, not only declaration keywords."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/mermaid-diagrams/references/architecture-diagrams.md",
+      "line": 64,
+      "evidence": "\u201cservice client(browser)[Client]\u201d uses an unregistered icon, while the reference itself lists only cloud, database, disk, internet, and server as built-ins. Other supposedly ready-to-use examples also use load_balancer and api without registration.",
+      "fix": "Use built-in icons throughout default examples. Put custom icons only in a separately gated example that includes the required host registration and target-renderer verification."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/mermaid-diagrams/references/c4-diagrams.md",
+      "line": 279,
+      "evidence": "The streaming-platform example declares both \u201cPerson(user, \"User\", \"Platform user\")\u201d and \u201cContainer(user, \"User Service\", ...)\u201d. Reusing the same identifier prevents relationships from unambiguously distinguishing the external person from the internal service.",
+      "fix": "Give every C4 element a unique identifier, such as person_user and svc_user, and update each Rel call to target the intended element. Validate identifier uniqueness across the complete example."
+    }
+  ]
+}

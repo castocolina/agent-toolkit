@@ -1,0 +1,104 @@
+{
+  "skill": "session-handoff",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 13,
+    "D3": 12,
+    "D4": 15,
+    "D5": 12,
+    "D6": 13,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 107,
+  "max_total": 125,
+  "percent": 85.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 42,
+      "evidence": "1. **Current State Summary** - What's happening right now",
+      "fix": "The four-section list restates the structure references/handoff-template.md already defines; keep only the 'three required sections' rule and point to the template"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 137,
+      "evidence": "For long sessions: create a new handoff with `--continues-from` to link the predecessor",
+      "fix": "Step 6 edits or chains handoffs without re-validation; add 're-run validate_handoff.py after editing or chaining a handoff before finalizing'"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 64,
+      "evidence": "**Gotchas:** Secret scanning is heuristic, not proof",
+      "fix": "Gotchas exist only on the CREATE side; add resume-side failure modes with reasons, e.g. 'FRESH only compares files and commits; after a revert or rebase, re-verify assumptions by hand'"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/session-handoff/scripts/__pycache__",
+      "line": null,
+      "evidence": "scripts/__pycache__/ ships compiled bytecode inside the skill directory",
+      "fix": "Delete scripts/__pycache__/ and add it to .gitignore"
+    },
+    {
+      "id": "D5-2",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 28,
+      "evidence": "python \"<resolved skill directory>/scripts/create_handoff.py\" [task-slug]",
+      "fix": "Use spec-relative paths (scripts/create_handoff.py) and state once that paths are relative to the skill directory, instead of placeholder prose in every command"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 40,
+      "evidence": "Scale depth to the remaining work.",
+      "fix": "Give a rule of thumb, e.g. one paragraph per section for under a day of remaining work; full evidence and reproduction commands for multi-day work"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/session-handoff/scripts/validate_handoff.py",
+      "line": 302,
+      "evidence": "Usage: python validate_handoff.py <handoff-file>",
+      "fix": "Usage prints only on missing arguments with no --help flag and free-form output; switch to argparse with --help and add a --json output mode so agents can consume results programmatically"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 49,
+      "evidence": "### Step 3: Validate the Handoff",
+      "fix": "Validation is a single pass before Step 4 confirms; add 'fix reported issues and re-run until the verdict is READY' between Steps 3 and 4"
+    }
+  ]
+}

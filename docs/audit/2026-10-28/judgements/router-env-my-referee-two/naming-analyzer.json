@@ -1,0 +1,86 @@
+{
+  "skill": "naming-analyzer",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 13,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 12,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 108,
+  "max_total": 125,
+  "percent": 86.4,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 31,
+      "evidence": "Never rename serialized fields, public API symbols, database columns, or protocol identifiers without checking compatibility and migration/versioning requirements.",
+      "fix": "Cut widely-known review basics (compatibility checks before public renames are standard agent behavior); keep and expand only the behavior-calibrating rules the model does not apply by default (project convention precedence, boolean polarity over prefix, ask-don't-infer)"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 23,
+      "evidence": "1. Check behavior mismatch first (for example, a `get*` method that writes persistent state).",
+      "fix": "Add one worked example walking a rename from evidence to compatibility verdict so the risk ordering is trained, not just listed"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 29,
+      "evidence": "## Gotchas",
+      "fix": "Add environment-specific gotchas: identifiers referenced by ORM mappings, generated code, i18n message keys, or reflection that rename tooling silently misses"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 17,
+      "evidence": "What naming patterns does the surrounding project actually use? Treat boolean prefixes and casing as defaults, not automatic defects.",
+      "fix": "State the fallback when no project convention exists (default to the language's dominant convention and say so in the report)"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/evals/evals.json",
+      "line": 6,
+      "evidence": "\"prompt\": \"Review `const d = new Date(); const usrCfg = loadConfig(); function getUser(id) { const u=fetchUser(id); u.lastLogin=Date.now(); saveUser(u); return u; }`.\"",
+      "fix": "Add a repo-level eval with a small file fixture containing a serialized-field identifier to test the compatibility rule, and vary prompt formality and context"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 41,
+      "evidence": "| Priority | Location | Current \u2192 proposed | Evidence and rationale | Confidence / compatibility |",
+      "fix": "Add one filled example row (including a no-change row) so the confidence and compatibility values are unambiguous"
+    }
+  ]
+}

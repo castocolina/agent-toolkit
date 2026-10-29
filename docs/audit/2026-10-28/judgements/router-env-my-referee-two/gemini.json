@@ -1,0 +1,95 @@
+{
+  "skill": "gemini",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 11,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/gemini/SKILL.md",
+      "line": 12,
+      "evidence": "Exclude secrets and unauthorized material before sending repository context",
+      "fix": "Replace the generic exclusion with concrete items (.env, key/token files, credentials dirs) and a quick grep the agent runs before sending context"
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/gemini/SKILL.md",
+      "line": 20,
+      "evidence": "For every target directory not already in Gemini's working directory, pass it explicitly with `--include-directories <path>` (repeat the flag for multiple directories); naming a path only in the prompt does not provide that directory as context.",
+      "fix": "State the --include-directories rule once (here) and cross-reference from step 1 instead of restating it in both workflow steps"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/gemini/SKILL.md",
+      "line": 17,
+      "evidence": "## Review workflow",
+      "fix": "Merge the overlapping steps 4 and 5 (substantiate claims / report verified findings) into one verify-then-report step with an explicit go/no-go gate"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/gemini/SKILL.md",
+      "line": 10,
+      "evidence": "## Safe execution",
+      "fix": "Extract a Gotchas list of CLI-specific traps with reasons (approval-mode default hang, pkill blast radius, partial output mistaken for results) instead of burying them in prose bullets"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/gemini/SKILL.md",
+      "line": 14,
+      "evidence": "Use bounded timeouts and track the exact PID/process group launched for this task.",
+      "fix": "State the default bound (timeout 300 as in the command shape) and when to raise it, so the timeout is a default rather than a per-run guess"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/gemini/evals/evals.json",
+      "line": 3,
+      "evidence": "I explicitly authorize automated full-tool approval with --approval-mode yolo for this review.",
+      "fix": "Vary the eval set: two prompts share near-identical yolo phrasing and all three are command-proposal tasks; add one eval that tests claim verification (workflow step 4) and one casual phrasing"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 28,
+      "evidence": "timeout 300 gemini -m gemini-3-pro-preview --approval-mode <approved-mode> \\",
+      "fix": "Enumerate the valid approval-mode values (default, plan, auto_edit, yolo) with one-line meaning and a default, so the placeholder is fillable without guessing"
+    }
+  ]
+}

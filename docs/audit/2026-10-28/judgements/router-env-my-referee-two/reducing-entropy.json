@@ -1,0 +1,104 @@
+{
+  "skill": "reducing-entropy",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 12,
+    "D4": 14,
+    "D5": 14,
+    "D6": 15,
+    "D7": 11,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 108,
+  "max_total": 125,
+  "percent": 86.4,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 12,
+      "evidence": "Ask the smallest-codebase question: what is the least code that still meets the need, and what can be deleted?",
+      "fix": "Keep the named mindsets and the end-state rule; trim the rhetorical question, which restates the title-level intent the model already infers from the explicit request."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 28,
+      "evidence": "3. Count first-party implementation lines consistently before and after the proposed changes, using the same directories and exclusions",
+      "fix": "Measure the baseline during inventory (step 1) so deletion candidates are proposed and ranked against measured sizes rather than counted after proposal."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 32,
+      "evidence": "NEVER delete tests or move complexity to generated/vendor code to improve counts.",
+      "fix": "Add the why: tests and vendored/generated code are not first-party entropy, so removing them games the metric while hiding risk."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 3,
+      "evidence": "Use only when users explicitly ask to reduce entropy, delete code, shrink/simplify a codebase, or choose the smallest implementation. Bias toward deletion and measure the final end state, not effort.",
+      "fix": "Guide deletion-biased codebase minimization: inventory deletable or mergeable code, guard behavior, public APIs, and data-retention obligations, and measure first-party line counts before and after. Use only when the user explicitly asks to reduce entropy, delete code, shrink or simplify the codebase, or choose the smallest implementation. Not for general refactoring, readability, or performance reviews."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/reducing-entropy/adding-reference-mindsets.md",
+      "line": 1,
+      "evidence": "# Contributor note: adding a reference mindset",
+      "fix": "Move this contributor-process note to the repository's contributor documentation outside the shipped skill package; nothing in SKILL.md loads it."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/evals/trigger-queries.json",
+      "line": 8,
+      "evidence": "\"query\": \"Load a reducing-entropy mindset\"",
+      "fix": "Replace several should-trigger queries with natural explicit requests that do not name the skill (e.g. 'this codebase is way too big \u2014 delete whatever we don't need'); all ten positives currently contain the literal skill name or 'entropy', so the explicitness axis is untested."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/reducing-entropy/evals/evals.json",
+      "line": 6,
+      "evidence": "\"prompt\": \"Please explicitly reduce entropy in this module. We have 14 wrappers around the same formatter; choose the smallest end state.\"",
+      "fix": "Bundle the module under evals/files/ so the measurement and merge-invariant steps run against real code instead of a described example."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 16,
+      "evidence": "Load the relevant reference before deciding:",
+      "fix": "State what to do when several lenses apply at once (load all applicable references, with PAGNI gating deletion decisions) so the routing cannot stall on overlapping triggers."
+    }
+  ]
+}
