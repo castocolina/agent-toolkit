@@ -18,9 +18,10 @@ You are allowed to use the `git` and `gh` cli tools, and `pr-diagrams.sh` when t
 
 The raw arguments are: `$ARGUMENTS`
 
-Arguments use the `=` form only, here and in every example, so a branch name is never read as a "Close <branch>" token. Accept only:
+Options that take a value use the `=` form, here and in every example, so a branch name is never read as a "Close <branch>" token. The three exact whole-token aliases `--drawio`, `--mermaid` and `--no-diagrams` are the only bare option tokens recognized: they start with `--`, so they can never be a branch name. Every other bare token stays a remaining argument. Accept only:
 
 - `--diagrams=none|mermaid|drawio`. Default `mermaid` when the flag is absent. `mermaid` is inline-only: it uploads nothing and never passes `--attach`.
+- The exact bare aliases: `--drawio` (same as `--diagrams=drawio`), `--mermaid` (same as `--diagrams=mermaid`) and `--no-diagrams` (same as `--diagrams=none`). An alias only resolves the diagram mode in phase 1; every rule below about the resolved mode applies unchanged.
 - `--reuse-from=<PR>`, a PR number.
 - `--base=<branch>`.
 
@@ -32,6 +33,7 @@ Run these checks first, before any git command, any `gh` call, any script call, 
 
 - An invalid `--diagrams` value `<v>` stops the command with exactly: `invalid --diagrams value: <v> (expected none, mermaid or drawio)`.
 - A `--reuse-from` value `<v>` that does not match `^[0-9]+$` stops the command with exactly: `invalid --reuse-from: <v> (expected a PR number)`.
+- After those checks, resolve the diagram mode: `--diagrams=` and the aliases `--drawio`, `--mermaid` and `--no-diagrams` each name a mode. When two given options resolve to different modes, stop with exactly: `conflicting diagram options: <first> and <second>`, naming the two tokens as written: scan the given options left to right, keep the first one as the reference, and pair it with the first later option that resolves to a different mode. Identical duplicates (`--drawio --diagrams=drawio`, or `--drawio` twice) are accepted and name one mode.
 
 ### 3.3 What counts as a diagram
 
@@ -253,7 +255,7 @@ Concurrent runs in the same checkout are unsupported: there is one pointer file.
 
 Before anything is pushed or written:
 
-1. The `--diagrams` and `--reuse-from` checks (3.2).
+1. The `--diagrams` and `--reuse-from` checks (3.2), including the `--drawio`, `--mermaid` and `--no-diagrams` alias resolution and the conflicting-diagram-options stop.
 2. Read the head with `git branch --show-current`. An empty head stops with `detached HEAD: check out a branch` before the guard and before any push.
 3. The head == base guard (3.6). A promotion head is a head in `PR_PROMOTION_BRANCHES` that differs from the base, so this guard runs before the missing-script stop.
 4. Locate `PRD` (3.5). When `--reuse-from` was given, or the head is a promotion head, and no candidate exists, stop with the error naming both paths, before any push and before any PR write.

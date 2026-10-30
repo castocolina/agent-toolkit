@@ -765,8 +765,24 @@ def parse_object(text: str, what: str):
         body = body[m.end():-3]
     try:
         return json.loads(body)
+    except ValueError:
+        pass
+    # Graders quote shell code in evidence (a stray backslash before $ or .), which strict JSON
+    # rejects. Retry once with every backslash that does not start a valid escape doubled.
+    try:
+        return json.loads(_double_invalid_escapes(body))
     except ValueError as e:
         raise HarnessError(f"{what}: answer is not JSON: {text.strip()[:200]!r}") from e
+
+
+_JSON_ESCAPE = re.compile(r"\\(u[0-9a-fA-F]{4}|.)", re.S)
+
+
+def _double_invalid_escapes(body: str) -> str:
+    def fix(m):
+        c = m.group(1)
+        return m.group(0) if len(c) == 5 or c in '"\\/bfnrt' else "\\\\" + c
+    return _JSON_ESCAPE.sub(fix, body)
 
 
 def normalize_assertion(text: str) -> str:

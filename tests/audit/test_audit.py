@@ -1411,6 +1411,22 @@ class ParseObjectTests(Base):
             with self.subTest(text=text[:20]):
                 self.assertEqual(audit.parse_object(text, "t"), want)
 
+    def test_parse_object_tolerates_invalid_escapes_in_strings(self):
+        # Graders quote shell code in evidence, e.g. `\\$x` or `\\.`, which strict JSON rejects.
+        body = ('{"results": [{"assertion": "a", "passed": true, '
+                '"evidence": "uses [[ \\"$o\\" == \\"2.101\\" ]] and \\$x \\. a\\\\b caf\\u00e9"}]}')
+        want = {"results": [{"assertion": "a", "passed": True,
+                             "evidence": 'uses [[ "$o" == "2.101" ]] and \\$x \\. a\\b caf\u00e9'}]}
+        for text in (body, f"```json\n{body}\n```"):
+            with self.subTest(text=text[:12]):
+                self.assertEqual(audit.parse_object(text, "t"), want)
+
+    def test_parse_object_still_rejects_broken_structure_after_escape_repair(self):
+        for text in ('{"results": [\\$x]}', '{"evidence": "a \\$ b"', "```json\n{'a': 1}\n```"):
+            with self.subTest(text=text[:12]):
+                with self.assertRaises(audit.HarnessError):
+                    audit.parse_object(text, "t")
+
     def test_parse_object_rejects(self):
         raw = '{"results":[]}'
         for text in (f"Sure:\n```json\n{raw}\n```", f"```json\n{raw}\n```.\nHope that helps",
