@@ -1,0 +1,328 @@
+name: Skill audit PR review
+
+# Reusable review of one scheduled-audit pull request. The main workflow calls it
+# after apply; a maintainer can retry it with workflow_dispatch; pull_request_target
+# synchronize only clears the review labels of a moved head (job invalidate).
+#
+# Trust model: `review` checks out the default branch into trusted/ and copies
+# the tooling it runs from there; the PR head goes to pr/ and no gate or
+# publish step runs code from pr/. Copilot gets only the read tool and no GitHub
+# token; the GitHub token reaches only the gate and publish steps.
+
+on:
+  workflow_call:
+    inputs:
+      pr_number:
+        description: Audit pull request number
+        type: string
+        required: true
+      head_sha:
+        description: Head commit the review binds to (must equal the live head)
+        type: string
+        required: true
+    secrets:
+      COPILOT_GITHUB_TOKEN:
+        required: true
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Audit pull request number to review again (retry)
+        type: string
+        required: true
+  pull_request_target:
+    types: [synchronize]
+
+permissions: {}
+
+concurrency:
+  group: skill-audit-review-${{ inputs.pr_number || github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  # Knob defaults, mirroring skill-audit.yaml. The model is empty by default: the
+  # reviewer stays off until the containment drill passes (README).
+  AUDIT_REVIEW_MODEL: ${{ vars.AUDIT_REVIEW_MODEL }}
+  AUDIT_REVIEW_EFFORT: ${{ vars.AUDIT_REVIEW_EFFORT || 'high' }}
+  AUDIT_ON_POSITIVE: ${{ vars.AUDIT_ON_POSITIVE || 'label' }}
+  AUDIT_AUTOMERGE: ${{ vars.AUDIT_AUTOMERGE }}
+
+jobs:
+  target:
+    # Resolves and validates the PR with gh and jq only: no checkout, no install.
+    # A job that fails here publishes nothing.
+    # Inside a called workflow github.event_name is the caller's event, so the condition
+    # excludes pull_request_target (job invalidate) instead of naming workflow_call.
+    if: ${{ github.event_name != 'pull_request_target' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      PR_NUMBER: ${{ inputs.pr_number }}
+      CALLER_HEAD: ${{ inputs.head_sha }}
+    outputs:
+      pr_number: ${{ steps.resolve.outputs.pr_number }}
+      head_sha: ${{ steps.resolve.outputs.head_sha }}
+      base_sha: ${{ steps.resolve.outputs.base_sha }}
+      default_branch: ${{ steps.resolve.outputs.default_branch }}
+      model_empty: ${{ steps.resolve.outputs.model_empty }}
+    steps:
+      - name: Resolve and validate the audit pull request
+        id: resolve
+        run: |
+          set -euo pipefail
+          [[ "$PR_NUMBER" =~ ^[0-9]+$ ]] || { echo "pr_number must be a number" >&2; exit 1; }
+          PR=$(gh pr view "$PR_NUMBER" --json state,labels,headRefOid,baseRefOid,headRepositoryOwner,isCrossRepository)
+          [[ "$(jq -r .state <<<"$PR")" == OPEN ]] || { echo "PR $PR_NUMBER is not open" >&2; exit 1; }
+          jq -e 'any(.labels[]?; .name == "skill-audit")' <<<"$PR" >/dev/null || { echo "PR $PR_NUMBER is not labeled skill-audit" >&2; exit 1; }
+          [[ "$(jq -r .isCrossRepository <<<"$PR")" == false ]] || { echo "PR $PR_NUMBER head is in a fork" >&2; exit 1; }
+          HEAD=$(jq -r .headRefOid <<<"$PR")
+          BASE=$(jq -r .baseRefOid <<<"$PR")
+          # A called run passes head_sha (non-empty); a dispatch run passes none and resolves the live head.
+          if [[ -n "$CALLER_HEAD" && "$CALLER_HEAD" != "$HEAD" ]]; then
+            echo "head_sha $CALLER_HEAD is not the live head $HEAD" >&2
+            exit 1
+          fi
+          DEFAULT=$(gh api "repos/$GH_REPO" --jq .default_branch)
+          [[ -n "$DEFAULT" ]] || { echo "cannot read the default branch" >&2; exit 1; }
+          if [[ -z "${AUDIT_REVIEW_MODEL:-}" ]]; then
+            # Skipped path: label it and stop before any install or checkout.
+            # Only the audit-review:* labels the PR carries are removed. A removal that fails is
+            # tolerated only when a fresh read shows the label already gone; any other failure fails the job.
+            while IFS= read -r name; do
+              [[ -n "$name" ]] || continue
+              if ! gh pr edit "$PR_NUMBER" --remove-label "$name" >/dev/null 2>&1; then
+                LIVE=$(gh pr view "$PR_NUMBER" --json labels | jq -r '.labels[].name')
+                if grep -qxF -- "$name" <<<"$LIVE"; then
+                  echo "cannot remove $name from PR $PR_NUMBER" >&2
+                  exit 1
+                fi
+              fi
+            done < <(jq -r '.labels[]?.name | select(startswith("audit-review:"))' <<<"$PR")
+            gh label create audit-review:skipped --force >/dev/null
+            gh pr edit "$PR_NUMBER" --add-label audit-review:skipped >/dev/null
+            model_empty=true
+          else
+            model_empty=false
+          fi
+          {
+            echo "pr_number=$PR_NUMBER"
+            echo "head_sha=$HEAD"
+            echo "base_sha=$BASE"
+            echo "default_branch=$DEFAULT"
+            echo "model_empty=$model_empty"
+          } >> "$GITHUB_OUTPUT"
+
+  review:
+    needs: target
+    if: ${{ github.event_name != 'pull_request_target' && needs.target.result == 'success' && needs.target.outputs.model_empty != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      checks: read
+      pull-requests: write
+      statuses: write
+      issues: write
+    env:
+      GH_REPO: ${{ github.repository }}
+      PR_NUMBER: ${{ needs.target.outputs.pr_number }}
+      HEAD_SHA: ${{ needs.target.outputs.head_sha }}
+      BASE_SHA: ${{ needs.target.outputs.base_sha }}
+    steps:
+      # Trusted copy first: the default branch's tooling, never the PR's.
+      - name: Check out the default branch into trusted
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.target.outputs.default_branch }}
+          path: trusted
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check out the pull request head into pr
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ needs.target.outputs.head_sha }}
+          path: pr
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Copy the trusted tooling
+        id: trusted
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/trusted"
+          cp trusted/scripts/audit/audit.py \
+             trusted/.github/audit/scope-check.py \
+             trusted/.github/audit/render-prompt.py \
+             trusted/.github/audit/review-combine.py \
+             trusted/.github/audit/review-publish.sh \
+             trusted/.github/audit/review-gates.sh \
+             trusted/.github/audit/copilot-review.sh \
+             trusted/.github/audit/review-prompt.md \
+             trusted/.github/audit/expected-checks.txt \
+             trusted/skills/skill-judge/references/agentskills/SOURCE.json \
+             trusted/scripts/audit/non_latin_allowlist.txt \
+             "$RUNNER_TEMP/trusted/"
+      - name: Validate the review knobs from the trusted copy
+        env:
+          GITHUB_WORKSPACE_ROOT: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE_ROOT/trusted"
+          python3 "$RUNNER_TEMP/trusted/audit.py" --root "$GITHUB_WORKSPACE_ROOT/trusted" validate-knobs
+      # UNVERIFIED: the Copilot CLI version is pinned by the Task 1 spike (docs/audit/ci-spike.md).
+      - name: Install Copilot CLI (UNVERIFIED until Task 1 spike)
+        run: npm install -g @github/copilot
+      # UNVERIFIED: the setup-uv pin is the same one the main workflow uses; its behaviour in this job is not verified offline.
+      - name: Install uv (setup-uv) (UNVERIFIED until Task 1 spike)
+        uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
+
+      # Gates. Every gate runs from the workspace root or the trusted copy, never
+      # inside pr/, so no PR file can supply uv configuration or code. Each gate
+      # writes its exit code (0 pass, 1 fail, 2 needs-human) to gates/<name>.
+      - name: Prepare the gate directory
+        run: mkdir -p "$RUNNER_TEMP/gates"
+      - name: Gate scope
+        run: |
+          # The shell's exit-on-error is off here: a gate that fails must still record its code.
+          # Anything other than 0 (pass) or 1 (fail), including a failed git call, is needs-human (2).
+          set +e
+          if ! git -C pr diff --numstat -z -M "$BASE_SHA...$HEAD_SHA" > "$RUNNER_TEMP/scope.numstat" \
+             || ! git -C pr diff --binary -M "$BASE_SHA...$HEAD_SHA" > "$RUNNER_TEMP/scope.patch"; then
+            code=2
+          else
+            python3 "$RUNNER_TEMP/trusted/scope-check.py" review --format numstat-z \
+              --patch "$RUNNER_TEMP/scope.patch" < "$RUNNER_TEMP/scope.numstat" >&2
+            code=$?
+          fi
+          case "$code" in 0|1) ;; *) code=2 ;; esac
+          echo "$code" > "$RUNNER_TEMP/gates/scope"
+      - name: Gate check
+        run: |
+          set +e
+          # The allowlist comes from the trusted copy: the PR's own file must not decide what passes.
+          python3 "$RUNNER_TEMP/trusted/audit.py" --root pr check --strict --validator-pin "$RUNNER_TEMP/trusted/SOURCE.json" \
+            --allowlist "$RUNNER_TEMP/trusted/non_latin_allowlist.txt" >&2
+          code=$?
+          case "$code" in 0|1) ;; *) code=2 ;; esac
+          echo "$code" > "$RUNNER_TEMP/gates/check"
+      - name: Gate evals
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          bash "$RUNNER_TEMP/trusted/review-gates.sh" evals > "$RUNNER_TEMP/gates/evals.out"
+          code=$?
+          value=$(cat "$RUNNER_TEMP/gates/evals.out")
+          # A non-zero exit is needs-human whatever the script printed.
+          case "$value" in 0|1|2) ;; *) value=2 ;; esac
+          if [ "$code" -ne 0 ]; then value=2; fi
+          echo "$value" > "$RUNNER_TEMP/gates/evals"
+      - name: Gate CI
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_CHECKS_FILE: ${{ runner.temp }}/trusted/expected-checks.txt
+        run: |
+          set +e
+          bash "$RUNNER_TEMP/trusted/review-gates.sh" ci > "$RUNNER_TEMP/gates/ci.out"
+          code=$?
+          value=$(cat "$RUNNER_TEMP/gates/ci.out")
+          # A non-zero exit is needs-human whatever the script printed.
+          case "$value" in 0|1|2) ;; *) value=2 ;; esac
+          if [ "$code" -ne 0 ]; then value=2; fi
+          echo "$value" > "$RUNNER_TEMP/gates/ci"
+      - name: Build the capped reviewer diff and gate its size
+        run: |
+          set -uo pipefail
+          mkdir -p .audit-evidence
+          # dist/** is generated output: excluded from the reviewer's evidence.
+          # A failed diff is needs-human: an empty pr.diff must never read as a small, passing diff.
+          if ! git -C pr diff --binary -M "$BASE_SHA...$HEAD_SHA" -- . ':!dist' > "$RUNNER_TEMP/pr.diff"; then
+            echo 2 > "$RUNNER_TEMP/gates/diff-size"
+            echo 'git diff failed: the reviewer diff cannot be built' >&2
+            : > .audit-evidence/pr.diff
+            exit 0
+          fi
+          # The gate measures the full diff; the reviewer sees at most 61440 bytes. Truncation is needs-human.
+          bash "$RUNNER_TEMP/trusted/review-gates.sh" diff-size "$RUNNER_TEMP/pr.diff" > "$RUNNER_TEMP/gates/diff-size"
+          head -c 61440 "$RUNNER_TEMP/pr.diff" > .audit-evidence/pr.diff
+      - name: Trust the reviewer answer only when its gates allow it
+        id: reviewer-allowed
+        run: |
+          # A failed gates call fails this step: the reviewer runs only on an explicit run_review=true.
+          set -euo pipefail
+          run=$(python3 "$RUNNER_TEMP/trusted/review-combine.py" gates --dir "$RUNNER_TEMP/gates" --out "$RUNNER_TEMP/gates.json")
+          case "$run" in run_review=true|run_review=false) ;; *) echo "unexpected gates output: $run" >&2; exit 1 ;; esac
+          echo "$run" >> "$GITHUB_OUTPUT"
+      - name: Render the reviewer prompt
+        if: ${{ steps.reviewer-allowed.outputs.run_review == 'true' }}
+        run: |
+          set -euo pipefail
+          python3 "$RUNNER_TEMP/trusted/render-prompt.py" "$RUNNER_TEMP/trusted/review-prompt.md" "$RUNNER_TEMP/review-prompt.rendered.md" \
+            --path PR_DIFF=.audit-evidence/pr.diff \
+            --path RUBRIC_PATH=trusted/skills/skill-judge/references
+      - name: Run the read-only PR reviewer
+        id: reviewer
+        if: ${{ !cancelled() && steps.reviewer-allowed.outputs.run_review == 'true' }}
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # The deadline is 35 minutes, under the job's 45. A hang ends this step as a failure (exit 124),
+          # so combine and publish still run with needs-human; the job itself is never cancelled.
+          timeout --kill-after=1m 35m bash "$RUNNER_TEMP/trusted/copilot-review.sh" < "$RUNNER_TEMP/review-prompt.rendered.md" > "$RUNNER_TEMP/review-raw.json"
+      - name: Validate the reviewer answer
+        if: ${{ !cancelled() && steps.reviewer.outcome == 'success' }}
+        run: |
+          set -euo pipefail
+          python3 "$RUNNER_TEMP/trusted/review-combine.py" validate --in "$RUNNER_TEMP/review-raw.json" --out "$RUNNER_TEMP/review.json" || true
+      - name: Combine the gates and the reviewer answer
+        id: combine
+        if: ${{ !cancelled() && steps.trusted.outcome == 'success' }}
+        env:
+          REVIEWER_OUTCOME: ${{ steps.reviewer.outcome || 'skipped' }}
+        run: |
+          set -euo pipefail
+          python3 "$RUNNER_TEMP/trusted/review-combine.py" outcome \
+            --gates "$RUNNER_TEMP/gates.json" \
+            --review "$RUNNER_TEMP/review.json" \
+            --reviewer-outcome "$REVIEWER_OUTCOME" \
+            --model "$AUDIT_REVIEW_MODEL" \
+            --on-positive "$AUDIT_ON_POSITIVE" > "$RUNNER_TEMP/outcome.json"
+      - name: Publish the review outcome
+        if: ${{ !cancelled() && steps.trusted.outcome == 'success' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ needs.target.outputs.pr_number }}
+          HEAD_SHA: ${{ needs.target.outputs.head_sha }}
+          AUDIT_AUTOMERGE: ${{ env.AUDIT_AUTOMERGE }}
+        run: |
+          set -euo pipefail
+          bash "$RUNNER_TEMP/trusted/review-publish.sh" \
+            "$RUNNER_TEMP/outcome.json" "$RUNNER_TEMP/review.json" "$RUNNER_TEMP/gates.json"
+
+  invalidate:
+    # A push to an audit PR gives the new head no status: clear the review labels.
+    # No checkout: only the default branch's workflow file runs, with the labels.
+    if: ${{ github.event_name == 'pull_request_target' && github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'skill-audit') }}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+    steps:
+      - name: Remove the review labels from the moved head
+        run: |
+          set -euo pipefail
+          # Only a label the PR does not carry is tolerated; any other failure fails the job.
+          CURRENT=$(gh pr view "$PR_NUMBER" --json labels --jq '[.labels[].name | select(startswith("audit-review:"))] | .[]')
+          while IFS= read -r name; do
+            [[ -n "$name" ]] || continue
+            gh pr edit "$PR_NUMBER" --remove-label "$name" >/dev/null
+          done <<<"$CURRENT"

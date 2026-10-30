@@ -1,0 +1,896 @@
+name: Scheduled skill audit
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Run judges even when no changes are detected
+        type: boolean
+        required: false
+        default: false
+      approved_upstreams:
+        description: Comma-separated skill|source keys approved from the audit-upstream issue
+        type: string
+        required: false
+
+concurrency:
+  group: skill-audit
+  cancel-in-progress: false
+
+permissions: {}
+
+env:
+  # Knob defaults. UNVERIFIED: 'auto' as a Copilot model identifier is not verified offline (Task 1 spike).
+  AUDIT_RESEARCH_MODELS: ${{ vars.AUDIT_RESEARCH_MODELS || 'auto' }}
+  AUDIT_MERGER_MODEL: ${{ vars.AUDIT_MERGER_MODEL || 'auto' }}
+  AUDIT_INTERVAL_DAYS: ${{ vars.AUDIT_INTERVAL_DAYS || '15' }}
+  AUDIT_REVIEW_EFFORT: ${{ vars.AUDIT_REVIEW_EFFORT || 'high' }}
+  AUDIT_ON_POSITIVE: ${{ vars.AUDIT_ON_POSITIVE || 'label' }}
+  AUDIT_PR_DIAGRAMS: ${{ vars.AUDIT_PR_DIAGRAMS }}
+  APPROVED_UPSTREAMS: ${{ inputs.approved_upstreams }}
+
+jobs:
+  detect:
+    if: ${{ github.event_name != 'schedule' || vars.AUDIT_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    outputs:
+      run_needed: ${{ steps.publish.outputs.run_needed || 'false' }}
+      full_check: ${{ steps.publish.outputs.full_check || 'false' }}
+      reasons: ${{ steps.publish.outputs.reasons }}
+      spec_changed: ${{ steps.publish.outputs.spec_changed }}
+      structure_changed: ${{ steps.publish.outputs.structure_changed }}
+      skills: ${{ steps.publish.outputs.skills }}
+      upstream_new: ${{ steps.publish.outputs.upstream_new }}
+      state: ${{ steps.publish.outputs.state }}
+      models: ${{ steps.publish.outputs.models }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Read the live audit state
+        env:
+          # The only detect step that holds the PAT: variables are not readable with GITHUB_TOKEN.
+          # It runs write-state.sh read and nothing else; the later steps see the saved file only.
+          GH_TOKEN: ${{ secrets.AUDIT_BOT_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          bash .github/audit/write-state.sh read > "$RUNNER_TEMP/live-state.json"
+      - name: Decide whether the audit interval is due
+        id: interval
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          python3 scripts/audit/audit.py validate-knobs
+          DUE=$(python3 scripts/audit/audit.py interval-due --state "$(<"$RUNNER_TEMP/live-state.json")" --days "$AUDIT_INTERVAL_DAYS" --event "$EVENT")
+          if [ "$DUE" = true ]; then
+            echo 'skip=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'skip=true' >> "$GITHUB_OUTPUT"
+            echo 'audit interval not due: nothing to check' >&2
+          fi
+      - uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
+        if: ${{ steps.interval.outputs.skip != 'true' }}
+      - name: Assert full git history
+        if: ${{ steps.interval.outputs.skip != 'true' }}
+        run: test "$(git rev-parse --is-shallow-repository)" = false
+      - name: Stop when an audit PR is already open
+        id: open-pr
+        if: ${{ steps.interval.outputs.skip != 'true' }}
+        run: |
+          set -euo pipefail
+          open=$(gh pr list --state open --label skill-audit --json number --jq 'length > 0')
+          echo "open=$open" >> "$GITHUB_OUTPUT"
+      - name: Fetch specification and detect changes
+        id: detect
+        if: ${{ steps.interval.outputs.skip != 'true' && steps.open-pr.outputs.open != 'true' }}
+        env:
+          FORCE: ${{ inputs.force }}
+        run: |
+          set -euo pipefail
+          echo 'audit-pages/' >> .git/info/exclude
+          bash skills/agentskills-research/scripts/fetch-spec.sh --pages-dir audit-pages > "$RUNNER_TEMP/spec-fetch.json"
+          FETCH="$RUNNER_TEMP/spec-fetch.json" python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          data = json.loads(Path(os.environ['FETCH']).read_text())
+          changed = bool(data.get('changed')) or bool(data.get('rubric_stale')) or bool(data.get('structure_changed'))
+          spec_changed = 'true' if changed else 'false'
+          structure_changed = 'true' if data.get('structure_changed') else 'false'
+          Path(os.environ['RUNNER_TEMP'], 'spec_changed').write_text(spec_changed)
+          Path(os.environ['RUNNER_TEMP'], 'structure_changed').write_text(structure_changed)
+          PY
+          if git diff --quiet -- skills/skill-judge/references/agentskills; then
+            if python3 -c 'import json,sys; sys.exit(not json.load(open(sys.argv[1])).get("rubric_stale"))' "$RUNNER_TEMP/spec-fetch.json"; then
+              OLD_SHA=$(python3 -c 'import re;print(re.search(r"spec_sha:\s*([0-9a-f]{40})",open("skills/skill-judge/references/rubric.md").read()).group(1))')
+              BASE=$(git log --format=%H -S"$OLD_SHA" -- skills/skill-judge/references/agentskills/SOURCE.json | tail -1)
+              if [ -n "$BASE" ]; then git diff "$BASE" -- skills/skill-judge/references/agentskills > spec.diff; else printf '%s\n' 'no base commit: read all references' > spec.diff; fi
+            else
+              git diff -- skills/skill-judge/references/agentskills > spec.diff
+            fi
+          else
+            git diff -- skills/skill-judge/references/agentskills > spec.diff
+          fi
+          SPEC_CHANGED=$(<"$RUNNER_TEMP/spec_changed")
+          python3 scripts/audit/audit.py upstreams --registry docs/audit/upstream-sources.json > upstreams.json
+          if [ -n "${APPROVED_UPSTREAMS:-}" ]; then FORCE=true; fi
+          DETECT_ARGS=()
+          if [ "$FORCE" = true ]; then DETECT_ARGS+=(--force); fi
+          python3 scripts/audit/audit.py detect --state "$(<"$RUNNER_TEMP/live-state.json")" --spec-changed "$SPEC_CHANGED" --upstreams upstreams.json "${DETECT_ARGS[@]}" > "$RUNNER_TEMP/detect.json"
+          python3 scripts/audit/audit.py check > check.json
+          MODELS=$(jq -cRn --arg v "$AUDIT_RESEARCH_MODELS" '$v|split(",")|map(gsub("^\\s+|\\s+$";""))|map(select(length>0))')
+          test "$MODELS" != '[]'
+          printf '%s' "$MODELS" > "$RUNNER_TEMP/models"
+          python3 - "${APPROVED_UPSTREAMS:-}" upstreams.json <<'PY'
+          import json,sys
+          approved=set(filter(None,(s.strip() for s in sys.argv[1].split(','))))
+          rows=json.load(open(sys.argv[2]))
+          stale={f"{r.get('skill') or ''}|{r['source']}" for r in rows if r.get('stale') is True}
+          invalid=approved-stale
+          if invalid: raise SystemExit(f'approved upstreams are not stale: {sorted(invalid)}')
+          PY
+          # On an approval dispatch upstream-report never runs, so fetch the
+          # change evidence for exactly the approved keys here, pinned to the
+          # registry refs. Fetch failures become 'evidence unavailable' and
+          # never abort the run.
+          mkdir -p approved-evidence
+          if [ -n "${APPROVED_UPSTREAMS:-}" ]; then
+            python3 .github/audit/upstream-evidence.py evidence \
+              --upstreams upstreams.json \
+              --registry docs/audit/upstream-sources.json \
+              --evidence-dir approved-evidence \
+              --keys "$APPROVED_UPSTREAMS"
+          fi
+          cp "$RUNNER_TEMP/spec-fetch.json" fetch-result.json
+          ZIP_PATHS=(skills/skill-judge/references/agentskills audit-pages spec.diff upstreams.json check.json fetch-result.json)
+          ZIP_PATHS+=(approved-evidence)
+          zip -q -r "$RUNNER_TEMP/spec.zip" "${ZIP_PATHS[@]}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: ${{ steps.interval.outputs.skip != 'true' && steps.open-pr.outputs.open != 'true' }}
+        with:
+          name: spec
+          path: ${{ runner.temp }}/spec.zip
+          if-no-files-found: error
+      - name: Publish detect outputs after artifact upload
+        id: publish
+        if: ${{ steps.interval.outputs.skip != 'true' && steps.open-pr.outputs.open != 'true' }}
+        run: |
+          set -euo pipefail
+          python3 - "$RUNNER_TEMP/detect.json" "$GITHUB_OUTPUT" "$RUNNER_TEMP/spec_changed" "$RUNNER_TEMP/structure_changed" "$RUNNER_TEMP/models" <<'PY'
+          import json,sys
+          data=json.load(open(sys.argv[1]))
+          with open(sys.argv[2], 'a') as out:
+              for key in ('run_needed','reasons','skills','upstream_new','state'):
+                  value=data.get(key, [])
+                  out.write(f'{key}={json.dumps(value,separators=(",",":")) if isinstance(value,(dict,list)) else str(value).lower()}\n')
+              out.write(f'spec_changed={open(sys.argv[3]).read()}\n')
+              out.write(f'structure_changed={open(sys.argv[4]).read()}\n')
+              out.write(f'models={open(sys.argv[5]).read()}\n')
+              # Written only here: every check above succeeded, so "checked, nothing to do" is real.
+              out.write('full_check=true\n')
+          PY
+
+  checkpoint:
+    # A clean check (checked, nothing to do) stamps checked_at. Serialized by the workflow-level group.
+    needs: detect
+    if: ${{ !cancelled() && (github.event_name != 'schedule' || vars.AUDIT_ENABLED == 'true') && needs.detect.result == 'success' && needs.detect.outputs.full_check == 'true' && needs.detect.outputs.run_needed == 'false' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      GH_REPO: ${{ github.repository }}
+    steps:
+      # Credentialless checkout: write-state.sh comes from the workflow's own ref.
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Stamp checked_at for a clean check
+        env:
+          GH_TOKEN: ${{ secrets.AUDIT_BOT_TOKEN }}
+        run: bash .github/audit/write-state.sh checkpoint
+
+  attempt:
+    # Stamps last_attempt_at before any model runs: a failed stamp starts no judging job.
+    needs: detect
+    if: ${{ !cancelled() && (github.event_name != 'schedule' || vars.AUDIT_ENABLED == 'true') && needs.detect.result == 'success' && needs.detect.outputs.run_needed == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Stamp last_attempt_at before judging
+        env:
+          GH_TOKEN: ${{ secrets.AUDIT_BOT_TOKEN }}
+        run: bash .github/audit/write-state.sh attempt
+
+  rubric:
+    needs: [detect, attempt]
+    if: ${{ (github.event_name != 'schedule' || vars.AUDIT_ENABLED == 'true') && needs.detect.result == 'success' && needs.attempt.result == 'success' && needs.detect.outputs.run_needed == 'true' && needs.detect.outputs.spec_changed == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      # UNVERIFIED: pin the exact @github/copilot version recorded by the
+      # Task 1 spike (docs/audit/ci-spike.md); the install stays unpinned until then.
+      - name: Install Copilot CLI (UNVERIFIED until Task 1 spike)
+        run: npm install -g @github/copilot
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: spec
+          path: ${{ runner.temp }}/spec
+      - run: unzip -q "$RUNNER_TEMP/spec/spec.zip" -d "$RUNNER_TEMP/spec/content"
+      - run: cp -a "$RUNNER_TEMP/spec/content/skills/skill-judge/references/agentskills/." skills/skill-judge/references/agentskills/ && cp -a "$RUNNER_TEMP/spec/content/audit-pages" .
+      - name: Verify fetched pages survived artifact transfer
+        run: |
+          set -euo pipefail
+          echo 'audit-pages/' >> .git/info/exclude
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          pages=json.loads(Path('audit-pages/pages.json').read_text())
+          for row in pages:
+              raw=Path('audit-pages') / row['raw']
+              assert raw.is_file() and raw.stat().st_size, f'missing fetched source: {raw}'
+              if row.get('mapped') is False:
+                  page=Path('audit-pages') / (row['page'] + '.mdx')
+                  assert page.is_file(), f'missing unmapped page: {page}'
+          PY
+      - name: Prepare excluded workspace evidence
+        run: |
+          set -euo pipefail
+          mkdir -p .audit-evidence
+          echo .audit-evidence/ >> .git/info/exclude
+          # This checkout is shallow, so the historical base diff and the full
+          # fetch result must come from the spec artifact.
+          cp "$RUNNER_TEMP/spec/content/spec.diff" .audit-evidence/spec.diff
+          cp "$RUNNER_TEMP/spec/content/fetch-result.json" .audit-evidence/fetch-result.json
+      - name: Trust scope and render tooling before the model runs
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/trusted"
+          cp -a .github/audit/scope-check.py .github/audit/render-prompt.py .github/audit/git-state.sh "$RUNNER_TEMP/trusted/"
+          bash "$RUNNER_TEMP/trusted/git-state.sh" snapshot "$RUNNER_TEMP/git-state"
+      - name: Refresh rubric and structural references
+        env:
+          STRUCTURE_CHANGED: ${{ needs.detect.outputs.structure_changed }}
+        run: |
+          set -euo pipefail
+          NEW_PAGES=$(jq -c '[.[] | select(.mapped == false) | .page]' audit-pages/pages.json)
+          REMOVED_PAGES=$(jq -c '.removed_pages' .audit-evidence/fetch-result.json)
+          python3 "$RUNNER_TEMP/trusted/render-prompt.py" .github/audit/rubric-prompt.md "$RUNNER_TEMP/rubric-prompt.rendered.md" \
+            --path PAGES_JSON=audit-pages/pages.json \
+            --path FETCH_RESULT=.audit-evidence/fetch-result.json \
+            --path SPEC_DIFF=.audit-evidence/spec.diff \
+            --text STRUCTURE_CHANGED="$STRUCTURE_CHANGED" \
+            --text NEW_PAGES="$NEW_PAGES" \
+            --text REMOVED_PAGES="$REMOVED_PAGES"
+          cat "$RUNNER_TEMP/rubric-prompt.rendered.md" | .github/audit/copilot-agent.sh
+      - name: Verify git state after the rubric model step
+        run: bash "$RUNNER_TEMP/trusted/git-state.sh" verify "$RUNNER_TEMP/git-state"
+      - name: Scope-check the rubric model output before any repository code runs
+        run: |
+          set -euo pipefail
+          git -c core.quotePath=false status --porcelain=v2 --untracked-files=all | python3 "$RUNNER_TEMP/trusted/scope-check.py" repairs --format porcelain-v2 --worktree .
+      - name: Run the fetcher tests on the host
+        run: bash tests/skills/agentskills-research/test-fetch-spec.sh
+      - name: Check the refreshed rubric on the host
+        run: python3 scripts/audit/audit.py rubric-check
+      - name: Capture the repairs patch
+        run: |
+          set -euo pipefail
+          git add -A && git diff --cached --binary > "$RUNNER_TEMP/repairs.patch"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rubric
+          path: ${{ runner.temp }}/repairs.patch
+          if-no-files-found: error
+
+  research:
+    needs: [detect, attempt, rubric]
+    if: ${{ !cancelled() && needs.attempt.result == 'success' && (github.event_name != 'schedule' || vars.AUDIT_ENABLED == 'true') && needs.detect.result == 'success' && needs.detect.outputs.run_needed == 'true' && needs.detect.outputs.skills != '[]' && (needs.rubric.result == 'success' || needs.rubric.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        model: ${{ fromJSON(needs.detect.outputs.models) }}
+    permissions:
+      contents: read
+    env:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      # UNVERIFIED: pin the exact @github/copilot version recorded by the
+      # Task 1 spike (docs/audit/ci-spike.md); the install stays unpinned until then.
+      - name: Install Copilot CLI (UNVERIFIED until Task 1 spike)
+        run: npm install -g @github/copilot
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: spec
+          path: ${{ runner.temp }}/spec
+      - run: unzip -q "$RUNNER_TEMP/spec/spec.zip" -d "$RUNNER_TEMP/spec/content"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        if: ${{ needs.detect.outputs.spec_changed == 'true' }}
+        with:
+          name: rubric
+          path: ${{ runner.temp }}/rubric
+      - name: Trust scope and render tooling before the repairs
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/trusted"
+          cp -a .github/audit/scope-check.py .github/audit/render-prompt.py .github/audit/git-state.sh "$RUNNER_TEMP/trusted/"
+      - name: Apply the rubric repairs within the audited scope
+        run: |
+          set -euo pipefail
+          if [ -s "$RUNNER_TEMP/rubric/repairs.patch" ]; then
+            # Reject out-of-scope repairs before anything is applied: the
+            # numstat list carries the paths, the patch adds symlink and
+            # mode-change detection. The scope gate comes from the trusted copy.
+            git apply --numstat "$RUNNER_TEMP/rubric/repairs.patch" | python3 "$RUNNER_TEMP/trusted/scope-check.py" repairs --format numstat --patch "$RUNNER_TEMP/rubric/repairs.patch"
+            git apply "$RUNNER_TEMP/rubric/repairs.patch"
+          fi
+      - name: Produce and validate judge verdicts
+        id: judge
+        env:
+          MODEL: ${{ matrix.model }}
+          SKILLS: ${{ needs.detect.outputs.skills }}
+        run: |
+          set -euo pipefail
+          SLUG=$(python3 scripts/audit/audit.py slug "$MODEL")
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          mkdir -p verdicts
+          PROMPT="$RUNNER_TEMP/judge-prompt.md"
+          SKILLS_CSV=$(jq -r 'join(",")' <<<"$SKILLS")
+          sed -e "s|{ROOT}|$GITHUB_WORKSPACE|g" -e "s|{JUDGE}|$SLUG|g" -e "s|{SKILLS}|$SKILLS_CSV|g" skills/skill-judge/references/judge-prompt.md > "$PROMPT"
+          for attempt in 1 2; do
+            if copilot -p "$(<"$PROMPT")" -s --no-ask-user --model="$MODEL" --allow-tool=read | python3 scripts/audit/audit.py split-verdicts --judge "$MODEL" --out verdicts; then
+              if python3 scripts/audit/audit.py validate-verdict "verdicts/$SLUG"/*.json; then break; fi
+            fi
+            [ "$attempt" = 2 ] && exit 1
+          done
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: ${{ always() }}
+        with:
+          name: verdicts-${{ steps.judge.outputs.slug }}
+          path: verdicts/
+          if-no-files-found: ignore
+
+  evals:
+    needs: [detect, attempt, rubric]
+    if: ${{ !cancelled() && needs.attempt.result == 'success' && (github.event_name != 'schedule' || vars.AUDIT_ENABLED == 'true') && needs.detect.result == 'success' && needs.detect.outputs.run_needed == 'true' && needs.detect.outputs.skills != '[]' && (needs.rubric.result == 'success' || needs.rubric.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      quality_failed: ${{ steps.evals.outputs.quality_failed }}
+    env:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      # UNVERIFIED: pin the exact @github/copilot version recorded by the
+      # Task 1 spike (docs/audit/ci-spike.md); the install stays unpinned until then.
+      - name: Install Copilot CLI (UNVERIFIED until Task 1 spike)
+        run: npm install -g @github/copilot
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: spec
+          path: ${{ runner.temp }}/spec
+      - run: unzip -q "$RUNNER_TEMP/spec/spec.zip" -d "$RUNNER_TEMP/spec/content"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        if: ${{ needs.detect.outputs.spec_changed == 'true' }}
+        with:
+          name: rubric
+          path: ${{ runner.temp }}/rubric
+      - name: Trust scope and render tooling before the repairs
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/trusted"
+          cp -a .github/audit/scope-check.py .github/audit/render-prompt.py .github/audit/git-state.sh "$RUNNER_TEMP/trusted/"
+      - name: Apply the rubric repairs within the audited scope
+        run: |
+          set -euo pipefail
+          if [ -s "$RUNNER_TEMP/rubric/repairs.patch" ]; then
+            # Reject out-of-scope repairs before anything is applied: the
+            # numstat list carries the paths, the patch adds symlink and
+            # mode-change detection. The scope gate comes from the trusted copy.
+            git apply --numstat "$RUNNER_TEMP/rubric/repairs.patch" | python3 "$RUNNER_TEMP/trusted/scope-check.py" repairs --format numstat --patch "$RUNNER_TEMP/rubric/repairs.patch"
+            git apply "$RUNNER_TEMP/rubric/repairs.patch"
+          fi
+      - name: Run quality evals
+        id: evals
+        env:
+          SKILLS: ${{ needs.detect.outputs.skills }}
+        run: |
+          set +e
+          python3 scripts/audit/audit.py run-evals --skills "$(jq -r 'join(",")' <<<"$SKILLS")" --runner "$GITHUB_WORKSPACE/.github/audit/copilot-runner.sh" --out evals-out
+          status=$?
+          python3 scripts/audit/audit.py run-evals --skills "$(jq -r 'join(",")' <<<"$SKILLS")" --runner "$GITHUB_WORKSPACE/.github/audit/copilot-runner.sh" --out evals-out --triggers
+          trigger_status=$?
+          set -e
+          # Exit 0/1 are tolerated (quality failures stay as evidence); anything
+          # else, including harness errors (2) and crashes, fails the job.
+          bash .github/audit/eval-status.sh "$status" "$trigger_status" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with: {name: evals-results, path: evals-out/}
+
+  merge:
+    needs: [detect, attempt, rubric, research, evals]
+    if: ${{ !cancelled() && needs.attempt.result == 'success' && (github.event_name != 'schedule' || vars.AUDIT_ENABLED == 'true') && needs.detect.result == 'success' && needs.detect.outputs.run_needed == 'true' && needs.detect.outputs.skills != '[]' && needs.evals.result == 'success' && (needs.rubric.result == 'success' || needs.rubric.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      update: ${{ steps.decision.outputs.update }}
+      type: ${{ steps.decision.outputs.type }}
+      title: ${{ steps.decision.outputs.title }}
+      targets: ${{ steps.decision.outputs.targets }}
+    env:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+      MODELS: ${{ needs.detect.outputs.models }}
+      SKILLS: ${{ needs.detect.outputs.skills }}
+      APPROVED_UPSTREAMS: ${{ inputs.approved_upstreams }}
+      QUALITY_FAILED: ${{ needs.evals.outputs.quality_failed }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
+      # UNVERIFIED: pin the exact @github/copilot version recorded by the
+      # Task 1 spike (docs/audit/ci-spike.md); the install stays unpinned until then.
+      - name: Install Copilot CLI (UNVERIFIED until Task 1 spike)
+        run: npm install -g @github/copilot
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: spec
+          path: ${{ runner.temp }}/spec
+      - name: Unpack the spec artifact as merge evidence
+        run: |
+          set -euo pipefail
+          unzip -q "$RUNNER_TEMP/spec/spec.zip" -d "$RUNNER_TEMP/evidence"
+          mkdir -p .audit-evidence
+          cp "$RUNNER_TEMP/evidence/spec.diff" "$RUNNER_TEMP/evidence/upstreams.json" "$RUNNER_TEMP/evidence/check.json" .audit-evidence/
+          cp -a "$RUNNER_TEMP/evidence/approved-evidence" .audit-evidence/approved-evidence
+          # upload-artifact skips empty directories: recreate approved-evidence when no keys were approved.
+          mkdir -p .audit-evidence/approved-evidence
+          echo .audit-evidence/ >> .git/info/exclude
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        if: ${{ needs.detect.outputs.spec_changed == 'true' }}
+        with:
+          name: rubric
+          path: ${{ runner.temp }}/rubric
+      - name: Trust scope and render tooling before the repairs
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/trusted"
+          cp -a .github/audit/scope-check.py .github/audit/render-prompt.py .github/audit/git-state.sh "$RUNNER_TEMP/trusted/"
+      - name: Apply the rubric repairs within the audited scope
+        run: |
+          set -euo pipefail
+          if [ -s "$RUNNER_TEMP/rubric/repairs.patch" ]; then
+            # Reject out-of-scope repairs before anything is applied: the
+            # numstat list carries the paths, the patch adds symlink and
+            # mode-change detection. The scope gate comes from the trusted copy.
+            git apply --numstat "$RUNNER_TEMP/rubric/repairs.patch" | python3 "$RUNNER_TEMP/trusted/scope-check.py" repairs --format numstat --patch "$RUNNER_TEMP/rubric/repairs.patch"
+            git apply "$RUNNER_TEMP/rubric/repairs.patch"
+          fi
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with: {pattern: verdicts-*, path: verdicts, merge-multiple: true}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: evals-results
+          path: ${{ runner.temp }}/evals-results
+      - run: mkdir -p .audit-evidence/evals-results && cp -a "$RUNNER_TEMP/evals-results/." .audit-evidence/evals-results/
+      - name: Merge verdicts and enforce complete coverage
+        run: python3 scripts/audit/audit.py merge --in verdicts --out merged --judges "$(jq -r 'join(",")' <<<"$MODELS")" --min-judges "$(jq length <<<"$MODELS")" --skills "$(jq -r 'join(",")' <<<"$SKILLS")" --check .audit-evidence/check.json
+      - name: Exclude pre-model workspace outputs from the decision scope
+        run: |
+          set -euo pipefail
+          # merged/ and verdicts/ are written before the model runs and are not model
+          # output: exclude them so the decision scope check sees only the model's changes.
+          printf '%s\n' merged/ verdicts/ >> .git/info/exclude
+          # Stage the validated rubric repairs so they are part of the baseline: the decision
+          # check then sees only what the model changed (it runs with --skip-staged).
+          git add -A
+          bash "$RUNNER_TEMP/trusted/git-state.sh" snapshot "$RUNNER_TEMP/git-state"
+      - name: Render and write merge decision
+        env:
+          QUALITY_FAILED: ${{ needs.evals.outputs.quality_failed }}
+          APPROVED_UPSTREAMS: ${{ inputs.approved_upstreams }}
+        run: |
+          # All evidence lives inside the excluded .audit-evidence/ workspace
+          # directory: the no-shell Copilot agent cannot read $RUNNER_TEMP.
+          python3 "$RUNNER_TEMP/trusted/render-prompt.py" .github/audit/merge-prompt.md "$RUNNER_TEMP/merge-prompt.rendered.md" \
+            --path MERGED_JSON=merged/merged.json \
+            --path SPEC_DIFF=.audit-evidence/spec.diff \
+            --path UPSTREAMS_JSON=.audit-evidence/upstreams.json \
+            --path EVALS_RESULTS=.audit-evidence/evals-results \
+            --path CHECK_JSON=.audit-evidence/check.json \
+            --path APPROVED_EVIDENCE=.audit-evidence/approved-evidence \
+            --out-path DECISION_JSON=decision.json \
+            --text QUALITY_FAILED="$QUALITY_FAILED" \
+            --text APPROVED_UPSTREAMS="${APPROVED_UPSTREAMS:-}"
+          cat "$RUNNER_TEMP/merge-prompt.rendered.md" | .github/audit/copilot-agent.sh
+      - name: Verify git state after the merge model step
+        run: bash "$RUNNER_TEMP/trusted/git-state.sh" verify "$RUNNER_TEMP/git-state"
+      - name: Scope-check the merge decision before any repository code runs
+        run: |
+          set -euo pipefail
+          git -c core.quotePath=false status --porcelain=v2 --untracked-files=all | python3 "$RUNNER_TEMP/trusted/scope-check.py" decision --format porcelain-v2 --worktree . --skip-staged
+      - name: Validate decision
+        id: decision
+        run: |
+          set -euo pipefail
+          ARGS=()
+          [ "${{ needs.detect.outputs.spec_changed }}" != true ] || ARGS+=(--spec-changed)
+          [ "${{ needs.detect.outputs.structure_changed }}" != true ] || ARGS+=(--structure-changed)
+          python3 scripts/audit/audit.py validate-decision decision.json "${ARGS[@]}"
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json,secrets
+          d=json.load(open('decision.json'))
+          delimiter='AUDIT_'+secrets.token_hex(16)
+          for k in ('update','type','targets'):
+              v=d[k]
+              print(f"{k}={json.dumps(v,separators=(',',':')) if isinstance(v,list) else str(v).lower() if isinstance(v,bool) else v}")
+          print(f'title<<{delimiter}')
+          print(d['title'])
+          print(delimiter)
+          PY
+      - name: Publish the evidence bundle for apply
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/bundle"
+          cp merged/merged.json .audit-evidence/check.json .audit-evidence/spec.diff .audit-evidence/upstreams.json "$RUNNER_TEMP/bundle/"
+          cp -a .audit-evidence/evals-results .audit-evidence/approved-evidence "$RUNNER_TEMP/bundle/"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: evidence-bundle
+          path: ${{ runner.temp }}/bundle
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with: {name: decision, path: decision.json}
+
+  apply:
+    needs: [detect, attempt, merge]
+    if: ${{ !cancelled() && needs.detect.result == 'success' && needs.attempt.result == 'success' && (github.event_name != 'schedule' || vars.AUDIT_ENABLED == 'true') && needs.merge.result == 'success' && needs.merge.outputs.update == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      statuses: write
+    env:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+      SKILLS: ${{ needs.merge.outputs.targets }}
+    outputs:
+      pr_number: ${{ steps.pr.outputs.pr_number }}
+      head_sha: ${{ steps.commit.outputs.head_sha }}
+    steps:
+      # Credentialless checkout: the model steps below never see AUDIT_BOT_TOKEN.
+      # The token is only passed to the trusted steps (push, PR).
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
+      # UNVERIFIED: pin the exact @github/copilot version recorded by the
+      # Task 1 spike (docs/audit/ci-spike.md); the install stays unpinned until then.
+      - name: Install Copilot CLI (UNVERIFIED until Task 1 spike)
+        run: npm install -g @github/copilot
+      - name: Prepare excluded workspace evidence
+        run: |
+          set -euo pipefail
+          mkdir -p .audit-evidence
+          echo .audit-evidence/ >> .git/info/exclude
+      - name: Choose a unique branch
+        id: branch
+        env:
+          TYPE: ${{ needs.merge.outputs.type }}
+          TITLE: ${{ needs.merge.outputs.title }}
+        run: |
+          set -euo pipefail
+          BRANCH=$(python3 scripts/audit/audit.py branch-name --type "$TYPE" --title "$TITLE")
+          # Anonymous ls-remote (the checkout is credentialless): exit 2 means no
+          # such ref; any other failure stops the run instead of guessing.
+          set +e
+          git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1
+          rc=$?
+          set -e
+          case $rc in
+            0) BRANCH=$(python3 scripts/audit/audit.py branch-name --type "$TYPE" --title "$TITLE" --suffix "r$GITHUB_RUN_NUMBER") ;;
+            2) ;;
+            *) echo "cannot query origin for $BRANCH (ls-remote exit $rc)" >&2; exit 1 ;;
+          esac
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: decision
+          path: ${{ runner.temp }}/decision
+      # The workspace decision is read-only evidence for the agent. The untouched
+      # download under RUNNER_TEMP is the only decision the scope gate trusts.
+      - run: cp "$RUNNER_TEMP/decision/decision.json" .audit-evidence/decision.json
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: evidence-bundle
+          path: ${{ runner.temp }}/bundle
+      - name: Restore the evidence bundle into the excluded workspace
+        run: |
+          set -euo pipefail
+          cp -a "$RUNNER_TEMP/bundle/." .audit-evidence/
+          # upload-artifact skips empty directories, so approved-evidence is absent on
+          # runs without approvals; recreate it so --path APPROVED_EVIDENCE resolves.
+          mkdir -p .audit-evidence/approved-evidence
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        if: ${{ needs.detect.outputs.spec_changed == 'true' }}
+        with:
+          name: rubric
+          path: ${{ runner.temp }}/rubric
+      - name: Trust scope and render tooling before the repairs
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/trusted"
+          cp -a .github/audit/scope-check.py .github/audit/render-prompt.py .github/audit/git-state.sh "$RUNNER_TEMP/trusted/"
+      - name: Apply the rubric repairs within the audited scope
+        run: |
+          set -euo pipefail
+          if [ -s "$RUNNER_TEMP/rubric/repairs.patch" ]; then
+            # Reject out-of-scope repairs before anything is applied: the
+            # numstat list carries the paths, the patch adds symlink and
+            # mode-change detection. The scope gate comes from the trusted copy.
+            git apply --numstat "$RUNNER_TEMP/rubric/repairs.patch" | python3 "$RUNNER_TEMP/trusted/scope-check.py" repairs --format numstat --patch "$RUNNER_TEMP/rubric/repairs.patch"
+            git apply --index "$RUNNER_TEMP/rubric/repairs.patch"
+          fi
+      - name: Render fixer prompt and apply decision
+        env:
+          TARGETS: ${{ needs.merge.outputs.targets }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+        run: |
+          set -euo pipefail
+          git checkout -b "$BRANCH"
+          # The fixer reads the validated decision and evidence from the excluded
+          # workspace directory; the no-shell agent cannot read $RUNNER_TEMP.
+          python3 "$RUNNER_TEMP/trusted/render-prompt.py" .github/audit/fix-prompt.md "$RUNNER_TEMP/fix-prompt.rendered.md" \
+            --path DECISION_JSON=.audit-evidence/decision.json \
+            --path MERGED_JSON=.audit-evidence/merged.json \
+            --path CHECK_JSON=.audit-evidence/check.json \
+            --path SPEC_DIFF=.audit-evidence/spec.diff \
+            --path APPROVED_EVIDENCE=.audit-evidence/approved-evidence \
+            --text TARGETS="$TARGETS"
+          bash "$RUNNER_TEMP/trusted/git-state.sh" snapshot "$RUNNER_TEMP/git-state"
+          cat "$RUNNER_TEMP/fix-prompt.rendered.md" | .github/audit/copilot-agent.sh
+      - name: Verify git state after the fixer model step
+        run: bash "$RUNNER_TEMP/trusted/git-state.sh" verify "$RUNNER_TEMP/git-state"
+      - name: Scope-check the fixer changes before any repository code runs
+        run: |
+          set -euo pipefail
+          git -c core.quotePath=false status --porcelain=v2 --untracked-files=all \
+            | python3 "$RUNNER_TEMP/trusted/scope-check.py" fixer --decision "$RUNNER_TEMP/decision/decision.json" --format porcelain-v2 --skip-staged
+      - run: python3 scripts/audit/audit.py check --strict
+      - run: python3 scripts/audit/audit.py run-evals --skills "$(jq -r 'join(",")' <<<"$SKILLS")" --runner "$GITHUB_WORKSPACE/.github/audit/copilot-runner.sh" --out "$RUNNER_TEMP/evals-apply" --fail-under 0.8
+      - run: python3 scripts/build_plugins.py
+      - name: Scope-check the final stage before commit
+        run: |
+          set -euo pipefail
+          git -c core.quotePath=false status --porcelain=v2 --untracked-files=all \
+            | python3 "$RUNNER_TEMP/trusted/scope-check.py" fixer --decision "$RUNNER_TEMP/decision/decision.json" --format porcelain-v2 --skip-staged --final-stage
+      - name: Commit the audit changes
+        id: commit
+        run: |
+          set -euo pipefail
+          # Identity and an empty hooks directory come from the environment, not git
+          # config: a config write would change .git/config after the verified state,
+          # and repository hooks never run in the commit.
+          mkdir -p "$RUNNER_TEMP/no-hooks"
+          export GIT_CONFIG_COUNT=3
+          export GIT_CONFIG_KEY_0=core.hooksPath GIT_CONFIG_VALUE_0="$RUNNER_TEMP/no-hooks"
+          export GIT_CONFIG_KEY_1=user.name GIT_CONFIG_VALUE_1='github-actions[bot]'
+          export GIT_CONFIG_KEY_2=user.email GIT_CONFIG_VALUE_2='41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m "chore(audit): apply scheduled skill audit"
+          echo "head_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Push the audit branch
+        env:
+          AUDIT_BOT_TOKEN: ${{ secrets.AUDIT_BOT_TOKEN }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+        run: |
+          set -euo pipefail
+          # Nothing the model wrote to .git may reach the push: verify the control files
+          # first (the index is expected to change with the commit, so only files here).
+          bash "$RUNNER_TEMP/trusted/git-state.sh" verify-files "$RUNNER_TEMP/git-state"
+          # The token reaches git only through GIT_CONFIG_* for this one command:
+          # it is never written to .git/config, a remote URL or a command line. The
+          # hooks path points at an empty directory so no repository hook can run.
+          AUTH=$(printf 'x-access-token:%s' "$AUDIT_BOT_TOKEN" | base64 -w0)
+          echo "::add-mask::$AUTH"
+          mkdir -p "$RUNNER_TEMP/no-hooks"
+          GIT_CONFIG_COUNT=2 \
+          GIT_CONFIG_KEY_0=http.https://github.com/.extraheader \
+          GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $AUTH" \
+          GIT_CONFIG_KEY_1=core.hooksPath \
+          GIT_CONFIG_VALUE_1="$RUNNER_TEMP/no-hooks" \
+            git push origin "$BRANCH"
+      - name: Set the eval status on the pushed head
+        env:
+          # Step-scoped workflow token: the status is the head-bound evidence that the eval gate passed.
+          # UNVERIFIED: a workflow token may create commit statuses on the pushed head (statuses: write); confirm in the spike.
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          HEAD_SHA: ${{ steps.commit.outputs.head_sha }}
+        run: |
+          set -euo pipefail
+          gh api --method POST "repos/$GH_REPO/statuses/$HEAD_SHA" -f state=success -f context=skill-audit/evals -f description='eval gate passed (fail-under 0.8)'
+      - name: Render the audit PR body
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          DIAGRAMS="${AUDIT_PR_DIAGRAMS:-mermaid}"
+          case "$DIAGRAMS" in
+            mermaid|none) ;;
+            drawio)
+              echo 'WARNING: AUDIT_PR_DIAGRAMS=drawio: the drawio CLI cannot be installed reliably on a hosted runner yet (UNVERIFIED); rendering the body with mermaid' >&2
+              DIAGRAMS=mermaid ;;
+            *) echo "invalid AUDIT_PR_DIAGRAMS value: $DIAGRAMS (expected none, mermaid or drawio)" >&2; exit 1 ;;
+          esac
+          # Body-only prompt: the read-only body generator cannot run git or gh,
+          # so the diff stat, a trimmed diff and the decision rationale are
+          # passed in and the body is collected from stdout. No token for gh here.
+          python3 .github/audit/pr-body-prompt.py prompt \
+            --template .github/audit/pr-body-prompt.md \
+            --decision .audit-evidence/decision.json \
+            --diagrams "$DIAGRAMS" \
+            --diff-cap 61440 \
+            --out "$RUNNER_TEMP/pr-body-prompt.md"
+          set +e
+          copilot -p "$(<"$RUNNER_TEMP/pr-body-prompt.md")" -s --no-ask-user --model "$AUDIT_MERGER_MODEL" --allow-tool=read > "$RUNNER_TEMP/pr-body.md"
+          status=$?
+          set -e
+          if [ "$status" -ne 0 ] || [ ! -s "$RUNNER_TEMP/pr-body.md" ]; then
+            echo "Copilot PR body generation failed or was empty (exit $status); using the plain summary fallback" >&2
+            python3 .github/audit/pr-body-prompt.py fallback --decision .audit-evidence/decision.json --out "$RUNNER_TEMP/pr-body.md"
+          fi
+      - name: Open audit pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.AUDIT_BOT_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+          TITLE: ${{ needs.merge.outputs.title }}
+        run: |
+          set -euo pipefail
+          # Trusted step: the only gh calls, with the bot token and no model.
+          gh label create skill-audit --force
+          NUMBER=$(gh pr create --head "$BRANCH" --title "$TITLE" --body-file "$RUNNER_TEMP/pr-body.md" --label skill-audit)
+          echo "pr_number=${NUMBER##*/}" >> "$GITHUB_OUTPUT"
+
+  # The PR review is a reusable workflow: it runs its own gates and publishes a
+  # review and the skill-audit/review status on the pushed head. Nothing here merges.
+  # UNVERIFIED: the called workflow's statuses: write ceiling and the caller grant are confirmed only by the spike.
+  review:
+    needs: apply
+    if: ${{ !cancelled() && (github.event_name != 'schedule' || vars.AUDIT_ENABLED == 'true') && needs.apply.result == 'success' }}
+    permissions:
+      contents: read
+      checks: read
+      pull-requests: write
+      statuses: write
+      issues: write
+    uses: ./.github/workflows/skill-audit-review.yaml
+    with:
+      pr_number: ${{ needs.apply.outputs.pr_number }}
+      head_sha: ${{ needs.apply.outputs.head_sha }}
+    secrets:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+
+  upstream-report:
+    needs: [detect, attempt]
+    if: ${{ !cancelled() && needs.attempt.result == 'success' && (github.event_name != 'schedule' || vars.AUDIT_ENABLED == 'true') && needs.detect.result == 'success' && needs.detect.outputs.run_needed == 'true' && needs.detect.outputs.upstream_new != '[]' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    env:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
+      # UNVERIFIED: pin the exact @github/copilot version recorded by the
+      # Task 1 spike (docs/audit/ci-spike.md); the install stays unpinned until then.
+      - name: Install Copilot CLI (UNVERIFIED until Task 1 spike)
+        run: npm install -g @github/copilot
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: spec
+          path: ${{ runner.temp }}/spec
+      - run: unzip -q "$RUNNER_TEMP/spec/spec.zip" -d "$RUNNER_TEMP/spec/content"
+      - name: Prepare upstream evidence and recommendations
+        env:
+          # Read-only commit lookups: the workflow token, never the bot PAT.
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p .audit-upstream
+          echo .audit-upstream/ >> .git/info/exclude
+          # Consume detect's snapshot; this job never recomputes freshness.
+          cp "$RUNNER_TEMP/spec/content/upstreams.json" .audit-upstream/upstreams.json
+          python3 .github/audit/upstream-evidence.py evidence \
+            --upstreams .audit-upstream/upstreams.json \
+            --registry docs/audit/upstream-sources.json \
+            --evidence-dir .audit-upstream
+          copilot -p "$(<.github/audit/upstream-prompt.md)" -s --no-ask-user --model "$AUDIT_MERGER_MODEL" --allow-tool=read > recommendations.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          rec=json.loads(Path('recommendations.json').read_text())
+          rows=json.loads(Path('.audit-upstream/upstreams.json').read_text())
+          expected={f"{r.get('skill') or ''}|{r['source']}" for r in rows if r.get('stale')}
+          actual=[r.get('key') for r in rec]
+          if len(actual)!=len(set(actual)) or set(actual)!=expected or any(set(r)!={'key','recommendation','reason'} or r['recommendation'] not in {'update','ignore'} or not isinstance(r['reason'],str) or not r['reason'].strip() for r in rec): raise SystemExit('recommendations.json schema or stale-row coverage invalid')
+          PY
+      - name: Render and publish upstream issue
+        env:
+          # Only the trusted issue update sees the bot token; no model runs here.
+          GH_TOKEN: ${{ secrets.AUDIT_BOT_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          python3 .github/audit/upstream-evidence.py issue \
+            --upstreams .audit-upstream/upstreams.json \
+            --registry docs/audit/upstream-sources.json \
+            --recommendations recommendations.json \
+            --issue-file upstream-issue.md
+          gh label create audit-upstream --force
+          issue=$(gh issue list --label audit-upstream --state open --json number --jq '[.[].number | select(. != null)] | first // empty')
+          if [ -n "$issue" ]; then
+            gh issue edit "$issue" --title 'Scheduled audit: upstream updates' --body-file upstream-issue.md
+          else
+            gh issue create --title 'Scheduled audit: upstream updates' --body-file upstream-issue.md --label audit-upstream
+          fi
+
+  state:
+    needs: [detect, attempt, evals, merge, apply, upstream-report]
+    if: ${{ !cancelled() && (github.event_name != 'schedule' || vars.AUDIT_ENABLED == 'true') && needs.detect.result == 'success' && needs.detect.outputs.run_needed == 'true' && needs.attempt.result == 'success' && (needs.upstream-report.result == 'success' || (needs.upstream-report.result == 'skipped' && needs.detect.outputs.skills != '[]')) && (needs.detect.outputs.skills == '[]' || (needs.merge.result == 'success' && needs.evals.result == 'success' && ((needs.merge.outputs.update == 'false' && needs.apply.result == 'skipped') || (needs.merge.outputs.update == 'true' && needs.apply.result == 'success')))) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      GH_REPO: ${{ github.repository }}
+      DETECT_STATE: ${{ needs.detect.outputs.state }}
+      DETECT_SKILLS: ${{ needs.detect.outputs.skills }}
+    steps:
+      # Credentialless checkout: write-state.sh comes from the workflow's own ref.
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Advance successful audit state
+        env:
+          GH_TOKEN: ${{ secrets.AUDIT_BOT_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ "$DETECT_SKILLS" = '[]' ]; then echo 'upstream-only run: issue updated'; elif [ '${{ needs.merge.outputs.update }}' = 'false' ]; then echo 'no update needed, no PR'; fi
+          bash .github/audit/write-state.sh state
