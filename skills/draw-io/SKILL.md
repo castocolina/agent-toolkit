@@ -59,9 +59,12 @@ bash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram1.d
 |--------|-------------|
 | `-x` | Export mode |
 | `-f png` | PNG format output |
+| `-e` | Embed the diagram XML in the PNG |
 | `-s 2` | 2x scale (high resolution) |
 | `-t` | Transparent background |
 | `-o` | Output file path |
+
+Every exported `.drawio.png` embeds its diagram (`-e`). The file is larger than a plain PNG and stays editable in draw.io.
 
 ## 4. Layout Adjustment
 

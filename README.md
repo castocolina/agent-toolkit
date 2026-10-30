@@ -117,6 +117,7 @@ Add skills to project knowledge or paste SKILL.md contents into the conversation
 | 📝 Documentation | [c4-architecture](skills/c4-architecture/README.md) | C4 architecture diagrams with Mermaid |
 | 📝 Documentation | [crafting-effective-readmes](skills/crafting-effective-readmes/README.md) | Write effective README files |
 | 📝 Documentation | [draw-io](skills/draw-io/README.md) | Create & edit draw.io diagrams |
+| 📝 Documentation | [pr-diagrams](skills/pr-diagrams/README.md) | Render draw.io PR diagrams, attach them with gh and reuse them in promotion PRs |
 | 📝 Documentation | [excalidraw](skills/excalidraw/README.md) | Work with Excalidraw diagrams |
 | 📝 Documentation | [frontend-to-backend-requirements](skills/frontend-to-backend-requirements/README.md) | Document API requirements |
 | 📝 Documentation | [marp-slide](skills/marp-slide/README.md) | Professional presentation slides |

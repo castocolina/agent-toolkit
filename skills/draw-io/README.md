@@ -142,7 +142,7 @@ vim architecture.drawio
 # Convert to PNG (via pre-commit hook)
 mise exec -- pre-commit run convert-drawio-to-png --files architecture.drawio
 
-# Result: architecture.drawio.png (2x resolution, transparent)
+# Result: architecture.drawio.png (2x resolution, diagram embedded)
 ```
 
 ### Example 3: Find AWS Icon
@@ -270,5 +270,5 @@ Before finalizing any diagram:
 - **Name**: draw-io
 - **Type**: Diagram creation and editing
 - **Input**: `.drawio` XML files
-- **Output**: `.drawio.png` high-resolution images
+- **Output**: `.drawio.png` high-resolution images. Every export embeds the diagram (`drawio -e`): the file is larger than a plain PNG and stays editable in draw.io.
 - **Dependencies**: drawio CLI, Python 3.x, pre-commit hooks
