@@ -17,7 +17,7 @@ setup() { # sets T and CODE/OUT; mutates only $T
 }
 run() { # run SHA [extra env assignments via env]; stdout -> $OUT, exit -> $CODE
   local sha=$1; shift
-  OUT=$(AGENTSKILLS_SHA=$sha "$@" bash "$FETCH" --dest "$T/dest" --rubric "$T/rubric.md" 2>"$T/err") && CODE=0 || CODE=$?
+  OUT=$(AGENTSKILLS_SHA=$sha "$@" bash "$FETCH" --dest "$T/dest" --rubric "$T/rubric.md" ${FETCH_ARGS:-} 2>"$T/err") && CODE=0 || CODE=$?
 }
 copy_sha() { cp -r "$T/fx/$A" "$T/fx/$1"; } # fresh upstream commit based on A
 snap() { (cd "$T" && find dest -type f 2>/dev/null | sort | xargs -r sha256sum); }
@@ -31,11 +31,176 @@ t() {
 }
 count_files() { find "$T/dest" -type f 2>/dev/null | wc -l; }
 
+test_docs_json_tracked() {
+  setup; run $A
+  check exit "$CODE" 0
+  check header "$(head -1 "$T/dest/docs-navigation.json.txt")" "# Source: https://github.com/agentskills/agentskills (CC-BY-4.0), verbatim copy, see SOURCE.json"
+  check structure "$(j .structure_changed)" false
+}
+test_new_nav_page_reported() {
+  setup; copy_sha $C
+  jq '.navigation.pages += ["skill-creation/new-guide"]' "$T/fx/$C/docs/docs.json" > "$T/docs.json"
+  mv "$T/docs.json" "$T/fx/$C/docs/docs.json"
+  run $C
+  check exit "$CODE" 0
+  check structure "$(j .structure_changed)" true
+  check new_pages "$(j .new_pages)" '["skill-creation/new-guide"]'
+}
+test_removed_nav_page_reported_and_kept() {
+  setup; run $A; local before; before=$(sha256sum < "$T/dest/using-scripts.md"); copy_sha $C
+  jq '.navigation.pages |= map(if type == "object" then .pages |= map(select(. != "skill-creation/using-scripts")) else . end)' "$T/fx/$C/docs/docs.json" > "$T/docs.json"
+  mv "$T/docs.json" "$T/fx/$C/docs/docs.json"
+  run $C
+  check exit "$CODE" 0
+  check removed "$(j .removed_pages)" '["skill-creation/using-scripts"]'
+  check kept "$(sha256sum < "$T/dest/using-scripts.md")" "$before"
+}
+test_out_of_scope_nav_page_ignored() {
+  setup; run $A; local before; before="$(j .new_pages)|$(j .removed_pages)"; copy_sha $C
+  jq '.navigation.pages += ["client-implementation/new"]' "$T/fx/$C/docs/docs.json" > "$T/docs.json"
+  mv "$T/docs.json" "$T/fx/$C/docs/docs.json"
+  run $C
+  check exit "$CODE" 0
+  check structure "$(j .structure_changed)" false
+  check sets "$(j .new_pages)|$(j .removed_pages)" "$before"
+}
+
+test_removed_upstream_file_is_not_downloaded() {
+  setup; run $A; local before; before=$(sha256sum < "$T/dest/using-scripts.md"); copy_sha $C
+  jq '.navigation.pages |= map(if type == "object" then .pages |= map(select(. != "skill-creation/using-scripts")) else . end)' "$T/fx/$C/docs/docs.json" > "$T/docs.json"
+  mv "$T/docs.json" "$T/fx/$C/docs/docs.json"
+  rm "$T/fx/$C/docs/skill-creation/using-scripts.mdx"
+  run $C
+  check exit "$CODE" 0
+  check removed "$(j .removed_pages)" '["skill-creation/using-scripts"]'
+  check kept "$(sha256sum < "$T/dest/using-scripts.md")" "$before"
+}
+
+test_empty_navigation_groups_are_supported() {
+  setup; copy_sha $C
+  jq '.navigation.pages += [{group:"empty",pages:[]},{group:"nested",pages:[{group:"deeper",pages:[]}]}]' \
+    "$T/fx/$C/docs/docs.json" > "$T/docs.json"
+  mv "$T/docs.json" "$T/fx/$C/docs/docs.json"
+  run $C
+  check exit "$CODE" 0
+  check structure "$(j .structure_changed)" false
+}
+
+test_pages_dir_rejects_symlink_escape() {
+  setup; copy_sha $C
+  jq '.navigation.pages += ["skill-creation/new-guide"]' "$T/fx/$C/docs/docs.json" > "$T/docs.json"
+  mv "$T/docs.json" "$T/fx/$C/docs/docs.json"
+  printf '# New guide\n' > "$T/fx/$C/docs/skill-creation/new-guide.mdx"
+  mkdir -p "$T/pages/skill-creation" "$T/outside"
+  printf 'sentinel\n' > "$T/outside/sentinel.txt"
+  ln -s "$T/outside/sentinel.txt" "$T/pages/skill-creation/new-guide.mdx"
+  FETCH_ARGS="--pages-dir $T/pages" run $C; unset FETCH_ARGS
+  check exit "$CODE" 1
+  check message "$(rg -c 'not a regular file' "$T/err" || true)" 1
+  check sentinel "$(cat "$T/outside/sentinel.txt")" sentinel
+  check still-link "$([ -L "$T/pages/skill-creation/new-guide.mdx" ] && echo yes || echo no)" yes
+}
+test_pages_json_symlink_is_rejected() {
+  setup; copy_sha $C
+  jq '.navigation.pages += ["skill-creation/new-guide"]' "$T/fx/$C/docs/docs.json" > "$T/docs.json"
+  mv "$T/docs.json" "$T/fx/$C/docs/docs.json"
+  printf '# New guide\n' > "$T/fx/$C/docs/skill-creation/new-guide.mdx"
+  mkdir -p "$T/pages" "$T/outside"
+  printf 'sentinel\n' > "$T/outside/pages.txt"
+  ln -s "$T/outside/pages.txt" "$T/pages/pages.json"
+  FETCH_ARGS="--pages-dir $T/pages" run $C; unset FETCH_ARGS
+  check exit "$CODE" 1
+  check sentinel "$(cat "$T/outside/pages.txt")" sentinel
+}
+
+test_malformed_navigation_path_is_rejected() {
+  setup; copy_sha $C
+  jq '.navigation.pages += ["skill-creation/../../escape"]' "$T/fx/$C/docs/docs.json" > "$T/docs.json"
+  mv "$T/docs.json" "$T/fx/$C/docs/docs.json"
+  run $C
+  check exit "$CODE" 1
+  check message "$(grep -c 'invalid navigation page path' "$T/err")" 1
+  check no_escape "$( [ ! -e "$T/fx/escape.mdx" ] && echo yes)" yes
+}
+
+test_mapping_is_derived_from_source_map() {
+  setup; run $A; copy_sha $C
+  jq '.navigation.pages |= map(if type == "object" then .pages |= map(select(. != "skill-creation/using-scripts")) else . end)' \
+    "$T/fx/$C/docs/docs.json" > "$T/docs.json"
+  mv "$T/docs.json" "$T/fx/$C/docs/docs.json"
+  run $C
+  check removed_page "$(j .removed_pages)" '["skill-creation/using-scripts"]'
+  cp "$FETCH" "$T/fetch-spec.sh"
+  sed -i '/using-scripts.md|docs\/skill-creation\/using-scripts.mdx/d' "$T/fetch-spec.sh"
+  local old_fetch=$FETCH
+  FETCH=$T/fetch-spec.sh
+  run $C
+  check removed_after_unmap "$(j .removed_pages)" '[]'
+  check new_after_unmap "$(j .new_pages)" '[]'
+  # With the map entry absent, putting the page back in navigation makes it new.
+  jq '.navigation.pages |= map(if type == "object" then .pages += ["skill-creation/using-scripts"] else . end)' "$T/fx/$C/docs/docs.json" > "$T/docs.json"
+  mv "$T/docs.json" "$T/fx/$C/docs/docs.json"
+  run $C
+  check new_without_mapping "$(j .new_pages)" '["skill-creation/using-scripts"]'
+  sed -i '/^FILES=(/a\  "using-scripts.md|docs/skill-creation/using-scripts.mdx"' "$T/fetch-spec.sh"
+  run $C
+  check no_longer_new "$(j .new_pages)" '[]'
+  check no_longer_removed "$(j .removed_pages)" '[]'
+  FETCH=$old_fetch
+}
+test_bad_docs_json_exits_1() {
+  setup; run $A; local before; before=$(snap); copy_sha $C
+  printf '{invalid' > "$T/fx/$C/docs/docs.json"
+  run $C
+  check exit "$CODE" 1
+  check unchanged "$(snap)" "$before"
+}
+test_pages_dir_downloads_new_page() {
+  setup; copy_sha $C
+  jq '.navigation.pages += ["skill-creation/new-guide"]' "$T/fx/$C/docs/docs.json" > "$T/docs.json"
+  mv "$T/docs.json" "$T/fx/$C/docs/docs.json"
+  mkdir -p "$T/fx/$C/docs/skill-creation"
+  printf 'new page body\n' > "$T/fx/$C/docs/skill-creation/new-guide.mdx"
+  local pages="$T/pages"; FETCH_ARGS="--pages-dir $pages" run $C; unset FETCH_ARGS
+  check exit "$CODE" 0
+  check byte_copy "$(cmp -s "$pages/skill-creation/new-guide.mdx" "$T/fx/$C/docs/skill-creation/new-guide.mdx" && echo yes)" yes
+  check page_map "$(jq -c '[.[]|select(.page=="skill-creation/new-guide")|.mapped]' "$pages/pages.json")" '[false]'
+  check mapped_count "$(jq '[.[]|select(.mapped)]|length' "$pages/pages.json")" 6
+  check no_reference "$( [ ! -e "$T/dest/new-guide.md" ] && echo yes)" yes
+}
+test_pages_dir_skips_removed_page() {
+  setup; run $A; copy_sha $C
+  jq '.navigation.pages |= map(if type == "object" then .pages |= map(select(. != "skill-creation/using-scripts")) else . end)' "$T/fx/$C/docs/docs.json" > "$T/docs.json"
+  mv "$T/docs.json" "$T/fx/$C/docs/docs.json"
+  local pages="$T/pages"; FETCH_ARGS="--pages-dir $pages" run $C; unset FETCH_ARGS
+  check absent "$( [ ! -e "$pages/skill-creation/using-scripts.mdx" ] && echo yes)" yes
+  check absent_map "$(jq -e 'all(.[]; .page != "skill-creation/using-scripts")' "$pages/pages.json" >/dev/null && echo yes)" yes
+}
+test_pages_dir_reuses_regular_targets_on_next_run() {
+  setup; copy_sha $C
+  local pages="$T/pages"
+  FETCH_ARGS="--pages-dir $pages" run $C; unset FETCH_ARGS
+  check first_exit "$CODE" 0
+  # Change a mapped document's actual source file.
+  printf 'changed upstream content\n' > "$T/fx/$C/docs/skill-creation/using-scripts.mdx"
+  FETCH_ARGS="--pages-dir $pages" run $C; unset FETCH_ARGS
+  check second_exit "$CODE" 0
+  check updated "$(cat "$pages/skill-creation/using-scripts.mdx")" "changed upstream content"
+}
+test_pages_dir_rejects_escaping_ancestor_before_mkdir() {
+  setup; copy_sha $C
+  jq '.navigation.pages += ["skill-creation/new-guide"]' "$T/fx/$C/docs/docs.json" > "$T/docs.json"
+  mv "$T/docs.json" "$T/fx/$C/docs/docs.json"
+  local pages="$T/pages"; mkdir "$T/outside"; ln -s "$T/outside" "$pages"
+  FETCH_ARGS="--pages-dir $pages" run $C; unset FETCH_ARGS
+  check exit "$CODE" 1
+  check no_outside_directory "$( [ ! -e "$T/outside/skill-creation" ] && echo yes)" yes
+}
 test_first_run_all_changed() {
   setup; run $A
   check exit "$CODE" 0
-  check changed_len "$(j '.changed|length')" 7
-  check files "$(count_files)" 8
+  check changed_len "$(j '.changed|length')" 8
+  check files "$(count_files)" 9
   check sha "$(j .sha)" "\"$A\""
   check stale "$(j .rubric_stale)" true
   check header "$(head -1 "$T/dest/best-practices.md")" "$HEADER"
@@ -51,7 +216,7 @@ test_second_run_unchanged() {
   check sha "$(j .sha)" "\"$A\""
   check resolved "$(j .resolved)" "\"$B\""
   check stale "$(j .rubric_stale)" true
-  check unchanged_len "$(j '.unchanged|length')" 7
+  check unchanged_len "$(j '.unchanged|length')" 8
 }
 test_one_file_changed() {
   setup; run $A; copy_sha $C

@@ -10,7 +10,7 @@ Run from this repo's root. It keeps `skills/skill-judge/references/agentskills/`
 ## Workflow
 
 1. Run `bash skills/agentskills-research/scripts/fetch-spec.sh` with no options (`-h` lists them). It prints one JSON object; the branches use `changed`, `rubric_stale` and `sha` (the pin). `fetch-spec.sh -h` documents the other fields and the overrides. If it exits 1, go to Failures.
-2. `changed` empty AND `rubric_stale` false: report "spec unchanged at <sha>" and stop. Do not edit the rubric.
+2. If `structure_changed` is true, or `rubric-check` reports a broken source anchor, follow **When upstream structure changes** before considering the unchanged early return. Otherwise, `changed` empty AND `rubric_stale` false means report "spec unchanged at <sha>" and stop. Do not edit the rubric.
 3. Otherwise pick exactly one branch, first match wins. Docs and the validator both count: a validator-only change is a rule change.
    1. `skills/skill-judge/references/rubric.md` missing: restore it with `git checkout -- skills/skill-judge/references/rubric.md` and re-run from step 1; if git has no copy, stop and report.
    2. `rubric_stale` false (so `changed` is non-empty: references repaired to the pin the rubric already matches): no rule change. Report the repair, leave the rubric alone, and record the pending commit without performing it.
@@ -29,8 +29,12 @@ Run from this repo's root. It keeps `skills/skill-judge/references/agentskills/`
    - Turning a rule into rubric text: a new hard limit goes in the dimension's criteria paragraph and caps its bottom band; a new SHOULD goes in the middle-band criteria; a removed rule means deleting its criterion.
    - THEN, if any rule changed (also when `changed` is empty): `rubric_version` +1, and the `# Skill Judge Rubric vN` title to match.
    - `spec_sha` = the `sha` in the fetcher output (equal to `SOURCE.json`). No rule changed: update `spec_sha` only.
-   - Check every `source` anchor still matches a heading in the refreshed copies (`grep -n '^#' skills/skill-judge/references/agentskills/<file>.md`; slug = lowercase, spaces to hyphens, punctuation dropped). `rubric-check` does not check anchors.
-6. Both branches that continue (reference repair and rule update) must run `python3 scripts/build_plugins.py` (skill-judge is mirrored into `dist/`), then `python3 scripts/audit/audit.py rubric-check` and require exit 0 before committing. Commit only after both checks succeed. The answer must end by running `python3 scripts/audit/audit.py rubric-check`: report its exit code.
+   - Check every `source` anchor still matches a heading in the refreshed copies (`grep -n '^#' skills/skill-judge/references/agentskills/<file>.md`; slug = lowercase, spaces to hyphens, punctuation dropped). `rubric-check` verifies each anchor against its reference file.
+6. Both branches that continue (reference repair and rule update) must run `python3 scripts/build_plugins.py` (skill-judge is mirrored into `dist/`), then `python3 scripts/audit/audit.py rubric-check` and require exit 0 before committing. Commit only after both checks succeed. The answer must end by running `python3 scripts/audit/audit.py rubric-check`: report its exit code. `rubric-check` verifies both the spec pin and source anchors.
+
+## When upstream structure changes
+
+Run this section when `fetch-spec.sh` reports `structure_changed: true` or `rubric-check` reports a broken source anchor. Update the fetcher's source map, fixture, and tests for added or removed pages; add or delete the matching reference copy; remap every affected rubric `source`; review criteria for rules added or removed with those pages; bump `rubric_version`; and keep the judge eval `files` lists aligned with cited sources. For a new page, use its pre-downloaded `--pages-dir` raw file (the repair job has no network), prepend the standard verbatim-copy header, and add its header-inclusive SHA-256 to `SOURCE.json`. Finish with `rubric-check` and `test-fetch-spec.sh` passing.
 
 The pin `sha` is also what `uvx --from "git+https://github.com/agentskills/agentskills@<sha>#subdirectory=skills-ref" skills-ref validate <dir>` should use.
 

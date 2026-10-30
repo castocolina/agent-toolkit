@@ -7,10 +7,10 @@ It ingests the Agent Skills docs and the `skills-ref` reference validator from [
 ## Usage
 
 ```bash
-bash skills/agentskills-research/scripts/fetch-spec.sh [--dest DIR] [--ref REF] [--rubric FILE] [-h|--help]
+bash skills/agentskills-research/scripts/fetch-spec.sh [--dest DIR] [--ref REF] [--rubric FILE] [--pages-dir DIR] [-h|--help]
 ```
 
-Run from the repo root; `-h` prints usage, env vars, prerequisites, JSON fields and exit codes. stdout is one JSON object (`ref`, `resolved`, `sha`, `changed`, `unchanged`, `rubric_stale`); status goes to stderr. Exit 0 on success, 1 on any failure (references are rolled back if the failure happened during publish; a later failure leaves the new references in place; a failed rollback is reported on stderr with the backup path). `AGENTSKILLS_SHA` pins a commit; `AGENTSKILLS_RAW_BASE` overrides the download base (used by the tests).
+Run from the repo root; `-h` prints usage, env vars, prerequisites, JSON fields and exit codes. stdout is one JSON object (`ref`, `resolved`, `sha`, `changed`, `unchanged`, `rubric_stale`, `structure_changed`, `new_pages`, `removed_pages`); status goes to stderr. Use `--pages-dir DIR` to pre-download current in-scope raw pages for structural repairs. Exit 0 on success, 1 on any failure (references are rolled back if the failure happened during publish; a later failure leaves the new references in place; a failed rollback is reported on stderr with the backup path). `AGENTSKILLS_SHA` pins a commit; `AGENTSKILLS_RAW_BASE` overrides the download base (used by the tests).
 
 `fetch-spec.sh` needs bash 4+ (it uses `declare -A`), GNU coreutils `sha256sum`, `curl`, `git` and `jq`.
 
