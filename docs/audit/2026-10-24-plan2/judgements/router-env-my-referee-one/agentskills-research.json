@@ -1,0 +1,59 @@
+{
+  "skill": "agentskills-research",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 8,
+      "evidence": "The introduction says the skill \"keeps `skills/skill-judge/references/agentskills/` ... and `skills/skill-judge/references/rubric.md` in step with github.com/agentskills/agentskills,\" largely repeating the description rather than adding a decision or constraint.",
+      "fix": "Shorten the introduction to the root-directory prerequisite and the location of the pin; start the substantive guidance at the workflow."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/agentskills-research/evals/evals.json",
+      "line": 18,
+      "evidence": "The changed-doc prompt supplies \"git diff on them is in best-practices.diff,\" while its expected output requires the agent to \"take the BASE diff\"; that BASE diff is not supplied as an eval input for this case.",
+      "fix": "Supply a BASE-to-current diff fixture and identify it in the prompt, so the assertion tests the prescribed baseline rather than relying on unavailable history."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 34,
+      "evidence": "The successful rule-change path proceeds from updating the rubric to \"Run `python3 scripts/build_plugins.py`\" and a final `rubric-check`; only the repair-only branch explicitly says to \"commit the restored references.\"",
+      "fix": "On a successful changed-rule or changed-pin path, instruct the agent to commit the refreshed references and rubric after building and before the final rubric-check, or explicitly require reporting why a commit was not made."
+    }
+  ]
+}

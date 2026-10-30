@@ -1,245 +1,103 @@
 # Skill Judge
 
-A comprehensive evaluation framework for assessing Agent Skill quality against official specifications and best practices. This skill provides multi-dimensional scoring and actionable improvement suggestions for SKILL.md files and skill packages.
+Scores an Agent Skill against the pinned [Agent Skills](https://github.com/agentskills/agentskills) specification and best practices. It produces a percentage, an A-F grade, per-dimension scores and concrete fixes, either as a readable summary (direct use) or as machine-readable JSON-lines verdicts (driven by a prompt or a pipeline).
 
 ## Purpose
 
-Skill Judge exists to solve a critical problem: **most Skills waste tokens on knowledge Claude already has**.
+Most skills waste tokens on knowledge the model and its harness already have. Skill Judge measures the knowledge delta:
 
-The skill helps you evaluate whether a Skill actually adds value by measuring its "knowledge delta" - the gap between what the Skill provides and what Claude already knows. A good Skill should be a compressed expert brain, not a tutorial.
+> Good skill = expert-only knowledge - what the model already knows
 
-### The Core Formula
-
-> **Good Skill = Expert-only Knowledge - What Claude Already Knows**
-
-This skill helps you identify:
-- Token-wasting redundant content (things Claude already knows)
-- Genuine expert knowledge that adds value
-- Structural issues that prevent Skills from being activated or used effectively
+It also checks the structural things that stop a skill from being used: a vague description, an oversized `SKILL.md`, unloaded references, missing tests.
 
 ## When to Use
 
-Use Skill Judge when you need to:
+- Review a skill before publishing.
+- Audit existing skills against one consistent rubric.
+- Get actionable fixes for a `SKILL.md`.
+- Compare skills by percentage.
 
-- **Review a Skill before publishing**: Evaluate quality and identify improvements
-- **Audit existing Skills**: Systematic assessment against best practices
-- **Improve a SKILL.md file**: Get specific, actionable suggestions
-- **Learn Skill design patterns**: Understand what makes a great Skill
-- **Compare Skills**: Assess relative quality using consistent criteria
-
-**Trigger phrases**:
-- "Evaluate this skill"
-- "Review my SKILL.md"
-- "Audit this skill"
-- "Score this skill"
-- "How can I improve this skill?"
-- "Is this skill well-designed?"
+Trigger phrases: "judge this skill", "review my SKILL.md", "audit this skill", "score this skill", "how can I improve this skill?".
 
 ## How It Works
 
-### Evaluation Protocol
+1. The skill reads `references/rubric.md` (rubric v4) and every pinned spec file the rubric cites, in full. These reads are mandatory on every run.
+2. It reads the target `SKILL.md` and, when a dimension needs them, `evals/` (inputs in `evals/files/`), `scripts/`, the repository's `tests/skills/<name>/` (script tests, not shipped with the skill) and referenced files.
+3. It scores eight dimensions with integer bands and records a finding, with evidence and a fix, for every score below its maximum.
+4. It computes the percentage and grade and prints the output.
 
-1. **First Pass - Knowledge Delta Scan**: Read the SKILL.md and categorize each section as:
-   - **[E] Expert**: Claude genuinely doesn't know this (value-add)
-   - **[A] Activation**: Claude knows but brief reminder is useful (acceptable)
-   - **[R] Redundant**: Claude definitely knows this (should delete)
+### Rubric v4: eight dimensions, 125 points
 
-2. **Structure Analysis**: Check frontmatter validity, line count, reference files, design pattern, and loading triggers
+| Dimension | Max | What it measures |
+|-----------|-----|------------------|
+| D1 Knowledge Delta | 20 | Expert knowledge versus what models and current harnesses already do |
+| D2 Mindset, Procedures and Patterns | 15 | Thinking patterns and domain procedures (up to 11), fit to an established design pattern (up to 4) |
+| D3 Anti-Pattern Quality | 15 | Specific NEVER items and gotchas, with reasons |
+| D4 Specification Compliance | 15 | Frontmatter validity and a description with WHAT, WHEN and keywords |
+| D5 Progressive Disclosure | 15 | Layering, size, conditional loading of optional references |
+| D6 Freedom Calibration | 15 | Specificity matched to the fragility of the task |
+| D7 Tests and Evals | 15 | Output evals, trigger queries, a runnable test when `scripts/` exists |
+| D8 Practical Usability | 15 | Decision trees, working examples, fallbacks, edge cases |
 
-3. **Score Each Dimension**: Evaluate against 8 dimensions with specific evidence and justifications
+Files the repository requires (`README.md`, `evals/`, bundled `references/` and `SOURCE.json`) are never deductions. Only redundant extras such as `CHANGELOG.md` are.
 
-4. **Calculate Total and Grade**: Sum scores (max 120 points) and assign grade
+### Grades
 
-5. **Generate Report**: Produce structured report with scores, critical issues, and improvements
+Grades use the percentage of the total, so the total can change between rubric versions.
 
-### The 8 Evaluation Dimensions (120 points total)
+| Grade | Percentage |
+|-------|------------|
+| A | 90 or more |
+| B | 80 to 89.9 |
+| C | 70 to 79.9 |
+| D | 60 to 69.9 |
+| F | below 60 |
 
-| Dimension | Max Points | What It Measures |
-|-----------|------------|------------------|
-| **D1: Knowledge Delta** | 20 | Does the Skill add genuine expert knowledge? (THE CORE DIMENSION) |
-| **D2: Mindset + Procedures** | 15 | Does it transfer expert thinking patterns and domain-specific workflows? |
-| **D3: Anti-Pattern Quality** | 15 | Does it have effective NEVER lists with specific reasons? |
-| **D4: Specification Compliance** | 15 | Is the frontmatter valid? Is the description comprehensive? |
-| **D5: Progressive Disclosure** | 15 | Is content properly layered for on-demand loading? |
-| **D6: Freedom Calibration** | 15 | Is specificity appropriate for task fragility? |
-| **D7: Pattern Recognition** | 10 | Does it follow an established official pattern? |
-| **D8: Practical Usability** | 15 | Can an Agent actually use this Skill effectively? |
+## Output
 
-### Grading Scale
+**Direct use** ("judge this SKILL.md"): a short summary (percent and grade, a per-dimension table, the top three findings with fixes) followed by the verdict as one JSON line in a fenced `json` block.
 
-| Grade | Percentage | Meaning |
-|-------|------------|---------|
-| A | 90%+ (108+) | Excellent - production-ready expert Skill |
-| B | 80-89% (96-107) | Good - minor improvements needed |
-| C | 70-79% (84-95) | Adequate - clear improvement path |
-| D | 60-69% (72-83) | Below Average - significant issues |
-| F | <60% (<72) | Poor - needs fundamental redesign |
+**Several skills or a comparison**: one short summary per skill, a ranking table (skill, percent, grade, largest per-dimension gaps), then one fenced `json` block with one verdict per line in the listed order.
 
-## Key Features
+**Driven by a prompt, or when only the verdict is requested**: one JSON object per line and nothing else. The shape is defined by `references/verdict.schema.json`:
 
-### Knowledge Classification System
+```json
+{"skill":"my-skill","judge":"direct","rubric_version":4,"spec_sha":"<40 hex>","scores":{"D1":16,"D2":15,"D3":15,"D4":14,"D5":15,"D6":15,"D7":3,"D8":15},"max":{"D1":20,"D2":15,"D3":15,"D4":15,"D5":15,"D6":15,"D7":15,"D8":15},"total":108,"max_total":125,"percent":86.4,"grade":"B","findings":[{"id":"D1-1","dimension":"D1","severity":"low","file":"skills/my-skill/SKILL.md","line":12,"evidence":"Explains what a PDF AcroForm is","fix":"Delete the definition"},{"id":"D4-1","dimension":"D4","severity":"low","file":"skills/my-skill/SKILL.md","line":3,"evidence":"No keyword for flattening","fix":"Add it to the description"},{"id":"D7-1","dimension":"D7","severity":"high","file":"skills/my-skill/SKILL.md","line":null,"evidence":"No evals/ directory","fix":"Add evals/evals.json"}]}
+```
 
-The skill teaches you to recognize three types of content:
+## Bundled files
 
-| Type | Definition | Treatment |
-|------|------------|-----------|
-| **Expert** | Claude genuinely doesn't know this | Must keep - this is the Skill's value |
-| **Activation** | Claude knows but may not think of | Keep if brief - serves as reminder |
-| **Redundant** | Claude definitely knows this | Should delete - wastes tokens |
+The skill reads these at run time.
 
-### Five Official Design Patterns
+| Path | Purpose |
+|------|---------|
+| `references/rubric.md` | Rubric v4: version, spec commit, dimension table, scoring criteria |
+| `references/verdict.schema.json` | JSON Schema for one verdict line |
+| `references/judge-prompt.md` | Prompt template for judges run by a pipeline, with `{ROOT}`, `{SKILLS}` and `{JUDGE}` placeholders |
+| `references/agentskills/` | Verbatim copies of the Agent Skills docs the rubric cites, pinned by commit in `SOURCE.json` (CC-BY-4.0) |
 
-Skill Judge identifies and evaluates against five established patterns:
-
-| Pattern | Lines | Best For | Example |
-|---------|-------|----------|---------|
-| **Mindset** | ~50 | Creative tasks requiring taste | frontend-design |
-| **Navigation** | ~30 | Multiple distinct scenarios | internal-comms |
-| **Philosophy** | ~150 | Art/creation requiring originality | canvas-design |
-| **Process** | ~200 | Complex multi-step projects | mcp-builder |
-| **Tool** | ~300 | Precise operations on specific formats | docx, pdf, xlsx |
-
-### Common Failure Pattern Detection
-
-The skill identifies 9 common failure patterns:
-
-1. **The Tutorial**: Explains basics Claude already knows
-2. **The Dump**: Everything in one 800+ line file
-3. **The Orphan References**: Reference files that never get loaded
-4. **The Checkbox Procedure**: Mechanical steps without thinking frameworks
-5. **The Vague Warning**: "Be careful" without specific guidance
-6. **The Invisible Skill**: Great content but poor description
-7. **The Wrong Location**: Trigger info in body instead of description
-8. **The Over-Engineered**: Unnecessary auxiliary files
-9. **The Freedom Mismatch**: Wrong freedom level for task type
+`evals/` (output evals, trigger queries and eval inputs) is for repository development and is not shipped in `dist/`.
 
 ## Usage Examples
 
-### Basic Evaluation
-
 ```
-Evaluate the skill at skills/my-new-skill/SKILL.md
+Judge the skill at skills/my-new-skill
 ```
-
-### Comparative Analysis
 
 ```
 Compare the quality of skills/skill-a and skills/skill-b
 ```
 
-### Targeted Improvement
-
 ```
 How can I improve the knowledge delta in my skill?
 ```
 
-### Pattern Identification
-
-```
-What pattern does this skill follow, and is it the right choice?
-```
-
-## Output
-
-Skill Judge produces a structured evaluation report:
-
-```markdown
-# Skill Evaluation Report: [Skill Name]
-
-## Summary
-- **Total Score**: X/120 (X%)
-- **Grade**: [A/B/C/D/F]
-- **Pattern**: [Mindset/Navigation/Philosophy/Process/Tool]
-- **Knowledge Ratio**: E:A:R = X:Y:Z
-- **Verdict**: [One sentence assessment]
-
-## Dimension Scores
-[Table with scores for all 8 dimensions]
-
-## Critical Issues
-[Must-fix problems]
-
-## Top 3 Improvements
-[Prioritized improvement suggestions]
-
-## Detailed Analysis
-[In-depth analysis for dimensions scoring below 80%]
-```
-
 ## Best Practices
 
-### When Evaluating Skills
+**Do:** check the description first; ask "does the model already know this?" for every section; look for specific anti-patterns with non-obvious reasons; mentally run the decision trees.
 
-**Do:**
-- Always check the description field first (it's the most critical)
-- Ask "Does Claude already know this?" for every section
-- Look for specific anti-patterns with non-obvious reasons
-- Verify decision trees actually lead to correct choices
-- Check that loading triggers are embedded in workflows
-
-**Never:**
-- Give high scores just because content looks professional
-- Ignore token waste from redundant explanations
-- Let length impress you (43 lines can outperform 500)
-- Forgive explaining basics as "helpful context"
-- Put "when to use" information only in the body
-
-### The Meta-Question
-
-When evaluating any Skill, always ask:
-
-> "Would an expert in this domain, looking at this Skill, say: 'Yes, this captures knowledge that took me years to learn'?"
-
-If yes, the Skill has genuine value. If no, it's compressing what Claude already knows.
-
-## Quick Reference Checklist
-
-```
-SKILL EVALUATION QUICK CHECK
-
-KNOWLEDGE DELTA (most important):
-  [ ] No "What is X" explanations for basic concepts
-  [ ] No step-by-step tutorials for standard operations
-  [ ] Has decision trees for non-obvious choices
-  [ ] Has trade-offs only experts would know
-  [ ] Has edge cases from real-world experience
-
-MINDSET + PROCEDURES:
-  [ ] Transfers thinking patterns (how to think about problems)
-  [ ] Has "Before doing X, ask yourself..." frameworks
-  [ ] Includes domain-specific procedures Claude wouldn't know
-
-ANTI-PATTERNS:
-  [ ] Has explicit NEVER list
-  [ ] Anti-patterns are specific, not vague
-  [ ] Includes WHY (non-obvious reasons)
-
-SPECIFICATION:
-  [ ] Valid YAML frontmatter
-  [ ] Description answers: WHAT, WHEN, KEYWORDS
-  [ ] Description specific enough for Agent activation
-
-STRUCTURE:
-  [ ] SKILL.md < 500 lines (ideal < 300)
-  [ ] Loading triggers embedded in workflow
-  [ ] Has "Do NOT Load" for preventing over-loading
-
-FREEDOM:
-  [ ] Creative tasks -> High freedom (principles)
-  [ ] Fragile operations -> Low freedom (exact scripts)
-
-USABILITY:
-  [ ] Decision trees for multi-path scenarios
-  [ ] Working code examples
-  [ ] Error handling and fallbacks
-```
+**Never:** reward polish, length or self-praise; forgive basics as "helpful context"; deduct for files the repository requires.
 
 ## Prerequisites
 
-None. Skill Judge is self-contained and requires no external tools or dependencies.
-
-## Related Concepts
-
-- **Tool vs Skill**: Tools define capability boundaries (what Claude CAN do). Skills inject knowledge (what Claude KNOWS how to do).
-- **Progressive Disclosure**: Three-layer loading system (metadata -> SKILL.md body -> resources)
-- **Freedom Calibration**: Matching constraint level to task fragility
+None. The skill is self-contained: the rubric and the spec copies it needs ship in `references/`.

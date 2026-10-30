@@ -15,9 +15,14 @@ Usage:
 
 import argparse
 import json
+import os
 import shutil
 import sys
 from pathlib import Path
+
+
+# Evals and tests are not shipped (roadmap Decision 16).
+EXCLUDED_DIRS = ("evals", "tests", "__pycache__")
 
 
 def get_root() -> Path:
@@ -94,8 +99,12 @@ def build_plugin(root: Path, dist_dir: Path, plugin: dict,
                 sys.exit(1)
             if not dry_run:
                 dst.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copytree(src, dst, dirs_exist_ok=True)
-            copied = sum(1 for _ in src.rglob("*") if _.is_file())
+                shutil.copytree(src, dst, dirs_exist_ok=True,
+                                ignore=shutil.ignore_patterns(*EXCLUDED_DIRS))
+            copied = 0
+            for _, dirs, files in os.walk(src):
+                dirs[:] = [d for d in dirs if d not in EXCLUDED_DIRS]
+                copied += sum(1 for f in files if f not in EXCLUDED_DIRS)
             file_count += copied
             if verbose:
                 print(f"  {name}: copied {rel_path}/ ({copied} files)")

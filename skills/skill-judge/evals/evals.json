@@ -1,0 +1,194 @@
+{
+  "skill_name": "skill-judge",
+  "evals": [
+    {
+      "id": "strong",
+      "prompt": "Judge the skill in evals/files/pdf-form-filler/SKILL.md.txt with judge slug test; print only the verdict line.",
+      "expected_output": "One verdict JSON line for pdf-form-filler with a high D4 score, correct max values and no name-mismatch finding.",
+      "files": [
+        "references/rubric.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/pdf-form-filler/SKILL.md.txt"
+      ],
+      "assertions": [
+        "Output is exactly one line holding one JSON object",
+        "The max values equal the rubric table",
+        "D4 score is at least half of D4 max",
+        "No finding says the name does not match the directory",
+        "`rubric_version` and `spec_sha` equal the first two lines of references/rubric.md",
+        "D4 score is at least 12 (the description has WHAT, WHEN, keywords and a boundary)",
+        "Every dimension scored below its max has at least one finding with that dimension"
+      ]
+    },
+    {
+      "id": "vague",
+      "prompt": "Judge the skill in evals/files/doc-helper/SKILL.md.txt with judge slug test; print only the verdict line.",
+      "expected_output": "One verdict JSON line for doc-helper with a low D4 score and a finding that its description is vague.",
+      "files": [
+        "references/rubric.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/doc-helper/SKILL.md.txt"
+      ],
+      "assertions": [
+        "Output is exactly one line holding one JSON object",
+        "The max values equal the rubric table",
+        "D4 score is below half of D4 max",
+        "A finding about the description exists",
+        "A finding with dimension D4 quotes the description `Handles document stuff` and proposes a description with WHAT, WHEN and keywords",
+        "Every dimension scored below its max has at least one finding with that dimension"
+      ]
+    },
+    {
+      "id": "oversized",
+      "prompt": "Judge the skill in evals/files/big-skill/SKILL.md.txt with judge slug test; print only the verdict line.",
+      "expected_output": "One verdict JSON line for big-skill with a finding that SKILL.md exceeds 500 lines and a D5 score below its max.",
+      "files": [
+        "references/rubric.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/big-skill/SKILL.md.txt"
+      ],
+      "assertions": [
+        "Output is exactly one line holding one JSON object",
+        "The max values equal the rubric table",
+        "A finding says SKILL.md exceeds 500 lines",
+        "D5 score is below its max",
+        "At least one D5 finding has severity high or critical",
+        "No finding says the file name `SKILL.md.txt` is wrong"
+      ]
+    },
+    {
+      "id": "direct-summary",
+      "prompt": "Judge the skill in evals/files/doc-helper/SKILL.md.txt with judge slug test.",
+      "expected_output": "A short readable summary with percent, grade and top findings for doc-helper, ending in one fenced json block holding the verdict.",
+      "files": [
+        "references/rubric.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/doc-helper/SKILL.md.txt"
+      ],
+      "assertions": [
+        "Output starts with a readable summary naming a percent and a grade",
+        "Output ends with one fenced json block holding one JSON object",
+        "The max values in the JSON equal the rubric table",
+        "The fenced json block is the last thing in the output",
+        "The summary lists exactly three top findings, each with a fix"
+      ]
+    },
+    {
+      "id": "casual",
+      "prompt": "is my skill any good? it's in evals/files/doc-helper/SKILL.md.txt, no idea what to fix first",
+      "expected_output": "A short readable summary for doc-helper with percent, grade and the top three findings (description first), ending in one fenced json block.",
+      "files": [
+        "references/rubric.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/doc-helper/SKILL.md.txt"
+      ],
+      "assertions": [
+        "Output is a readable summary followed by exactly one fenced json block, not a bare JSON line",
+        "The summary names a percent and a grade",
+        "A D4 finding quotes the vague description and proposes replacement text",
+        "The fenced json has `judge` set to `direct`"
+      ]
+    },
+    {
+      "id": "pasted",
+      "prompt": "Review this skill and tell me if it is ready to publish:\n\n---\nname: doc-helper\ndescription: Handles document stuff\n---\n# Doc Helper\nThis skill helps with documents.\n1. Open the document.\n2. Make changes.\n3. Save the document.\nBe careful and check your work.\n",
+      "expected_output": "Judges from the pasted SKILL.md alone: a low D4, a low D1, and a D7 finding that only SKILL.md was supplied, with no invented files; ends in one fenced json block.",
+      "files": [
+        "references/rubric.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md"
+      ],
+      "assertions": [
+        "A D7 finding says only SKILL.md was supplied and no evals/ directory was seen",
+        "No finding invents or quotes a file other than the pasted SKILL.md",
+        "D4 score is below half of D4 max",
+        "Output ends with one fenced json block holding one JSON object whose `skill` is `doc-helper`"
+      ]
+    },
+    {
+      "id": "two-skills",
+      "prompt": "You are judge `test`. Judge these skills: pdf-form-filler, doc-helper. Each is the fixture evals/files/<name>/SKILL.md.txt. Output contract rule 1 applies.",
+      "expected_output": "Exactly two JSON lines, pdf-form-filler first and doc-helper second, with the pdf-form-filler D4 score higher than the doc-helper D4 score.",
+      "files": [
+        "references/rubric.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/pdf-form-filler/SKILL.md.txt",
+        "evals/files/doc-helper/SKILL.md.txt"
+      ],
+      "assertions": [
+        "Output is exactly two lines, each holding one JSON object, with no Markdown, code fence or commentary",
+        "Line 1 has `skill` equal to `pdf-form-filler` and line 2 has `skill` equal to `doc-helper`",
+        "Both lines have `judge` equal to `test`",
+        "The D4 score on line 1 is higher than the D4 score on line 2"
+      ]
+    },
+    {
+      "id": "comparison",
+      "prompt": "Compare evals/files/pdf-form-filler/SKILL.md.txt and evals/files/doc-helper/SKILL.md.txt and tell me which one is better designed.",
+      "expected_output": "One short summary per skill, a ranking table with pdf-form-filler above doc-helper, then one fenced json block with two verdict lines in the listed order.",
+      "files": [
+        "references/rubric.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/pdf-form-filler/SKILL.md.txt",
+        "evals/files/doc-helper/SKILL.md.txt"
+      ],
+      "assertions": [
+        "Output has one short summary per skill before the ranking table",
+        "The ranking table has columns skill, percent, grade and largest per-dimension gaps, and lists pdf-form-filler above doc-helper",
+        "Output ends with one fenced json block holding two lines, one object each, in the listed order (pdf-form-filler, then doc-helper)",
+        "The percent in the ranking table equals the percent in each JSON line"
+      ]
+    },
+    {
+      "id": "missing-ref",
+      "prompt": "Judge the skill in evals/files/missing-ref/SKILL.md.txt with judge slug test; print only the verdict line. Its SKILL.md says to read references/rotation-runbook.md, which is not in the directory.",
+      "expected_output": "One verdict JSON line for missing-ref with a high-severity finding that references/rotation-runbook.md cannot be read, and no invented runbook content.",
+      "files": [
+        "references/rubric.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/missing-ref/SKILL.md.txt"
+      ],
+      "assertions": [
+        "Output is exactly one line holding one JSON object",
+        "A finding has severity `high` and its evidence names `references/rotation-runbook.md` as missing or unreadable",
+        "No finding quotes or summarises the content of the missing runbook",
+        "Every dimension scored below its max has at least one finding with that dimension"
+      ]
+    }
+  ]
+}
