@@ -45,6 +45,8 @@ Here's a success meme:
 ### Python Script Example
 
 ```python
+import sys
+sys.path.insert(0, "scripts")
 from meme_generator import MemeGenerator
 
 # Initialize generator
@@ -77,19 +79,19 @@ print(f"Markdown: {markdown}")
 
 ```bash
 # Generate a basic meme
-python meme_generator.py generate buzz "features" "features everywhere"
+python3 scripts/meme_generator.py generate buzz "features" "features everywhere"
 
 # Generate with markdown output
-python meme_generator.py generate success "deployed" "no errors" --markdown
+python3 scripts/meme_generator.py generate success "deployed" "no errors" --markdown
 
 # Generate with custom dimensions
-python meme_generator.py generate drake "old way" "new way" --width 1200 --height 630
+python3 scripts/meme_generator.py generate drake "old way" "new way" --width 1200 --height 630
 
 # List all available templates
-python meme_generator.py list-templates
+python3 scripts/meme_generator.py list-templates
 
 # Suggest template for context
-python meme_generator.py suggest "deployment success"
+python3 scripts/meme_generator.py suggest "deployment success"
 ```
 
 ## Context-Specific Examples
@@ -237,6 +239,8 @@ def comment_pr_review(pr_number: int, review_type: str):
     }
 
     url = review_memes.get(review_type)
+    if url is None:
+        raise ValueError(f"Unsupported review type: {review_type}")
     markdown = meme.get_markdown_image(url, alt_text="Code Review Meme")
 
     # Post comment (pseudo-code)
@@ -259,6 +263,8 @@ async def deploy_meme(ctx, status: str):
     elif status == "fail":
         url = meme.generate("fine", "servers on fire", "this is fine")
 
+    if status not in ("success", "fail"):
+        raise ValueError(f"Unsupported status: {status}")
     await ctx.send(f"Deployment Status: {status}")
     await ctx.send(url)
 ```

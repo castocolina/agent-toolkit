@@ -151,12 +151,22 @@ class MemeGenerator:
         """
         context_lower = context.lower()
 
-        # Check for keyword matches
-        for key, templates in self.CONTEXT_MAP.items():
-            if key in context_lower:
-                return templates[0]
+        # Resolve outcomes before topics so "deployment failed" cannot be
+        # classified as deployment success merely because deployment matches.
+        failure_terms = ("failure", "failed", "failing", "error", "broken")
+        success_terms = ("success", "successful", "succeeded", "passed", "working")
+        if any(term in context_lower for term in failure_terms):
+            return self.CONTEXT_MAP["failure"][0]
+        if any(term in context_lower for term in success_terms):
+            return self.CONTEXT_MAP["success"][0]
 
-        # Default fallback
+        # Ambiguous outcomes use a neutral reaction rather than implying success.
+        for key, templates in self.CONTEXT_MAP.items():
+            if key in context_lower and key not in {"deployment", "testing"}:
+                return templates[0]
+        if "deployment" in context_lower or "testing" in context_lower:
+            return "fry"
+
         return "buzz"
 
     def list_templates(self) -> dict[str, str]:
@@ -190,6 +200,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Generate memes using memegen.link")
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
+    parser.add_argument("--json", action="store_true", help="Emit structured JSON for list/suggest commands")
+
     # Generate command
     generate_parser = subparsers.add_parser("generate", help="Generate a meme")
     generate_parser.add_argument("template", help="Template name (e.g., buzz, drake)")
@@ -214,7 +226,7 @@ def main() -> None:
     generator = MemeGenerator()
 
     if args.command == "generate":
-        generator.generate(
+        url = generator.generate(
             template=args.template,
             top_text=args.top,
             bottom_text=args.bottom,
@@ -224,17 +236,26 @@ def main() -> None:
             layout=args.layout,
         )
         if args.markdown:
-            pass
+            print(generator.get_markdown_image(url))
         else:
-            pass
+            print(url)
 
     elif args.command == "list-templates":
         templates = generator.list_templates()
-        for _name, _description in sorted(templates.items()):
-            pass
+        if args.json:
+            import json
+            print(json.dumps(templates, sort_keys=True))
+        else:
+            for name, description in sorted(templates.items()):
+                print(f"{name}: {description}")
 
     elif args.command == "suggest":
-        generator.suggest_template_for_context(args.context)
+        suggestion = generator.suggest_template_for_context(args.context)
+        if args.json:
+            import json
+            print(json.dumps({"template": suggestion}))
+        else:
+            print(suggestion)
 
     else:
         parser.print_help()

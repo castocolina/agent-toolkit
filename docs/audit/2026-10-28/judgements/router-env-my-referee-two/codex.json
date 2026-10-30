@@ -1,0 +1,77 @@
+{
+  "skill": "codex",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 12,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/codex/SKILL.md",
+      "line": 34,
+      "evidence": "Never interpolate task text directly into shell syntax. Use a safely quoted argument or stdin to avoid command expansion.",
+      "fix": "Trim the generic shell-quoting lesson to the Codex-specific instruction (pipe the follow-up prompt to codex exec via stdin) and drop the general quoting advice the model already applies"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/codex/SKILL.md",
+      "line": 10,
+      "evidence": "If absent or unsupported, stop and report; do not guess flags.",
+      "fix": "Define the support check (e.g., treat the CLI as unsupported only when 'codex exec --help' lacks the documented subcommands) or drop 'unsupported' and branch only on absence"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/codex/SKILL.md",
+      "line": 12,
+      "evidence": "Resolve task intent, model (default `gpt-5.2`), and effort",
+      "fix": "Add a gotcha that default model names drift across CLI releases and may not exist on the installed version; verify the model name against the installed CLI before passing it"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/codex/evals/evals.json",
+      "line": 1,
+      "evidence": "Eval ids are read-only-review, requested-edit and resume-session; no failure-path case (CLI absent, non-zero exit, --last selecting the wrong session)",
+      "fix": "Add a fourth eval for the failure path asserting the skill reports actual diagnostics and stops without silent retry"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/codex/SKILL.md",
+      "line": 20,
+      "evidence": "Use the narrowest supported network/workspace configuration.",
+      "fix": "Name the network-capable sandbox flag(s) for the pinned CLI version, or make preflight step 2 (inspect 'codex exec --help') mandatory before choosing any network configuration"
+    }
+  ]
+}

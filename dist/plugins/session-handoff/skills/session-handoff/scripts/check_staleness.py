@@ -45,6 +45,7 @@ def parse_handoff_metadata(filepath: str) -> dict:
         "branch": None,
         "project_path": None,
         "modified_files": [],
+        "baseline_commit": None,
     }
 
     # Parse Created timestamp
@@ -66,6 +67,10 @@ def parse_handoff_metadata(filepath: str) -> dict:
     match = re.search(r'Project:\s*(.+?)(?:\n|$)', content)
     if match:
         metadata["project_path"] = match.group(1).strip()
+
+    match = re.search(r'Baseline commit:\s*([0-9a-f]{7,40})', content, re.IGNORECASE)
+    if match:
+        metadata["baseline_commit"] = match.group(1)
 
     # Parse modified files from table
     table_matches = re.findall(r'\|\s*([a-zA-Z0-9_\-./]+\.[a-zA-Z]+)\s*\|', content)
@@ -101,28 +106,26 @@ def get_current_branch(project_path: str) -> str | None:
     return branch if success else None
 
 
-def get_changed_files_since(timestamp: datetime, project_path: str) -> list[str]:
-    """Get files that changed since timestamp."""
-    if not timestamp:
-        return []
-
-    iso_time = timestamp.strftime("%Y-%m-%dT%H:%M:%S")
+def get_changed_files_since(baseline_commit: str, project_path: str) -> tuple[list[str] | None, bool]:
+    """Compare baseline tree to HEAD and include tracked/untracked worktree changes."""
+    if not baseline_commit:
+        return None, False
+    success, output = run_cmd(["git", "merge-base", "--is-ancestor", baseline_commit, "HEAD"], cwd=project_path)
+    ancestry_diverged = not success
     success, output = run_cmd(
-        ["git", "diff", "--name-only", f"--since={iso_time}", "HEAD"],
-        cwd=project_path
+        ["git", "diff", "--name-only", baseline_commit, "HEAD"], cwd=project_path
     )
-
-    # Fallback: get files changed in commits since timestamp
-    if not output:
-        success, output = run_cmd(
-            ["git", "log", f"--since={iso_time}", "--name-only", "--pretty=format:"],
-            cwd=project_path
-        )
-
-    if success and output:
-        files = [f.strip() for f in output.split("\n") if f.strip()]
-        return list(set(files))  # Deduplicate
-    return []
+    if not success:
+        return None, ancestry_diverged
+    files = set(output.splitlines()) if output else set()
+    success, working = run_cmd(["git", "status", "--porcelain", "--untracked-files=all"], cwd=project_path)
+    if not success:
+        return None, ancestry_diverged
+    for line in working.splitlines():
+        entry = line[3:].split(" -> ")[-1].strip()
+        if entry:
+            files.add(entry)
+    return sorted(files), ancestry_diverged
 
 
 def check_files_exist(files: list[str], project_path: str) -> tuple[list[str], list[str]]:
@@ -268,14 +271,28 @@ def check_staleness(handoff_path: str) -> dict:
         result["commits_since"] = len(commits)
         result["recent_commits"] = commits[:5]  # Show first 5
 
-        changed_files = get_changed_files_since(metadata["created"], project_path)
-        result["files_changed_count"] = len(changed_files)
-        result["files_changed"] = changed_files[:10]  # Show first 10
+        changed_files, ancestry_diverged = get_changed_files_since(metadata["baseline_commit"], project_path)
+        result["baseline_ancestry_diverged"] = ancestry_diverged
+        result["files_changed_count"] = len(changed_files) if changed_files is not None else None
+        result["files_changed"] = changed_files[:10] if changed_files is not None else []
+
+        if not metadata["created"] or not metadata["baseline_commit"] or changed_files is None:
+            result["staleness_level"] = "UNKNOWN"
+            result["recommendation"] = "Baseline metadata missing or comparison failed; verify project state manually"
+            result["issues"] = ["Missing timestamp/baseline commit or git comparison unavailable"]
+            return result
 
         # Check if handoff's modified files still exist
         existing, missing = check_files_exist(metadata["modified_files"], project_path)
         result["referenced_files_exist"] = len(existing)
         result["referenced_files_missing"] = missing
+
+        # Divergence/rollback makes commit comparison unsafe; require manual verification.
+        if ancestry_diverged:
+            result["staleness_level"] = "UNKNOWN"
+            result["recommendation"] = "Baseline is not an ancestor of HEAD; possible rollback or divergence requires manual verification"
+            result["issues"] = ["Baseline ancestry diverged; verify rollback/divergence and review changed files"]
+            return result
 
         # Calculate staleness
         level, recommendation, issues = calculate_staleness_level(

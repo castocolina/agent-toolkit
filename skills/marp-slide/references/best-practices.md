@@ -5,7 +5,7 @@ Guidelines for creating "cool" high-quality slides.
 ## Slide Titles (h2)
 
 ### ✅ Good Examples
-- **Concise**: About 5-7 characters
+- **Concise**: About 3-6 words
 - **Clear**: Content is immediately understandable
 - **Consistent**: Use the same style at the same hierarchy level
 
@@ -150,7 +150,7 @@ Focus on simple slide transitions.
 
 After completing slides, verify:
 
-- [ ] Are titles concise (5-7 characters)?
+- [ ] Are titles concise (3-6 words)?
 - [ ] Are bullet points 3-5 items?
 - [ ] Is it 1 slide = 1 message?
 - [ ] Is the text amount appropriate?

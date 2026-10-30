@@ -1,26 +1,27 @@
 #!/bin/bash
-# Run taze for Node.js dependency updates
-# Usage: run-taze.sh [-r] [additional-args]
-#   -r: Recursive mode for monorepos
-
+# Run taze in the current Node project. stdout is JSON status/output.
 set -e
 
-# Check if taze is installed
-if ! command -v taze &> /dev/null; then
-    echo "ERROR: taze is not installed"
-    echo ""
-    echo "Install options:"
-    echo "  npm install -g taze    # Global install (recommended)"
-    echo "  npx taze               # One-time via npx"
-    exit 1
+usage() {
+    echo 'Usage: run-taze.sh [-r] [taze arguments]' >&2
+    echo 'Pass --write only for an approved target set. Exit codes: 0 success/help, 1 missing taze, 2 missing package.json, delegated taze code otherwise.' >&2
+}
+
+if [ "${1:-}" = --help ] || [ "${1:-}" = -h ]; then
+    usage
+    exit 0
 fi
 
-# Check if package.json exists
-if [ ! -f "package.json" ]; then
-    echo "ERROR: No package.json found in current directory"
+if ! command -v taze >/dev/null 2>&1; then
+    echo 'taze is not installed (install with npm install -g taze or use npx taze)' >&2
+    printf '{"status":"error","diagnostic":"taze is not installed"}\n'
+    exit 1
+fi
+if [ ! -f package.json ]; then
+    echo 'No package.json found in current directory' >&2
+    printf '{"status":"error","diagnostic":"No package.json found in current directory"}\n'
     exit 2
 fi
 
-# Run taze with provided arguments
-echo "Running taze..."
-taze "$@"
+output=$(taze "$@") || { rc=$?; printf '{"status":"error","exit_code":%s}\n' "$rc"; printf '%s\n' "$output" >&2; exit "$rc"; }
+python3 -c 'import json,sys; print(json.dumps({"status":"ok","output":sys.stdin.read()}))' <<< "$output"

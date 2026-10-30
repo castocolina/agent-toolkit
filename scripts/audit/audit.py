@@ -16,6 +16,7 @@ Usage:
 
 import argparse
 import contextlib
+import datetime
 import json
 import math
 import os
@@ -26,6 +27,9 @@ import signal
 import subprocess
 import sys
 import tempfile
+import urllib.error
+import urllib.parse
+import urllib.request
 from collections import Counter
 from pathlib import Path
 
@@ -955,6 +959,210 @@ def run_evals(
     return 1 if any(s["passed"] / s["total"] < fail_under for s in summaries if "total" in s) else 0
 
 
+# ---------- upstream sources ----------
+
+
+class SourceUnavailable(Exception):
+    """An upstream source could not be checked reliably."""
+
+
+def validate_entry(root: Path, entry) -> str | None:
+    if not isinstance(entry, dict):
+        return "entry must be an object"
+    if set(entry) != {"skill", "kind", "source", "ref"}:
+        return "entry must have exactly skill, kind, source, ref"
+    kind, skill, source, ref = (entry[k] for k in ("kind", "skill", "source", "ref"))
+    if not isinstance(kind, str) or kind not in {"github", "github-path", "wikipedia", "repo", "unversioned"}:
+        return f"unsupported kind {kind!r}"
+    if kind == "repo":
+        if skill is not None:
+            return "repo skill must be null"
+    else:
+        if not isinstance(skill, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", skill):
+            return "skill must be a kebab-case name"
+        skills = (root / "skills").resolve()
+        sdir = root / "skills" / skill
+        if not sdir.is_dir() or not sdir.resolve().is_relative_to(skills):
+            return f"skill directory {skill!r} does not exist under skills/"
+    component = r"[A-Za-z0-9._-]+"
+    repo_pattern = rf"{component}/{component}"
+    if kind in ("github", "repo"):
+        source_ok = isinstance(source, str) and re.fullmatch(repo_pattern, source) and not any(
+            part in (".", "..") for part in source.split("/")
+        )
+    elif kind == "github-path":
+        match = re.fullmatch(rf"({component})/({component}):(.+)", source) if isinstance(source, str) else None
+        source_ok = bool(match and match.group(1) not in (".", "..") and match.group(2) not in (".", "..")
+                         and not match.group(3).startswith("/")
+                         and not any(ord(char) < 32 or ord(char) == 127 or char in "\\\\?#%&=" for char in match.group(3))
+                         and all(part not in ("", ".", "..") for part in match.group(3).split("/")))
+    elif kind == "wikipedia":
+        source_ok = isinstance(source, str) and bool(source.strip()) and "\n" not in source and "\r" not in source
+    else:
+        source_ok = isinstance(source, str) and bool(source.strip())
+    if not source_ok:
+        return f"invalid source for {kind}"
+    if kind in ("github", "github-path", "repo"):
+        if not isinstance(ref, str) or not ref.strip():
+            return f"{kind} ref must be a non-empty string"
+    elif ref is not None:
+        return f"{kind} ref must be null"
+    return None
+
+
+def source_query(entry: dict) -> str | None:
+    kind, source, ref = entry["kind"], entry["source"], entry["ref"]
+    if kind in ("github", "repo"):
+        owner, repo = source.split("/", 1)
+        return f"repos/{owner}/{repo}/commits?sha={urllib.parse.quote(ref, safe='')}&per_page=1"
+    if kind == "github-path":
+        repo, path = source.split(":", 1)
+        owner, name = repo.split("/", 1)
+        return f"repos/{owner}/{name}/commits?path={urllib.parse.quote(path, safe='')}&sha={urllib.parse.quote(ref, safe='')}&per_page=1"
+    if kind == "wikipedia":
+        return "https://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=" + urllib.parse.quote(entry["source"], safe="") + "&rvprop=timestamp&format=json"
+    return None
+
+
+def upstream_repo_url(entry: dict) -> str:
+    """Build the repo fetch URL; overridable in tests for local fixture remotes."""
+    return f"https://github.com/{entry['source']}.git"
+
+
+def fetch_source_updated(entry: dict) -> str | None:
+    query = source_query(entry)
+    if query is None:
+        return None
+    try:
+        if entry["kind"] == "wikipedia":
+            request = urllib.request.Request(query, headers={"User-Agent": "agent-toolkit-upstream-audit/1.0"})
+            with urllib.request.urlopen(request, timeout=10) as response:
+                data = json.loads(response.read().decode("utf-8"))
+            pages = data["query"]["pages"]
+            if not isinstance(pages, dict) or not pages:
+                raise SourceUnavailable("malformed Wikipedia pages")
+            page = next(iter(pages.values()))
+            revisions = page.get("revisions") if isinstance(page, dict) else None
+            if not isinstance(revisions, list) or not revisions or not isinstance(revisions[0], dict):
+                raise SourceUnavailable("malformed Wikipedia revisions")
+            timestamp = revisions[0]["timestamp"]
+        else:
+            proc = subprocess.run(["gh", "api", query], capture_output=True, text=True, timeout=10)
+            if proc.returncode:
+                raise SourceUnavailable(proc.stderr.strip() or f"gh api exited {proc.returncode}")
+            commits = json.loads(proc.stdout)
+            timestamp = commits[0]["commit"]["committer"]["date"]
+        if not isinstance(timestamp, str) or not timestamp:
+            raise SourceUnavailable("response has no timestamp")
+        return timestamp
+    except SourceUnavailable:
+        raise
+    except (OSError, subprocess.SubprocessError, ValueError, KeyError, TypeError, IndexError, StopIteration, urllib.error.URLError) as e:
+        raise SourceUnavailable(str(e) or "malformed upstream response") from e
+
+
+def ours_updated(root: Path, entry: dict) -> str | None:
+    if entry["kind"] == "repo":
+        try:
+            subprocess.run(["git", "fetch", "--quiet", "--", upstream_repo_url(entry), entry["ref"]],
+                           cwd=root, check=True, capture_output=True, text=True)
+        except (subprocess.CalledProcessError, OSError) as exc:
+            raise SourceUnavailable(str(exc)) from exc
+        try:
+            base_proc = subprocess.run(["git", "merge-base", "HEAD", "FETCH_HEAD"], cwd=root,
+                                       capture_output=True, text=True)
+        except OSError as exc:
+            raise SourceUnavailable(str(exc)) from exc
+        if base_proc.returncode == 0:
+            target = base_proc.stdout.strip()
+        elif base_proc.returncode == 1:
+            try:
+                local = subprocess.run(["git", "rev-list", "--max-parents=0", "HEAD"], cwd=root,
+                                       capture_output=True, text=True)
+            except OSError as exc:
+                raise SourceUnavailable(str(exc)) from exc
+            if local.returncode:
+                raise SourceUnavailable(local.stderr.strip() or "cannot locate earliest local commit")
+            roots = local.stdout.split()
+            if roots:
+                dated = subprocess.run(["git", "show", "-s", "--format=%ct", *roots], cwd=root,
+                                       capture_output=True, text=True)
+                if dated.returncode:
+                    raise SourceUnavailable(dated.stderr.strip() or "cannot date local root commits")
+                dates = [int(date) for date in dated.stdout.splitlines()]
+                target = roots[min(range(len(roots)), key=lambda index: dates[index])]
+            else:
+                target = ""
+        else:
+            raise SourceUnavailable(base_proc.stderr.strip() or f"git merge-base exited {base_proc.returncode}")
+        if not target:
+            return None
+        args = ["git", "show", "-s", "--format=%cI", target]
+    else:
+        name = entry["skill"]
+        paths = [f"skills/{name}/SKILL.md", f"skills/{name}/references/"]
+        args = ["git", "log", "-1", "--format=%cI", "--", *paths]
+    try:
+        proc = subprocess.run(args, cwd=root, capture_output=True, text=True)
+    except OSError as exc:
+        raise SourceUnavailable(str(exc)) from exc
+    if proc.returncode:
+        raise SourceUnavailable(proc.stderr.strip() or "git query failed")
+    return proc.stdout.strip() or None
+
+
+def upstreams(root: Path, registry: Path) -> int:
+    try:
+        entries = json.loads(registry.read_text(encoding="utf-8"))
+        if not isinstance(entries, list):
+            raise ValueError("registry must be a JSON list")
+    except (OSError, ValueError, RecursionError) as exc:
+        print(f"cannot read registry {registry}: {exc}", file=sys.stderr)
+        return 2
+    rows, failed = [], False
+    for entry in entries:
+        skill = entry.get("skill") if isinstance(entry, dict) else None
+        source = entry.get("source") if isinstance(entry, dict) else None
+        kind = entry.get("kind") if isinstance(entry, dict) else None
+        reason = validate_entry(root, entry)
+        source_updated = ours = None
+        error = None
+        stale = None
+        if reason:
+            error = f"invalid entry: {reason}"
+        else:
+            try:
+                if entry["kind"] != "unversioned":
+                    source_updated = fetch_source_updated(entry)
+                ours = ours_updated(root, entry)
+                if ours is None:
+                    error = "no local commit for source material"
+                elif entry["kind"] == "unversioned":
+                    stale = False
+                else:
+                    def instant(value):
+                        if not isinstance(value, str):
+                            raise ValueError("timestamp is not a string")
+                        normalized = value[:-1] + "+00:00" if value.endswith("Z") else value
+                        parsed = datetime.datetime.fromisoformat(normalized)
+                        if parsed.tzinfo is None:
+                            raise ValueError("timestamp must include timezone")
+                        return parsed.astimezone(datetime.timezone.utc)
+                    try:
+                        stale = instant(source_updated) > instant(ours)
+                    except (TypeError, ValueError, OverflowError) as exc:
+                        raise SourceUnavailable(f"invalid upstream timestamp: {exc}") from exc
+            except SourceUnavailable as exc:
+                error = str(exc)
+        if error:
+            failed = True
+            stale = None
+        rows.append({"skill": skill, "source": source, "kind": kind, "source_updated": source_updated,
+                     "ours_updated": ours, "stale": stale, "error": error})
+    print(json.dumps(rows, indent=2))
+    return 1 if failed else 0
+
+
 # ---------- CLI ----------
 
 
@@ -966,6 +1174,8 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--root", type=Path, default=None)
     sub = p.add_subparsers(dest="cmd", required=True)
+    up = sub.add_parser("upstreams")
+    up.add_argument("--registry", type=Path, required=True)
     c = sub.add_parser("check")
     c.add_argument("--strict", action="store_true")
     c.add_argument("--skills", type=csv, default=None)
@@ -1014,6 +1224,8 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     root = (args.root or default_root()).resolve()
+    if args.cmd == "upstreams":
+        return upstreams(root, args.registry)
     if args.cmd == "check":
         if args.allowlist and not args.allowlist.is_file():
             print(f"allowlist not found: {args.allowlist}", file=sys.stderr)

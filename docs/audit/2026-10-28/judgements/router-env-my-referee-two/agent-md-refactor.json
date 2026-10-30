@@ -1,0 +1,95 @@
+{
+  "skill": "agent-md-refactor",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/agent-md-refactor/SKILL.md",
+      "line": 15,
+      "evidence": "1. Read every relevant instruction file, including scoped/ancestor files. Inventory each rule with source file, directory scope, exceptions, and precedence.",
+      "fix": "Lead with the non-obvious part only: keep the scope/precedence inventory schema and ancestor-file discovery; drop the generic 'read every relevant file' framing the model already follows."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/agent-md-refactor/SKILL.md",
+      "line": 13,
+      "evidence": "If instruction files or repository evidence are unavailable, do not stop at a request for them.",
+      "fix": "Move this missing-evidence fallback out of the numbered procedure into its own short subsection after step 7; the current long paragraph mixes two scenarios before the workflow starts."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/agent-md-refactor/SKILL.md",
+      "line": 28,
+      "evidence": "Claude Code does not automatically load arbitrary files under .claude/; links must say when the agent must read them.",
+      "fix": "Add the missing harness-precedence gotcha: which file wins when both AGENTS.md and CLAUDE.md exist and how parent-directory instruction files merge; that is the other landmine in this domain."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/agent-md-refactor/SKILL.md",
+      "line": 18,
+      "evidence": "Avoid unnecessary file counts and generic template scaffolding.",
+      "fix": "Replace with a concrete threshold, e.g. 'create a topic file only when three or more rules share one scope and one read condition'."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/agent-md-refactor/evals/evals.json",
+      "line": null,
+      "evidence": "No evals/files/ directory; every prompt describes the instruction file hypothetically ('Our root AGENTS.md has 180 lines...').",
+      "fix": "Add evals/files fixtures (a bloated AGENTS.md with a planted contradiction and a concise 12-line file) so assertions grade real refactors instead of plans."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/agent-md-refactor/evals/evals.json",
+      "line": null,
+      "evidence": "Assertion 'Avoids claiming the under-50-line target requires further splitting' tests a target SKILL.md never states ('a suggested length' is undefined).",
+      "fix": "State the root-length guidance in SKILL.md or reword the assertion to 'recognizes a concise universal file needs no split'."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/agent-md-refactor/SKILL.md",
+      "line": 21,
+      "evidence": "confirm the target harness will load conditional guidance when relevant",
+      "fix": "Give the concrete check: for Claude Code only the root file auto-loads, so verification means every linked file carries an explicit read condition in its link text; name the equivalent check for other harnesses or drop the step."
+    }
+  ]
+}

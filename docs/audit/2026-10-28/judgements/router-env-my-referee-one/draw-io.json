@@ -1,0 +1,113 @@
+{
+  "skill": "draw-io",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 13,
+    "D2": 13,
+    "D3": 15,
+    "D4": 13,
+    "D5": 13,
+    "D6": 12,
+    "D7": 12,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 101,
+  "max_total": 125,
+  "percent": 80.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 3,
+      "evidence": "The description includes \"an architecture diagram\" and \"a Quarto or reveal.js slide figure\" without boundaries excluding other diagram formats or general slide work.",
+      "fix": "Create and edit uncompressed .drawio/mxGraph XML diagrams and export editable PNGs. Use for draw.io files, AWS architecture diagrams with mxgraph.aws4 icons, connector or container layout fixes, and diagram figures for Quarto/reveal.js, including requests for an editable architecture diagram without naming draw.io. Not for Mermaid, Excalidraw, Graphviz, general slide styling, or OCR."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 84,
+      "evidence": "\"Element center coordinate = `y + (height / 2)`\" and the 18-line Layout Adjustment section teach basic coordinate editing; much of the 38-line Design Principles section repeats familiar design advice.",
+      "fix": "Delete elementary coordinate explanations and generic clarity/consistency advice. Retain mxGraph-specific containment, connector routing, font propagation, and export constraints."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "line": 59,
+      "evidence": "\"git add \"${generated_files[@]}\"\" runs after every successful export. The direct-export branch therefore fails outside a Git repository and changes the index inside one without the skill disclosing that side effect.",
+      "fix": "Make staging an explicit opt-in or place it in a separate pre-commit wrapper. Standalone conversion should succeed without Git and leave the index unchanged."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "line": 39,
+      "evidence": "\"rm -f \"$png\"\" executes when drawio export fails, deleting a previously existing output as well as any newly failed output.",
+      "fix": "Export to a temporary PNG, validate it, and atomically replace the destination only after success. On failure, remove only temporary artifacts and preserve the previous PNG."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 73,
+      "evidence": "The numbered editing procedure starts with \"Open `.drawio` file in text editor (plain XML format)\"; creation guidance is distributed across rules and a final checklist rather than an ordered creation workflow.",
+      "fix": "Add a short creation sequence: establish topology and output constraints, initialize the document, create parent containers before children, connect and route edges, export, inspect, and repeat corrections until the checklist passes."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 41,
+      "evidence": "\"bash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram1.drawio\" hard-codes one harness installation location; icon-search examples make the same assumption.",
+      "fix": "Use skill-root-relative script references and resolve the installed skill directory at runtime. Preserve the target project's working directory or pass absolute diagram paths."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 236,
+      "evidence": "\"Proportion is the slide canvas (16:9), not a GitHub column\" is unconditional although the description also covers ordinary editable architecture diagrams.",
+      "fix": "Apply 16:9 proportions and slide-specific sizing only to slide figures. Otherwise preserve the user's intended medium, canvas, and aspect ratio."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/draw-io/evals/evals.json",
+      "line": 7,
+      "evidence": "\"A plan or XML-ready diagram\" permits a planning response to pass an eval whose prompt asks the agent to make a draw.io diagram.",
+      "fix": "Require an actual parseable .drawio document and assertions for its root cells, requested nodes, edges, and background rather than accepting a plan."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/draw-io/scripts/find_aws_icon.py",
+      "line": 61,
+      "evidence": "\"query = sys.argv[1]\" treats --help as a search term, and \"Found {len(results)} icon(s)\" introduces human-oriented stdout. Runnable repository tests exist, but neither script provides the rubric's help and structured-result interface.",
+      "fix": "Implement --help for both scripts and machine-readable result modes, with diagnostics on stderr. Extend the existing tests to verify those interfaces and background-selection branches."
+    }
+  ]
+}

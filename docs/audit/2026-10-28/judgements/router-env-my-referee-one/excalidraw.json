@@ -1,0 +1,95 @@
+{
+  "skill": "excalidraw",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 14,
+    "D5": 15,
+    "D6": 10,
+    "D7": 8,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 104,
+  "max_total": 125,
+  "percent": 83.2,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 24,
+      "evidence": "'IDs must be unique across the entire scene' repeats the unique-ID requirements in steps 3 and 5; preservation of metadata is likewise repeated between the procedure and gotchas.",
+      "fix": "Keep one precise ID invariant and one validation check, and consolidate repeated preservation instructions while retaining the explanations of binding and image-loss hazards."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 3,
+      "evidence": "The description lists '*.excalidraw or *.excalidraw.json' but omits the source-embedded '.excalidraw.png' input explicitly supported in step 1.",
+      "fix": "Create, inspect, modify, and compare editable Excalidraw diagrams. Use when the user supplies .excalidraw, .excalidraw.json, or source-embedded .excalidraw.png files, asks to change diagram labels or connections, or requests Excalidraw flowcharts or architecture sketches. Keep scene JSON out of the main conversation context. Not for Mermaid, draw.io, PlantUML, Graphviz, ordinary PNG editing, or text-only architecture explanations."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 8,
+      "evidence": "'even a tiny file or a single label lookup must be delegated' imposes the same worker requirement and announcement on low-risk inspection as on complex scene editing.",
+      "fix": "Default to bounded structured extraction for small read-only lookups without exposing scene JSON. Require isolation for large scenes and substantial edits, and reserve status announcements for cases where delegation materially affects execution."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/excalidraw/evals/evals.json",
+      "line": 7,
+      "evidence": "'A plan for an editable Excalidraw flowchart' can pass without producing an artifact; the architecture-edit case names a scene but supplies no input fixture.",
+      "fix": "Supply real scene fixtures and require created or edited artifacts. Assert parseability, editor acceptance, preserved unrelated elements, unique IDs, reciprocal bindings, and the requested label or connection changes."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/excalidraw/evals/trigger-queries.json",
+      "line": 31,
+      "evidence": "'Update my flowchart and summarize what elements you added, no JSON dump.' is labeled should-trigger without identifying Excalidraw; the huge-diagram query has the same ambiguity.",
+      "fix": "Give these positives explicit Excalidraw file paths or prior-context cues. Add format-unspecified diagram requests as boundary cases rather than assuming every flowchart uses Excalidraw."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 12,
+      "evidence": "'For embedded PNG source, use a tool that preserves the image and metadata' names neither a capable tool nor an extraction, re-embedding, or verification procedure.",
+      "fix": "Document a supported PNG round-trip tool and exact validation steps, or explicitly request a plain .excalidraw export before editing when that capability is unavailable."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 28,
+      "evidence": "'For creation, require valid Excalidraw JSON with an elements array' leaves required scene and element fields unspecified; parsing and binding checks alone do not establish that the editor can load the artifact.",
+      "fix": "Provide a known-good minimal scene template or a pinned creation tool, document required fields, and add an editor-open or render validation step with a repair-and-recheck loop."
+    }
+  ]
+}

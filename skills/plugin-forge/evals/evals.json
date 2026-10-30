@@ -1,0 +1,35 @@
+{
+  "skill_name": "plugin-forge",
+  "evals": [
+    {
+      "id": "new-plugin",
+      "prompt": "Create Claude Code plugin release-helper, Dana Lee (dana@example.com), description Release checklist tools, keywords release/deploy, category productivity. Give scaffold command and next files.",
+      "expected_output": "Scaffold command with metadata and expected plugin files; no execution claim.",
+      "assertions": [
+        "Uses the scaffold command `python3 scripts/create_plugin.py release-helper` (or equivalent explicit Python 3 invocation).",
+        "Includes author, email, description, keywords, category",
+        "Names plugin.json, README, marketplace registration"
+      ]
+    },
+    {
+      "id": "version",
+      "prompt": "Plugin docs-kit 1.4.2 has backward-compatible feature. Command and versions?",
+      "expected_output": "Minor bump expected 1.5.0 in both manifests.",
+      "assertions": [
+        "Uses the version command `python3 scripts/bump_version.py docs-kit minor` (or equivalent explicit Python 3 invocation).",
+        "States expected `1.5.0`",
+        "Mentions both manifests"
+      ]
+    },
+    {
+      "id": "missing-marketplace",
+      "prompt": "The marketplace root is `/work/marketplace` and has no `.claude-plugin/marketplace.json`. Propose the commands to initialize it and scaffold plugin `audit-kit`. Use author name `Riley Chen`, email `riley@example.com`, description `Audit workflow helpers`, and keywords `audit,security,workflow`. Do not claim execution.",
+      "expected_output": "A manifest-initialization step that creates the parent directory and a valid marketplace.json before invoking create_plugin.py with all required metadata.",
+      "assertions": [
+        "Places creation of `/work/marketplace/.claude-plugin/marketplace.json` before the create_plugin.py invocation.",
+        "Uses a Python 3 invocation of `create_plugin.py audit-kit` with `--author-name \"Riley Chen\"`, `--author-email \"riley@example.com\"`, `--description \"Audit workflow helpers\"`, and comma-separated `--keywords \"audit,security,workflow\"`; scopes the marketplace to `/work/marketplace` either by changing to that directory before invoking the script or by passing `--marketplace-root /work/marketplace`.",
+        "States create_plugin.py updates an existing marketplace manifest and generates `plugin.json` plus README; does not claim it creates a missing marketplace manifest."
+      ]
+    }
+  ]
+}

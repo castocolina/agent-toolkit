@@ -1,0 +1,35 @@
+{
+  "skill_name": "session-handoff",
+  "evals": [
+    {
+      "id": "pause-work",
+      "prompt": "We are migrating the billing API. Completed: added `POST /v2/invoices`; pending: update the client and add contract tests. Decision: keep v1 until the client rollout finishes. I need to stop until tomorrow; propose the handoff document content and commands.",
+      "expected_output": "Proposed session-handoff workflow and populated handoff content, with scaffold, validation, state, decisions, and concrete next steps.",
+      "assertions": [
+        "Includes a command using `scripts/create_handoff.py` with a task slug.",
+        "Handoff text records completed POST /v2/invoices, pending client/tests, and decision to keep v1.",
+        "Includes next steps to update client and add contract tests, and a `scripts/validate_handoff.py` command."
+      ]
+    },
+    {
+      "id": "resume-chain",
+      "prompt": "Resume from the latest handoff. Its excerpt says: \u201cContinue from 2026-10-23-api-start.md. Completed the request adapter; next verify the v2 invoice response. Working tree may have changed since then.\u201d Propose the commands and checks before editing.",
+      "expected_output": "Resume workflow finding handoffs, checking staleness, reading latest plus predecessor, verifying current context, then beginning the stated next step.",
+      "assertions": [
+        "Proposes `python scripts/list_handoffs.py` and `python scripts/check_staleness.py <handoff-file>`.",
+        "Reads the linked `2026-10-23-api-start.md` predecessor as well as the latest handoff.",
+        "Verifies branch, working tree, and assumptions before checking the v2 invoice response."
+      ]
+    },
+    {
+      "id": "no-handoff",
+      "prompt": "Please fix the typo in this line: \u201cThe server recieves requests.\u201d It is a one-line documentation edit. Decide whether a handoff is warranted and explain briefly.",
+      "expected_output": "Corrects \u201crecieves\u201d to \u201creceives\u201d and makes a small-task judgment without being told the answer.",
+      "assertions": [
+        "Provides the corrected sentence with \u201creceives\u201d.",
+        "Explains the one-line typo is a small task and makes an explicit handoff judgment.",
+        "Does not force a handoff document or handoff command for this isolated typo."
+      ]
+    }
+  ]
+}

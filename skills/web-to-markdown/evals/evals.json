@@ -1,0 +1,35 @@
+{
+  "skill_name": "web-to-markdown",
+  "evals": [
+    {
+      "id": "explicit-convert",
+      "prompt": "Use the skill web-to-markdown to convert https://example.com/guide and save it to ./guide.md.",
+      "expected_output": "Honor explicit gate, validate URL, check CLI, convert, verify file.",
+      "assertions": [
+        "Recognizes explicit invocation",
+        "Uses web2md URL with --out ./guide.md",
+        "Includes non-empty output validation"
+      ]
+    },
+    {
+      "id": "explicit-print",
+      "prompt": "Use the skill web-to-markdown for https://example.org/news; print Markdown and wait for main element.",
+      "expected_output": "Use web2md --print and selector wait.",
+      "assertions": [
+        "Uses web2md with --print",
+        "Uses --wait-for main",
+        "Does not save unrequested file"
+      ]
+    },
+    {
+      "id": "implicit-gate",
+      "prompt": "Convert https://example.com/article to Markdown using whichever browser tool is easiest.",
+      "expected_output": "Hard gate forbids using skill without explicit invocation; request required phrase.",
+      "assertions": [
+        "Does not run web2md",
+        "Requests phrase use the skill web-to-markdown",
+        "Does not select alternative browser stack under skill"
+      ]
+    }
+  ]
+}

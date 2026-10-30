@@ -289,7 +289,9 @@ export async function loader({ params }: Route.LoaderArgs) {
 Control when loaders rerun:
 
 ```tsx
-export const shouldRevalidate: ShouldRevalidateFunctionArgs = (args) => {
+import type { ShouldRevalidateFunction } from "react-router";
+
+export const shouldRevalidate: ShouldRevalidateFunction = (args) => {
   // Return true to revalidate, false to skip
   // Default: true when params change or after successful action
   return true;

@@ -242,11 +242,12 @@ assignee = currentUser() AND status NOT IN (Done, Closed) AND priority >= High
 # Bugs created this week
 issuetype = Bug AND created >= startOfWeek() ORDER BY priority DESC
 
-# Epics in progress with stories
+# Epics in progress with stories (ScriptRunner required)
+# `issueFunction` / `hasLinks()` are ScriptRunner extensions, not native JQL.
 issuetype = Epic AND status = "In Progress" AND issueFunction in hasLinks("is parent of")
 
-# Issues updated by me recently
-updatedBy = currentUser() AND updated >= -7d ORDER BY updated DESC
+# Issues updated by a resolved user recently (updatedBy() is a JQL function)
+issuekey in updatedBy("account-id-or-username") AND updated >= -7d ORDER BY updated DESC
 
 # Blocked issues
 status = Blocked OR "Flagged" = "Impediment"
@@ -269,10 +270,14 @@ resolved >= -7d AND project = PROJ ORDER BY resolved DESC
 
 ---
 
+## JQL extension limits
+
+The `issueFunction in hasLinks(...)` examples require ScriptRunner. Native JQL has no general equivalent for querying arbitrary link descriptions such as "is parent of"; use native `linkedIssues(issueKey)` when querying links to a known issue, or report that the requested relationship query needs an extension.
+
 ## Issue Linking
 
 ### Limitation
-The Atlassian MCP does not currently support creating issue links. Use the bundled `jira-link-issues` script instead.
+The Jira MCP operation list here has no issue-link creation tool. If an approved link is needed, use the documented Jira REST API only when an authorized REST client and credentials are already configured; otherwise report linking unavailable and provide a setup handoff. Do not route to an absent helper.
 
 ### Link Types
 
@@ -284,18 +289,9 @@ The Atlassian MCP does not currently support creating issue links. Use the bundl
 | Clones | is cloned by | clones | Cloned issues |
 | Duplicates | is duplicated by | duplicates | Duplicate issues |
 
-### Script Usage
+### REST request when configured
 
-```bash
-# Link PROJ-123 depends on PROJ-456
-~/.claude/skills/jira/jira-link-issues PROJ-123 PROJ-456 "Depends On"
-
-# PROJ-100 blocks PROJ-200
-~/.claude/skills/jira/jira-link-issues PROJ-100 PROJ-200 "Blocks"
-
-# General relationship
-~/.claude/skills/jira/jira-link-issues PROJ-50 PROJ-75 "Relates To"
-```
+After approval and confirming the link type, submit `POST $JIRA_BASE_URL/rest/api/3/issueLink` with JSON `{"type":{"name":"Blocks"},"inwardIssue":{"key":"PROJ-100"},"outwardIssue":{"key":"PROJ-200"}}`. Use the instance's actual link type name and direction; never print credentials. If authorized REST access is not configured, stop and provide a setup handoff.
 
 ### Finding Link Types
 Query the Jira API to get available link types:
@@ -417,11 +413,7 @@ Before creating issues:
      transitionId: "done_id"
    )
 
-4. Add comment:
-   mcp__atlassian__addCommentToJiraIssue(
-     issueKey: "PROJ-123",
-     body: "Completed and deployed"
-   )
+4. Do not add a comment unless the user requested one. If requested, derive its text from verified context, include the exact comment in the approved changes, then verify both the transitioned issue and comment after execution.
 ```
 
 ### Create and Assign Issue

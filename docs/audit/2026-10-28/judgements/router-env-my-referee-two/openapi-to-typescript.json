@@ -1,0 +1,86 @@
+{
+  "skill": "openapi-to-typescript",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 12,
+      "evidence": "1. Read the provided JSON/YAML; ask for the file only if absent.",
+      "fix": "Drop the ask-for-file clause (default agent behavior); keep the version and paths checks, which are the non-obvious part"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 14,
+      "evidence": "Detect collisions before emission; disambiguate deterministically with parameter or status/media suffixes and state the rule.",
+      "fix": "Give one collision example with the exact emitted names (e.g. two GET /users/{id} operations \u2192 GetUserById and GetUserByIdQueryParams) so the suffix rule is unambiguous"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 21,
+      "evidence": "`oneOf` maps to a union, `allOf` generally to an intersection, and enums to literal unions.",
+      "fix": "Add the missing environment gotchas: oneOf without a discriminator field, and readOnly/writeOnly asymmetry between request and response types"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 15,
+      "evidence": "4. Write to `types/api.ts` by default.",
+      "fix": "For large specs, summarize planned type names before writing (or support a dry run) so a naming collision does not produce a full-file rewrite"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/evals/evals.json",
+      "line": 16,
+      "evidence": "\"id\": \"union-ref\"",
+      "fix": "Add evals for recursive $ref guards (cycle safety) and operationId collisions \u2014 both rule-heavy paths no eval covers"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 12,
+      "evidence": "note whether `components.schemas` exists",
+      "fix": "State the empty-schemas branch explicitly: emit only operation types and report zero named schemas, so the agent is not left guessing"
+    }
+  ]
+}

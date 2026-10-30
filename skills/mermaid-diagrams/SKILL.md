@@ -152,45 +152,15 @@ Do not use architecture-diagrams as the default for "the architecture". That que
 10. **Keep the source** - Store the `.mmd` next to the code when the diagram is maintained with it
 11. **Validate before you ship** - Render in [Mermaid Live](https://mermaid.live) or `mmdc`. A clean-looking fence can still be a syntax bomb on GitHub
 
-## Configuration and Theming
+## Renderer and host constraints
 
-Configure diagrams using frontmatter:
+- `layout: elk` requires host integration; `dagre` is the default.
+- GitHub and the VS Code preview render `aws:` and `logos:` architecture icons as `?`; use built-in icons there.
+- Frontmatter configuration and newer syntax vary by Mermaid version. Confirm the host version and render in the target environment before relying on them.
 
-```mermaid
----
-config:
-  theme: base
-  themeVariables:
-    primaryColor: "#e3f2fd"
-    primaryBorderColor: "#1565c0"
-    primaryTextColor: "#111111"
-    textColor: "#111111"
----
-flowchart TD
-    A --> B
-```
+## Rendering
 
-**Available themes:** default, forest, dark, neutral, base
-
-**Layout options:**
-- `layout: dagre` (default) - Classic balanced layout
-- `layout: elk` - Advanced layout for complex diagrams (requires integration)
-
-**Look options:**
-- `look: classic` - Traditional Mermaid style
-- `look: handDrawn` - Sketch-like appearance
-
-## Exporting and Rendering
-
-**Native support in:**
-- GitHub/GitLab - Automatically renders in Markdown
-- VS Code - With Markdown Mermaid extension
-- Notion, Obsidian, Confluence - Built-in support
-
-**Export options:**
-- [Mermaid Live Editor](https://mermaid.live) - Online editor with PNG/SVG export
-- Mermaid CLI - `npm install -g @mermaid-js/mermaid-cli` then `mmdc -i input.mmd -o output.png`
-- Docker - `docker run --rm -v $(pwd):/data minlag/mermaid-cli -i /data/input.mmd -o /data/output.png`
+Validate in the actual host or with `mmdc`; host Mermaid versions and enabled integrations differ, and valid-looking source can still fail to render.
 
 ## Common Pitfalls
 

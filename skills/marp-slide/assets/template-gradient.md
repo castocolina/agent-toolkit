@@ -39,7 +39,7 @@ section:nth-child(4n) {
 }
 
 section:nth-child(5n) {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  background: linear-gradient(135deg, #167a45 0%, #087c75 100%);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -138,22 +138,22 @@ strong {
 
 <!-- _class: lead -->
 
-# プレゼンテーション
+# Presentation
 
-グラデーション背景
-
----
-
-## アジェンダ
-
-- トピック1
-- トピック2
-- トピック3
+Gradient Background
 
 ---
 
-## スライド
+## Agenda
 
-- ポイント1
-- ポイント2
-- ポイント3
+- Topic1
+- Topic2
+- Topic3
+
+---
+
+## Slide
+
+- Point1
+- Point2
+- Point3

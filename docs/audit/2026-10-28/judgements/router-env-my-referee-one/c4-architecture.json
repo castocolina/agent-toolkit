@@ -1,0 +1,68 @@
+{
+  "skill": "c4-architecture",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 10,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 12,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 107,
+  "max_total": 125,
+  "percent": 85.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/c4-architecture/references/advanced-patterns.md",
+      "line": 175,
+      "evidence": "'### CQRS Pattern', '### AWS Production Deployment', and '### API Gateway Pattern' introduce long, familiar architecture examples. Together with the basic abstraction table and syntax walkthroughs, these substantially dilute the concise ownership, modeling, and renderer-specific corrections.",
+      "fix": "Remove or sharply compress generic CQRS, API gateway, and cloud-deployment walkthroughs and basic C4 definitions. Retain non-obvious boundary decisions, evidence-extraction rules, and Mermaid-specific incompatibilities, with minimal examples for those issues."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": 16,
+      "evidence": "'Component view only when a container has 5+ meaningful internal modules or requester names a specific container' makes a module count a hard gate. A useful or explicitly requested component view can have fewer modules without naming a container in the request.",
+      "fix": "Make module count an optional complexity hint, not a restriction. Select component views according to the requested question, audience, meaningful responsibility boundaries, and available evidence; honor explicit component-view requests when the container can be identified."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/c4-architecture/evals/evals.json",
+      "line": 1,
+      "evidence": "'Customers use a React web app; it calls a Node.js order API' supplies the architecture directly. None of the three cases exercises extracting deployable units and runtime relationships from repository artifacts, despite that being the workflow's first two steps.",
+      "fix": "Add a small repository fixture with build configuration, deployment manifests, runtime dependencies, and a shared library. Assert that generated views distinguish containers from libraries and attach evidence to inferred boundaries and relationships."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/c4-architecture/references/advanced-patterns.md",
+      "line": 436,
+      "evidence": "'Container(api, \"API\", \"Node.js\") {' attempts to nest a Component inside a Container declaration in the Error Handling Flow example. Container declarations are not boundary blocks, so this supplied C4Dynamic example cannot be followed as valid Mermaid syntax.",
+      "fix": "Use Container_Boundary for the API's internal components, add a handler component as the relationship endpoint, and connect that handler to the circuit breaker. Validate the corrected example with the target Mermaid renderer."
+    }
+  ]
+}

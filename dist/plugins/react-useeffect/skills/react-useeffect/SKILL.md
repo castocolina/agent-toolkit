@@ -1,53 +1,35 @@
 ---
 name: react-useeffect
-description: React useEffect best practices from official docs. Use when writing/reviewing useEffect, useState for derived values, data fetching, or state synchronization. Teaches when NOT to use Effect and better alternatives.
+description: "Review and refactor React behavior involving useEffect, derived state, subscriptions, and stale fetch responses. Use when asking about Effect dependencies/cleanup, avoiding redundant renders, or testing Effect behavior with React Testing Library. Not for standalone React Testing Library mocks, generic component features such as dropdown keyboard navigation, reducer-only undo/redo, generic networking, cache-library configuration, routing, Server Action forms, or TypeScript-only typing unless the question specifically concerns Effect/state-synchronization choices."
 ---
 
-# You Might Not Need an Effect
+# React Effects: synchronize, then validate
 
-Effects are an **escape hatch** from React. They let you synchronize with external systems. If there is no external system involved, you shouldn't need an Effect.
+An Effect synchronizes React with an external system. Before writing one, name the external system; if none exists, keep the logic in render or an event handler.
 
-## Quick Reference
+| Situation | Preferred location |
+|---|---|
+| Derived value / transformation | Render; `useMemo` only for measured expensive work |
+| User-triggered action | Event handler |
+| Prop/state changes require derived value | Render calculation |
+| Identity change resets all local state | `key` on the subtree |
+| Identity change adjusts one field but preserves other state | Derive that field or use a scoped adjustment; do not key the whole subtree |
+| External subscription | `useSyncExternalStore` when its snapshot/subscribe contract fits |
+| External widget/browser API/visibility analytics | Effect with symmetric cleanup where applicable |
+| Fetch | Existing project data framework (React Query, SWR, framework loader) by default; hand-rolled Effect only otherwise |
 
-| Situation | DON'T | DO |
-|-----------|-------|-----|
-| Derived state from props/state | `useState` + `useEffect` | Calculate during render |
-| Expensive calculations | `useEffect` to cache | `useMemo` |
-| Reset state on prop change | `useEffect` with `setState` | `key` prop |
-| User event responses | `useEffect` watching state | Event handler directly |
-| Notify parent of changes | `useEffect` calling `onChange` | Call in event handler |
-| Fetch data | `useEffect` without cleanup | `useEffect` with cleanup OR framework |
+Mixed event and prop logic: split it. Keep user-caused work in the event handler; derive prop-dependent values during render or synchronize an actual external system in an Effect.
 
-## When You DO Need Effects
+## Effect correctness loop
 
-- Synchronizing with **external systems** (non-React widgets, browser APIs)
-- **Subscriptions** to external stores (use `useSyncExternalStore` when possible)
-- **Analytics/logging** that runs because component displayed
-- **Data fetching** with proper cleanup (or use framework's built-in mechanism)
+1. State the synchronization invariant and external system.
+2. Choose the branch above; don't use an Effect merely to copy React state into React state.
+3. Check dependencies against every reactive value read. If dependencies cause unwanted repetition, fix identity/logic rather than suppressing the linter.
+4. Pair setup with cleanup that reverses the subscription/resource created. Cleanup must tolerate repeated invocation: Strict Mode replays setup/cleanup in development to expose asymmetry; it is not a reason to disable Strict Mode.
+5. Test rapid dependency changes and mount/unmount. For fetches, ensure stale results cannot win and handle non-2xx responses distinctly from network rejection.
 
-## When You DON'T Need Effects
+Effects capture a render's values. A stale closure is not repaired by omitting a dependency; it is repaired by correct dependencies and an appropriate lifetime/identity strategy. External subscriptions must also provide a stable snapshot contract for concurrent rendering and SSR/hydration.
 
-1. **Transforming data for rendering** - Calculate at top level, re-runs automatically
-2. **Handling user events** - Use event handlers, you know exactly what happened
-3. **Deriving state** - Just compute it: `const fullName = firstName + ' ' + lastName`
-4. **Chaining state updates** - Calculate all next state in the event handler
+## Task-gated detail
 
-## Decision Tree
-
-```
-Need to respond to something?
-├── User interaction (click, submit, drag)?
-│   └── Use EVENT HANDLER
-├── Component appeared on screen?
-│   └── Use EFFECT (external sync, analytics)
-├── Props/state changed and need derived value?
-│   └── CALCULATE DURING RENDER
-│       └── Expensive? Use useMemo
-└── Need to reset state when prop changes?
-    └── Use KEY PROP on component
-```
-
-## Detailed Guidance
-
-- [Anti-Patterns](./anti-patterns.md) - Common mistakes with fixes
-- [Better Alternatives](./alternatives.md) - useMemo, key prop, lifting state, useSyncExternalStore
+Read [anti-patterns](anti-patterns.md) when auditing existing Effects, fetch races, notification chains, or initialization bugs. Read [alternatives](alternatives.md) when designing state logic, resetting identity, lifting state, or subscribing to an external store.

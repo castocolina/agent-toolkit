@@ -1,11 +1,9 @@
 ---
 name: session-handoff
-description: "Creates comprehensive handoff documents for seamless AI agent session transfers. Triggered when: (1) user requests handoff/memory/context save, (2) context window approaches capacity, (3) major task milestone completed, (4) work session ending, (5) user says 'save state', 'create handoff', 'I need to pause', 'context is getting full', (6) resuming work with 'load handoff', 'resume from', 'continue where we left off'. Proactively suggests handoffs after substantial work (multiple file edits, complex debugging, architecture decisions). Solves long-running agent context exhaustion by enabling fresh agents to continue with zero ambiguity."
+description: "Create, validate, and resume project-session handoff documents in .claude/handoffs/ using bundled Python scaffolding, secret checks, and staleness reports. Use when the user asks to pause coding, save session state, transfer work to another agent, load a handoff, or resume a handoff chain. Suggest a handoff at major milestones or near context limits. Not for ordinary status emails, ADRs, commit messages, or updates to persistent harness memory."
 ---
 
 # Handoff
-
-Creates comprehensive handoff documents that enable fresh AI agents to seamlessly continue work with zero ambiguity. Solves the long-running agent context exhaustion problem.
 
 ## Mode Selection
 
@@ -27,26 +25,19 @@ Determine which mode applies:
 Run the smart scaffold script to create a pre-filled handoff document:
 
 ```bash
-python scripts/create_handoff.py [task-slug]
+python "<resolved skill directory>/scripts/create_handoff.py" [task-slug]
 ```
 
-Example: `python scripts/create_handoff.py implementing-user-auth`
+Example: `python "<resolved skill directory>/scripts/create_handoff.py" implementing-user-auth`
 
 **For continuation handoffs** (linking to previous work):
 ```bash
-python scripts/create_handoff.py "auth-part-2" --continues-from 2024-01-15-auth.md
+python "<resolved skill directory>/scripts/create_handoff.py" "auth-part-2" --continues-from 2024-01-15-auth.md
 ```
-
-The script will:
-- Create `.claude/handoffs/` directory if needed
-- Generate timestamped filename
-- Pre-fill: timestamp, project path, git branch, recent commits, modified files
-- Add handoff chain links if continuing from previous
-- Output file path for editing
 
 ### Step 2: Complete the Handoff Document
 
-Open the generated file and fill in all `[TODO: ...]` sections. Prioritize these sections:
+Open the generated file. Before writing, ask what the next agent would waste time rediscovering. Record verified facts separately from proposals; prioritize state that cannot be reconstructed from the repository, exact reproduction commands and observed results, rejected hypotheses with reasons, and unresolved assumptions. Complete the three required sections (current state, important context, immediate next steps) plus task-relevant evidence; remove irrelevant optional scaffold sections or mark them not applicable. Scale depth to the remaining work.
 
 1. **Current State Summary** - What's happening right now
 2. **Important Context** - Critical info the next agent MUST know
@@ -60,7 +51,7 @@ Use the template structure in [references/handoff-template.md](references/handof
 Run the validation script to check completeness and security:
 
 ```bash
-python scripts/validate_handoff.py <handoff-file>
+python "<resolved skill directory>/scripts/validate_handoff.py" <handoff-file>
 ```
 
 The validator checks:
@@ -70,7 +61,7 @@ The validator checks:
 - [ ] Referenced files exist
 - [ ] Quality score (0-100)
 
-**Do not finalize a handoff with secrets detected or score below 70.**
+**Gotchas:** Secret scanning is heuristic, not proof; manually inspect the final handoff. Record environment variable names only, never secret values. Do not finalize with secrets, TODO placeholders, missing required sections, or a score below 70. The scaffold lists only ten modified-file rows and omits untracked files; inspect git status and include relevant untracked files yourself. `list_handoffs.py` marks Complete from TODO absence, not semantic validation.
 
 ### Step 4: Confirm Handoff
 
@@ -87,7 +78,7 @@ Report to user:
 List handoffs in the current project:
 
 ```bash
-python scripts/list_handoffs.py
+python "<resolved skill directory>/scripts/list_handoffs.py"
 ```
 
 This shows all handoffs with dates, titles, and completion status.
@@ -97,7 +88,7 @@ This shows all handoffs with dates, titles, and completion status.
 Before loading, check how current the handoff is:
 
 ```bash
-python scripts/check_staleness.py <handoff-file>
+python "<resolved skill directory>/scripts/check_staleness.py" <handoff-file>
 ```
 
 Staleness levels:
@@ -117,7 +108,7 @@ The script checks:
 
 Read the relevant handoff document completely before taking any action.
 
-If handoff is part of a chain (has "Continues from" link), also read the linked previous handoff for full context.
+If handoff is part of a chain, read the latest plus at most two predecessors. For older links, summarize the relevant lineage rather than loading an unbounded chain.
 
 ### Step 4: Verify Context
 
@@ -143,26 +134,7 @@ Reference these sections as you work:
 As you work:
 - Mark completed items in "Pending Work"
 - Add new discoveries to relevant sections
-- For long sessions: create a new handoff with `--continues-from` to chain them
-
-## Handoff Chaining
-
-For long-running projects, chain handoffs together to maintain context lineage:
-
-```
-handoff-1.md (initial work)
-    ↓
-handoff-2.md --continues-from handoff-1.md
-    ↓
-handoff-3.md --continues-from handoff-2.md
-```
-
-Each handoff in the chain:
-- Links to its predecessor
-- Can mark older handoffs as superseded
-- Provides context breadcrumbs for new agents
-
-When resuming from a chain, read the most recent handoff first, then reference predecessors as needed.
+- For long sessions: create a new handoff with `--continues-from` to link the predecessor
 
 ## Storage Location
 

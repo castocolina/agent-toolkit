@@ -1,13 +1,3 @@
-# Commit message template (Conventional Commits)
+# Repository commit-message overrides
 
-```text
-<type>(<scope>): <summary>
-
-<What changed.>
-<Why it changed.>
-```
-
-Notes:
-- Keep the summary imperative and specific ("Add", "Fix", "Remove", "Refactor").
-- Avoid implementation minutiae; focus on behavior and intent.
-- If breaking: use `!` in header and/or add `BREAKING CHANGE:` footer.
+Use the repository's configured type/scope vocabulary and subject-length limit when present. Verify scopes against current paths, especially after monorepo moves. Add a body only when it records necessary context or rationale; add a breaking-change footer only for an actual compatibility break. The main skill defines the required Conventional Commit shape.

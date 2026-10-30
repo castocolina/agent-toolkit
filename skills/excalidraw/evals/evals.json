@@ -1,0 +1,35 @@
+{
+  "skill_name": "excalidraw",
+  "evals": [
+    {
+      "id": "casual-flow-create",
+      "prompt": "Could you sketch an Excalidraw flow for password reset: request link, verify token, set new password, done?",
+      "expected_output": "A plan for an editable Excalidraw flowchart with labeled steps, directional connectors, and a concise text-only description of output.",
+      "assertions": [
+        "Includes request-link, token verification, new-password, and completion steps",
+        "Connects the steps in the correct order with directional arrows",
+        "Describes an editable Excalidraw artifact rather than a static-only image"
+      ]
+    },
+    {
+      "id": "architecture-delegate",
+      "prompt": "For architecture.excalidraw.json, add a Redis cache connected to the existing API service. Follow the skill’s isolation rule and report only a concise text summary, not raw diagram JSON.",
+      "expected_output": "The response delegates file reading/editing to an isolated worker, requests minimal text-only reporting, and does not include raw JSON.",
+      "assertions": [
+        "Explicitly keeps the main agent from reading/parsing Excalidraw JSON directly",
+        "Requests delegation for modifying the existing diagram",
+        "Requests a text-only summary and no raw JSON"
+      ]
+    },
+    {
+      "id": "small-file-exception",
+      "prompt": "This is just a tiny .excalidraw file with one box. Read it here and tell me the label; it’s too small to need delegation.",
+      "expected_output": "A refusal to inspect the diagram directly in main context and a recommendation to delegate text extraction despite the file being small.",
+      "assertions": [
+        "Does not offer to read or parse the Excalidraw file in the main context",
+        "States that even small-file inspection must be delegated",
+        "Asks the delegate for extracted labels or a concise summary, not full JSON"
+      ]
+    }
+  ]
+}

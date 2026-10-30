@@ -1,0 +1,35 @@
+{
+  "skill_name": "naming-analyzer",
+  "evals": [
+    {
+      "id": "ts-review",
+      "prompt": "Review `const d = new Date(); const usrCfg = loadConfig(); function getUser(id) { const u=fetchUser(id); u.lastLogin=Date.now(); saveUser(u); return u; }`.",
+      "expected_output": "Suggest descriptive names and flag getUser side effect.",
+      "assertions": [
+        "Replaces `d` and `usrCfg`",
+        "Flags `getUser` as misleading mutator",
+        "Uses JS conventions"
+      ]
+    },
+    {
+      "id": "python-names",
+      "prompt": "Python: `class user_profile`, `def calc_ttl(arr)`, `MAX=5`. Correct names.",
+      "expected_output": "PascalCase class, descriptive snake_case function/param, descriptive uppercase constant.",
+      "assertions": [
+        "PascalCase class",
+        "Descriptive snake_case names",
+        "Descriptive UPPER_SNAKE_CASE constant"
+      ]
+    },
+    {
+      "id": "context-edge",
+      "prompt": "Rename loop `i` and `id` in `user.id`? Assess context.",
+      "expected_output": "Loop i and common id are acceptable absent contrary context.",
+      "assertions": [
+        "Allows loop counter `i`",
+        "Recognizes common `id` abbreviation",
+        "Does not insist on needless renaming"
+      ]
+    }
+  ]
+}

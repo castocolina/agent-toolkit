@@ -132,17 +132,11 @@ type FormState = {
   message?: string;
 };
 
-type FormData = {
-  email: string;
-  password: string;
-};
-
-// Server Action
-async function login(
+// actions/login.ts ('use server' module)
+export async function login(
   prevState: FormState,
-  formData: FormData
+  formData: globalThis.FormData
 ): Promise<FormState> {
-  'use server';
 
   const email = formData.get('email');
   const password = formData.get('password');
@@ -172,11 +166,14 @@ async function login(
   }
 }
 
-// Client Component
+// LoginForm.tsx ('use client' module)
+import { login } from './actions/login';
+
 export function LoginForm() {
+  const initialState: FormState = { success: false };
   const [state, formAction, isPending] = useActionState<FormState, FormData>(
     login,
-    {} // Initial state
+    initialState
   );
 
   return (
@@ -225,28 +222,38 @@ export function LoginForm() {
 
 ### useActionState with Optimistic Updates
 
-```typescript
-'use client';
+**Server module** (`actions/todos.ts`):
 
-import { useActionState, useOptimistic } from 'react';
+```typescript
+'use server';
 
 type Todo = { id: string; title: string; completed: boolean };
+type TodoState = { todos: Todo[] };
 
-async function toggleTodo(
-  prevState: { todos: Todo[] },
+export async function toggleTodo(
+  prevState: TodoState,
   formData: FormData
-): Promise<{ todos: Todo[] }> {
-  'use server';
-
-  const todoId = formData.get('todoId') as string;
+): Promise<TodoState> {
+  const todoId = formData.get('todoId');
+  if (typeof todoId !== 'string') throw new Error('Missing todoId');
   await db.todo.update({
     where: { id: todoId },
     data: { completed: { toggle: true } },
   });
 
-  const todos = await db.todo.findMany();
-  return { todos };
+  return { todos: await db.todo.findMany() };
 }
+```
+
+**Client component** (`TodoList.tsx`):
+
+```typescript
+'use client';
+
+import { useActionState, useOptimistic } from 'react';
+import { toggleTodo } from './actions/todos';
+
+type Todo = { id: string; title: string; completed: boolean };
 
 export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
   const [state, formAction] = useActionState(
@@ -293,7 +300,7 @@ use() unwraps promises and context — enables new patterns for data fetching.
 ```typescript
 // Server Component
 async function UserPage({ params }: { params: { id: string } }) {
-  // Pass promise without awaiting
+  // Create the promise in the Server Component and pass the stable resource down.
   const userPromise = fetchUser(params.id);
 
   return (
@@ -339,14 +346,16 @@ type Props = {
   userId?: string;
 };
 
+// A Suspense boundary must exist above this component.
 export function UserDisplay({ userPromise, userId }: Props) {
   let user: User | undefined;
 
   if (userPromise) {
-    user = use(userPromise); // Conditional use() - allowed!
+    user = use(userPromise); // Conditional use() is allowed; promise must be stable.
   } else if (userId) {
-    // Fetch inline
-    user = use(fetchUser(userId));
+    // Resolve through a Suspense-enabled cache keyed by userId; do not create
+    // a fresh uncached promise during client render.
+    user = use(userCache.getPromise(userId));
   }
 
   if (!user) return <div>No user data</div>;
@@ -366,6 +375,7 @@ type Props = {
   userPromises: Promise<User>[];
 };
 
+// A Suspense boundary must exist above this component; each promise has a stable owner.
 export function UserList({ userPromises }: Props) {
   return (
     <ul>
@@ -461,6 +471,7 @@ type Item = { id: string; name: string; quantity: number };
 
 export function ShoppingCart({ items: initialItems }: { items: Item[] }) {
   const [items, setItems] = useState(initialItems);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const [optimisticItems, updateOptimistic] = useOptimistic(
@@ -471,18 +482,22 @@ export function ShoppingCart({ items: initialItems }: { items: Item[] }) {
       )
   );
 
-  async function updateQuantity(id: string, quantity: number) {
-    // Optimistic update
-    updateOptimistic({ id, quantity });
-
-    // Server update
+  function updateQuantity(id: string, quantity: number) {
     startTransition(async () => {
-      const updated = await fetch(`/api/cart/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ quantity }),
-      }).then((r) => r.json());
-
-      setItems(updated);
+      updateOptimistic({ id, quantity });
+      try {
+        const response = await fetch(`/api/cart/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ quantity }),
+        });
+        if (!response.ok) throw new Error('Cart update failed');
+        const updated: Item[] = await response.json();
+        // State updates after await need a new transition in React 19.
+        startTransition(() => setItems(updated));
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Cart update failed');
+        // No base-state update means optimistic state rolls back.
+      }
     });
   }
 

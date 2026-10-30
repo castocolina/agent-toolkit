@@ -1,0 +1,86 @@
+{
+  "skill": "excalidraw",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 12,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 109,
+  "max_total": 125,
+  "percent": 87.2,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 8,
+      "evidence": "The main agent must not read, parse, or print the Excalidraw JSON directly. Say up front that even a tiny file or a single label lookup must be delegated, including when the user calls it too small to need delegation.",
+      "fix": "State the delegation rule once and cut the repeated restatements within the same paragraph; the rule is expert, the triple repetition is token waste."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 10,
+      "evidence": "## Safe editing procedure",
+      "fix": "Add a short entry-point decision above the procedure (create / inspect / modify / compare) so each advertised mode routes to its own workflow instead of all modes funneling into the editing steps."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 12,
+      "evidence": "For embedded PNG source, use a tool that preserves the image and metadata; do not treat it as plain JSON.",
+      "fix": "Add a Format-gotchas entry for .excalidraw.png naming the specific loss (image editors that re-encode the PNG strip the embedded scene chunk) so the hazard lives with the other gotchas."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 12,
+      "evidence": "For embedded PNG source, use a tool that preserves the image and metadata; do not treat it as plain JSON.",
+      "fix": "Name the default tool or exact operation for editing .excalidraw.png; vague guidance on a fragile, loss-prone operation invites corruption."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/excalidraw/evals/evals.json",
+      "line": 16,
+      "evidence": "\"prompt\": \"For architecture.excalidraw.json, add a Redis cache connected to the existing API service. Follow the skill's isolation rule and report only a concise text summary, not raw diagram JSON.\"",
+      "fix": "Bundle a small evals/files/architecture.excalidraw.json fixture so the modify path runs against a real scene; the referenced file does not exist."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 3,
+      "evidence": "Create, inspect, modify, and compare editable Excalidraw diagrams.",
+      "fix": "Add a compare workflow (delegate a pairwise label/binding diff to the worker and report differences textually) or drop 'compare' from the description; the body defines no comparison procedure."
+    }
+  ]
+}

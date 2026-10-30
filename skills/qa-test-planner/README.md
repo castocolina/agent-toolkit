@@ -1,10 +1,10 @@
 # QA Test Planner
 
-A comprehensive Claude Code skill for QA engineers to generate test plans, manual test cases, regression test suites, Figma design validations, and structured bug reports.
+A Claude Code skill for creating risk-traceable manual QA plans, test cases, regression suites, Figma validation checklists, and bug reports when explicitly invoked by name.
 
 ## Purpose
 
-The QA Test Planner skill helps quality assurance professionals create thorough, well-structured testing documentation quickly and consistently. It eliminates the repetitive work of formatting test plans and cases while ensuring best practices are followed for test coverage, bug reporting, and design validation.
+The QA Test Planner creates manual QA deliverables from requirements and evidence, with explicit coverage, risk, and execution criteria.
 
 ## When to Use This Skill
 
@@ -15,8 +15,7 @@ Use the QA Test Planner skill when you need to:
 - Build regression test suites (smoke, targeted, or full)
 - Validate UI implementation against Figma designs
 - Document bugs with clear reproduction steps
-- Establish testing standards for your team
-- Train new QA engineers on proper documentation
+
 
 ### Activation
 
@@ -32,21 +31,14 @@ use the skill qa-test-planner
 
 The QA Test Planner follows a three-phase workflow:
 
-### 1. Analyze Phase
-- Parses your feature description or requirement
-- Identifies the types of testing needed (functional, UI, integration, etc.)
-- Determines scope, priorities, and edge cases to cover
+### 1. Identify the deliverable
+Choose a test plan, manual cases, regression/smoke suite, Figma comparison, or bug report based on the explicit request.
 
-### 2. Generate Phase
-- Creates structured deliverables using proven templates
-- Applies QA best practices automatically
-- Includes comprehensive edge cases and test variations
-- Organizes content for easy execution and tracking
+### 2. Build from evidence
+Map requirements and risks to observable pass/fail criteria, executable cases, and test data. State uncovered requirements and blocked tests.
 
-### 3. Validate Phase
-- Checks completeness of generated documentation
-- Verifies traceability between requirements and tests
-- Ensures all steps are clear and actionable
+### 3. Review
+Check that cases are standalone, reproducible, and prioritized by risk.
 
 ## Key Features
 
@@ -70,18 +62,10 @@ Generates structured test cases with:
 - Edge cases and variations
 
 ### 3. Regression Test Suites
-Builds tiered test suites:
-- **Smoke tests** (15-30 min) - Critical paths only
-- **Targeted regression** (30-60 min) - Affected areas
-- **Full regression** (2-4 hours) - Comprehensive coverage
-- **Sanity tests** (10-15 min) - Quick validation after hotfixes
+Builds prioritized regression and smoke suites based on changed code, critical journeys, failure impact, and execution cost.
 
 ### 4. Figma Design Validation
-Integrates with Figma MCP to:
-- Extract design specifications (colors, spacing, typography)
-- Compare implementation against design system
-- Create validation checklists for UI testing
-- Document visual discrepancies as bugs
+When Figma MCP is available, compare the matching frame and implementation context. Otherwise, request screenshots or specifications and state the limitation.
 
 ### 5. Bug Report Documentation
 Generates structured bug reports with:
@@ -139,11 +123,7 @@ Build a smoke test suite for the payment module
 ```
 
 **Output:**
-A prioritized smoke test suite (15-30 min execution) with:
-- Critical path tests (payment processing, refunds)
-- Execution order and dependencies
-- Pass/fail criteria
-- Quick validation checklist
+A prioritized smoke suite that focuses on critical journeys and states its pass/fail criteria, dependencies, and any coverage gaps.
 
 ### Example 4: Validate Against Figma
 
@@ -184,17 +164,13 @@ A structured bug report with:
 
 ## Interactive Scripts
 
-The skill includes bash scripts for guided test case and bug report creation:
+Optional local document generators are available; they are not test automation. Inspect before use, and do not invoke them in a non-interactive session:
 
 ### Generate Test Cases Script
 ```bash
 ./scripts/generate_test_cases.sh
 ```
-Prompts for:
-- Feature name
-- Test type (functional, UI, integration)
-- Number of test cases
-- Priority level
+Prompts for a single test case: ID and title, priority (P0-P3), test type, estimated time, objective, preconditions, steps with expected results, and test data. It writes one test-case file per run.
 
 ### Create Bug Report Script
 ```bash
@@ -209,12 +185,12 @@ Prompts for:
 
 ## Reference Documentation
 
-The skill includes comprehensive reference guides in the `references/` directory:
+Use only these shipped references for additional detail:
 
-- **test_case_templates.md** - Standard formats for all test types
-- **bug_report_templates.md** - Bug documentation templates
-- **regression_testing.md** - Suite building and execution strategies
-- **figma_validation.md** - Design-implementation validation workflows
+- `references/test_case_templates.md` - Manual test case formats
+- `references/bug_report_templates.md` - Bug report formats
+- `references/regression_testing.md` - Regression suite selection and gating
+- `references/figma_validation.md` - Design comparison guidance
 
 ## Quality Standards
 
@@ -249,27 +225,9 @@ The skill helps you avoid common testing mistakes:
 | Generic bug titles | Hard to track and prioritize | Be specific: "[Feature] issue when [action]" |
 | Skipping edge cases | Miss critical bugs | Include boundary values, nulls, empty states |
 
-## Integration with Figma MCP
+## Figma Design Validation
 
-When Figma MCP is configured, the skill can:
-
-1. Extract design specifications from Figma URLs
-2. Generate pixel-perfect validation test cases
-3. Compare implementation against design tokens
-4. Create bug reports with Figma links for UI discrepancies
-
-**Example Query:**
-```
-Get button specifications from Figma design [URL]
-```
-
-**Returns:**
-- Dimensions (width x height)
-- Colors (background, text, border with hex values)
-- Typography (font family, size, weight, line-height)
-- Spacing (padding, margin)
-- Border radius
-- Interactive states (default, hover, active, disabled)
+Use Figma MCP only when it is available. Confirm the frame/version, viewport, theme, and device-pixel ratio before assessing visual differences. Without MCP access, request screenshots or specifications and state the limitation.
 
 ## Best Practices
 
@@ -292,22 +250,22 @@ Get button specifications from Figma design [URL]
 - Prioritize critical paths
 - Run smoke tests frequently (daily/per build)
 - Update suite after each release
-- Track coverage to identify gaps
+- Make uncovered requirements and blocked tests explicit
 
 ## Skill Structure
 
 ```
 qa-test-planner/
-├── README.md                          # This file
-├── SKILL.md                           # Main skill definition and templates
+├── README.md
+├── SKILL.md
 ├── references/
-│   ├── test_case_templates.md        # Test case formats
-│   ├── bug_report_templates.md       # Bug documentation templates
-│   ├── regression_testing.md         # Regression suite strategies
-│   └── figma_validation.md           # Design validation workflows
+│   ├── bug_report_templates.md
+│   ├── figma_validation.md
+│   ├── regression_testing.md
+│   └── test_case_templates.md
 └── scripts/
-    ├── generate_test_cases.sh        # Interactive test case generator
-    └── create_bug_report.sh          # Interactive bug report creator
+    ├── create_bug_report.sh
+    └── generate_test_cases.sh
 ```
 
 ## Output Formats
@@ -322,15 +280,7 @@ The structured format ensures consistency across your team and makes test docume
 
 ## Time Savings
 
-Typical time to create documentation:
-
-| Deliverable | Manual Time | With Skill | Time Saved |
-|-------------|-------------|------------|------------|
-| Test Plan | 2-3 hours | 10-15 min | 90% |
-| 10 Test Cases | 1-2 hours | 5-10 min | 85% |
-| Regression Suite | 2-4 hours | 15-20 min | 90% |
-| Bug Report | 10-15 min | 5 min | 50% |
-| Figma Validation | 30-60 min | 10-15 min | 75% |
+The skill does not prescribe fixed authoring-time or pass-rate targets. Set release gates from critical requirements, unresolved risk, blocked coverage, and stakeholder acceptance.
 
 ## Getting Started
 
@@ -341,15 +291,6 @@ Typical time to create documentation:
 
 ## Support
 
-For detailed information on specific deliverables, see SKILL.md which includes:
-- Deep dive sections on each deliverable type
-- Complete templates with examples
-- QA process workflow
-- Test execution tracking
-- Coverage matrix templates
+See `SKILL.md` for the workflow and safeguards. Use the reference files listed above for deliverable-specific formats and guidance.
 
 ---
-
-**"Testing shows the presence, not the absence of bugs."** - Edsger Dijkstra
-
-**"Quality is not an act, it is a habit."** - Aristotle

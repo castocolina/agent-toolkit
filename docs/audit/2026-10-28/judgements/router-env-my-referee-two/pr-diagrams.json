@@ -1,0 +1,77 @@
+{
+  "skill": "pr-diagrams",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 17,
+      "evidence": "gh pr create --repo \"$REPO\" --base \"$BASE\" --head \"$HEAD\" --title \"$TITLE\" --body-file \"$AD/body.md\" --attach \"$PNG\"",
+      "fix": "Keep only the non-obvious pairing rule (one gh call, --attach path must equal the body image path character-for-character) and drop the standard flag-by-flag invocation the model already knows"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 24,
+      "evidence": "## Reuse \u2014 the attach-versus-reuse routing exists only implicitly in the Reuse paragraph",
+      "fix": "Add a one-line decision under the intro: promotion (copying merged PRs forward) \u2192 Reuse; any new diagram \u2192 Attach"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 8,
+      "evidence": "(gh >= 2.101) \u2014 the environment landmines (gh >= 2.101 for --attach, duplicate basenames failing pre-conversion, empty stdout on failure) are buried mid-paragraph instead of a Gotchas section",
+      "fix": "Collect the environment-specific landmines under a Gotchas heading so the agent reads them before hitting the situation"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+      "line": 203,
+      "evidence": "*) die \"usage: pr-diagrams.sh repo|related|reviewers|render ...\" \u2014 usage is only printed on error; there is no --help",
+      "fix": "Add a help subcommand or --help flag printing each subcommand, its arguments, output shape and exit semantics"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 19,
+      "evidence": "gh pr edit \"$N\" --repo \"$REPO\" --body-file \"$AD/body.md\" --attach \"$PNG\" \u2014 $AD, $N, $REPO, $BASE, $HEAD are never defined",
+      "fix": "Define the placeholders at first use: $AD is a scratch directory holding body.md, $N the PR number, $REPO from the repo subcommand, $BASE/$HEAD/$TITLE from the task"
+    }
+  ]
+}

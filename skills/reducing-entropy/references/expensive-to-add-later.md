@@ -44,7 +44,7 @@ Before invoking PAGNI, ask:
 2. **Is this a known pattern from experience?** (not speculative)
 3. **Is the cost of adding it now actually low?** (minutes/hours, not days)
 
-If yes to all three, it's a PAGNI. Otherwise, YAGNI still applies.
+If yes to all three, it's a PAGNI candidate, not automatic authorization. Correctness, security, compliance, and explicit user-approved data-retention behavior override the size gate; validate behavior before retaining or adding it. Otherwise prefer net deletion. When evidence or scope is contested, name the tension and ask the user.
 
 ## The Balance
 

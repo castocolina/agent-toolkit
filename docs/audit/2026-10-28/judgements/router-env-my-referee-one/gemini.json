@@ -1,0 +1,77 @@
+{
+  "skill": "gemini",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 11,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 110,
+  "max_total": 125,
+  "percent": 88.0,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 21,
+      "evidence": "\"Capture exit status and output\" and generic findings/reporting instructions occupy substantial activation content, while the external-directory inclusion rule is repeated in workflow steps 1 and 2 and again before the examples.",
+      "fix": "Consolidate directory-access guidance into one authoritative rule and shorten familiar execution/reporting advice. Preserve the non-interactive approval trap, owned-process cleanup, and source-verification requirements."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 36,
+      "evidence": "The example includes \"--include-directories /work/api --include-directories /work/web\" but asks Gemini to review \"/work/plan.md\". When invoked outside /work, the plan is outside both included directories, and prompt text alone does not establish access.",
+      "fix": "Pass the supplied plan text directly, copy it into an authorized scoped workspace, or explicitly include its containing directory after checking the expanded access boundary. Correct both plan-review examples."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 28,
+      "evidence": "\"timeout 300 gemini\" sends the default termination signal without a kill-after deadline. A child that ignores TERM can outlive the supposed execution bound.",
+      "fix": "Use an explicit escalation bound such as timeout --signal=TERM --kill-after=10s 300, and document owned-process-group handling for background execution."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/gemini/evals/evals.json",
+      "line": 7,
+      "evidence": "\"A safe proposed Gemini CLI command ... has not been run\" is the expected result for a prompt asking to use Gemini. All three evals assess command proposals rather than captured reviews, failures, or verification of returned claims.",
+      "fix": "Make proposal-only intent explicit in proposal tests. Add fixtures for successful and failed CLI responses, timeout handling, and unsupported findings, with assertions distinguishing verified results from incomplete or rejected analysis."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/gemini/evals/trigger-queries.json",
+      "line": 3,
+      "evidence": "\"use Gemini CLI for a cross-directory architecture review\" exemplifies the positive set: every should-trigger query explicitly names Gemini, although the description also targets unnamed second-opinion reviews.",
+      "fix": "Replace some explicit-name positives with realistic second-opinion and big-context requests that do not name Gemini, including a contextual multi-directory request."
+    }
+  ]
+}

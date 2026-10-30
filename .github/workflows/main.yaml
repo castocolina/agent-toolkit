@@ -40,6 +40,15 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install uv
+        run: python3 -m pip install uv
+
+      - name: Skill script tests
+        run: bash scripts/audit/run-script-tests.sh
+
+      - name: Validate skills
+        run: python3 scripts/audit/audit.py check --strict
+
       - name: Validate dist/ is up to date
         if: github.event_name == 'pull_request'
         run: |

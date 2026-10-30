@@ -269,22 +269,7 @@ function App() {
   }, []);
 }
 
-// GOOD: Module-level guard
-let didInit = false;
+A guard is valid only after defining the required lifetime: once per page, root, component, or authentication session. A module-global boolean cannot distinguish independent roots or session changes. Setting it before asynchronous or fallible work succeeds also makes a thrown initialization permanently look complete.
 
-function App() {
-  useEffect(() => {
-    if (!didInit) {
-      didInit = true;
-      loadDataFromLocalStorage();
-      checkAuthToken();
-    }
-  }, []);
-}
-
-// ALSO GOOD: Module-level execution
-if (typeof window !== 'undefined') {
-  checkAuthToken();
-  loadDataFromLocalStorage();
-}
+Prefer idempotent initialization with explicit completion/failure handling. If initialization is cached, scope the promise to the intended lifetime, clear/retry it on failure when retry is valid, and invalidate it when that lifetime ends (for example, on auth-session change). Test a failed initialization followed by retry, remount behavior, multiple roots where applicable, and session change. Do not move effect work to module scope unless import-time execution and its lifetime are explicitly safe.
 ```

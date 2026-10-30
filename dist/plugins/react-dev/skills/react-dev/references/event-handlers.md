@@ -375,14 +375,12 @@ Reusable handlers with proper typing.
 
 ```typescript
 // Generic change handler
-function createChangeHandler<T extends HTMLElement>(
+type ValueElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+
+function createChangeHandler<T extends ValueElement>(
   callback: (value: string) => void
-) {
-  return (event: React.ChangeEvent<T>) => {
-    if ('value' in event.target) {
-      callback(event.target.value);
-    }
-  };
+): React.ChangeEventHandler<T> {
+  return (event) => callback(event.currentTarget.value);
 }
 
 // Usage

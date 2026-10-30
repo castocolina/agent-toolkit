@@ -25,8 +25,8 @@ Use this skill when you need to:
 - "make a presentation"
 - "create Marp slides"
 - "make it look good"
-- "良い感じにして" (make it nice - Japanese)
-- "かっこよく" (make it cool - Japanese)
+- "make it look nice"
+- "make it cool"
 
 ## How It Works
 
@@ -42,7 +42,7 @@ The skill intelligently selects themes based on content:
 ### 2. Content Structuring
 Follows best practices automatically:
 - Title slide with lead class styling
-- Concise headings (5-7 characters for Japanese)
+- Concise headings (about 3-6 words)
 - 3-5 bullet points per slide
 - Adequate whitespace and visual hierarchy
 - Consistent formatting throughout
@@ -139,9 +139,9 @@ Agent: I'll use the business theme for your corporate presentation.
 [Uses formal tone and structure]
 ```
 
-### Example 4: Vague Request (Japanese)
+### Example 4: Vague Request
 ```
-User: このスライドを良い感じにして
+User: Make these slides look nice
 
 Agent: I'll enhance this presentation's visual appeal.
 [Analyzes content to infer appropriate theme]
@@ -184,7 +184,7 @@ All generated slides are saved to `/mnt/user-data/outputs/` with `.md` extension
 ## Quality Standards
 
 Every presentation created follows:
-- Concise titles (5-7 characters for Japanese)
+- Concise titles (about 3-6 words)
 - 3-5 bullet points per slide
 - Proper visual hierarchy
 - Adequate whitespace

@@ -30,10 +30,10 @@ prompt_input() {
         read -r input
         
         if [ -n "$input" ]; then
-            eval "$var_name=\"$input\""
+            printf -v "$var_name" '%s' "$input"
             break
         elif [ "$required" != "true" ]; then
-            eval "$var_name=\"\""
+            printf -v "$var_name" '%s' ''
             break
         else
             echo -e "${RED}This field is required.${NC}"
@@ -110,7 +110,7 @@ while true; do
     if [ -z "$line" ]; then
         break
     fi
-    PRECONDITIONS="${PRECONDITIONS}- ${line}\n"
+    PRECONDITIONS+="- ${line}"$'\n'
 done
 
 # Step 4: Test Steps
@@ -135,7 +135,7 @@ while true; do
     
     prompt_input "Expected result:" EXPECTED true
     
-    TEST_STEPS="${TEST_STEPS}${STEP_NUM}. ${ACTION}\n   **Expected:** ${EXPECTED}\n\n"
+    TEST_STEPS+="${STEP_NUM}. ${ACTION}"$'\n'"   **Expected:** ${EXPECTED}"$'\n\n'
     ((STEP_NUM++))
 done
 
@@ -166,20 +166,39 @@ prompt_input "Related test cases (IDs):" RELATED_TCS false
 prompt_input "Notes or comments:" NOTES false
 
 # Generate filename
-FILENAME="${TC_ID}.md"
-FILENAME="${FILENAME//[^a-zA-Z0-9_-]/}"
+SAFE_TC_ID="${TC_ID//[^a-zA-Z0-9_-]/}"
+FILENAME="${SAFE_TC_ID}.md"
 
 OUTPUT_DIR="."
-if [ ! -z "$1" ]; then
-    OUTPUT_DIR="$1"
-fi
+OVERWRITE=false
+for arg in "$@"; do
+    if [ "$arg" = "--overwrite" ]; then
+        OVERWRITE=true
+    else
+        OUTPUT_DIR="$arg"
+    fi
+done
 
 OUTPUT_FILE="$OUTPUT_DIR/$FILENAME"
+
+if [ -e "$OUTPUT_FILE" ] && [ "$OVERWRITE" != true ]; then
+    echo -e "${RED}Error: $OUTPUT_FILE already exists. Use --overwrite to replace it.${NC}" >&2
+    exit 1
+fi
 
 # Generate test case
 echo ""
 echo -e "${BLUE}Generating test case...${NC}"
 echo ""
+
+if [ "$OVERWRITE" = true ]; then
+    : > "$OUTPUT_FILE"
+else
+    (set -o noclobber; : > "$OUTPUT_FILE") || {
+        echo -e "${RED}Error: $OUTPUT_FILE already exists. Use --overwrite to replace it.${NC}" >&2
+        exit 1
+    }
+fi
 
 cat > "$OUTPUT_FILE" << EOF
 # ${TC_ID}: ${TC_TITLE}

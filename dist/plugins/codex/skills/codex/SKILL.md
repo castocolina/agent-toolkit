@@ -1,66 +1,35 @@
 ---
 name: codex
-description: Use when the user asks to run Codex CLI (codex exec, codex resume) or references OpenAI Codex for code analysis, refactoring, or automated editing. Uses GPT-5.2 by default for state-of-the-art software engineering.
+description: "Run or resume OpenAI Codex CLI tasks with `codex exec` or `codex exec resume`, choosing permissions for read-only analysis or user-authorized workspace edits and reporting the outcome. Use when asked to invoke Codex for review, debugging, refactoring, automated edits, or continuation of an existing session. Not for installing the CLI, configuring credentials, conceptual explanations, summarizing prior output without invocation, or other vendors' CLIs."
 ---
 
-# Codex Skill Guide
+# Codex CLI
 
-## Running a Task
-1. Default to `gpt-5.2` model. Ask the user (via `AskUserQuestion`) which reasoning effort to use (`xhigh`,`high`, `medium`, or `low`). User can override model if needed (see Model Options below).
-2. Select the sandbox mode required for the task; default to `--sandbox read-only` unless edits or network access are necessary.
-3. Assemble the command with the appropriate options:
-   - `-m, --model <MODEL>`
-   - `--config model_reasoning_effort="<high|medium|low>"`
-   - `--sandbox <read-only|workspace-write|danger-full-access>`
-   - `--full-auto`
-   - `-C, --cd <DIR>`
-   - `--skip-git-repo-check`
-3. Always use --skip-git-repo-check.
-4. When continuing a previous session, use `codex exec --skip-git-repo-check resume --last` via stdin. When resuming don't use any configuration flags unless explicitly requested by the user e.g. if he species the model or the reasoning effort when requesting to resume a session. Resume syntax: `echo "your prompt here" | codex exec --skip-git-repo-check resume --last 2>/dev/null`. All flags have to be inserted between exec and resume.
-5. **IMPORTANT**: By default, append `2>/dev/null` to all `codex exec` commands to suppress thinking tokens (stderr). Only show stderr if the user explicitly requests to see thinking tokens or if debugging is needed.
-6. Run the command, capture stdout/stderr (filtered as appropriate), and summarize the outcome for the user.
-7. **After Codex completes**, inform the user: "You can resume this Codex session at any time by saying 'codex resume' or asking me to continue with additional analysis or changes."
+## Preflight
 
-### Quick Reference
-| Use case | Sandbox mode | Key flags |
-| --- | --- | --- |
-| Read-only review or analysis | `read-only` | `--sandbox read-only 2>/dev/null` |
-| Apply local edits | `workspace-write` | `--sandbox workspace-write --full-auto 2>/dev/null` |
-| Permit network or broad access | `danger-full-access` | `--sandbox danger-full-access --full-auto 2>/dev/null` |
-| Resume recent session | Inherited from original | `echo "prompt" \| codex exec --skip-git-repo-check resume --last 2>/dev/null` (no flags allowed) |
-| Run from another directory | Match task needs | `-C <DIR>` plus other flags `2>/dev/null` |
+1. Check availability and version with `codex --version`. If absent or unsupported, stop and report; do not guess flags.
+2. When option support or resume syntax is uncertain, inspect installed `codex exec --help` and `codex exec resume --help` before constructing the command.
+3. Resolve task intent, model (default `gpt-5.2`), and effort (high for architecture/refactor/security, medium for features/bugs, low for formatting/docs). Ask only when an unresolved choice affects the result. Confirm required permissions before execution.
 
-## Model Options
+## Run
 
-| Model | Best for | Context window | Key features |
-| --- | --- | --- | --- |
-| `gpt-5.2-max` | **Max model**: Ultra-complex reasoning, deep problem analysis | 400K input / 128K output | 76.3% SWE-bench, adaptive reasoning, $1.25/$10.00 |
-| `gpt-5.2` ⭐ | **Flagship model**: Software engineering, agentic coding workflows | 400K input / 128K output | 76.3% SWE-bench, adaptive reasoning, $1.25/$10.00 |
-| `gpt-5.2-mini` | Cost-efficient coding (4x more usage allowance) | 400K input / 128K output | Near SOTA performance, $0.25/$2.00 |
-| `gpt-5.1-thinking` | Ultra-complex reasoning, deep problem analysis | 400K input / 128K output | Adaptive thinking depth, runs 2x slower on hardest tasks |
+Choose the narrowest sandbox that satisfies the request:
 
-**GPT-5.2 Advantages**: 76.3% SWE-bench (vs 72.8% GPT-5), 30% faster on average tasks, better tool handling, reduced hallucinations, improved code quality. Knowledge cutoff: September 30, 2024.
+- Analysis/review: `--sandbox read-only`.
+- Requested local edits: `--sandbox workspace-write`; when the user explicitly asks Codex to perform the edits and authorizes autonomous execution, include `--full-auto`. For a command proposal or edits without that authorization, omit it and explain the approval boundary.
+- Network: network need is not permission for broad filesystem access. Use the narrowest supported network/workspace configuration. Reserve `--sandbox danger-full-access` for an explicitly approved task where narrower configuration cannot work.
 
-**Reasoning Effort Levels**:
-- `xhigh` - Ultra-complex tasks (deep problem analysis, complex reasoning, deep understanding of the problem)
-- `high` - Complex tasks (refactoring, architecture, security analysis, performance optimization)
-- `medium` - Standard tasks (refactoring, code organization, feature additions, bug fixes)
-- `low` - Simple tasks (quick fixes, simple changes, code formatting, documentation)
+Use `--skip-git-repo-check` when needed for this harness. Put flags before the `resume` subcommand. Use `-C <dir>` when the requested project is not the current directory.
 
-**Cached Input Discount**: 90% off ($0.125/M tokens) for repeated context, cache lasts up to 24 hours.
+Capture stdout and stderr separately (for example, `>codex.stdout.log 2>codex.stderr.log`). By default, keep stderr available in a log and do not replay it to the user on success; display it only when diagnosing an error or when it contains a relevant warning. Never redirect stderr to `/dev/null` by default: it can contain the only useful failure diagnostics. If reasoning/progress noise must be hidden, filter only known progress lines while retaining warnings and all output on non-zero exit. On failure, report actual diagnostics and stop; do not silently retry.
 
-## Following Up
-- After every `codex` command, immediately use `AskUserQuestion` to confirm next steps, collect clarifications, or decide whether to resume with `codex exec resume --last`.
-- When resuming, pipe the new prompt via stdin: `echo "new prompt" | codex exec resume --last 2>/dev/null`. The resumed session automatically uses the same model, reasoning effort, and sandbox mode from the original session.
-- Restate the chosen model, reasoning effort, and sandbox mode when proposing follow-up actions.
+## Resume
 
-## Error Handling
-- Stop and report failures whenever `codex --version` or a `codex exec` command exits non-zero; request direction before retrying.
-- Before you use high-impact flags (`--full-auto`, `--sandbox danger-full-access`, `--skip-git-repo-check`) ask the user for permission using AskUserQuestion unless it was already given.
-- When output includes warnings or partial results, summarize them and ask how to adjust using `AskUserQuestion`.
+Use `codex exec resume --last` only after confirming the most recent session belongs to the intended repository/task; `--last` can select another project's session. Resume configuration is inherited from the original run; do not add model/sandbox configuration unless explicitly requested and supported. Pipe the follow-up prompt as stdin, with shell-safe quoting or a heredoc—never interpolate arbitrary user text into shell syntax. Example shape: `codex exec --skip-git-repo-check resume --last`.
 
-## CLI Version
+## Authorization and gotchas
 
-Requires Codex CLI v0.57.0 or later for GPT-5.2 model support. The CLI defaults to `gpt-5.2` on macOS/Linux and `gpt-5.2` on Windows. Check version: `codex --version`
-
-Use `/model` slash command within a Codex session to switch models, or configure default in `~/.codex/config.toml`.
+- Ask before `--full-auto` or `danger-full-access` unless the user already authorized that exact scope. If denied, do not execute; offer a narrower mode.
+- Never assume `--last` is safe solely because it is recent; cross-project session selection can disclose or modify the wrong workspace.
+- Never interpolate task text directly into shell syntax. Use a safely quoted argument or stdin to avoid command expansion.
+- Preserve warnings and partial results in the report. State model/effort/sandbox and whether edits actually occurred; do not imply completion from a launched process alone.

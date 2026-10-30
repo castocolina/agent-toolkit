@@ -1,0 +1,77 @@
+{
+  "skill": "session-handoff",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 12,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 12,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 109,
+  "max_total": 125,
+  "percent": 87.2,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 153,
+      "evidence": "\"Generate new handoff with smart scaffolding\" repeats the CREATE command and explanation already given earlier. Mode selection, section descriptions, confirmation fields, storage examples, and resource summaries consume substantial lines beyond the distinctive validator limitations and handoff-chain protocol.",
+      "fix": "Remove the repeated resource catalogue and compress generic open/fill/report instructions. Keep one CREATE route, one RESUME route, exact script interfaces, the irreconstructable-context prioritization, bounded lineage, and implementation-specific safeguards."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "skills/session-handoff/scripts/create_handoff.py",
+      "line": 334,
+      "evidence": "\"filepath.write_text(content)\" silently replaces an existing file. Filenames have only second-level timestamp precision, so retrying the same slug within a second can overwrite an existing handoff rather than failing safely.",
+      "fix": "Create handoff files exclusively and refuse collisions by default. Generate a unique suffix or require an explicit overwrite option before replacement, and add a deterministic same-timestamp collision test."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/session-handoff/scripts/validate_handoff.py",
+      "line": 303,
+      "evidence": "\"if len(sys.argv) < 2:\" provides usage only for missing arguments; --help is treated as a filename. list_handoffs.py and check_staleness.py likewise lack real --help handling, and the four CLIs print human-oriented reports rather than machine-readable results. Runnable smoke tests are present for all four scripts.",
+      "fix": "Use argparse consistently across the helpers, document exit codes and examples through --help, and add a JSON output mode with diagnostics on stderr. Extend the existing tests to validate help behavior and parse the JSON result."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/scripts/check_staleness.py",
+      "line": 35,
+      "evidence": "\"return result.returncode == 0, result.stdout.strip()\" removes leading spaces from the first git-status record, but get_changed_files_since later assumes the original fixed-width prefix with \"line[3:]\". An initial unstaged record such as ' M src/api.py' consequently loses the first character of its pathname.",
+      "fix": "Preserve status-record whitespace and parse porcelain output without stripping its prefix, preferably using NUL-delimited status records with explicit rename handling. Add a test asserting the exact changed pathname when the first record is an unstaged tracked modification."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/scripts/validate_handoff.py",
+      "line": 126,
+      "evidence": "\"if filepath and not filepath.startswith('http') and '/' in filepath:\" discards root-level references such as package.json, tsconfig.json, and README.md. These files can be missing while the validator still reports that all recognized references exist.",
+      "fix": "Validate root-relative filenames as well as paths containing slashes, filtering URLs separately. Apply the same correction to staleness reference extraction and add missing-root-file cases to both script test suites."
+    }
+  ]
+}

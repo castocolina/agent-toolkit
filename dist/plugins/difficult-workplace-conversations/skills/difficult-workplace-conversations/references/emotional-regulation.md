@@ -2,32 +2,15 @@
 
 Techniques for managing your own emotions before, during, and after challenging workplace conversations.
 
-## Understanding Your Emotional Landscape
+## Regulation Worksheet
 
-### Why Emotions Run High
+Use this brief worksheet to identify what could affect your judgment or the meeting's outcome:
 
-Difficult conversations threaten core needs:
-
-- **Autonomy:** Someone is telling us what to do
-- **Competence:** Our abilities are being questioned
-- **Relatedness:** The relationship is at risk
-- **Fairness:** We feel treated unjustly
-- **Identity:** Our sense of self is challenged
-
-Understanding which need is threatened helps you address the root cause.
-
-### The Emotional Hijack
-
-When emotions take over:
-
-1. Amygdala detects threat
-2. Stress hormones flood system
-3. Prefrontal cortex (rational thinking) goes offline
-4. We react (fight, flight, freeze) instead of respond
-
-**Time to recover:** 20-30 minutes once fully triggered
-
-**Implication:** It's better to prevent hijack than to recover from one.
+- Trigger or disputed issue:
+- What evidence or context do I still need?
+- What response do I want to avoid?
+- What pause or break will I request if needed?
+- What is the next safe, documented step?
 
 ### Know Your Triggers
 
@@ -52,41 +35,18 @@ Complete this for yourself:
 
 ## Pre-Conversation Regulation
 
-### The Night Before
+### Before a High-Stakes Conversation
 
-**If you're anxious:**
-
-1. Write down worst-case scenario
-2. Write down how you'd cope with it
-3. Write down most likely outcome
-4. Write down best-case scenario
-5. Notice: You'd survive any of these
-
-**If you're angry:**
-
-1. Write an angry letter (don't send it)
-2. Do physical activity (walk, gym)
-3. Talk to someone uninvolved
-4. Sleep on it
-5. Ask: Is this about them, or me?
+Write down the specific outcome you need, the facts you can substantiate, what remains disputed, and which records or people could clarify it. If you are too activated to listen or document accurately, request a pause and a concrete time to resume.
 
 ### The Day Of
 
-**Physical Preparation:**
+**Workplace preparation:**
 
-- Get enough sleep the night before
-- Eat something (low blood sugar = low patience)
-- Avoid excess caffeine (amplifies anxiety)
-- Exercise in the morning if possible
-- Wear something that makes you feel confident
-
-**Mental Preparation:**
-
-- Review your preparation notes
-- Practice your opening out loud
-- Visualize a successful conversation
-- Set your intention (curious, calm, direct)
-- Accept that discomfort is part of the process
+- Bring dated examples and distinguish direct observation from inference.
+- Check relevant policy, reporting channels, confidentiality limits, and documentation requirements.
+- Decide what can be agreed in the meeting and what requires a written follow-up or escalation.
+- Prepare a neutral opening and a question that invites the other person's account.
 
 ### Immediately Before
 

@@ -1,0 +1,68 @@
+{
+  "skill": "react-useeffect",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 10,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 110,
+  "max_total": 125,
+  "percent": 88.0,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/react-useeffect/SKILL.md",
+      "line": 12,
+      "evidence": "\"| Derived value / transformation | Render; `useMemo` only for measured expensive work |\" exemplifies the standard React guidance that dominates the introductory decision table and many linked examples. The partial-reset, snapshot, initialization-lifetime, and mutation-cancellation boundaries provide the stronger knowledge delta.",
+      "fix": "Keep the common render/event distinctions as a short activation table. Reduce duplicated basic demonstrations and devote detailed examples to partial identity resets, SSR snapshots, initialization retries, and stale asynchronous writes."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/react-useeffect/evals/trigger-queries.json",
+      "line": 35,
+      "evidence": "\"Fetch response arrives out of order\" is labeled should_trigger:true without any React or Effect context, although the description explicitly excludes generic networking.",
+      "fix": "Label this standalone networking query false. Add a separate positive with realistic React context, such as an existing useEffect in SearchResults.tsx whose previous query overwrites the current results."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/react-useeffect/anti-patterns.md",
+      "line": 250,
+      "evidence": "\"fetchResults(query).then(json => {\" protects only successful result writes. Following the reference's GOOD fetch branch through a rejection produces no handled error or loading outcome, despite the main correctness loop requiring explicit failure handling.",
+      "fix": "Complete the example with loading and error state, guarded success/error/finally writes, and HTTP-status handling in the fetch helper. Verify obsolete failures and completions cannot overwrite the current request's state."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/react-useeffect/anti-patterns.md",
+      "line": 272,
+      "evidence": "\"A guard is valid only after defining the required lifetime\" appears inside the still-open tsx code fence for the initialization example, making the guidance render as invalid source code.",
+      "fix": "Close the tsx fence immediately after the App example and leave the lifetime, retry, and cache guidance as ordinary prose."
+    }
+  ]
+}

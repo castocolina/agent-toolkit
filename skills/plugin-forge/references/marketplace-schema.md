@@ -120,13 +120,13 @@ Configure automatic marketplace availability via `.claude/settings.json`:
 
 ```json
 {
-  "extraKnownMarketplaces": [
-    {
+  "extraKnownMarketplaces": {
+    "company-marketplace": {
       "source": {
         "source": "github",
         "repo": "company/marketplace"
       }
     }
-  ]
+  }
 }
 ```

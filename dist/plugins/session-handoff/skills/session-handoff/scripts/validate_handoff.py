@@ -64,15 +64,15 @@ def check_required_sections(content: str) -> tuple[bool, list[str]]:
     """Check that required sections exist and have content."""
     missing = []
     for section in REQUIRED_SECTIONS:
-        # Look for section header
-        pattern = rf'(?:^|\n)##?\s*{re.escape(section)}'
+        # Match section headings at any depth in the scaffold hierarchy.
+        pattern = rf'(?:^|\n)#{{1,6}}\s*{re.escape(section)}'
         match = re.search(pattern, content, re.IGNORECASE)
         if not match:
             missing.append(f"{section} (missing)")
         else:
             # Check if section has meaningful content (not just placeholder)
             section_start = match.end()
-            next_section = re.search(r'\n##?\s+', content[section_start:])
+            next_section = re.search(r'\n#{1,6}\s+', content[section_start:])
             section_end = section_start + next_section.start() if next_section else len(content)
             section_content = content[section_start:section_end].strip()
 
@@ -87,7 +87,7 @@ def check_recommended_sections(content: str) -> list[str]:
     """Check which recommended sections are missing."""
     missing = []
     for section in RECOMMENDED_SECTIONS:
-        pattern = rf'(?:^|\n)##?\s*{re.escape(section)}'
+        pattern = rf'(?:^|\n)#{{1,6}}\s*{re.escape(section)}'
         if not re.search(pattern, content, re.IGNORECASE):
             missing.append(section)
     return missing
@@ -288,7 +288,8 @@ def print_report(result: dict):
     print(f"\n{'='*60}")
 
     # Final verdict
-    if result['score'] >= 70 and not result['secrets_found']:
+    if (result['score'] >= 70 and result['todos_clear'] and
+            result['required_complete'] and not result['secrets_found']):
         print("Verdict: READY for handoff")
         return True
     elif result['secrets_found']:

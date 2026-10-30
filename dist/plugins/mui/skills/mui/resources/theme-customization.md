@@ -254,6 +254,12 @@ declare module '@mui/material/styles' {
   }
 }
 
+declare module '@mui/material/Button' {
+  interface ButtonPropsColorOverrides {
+    tertiary: true;
+  }
+}
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -500,13 +506,13 @@ export default theme;
 ## Theme Provider Setup
 
 ```typescript
-// src/theme.ts - Export your theme
-export { default as theme } from './theme';
+// src/theme.ts
+export default theme;
 
 // src/main.tsx or src/index.tsx
+import theme from './theme';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import theme from './theme';
 
 root.render(
   <StrictMode>
@@ -531,7 +537,7 @@ function MyComponent() {
       sx={{
         color: theme.palette.primary.main,
         padding: theme.spacing(2),
-        borderRadius: theme.shape.borderRadius
+        borderRadius: `${theme.shape.borderRadius}px`
       }}
     />
   );

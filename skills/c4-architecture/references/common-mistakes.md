@@ -269,7 +269,7 @@ Showing Level 4 code diagrams to executives, or only Level 1 to developers who n
 Not every system needs all four levels. Level 3 (Component) and Level 4 (Code) often add no value.
 
 **Guidance:**
-- **Always create:** Context (L1) and Container (L2)
+- **Broad-overview default:** Context (L1) plus Container (L2). For a focused request, create only the requested view(s).
 - **Create if valuable:** Component (L3) for complex containers
 - **Rarely create:** Code (L4) - let IDEs generate these
 

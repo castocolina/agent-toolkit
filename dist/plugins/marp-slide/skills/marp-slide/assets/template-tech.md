@@ -153,22 +153,22 @@ strong {
 
 <!-- _class: lead -->
 
-# プレゼンテーション
+# Presentation
 
-技術系（コード向け）
-
----
-
-## アジェンダ
-
-- トピック1
-- トピック2
-- トピック3
+Technical (Code-focused)
 
 ---
 
-## スライド
+## Agenda
 
-- ポイント1
-- ポイント2
-- ポイント3
+- Topic1
+- Topic2
+- Topic3
+
+---
+
+## Slide
+
+- Point1
+- Point2
+- Point3

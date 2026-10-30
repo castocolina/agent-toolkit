@@ -150,13 +150,13 @@ These should always work regardless of model:
 
 1. **Run setup script:**
    ```bash
-   python evals/setup_test_env.py
+   python tests/skills/session-handoff/setup_test_env.py
    cd /tmp/handoff-eval-project
    ```
 
 2. **Test each scenario in new conversation**
    - Start fresh conversation for each scenario
-   - Use exact trigger phrases from test-scenarios.md
+   - Use exact trigger phrases from tests/skills/session-handoff/test-scenarios.md
    - Record scores using results template
 
 3. **Compare across models**

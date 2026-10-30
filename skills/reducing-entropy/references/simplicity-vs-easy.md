@@ -1,46 +1,16 @@
 ---
-description: Simple is objective (not intertwined), easy is subjective (familiar). Choose simple over easy for long-term maintainability.
+description: Use when a smaller implementation risks increasing coupling or hiding complexity in a harder-to-change form.
 ---
 
-# Simplicity vs Easy
+# Simplicity vs. ease: decision prompts
 
-## The Core Distinction
+Choose the design with fewer entangled decisions, not merely fewer keystrokes. Use these questions to compare options:
 
-**Simple** and **easy** are not the same thing. We conflate them constantly, and it costs us.
+- Does this combine concerns that change for different reasons?
+- Can consumers change independently, or must unrelated code coordinate?
+- Is a tiny abstraction reducing repeated knowledge, or adding indirection without a stable concept?
+- Does the apparent deletion move complexity into dependency configuration, generated code, or operational behavior?
 
-- **Simple**: One concept, not intertwined with others. Objective measure.
-- **Easy**: Near at hand, familiar, relative to our capabilities. Subjective.
+The smallest line count is not automatically simplest if it couples independent change or obscures a correctness boundary. Name that cost and compare it with the measured reduction.
 
-Easy changes over time as you learn. Simple is absolute.
-
-## Why This Matters
-
-When we reach for the "easy" solution - the familiar pattern, the framework we know, the abstraction we've used before - we often add complexity. The easy path introduces concepts that intertwine with others.
-
-The simple solution might be unfamiliar. It might require thinking. But it doesn't braid together concerns that should be separate.
-
-## Complecting
-
-"Complect" means to intertwine or braid together.
-
-Complexity comes from braiding together concepts that should be separate. Every time we couple things, we create complexity. Every coupling is a future debugging session.
-
-Simple means:
-- One role
-- One task  
-- One concept
-
-If you can't explain it simply, it's too complex.
-
-## The Choice
-
-When designing, ask: "Am I choosing this because it's simple, or because it's familiar?"
-
-Familiar feels productive. Simple *is* productive - over the lifetime of the code.
-
-**Choose simple over easy. Always.**
-
-## External References
-
-- [Simple Made Easy](https://www.infoq.com/presentations/Simple-Made-Easy/) - Rich Hickey's canonical talk on this distinction
-- [The Value of Values](https://www.infoq.com/presentations/Value-Values/) - Related talk on immutability and simplicity
+Further reading: [Simple Made Easy](https://www.infoq.com/presentations/Simple-Made-Easy/).

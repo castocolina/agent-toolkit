@@ -1,0 +1,35 @@
+{
+  "skill_name": "database-schema-designer",
+  "evals": [
+    {
+      "id": "design-shop-schema",
+      "prompt": "I’m opening a tiny online shop for handmade mugs. Can you sketch the database tables?",
+      "expected_output": "A SQL schema for customers, products, orders, and order items with relationships and basic integrity constraints.",
+      "assertions": [
+        "Includes separate customer, product, order, and order-item entities",
+        "Defines primary keys and foreign keys for order relationships",
+        "Uses exact `DECIMAL`/`NUMERIC` or integer minor units for monetary values, never floating point"
+      ]
+    },
+    {
+      "id": "postgres-tenant-model",
+      "prompt": "Design a PostgreSQL schema for a multi-tenant SaaS: organizations own users and projects; projects have tasks. Include uniqueness, deletion behavior, and indexes for listing a tenant’s tasks by status and date.",
+      "expected_output": "PostgreSQL DDL with tenant-scoped relationships, constraints, deletion behavior, and a query-aligned composite index.",
+      "assertions": [
+        "Includes organizations, users, projects, and tasks tables",
+        "Uses foreign keys and an explicit ON DELETE strategy",
+        "Includes a composite index covering tenant task listing by status/date"
+      ]
+    },
+    {
+      "id": "unsafe-column-migration",
+      "prompt": "We need to make existing users.phone NOT NULL on a live app with millions of rows. Give me a safe migration approach and rollback considerations.",
+      "expected_output": "A staged backward-compatible migration that avoids immediate NOT NULL enforcement, with backfill, validation, deployment sequencing, and rollback notes.",
+      "assertions": [
+        "Recommends adding or retaining the column nullable before backfill",
+        "Describes backfill before applying NOT NULL",
+        "Mentions backward compatibility and a rollback or recovery consideration"
+      ]
+    }
+  ]
+}

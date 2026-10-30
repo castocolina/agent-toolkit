@@ -63,7 +63,7 @@ Ready-to-use opening lines, responses to common reactions, and frameworks for na
 **They say:** "I was just doing what I thought was right!"
 
 **You respond:**
-> "I believe you had good intentions. Let's talk about the impact regardless of intent, and how we can prevent this going forward."
+> "I don't want to assume what you intended. Let's talk about the impact and what happened from your perspective, then discuss how to prevent this going forward."
 
 ### Deflection
 

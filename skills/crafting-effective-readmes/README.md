@@ -47,7 +47,7 @@ The skill determines what README task you are working on:
 
 ### Step 2: Gather Context
 
-Based on the task, the skill asks targeted questions:
+Based on the task, the skill infers context from the repository first and asks only when an ambiguity would materially change the result:
 
 - **Creating**: What type of project? What problem does it solve? What is the quickest path to "it works"?
 - **Adding**: What needs documenting? Where should it go? Who needs this info most?
@@ -56,7 +56,7 @@ Based on the task, the skill asks targeted questions:
 
 ### Step 3: Generate and Refine
 
-The skill uses the appropriate template and follows up with: "Anything else to highlight or include that I might have missed?"
+The skill uses the appropriate template and delivers the result directly; it adds a closing question only when a consequential fact is still unresolved.
 
 ## Key Features
 
@@ -127,7 +127,7 @@ Claude: [Compares README against package.json, main files, etc.
 
 ## Best Practices
 
-1. **Always ask about audience** - Don't assume OSS defaults for everything
+1. **Settle the audience** - Infer it from evidence, ask only if it changes the result; don't assume OSS defaults for everything
 2. **Show, don't just tell** - Include examples and code samples
 3. **Use structure** - Headers, tables, and lists improve scannability
 4. **Keep it current** - Add "last reviewed" dates for internal/config projects
@@ -155,26 +155,22 @@ Every README needs at minimum:
 ```
 crafting-effective-readmes/
   SKILL.md                 # Skill definition
-  section-checklist.md     # Quick reference for sections by project type
-  style-guide.md           # Common mistakes and prose guidance
-  using-references.md      # Guide to reference materials
+  references/
+    section-checklist.md   # Quick reference for sections by project type
+    style-guide.md         # Common mistakes and prose guidance
+    using-references.md    # Guide to reference materials
+    art-of-readme.md       # README philosophy
+    make-a-readme.md       # Section-by-section guidance
+    standard-readme-spec.md # Formal specification
+    standard-readme-example-minimal.md # Minimal compliant example
+    standard-readme-example-maximal.md # Full-featured example
   templates/
     oss.md                 # Open source project template
     personal.md            # Personal/portfolio project template
     internal.md            # Internal/team project template
     xdg-config.md          # Configuration directory template
-  references/
-    art-of-readme.md       # README philosophy
-    make-a-readme.md       # Section-by-section guidance
-    standard-readme-spec.md        # Formal specification
-    standard-readme-example-minimal.md  # Minimal compliant example
-    standard-readme-example-maximal.md  # Full-featured example
 ```
 
 ## Related Skills
 
 - `writing-clearly-and-concisely` - For general prose quality, clear writing, and avoiding AI patterns
-
-## Attribution
-
-- Original skill by @joshuadavidthomas from [joshuadavidthomas/agent-skills](https://github.com/joshuadavidthomas/agent-skills) (MIT)

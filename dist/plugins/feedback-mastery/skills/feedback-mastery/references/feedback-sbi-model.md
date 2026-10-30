@@ -17,7 +17,7 @@ Situation + Behavior + Impact = Effective Feedback
 ## Why SBI Works
 
 1. **Specificity** - Concrete examples are harder to dismiss than vague complaints
-2. **Objectivity** - Observable behaviors can't be argued; interpretations can
+2. **Checkability** - Observable accounts can still be disputed; check them against records, witnesses, or other available evidence before treating them as established.
 3. **Actionability** - Clear situations and behaviors can be repeated or changed
 4. **Non-threatening** - Impact focuses on effects, not character attacks
 
@@ -164,7 +164,7 @@ After delivering SBI feedback, ask about intent:
 
 > **SBI:** "When you pushed to main without a PR yesterday, it broke the build and blocked five developers for two hours."
 >
-> **I (Intent):** "I'm sure you didn't mean to cause a disruption. Can you help me understand what happened?"
+> **I (Intent):** "What was happening when you pushed to main without a PR? Help me understand your perspective."
 
 ### SBI-NS: Proposing Next Steps
 

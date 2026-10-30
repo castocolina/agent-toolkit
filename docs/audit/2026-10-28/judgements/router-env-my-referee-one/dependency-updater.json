@@ -1,0 +1,77 @@
+{
+  "skill": "dependency-updater",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 13,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 18,
+      "evidence": "\u201cRun the resolver install/check, applicable tests, type checks, build, and security audit\u201d and the Report section are familiar activation guidance. The failure-mode and recovery sections add stronger expert knowledge, but routine validation, reporting, and repeated preservation reminders dilute the line-weighted delta.",
+      "fix": "Consolidate routine validation, reporting, and preservation reminders into one compact completion gate; retain the resolver-ownership, constraint-grammar, peer/ABI, cohort, and recovery decisions."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 30,
+      "evidence": "\u201cNode: use `taze` for candidate discovery and scoped writes\u201d routes to references/node.md, but neither that reference nor SKILL.md routes to scripts/check-tool.sh or scripts/run-taze.sh. The script usage is discoverable only through README.md.",
+      "fix": "Add conditional script routes: use scripts/check-tool.sh when checking prerequisites and scripts/run-taze.sh when collecting Node candidates. State that the wrapper runs against the target project's working directory."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/dependency-updater/evals/evals.json",
+      "line": 7,
+      "evidence": "\u201cApplies only safe minor/patch updates\u201d is evaluated without an input manifest or lockfile, while the assertions check major approval and exact pins but not breaking 0.x updates, peer/runtime constraints, exact approved targets, or failed verification gates.",
+      "fix": "Add a small workspace fixture containing an exact pin, a breaking 0.x candidate, and a peer/runtime constraint. Assert the exact manifest/lockfile diff, approved target map, and stop-on-failure behavior rather than only the proposed plan."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/dependency-updater/scripts/check-tool.sh",
+      "line": 23,
+      "evidence": "\u201cjson_string() { local value=${1//\\\\/\\\\\\\\}; value=${value//\\\"/\\\\\\\"}; printf '%s' \"$value\"; }\u201d escapes backslashes and quotes but not JSON control characters. A multiline or tab-containing install-command argument produces invalid JSON in the missing-tool branch.",
+      "fix": "Use a complete JSON string encoder, or reject unsupported control characters with a structured error. Add tests that parse the output for newline, tab, quote, and backslash inputs."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/dependency-updater/scripts/run-taze.sh",
+      "line": 27,
+      "evidence": "\u201cpython3 -c 'import json,sys; ...'\u201d runs after taze succeeds, but the script checks only taze and package.json and does not document or check Python. In a Node-only environment, discovery can succeed before the wrapper fails without its promised JSON success result.",
+      "fix": "Document and check Python 3 before invoking taze, or serialize with the Node runtime already required by taze. Return a structured prerequisite error before performing the delegated operation."
+    }
+  ]
+}

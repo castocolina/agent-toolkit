@@ -1,0 +1,45 @@
+{
+  "skill_name": "perplexity",
+  "evals": [
+    {
+      "id": "current-search",
+      "prompt": "Find recent reporting on latest EU AI Act deadlines; need links, not essay.",
+      "expected_output": "Concise current search with URLs using conservative search limits.",
+      "assertions": [
+        "Selects Perplexity Search",
+        "Uses `max_results: 3` and `max_tokens_per_page: 512`",
+        "Provides URLs with publication or update dates and checks each cited page supports its linked claim"
+      ]
+    },
+    {
+      "id": "ask-explain",
+      "prompt": "Explain PostgreSQL advisory lock tradeoffs in plain language using current sources.",
+      "expected_output": "Conversational synthesis using Perplexity Ask.",
+      "assertions": [
+        "Selects Perplexity Ask",
+        "Addresses advisory lock trade-offs",
+        "Does not select prohibited `perplexity_research`"
+      ]
+    },
+    {
+      "id": "docs-boundary",
+      "prompt": "Look up official React useEffect reference. Should Perplexity handle it?",
+      "expected_output": "Route framework documentation to Context7 MCP.",
+      "assertions": [
+        "Routes to Context7 when configured",
+        "Does not select Perplexity",
+        "Identifies library docs boundary"
+      ]
+    },
+    {
+      "id": "empty-search-escalation",
+      "prompt": "The initial search found no useful results for a current comparison of two public database releases. Dig deeper.",
+      "expected_output": "Raise search limits modestly, then use Ask or available WebSearch if still inadequate; state unavailable tools rather than assuming them.",
+      "assertions": [
+        "Raises max_results to no more than 5 and max_tokens_per_page to no more than 1024 before fallback",
+        "Uses Ask or available WebSearch only after the larger search remains inadequate",
+        "Does not claim use of an unavailable integration"
+      ]
+    }
+  ]
+}

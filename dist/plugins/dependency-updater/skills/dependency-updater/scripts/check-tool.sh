@@ -1,22 +1,30 @@
 #!/bin/bash
-# Check if a tool is installed and provide installation instructions if not
+# Check a prerequisite. stdout is one JSON result; diagnostics go to stderr.
+set -e
 
-TOOL_NAME="$1"
-INSTALL_CMD="$2"
+usage() {
+    echo 'Usage: check-tool.sh <tool-name> [install-command]' >&2
+}
 
-if [ -z "$TOOL_NAME" ]; then
-    echo "Usage: check-tool.sh <tool-name> [install-command]"
-    exit 1
-fi
-
-if command -v "$TOOL_NAME" &> /dev/null; then
-    echo "OK: $TOOL_NAME is installed"
-    $TOOL_NAME --version 2>/dev/null || true
+if [ "${1:-}" = --help ] || [ "${1:-}" = -h ]; then
+    usage
+    echo 'Exit codes: 0 installed, 1 missing/invalid arguments.' >&2
     exit 0
-else
-    echo "MISSING: $TOOL_NAME is not installed"
-    if [ -n "$INSTALL_CMD" ]; then
-        echo "Install with: $INSTALL_CMD"
-    fi
+fi
+
+TOOL_NAME="${1:-}"
+INSTALL_CMD="${2:-}"
+if [ -z "$TOOL_NAME" ]; then
+    usage
+    printf '{"status":"error","diagnostic":"tool name is required"}\n'
     exit 1
 fi
+
+json_string() { local value=${1//\\/\\\\}; value=${value//\"/\\\"}; printf '%s' "$value"; }
+if command -v "$TOOL_NAME" >/dev/null 2>&1; then
+    printf '{"status":"ok","tool":"%s"}\n' "$(json_string "$TOOL_NAME")"
+    "$TOOL_NAME" --version >&2 2>/dev/null || true
+    exit 0
+fi
+printf '{"status":"missing","tool":"%s","install":"%s"}\n' "$(json_string "$TOOL_NAME")" "$(json_string "$INSTALL_CMD")"
+exit 1

@@ -1,0 +1,35 @@
+{
+  "skill_name": "react-useeffect",
+  "evals": [
+    {
+      "id": "derived-name",
+      "prompt": "My component stores firstName, lastName, and fullName, then an Effect updates fullName. This feels clunky\u2014what should I do?",
+      "expected_output": "Compute fullName during render instead of redundant state and an Effect.",
+      "assertions": [
+        "Computes fullName during render",
+        "Removes fullName useState",
+        "Does not add an Effect"
+      ]
+    },
+    {
+      "id": "query-race",
+      "prompt": "Search results sometimes show the previous query after fast typing. I fetch in useEffect; fix the race.",
+      "expected_output": "Use cleanup to prevent stale responses from updating results.",
+      "assertions": [
+        "Includes Effect cleanup",
+        "Prevents stale response from setting results",
+        "Names ignore flag or AbortController"
+      ]
+    },
+    {
+      "id": "external-widget",
+      "prompt": "A React component must keep a third-party map widget synchronized with its zoom prop. Is an Effect appropriate?",
+      "expected_output": "Yes, synchronize this external system in an Effect and clean up created resources/listeners.",
+      "assertions": [
+        "Says Effect is appropriate for external synchronization",
+        "Synchronizes zoom prop with widget",
+        "Mentions cleanup"
+      ]
+    }
+  ]
+}

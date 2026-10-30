@@ -1,0 +1,77 @@
+{
+  "skill": "daily-meeting-update",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 9,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 108,
+  "max_total": 125,
+  "percent": 86.4,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 33,
+      "evidence": "\"Yesterday / since last standup: completed outcomes and other work.\" By line count, the routine Interview and Output sections occupy 39 lines, versus 14 for the integration-specific section; most of that interview/template material activates familiar standup conventions rather than adding expertise.",
+      "fix": "Compress the standard questions and output headings into a compact contract. Retain the higher-value consent ordering, day filtering, unresolved-path handling, privacy safeguards, and cross-source deduplication."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 38,
+      "evidence": "\"Distinguish completed outcomes from investigation and future plans\" states the desired classification but does not establish what evidence qualifies activity as a completed outcome.",
+      "fix": "Add a provenance gate before drafting: require user confirmation or explicit completion evidence for outcome claims; treat read/edit/command counts as activity only, and ask for confirmation before promoting them to completed work."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/evals/evals.json",
+      "line": 1,
+      "evidence": "The case named \"consented-integration\" says \"don't access it unless I approve\" and supplies manual facts only. None of the three output cases exercises an actually approved integration and session selection.",
+      "fix": "Add an approved-integration case with scoped activity fixtures. Assert from the tool trace that authentication/history access occurs only after approval, only approved scope or sessions are used, duplicate work is merged, and raw session text is not exposed."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/scripts/claude_digest.py",
+      "line": 257,
+      "evidence": "\"branch=session_data['git_branch']\" uses session-wide metadata after filtering day_messages. The branch comes from the first available branch in the entire file, while project_path can come from a later day's cwd; a cross-day session can therefore attribute matching-day work to the wrong branch or project.",
+      "fix": "Preserve cwd and branch on individual messages, filter by the requested day first, and derive metadata from those filtered messages. Split or explicitly represent sessions that change project or branch."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/scripts/claude_digest.py",
+      "line": 220,
+      "evidence": "\"local_tz = datetime.now().astimezone().tzinfo\" captures the current fixed UTC offset. Historical --date queries across a daylight-saving transition can classify activity near midnight into the wrong local calendar day.",
+      "fix": "Convert each timestamp with the system's date-aware local conversion, such as timestamp.astimezone() without the captured fixed-offset argument, or use an explicit ZoneInfo timezone. Add deterministic tests on both sides of a DST transition."
+    }
+  ]
+}

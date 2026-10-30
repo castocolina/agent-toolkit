@@ -11,9 +11,9 @@ Official documentation: https://github.com/marp-team/marpit/tree/main/docs/fragm
 ### Basic Usage
 
 ```markdown
-* Item 1
-* Item 2
-* Item 3
+- Item 1
+- Item 2
+- Item 3
 ```
 
 Normally, all items are displayed at once.
@@ -251,12 +251,11 @@ marp slide.md --html
 ### PDF Output Options
 
 ```bash
-# PDF output
 marp slide.md --pdf --allow-local-files
-
-# PDF without page numbers
 marp slide.md --pdf --pdf-notes
 ```
+
+To disable page numbers, set `paginate: false` in frontmatter (or `<!-- _paginate: false -->` on selected slides) and export with `--pdf`. `--pdf-notes` exports speaker notes; it does not disable pagination.
 
 ### Image Output
 
@@ -401,17 +400,30 @@ Right side content
 
 ### 4. Progress Bar
 
+For a fixed three-slide deck, target each rendered section explicitly:
+
 ```css
+section {
+  --progress-width: 33.333%;
+}
+section:nth-of-type(2) {
+  --progress-width: 66.667%;
+}
+section:nth-of-type(3) {
+  --progress-width: 100%;
+}
 section::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
-  width: calc(var(--paginate) / var(--paginate-total) * 100%);
+  width: var(--progress-width);
   height: 5px;
   background-color: #3b82f6;
 }
 ```
+
+With three Markdown slides separated by `---`, the rendered bar is one-third width on slide 1, two-thirds on slide 2, and full width on slide 3. Render the deck to verify the section ordering and widths.
 
 ## Troubleshooting
 

@@ -69,9 +69,9 @@ plugin-name/
 
 ```
 commands/
-├── simple.md              # Invoked as /simple
+├── simple.md              # Invoked as /plugin-name:simple (verify after installation)
 └── namespace/
-    └── command.md         # Invoked as /namespace:command
+    └── command.md         # Discover the plugin-qualified name after installation
 ```
 
 ### Agents

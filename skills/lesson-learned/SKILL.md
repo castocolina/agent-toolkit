@@ -1,105 +1,54 @@
 ---
 name: lesson-learned
-description: "Analyze recent code changes via git history and extract software engineering lessons. Use when the user asks 'what is the lesson here?', 'what can I learn from this?', 'engineering takeaway', 'what did I just learn?', 'reflect on this code', or wants to extract principles from recent work."
+description: "Use when users ask what they learned, want an engineering takeaway, or reflect on recent commits, a branch diff, a specific commit, or staged/unstaged changes—even without naming Git or a principle. Ground one lesson in concrete changes and a next-time action. Not for generic engineering tutorials, ordinary bug reviews, or implementing refactors."
 ---
 
 # Lesson Learned
 
-Extract specific, grounded software engineering lessons from actual code changes. Not a lecture -- a mirror. Show the user what their code already demonstrates.
+Extract one evidence-backed engineering lesson from actual code changes. Show what the changes demonstrate, not a generic lecture.
 
-## Before You Begin
+## Prepare
 
-**Load the principles reference first.**
+Read [the diff-signal lookup](references/se-principles.md). Read [anti-patterns](references/anti-patterns.md) when 10+ files changed (check change amplification) or a changed function exceeds 50 lines (check long methods).
 
-1. Read `references/se-principles.md` to have the principle catalog available
-2. Optionally read `references/anti-patterns.md` if you suspect the changes include areas for improvement
-3. Determine the scope of analysis (see Phase 1)
+## Choose the evidence scope
 
-**Do not proceed until you've loaded at least `se-principles.md`.**
+| Request | Evidence |
+|---|---|
+| Feature branch (default off base branch) | Resolve base branch from repo metadata/remotes; use `<base>..HEAD` for commits absent from base and `<base>...HEAD` for diff from merge-base. Ask if base is ambiguous. |
+| Last N commits | Up to N available commits and their diff; default N=5. |
+| Specific commit | `git show <sha>` |
+| Working changes | `git diff` and `git diff --cached` |
 
-## Phase 1: Determine Scope
+Two-dot log and three-dot diff can disagree after partial merges; choose deliberately and state the comparison. On base branch use the last 5 available commits. If there are no commits, analyze working/staged changes; if there is no history or diff, explain that evidence is unavailable and stop rather than forcing a lesson.
 
-Ask the user or infer from context what to analyze.
+Start with the scoped log and diff. For a diff over 500 lines, inspect `git diff --stat` then representative high-signal hunks. Read changed files first. Read an unchanged caller, contract, or test only when needed to substantiate a claim, and state why you expanded scope.
 
-| Scope | Git Commands | When to Use |
-|-------|-------------|-------------|
-| Feature branch | `git log main..HEAD --oneline` + `git diff main...HEAD` | User is on a non-main branch (default) |
-| Last N commits | `git log --oneline -N` + `git diff HEAD~N..HEAD` | User specifies a range, or on main (default N=5) |
-| Specific commit | `git show <sha>` | User references a specific commit |
-| Working changes | `git diff` + `git diff --cached` | User says "what about these changes?" before committing |
+## Select and verify a lesson
 
-**Default behavior:**
-- If on a feature branch: analyze branch commits vs main
-- If on main: analyze the last 5 commits
-- If the user provides a different scope, use that
+1. Identify candidate causal changes.
+2. Rank by observable behavioral consequence and evidence strength; favor a demonstrated trade-off over a superficial principle match.
+3. Choose one lesson with a defensible counterfactual: what would likely have happened without the change?
+4. Verify the consequence in code/tests. A before/after improvement needs evidence from both states or a test; otherwise describe only what changed.
+5. Map the signal to a named principle using the reference. If none fits, don't force a label.
 
-## Phase 2: Gather Changes
+Commit messages express intent, not proof: code and tests override contradictory messages. Extraction alone does not prove modularity; inspect the dependency contract. File count alone does not prove shotgun surgery; generated changes and mechanical renames produce the same signal.
 
-1. Run `git log` with the determined scope to get the commit list and messages
-2. Run `git diff` for the full diff of the scope
-3. If the diff is large (>500 lines), use `git diff --stat` first, then selectively read the top 3-5 most-changed files
-4. **Read commit messages carefully** -- they contain intent that raw diffs miss
-5. Only read changed files. Do not read the entire repo.
-
-## Phase 3: Analyze
-
-Identify the **dominant pattern** -- the single most instructive thing about these changes.
-
-Look for:
-- **Structural decisions** -- How was the code organized? Why those boundaries?
-- **Trade-offs made** -- What was gained vs. sacrificed? (readability vs. performance, DRY vs. clarity, speed vs. correctness)
-- **Problems solved** -- What was the before/after? What made the "after" better?
-- **Missed opportunities** -- Where could the code improve? (present gently as "next time, consider...")
-
-Map findings to specific principles from `references/se-principles.md`. Be specific -- quote actual code, reference actual file names and line changes.
-
-## Phase 4: Present the Lesson
-
-Use this template:
+## Present
 
 ```markdown
-## Lesson: [Principle Name]
+## Lesson: [Principle]
 
-**What happened in the code:**
-[2-3 sentences describing the specific change, referencing files and commits]
-
-**The principle at work:**
-[1-2 sentences explaining the SE principle]
-
-**Why it matters:**
-[1-2 sentences on the practical consequence -- what would go wrong without this, or what goes right because of it]
-
-**Takeaway for next time:**
-[One concrete, actionable sentence the user can apply to future work]
+**What changed:** [Concrete files/commits and behavior, with a short code or test reference]
+**Why it matters:** [Observable consequence and evidence-backed counterfactual]
+**Next time:** [One actionable practice]
 ```
 
-If there is a second lesson worth noting (maximum 2 additional):
+Default to one lesson. Add more only for genuinely independent concerns (at most two additional). Keep it reflective and specific; if changes are trivial or evidence is thin, say so rather than inventing insight. Avoid generic principle lists and unsupported improvement claims.
 
-```markdown
----
+## Evidence rules
 
-### Also worth noting: [Principle Name]
-
-**In the code:** [1 sentence]
-**The principle:** [1 sentence]
-**Takeaway:** [1 sentence]
-```
-
-## What NOT to Do
-
-| Avoid | Why | Instead |
-|-------|-----|---------|
-| Listing every principle that vaguely applies | Overwhelming and generic | Pick the 1-2 most relevant |
-| Analyzing files that were not changed | Scope creep | Stick to the diff |
-| Ignoring commit messages | They contain intent that diffs miss | Read them as primary context |
-| Abstract advice disconnected from the code | Not actionable | Always reference specific files/lines |
-| Negative-only feedback | Demoralizing | Lead with what works, then suggest improvements |
-| More than 3 lessons | Dilutes the insight | One well-grounded lesson beats seven vague ones |
-
-## Conversation Style
-
-- **Reflective, not prescriptive.** Use the user's own code as primary evidence.
-- **Never say "you should have..."** -- instead use "the approach here shows..." or "next time you face this, consider..."
-- **If the code is good, say so.** Not every lesson is about what went wrong. Recognizing good patterns reinforces them.
-- **If the changes are trivial** (a single config tweak, a typo fix), say so honestly rather than forcing a lesson. "These changes are straightforward -- no deep lesson here, just good housekeeping."
-- **Be specific.** Generic advice is worthless. Every claim must point to a concrete code change.
+- NEVER let a commit message override contradictory code or tests; intent is not behavioral evidence.
+- NEVER infer improved modularity from extraction alone; shared internals can increase coupling.
+- NEVER diagnose shotgun surgery solely from file count; mechanical/generated edits are false positives.
+- Don't turn reflection into a bug review or refactor proposal. State a next-time action, not an implementation plan.

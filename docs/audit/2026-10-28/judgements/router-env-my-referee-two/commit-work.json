@@ -1,0 +1,86 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 15,
+      "evidence": "Check secrets, generated artifacts, lockfile churn mixed with unrelated logic, and scope accuracy against current paths.",
+      "fix": "Ground the generic parts: check staged paths against .gitignore and the build outputs the CI config produces; keep lockfile-churn and scope-accuracy, the checks the model actually skips."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 12,
+      "evidence": "1. Establish which changes are approved for this task. Inspect status, staged diff, and working-tree diff; treat pre-existing index content as user-owned unless explicitly included. If unrelated staged content exists, stop and request authorization for an index-isolation strategy. Never proceed with an ordinary commit that would include unrelated staged content.",
+      "fix": "Split into 1a inspect, 1b ownership rule, 1c stop rule; one 60-word step hides the stop condition an agent must not miss."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 24,
+      "evidence": "Never commit an unresolved merge: conflict markers can produce a syntactically valid but semantically partial result.",
+      "fix": "Extend to the rebase case: during a rebase git status shows 'rebasing' and a commit silently continues it; check status in step 1, not just for conflict markers."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 12,
+      "evidence": "stop and request authorization for an index-isolation strategy",
+      "fix": "Name the default tactic after authorization (e.g., stash unrelated staged content with git stash push --keep-index, or build the commit from a temporary index); 'an index-isolation strategy' leaves the fragile step to invention."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/commit-work/evals/evals.json",
+      "line": null,
+      "evidence": "3 output evals, no evals/files/ fixtures; prompts describe git state in prose only.",
+      "fix": "Add evals/files fixtures (a status/diff snapshot with mixed staged and unstaged content) so selective-staging assertions grade real command sequences."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/references/commit-message-template.md",
+      "line": 3,
+      "evidence": "The main skill defines the required Conventional Commit shape.",
+      "fix": "SKILL.md step 6 never states the shape; add the minimal template there (type(scope)!: subject, blank line, body, footer) or move the shape into this reference so the cross-reference resolves."
+    }
+  ]
+}

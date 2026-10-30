@@ -1,0 +1,35 @@
+{
+  "skill_name": "jira",
+  "evals": [
+    {
+      "id": "casual-jira",
+      "prompt": "Could you check PROJ-418 and get it moving to done? It is currently To Do.",
+      "expected_output": "A proposed workflow fetches current issue and transitions before showing proposed change and requesting approval.",
+      "assertions": [
+        "Does not claim a change was made.",
+        "Proposes fetching current issue/status and available transitions before action.",
+        "Requests approval before modifying."
+      ]
+    },
+    {
+      "id": "precise-jira",
+      "prompt": "Create a PROJ bug ticket: Checkout times out after selecting express shipping. Reproduction: sign in as a returning customer, add any item, select express shipping, then submit. Expected: confirmation within 3 seconds; actual: spinner continues and no order appears. Show the proposed command before creating it.",
+      "expected_output": "A draft CLI proposal includes summary, reproduction, expected/actual behavior and waits for approval.",
+      "assertions": [
+        "Includes the reproduction steps and expected-versus-actual behavior.",
+        "Shows a proposed jira issue create command or complete draft before creation.",
+        "Does not claim creation; requests approval."
+      ]
+    },
+    {
+      "id": "no-backend",
+      "prompt": "Show me PROJ-9, but assume neither jira CLI nor Atlassian MCP is available.",
+      "expected_output": "Explains no backend is available, gives documented setup guidance, and avoids invented issue details.",
+      "assertions": [
+        "States neither backend can access the issue and does not invent its contents.",
+        "Gives jira CLI installation URL and jira init setup guidance.",
+        "Mentions Atlassian MCP as an alternative."
+      ]
+    }
+  ]
+}

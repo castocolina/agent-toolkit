@@ -1,0 +1,86 @@
+{
+  "skill": "command-creator",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 9,
+    "D2": 13,
+    "D3": 11,
+    "D4": 15,
+    "D5": 15,
+    "D6": 12,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 100,
+  "max_total": 125,
+  "percent": 80.0,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/command-creator/references/patterns.md",
+      "line": 9,
+      "evidence": "'Structure: Analyze \u2192 Act \u2192 Report' and 'Progress tracking with TodoWrite' restate generic procedures and native harness functionality. Such material occupies substantial portions of the pattern guide and worked examples rather than adding command-specific expertise.",
+      "fix": "Collapse generic workflow tutorials and native planning, todo, and delegation explanations. Keep command-specific field semantics, argument boundaries, environment constraints, and concrete failure-recovery decisions."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 14,
+      "evidence": "'plan then approved execution \u2192 Agent Delegation' conflates a human approval boundary with a need for delegation. A planning-and-approval workflow does not inherently benefit from a specialized agent.",
+      "fix": "Treat plan\u2013approval\u2013execution as an approval-gated workflow independent of delegation. Choose delegation only when specialization, isolation, or parallel work provides a concrete benefit."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 33,
+      "evidence": "'Treat command arguments as untrusted data' and 'Never retry a non-idempotent operation blindly' are useful warnings, but there is no command-specific Gotchas section explaining Claude Code expansion behavior or the distinction between argument hints and validation.",
+      "fix": "Add concise Gotchas explaining that argument-hint is display metadata rather than validation and that pre-run ! shell blocks execute during prompt expansion, before written workflow inspection or approval steps. Prohibit state-changing pre-run blocks and require explicit body-level argument validation."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/command-creator/references/examples.md",
+      "line": 113,
+      "evidence": "'NEVER run additional exploration commands beyond checking .PLAN.md, git status/diff/log' imposes a blanket restriction in a reusable PR-automation example. It can prevent necessary prerequisite, scope, or verification checks required by the main procedure.",
+      "fix": "Replace the blanket prohibition with bounded inspection criteria: permit checks necessary to establish prerequisites, intended changes, authorization, and verification, while requiring approval before unrelated or open-ended exploration."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/command-creator/evals/evals.json",
+      "line": 1,
+      "evidence": "'Defines ordered run/parse/fix/repeat steps and a clear passing condition' does not require a bounded retry or stuck condition. The three cases also omit malformed or hostile arguments and partially completed external actions.",
+      "fix": "Add assertions for maximum attempts and stuck detection, plus edge cases covering shell-special characters in arguments and a timed-out publication that may already have succeeded. Verify validation, state inspection before retry, and explicit authorization boundaries."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/command-creator/references/patterns.md",
+      "line": 202,
+      "evidence": "'Use Task tool with subagent_type=\"subagent\" to create plan' is unconditional in Multi-Agent Orchestration. Unlike the earlier delegation example, this branch does not check registered agent types or supply a direct fallback, so an environment without that custom type cannot execute it.",
+      "fix": "Apply the registered-agent check to every delegation example. Select an actually available suitable agent, and otherwise continue directly while preserving the planning and approval boundary; remove unconditional references to the custom subagent type."
+    }
+  ]
+}

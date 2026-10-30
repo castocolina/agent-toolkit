@@ -1,0 +1,86 @@
+{
+  "skill": "marp-slide",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 12,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 107,
+  "max_total": 125,
+  "percent": 85.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/marp-slide/references/best-practices.md",
+      "line": 9,
+      "evidence": "\u201cClear: Content is immediately understandable\u201d and the subsequent whitespace, consistency, and concise-bullet guidance largely repeat presentation knowledge the model already has. The main Quality check section also primarily provides activation rather than new expertise.",
+      "fix": "Trim the generic presentation tutorial. Retain the bundled-style decisions, Marpit-specific layout behavior, export limitations, and concrete rendering failures that the agent would otherwise miss."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/marp-slide/SKILL.md",
+      "line": 14,
+      "evidence": "\u201cStart from assets/template-*.md\u201d is the single authoring procedure, although the description also promises improvements to existing decks. There is no redesign-specific checkpoint for preserving existing content, notes, branding, or working layouts.",
+      "fix": "Branch the workflow into new-deck creation and existing-deck redesign. For redesign, inspect the current deck, identify what must be preserved, diagnose its rendered problems, and apply only the necessary template or CSS changes."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/marp-slide/references/best-practices.md",
+      "line": 29,
+      "evidence": "\u201cConcise: About 15-25 characters per line\u201d imposes a language-insensitive text limit on creative slide content, despite the main workflow correctly prioritizing rendered readability.",
+      "fix": "Replace the character limit with a rendered-fit principle: preserve complete claims, avoid distracting wrapping, and split content when the chosen font and layout become difficult to read."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/marp-slide/evals/evals.json",
+      "line": 20,
+      "evidence": "\u201cHas lead title styling and embedded styling from the selected template\u201d checks source structure, but the three evals do not exercise existing-deck redesign, image resolution, or the gradient variants whose rendered quality the workflow explicitly requires checking.",
+      "fix": "Add an existing-deck fixture and a multi-variant gradient/image case. Assert preserved requested content, resolved assets, readable contrast, absence of overflow, and truthful reporting when rendering is unavailable."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/marp-slide/assets/template-gradient.md",
+      "line": 38,
+      "evidence": "\u201cbackground: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)\u201d is paired with white body text. Following the gradient-style branch produces a bright cyan variant with inadequate text contrast; the external gradient stylesheet repeats this combination.",
+      "fix": "Darken the bright gradient stops or place text on a sufficiently opaque dark surface. Apply the correction to both gradient assets and verify every variant, not only the title slide."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/marp-slide/references/advanced-features.md",
+      "line": 336,
+      "evidence": "The supplied GitHub Actions build uses \u201cactions/upload-artifact@v3\u201d, a retired action version that prevents the documented workflow from completing on GitHub.com.",
+      "fix": "Update the artifact upload to a supported version such as actions/upload-artifact@v4, update the checkout action as appropriate, and verify that the example successfully uploads the generated PDF."
+    }
+  ]
+}

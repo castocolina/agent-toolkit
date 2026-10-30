@@ -1,0 +1,86 @@
+{
+  "skill": "mui",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 10,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 13,
+    "D6": 15,
+    "D7": 11,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 104,
+  "max_total": 125,
+  "percent": 83.2,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/mui/resources/styling-guide.md",
+      "line": 25,
+      "evidence": "\u201cSpacing (multiplied by theme.spacing, default 8px)\u201d exemplifies extensive basic sx, responsive-style, spacing, and createTheme tutorials in the resources. The concise v7 migration section adds expert traps, but these familiar library examples substantially dilute the overall knowledge delta.",
+      "fix": "Remove beginner explanations and repeated basic theme configurations from the resources. Retain focused v7 decisions about slot targets, selector specificity, sx transformations, palette augmentation, public exports, and migration compatibility."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/mui/skill-rules-fragment.json",
+      "line": 6,
+      "evidence": "\u201cpromptTriggers\u201d defines a separate activation configuration, but SKILL.md's resource routes do not mention this fragment and no consuming integration is documented there. Its purpose and loading conditions are disconnected from the skill's navigation.",
+      "fix": "Remove the fragment if it is not consumed, or document the actual integration and route to it only when configuring that integration. Do not load activation configuration for ordinary MUI implementation tasks."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/mui/evals/evals.json",
+      "line": 18,
+      "evidence": "The dialog assertions are only \u201cUses `onClose`, not `onBackdropClick`,\u201d \u201cIncludes Cancel and Delete,\u201d and \u201cUses MUI imports.\u201d An uncontrolled or unnamed dialog can satisfy them, and the legacy-import case supplies no actual import to distinguish a valid public component path from a private deep import.",
+      "fix": "Add concrete migration inputs and assertions for controlled open/close behavior, the rendered dialog's accessible name, Escape/backdrop handling, and public-versus-private import paths. Include typechecked Grid and palette-augmentation consumers."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/mui/evals/trigger-queries.json",
+      "line": 27,
+      "evidence": "\u201cDialog controlled state with Cancel/Save.\u201d is labeled should_trigger=true without MUI context; \u201cResponsive Grid full-width mobile cards.\u201d has the same ambiguity. Both can describe other libraries or ordinary React/CSS work excluded by the description.",
+      "fix": "Make these bare requests near-miss negatives, and add positive versions with realistic MUI imports, package-version context, or existing MUI file references."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/mui/resources/theme-customization.md",
+      "line": 555,
+      "evidence": "\u201ccreateTheme({ ...outerTheme, palette: { ...outerTheme.palette, mode: 'dark' } })\u201d carries the resolved outer palette into the dark-theme branch. Its explicit light background/text values remain supplied overrides, so changing mode alone does not create the intended dark palette; a CSS-variable theme can also carry the private vars field into createTheme.",
+      "fix": "Build the nested theme from shared source ThemeOptions rather than a resolved theme, explicitly derive the dark palette or use the project's supported color-scheme mechanism, and verify computed background/text colors in the nested region."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/mui/resources/theme-customization.md",
+      "line": 101,
+      "evidence": "\u201c<IconButton onClick={() => setMode(...)}>\u201d contains only DarkModeIcon or LightModeIcon and supplies no accessible name. Following the dark-mode example creates an unnamed theme-toggle button.",
+      "fix": "Add an aria-label describing the target action, such as switching to dark or light mode, and assert the toggle's accessible name and state change with a role-based test."
+    }
+  ]
+}

@@ -1,328 +1,45 @@
 ---
 name: ship-learn-next
-description: Transform learning content (like YouTube transcripts, articles, tutorials) into actionable implementation plans using the Ship-Learn-Next framework. Use when user wants to turn advice, lessons, or educational content into concrete action steps, reps, or a learning quest.
-allowed-tools:
-  - Read
-  - Write
+description: "Turn supplied articles, tutorials, YouTube transcripts, or course notes into a Ship-Learn-Next implementation quest with a shippable first rep, measurable completion criteria, reflection, and evidence-driven next iterations. Use when the user wants to implement advice or practice lessons. Not for summaries, reading lists, curricula, or exam-study schedules."
+allowed-tools: Read Write
 ---
 
-# Ship-Learn-Next Action Planner
+# Ship-Learn-Next
 
-This skill helps transform passive learning content into actionable **Ship-Learn-Next cycles** - turning advice and lessons into concrete, shippable iterations.
+Use when the user wants to act on learning content, not merely understand or summarize it. Build a short loop: ship a controllable deliverable, inspect evidence, then choose the next rep. Be direct, question-driven, and end with a concrete commitment.
 
-## When to Use This Skill
+## Source and extraction
 
-Activate when the user:
-- Has a transcript/article/tutorial and wants to "implement the advice"
-- Asks to "turn this into a plan" or "make this actionable"
-- Wants to extract implementation steps from educational content
-- Needs help breaking down big ideas into small, shippable reps
-- Says things like "I watched/read X, now what should I do?"
+When the eval or runtime cannot write files, state that assumption and provide the complete Markdown plan in the response rather than stopping at a request for inputs. If inputs are absent, give a clearly labeled provisional plan based only on the stated goal and identify missing source lessons as assumptions; do not claim it is source-derived. Name the intended saved Markdown plan path.
 
-## Core Framework: Ship-Learn-Next
+- Read the content the user provides, whether pasted text or a file. If they provide only a YouTube URL and no accessible transcript, ask them to paste/upload the transcript; do not invent source lessons or timestamps.
+- Extract only practice-worthy claims and techniques. Link each to the source section or timestamp only when actually available. If content is missing, ask for it instead of presenting a generic plan as source-derived.
+- Identify what outcome the user wants. Reuse their deadline and available time; ask only for missing constraints that change the first rep.
 
-Every learning quest follows three repeating phases:
+## Design the first rep
 
-1. **SHIP** - Create something real (code, content, product, demonstration)
-2. **LEARN** - Honest reflection on what happened
-3. **NEXT** - Plan the next iteration based on learnings
+Choose the smallest real deliverable that tests one lesson and can be completed with the user's available time. Make its completion criteria controllable (publish, send, build, demonstrate); keep external response, revenue, or adoption as a learning metric, not a shipment gate. Include only resources needed for this rep.
 
-**Key principle**: 100 reps beats 100 hours of study. Learning = doing better, not knowing more.
+A rep must be small enough that its outcome is interpretable. Change one experimental variable at a time; otherwise a result cannot show which change mattered. Where outcomes are noisy, define an observable process measure alongside the external result.
 
-## How This Skill Works
+## Review evidence and choose next
 
-### Step 1: Read the Content
+After the user reports a rep, distinguish shipped artifact/process evidence from outcome metrics and anecdote. Apply this rule:
 
-Read the file the user provides (transcript, article, notes):
+- Deliverable not shipped: shrink or remove the blocker before repeating.
+- Execution inconsistent: repeat the same rep until execution is reliable.
+- Evidence ambiguous: isolate one variable and run a cleaner rep.
+- Reliable completion with usable evidence: increase difficulty or test the next lesson.
 
-```bash
-# User provides path to file
-FILE_PATH="/path/to/content.txt"
-```
+Keep Rep 1 fully actionable. Later reps are provisional outlines only; each proposed later rep should add or change exactly one element relative to the prior rep, and state that single change. Expand Rep 2 after reviewing Rep 1 evidence, and never pretend future learning is known.
 
-Use the Read tool to analyze the content.
+## Save and present
 
-### Step 2: Extract Core Lessons
+Save as `Ship-Learn-Next Plan - <brief title>.md` unless the user names a path. File saving is the default, not a requirement: honor chat-only requests and state if writing is unavailable. Save source, extracted lessons, Rep 1 deliverable/criteria/steps/reflection, and provisional future direction. Report the path only if the file was actually written. End by asking for a ship date or naming the next concrete commitment.
 
-Identify from the content:
-- **Main advice/lessons**: What are the key takeaways?
-- **Actionable principles**: What can actually be practiced?
-- **Skills being taught**: What would someone learn by doing this?
-- **Examples/case studies**: Real implementations mentioned
+## Gotchas
 
-**Do NOT**:
-- Summarize everything (focus on actionable parts)
-- List theory without application
-- Include "nice to know" vs "need to practice"
-
-### Step 3: Define the Quest
-
-Help the user frame their learning goal:
-
-Ask:
-1. "Based on this content, what do you want to achieve in 4-8 weeks?"
-2. "What would success look like? (Be specific)"
-3. "What's something concrete you could build/create/ship?"
-
-**Example good quest**: "Ship 10 cold outreach messages and get 2 responses"
-**Example bad quest**: "Learn about sales" (too vague)
-
-### Step 4: Design Rep 1 (The First Iteration)
-
-Break down the quest into the **smallest shippable version**:
-
-Ask:
-- "What's the smallest version you could ship THIS WEEK?"
-- "What do you need to learn JUST to do that?" (not everything)
-- "What would 'done' look like for rep 1?"
-
-**Make it:**
-- Concrete and specific
-- Completable in 1-7 days
-- Produces real evidence/artifact
-- Small enough to not be intimidating
-- Big enough to learn something meaningful
-
-### Step 5: Create the Rep Plan
-
-Structure each rep with:
-
-```markdown
-## Rep 1: [Specific Goal]
-
-**Ship Goal**: [What you'll create/do]
-**Success Criteria**: [How you'll know it's done]
-**What You'll Learn**: [Specific skills/insights]
-**Resources Needed**: [Minimal - just what's needed for THIS rep]
-**Timeline**: [Specific deadline]
-
-**Action Steps**:
-1. [Concrete step 1]
-2. [Concrete step 2]
-3. [Concrete step 3]
-...
-
-**After Shipping - Reflection Questions**:
-- What actually happened? (Be specific)
-- What worked? What didn't?
-- What surprised you?
-- On a scale of 1-10, how did this rep go?
-- What would you do differently next time?
-```
-
-### Step 6: Map Future Reps (2-5)
-
-Based on the content, suggest a progression:
-
-```markdown
-## Rep 2: [Next level]
-**Builds on**: What you learned in Rep 1
-**New challenge**: One new thing to try/improve
-**Expected difficulty**: [Easier/Same/Harder - and why]
-
-## Rep 3: [Continue progression]
-...
-```
-
-**Progression principles**:
-- Each rep adds ONE new element
-- Increase difficulty based on success
-- Reference specific lessons from the content
-- Keep reps shippable (not theoretical)
-
-### Step 7: Connect to Content
-
-For each rep, reference the source material:
-
-- "This implements the [concept] from minute X"
-- "You're practicing the [technique] mentioned in the video"
-- "This tests the advice about [topic]"
-
-**But**: Always emphasize DOING over studying. Point to resources only when needed for the specific rep.
-
-## Conversation Style
-
-**Direct but supportive**:
-- No fluff, but encouraging
-- "Ship it, then we'll improve it"
-- "What's the smallest version you could do this week?"
-
-**Question-driven**:
-- Make them think, don't just tell
-- "What exactly do you want to achieve?" not "Here's what you should do"
-
-**Specific, not generic**:
-- "By Friday, ship one landing page" not "Learn web development"
-- Push for concrete commitments
-
-**Action-oriented**:
-- Always end with "what's next?"
-- Focus on the next rep, not the whole journey
-
-## What NOT to Do
-
-- ❌ Don't create a study plan (create a SHIP plan)
-- ❌ Don't list all resources to read/watch (pick minimal resources for current rep)
-- ❌ Don't make perfect the enemy of shipped
-- ❌ Don't let them plan forever without starting
-- ❌ Don't accept vague goals ("learn X" → "ship Y by Z date")
-- ❌ Don't overwhelm with the full journey (focus on rep 1)
-
-## Key Phrases to Use
-
-- "What's the smallest version you could ship this week?"
-- "What do you need to learn JUST to do that?"
-- "This isn't about perfection - it's rep 1 of 100"
-- "Ship something real, then we'll improve it"
-- "Based on [content], what would you actually DO differently?"
-- "Learning = doing better, not knowing more"
-
-## Example Output Structure
-
-```markdown
-# Your Ship-Learn-Next Quest: [Title]
-
-## Quest Overview
-**Goal**: [What they want to achieve in 4-8 weeks]
-**Source**: [The content that inspired this]
-**Core Lessons**: [3-5 key actionable takeaways from content]
-
----
-
-## Rep 1: [Specific, Shippable Goal]
-
-**Ship Goal**: [Concrete deliverable]
-**Timeline**: [This week / By [date]]
-**Success Criteria**:
-- [ ] [Specific thing 1]
-- [ ] [Specific thing 2]
-- [ ] [Specific thing 3]
-
-**What You'll Practice** (from the content):
-- [Skill/concept 1 from source material]
-- [Skill/concept 2 from source material]
-
-**Action Steps**:
-1. [Concrete step]
-2. [Concrete step]
-3. [Concrete step]
-4. Ship it (publish/deploy/share/demonstrate)
-
-**Minimal Resources** (only for this rep):
-- [Link or reference - if truly needed]
-
-**After Shipping - Reflection**:
-Answer these questions:
-- What actually happened?
-- What worked? What didn't?
-- What surprised you?
-- Rate this rep: _/10
-- What's one thing to try differently next time?
-
----
-
-## Rep 2: [Next Iteration]
-
-**Builds on**: Rep 1 + [what you learned]
-**New element**: [One new challenge/skill]
-**Ship goal**: [Next concrete deliverable]
-
-[Similar structure...]
-
----
-
-## Rep 3-5: Future Path
-
-**Rep 3**: [Brief description]
-**Rep 4**: [Brief description]
-**Rep 5**: [Brief description]
-
-*(Details will evolve based on what you learn in Reps 1-2)*
-
----
-
-## Remember
-
-- This is about DOING, not studying
-- Aim for 100 reps over time (not perfection on rep 1)
-- Each rep = Plan → Do → Reflect → Next
-- You learn by shipping, not by consuming
-
-**Ready to ship Rep 1?**
-```
-
-## Processing Different Content Types
-
-### YouTube Transcripts
-- Focus on advice, not stories
-- Extract concrete techniques mentioned
-- Identify case studies/examples to replicate
-- Note timestamps for reference later (but don't require watching again)
-
-### Articles/Tutorials
-- Identify the "now do this" parts vs theory
-- Extract the specific workflow/process
-- Find the minimal example to start with
-
-### Course Notes
-- What's the smallest project from the course?
-- Which modules are needed for rep 1? (ignore the rest for now)
-- What can be practiced immediately?
-
-## Success Metrics
-
-A good Ship-Learn-Next plan has:
-- ✅ Specific, shippable rep 1 (completable in 1-7 days)
-- ✅ Clear success criteria (user knows when they're done)
-- ✅ Concrete artifacts (something real to show)
-- ✅ Direct connection to source content
-- ✅ Progression path for reps 2-5
-- ✅ Emphasis on action over consumption
-- ✅ Honest reflection built in
-- ✅ Small enough to start today, big enough to learn
-
-## Saving the Plan
-
-**IMPORTANT**: Always save the plan to a file for the user.
-
-### Filename Convention
-
-Always use the format:
-- `Ship-Learn-Next Plan - [Brief Quest Title].md`
-
-Examples:
-- `Ship-Learn-Next Plan - Build in Proven Markets.md`
-- `Ship-Learn-Next Plan - Learn React.md`
-- `Ship-Learn-Next Plan - Cold Email Outreach.md`
-
-**Quest title should be**:
-- Brief (3-6 words)
-- Descriptive of the main goal
-- Based on the content's core lesson/theme
-
-### What to Save
-
-**Complete plan including**:
-- Quest overview with goal and source
-- All reps (1-5) with full details
-- Action steps and reflection questions
-- Timeline commitments
-- Reference to source material
-
-**Format**: Always save as Markdown (`.md`) for readability
-
-## After Creating the Plan
-
-**Display to user**:
-1. Show them you've saved the plan: "✓ Saved to: [filename]"
-2. Give a brief overview of the quest
-3. Highlight Rep 1 (what's due this week)
-
-**Then ask**:
-1. "When will you ship Rep 1?"
-2. "What's the one thing that might stop you? How will you handle it?"
-3. "Come back after you ship and we'll reflect + plan Rep 2"
-
-**Remember**: You're not creating a curriculum. You're helping them ship something real, learn from it, and ship the next thing.
-
-Let's help them ship.
+- Never make completion depend on an uncontrollable market response; otherwise the user can do the work and still be told they did not ship.
+- Keep completion criteria separate from learning metrics; an experiment can be completed even when its hypothesis is disproved.
+- Never fabricate source references or timestamps. False provenance makes the plan look grounded when it is not.
+- Never vary several elements in one rep: confounded results cannot guide the next decision.

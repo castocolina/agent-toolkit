@@ -4,6 +4,7 @@ import json
 import os
 import shlex
 import shutil
+import subprocess
 import sys
 import tempfile
 import time
@@ -62,6 +63,278 @@ class Base(unittest.TestCase):
     def codes(self, *extra, **kw):
         _, skills = self.check(*extra, **kw)
         return [i["code"] for i in skills[0]["issues"]]
+
+
+class UpstreamsTests(Base):
+    def setup_registry(self, entries):
+        path = self.write("registry.json", json.dumps(entries))
+        return path
+
+    def run_upstreams(self, entries, **stubs):
+        path = self.setup_registry(entries)
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch("audit.fetch_source_updated", side_effect=stubs.get("fetch", ["2025-01-02T00:00:00Z"] * len(entries))), \
+             mock.patch("audit.ours_updated", side_effect=stubs.get("ours", ["2025-01-01T00:00:00Z"] * len(entries))), \
+             contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = audit.main(["--root", str(self.root), "upstreams", "--registry", str(path)])
+        return code, json.loads(out.getvalue()), err.getvalue()
+
+    def test_upstreams_stale_when_source_newer(self):
+        self.skill("x")
+        entry = {"skill":"x", "kind":"github", "source":"o/r", "ref":"main"}
+        code, rows, _ = self.run_upstreams([entry])
+        self.assertEqual((code, rows[0]["stale"]), (0, True))
+
+    def test_staleness_compares_instants_across_offsets_and_equal_instants(self):
+        self.skill("x")
+        entry = {"skill": "x", "kind": "github", "source": "o/r", "ref": "main"}
+        for upstream, ours, stale in (
+            ("2025-01-01T12:00:00Z", "2025-01-01T13:00:00+02:00", True),
+            ("2025-01-01T12:00:00+00:00", "2025-01-01T14:00:00+02:00", False),
+        ):
+            with self.subTest(upstream=upstream, ours=ours):
+                code, rows, _ = self.run_upstreams([entry], fetch=[upstream], ours=[ours])
+                self.assertEqual((code, rows[0]["stale"]), (0, stale))
+
+    def test_upstreams_unversioned_never_stale(self):
+        self.skill("x")
+        e = {"skill":"x", "kind":"unversioned", "source":"citation", "ref":None}
+        code, rows, _ = self.run_upstreams([e])
+        self.assertEqual((code, rows[0]["stale"], rows[0]["source_updated"]), (0, False, None))
+
+    def test_upstreams_repo_kind_uses_merge_base(self):
+        self.skill("x")
+        e = {"skill":None, "kind":"repo", "source":"o/r", "ref":"main"}
+        with mock.patch("audit.fetch_source_updated", return_value="2025-01-02T00:00:00Z"), \
+             mock.patch("audit.ours_updated", return_value="2025-01-01T00:00:00Z"):
+            code, rows, _ = self.run_upstreams([e])
+        self.assertEqual((code, rows[0]["stale"]), (0, True))
+
+    def test_upstreams_repo_kind_uses_shared_ancestor_committer_date(self):
+        self.skill("x")
+        self._git_init(self.root)
+        self._commit(self.root, "base.txt", "common\n", "2025-01-01T00:00:00+00:00")
+        upstream = Path(self._tmp.name) / "upstream.git"
+        subprocess.run(["git", "clone", "--bare", str(self.root), str(upstream)], check=True, capture_output=True)
+        seed = Path(self._tmp.name) / "seed"
+        subprocess.run(["git", "clone", str(upstream), str(seed)], check=True, capture_output=True)
+        self._git_config(seed)
+        self._commit(self.root, "local.txt", "local later\n", "2025-01-03T00:00:00+00:00")
+        self._commit(seed, "upstream.txt", "upstream later\n", "2025-01-02T00:00:00+00:00")
+        subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=seed, check=True, capture_output=True)
+        subprocess.run(["git", "symbolic-ref", "HEAD", "refs/heads/main"], cwd=upstream, check=True)
+        entry = {"skill": None, "kind": "repo", "source": "o/r", "ref": "main"}
+        before_refs = subprocess.run(["git", "show-ref"], cwd=self.root, capture_output=True, text=True).stdout
+        with mock.patch("audit.upstream_repo_url", return_value=str(upstream)):
+            self.assertEqual(audit.ours_updated(self.root, entry), "2025-01-01T00:00:00Z")
+        refs = subprocess.run(["git", "show-ref"], cwd=self.root, capture_output=True, text=True).stdout
+        self.assertEqual(refs, before_refs)
+
+    def _git_config(self, path):
+        subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=path, check=True)
+        subprocess.run(["git", "config", "user.name", "Test"], cwd=path, check=True)
+
+    def _git_init(self, path):
+        subprocess.run(["git", "init", "-q"], cwd=path, check=True)
+        self._git_config(path)
+
+    def _commit(self, path, rel, content, timestamp):
+        target = path / rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(content)
+        subprocess.run(["git", "add", rel], cwd=path, check=True)
+        env = {**os.environ, "GIT_AUTHOR_DATE": timestamp, "GIT_COMMITTER_DATE": timestamp}
+        subprocess.run(["git", "commit", "-m", "fixture"], cwd=path, env=env, check=True, capture_output=True)
+
+    def test_upstreams_invalid_timestamp_errors_and_unversioned_needs_history(self):
+        self.skill("x")
+        entry = {"skill": "x", "kind": "github", "source": "o/r", "ref": "main"}
+        code, rows, _ = self.run_upstreams([entry], fetch=["not-a-date"])
+        self.assertEqual((code, rows[0]["stale"]), (1, None))
+        unversioned = {"skill": "x", "kind": "unversioned", "source": "citation", "ref": None}
+        empty = self.root / "empty"
+        subprocess.run(["git", "init", "-q", str(empty)], check=True)
+        path = self.setup_registry([unversioned])
+        out = io.StringIO()
+        with mock.patch("audit.ours_updated", return_value=None), contextlib.redirect_stdout(out):
+            code = audit.main(["--root", str(self.root), "upstreams", "--registry", str(path)])
+        self.assertEqual((code, json.loads(out.getvalue())[0]["stale"]), (1, None))
+
+    def test_upstreams_repo_unrelated_history_uses_oldest_root_commit(self):
+        self.skill("x")
+        self._git_init(self.root)
+        self._commit(self.root, "skills/x/SKILL.md", "first\n", "2025-01-01T00:00:00+00:00")
+        self._commit(self.root, "later.txt", "later\n", "2025-01-03T00:00:00+00:00")
+        branch = subprocess.run(["git", "branch", "--show-current"], cwd=self.root,
+                                check=True, capture_output=True, text=True).stdout.strip()
+        subprocess.run(["git", "checkout", "--orphan", "older-root"], cwd=self.root,
+                       check=True, capture_output=True)
+        self._commit(self.root, "older-root.txt", "old root\n", "2024-12-31T00:00:00+00:00")
+        subprocess.run(["git", "checkout", branch], cwd=self.root, check=True, capture_output=True)
+        subprocess.run(["git", "merge", "--allow-unrelated-histories", "--no-commit", "older-root"],
+                       cwd=self.root, check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "join roots"], cwd=self.root, check=True, capture_output=True)
+        upstream = Path(self._tmp.name) / "unrelated.git"
+        subprocess.run(["git", "init", "--bare", str(upstream)], check=True, capture_output=True)
+        seed = Path(self._tmp.name) / "unrelated-seed"
+        subprocess.run(["git", "clone", str(upstream), str(seed)], check=True, capture_output=True)
+        self._git_config(seed)
+        self._commit(seed, "remote.txt", "remote\n", "2025-01-02T00:00:00+00:00")
+        subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=seed, check=True, capture_output=True)
+        entry = {"skill": None, "kind": "repo", "source": "o/r", "ref": "main"}
+        with mock.patch("audit.upstream_repo_url", return_value=str(upstream)):
+            self.assertEqual(audit.ours_updated(self.root, entry), "2024-12-31T00:00:00Z")
+
+    def test_upstreams_real_repo_fetch_failure_is_unavailable(self):
+        self.skill("x")
+        entry = {"skill": None, "kind": "repo", "source": "o/r", "ref": "main"}
+        with mock.patch("audit.upstream_repo_url", return_value=str(Path(self._tmp.name) / "missing.git")):
+            with self.assertRaises(audit.SourceUnavailable):
+                audit.ours_updated(self.root, entry)
+
+    def test_upstreams_fetch_failure_is_error_not_stale(self):
+        self.skill("x")
+        e = {"skill":"x", "kind":"github", "source":"o/r", "ref":"main"}
+        code, rows, _ = self.run_upstreams([e], fetch= audit.SourceUnavailable("offline"))
+        self.assertEqual((code, rows[0]["stale"]), (1, None))
+        self.assertTrue(rows[0]["error"])
+
+    def test_upstreams_evals_only_commit_does_not_reset_staleness(self):
+        self.skill("x")
+        def git(*args):
+            return subprocess.run(["git", *args], cwd=self.root, check=True, capture_output=True, text=True).stdout.strip()
+        git("init", "-q")
+        git("config", "user.email", "test@example.com")
+        git("config", "user.name", "Test")
+        git("add", "skills/x/SKILL.md")
+        env = {**os.environ, "GIT_AUTHOR_DATE": "2025-01-01T12:00:00+00:00", "GIT_COMMITTER_DATE": "2025-01-01T12:00:00+00:00"}
+        subprocess.run(["git", "commit", "-qm", "skill"], cwd=self.root, env=env, check=True)
+        initial = git("log", "-1", "--format=%cI", "--", "skills/x/SKILL.md")
+        self.assertEqual(audit.ours_updated(self.root, {"kind":"github", "skill":"x"}), initial)
+        self.write("skills/x/evals/evals.json", "later")
+        git("add", "skills/x/evals/evals.json")
+        env = {**os.environ, "GIT_AUTHOR_DATE": "2025-01-02T12:00:00+00:00", "GIT_COMMITTER_DATE": "2025-01-02T12:00:00+00:00"}
+        subprocess.run(["git", "commit", "-qm", "evals only"], cwd=self.root, env=env, check=True)
+        entry = {"skill":"x", "kind":"github", "source":"o/r", "ref":"main"}
+        self.assertEqual(audit.ours_updated(self.root, entry), initial)
+
+    def test_registry_failure_cases_are_independent_subtests(self):
+        for text in (None, "not json", "{}"):
+            with self.subTest(registry=text):
+                path = self.root / "bad-registry.json"
+                if text is None:
+                    path.unlink(missing_ok=True)
+                else:
+                    path.write_text(text)
+                err = io.StringIO()
+                with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
+                    code = audit.main(["--root", str(self.root), "upstreams", "--registry", str(path)])
+                self.assertEqual(code, 2)
+                self.assertIn("cannot read registry", err.getvalue())
+
+    def test_upstreams_empty_local_history_is_error(self):
+        self.skill("x")
+        subprocess.run(["git", "init", "-q"], cwd=self.root, check=True)
+        entry = {"skill":"x", "kind":"github", "source":"o/r", "ref":"main"}
+        path = self.setup_registry([entry])
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch("audit.fetch_source_updated", return_value="2025-01-02T00:00:00Z"), \
+             contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = audit.main(["--root", str(self.root), "upstreams", "--registry", str(path)])
+        rows = json.loads(out.getvalue())
+        self.assertEqual((code, rows[0]["stale"]), (1, None))
+
+    def test_fetch_source_updated_malformed_response_raises(self):
+        entry = {"kind":"github", "source":"o/r", "ref":"main"}
+        with mock.patch("audit.subprocess.run", return_value=mock.Mock(returncode=0, stdout="[]", stderr="")):
+            with self.assertRaises(audit.SourceUnavailable):
+                audit.fetch_source_updated(entry)
+
+    def test_wikipedia_shapes_and_bad_kind_are_rejected(self):
+        entry = {"skill": "x", "kind": "wikipedia", "source": "title", "ref": None}
+        for payload in (
+            {"query": {"pages": None}}, {"query": {"pages": []}},
+            {"query": {"pages": {"1": {"revisions": None}}}},
+            {"query": {"pages": {"1": {"revisions": {}}}}},
+        ):
+            with self.subTest(payload=payload), mock.patch("audit.urllib.request.urlopen") as urlopen:
+                urlopen.return_value.__enter__.return_value.read.return_value = json.dumps(payload).encode()
+                with self.assertRaises(audit.SourceUnavailable):
+                    audit.fetch_source_updated(entry)
+        for kind in ([], {}):
+            with self.subTest(kind=kind):
+                self.assertIsNotNone(audit.validate_entry(self.root, {"skill": "x", "kind": kind,
+                                                                       "source": "citation", "ref": None}))
+
+    def test_source_query_per_kind(self):
+        for kind, source, ref, fragment in [
+            ("github", "o/r", "main", "sha=main"), ("github-path", "o/r:a.md", "main", "path=a.md"),
+            ("repo", "o/r", "main", "sha=main"), ("wikipedia", "Signs of AI writing", None, "Signs%20of%20AI%20writing"),
+            ("unversioned", "citation", None, None)]:
+            with self.subTest(kind=kind):
+                q = audit.source_query({"kind":kind,"source":source,"ref":ref})
+                if fragment is None:
+                    self.assertIsNone(q)
+                else:
+                    self.assertIn(fragment, q)
+                if kind == "github-path":
+                    self.assertIn("path=a.md", q)
+                    self.assertIn("sha=main", q)
+        self.assertNotIn("path=", audit.source_query({"kind":"github","source":"o/r","ref":"main"}))
+        self.assertNotIn("path=", audit.source_query({"kind":"repo","source":"o/r","ref":"main"}))
+
+    def test_source_validation_accepts_github_component_and_path_characters(self):
+        self.skill("x")
+        base = {"skill": "x", "kind": "github", "source": "o/.github", "ref": "main"}
+        self.assertIsNone(audit.validate_entry(self.root, base))
+        self.assertIsNone(audit.validate_entry(self.root, {**base, "source": "o/_x"}))
+        self.assertIsNone(audit.validate_entry(self.root, {
+            **base, "kind": "github-path", "source": "o/r:folder/a file-é.md"
+        }))
+        self.assertIn("path=folder%2Fa%20file-%C3%A9.md", audit.source_query({
+            "kind": "github-path", "source": "o/r:folder/a file-é.md", "ref": "main"
+        }))
+        self.assertIsNotNone(audit.validate_entry(self.root, {**base, "source": "o/.."}))
+
+    def test_upstreams_invalid_entries_are_error_rows(self):
+        self.skill("x")
+        valid = {"skill":"x", "kind":"unversioned", "source":"citation", "ref":None}
+        bads = [
+            {"kind":"github","source":"o/r","ref":"main"},
+            {**valid,"kind":"wat"}, {**valid,"skill":"missing"}, {**valid,"skill":"../x"},
+            {**valid,"kind":"github","source":"bad","ref":"main"},
+            {**valid,"kind":"github","source":"owner/../repo","ref":"main"},
+            {**valid,"kind":"github-path","source":"o/r:path?x=1","ref":"main"},
+            {**valid,"kind":"wikipedia","source":"line\nfeed","ref":None},
+            {**valid,"kind":"wikipedia","source":"carriage\rreturn","ref":None},
+            {**valid,"kind":"github-path","source":"o/r:a/../b","ref":"main"},
+            {**valid,"kind":"repo","skill":"x","source":"o/r","ref":"main"},
+            {**valid,"kind":"github","source":"o/r","ref":None},
+            {**valid,"kind":"wikipedia","ref":"x"},
+        ]
+        valid = {"skill": "x", "kind": "github", "source": "o/r", "ref": "main"}
+        for bad in bads:
+            fetched = []
+            def fetch_stub(entry):
+                fetched.append(entry)
+                return "2024-01-02T00:00:00Z"
+            with self.subTest(bad=bad):
+                code, rows, _ = self.run_upstreams([bad, valid], fetch=fetch_stub)
+                self.assertEqual(fetched, [valid])
+                self.assertEqual(code, 1)
+                self.assertIsNone(rows[0]["stale"])
+                self.assertTrue(rows[0]["error"].startswith("invalid entry"))
+                self.assertFalse(rows[1]["stale"])
+
+    def test_upstreams_unreadable_registry_exits_2(self):
+        for text in (None, "nope", "{}"):
+            path = self.root / "bad.json"
+            if text is None: path.unlink(missing_ok=True)
+            else: path.write_text(text)
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
+                code = audit.main(["--root", str(self.root), "upstreams", "--registry", str(path)])
+            self.assertEqual(code, 2)
 
 
 class CheckTests(Base):

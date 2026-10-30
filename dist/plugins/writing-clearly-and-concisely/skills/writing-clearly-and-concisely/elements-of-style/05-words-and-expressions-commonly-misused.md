@@ -247,7 +247,7 @@ In the examples above, the subject of the action is a single, unmodified term, i
 
 In some kinds of formal writing, as geometrical proofs, it may be necessary to use *respectively*, but it should not appear in writing on ordinary subjects.
 
-**Shall, Will.** The future tense requires *shall* for the first person, *will* for the second and third. The formula to express the speaker's belief regarding his future action or state is *I shall*; *I will* expresses his determination or his consent.
+**Shall, Will.** This entry records a historical prescription, not a universal modern rule. Follow contemporary usage, the user's intended meaning, and house style; do not mechanically replace *will* with *shall* or vice versa.
 
 **Should.** See under **Would**.
 
@@ -284,7 +284,7 @@ On the use of *so* to introduce clauses, see Rule 4.
 
 **They.** A common inaccuracy is the use of the plural pronoun when the antecedent is a distributive expression such as *each*, *each one*, *everybody*, *every one*, *many a man*, which, though implying more than one person, requires the pronoun to be in the singular. Similar to this, but with even less justification, is the use of the plural pronoun with the antecedent *anybody*, *any one*, *somebody*, *some one*, the intention being either to avoid the awkward “he or she,” or to avoid committing oneself to either. Some bashful speakers even say, “A friend of mine told me that they, etc.”
 
-Use *he* with all the above words, unless the antecedent is or must be feminine.
+[Historical generic-*he* prescription omitted. Follow a person's stated pronouns and contemporary singular-*they* usage.]
 
 **Very.** Use this word sparingly. Where emphasis is necessary, use words strong in themselves.
 

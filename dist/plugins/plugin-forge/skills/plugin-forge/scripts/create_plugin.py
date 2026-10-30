@@ -6,6 +6,7 @@ Create a new Claude Code plugin with proper directory structure and manifests.
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -13,11 +14,27 @@ from pathlib import Path
 def create_plugin_structure(plugin_name: str, marketplace_root: Path, author_name: str, author_email: str, description: str, keywords: list[str], category: str = "productivity") -> None:
     """Create complete plugin directory structure with manifests."""
 
-    # Create plugin directory
-    plugin_dir = marketplace_root / "plugins" / plugin_name
+    # Reject traversal and absolute paths before touching the filesystem.
+    if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", plugin_name):
+        raise ValueError("plugin_name must be a kebab-case identifier")
+    plugins_root = (marketplace_root / "plugins").resolve()
+    plugin_dir = (plugins_root / plugin_name).resolve()
+    if not plugin_dir.is_relative_to(plugins_root):
+        raise ValueError("plugin_name escapes plugins directory")
     if plugin_dir.exists():
-        print(f"❌ Plugin directory already exists: {plugin_dir}")
-        sys.exit(1)
+        raise FileExistsError(f"Plugin directory already exists: {plugin_dir}")
+
+    marketplace_json_path = marketplace_root / ".claude-plugin" / "marketplace.json"
+
+    if not marketplace_json_path.exists():
+        raise FileNotFoundError(f"Marketplace manifest not found: {marketplace_json_path}")
+
+    with open(marketplace_json_path, "r") as f:
+        marketplace_data = json.load(f)
+
+    for plugin in marketplace_data.get("plugins", []):
+        if plugin.get("name") == plugin_name:
+            raise FileExistsError(f"Plugin '{plugin_name}' already exists in marketplace manifest")
 
     # Create directory structure
     plugin_config_dir = plugin_dir / ".claude-plugin"
@@ -44,7 +61,7 @@ def create_plugin_structure(plugin_name: str, marketplace_root: Path, author_nam
     with open(plugin_json_path, "w") as f:
         json.dump(plugin_manifest, f, indent=2)
 
-    print(f"✅ Created plugin manifest: {plugin_json_path}")
+    print(f"Created plugin manifest: {plugin_json_path}", file=sys.stderr)
 
     # Create README.md
     readme_content = f"""# {plugin_name}
@@ -75,23 +92,9 @@ See [workflows.md](../../CLAUDE.md) for development guidelines.
     with open(readme_path, "w") as f:
         f.write(readme_content)
 
-    print(f"✅ Created README: {readme_path}")
+    print(f"Created README: {readme_path}", file=sys.stderr)
 
     # Update marketplace.json
-    marketplace_json_path = marketplace_root / ".claude-plugin" / "marketplace.json"
-
-    if not marketplace_json_path.exists():
-        print(f"❌ Marketplace manifest not found: {marketplace_json_path}")
-        sys.exit(1)
-
-    with open(marketplace_json_path, "r") as f:
-        marketplace_data = json.load(f)
-
-    # Check if plugin already exists in marketplace
-    for plugin in marketplace_data.get("plugins", []):
-        if plugin.get("name") == plugin_name:
-            print(f"❌ Plugin '{plugin_name}' already exists in marketplace manifest")
-            sys.exit(1)
 
     # Add plugin entry
     plugin_entry = {
@@ -111,13 +114,9 @@ See [workflows.md](../../CLAUDE.md) for development guidelines.
     with open(marketplace_json_path, "w") as f:
         json.dump(marketplace_data, f, indent=2)
 
-    print(f"✅ Updated marketplace manifest: {marketplace_json_path}")
+    print(f"Updated marketplace manifest: {marketplace_json_path}", file=sys.stderr)
+    print(json.dumps({"status": "created", "plugin": plugin_name, "paths": [str(plugin_json_path), str(readme_path), str(marketplace_json_path)], "version": "0.1.0"}))
 
-    print(f"\n🎉 Plugin '{plugin_name}' created successfully!")
-    print(f"\nNext steps:")
-    print(f"1. Add commands to: {commands_dir}")
-    print(f"2. Add skills to: {skills_dir}")
-    print(f"3. Test with: /plugin install {plugin_name}@marketplace-name")
 
 
 def main():
@@ -147,4 +146,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (ValueError, FileNotFoundError, FileExistsError) as exc:
+        print(str(exc), file=sys.stderr)
+        sys.exit(2)

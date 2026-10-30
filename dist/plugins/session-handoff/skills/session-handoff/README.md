@@ -181,8 +181,7 @@ Example: `2024-01-15-143022-implementing-auth.md`
 
 - [handoff-template.md](references/handoff-template.md) - Complete template structure with guidance
 - [resume-checklist.md](references/resume-checklist.md) - Verification checklist for resuming agents
-- [evals/model-expectations.md](evals/model-expectations.md) - Model behavior expectations
-- [evals/test-scenarios.md](evals/test-scenarios.md) - Test cases for handoff creation and resumption
+- [Session handoff tests](https://github.com/castocolina/agent-toolkit/tree/main/tests/skills/session-handoff) - Test support and scenarios
 
 ## Benefits
 
