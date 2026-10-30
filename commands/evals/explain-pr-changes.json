@@ -792,6 +792,84 @@
         "No 'gh pr create' or 'gh pr edit' runs: the truncated body is never sent and no PR write happens",
         "The prose after the unclosed fence is not silently dropped into a sent body"
       ]
+    },
+    {
+      "id": "alias-drawio",
+      "files": [
+        "render-ok.json"
+      ],
+      "prompt": "Scenario: feature head `feature/diagrams`, base `main`, invoked with the bare alias `--drawio` (no `--diagrams` flag). The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists, `gh --version` prints `gh version 2.101.0`, and the render call prints render-ok.json. The diff introduces a new data flow that warrants a diagram. No open PR exists for the head. Show the exact ordered commands, the files written under the scratch directory $AD, and the final user-facing message. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "`--drawio` resolves the mode to drawio: the run renders and attaches exactly as `--diagrams=drawio` would",
+        "'git push -u origin feature/diagrams' runs before any gh call",
+        "A 'gh --version' check runs before rendering, and 'pr-diagrams.sh render' is called on '/tmp/explain-pr-changes.Ab12Cd/diagram.drawio' before any PR write",
+        "Exactly one gh pr create passes '--base main --head feature/diagrams', '--title', '--body-file' and '--attach' with a path ending in 'diagram.drawio.png'"
+      ]
+    },
+    {
+      "id": "alias-no-diagrams",
+      "prompt": "Scenario: feature head `feature/cleanup`, base `main`, invoked with the bare alias `--no-diagrams` (no `--diagrams` flag). Neither pr-diagrams.sh candidate exists. The diff is a medium-sized refactor that introduces a new data flow and would warrant a diagram under the default mode. No open PR exists.  Facts: `git remote get-url origin` prints `git@github.com:acme/widgets.git`; diff summary is `M src/cache.ts: split cache key construction into a new keyer module`, lookup returns `[]`; use title `Simplify cache key construction`. Show the exact ordered commands and the final user-facing message. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "`--no-diagrams` resolves the mode to none: the body contains no diagram content, no image and no Mermaid block",
+        "No 'pr-diagrams.sh' call of any kind is made (no render, no related, no repo)",
+        "A PR is still created with '--base main --head feature/cleanup' and a textual summary",
+        "The alias is consumed: the summary has no 'Close --no-diagrams' line"
+      ]
+    },
+    {
+      "id": "alias-mermaid-explicit",
+      "prompt": "Scenario: feature head `feature/login-form`, base `main`, invoked with the bare alias `--mermaid` (no `--diagrams` flag). Neither pr-diagrams.sh candidate exists. The diff `origin/main...HEAD` is a medium-sized refactor that warrants a Mermaid diagram. No open PR exists. Show the exact ordered commands and the final user-facing message. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "`--mermaid` resolves the mode to mermaid: the body contains an inline Mermaid block and no user-attachments URL",
+        "No gh command contains '--attach' and no pr-diagrams.sh call is made; nothing is uploaded",
+        "REPO is acme/widgets parsed inline from the origin URL, and a PR is created with '--base main --head feature/login-form'",
+        "The alias is consumed: the summary has no 'Close --mermaid' line"
+      ]
+    },
+    {
+      "id": "alias-conflict",
+      "prompt": "Scenario: the command is invoked with both `--drawio` and `--diagrams=none`. Head `feature/api-v2`, base `main`. Show the exact commands and the final user-facing message. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The command stops with exactly the error 'conflicting diagram options: --drawio and --diagrams=none'",
+        "No git push, no gh call, no pr-diagrams.sh call and no file write happens before the error"
+      ]
+    },
+    {
+      "id": "alias-with-reuse-from",
+      "files": [
+        "body-plain.md",
+        "render-ok.json",
+        "reviewers-ok.json"
+      ],
+      "prompt": "Scenario: feature head `feature/api-v2`, base `main`, invoked with `--reuse-from=41` and the bare alias `--drawio`. `gh pr view 41 --repo acme/widgets --json title,body,mergedAt` returns title `Billing export`, body-plain.md as the body (no diagram), and a non-null mergedAt. The author is `dora`; `pr-diagrams.sh reviewers 41 --exclude dora` prints reviewers-ok.json. The script exists, `gh --version` prints `gh version 2.101.0`, and the render call prints render-ok.json. The diff warrants a diagram. Show the exact ordered commands, the composed title and body, and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "`--drawio` resolves the mode to drawio on the reuse path: the diagram is rendered and attached, exactly as `--diagrams=drawio` would",
+        "No 'pr-diagrams.sh related' call happens: `--reuse-from=41` is the only source",
+        "The source body from body-plain.md is copied verbatim (only its leading '# PR Summary:' heading rewritten) and the new diagram section is appended",
+        "'pr-diagrams.sh reviewers 41 --exclude dora' runs in the read phase",
+        "The PR write passes '--attach' with a path ending in 'diagram.drawio.png'"
+      ]
+    },
+    {
+      "id": "alias-duplicate-ok",
+      "prompt": "Scenario: feature head `feature/typo`, base `main`, invoked with both `--drawio` and `--diagrams=drawio` (identical duplicates naming the same mode). The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists and `gh --version` prints 2.101.0. The diff introduces a new data flow that warrants a diagram, and the render call prints render-ok.json. No open PR exists. Show the exact ordered commands and the final user-facing message. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The identical duplicates are accepted: the run proceeds and does not stop with 'conflicting diagram options'",
+        "The mode resolves to drawio: 'pr-diagrams.sh render' is called on '/tmp/explain-pr-changes.Ab12Cd/diagram.drawio' before any PR write",
+        "Exactly one gh pr create passes '--attach' with a path ending in 'diagram.drawio.png', and the summary has no 'Close --drawio' line"
+      ],
+      "files": [
+        "render-ok.json"
+      ]
+    },
+    {
+      "id": "close-remaining-args",
+      "prompt": "Scenario: feature head `feature/typo`, base `main`, mermaid mode, invoked with the bare text arguments `issue 42` and the unknown bare flag `--verbose` (no diagram flags). Neither pr-diagrams.sh candidate exists. The diff only fixes a typo in a comment; no diagram is warranted. No open PR exists.  Facts: `git remote get-url origin` prints `git@github.com:acme/widgets.git`; lookup returns `[]`; use title `Clarify login comment`. Show the exact ordered commands, the composed body, and the final user-facing message. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "`issue 42` and `--verbose` are remaining arguments: the feature body's High-Level Summary contains the line 'Close issue 42 --verbose'",
+        "The unknown bare flag `--verbose` is not treated as an option and does not stop the command",
+        "The body has no diagram content and a PR is still created with '--base main --head feature/typo'"
+      ]
     }
   ]
 }
