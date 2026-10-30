@@ -1,4 +1,5 @@
 import contextlib
+import datetime
 import io
 import json
 import os
@@ -73,8 +74,10 @@ class UpstreamsTests(Base):
     def run_upstreams(self, entries, **stubs):
         path = self.setup_registry(entries)
         out, err = io.StringIO(), io.StringIO()
+        ours_default = stubs.get("ours", ["2025-01-01T00:00:00Z"] * len(entries))
         with mock.patch("audit.fetch_source_updated", side_effect=stubs.get("fetch", ["2025-01-02T00:00:00Z"] * len(entries))), \
-             mock.patch("audit.ours_updated", side_effect=stubs.get("ours", ["2025-01-01T00:00:00Z"] * len(entries))), \
+             mock.patch("audit.ours_updated", side_effect=ours_default), \
+             mock.patch("audit.repo_ours_updated", side_effect=stubs.get("repo_ours", [(ours, None) for ours in ours_default])), \
              contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
             code = audit.main(["--root", str(self.root), "upstreams", "--registry", str(path)])
         return code, json.loads(out.getvalue()), err.getvalue()
@@ -105,15 +108,18 @@ class UpstreamsTests(Base):
     def test_upstreams_repo_kind_uses_merge_base(self):
         self.skill("x")
         e = {"skill":None, "kind":"repo", "source":"o/r", "ref":"main"}
-        with mock.patch("audit.fetch_source_updated", return_value="2025-01-02T00:00:00Z"), \
-             mock.patch("audit.ours_updated", return_value="2025-01-01T00:00:00Z"):
-            code, rows, _ = self.run_upstreams([e])
+        code, rows, _ = self.run_upstreams([e], repo_ours=[("2025-01-01T00:00:00Z", "0f63ca1e")])
         self.assertEqual((code, rows[0]["stale"]), (0, True))
+        self.assertEqual(rows[0]["merge_base"], "0f63ca1e")
+        code, rows, _ = self.run_upstreams([e])
+        self.assertIsNone(rows[0]["merge_base"])
 
     def test_upstreams_repo_kind_uses_shared_ancestor_committer_date(self):
         self.skill("x")
         self._git_init(self.root)
         self._commit(self.root, "base.txt", "common\n", "2025-01-01T00:00:00+00:00")
+        expected_base = subprocess.run(["git", "rev-parse", "HEAD"], cwd=self.root,
+                                       check=True, capture_output=True, text=True).stdout.strip()
         upstream = Path(self._tmp.name) / "upstream.git"
         subprocess.run(["git", "clone", "--bare", str(self.root), str(upstream)], check=True, capture_output=True)
         seed = Path(self._tmp.name) / "seed"
@@ -127,6 +133,9 @@ class UpstreamsTests(Base):
         before_refs = subprocess.run(["git", "show-ref"], cwd=self.root, capture_output=True, text=True).stdout
         with mock.patch("audit.upstream_repo_url", return_value=str(upstream)):
             self.assertEqual(audit.ours_updated(self.root, entry), "2025-01-01T00:00:00Z")
+            timestamp, merge_base = audit.repo_ours_updated(self.root, entry)
+            self.assertEqual(timestamp, "2025-01-01T00:00:00Z")
+            self.assertEqual(merge_base, expected_base)
         refs = subprocess.run(["git", "show-ref"], cwd=self.root, capture_output=True, text=True).stdout
         self.assertEqual(refs, before_refs)
 
@@ -184,6 +193,7 @@ class UpstreamsTests(Base):
         entry = {"skill": None, "kind": "repo", "source": "o/r", "ref": "main"}
         with mock.patch("audit.upstream_repo_url", return_value=str(upstream)):
             self.assertEqual(audit.ours_updated(self.root, entry), "2024-12-31T00:00:00Z")
+            self.assertIsNone(audit.repo_ours_updated(self.root, entry)[1])
 
     def test_upstreams_real_repo_fetch_failure_is_unavailable(self):
         self.skill("x")
@@ -571,6 +581,80 @@ class CheckTests(Base):
         self.assertEqual([(i["code"], i["ignored"]) for i in skills[0]["issues"]], [("name_mismatch", True)])
 
 
+class ValidatorPinTests(Base):
+    """check --validator-pin: the executable skills-ref dependency comes from a trusted pin file."""
+
+    OTHER_SHA = "b" * 40
+
+    def setUp(self):
+        super().setUp()
+        self.skill("x")
+        self.bindir = Path(self._tmp.name) / "bin"
+        self.bindir.mkdir()
+        self.argv_out = Path(self._tmp.name) / "uvx-argv.txt"
+        uvx = self.bindir / "uvx"  # stub: records its argv, passes validation
+        uvx.write_text('#!/bin/bash\nprintf "%s\\n" "$@" > "$UVX_ARGV_OUT"\nexit 0\n')
+        uvx.chmod(0o755)
+        self.pin = Path(self._tmp.name) / "trusted" / "SOURCE.json"
+        self.pin.parent.mkdir()
+        self.pin.write_text(json.dumps({"sha": self.OTHER_SHA}))
+        env = {"PATH": f"{self.bindir}:{os.environ['PATH']}", "UVX_ARGV_OUT": str(self.argv_out)}
+        patcher = mock.patch.dict(os.environ, env)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def run_check(self, *extra):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = audit.main(["--root", str(self.root), "check", "--skills", "x", *extra])
+        return code, err.getvalue()
+
+    def uvx_source(self):
+        return self.argv_out.read_text().splitlines()[1]
+
+    def test_review_checker_uses_trusted_validator_pin(self):
+        # The data root (the PR checkout in review) carries a different, hostile pin.
+        self.write("skills/skill-judge/references/agentskills/SOURCE.json",
+                   json.dumps({"sha": "c" * 40}))
+        code, err = self.run_check("--validator-pin", str(self.pin))
+        self.assertEqual(code, 0, err)
+        self.assertIn(self.OTHER_SHA, self.uvx_source())
+        self.assertNotIn("c" * 40, self.uvx_source())
+        self.assertNotIn(SHA, self.uvx_source())
+
+    def test_changed_data_root_source_json_cannot_alter_the_command(self):
+        self.run_check("--validator-pin", str(self.pin))
+        first = self.uvx_source()
+        self.write("skills/skill-judge/references/agentskills/SOURCE.json",
+                   json.dumps({"sha": "d" * 40}))
+        self.argv_out.unlink()
+        self.run_check("--validator-pin", str(self.pin))
+        self.assertEqual(self.uvx_source(), first)
+
+    def test_without_the_flag_the_data_root_pin_is_used(self):
+        code, _ = self.run_check()
+        self.assertEqual(code, 0)
+        self.assertIn(SHA, self.uvx_source())
+
+    def test_missing_or_malformed_pin_fails_closed(self):
+        code, err = self.run_check("--validator-pin", str(self.bindir / "nope.json"))
+        self.assertEqual(code, 1)
+        self.assertIn("nope.json", err)
+        self.assertFalse(self.argv_out.exists())
+        self.pin.write_text("[]")
+        code, err = self.run_check("--validator-pin", str(self.pin))
+        self.assertEqual(code, 1)
+        self.assertIn("cannot read sha", err)
+        self.assertFalse(self.argv_out.exists())
+
+    def test_pin_runs_the_validator_even_when_the_data_root_has_no_judge_skill(self):
+        shutil.rmtree(self.root / "skills" / "skill-judge")
+        code, err = self.run_check("--validator-pin", str(self.pin))
+        self.assertEqual(code, 0, err)
+        self.assertIn(self.OTHER_SHA, self.uvx_source())
+        self.assertNotIn("skills-ref skipped", err)
+
+
 class RubricTests(Base):
     def run_rubric(self):
         err = io.StringIO()
@@ -609,6 +693,624 @@ class RubricTests(Base):
         code, err = self.run_rubric()
         self.assertEqual(code, 1)
         self.assertIn("D3", err)
+
+    def set_rubric_source(self, source):
+        rows = "\n".join(f"| D{i} | n | {m} | {source if i == 1 else 's'} |"
+                          for i, m in enumerate([20, 15, 15, 15, 15, 15, 15, 15], 1))
+        (self.root / "skills/skill-judge/references/rubric.md").write_text(RUBRIC.format(sha=SHA, rows=rows))
+
+    def test_rubric_check_accepts_slug_anchor(self):
+        source = "references/agentskills/specification.md#skill-metadata"
+        self.write("skills/skill-judge/references/agentskills/specification.md", "# Skill Metadata\n")
+        self.set_rubric_source(source)
+        self.assertEqual(self.run_rubric(), (0, ""))
+
+    def test_rubric_check_accepts_file_only_validator_citation(self):
+        source = "references/agentskills/skills-ref-validator.py.txt"
+        self.write("skills/skill-judge/references/agentskills/skills-ref-validator.py.txt", "# rule source\n")
+        self.set_rubric_source(source)
+        self.assertEqual(self.run_rubric(), (0, ""))
+
+    def test_rubric_check_rejects_missing_file_only_citation(self):
+        source = "references/agentskills/skills-ref-validator.py.txt"
+        self.set_rubric_source(source)
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn(f"broken source anchor: {source}", err)
+
+    def test_rubric_check_rejects_broken_anchor(self):
+        source = "references/agentskills/specification.md#skill-metadata"
+        self.write("skills/skill-judge/references/agentskills/specification.md", "# Renamed Heading\n")
+        self.set_rubric_source(source)
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn(f"broken source anchor: {source}", err)
+
+    def test_rubric_check_rejects_missing_reference_file(self):
+        source = "references/agentskills/missing.md#heading"
+        self.set_rubric_source(source)
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn(f"broken source anchor: {source}", err)
+
+    def test_rubric_ignores_heading_shaped_lines_in_fences(self):
+        source = "references/agentskills/specification.md#ghost-heading"
+        self.write("skills/skill-judge/references/agentskills/specification.md",
+                   "```md\n# Ghost Heading\n```\n")
+        self.set_rubric_source(source)
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn(f"broken source anchor: {source}", err)
+
+    def test_rubric_ignores_nested_backtick_fence(self):
+        source = "references/agentskills/specification.md#ghost-heading"
+        self.write("skills/skill-judge/references/agentskills/specification.md",
+                   "````md\n```example\n# Ghost Heading\n```\n````\n")
+        self.set_rubric_source(source)
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn(f"broken source anchor: {source}", err)
+
+    def test_rubric_ignores_nested_tilde_fence(self):
+        source = "references/agentskills/specification.md#ghost-heading"
+        self.write("skills/skill-judge/references/agentskills/specification.md",
+                   "~~~~md\n~~~example\n# Ghost Heading\n~~~\n~~~~\n")
+        self.set_rubric_source(source)
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn(f"broken source anchor: {source}", err)
+
+    def test_rubric_closes_indented_backtick_fence(self):
+        source = "references/agentskills/specification.md#real-heading"
+        self.write("skills/skill-judge/references/agentskills/specification.md",
+                   "```md\n# Ghost Heading\n   ```\n\n## Real Heading\n")
+        self.set_rubric_source(source)
+        self.assertEqual(self.run_rubric(), (0, ""))
+
+    def test_rubric_closes_indented_tilde_fence(self):
+        source = "references/agentskills/specification.md#real-heading"
+        self.write("skills/skill-judge/references/agentskills/specification.md",
+                   "~~~md\n# Ghost Heading\n  ~~~\n\n## Real Heading\n")
+        self.set_rubric_source(source)
+        self.assertEqual(self.run_rubric(), (0, ""))
+
+    def test_rubric_accepts_three_space_atx_heading(self):
+        source = "references/agentskills/specification.md#real-heading"
+        self.write("skills/skill-judge/references/agentskills/specification.md", "   ## Real Heading\n")
+        self.set_rubric_source(source)
+        self.assertEqual(self.run_rubric(), (0, ""))
+
+
+class DetectTests(Base):
+    def setUp(self):
+        super().setUp()
+        self.git("init", "-q")
+        self.git("config", "user.email", "test@example.com")
+        self.git("config", "user.name", "Test")
+        self.skill("alpha")
+        self.skill("beta")
+        self.skill("gepetto")
+        self.skill("datadog-cli")
+        self.write("skills/skill-judge/SKILL.md", "judge\n")
+        self.git("add", ".")
+        self.git("commit", "-qm", "initial")
+        self.state = self.current_state()
+        self.state_path = self.write("state.json", json.dumps(self.state))
+        self.upstreams_path = self.write("upstreams.json", "[]")
+
+    def git(self, *args):
+        return subprocess.run(["git", *args], cwd=self.root, check=True, capture_output=True, text=True).stdout.strip()
+
+    def detect(self, upstreams, state="auto", spec_changed=False, force=False):
+        if state == "auto":
+            state = self.state if hasattr(self, "state") else None
+        state_json = json.dumps(state) if state is not None else ""
+        upstreams_path = self.write("detect-upstreams.json", json.dumps(upstreams))
+        argv = ["--root", str(self.root), "detect", "--state", state_json,
+                "--spec-changed", str(spec_changed).lower(), "--upstreams", str(upstreams_path)]
+        if force:
+            argv.append("--force")
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            try:
+                code = audit.main(argv)
+            except SystemExit as exc:
+                code = exc.code
+        self.assertEqual(code, 0)
+        return json.loads(out.getvalue())
+
+    def current_state(self):
+        skills = sorted(p.name for p in (self.root / "skills").iterdir() if p.is_dir() and p.name not in audit.SYNCED)
+        return {"judge_sha": self.git("rev-parse", "HEAD:skills/skill-judge"),
+                "skills": {name: self.git("rev-parse", f"HEAD:skills/{name}") for name in skills},
+                "upstreams": {}}
+
+    def test_detect_no_change_no_run(self):
+        result = self.detect([])
+        self.assertFalse(result["run_needed"])
+        self.assertEqual(result["reasons"], [])
+        self.assertEqual(result["skills"], [])
+
+    def test_detect_spec_change_runs_all(self):
+        result = self.detect([], spec_changed=True)
+        self.assertTrue(result["run_needed"])
+        self.assertEqual(result["skills"], sorted(self.state["skills"]))
+        self.assertIn("spec_changed", result["reasons"])
+
+    def test_detect_judge_change_runs_all(self):
+        (self.root / "skills/skill-judge/SKILL.md").write_text("changed\n")
+        self.git("add", ".")
+        self.git("commit", "-qm", "judge changed")
+        result = self.detect([])
+        self.assertTrue(result["run_needed"])
+        self.assertEqual(result["skills"], sorted(self.state["skills"]))
+        self.assertIn("judge_changed", result["reasons"])
+
+    def test_detect_single_skill_change(self):
+        (self.root / "skills/alpha/SKILL.md").write_text("changed\n")
+        self.git("add", ".")
+        self.git("commit", "-qm", "skill changed")
+        result = self.detect([])
+        self.assertEqual(result["skills"], ["alpha"])
+        self.assertEqual(result["reasons"], ["skills_changed"])
+
+    def test_detect_bad_state_runs_all(self):
+        result = self.detect([], state={"bad": True})
+        self.assertIn("state_invalid", result["reasons"])
+        self.assertEqual(result["skills"], sorted(self.state["skills"]))
+
+    def test_detect_force(self):
+        result = self.detect([], force=True)
+        self.assertIn("force", result["reasons"])
+        self.assertEqual(result["skills"], sorted(self.state["skills"]))
+
+    def test_detect_synced_only_change_not_run(self):
+        (self.root / "skills/gepetto/SKILL.md").write_text("changed\n")
+        self.git("add", ".")
+        self.git("commit", "-qm", "synced changed")
+        result = self.detect([])
+        self.assertFalse(result["run_needed"])
+        self.assertEqual(result["reasons"], [])
+        self.assertEqual(result["skills"], [])
+
+    def test_detect_skills_exclude_synced(self):
+        result = self.detect([], spec_changed=True)
+        self.assertEqual(set(result["skills"]), {"alpha", "beta", "skill-judge"})
+        self.assertNotIn("gepetto", result["state"]["skills"])
+        self.assertNotIn("datadog-cli", result["state"]["skills"])
+
+    def test_detect_new_stale_upstream_runs_without_skills(self):
+        row = {"skill": "alpha", "source": "owner/repo", "kind": "github",
+               "source_updated": "2026-01-01T00:00:00Z", "ours_updated": "2025-01-01T00:00:00Z", "stale": True}
+        result = self.detect([row])
+        self.assertEqual(result["reasons"], ["upstream_stale"])
+        self.assertEqual(result["skills"], [])
+        self.assertEqual(result["upstream_new"], [row])
+        self.assertEqual(result["state"]["upstreams"], {"alpha|owner/repo": row["source_updated"]})
+
+    def test_detect_recorded_stale_upstream_no_run(self):
+        row = {"skill": "alpha", "source": "owner/repo", "kind": "github",
+               "source_updated": "2026-01-01T00:00:00Z", "ours_updated": "2025-01-01T00:00:00Z", "stale": True}
+        state = {**self.state, "upstreams": {"alpha|owner/repo": row["source_updated"]}}
+        result = self.detect([row], state=state)
+        self.assertFalse(result["run_needed"])
+        self.assertEqual(result["upstream_new"], [])
+
+    def test_detect_stale_upstream_new_timestamp_runs(self):
+        row = {"skill": "alpha", "source": "owner/repo", "kind": "github",
+               "source_updated": "2026-02-01T00:00:00Z", "ours_updated": "2025-01-01T00:00:00Z", "stale": True}
+        state = {**self.state, "upstreams": {"alpha|owner/repo": "2026-01-01T00:00:00Z"}}
+        result = self.detect([row], state=state)
+        self.assertEqual(result["reasons"], ["upstream_stale"])
+        self.assertEqual(result["upstream_new"], [row])
+
+    def test_detect_not_stale_upstream_ignored(self):
+        row = {"skill": "alpha", "source": "owner/repo", "kind": "github",
+               "source_updated": "2026-01-01T00:00:00Z", "ours_updated": "2026-02-01T00:00:00Z", "stale": False}
+        result = self.detect([row])
+        self.assertFalse(result["run_needed"])
+        self.assertEqual(result["state"]["upstreams"], {})
+
+    def test_detect_accepts_producer_success_rows_and_rejects_non_null_error(self):
+        success = {"skill": "alpha", "source": "owner/repo", "kind": "github",
+                   "source_updated": "2026-01-01T00:00:00Z", "ours_updated": "2025-01-01T00:00:00Z",
+                   "stale": True, "error": None}
+        path = self.write("producer-upstreams.json", json.dumps([success]))
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = audit.main(["--root", str(self.root), "detect", "--state", json.dumps(self.state),
+                               "--spec-changed", "false", "--upstreams", str(path)])
+        self.assertEqual(code, 0, err.getvalue())
+        self.assertEqual(json.loads(out.getvalue())["upstream_new"], [success])
+        failed = {**success, "error": "offline"}
+        path.write_text(json.dumps([failed]))
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err := io.StringIO()):
+            code = audit.main(["--root", str(self.root), "detect", "--state", json.dumps(self.state),
+                               "--spec-changed", "false", "--upstreams", str(path)])
+        self.assertEqual(code, 1)
+
+    def test_detect_rejects_malformed_and_error_upstream_rows(self):
+        for row in ({"skill": "alpha", "stale": True},
+                    {"skill": "alpha", "source": "x", "kind": "github", "source_updated": None,
+                     "ours_updated": None, "stale": None, "error": "offline"}):
+            path = self.write("bad-upstreams.json", json.dumps([row]))
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
+                code = audit.main(["--root", str(self.root), "detect", "--state", "{}",
+                                   "--spec-changed", "false", "--upstreams", str(path)])
+            self.assertEqual(code, 1)
+            self.assertIn("alpha", err.getvalue())
+
+    def test_unknown_state_fields_pass_through(self):
+        state = {**self.state, "checked_at": "2026-10-01T06:00:00Z",
+                 "last_attempt_at": "2026-10-02T06:00:00Z", "future_field": {"a": [1]}}
+        result = self.detect([], state=state)
+        for key in ("checked_at", "last_attempt_at", "future_field"):
+            self.assertEqual(result["state"][key], state[key])
+        self.assertEqual(result["state"]["judge_sha"], self.state["judge_sha"])
+        self.assertFalse(result["run_needed"])
+
+    def test_unknown_fields_kept_even_when_detect_state_is_invalid(self):
+        result = self.detect([], state={"checked_at": "2026-10-01T06:00:00Z"})
+        self.assertIn("state_invalid", result["reasons"])
+        self.assertEqual(result["state"]["checked_at"], "2026-10-01T06:00:00Z")
+
+    def test_detect_cli_invalid_state_and_inputs(self):
+        for state, rows, code_expected, message in (
+            ("{bad", "[]", 0, "state_invalid"),
+            ("{}", "{}", 1, "upstreams must be a JSON list"),
+        ):
+            with self.subTest(message=message):
+                path = self.write("input.json", rows)
+                out, err = io.StringIO(), io.StringIO()
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                    code = audit.main(["--root", str(self.root), "detect", "--state", state,
+                                       "--spec-changed", "false", "--upstreams", str(path)])
+                self.assertEqual(code, code_expected)
+                self.assertIn(message, out.getvalue() + err.getvalue())
+        shutil.rmtree(self.root / "skills")
+        path = self.write("input.json", "[]")
+        err = io.StringIO()
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+            code = audit.main(["--root", str(self.root), "detect", "--state", "{}",
+                               "--spec-changed", "false", "--upstreams", str(path)])
+        self.assertEqual(code, 1)
+        self.assertIn("skills", err.getvalue())
+
+
+class IntervalDueTests(unittest.TestCase):
+    NOW = datetime.datetime(2026, 10, 30, 6, 0, tzinfo=datetime.timezone.utc)
+    HALF_DAY = datetime.timedelta(hours=12)
+
+    def ago(self, delta):
+        return (self.NOW - delta).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    def due(self, state, days=15, event="schedule"):
+        return audit.interval_due(state, self.NOW, days, event)
+
+    def cli(self, state, *extra):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = audit.main(["interval-due", "--state", state, *extra])
+        return code, out.getvalue().strip(), err.getvalue()
+
+    def test_interval_due_boundary(self):
+        for days in (15, 30):
+            edge = datetime.timedelta(days=days) - self.HALF_DAY
+            self.assertTrue(self.due({"checked_at": self.ago(edge)}, days=days))
+            self.assertFalse(self.due({"checked_at": self.ago(edge - datetime.timedelta(seconds=1))}, days=days))
+
+    def test_boundary_minus_12h(self):
+        # checked_at is stamped when a run finishes, so the cadence is N days, not N plus one.
+        self.assertTrue(self.due({"checked_at": self.ago(datetime.timedelta(days=14, hours=12))}))
+        self.assertFalse(self.due({"checked_at": self.ago(datetime.timedelta(days=14, hours=11))}))
+        self.assertFalse(self.due({"checked_at": self.ago(datetime.timedelta(days=1))}))
+
+    def test_dispatch_always_due(self):
+        fresh = {"checked_at": self.ago(datetime.timedelta(0)),
+                 "last_attempt_at": self.ago(datetime.timedelta(hours=1))}
+        self.assertTrue(self.due(fresh, event="workflow_dispatch"))
+        self.assertFalse(self.due(fresh, event="schedule"))
+
+    def test_missing_checked_at_is_due(self):
+        for state in ({}, None, [], {"checked_at": "garbage"}, {"checked_at": None},
+                      {"checked_at": "2026-10-29T06:00:00"}):
+            with self.subTest(state=state):
+                self.assertTrue(self.due(state))
+
+    def test_invalid_interval_value_fails(self):
+        for days in (7, 0, 16, -15):
+            with self.subTest(days=days), self.assertRaises(ValueError):
+                self.due({}, days=days)
+        for days in ("7", "15.0", "abc", ""):
+            with self.subTest(cli_days=days):
+                code, out, err = self.cli("{}", "--days", days)
+                self.assertEqual((code, out), (1, ""))
+                self.assertIn("15 or 30", err)
+        # fail-closed on every event, including dispatch
+        self.assertEqual(self.cli("{}", "--days", "7", "--event", "workflow_dispatch")[0], 1)
+
+    def test_failure_backoff_3_days(self):
+        # A failed attempt holds the run off for 3 days (minus 12h), even when checked_at is old.
+        old = self.ago(datetime.timedelta(days=40))
+        self.assertFalse(self.due({"checked_at": old, "last_attempt_at": self.ago(datetime.timedelta(days=1))}))
+        self.assertTrue(self.due({"checked_at": old, "last_attempt_at": self.ago(datetime.timedelta(days=3))}))
+
+    def test_backoff_boundary_minus_12h(self):
+        edge = datetime.timedelta(days=3) - self.HALF_DAY
+        self.assertTrue(self.due({"last_attempt_at": self.ago(edge)}))
+        self.assertFalse(self.due({"last_attempt_at": self.ago(edge - datetime.timedelta(seconds=1))}))
+
+    def test_future_stamps_are_treated_as_absent(self):
+        future = (self.NOW + datetime.timedelta(days=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        self.assertTrue(self.due({"checked_at": future}))
+        self.assertTrue(self.due({"checked_at": self.ago(datetime.timedelta(days=40)), "last_attempt_at": future}))
+
+    def test_interval_due_cli_prints_true_or_false(self):
+        now = self.NOW.strftime("%Y-%m-%dT%H:%M:%SZ")
+        recent = json.dumps({"checked_at": self.ago(datetime.timedelta(days=2))})
+        self.assertEqual(self.cli(recent, "--now", now, "--days", "15")[:2], (0, "false"))
+        self.assertEqual(self.cli("{bad", "--now", now, "--days", "15")[:2], (0, "true"))
+        self.assertEqual(self.cli(recent, "--now", now, "--days", "15", "--event", "workflow_dispatch")[:2],
+                         (0, "true"))
+        self.assertEqual(self.cli(recent, "--now", "not-a-time", "--days", "15")[0], 1)
+
+    def test_interval_due_requires_days(self):
+        # U1(d): the cadence is never silently defaulted in the CLI; the workflow must pass --days.
+        now = self.NOW.strftime("%Y-%m-%dT%H:%M:%SZ")
+        recent = json.dumps({"checked_at": self.ago(datetime.timedelta(days=2))})
+        with self.assertRaises(SystemExit) as raised:
+            self.cli(recent, "--now", now)
+        self.assertEqual(raised.exception.code, 2)
+
+
+class ValidateKnobsTests(unittest.TestCase):
+    def test_unset_knobs_use_defaults(self):
+        self.assertEqual(audit.validate_knobs({}), [])
+        self.assertEqual(audit.validate_knobs({"AUDIT_RESEARCH_MODELS": "", "AUDIT_INTERVAL_DAYS": ""}), [])
+
+    def test_valid_knobs_pass(self):
+        env = {"AUDIT_RESEARCH_MODELS": "org/a, org/b", "AUDIT_MERGER_MODEL": "auto",
+               "AUDIT_INTERVAL_DAYS": "30", "AUDIT_REVIEW_EFFORT": "xhigh", "AUDIT_ON_POSITIVE": "none"}
+        self.assertEqual(audit.validate_knobs(env), [])
+        for effort in ("none", "minimal", "low", "medium", "high", "xhigh", "max"):
+            self.assertEqual(audit.validate_knobs({"AUDIT_REVIEW_EFFORT": effort}), [])
+
+    def test_three_lanes_rejected(self):
+        self.assertTrue(audit.validate_knobs({"AUDIT_RESEARCH_MODELS": "org/a,org/b,org/c"}))
+
+    def test_empty_list_rejected(self):
+        self.assertTrue(audit.validate_knobs({"AUDIT_RESEARCH_MODELS": " , "}))
+
+    def test_duplicate_or_colliding_lanes_rejected(self):
+        for models in ("auto,auto", "Auto,auto", "org/model,org-model", "org/a,org/a", "org/a,/"):
+            with self.subTest(models=models):
+                self.assertTrue(audit.validate_knobs({"AUDIT_RESEARCH_MODELS": models}))
+
+    def test_invalid_interval_rejected(self):
+        for days in ("7", "0", "abc", "45"):
+            with self.subTest(days=days):
+                self.assertTrue(audit.validate_knobs({"AUDIT_INTERVAL_DAYS": days}))
+
+    def test_invalid_on_positive_or_effort_rejected(self):
+        self.assertTrue(audit.validate_knobs({"AUDIT_ON_POSITIVE": "merge"}))
+        self.assertTrue(audit.validate_knobs({"AUDIT_ON_POSITIVE": "Label"}))
+        self.assertTrue(audit.validate_knobs({"AUDIT_REVIEW_EFFORT": "ultra"}))
+        self.assertTrue(audit.validate_knobs({"AUDIT_REVIEW_EFFORT": "High"}))
+
+    def test_validate_knobs_cli_fails_closed(self):
+        err = io.StringIO()
+        with mock.patch.dict(os.environ, {"AUDIT_RESEARCH_MODELS": "a/x,b/x,c/x"}, clear=True), \
+                contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
+            code = audit.main(["validate-knobs"])
+        self.assertEqual(code, 1)
+        self.assertIn("at most two", err.getvalue())
+        with mock.patch.dict(os.environ, {}, clear=True), contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(audit.main(["validate-knobs"]), 0)
+
+
+class BranchNameTests(Base):
+    def run_branch(self, *extra):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            try:
+                code = audit.main(["--root", str(self.root), "branch-name", *extra])
+            except SystemExit as exc:
+                code = exc.code
+        self.assertEqual(code, 0)
+        return out.getvalue().strip()
+
+    def test_branch_name_slug(self):
+        self.assertEqual(self.run_branch("--type", "feat", "--title", "Refresh: skill-judge rubric ✨ für v2",
+                                         "--date", "26-10-24"),
+                         "feat/26-10-24-refresh-skill-judge-rubric-fur-v2")
+
+    def test_branch_name_collapses_and_trims(self):
+        self.assertEqual(self.run_branch("--type", "fix", "--title", "--Fix:  a__b!! ", "--date", "26-10-24"),
+                         "fix/26-10-24-fix-a-b")
+
+    def test_branch_name_truncates(self):
+        branch = self.run_branch("--type", "feat", "--title", "a" * 70, "--date", "26-10-24")
+        self.assertLessEqual(len(branch.split("26-10-24-", 1)[1]), 50)
+        self.assertFalse(branch.endswith("-"))
+
+    def test_branch_name_suffix(self):
+        branch = self.run_branch("--type", "feat", "--title", "a" * 70, "--date", "26-10-24", "--suffix", "r17")
+        self.assertTrue(branch.endswith("-r17"))
+        self.assertNotIn("--", branch)
+        self.assertLessEqual(len(branch.split("26-10-24-", 1)[1].rsplit("-r17", 1)[0]), 50)
+
+    def test_branch_name_rejects_explicit_empty_date(self):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = audit.main(["--root", str(self.root), "branch-name", "--type", "fix",
+                               "--title", "Change", "--date", ""])
+        self.assertEqual(code, 1)
+        self.assertEqual(out.getvalue(), "")
+        self.assertIn("date", err.getvalue())
+
+    def test_branch_name_rejects_invalid_or_impossible_date(self):
+        for date in ("2026-10-24", "26-13-01", "26-02-30", "x"):
+            out, err = io.StringIO(), io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                code = audit.main(["--root", str(self.root), "branch-name", "--type", "fix",
+                                   "--title", "!!!", "--date", date])
+            self.assertEqual(code, 1)
+            self.assertIn("date", err.getvalue())
+
+    def test_branch_name_empty_slug_has_no_trailing_dash(self):
+        self.assertEqual(self.run_branch("--type", "fix", "--title", "!!!", "--date", "26-10-24"),
+                         "fix/26-10-24")
+
+
+class ValidateDecisionTests(Base):
+    def decision(self, data, *flags):
+        path = self.write("decision.json", json.dumps(data))
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = audit.main(["--root", str(self.root), "validate-decision", str(path), *flags])
+        return code, err.getvalue()
+
+    def test_validate_decision_accepts_full_update_decision(self):
+        code, err = self.decision({"type": "fix", "title": "Change", "update": True,
+                                   "targets": ["skill-judge"], "rationale": "Evidence supports a fix"})
+        self.assertEqual(code, 0)
+        self.assertEqual(err, "")
+
+    def test_validate_decision_accepts_no_update_decision(self):
+        code, err = self.decision({"type": "feat", "title": "No change", "update": False,
+                                   "targets": [], "rationale": "Everything matches the pinned rubric"})
+        self.assertEqual(code, 0)
+        self.assertEqual(err, "")
+
+    def test_agentskills_research_no_longer_claims_rubric_check_skips_anchors(self):
+        skill = Path(__file__).resolve().parents[2] / "skills/agentskills-research/SKILL.md"
+        text = skill.read_text(encoding="utf-8").replace("`", "")
+        self.assertNotIn("rubric-check does not check anchors", text)
+        self.assertIn("rubric-check verifies each anchor", text)
+
+    def test_validate_decision_rejects_title_with_newline(self):
+        code, err = self.decision({"type": "fix", "title": "Change\nupdate=false", "update": True,
+                                   "targets": ["skill-judge"], "rationale": "Documented evidence"})
+        self.assertEqual(code, 1)
+        self.assertIn("control", err)
+
+    def test_validate_decision_rejects_title_with_carriage_return(self):
+        code, err = self.decision({"type": "fix", "title": "Change\rupdate=false", "update": True,
+                                   "targets": ["skill-judge"], "rationale": "Documented evidence"})
+        self.assertEqual(code, 1)
+        self.assertIn("control", err)
+
+    def test_validate_decision_rejects_missing_rationale(self):
+        code, err = self.decision({"type": "fix", "title": "Change", "update": False, "targets": []})
+        self.assertEqual(code, 1)
+        self.assertIn("rationale", err)
+
+    def test_validate_decision_rejects_blank_rationale(self):
+        for rationale in ("", "   "):
+            with self.subTest(rationale=rationale):
+                code, err = self.decision({"type": "fix", "title": "Change", "update": False,
+                                           "targets": [], "rationale": rationale})
+                self.assertEqual(code, 1)
+                self.assertIn("rationale", err)
+
+    def test_validate_decision_rejects_multiline_rationale(self):
+        code, err = self.decision({"type": "fix", "title": "Change", "update": True,
+                                   "targets": ["skill-judge"], "rationale": "First paragraph\nSecond paragraph"})
+        self.assertEqual(code, 1)
+        self.assertIn("paragraph", err)
+
+    def test_validate_decision_rejects_non_string_rationale(self):
+        code, err = self.decision({"type": "fix", "title": "Change", "update": False,
+                                   "targets": [], "rationale": ["because"]})
+        self.assertEqual(code, 1)
+        self.assertIn("rationale", err)
+
+    def test_validate_decision_rejects_unknown_keys(self):
+        code, err = self.decision({"type": "fix", "title": "Change", "update": False,
+                                   "targets": [], "rationale": "r", "priority": "high"})
+        self.assertEqual(code, 1)
+        self.assertIn("unknown key", err)
+        self.assertIn("priority", err)
+
+    def test_validate_decision_rejects_missing_keys(self):
+        code, err = self.decision({"update": True})
+        self.assertEqual(code, 1)
+        for key in ("type", "title", "targets", "rationale"):
+            self.assertIn(key, err)
+
+    def test_validate_decision_rejects_targets_when_update_false(self):
+        code, err = self.decision({"type": "fix", "title": "Change", "update": False,
+                                   "targets": ["skill-judge"], "rationale": "r"})
+        self.assertEqual(code, 1)
+        self.assertIn("targets must be empty when update is false", err)
+
+    def test_validate_decision_rejects_empty_targets_when_update_true(self):
+        code, err = self.decision({"type": "fix", "title": "Change", "update": True,
+                                   "targets": [], "rationale": "r"})
+        self.assertEqual(code, 1)
+        self.assertIn("targets must be non-empty when update is true", err)
+
+    def test_validate_decision_validates_type_even_when_update_false(self):
+        code, err = self.decision({"type": "ship", "title": "No change", "update": False,
+                                   "targets": [], "rationale": "r"})
+        self.assertEqual(code, 1)
+        self.assertIn("type must be feat or fix", err)
+
+    def test_validate_decision_rejects_unknown_target(self):
+        code, err = self.decision({"type": "fix", "title": "Change", "update": True,
+                                   "targets": ["unknown"], "rationale": "Documented evidence"})
+        self.assertEqual(code, 1)
+        self.assertIn("target", err)
+
+    def test_validate_decision_rejects_synced_target(self):
+        (self.root / "skills/gepetto").mkdir(parents=True)
+        code, err = self.decision({"type": "fix", "title": "Change", "update": True,
+                                   "targets": ["gepetto"], "rationale": "Documented evidence"})
+        self.assertEqual(code, 1)
+        self.assertIn("target", err)
+
+    def test_validate_decision_spec_changed_requires_skill_judge(self):
+        (self.root / "skills/x").mkdir(parents=True, exist_ok=True)
+        data = {"type": "fix", "title": "Change", "update": True, "targets": ["x"],
+                "rationale": "Documented evidence"}
+        code, err = self.decision(data, "--spec-changed")
+        self.assertEqual(code, 1)
+        self.assertIn("skill-judge", err)
+
+    def test_validate_decision_structure_changed_requires_research_and_judge(self):
+        (self.root / "skills/agentskills-research").mkdir(parents=True)
+        data = {"type": "fix", "title": "Change", "update": True, "targets": ["agentskills-research"],
+                "rationale": "Documented evidence"}
+        code, err = self.decision(data, "--structure-changed")
+        self.assertEqual(code, 1)
+        self.assertIn("skill-judge", err)
+
+    def test_validate_decision_rejects_path_and_synced_alias_targets(self):
+        (self.root / "skills/gepetto").mkdir(parents=True)
+        for target in ("../scripts", "/tmp", "", "gepetto/.", "gepetto"):
+            with self.subTest(target=target):
+                code, err = self.decision({"type": "fix", "title": "Change", "update": True,
+                                           "targets": [target], "rationale": "Documented evidence"})
+                self.assertEqual(code, 1)
+                self.assertIn("invalid target", err)
+
+    def test_validate_decision_rejects_symlink_escape_target(self):
+        outside = Path(self._tmp.name) / "outside"
+        outside.mkdir()
+        (self.root / "skills" / "escaped").symlink_to(outside)
+        code, err = self.decision({"type": "fix", "title": "Change", "update": True,
+                                   "targets": ["escaped"], "rationale": "Documented evidence"})
+        self.assertEqual(code, 1)
+        self.assertIn("invalid target", err)
+
+    def test_validate_decision_rejects_non_string_type(self):
+        for bad_type in ([], {}):
+            with self.subTest(bad_type=bad_type):
+                code, err = self.decision({"type": bad_type, "title": "Change", "update": True,
+                                           "targets": ["skill-judge"], "rationale": "Documented evidence"})
+                self.assertEqual(code, 1)
+                self.assertIn("type must be", err)
 
 
 class NoJudgeSkillTests(Base):
