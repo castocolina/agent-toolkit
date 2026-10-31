@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-30 (continues [the 2026-10-24 roadmap](2026-10-24-00-roadmap.md); its Decisions and Global Constraints still apply except where this file says otherwise)
 **Handoff (read first in a clean session):** [2026-10-30-00-handoff.md](2026-10-30-00-handoff.md)
-**Status:** Plans 1-4 merged or in review (#7 open, mergeable); plan 5 Phase 1 open as #8; plans 6, 7, 8 and 10 under spec review, not executed; plans 9 and 11 are drafts split out of that review.
+**Status:** Plans 1-5 (Phase 1) and 6-11 as documents are merged (#7, #8, #10); plan 6 executed and open as #11; plans 7, 8 and 10 reviewed and ready; plans 9 and 11 are drafts that need their own review now that #8 is merged.
 
 **Goal:** Every skill, command and agent is judged and fixed in small batches; a `skill-updater` keeps them current against sources and models; the scheduled CI reviews them in rotation; and `pr-diagrams` works on servers without `gh --attach`.
 
@@ -11,7 +11,7 @@
 | # | Plan | Depends on | Ships |
 |---|---|---|---|
 | 5 | [Scheduled audit](2026-10-24-05-scheduled-audit.md), Phase 1 | 4 | PR #8 (open). Phase 2 stays blocked on the Copilot spike and your inputs |
-| 6 | [New skills](2026-10-30-06-new-skills.md) | 4 merged, plan 5 merged (registry validator) | `ui-ux-principles`, `skill-updater`, `audit.py track`, judge profiles for commands and agents |
+| 6 | [New skills](2026-10-30-06-new-skills.md) | 4 merged, plan 5 merged (registry validator) | `ui-ux-principles`, `skill-updater`, `audit.py track`, judge profiles for commands and agents | **Executed: PR #11.**
 | 7 | [Artifact audit](2026-10-30-07-artifact-audit.md) | 6 | verdicts and a disposition table for 7 commands, 6 agents and 2 new skills |
 | 8 | [Artifact fixes](2026-10-30-08-artifact-fixes.md) | 7 | the 26 high findings and every other finding, in batches of at most 3 artifacts; Mermaid rules moved into the diagram skills |
 | 10 | [pr-diagrams branch and CI triggers](2026-10-30-10-pr-diagrams-branch.md) | 8 Task 4 | single `pr-diagrams` branch fallback, CI on any PR base |
@@ -66,3 +66,13 @@ RULES
 ## Open for the user
 
 Dispositions for commands and agents (after plan 7); upstream proposals; Orwell port; Copilot spike and tokens; whether to run plan 5 Phase 2 once the spike inputs exist; `skill-audit-plan` worktree (unmerged old plan drafts, kept).
+
+## Lessons from executing plan 6 (2026-10-31)
+
+- **Eval runner scope.** `run-evals` gives the tool-less runner only `SKILL.md` and the `files` fixtures listed in the eval (never `references/`). Every output assertion must be satisfiable from those, so output contracts (a review table, a verdict format) live in `SKILL.md`, or the scenario lists the reference file under `files`.
+- **Judge variance.** One lane scores a skill 80 to 93 across rounds and each round raises new nits. Patching finding by finding with `my-coding` oscillated (80.0, 84.8, 85.6, 87.2, 85.6); one holistic rewrite by an Opus-high fixer (fixing may use Opus, only review may not) reached 91 to 93 on all three skills. Give the fixer the verdicts, the root causes (duplicated facts, one owner per fact, one gated load list) and the rule "decide each fact once".
+- **Plan review that does not converge.** Large plans that edit unmerged workflow code keep drawing new defects: escalate Opus high, split the integration-heavy plans out as drafts, then Opus xhigh; stop at 3 critical/high and fix by hand (user ruling 2026-10-31). Verify each finding against the code first; about one in five is a misreading.
+- **Dispatch.** `resolve-injection` of the execute adapter does not know `my-coding`; run `pi -p --model router-env/my-coding` by hand. Work that needs the web (WebFetch) goes to a native sonnet agent, ledgered. Never run the eval runner or the judge on `my-coding`.
+- **Running evals.** One run per lane at a time, `--timeout 900`, outputs go to `docs/audit/evals/<name>/` inside the repo (do not `git add -A` it; delete the directory after each run). Do not edit the skill or `audit.py` while a run is in flight. A harness stall exits 2: rerun once.
+- **Run the documented commands.** The `track` bug (new `local` rows for commands and agents lacked `artifact_kind`) was found only when an agent ran the command the skill told it to run; add such a smoke to every task that ships a CLI plus a skill that calls it.
+- **Shared temp volume.** `/tmp` is a tmpfs of 1M inodes shared by every session; another project's session once filled it and stopped all jobs. Check `df -i /tmp` when commands fail with "No space left".
