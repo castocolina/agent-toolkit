@@ -50,8 +50,8 @@ set -e
 # The workflow must delegate the combining decision to this helper and no longer
 # treat unknown statuses as success.
 WF="$ROOT/.github/workflows/skill-audit.yaml"
-rg -Fq '.github/audit/eval-status.sh' "$WF" || { echo 'workflow does not call eval-status.sh' >&2; exit 1; }
-if rg -q "quality_failed=true' >> \"\\\$GITHUB_OUTPUT\"" "$WF"; then
+grep -Fq '.github/audit/eval-status.sh' "$WF" || { echo 'workflow does not call eval-status.sh' >&2; exit 1; }
+if grep -qE "quality_failed=true' >> \"\\\$GITHUB_OUTPUT\"" "$WF"; then
   echo 'workflow still inlines quality_failed handling' >&2
   exit 1
 fi

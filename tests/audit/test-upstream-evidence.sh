@@ -55,7 +55,7 @@ AUDIT_UPSTREAM_FETCH="$TMP/bin/fetch-stub" python3 "$HELPER" evidence \
 count=$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))))' "$TMP/written.json")
 [ "$count" -eq 9 ] || { echo "expected 9 evidence files, got $count" >&2; exit 1; }
 
-repo_file=$(rg -l 'Stale upstream key: \|o/r$' "$TMP/evidence")
+repo_file=$(grep -rlE 'Stale upstream key: \|o/r$' "$TMP/evidence")
 grep -q 'Kind: repo' "$repo_file" || { echo 'repo evidence lost kind' >&2; exit 1; }
 grep -qF 'Source last update: 2026-01-05T00:00:00Z' "$repo_file" || { echo 'evidence lost source_updated as display text' >&2; exit 1; }
 grep -qF 'Our last update: 2026-01-01T00:00:00Z' "$repo_file" || { echo 'evidence lost ours_updated' >&2; exit 1; }
@@ -68,28 +68,28 @@ if grep -q 'upstream_updated\|Upstream update' "$repo_file" "$TMP/evidence"/*; t
   exit 1
 fi
 
-repo2_file=$(rg -l 'Stale upstream key: \|o/r2$' "$TMP/evidence")
+repo2_file=$(grep -rlE 'Stale upstream key: \|o/r2$' "$TMP/evidence")
 grep -qF 'Diff link: https://github.com/o/r2/commits/main' "$repo2_file" \
   || { echo 'repo without merge base must link commits/<ref>' >&2; exit 1; }
 
-github_file=$(rg -l 'Stale upstream key: humanizer\|blader/humanizer' "$TMP/evidence")
+github_file=$(grep -rlE 'Stale upstream key: humanizer\|blader/humanizer' "$TMP/evidence")
 grep -qF 'Diff link: https://github.com/blader/humanizer/commits/main' "$github_file" \
   || { echo 'github link wrong' >&2; exit 1; }
 
-path_file=$(rg -l 'Stale upstream key: react-useeffect\|reactjs/react.dev' "$TMP/evidence")
+path_file=$(grep -rlE 'Stale upstream key: react-useeffect\|reactjs/react.dev' "$TMP/evidence")
 grep -qF 'Diff link: https://github.com/reactjs/react.dev/commits/main/src/content/learn/you-might-not-need-an-effect.md' "$path_file" \
   || { echo 'github-path link wrong' >&2; exit 1; }
 
-wiki_file=$(rg -l 'Stale upstream key: humanizer\|Wikipedia:Signs of AI writing' "$TMP/evidence")
+wiki_file=$(grep -rlE 'Stale upstream key: humanizer\|Wikipedia:Signs of AI writing' "$TMP/evidence")
 grep -qF 'Diff link: https://en.wikipedia.org/w/index.php?title=Wikipedia%3ASigns%20of%20AI%20writing&action=history' "$wiki_file" \
   || { echo 'wikipedia link not url-quoted' >&2; exit 1; }
 
 # Refs and paths with spaces, '#', '?' and non-ASCII are percent-encoded while
 # the structural '/' separators survive.
-ref_file=$(rg -l 'Stale upstream key: weird-ref\|o/r4$' "$TMP/evidence")
+ref_file=$(grep -rlE 'Stale upstream key: weird-ref\|o/r4$' "$TMP/evidence")
 grep -qF 'Diff link: https://github.com/o/r4/commits/feat%2Fx%231' "$ref_file" \
   || { echo 'ref with slash and hash not url-encoded' >&2; exit 1; }
-path2_file=$(rg -l 'Stale upstream key: weird-path\|o/r3:folder' "$TMP/evidence")
+path2_file=$(grep -rlE 'Stale upstream key: weird-path\|o/r3:folder' "$TMP/evidence")
 grep -qF 'Diff link: https://github.com/o/r3/commits/feat%2Fx%231/folder/a%20file-%C3%A9.md' "$path2_file" \
   || { echo 'path components not url-encoded' >&2; exit 1; }
 
@@ -103,14 +103,14 @@ GH_CALL_LOG="$TMP/gh-calls.log" AUDIT_UPSTREAM_FETCH="" \
 # repo rows are dispatched to the commits fetcher with the registry ref, limit 20.
 grep -qF 'repos/o/r/commits?sha=main&per_page=20' "$TMP/gh-calls.log" \
   || { echo 'repo kind not dispatched to the commits fetcher' >&2; exit 1; }
-repo_gh=$(rg -l 'Stale upstream key: \|o/r$' "$gh_file")
+repo_gh=$(grep -rlE 'Stale upstream key: \|o/r$' "$gh_file")
 grep -qF '0123456789ab 2026-01-04T12:00:00Z Fix typo' "$repo_gh" \
   || { echo 'repo evidence missing commits fetch text' >&2; exit 1; }
 if grep -rqF 'no fetch for kind repo' "$gh_file"; then
   echo 'repo kind still skipped by the default fetcher' >&2
   exit 1
 fi
-humanizer_gh=$(rg -l 'Stale upstream key: humanizer\|blader/humanizer' "$gh_file")
+humanizer_gh=$(grep -rlE 'Stale upstream key: humanizer\|blader/humanizer' "$gh_file")
 grep -qF '0123456789ab 2026-01-04T12:00:00Z Fix typo' "$humanizer_gh" \
   || { echo 'default github fetch formatting wrong' >&2; exit 1; }
 grep -qF 'fedcba987654 fedcba9876543210fedcba9876543210fedcba98' "$humanizer_gh" && \
@@ -118,7 +118,7 @@ grep -qF 'fedcba987654 fedcba9876543210fedcba9876543210fedcba98' "$humanizer_gh"
 grep -qF 'fedcba987654 2026-01-03T09:00:00Z Add guide' "$humanizer_gh" \
   || { echo 'second commit line missing' >&2; exit 1; }
 # The wikipedia row goes through the redirected transport, offline.
-wiki_gh=$(rg -l 'Stale upstream key: humanizer\|Wikipedia:Signs of AI writing' "$gh_file")
+wiki_gh=$(grep -rlE 'Stale upstream key: humanizer\|Wikipedia:Signs of AI writing' "$gh_file")
 grep -qF '2026-01-06T00:00:00Z WikiEditor copyedit pass' "$wiki_gh" \
   || { echo 'wikipedia transport text missing' >&2; exit 1; }
 grep -qF 'titles=Wikipedia%3ASigns%20of%20AI%20writing' "$TMP/wiki-url.log" \
@@ -195,10 +195,10 @@ grep -q 'do not cover the stale rows exactly' "$TMP/err" || { echo 'coverage err
 
 # --- workflow sync: detect ships the snapshot, the report consumes it ---
 WF="$ROOT/.github/workflows/skill-audit.yaml"
-rg -Fq '.github/audit/upstream-evidence.py evidence' "$WF" || { echo 'workflow lacks evidence subcommand' >&2; exit 1; }
-rg -Fq '.github/audit/upstream-evidence.py issue' "$WF" || { echo 'workflow lacks issue subcommand' >&2; exit 1; }
-rg -Fq 'spec/content/upstreams.json' "$WF" || { echo 'upstream-report does not consume the detect snapshot' >&2; exit 1; }
-if rg -q 'audit.py upstreams --registry' <(sed -n '/^  upstream-report:/,/^  state:/p' "$WF"); then
+grep -Fq '.github/audit/upstream-evidence.py evidence' "$WF" || { echo 'workflow lacks evidence subcommand' >&2; exit 1; }
+grep -Fq '.github/audit/upstream-evidence.py issue' "$WF" || { echo 'workflow lacks issue subcommand' >&2; exit 1; }
+grep -Fq 'spec/content/upstreams.json' "$WF" || { echo 'upstream-report does not consume the detect snapshot' >&2; exit 1; }
+if grep -qE 'audit.py upstreams --registry' <(sed -n '/^  upstream-report:/,/^  state:/p' "$WF"); then
   echo 'upstream-report still recomputes upstreams' >&2
   exit 1
 fi

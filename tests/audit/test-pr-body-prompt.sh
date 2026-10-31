@@ -94,12 +94,12 @@ grep -q 'missing rationale' "$TMP/err" || { echo 'decision error not surfaced' >
 # The workflow must use the body-only helpers, keep AUDIT_PR_DIAGRAMS from env,
 # validate the body, and no longer install xvfb or feed the whole command file.
 WF="$ROOT/.github/workflows/skill-audit.yaml"
-rg -Fq '.github/audit/pr-body-prompt.py prompt' "$WF" || { echo 'workflow does not render the body prompt' >&2; exit 1; }
-rg -Fq '.github/audit/pr-body-prompt.py fallback' "$WF" || { echo 'workflow lacks the fallback path' >&2; exit 1; }
-rg -Fq 'AUDIT_PR_DIAGRAMS:-mermaid' "$WF" || { echo 'AUDIT_PR_DIAGRAMS no longer read from env' >&2; exit 1; }
-rg -Fq 'cannot be installed reliably on a hosted runner yet (UNVERIFIED)' "$WF" || { echo 'drawio fallback warning missing' >&2; exit 1; }
-rg -qF 'xvfb' "$WF" && { echo 'workflow still installs xvfb' >&2; exit 1; }
-rg -qF 'explain-pr-changes.md) --diagrams' "$WF" && { echo 'workflow still feeds the command file to copilot' >&2; exit 1; }
-rg -qF '[ ! -s "$RUNNER_TEMP/pr-body.md" ]' "$WF" || { echo 'workflow does not validate a non-empty body' >&2; exit 1; }
+grep -Fq '.github/audit/pr-body-prompt.py prompt' "$WF" || { echo 'workflow does not render the body prompt' >&2; exit 1; }
+grep -Fq '.github/audit/pr-body-prompt.py fallback' "$WF" || { echo 'workflow lacks the fallback path' >&2; exit 1; }
+grep -Fq 'AUDIT_PR_DIAGRAMS:-mermaid' "$WF" || { echo 'AUDIT_PR_DIAGRAMS no longer read from env' >&2; exit 1; }
+grep -Fq 'cannot be installed reliably on a hosted runner yet (UNVERIFIED)' "$WF" || { echo 'drawio fallback warning missing' >&2; exit 1; }
+grep -qF 'xvfb' "$WF" && { echo 'workflow still installs xvfb' >&2; exit 1; }
+grep -qF 'explain-pr-changes.md) --diagrams' "$WF" && { echo 'workflow still feeds the command file to copilot' >&2; exit 1; }
+grep -qF '[ ! -s "$RUNNER_TEMP/pr-body.md" ]' "$WF" || { echo 'workflow does not validate a non-empty body' >&2; exit 1; }
 
 printf 'PASS PR body prompt is body-only, diff-capped, validated and falls back cleanly\n'

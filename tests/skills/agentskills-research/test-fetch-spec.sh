@@ -96,7 +96,7 @@ test_pages_dir_rejects_symlink_escape() {
   ln -s "$T/outside/sentinel.txt" "$T/pages/skill-creation/new-guide.mdx"
   FETCH_ARGS="--pages-dir $T/pages" run $C; unset FETCH_ARGS
   check exit "$CODE" 1
-  check message "$(rg -c 'not a regular file' "$T/err" || true)" 1
+  check message "$(grep -c 'not a regular file' "$T/err" || true)" 1
   check sentinel "$(cat "$T/outside/sentinel.txt")" sentinel
   check still-link "$([ -L "$T/pages/skill-creation/new-guide.mdx" ] && echo yes || echo no)" yes
 }

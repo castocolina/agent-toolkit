@@ -169,14 +169,14 @@ fi
 # The workflow must render both prompts through the helper with evidence copied
 # into the excluded workspace directory, never from $RUNNER_TEMP.
 WF="$ROOT/.github/workflows/skill-audit.yaml"
-rg -Fq 'render-prompt.py" .github/audit/merge-prompt.md' "$WF" || { echo 'merge render not via helper' >&2; exit 1; }
-rg -Fq 'render-prompt.py" .github/audit/fix-prompt.md' "$WF" || { echo 'fix render not via helper' >&2; exit 1; }
-rg -Fq 'render-prompt.py" .github/audit/rubric-prompt.md' "$WF" || { echo 'rubric render not via helper' >&2; exit 1; }
-if rg -q 'python3 \.github/audit/render-prompt\.py' "$WF"; then echo 'a render still runs the checkout render-prompt.py' >&2; exit 1; fi
-rg -Fq '.audit-evidence/evals-results' "$WF" || { echo 'evals results not copied into workspace evidence' >&2; exit 1; }
-rg -Fq '.audit-evidence/decision.json' "$WF" || { echo 'decision not copied into workspace evidence' >&2; exit 1; }
-rg -Fq 'echo .audit-evidence/ >> .git/info/exclude' "$WF" || { echo 'evidence dir not git-excluded' >&2; exit 1; }
-if rg -q 'EVALS_RESULTS=.*RUNNER_TEMP' "$WF" || rg -q 'DECISION_JSON=.*RUNNER_TEMP' "$WF"; then
+grep -Fq 'render-prompt.py" .github/audit/merge-prompt.md' "$WF" || { echo 'merge render not via helper' >&2; exit 1; }
+grep -Fq 'render-prompt.py" .github/audit/fix-prompt.md' "$WF" || { echo 'fix render not via helper' >&2; exit 1; }
+grep -Fq 'render-prompt.py" .github/audit/rubric-prompt.md' "$WF" || { echo 'rubric render not via helper' >&2; exit 1; }
+if grep -qE 'python3 \.github/audit/render-prompt\.py' "$WF"; then echo 'a render still runs the checkout render-prompt.py' >&2; exit 1; fi
+grep -Fq '.audit-evidence/evals-results' "$WF" || { echo 'evals results not copied into workspace evidence' >&2; exit 1; }
+grep -Fq '.audit-evidence/decision.json' "$WF" || { echo 'decision not copied into workspace evidence' >&2; exit 1; }
+grep -Fq 'echo .audit-evidence/ >> .git/info/exclude' "$WF" || { echo 'evidence dir not git-excluded' >&2; exit 1; }
+if grep -qE 'EVALS_RESULTS=.*RUNNER_TEMP' "$WF" || grep -qE 'DECISION_JSON=.*RUNNER_TEMP' "$WF"; then
   echo 'prompt paths still rendered from RUNNER_TEMP' >&2
   exit 1
 fi
