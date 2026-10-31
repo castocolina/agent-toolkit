@@ -1,6 +1,6 @@
 # Plan 9 — Scheduled CI for the Judge Refresh and Artifact Review
 
-Status: DRAFT, split out of the first plans PR. Not spec-reviewed. Re-run /ai-kit-spec-review after plan 5 (PR #8) merges. Open review findings: tmp/docs/spec-review-iter11-plans-9-11.md (main checkout, untracked) and the handoff.
+Status: DRAFT, split out of the first plans PR. Not spec-reviewed. Re-run /ai-kit-spec-review after plan 5 (PR #8) merges. Open review findings: tmp/docs/spec-review-iter12-plans-9-11.md (main checkout, untracked) and the handoff.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
