@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit helpers for skills: check, rubric-check, slug, split-verdicts, validate-verdict, merge, run-evals, pi-cmd.
+"""Audit helpers for skills: check, rubric-check, slug, split-verdicts, validate-verdict, merge, run-evals, pi-cmd, judge-prompt.
 
 Usage:
     python3 scripts/audit/audit.py [--root DIR] check [--strict] [--skills a,b] [--ignore CODE,...]
@@ -12,12 +12,17 @@ Usage:
     python3 scripts/audit/audit.py run-evals --skills a,b --runner CMD [--timeout S] [--triggers] [--runs N]
         [--out DIR] [--fail-under 0.8]
     python3 scripts/audit/audit.py pi-cmd runner|judge [--model ID] [--print0]
+    python3 scripts/audit/audit.py judge-prompt [--kind skill|command|agent] --artifact PATH [--artifact PATH ...]
+        --judge SLUG [--root DIR]
     python3 scripts/audit/audit.py interval-due --state JSON --days 15|30 [--now ISO] [--event NAME]
     python3 scripts/audit/audit.py validate-knobs   (reads AUDIT_* knobs from the environment)
+    python3 scripts/audit/audit.py track --artifact NAME [--artifact-kind K] [--source SOURCE] --status S
+        [--sha SHA] [--model MODEL] [--new-path PATH] [--today YYYY-MM-DD] [--registry FILE]
 """
 
 import argparse
 import contextlib
+import copy
 import datetime
 import json
 import math
@@ -636,6 +641,53 @@ def pi_cmd(kind: str, model: str = DEFAULT_JUDGE_MODEL) -> list[str]:
     return PI_BASE + tools + ["--model", model]
 
 
+JUDGE_KINDS = ("skill", "command", "agent")
+SKILL_JUDGE_LINE = "Judge these skills: {SKILLS}"
+SKILL_READ = (
+    "Each skill in the list is a directory under `{ROOT}/skills/`. "
+    "Read its `SKILL.md` and any other file in that directory the rubric needs and, "
+    "when it has `scripts/`, its script tests under `{ROOT}/tests/skills/<name>/`."
+)
+SKILL_PER = "per listed skill"
+SKILL_SET = "Set `skill` to the directory name."
+ARTIFACT_READ = (
+    "The artifact is the file `{ROOT}/<path>`. Read it and, for a command, its eval file "
+    "`{ROOT}/commands/evals/<name>.json` when that exists; there is no `scripts/` directory "
+    "or script test to read."
+)
+
+
+def artifact_label(kind: str, path: Path) -> str:
+    """Skill directory name, or the command/agent file stem."""
+    return path.parent.name if kind == "skill" else path.stem
+
+
+def render_judge_prompt(root: Path, kind: str, artifacts: list[Path], judge: str) -> str:
+    """Fill judge-prompt.md. Command and agent replace four skill sentences and append a profile."""
+    if kind not in JUDGE_KINDS:
+        raise ValueError(f"unknown kind {kind!r}")
+    if kind != "skill" and len(artifacts) != 1:
+        raise ValueError(f"--kind {kind} takes exactly one --artifact")
+    if not artifacts:
+        raise ValueError("need at least one --artifact")
+    template = (judge_refs(root) / "judge-prompt.md").read_text(encoding="utf-8")
+    names = ",".join(artifact_label(kind, p) for p in artifacts)
+    root_s = str(root.resolve())
+    if kind == "skill":
+        return template.replace("{ROOT}", root_s).replace("{JUDGE}", judge).replace("{SKILLS}", names)
+    text = (
+        template
+        .replace(SKILL_JUDGE_LINE, f"Judge this {kind}: {{SKILLS}}")
+        .replace(SKILL_READ, ARTIFACT_READ)
+        .replace(SKILL_PER, "per listed artifact")
+        .replace(SKILL_SET, "Set `skill` to the file stem (the file name without `.md`).")
+    )
+    text = text.replace("{ROOT}/<path>", str(artifacts[0].resolve()))
+    text = text.replace("{ROOT}", root_s).replace("{JUDGE}", judge).replace("{SKILLS}", names)
+    profile = (judge_refs(root) / "profiles" / f"{kind}.md").read_text(encoding="utf-8").rstrip("\n")
+    return text.rstrip("\n") + "\n\n" + profile + "\n"
+
+
 def resolve_runner(cmd: str) -> list[str]:
     """Tokenise CMD and pin its executable against the invocation cwd / PATH."""
     try:
@@ -1037,13 +1089,59 @@ class SourceUnavailable(Exception):
     """An upstream source could not be checked reliably."""
 
 
+REQUIRED_ENTRY_KEYS = {"skill", "kind", "source", "ref"}
+OPTIONAL_ENTRY_KEYS = {"last_reviewed", "last_upstream_sha", "reviewed_for_model", "status", "new_path",
+                       "artifact_kind"}
+REVIEW_STATUSES = {"current", "stale", "path-moved", "unreachable"}
+ARTIFACT_KINDS = {"skill", "command", "agent"}
+DATE_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
+
+
+def artifact_path(root: Path, name: str, artifact_kind: str) -> Path | None:
+    """The on-disk path of an artifact, or None when the kind is unknown."""
+    if artifact_kind == "skill":
+        return root / "skills" / name
+    if artifact_kind == "command":
+        return root / "commands" / f"{name}.md"
+    if artifact_kind == "agent":
+        return root / "agents" / f"{name}.md"
+    return None
+
+
+def artifact_exists(root: Path, name: str, artifact_kind: str) -> bool:
+    if os.sep in name or (os.altsep and os.altsep in name) or Path(name).name != name or name in (".", ".."):
+        return False
+    path = artifact_path(root, name, artifact_kind)
+    if path is None:
+        return False
+    if artifact_kind == "skill":
+        return path.is_dir() and path.resolve().is_relative_to((root / "skills").resolve())
+    home = root / ("commands" if artifact_kind == "command" else "agents")
+    return path.is_file() and path.resolve().is_relative_to(home.resolve())
+
+
+def _calendar_date(value: str):
+    try:
+        return datetime.date.fromisoformat(value)
+    except ValueError:
+        return None
+
+
+def valid_repo_path(value) -> bool:
+    """A repository-relative path: no leading or trailing slash, no empty, '.' or '..' segment."""
+    if not isinstance(value, str) or not value or value.startswith("/") or value.endswith("/"):
+        return False
+    return all(part.strip() not in ("", ".", "..") for part in value.split("/"))
+
+
 def validate_entry(root: Path, entry) -> str | None:
     if not isinstance(entry, dict):
         return "entry must be an object"
-    if set(entry) != {"skill", "kind", "source", "ref"}:
+    unknown = set(entry) - REQUIRED_ENTRY_KEYS - OPTIONAL_ENTRY_KEYS
+    if not REQUIRED_ENTRY_KEYS.issubset(entry) or unknown:
         return "entry must have exactly skill, kind, source, ref"
     kind, skill, source, ref = (entry[k] for k in ("kind", "skill", "source", "ref"))
-    if not isinstance(kind, str) or kind not in {"github", "github-path", "wikipedia", "repo", "unversioned"}:
+    if not isinstance(kind, str) or kind not in {"github", "github-path", "wikipedia", "repo", "unversioned", "local"}:
         return f"unsupported kind {kind!r}"
     if kind == "repo":
         if skill is not None:
@@ -1051,10 +1149,14 @@ def validate_entry(root: Path, entry) -> str | None:
     else:
         if not isinstance(skill, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", skill):
             return "skill must be a kebab-case name"
-        skills = (root / "skills").resolve()
-        sdir = root / "skills" / skill
-        if not sdir.is_dir() or not sdir.resolve().is_relative_to(skills):
-            return f"skill directory {skill!r} does not exist under skills/"
+        artifact_kind = entry.get("artifact_kind", "skill")
+        if artifact_kind not in ARTIFACT_KINDS:
+            return f"unsupported artifact_kind {artifact_kind!r}"
+        if not artifact_exists(root, skill, artifact_kind):
+            label = "directory" if artifact_kind == "skill" else "file"
+            return f"artifact {skill!r} does not exist as a {artifact_kind} {label}"
+    if "artifact_kind" in entry and kind != "local":
+        return "artifact_kind is valid only on local rows"
     component = r"[A-Za-z0-9._-]+"
     repo_pattern = rf"{component}/{component}"
     if kind in ("github", "repo"):
@@ -1069,6 +1171,8 @@ def validate_entry(root: Path, entry) -> str | None:
                          and all(part not in ("", ".", "..") for part in match.group(3).split("/")))
     elif kind == "wikipedia":
         source_ok = isinstance(source, str) and bool(source.strip()) and "\n" not in source and "\r" not in source
+    elif kind == "local":
+        source_ok = source == ""
     else:
         source_ok = isinstance(source, str) and bool(source.strip())
     if not source_ok:
@@ -1076,8 +1180,29 @@ def validate_entry(root: Path, entry) -> str | None:
     if kind in ("github", "github-path", "repo"):
         if not isinstance(ref, str) or not ref.strip():
             return f"{kind} ref must be a non-empty string"
+    elif kind == "local":
+        if ref != "":
+            return "local ref must be empty"
     elif ref is not None:
         return f"{kind} ref must be null"
+    reviewed = entry.get("last_reviewed")
+    if "last_reviewed" in entry and (not isinstance(reviewed, str) or not DATE_RE.fullmatch(reviewed)
+                                     or _calendar_date(reviewed) is None):
+        return "last_reviewed must be YYYY-MM-DD"
+    sha = entry.get("last_upstream_sha", None)
+    if "last_upstream_sha" in entry and not (sha is None or isinstance(sha, str)):
+        return "last_upstream_sha must be a string or null"
+    model = entry.get("reviewed_for_model", None)
+    if "reviewed_for_model" in entry and not (model is None or isinstance(model, str)):
+        return "reviewed_for_model must be a string or null"
+    status = entry.get("status", "current")
+    if "status" in entry and status not in REVIEW_STATUSES:
+        return f"status must be one of {', '.join(sorted(REVIEW_STATUSES))}"
+    if "new_path" in entry:
+        if kind != "github-path":
+            return "new_path is valid only on github-path rows"
+        if not valid_repo_path(entry["new_path"]):
+            return "new_path must be a repository-relative path without a leading or trailing slash or '..'"
     return None
 
 
@@ -1088,6 +1213,7 @@ def source_query(entry: dict) -> str | None:
         return f"repos/{owner}/{repo}/commits?sha={urllib.parse.quote(ref, safe='')}&per_page=1"
     if kind == "github-path":
         repo, path = source.split(":", 1)
+        path = entry.get("new_path") or path
         owner, name = repo.split("/", 1)
         return f"repos/{owner}/{name}/commits?path={urllib.parse.quote(path, safe='')}&sha={urllib.parse.quote(ref, safe='')}&per_page=1"
     if kind == "wikipedia":
@@ -1209,6 +1335,8 @@ def upstreams(root: Path, registry: Path) -> int:
         return 2
     rows, failed = [], False
     for entry in entries:
+        if isinstance(entry, dict) and entry.get("kind") == "local":
+            continue
         skill = entry.get("skill") if isinstance(entry, dict) else None
         source = entry.get("source") if isinstance(entry, dict) else None
         kind = entry.get("kind") if isinstance(entry, dict) else None
@@ -1249,10 +1377,111 @@ def upstreams(root: Path, registry: Path) -> int:
         if error:
             failed = True
             stale = None
+        new_path = entry.get("new_path") if isinstance(entry, dict) else None
         rows.append({"skill": skill, "source": source, "kind": kind, "source_updated": source_updated,
-                     "ours_updated": ours, "merge_base": merge_base, "stale": stale, "error": error})
+                     "ours_updated": ours, "merge_base": merge_base, "stale": stale, "error": error,
+                     "new_path": new_path})
     print(json.dumps(rows, indent=2))
     return 1 if failed else 0
+
+
+def _track_fail(reason: str) -> tuple[int, dict | None]:
+    print(f"track: {reason}", file=sys.stderr)
+    return 2, None
+
+
+def track(root: Path, registry: Path, artifact: str, status: str, source: str | None = None,
+          artifact_kind: str = "skill", sha: str | None = None, model: str | None = None,
+          new_path: str | None = None, today: str | None = None) -> tuple[int, dict | None]:
+    """Upsert one artifact's review. Exit 2 writes nothing; the printed row is the addressed one.
+
+    Without ``--source``, several ``local`` rows for the artifact are not an error: the first one
+    in file order is the addressed row. Its per-source keys change; every other row of the artifact
+    receives only ``last_reviewed`` and, when ``--model`` is given, ``reviewed_for_model``.
+    """
+    if status not in REVIEW_STATUSES:
+        return _track_fail(f"invalid status {status!r}; expected one of {', '.join(sorted(REVIEW_STATUSES))}")
+    if artifact in SYNCED:
+        return _track_fail(f"artifact {artifact!r} is a synced skill and cannot be tracked")
+    if not artifact_exists(root, artifact, artifact_kind):
+        label = "directory" if artifact_kind == "skill" else "file"
+        return _track_fail(f"artifact {artifact!r} does not exist as a {artifact_kind} {label}")
+    try:
+        loaded = json.loads(registry.read_text(encoding="utf-8"))
+        if not isinstance(loaded, list):
+            raise ValueError("registry must be a JSON list")
+    except (OSError, ValueError, RecursionError) as exc:
+        return _track_fail(f"cannot read registry {registry}: {exc}")
+    entries = copy.deepcopy(loaded)
+    if source is None:
+        matches = [index for index, entry in enumerate(entries)
+                   if isinstance(entry, dict) and entry.get("skill") == artifact and entry.get("kind") == "local"]
+        if not matches:
+            row = {"skill": artifact, "kind": "local", "source": "", "ref": "",
+                   "last_upstream_sha": None, "reviewed_for_model": None}
+            if artifact_kind != "skill":  # validate_entry looks for a skills/ directory unless told otherwise
+                row["artifact_kind"] = artifact_kind
+            entries.append(row)
+            matches = [len(entries) - 1]
+        index = matches[0]  # first local row in file order; later local rows stay per-source
+    else:
+        matches = [index for index, entry in enumerate(entries)
+                   if isinstance(entry, dict) and entry.get("skill") == artifact and entry.get("source") == source
+                   and entry.get("kind") != "repo"]
+        if len(matches) != 1:
+            return _track_fail(f"--source {source!r} matches {len(matches)} rows of {artifact!r}; expected one")
+        index = matches[0]
+    target = entries[index]
+    if new_path is not None and target.get("kind") != "github-path":
+        return _track_fail(f"--new-path is valid only on a github-path row, not {target.get('kind')!r}")
+    reviewed = today or datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d")
+    for entry in entries:
+        if isinstance(entry, dict) and entry.get("skill") == artifact and entry.get("kind") != "repo":
+            entry["last_reviewed"] = reviewed
+            if model is not None:
+                entry["reviewed_for_model"] = model
+    if sha is not None:
+        target["last_upstream_sha"] = sha
+    target["status"] = status
+    if new_path is not None:
+        target["new_path"] = new_path
+    elif status != "path-moved":  # new_path names where a moved source lives: any other status drops it
+        target.pop("new_path", None)
+    for row_index, (before, entry) in enumerate(zip(loaded, entries)):
+        if entry == before:
+            continue
+        if not isinstance(entry, dict):
+            return _track_fail(f"invalid result: entry {row_index} must be an object")
+        # A row this call rewrites must be valid before and after. Fixing a malformed sibling
+        # by writing last_reviewed over it would hide a registry that upstreams already rejects.
+        for candidate in (before, entry):
+            if not isinstance(candidate, dict):
+                return _track_fail(f"invalid result: entry {row_index} must be an object")
+            reason = validate_entry(root, candidate)
+            if reason:
+                return _track_fail(f"invalid result: {reason}")
+    for entry in entries[len(loaded):]:
+        reason = validate_entry(root, entry)
+        if reason:
+            return _track_fail(f"invalid result: {reason}")
+    text = json.dumps(entries, indent=2) + "\n"
+    tmp_name = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", delete=False,
+                                         dir=registry.parent, prefix=registry.name + ".") as tmp:
+            tmp_name = tmp.name
+            tmp.write(text)
+        os.replace(tmp_name, registry)
+        tmp_name = None
+    except OSError as exc:
+        return _track_fail(f"cannot write registry {registry}: {exc}")
+    finally:
+        if tmp_name is not None:
+            try:
+                os.unlink(tmp_name)
+            except OSError:
+                pass
+    return 0, target
 
 
 # ---------- scheduled audit ----------
@@ -1513,6 +1742,16 @@ def build_parser() -> argparse.ArgumentParser:
     decision.add_argument("--structure-changed", action="store_true")
     up = sub.add_parser("upstreams")
     up.add_argument("--registry", type=Path, required=True)
+    tr = sub.add_parser("track", help="record a review of one artifact against its sources")
+    tr.add_argument("--registry", type=Path, default=None)
+    tr.add_argument("--artifact", required=True)
+    tr.add_argument("--artifact-kind", choices=sorted(ARTIFACT_KINDS), default="skill")
+    tr.add_argument("--source", default=None)
+    tr.add_argument("--status", required=True)
+    tr.add_argument("--sha", default=None)
+    tr.add_argument("--model", default=None)
+    tr.add_argument("--new-path", default=None)
+    tr.add_argument("--today", default=None)
     c = sub.add_parser("check")
     c.add_argument("--strict", action="store_true")
     c.add_argument("--skills", type=csv, default=None)
@@ -1557,6 +1796,10 @@ def build_parser() -> argparse.ArgumentParser:
     pc.add_argument("kind", choices=["runner", "judge"])
     pc.add_argument("--model", default=DEFAULT_JUDGE_MODEL)
     pc.add_argument("--print0", action="store_true")
+    jp = sub.add_parser("judge-prompt")
+    jp.add_argument("--kind", default="skill")
+    jp.add_argument("--artifact", type=Path, action="append", required=True)
+    jp.add_argument("--judge", required=True)
     return p
 
 
@@ -1617,6 +1860,13 @@ def main(argv: list[str] | None = None) -> int:
         return 1 if errors else 0
     if args.cmd == "upstreams":
         return upstreams(root, args.registry)
+    if args.cmd == "track":
+        registry = args.registry or root / "docs" / "audit" / "upstream-sources.json"
+        code, row = track(root, registry, args.artifact, args.status, args.source, args.artifact_kind,
+                          args.sha, args.model, args.new_path, args.today)
+        if row is not None:
+            print(json.dumps(row, indent=2))
+        return code
     if args.cmd == "check":
         if args.allowlist and not args.allowlist.is_file():
             print(f"allowlist not found: {args.allowlist}", file=sys.stderr)
@@ -1649,6 +1899,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "pi-cmd":
         tokens = pi_cmd(args.kind, args.model)
         sys.stdout.write("".join(t + "\0" for t in tokens) if args.print0 else shlex.join(tokens) + "\n")
+        return 0
+    if args.cmd == "judge-prompt":
+        try:
+            sys.stdout.write(render_judge_prompt(root, args.kind, args.artifact, args.judge))
+        except (OSError, ValueError) as e:
+            print(f"judge-prompt: {e}", file=sys.stderr)
+            return 2
         return 0
     if args.cmd == "run-evals":
         try:

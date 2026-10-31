@@ -1,4 +1,6 @@
+import argparse
 import contextlib
+import copy
 import datetime
 import io
 import json
@@ -345,6 +347,423 @@ class UpstreamsTests(Base):
             with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
                 code = audit.main(["--root", str(self.root), "upstreams", "--registry", str(path)])
             self.assertEqual(code, 2)
+
+    def test_run_upstreams_skips_local_and_prints_nine_contract_keys(self):
+        # Break: a local row is printed, an optional review key leaks into the row, or new_path is dropped.
+        self.skill("x")
+        local = {"skill": "x", "kind": "local", "source": "", "ref": "",
+                 "artifact_kind": "skill", "last_reviewed": "2026-10-30",
+                 "last_upstream_sha": None, "reviewed_for_model": None, "status": "current"}
+        github = {"skill": "x", "kind": "github", "source": "o/r", "ref": "main",
+                  "last_reviewed": "2026-10-30", "last_upstream_sha": "abc", "reviewed_for_model": "m",
+                  "status": "stale"}
+        code, rows, _ = self.run_upstreams([local, github])
+        self.assertEqual(code, 0)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(set(rows[0]), {"skill", "source", "kind", "source_updated", "ours_updated",
+                                         "merge_base", "stale", "error", "new_path"})
+        self.assertIsNone(rows[0]["error"])
+        self.assertIsInstance(rows[0]["stale"], bool)
+        self.assertIsNone(rows[0]["new_path"])
+        self.assertEqual(rows[0]["source"], "o/r")
+
+    def test_source_query_uses_new_path_and_upstreams_prints_it(self):
+        # Break: new_path is ignored and the query or the printed row still names the stored path.
+        self.skill("x")
+        entry = {"skill": "x", "kind": "github-path",
+                 "source": "joshuadavidthomas/agent-skills:old-dir", "ref": "main",
+                 "new_path": "skills/old-dir"}
+        for new_path, encoded in (("skills/old-dir", "skills%2Fold-dir"),
+                                  ("skills/old-dir/SKILL.md", "skills%2Fold-dir%2FSKILL.md")):
+            with self.subTest(new_path=new_path):
+                query = audit.source_query({**entry, "new_path": new_path})
+                self.assertIn(f"path={encoded}", query)
+                self.assertNotIn("old-dir", query.split("path=", 1)[1].split("&", 1)[0].replace("%2Fold-dir", ""))
+                self.assertNotIn("path=old-dir", query)
+        code, rows, _ = self.run_upstreams([entry, {"skill": "x", "kind": "github", "source": "o/r", "ref": "main"}])
+        self.assertEqual(code, 0)
+        self.assertEqual([row["new_path"] for row in rows], ["skills/old-dir", None])
+
+    def test_fetch_failure_row_has_error_and_null_stale_and_exits_1(self):
+        # Break: a failed fetch is printed as a success row or upstreams exits 0.
+        self.skill("x")
+        entry = {"skill": "x", "kind": "github", "source": "o/r", "ref": "main"}
+        code, rows, _ = self.run_upstreams([entry], fetch=audit.SourceUnavailable("offline"))
+        self.assertEqual(code, 1)
+        self.assertEqual(set(rows[0]), {"skill", "source", "kind", "source_updated", "ours_updated",
+                                         "merge_base", "stale", "error", "new_path"})
+        self.assertTrue(rows[0]["error"])
+        self.assertIsNone(rows[0]["stale"])
+
+
+OPTIONAL_KEYS = ("last_reviewed", "last_upstream_sha", "reviewed_for_model", "status")
+
+
+class ValidateEntryTests(Base):
+    def four(self, **over):
+        row = {"skill": "x", "kind": "github", "source": "o/r", "ref": "main"}
+        row.update(over)
+        return row
+
+    def test_four_keys_still_validate(self):
+        # Break: relaxing the key set rejects the registry rows plan 4 already wrote.
+        self.skill("x")
+        self.assertIsNone(audit.validate_entry(self.root, self.four()))
+
+    def test_each_optional_key_validates_when_well_formed(self):
+        # Break: a well-formed review field is rejected, so track cannot persist it.
+        self.skill("x")
+        for key, value in (("last_reviewed", "2026-10-30"), ("last_upstream_sha", "abc123"),
+                           ("last_upstream_sha", None), ("reviewed_for_model", "claude-opus"),
+                           ("reviewed_for_model", None), ("status", "current"),
+                           ("status", "stale"), ("status", "path-moved"), ("status", "unreachable")):
+            with self.subTest(key=key, value=value):
+                self.assertIsNone(audit.validate_entry(self.root, self.four(**{key: value})))
+
+    def test_each_optional_key_fails_when_malformed(self):
+        # Break: a bad date or a status that is really a kind is stored as review state.
+        self.skill("x")
+        for key, value in (("last_reviewed", "2026-10-30T00:00:00Z"), ("last_reviewed", "30-10-2026"),
+                           ("last_reviewed", None), ("last_upstream_sha", 12),
+                           ("reviewed_for_model", 12), ("status", "unversioned"),
+                           ("status", "current "), ("status", None)):
+            with self.subTest(key=key, value=value):
+                self.assertIsNotNone(audit.validate_entry(self.root, self.four(**{key: value})))
+
+    def test_unknown_extra_key_still_fails(self):
+        # Break: any extra key is accepted, so a typo silently lands in the registry.
+        self.skill("x")
+        self.assertIsNotNone(audit.validate_entry(self.root, self.four(note="later")))
+
+    def test_local_row_needs_empty_source_and_ref_and_an_existing_path(self):
+        # Break: a local row points at a path that is not on disk, or keeps an upstream source.
+        self.skill("x")
+        self.write("commands/x.md", "# x\n")
+        self.write("agents/x.md", "# x\n")
+        for kind in ("skill", "command", "agent"):
+            with self.subTest(kind=kind):
+                self.assertIsNone(audit.validate_entry(self.root, {
+                    "skill": "x", "kind": "local", "source": "", "ref": "", "artifact_kind": kind}))
+        self.assertIsNone(audit.validate_entry(self.root, {"skill": "x", "kind": "local", "source": "", "ref": ""}))
+        for bad in (
+            {"skill": "x", "kind": "local", "source": "o/r", "ref": ""},
+            {"skill": "x", "kind": "local", "source": "", "ref": "main"},
+            {"skill": "missing", "kind": "local", "source": "", "ref": ""},
+            {"skill": "x", "kind": "local", "source": "", "ref": "", "artifact_kind": "widget"},
+        ):
+            with self.subTest(bad=bad):
+                self.assertIsNotNone(audit.validate_entry(self.root, bad))
+
+    def test_new_path_only_on_github_path_and_rejects_slashes_and_dotdot(self):
+        # Break: new_path rewrites a non-path source or walks out of the repository.
+        self.skill("x")
+        path_row = {"skill": "x", "kind": "github-path", "source": "o/r:old", "ref": "main"}
+        self.assertIsNone(audit.validate_entry(self.root, {**path_row, "new_path": "skills/old"}))
+        self.assertIsNone(audit.validate_entry(self.root, {**path_row, "new_path": "skills/old/SKILL.md"}))
+        for bad_path in ("/skills/old", "skills/old/", "skills/../old", "../old", "skills/./old"):
+            with self.subTest(bad_path=bad_path):
+                self.assertIsNotNone(audit.validate_entry(self.root, {**path_row, "new_path": bad_path}))
+        for kind, source, ref in (("github", "o/r", "main"), ("wikipedia", "Title", None),
+                                  ("unversioned", "citation", None), ("repo", "o/r", "main")):
+            skill = None if kind == "repo" else "x"
+            with self.subTest(kind=kind):
+                self.assertIsNotNone(audit.validate_entry(self.root, {
+                    "skill": skill, "kind": kind, "source": source, "ref": ref, "new_path": "skills/old"}))
+
+
+class TrackTests(UpstreamsTests):
+    def registry(self, entries):
+        return self.write("docs/audit/upstream-sources.json", json.dumps(entries, indent=2) + "\n")
+
+    def track(self, registry, *args):
+        before = registry.read_bytes() if registry.exists() else b""
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            try:
+                code = audit.main(["--root", str(self.root), "track", "--registry", str(registry), *args])
+            except SystemExit as exc:
+                code = exc.code
+        after = registry.read_bytes() if registry.exists() else b""
+        return code, out.getvalue(), err.getvalue(), before, after
+
+    def test_track_creates_a_local_row_for_a_command_and_an_agent(self):
+        # Break: the new local row omits artifact_kind, so validation looks for skills/<name>/ and exits 2.
+        self.write("commands/plan-it.md", "---\ndescription: x\n---\n")
+        self.write("agents/reviewer.md", "---\nname: reviewer\ndescription: x\n---\n")
+        registry = self.registry([])
+        for name, kind in (("plan-it", "command"), ("reviewer", "agent")):
+            code, printed, err, _, _ = self.track(
+                registry, "--artifact", name, "--artifact-kind", kind, "--status", "current", "--today", "2026-10-31")
+            self.assertEqual(code, 0, err)
+            self.assertEqual(json.loads(printed)["artifact_kind"], kind)
+        rows = json.loads(registry.read_text(encoding="utf-8"))
+        self.assertEqual([(r["skill"], r["kind"], r["artifact_kind"]) for r in rows],
+                         [("plan-it", "local", "command"), ("reviewer", "local", "agent")])
+
+    def test_blank_new_path_is_invalid(self):
+        # Break: a whitespace-only new_path validates and is then silently ignored by the query.
+        row = {"skill": "x", "kind": "github-path", "source": "o/r:old", "ref": "main"}
+        self.skill("x")
+        for blank in (" ", "\t", "a/ /b", "\u00a0", "a/\u2003/b"):  # str.strip() removes Unicode whitespace too
+            self.assertIsNotNone(audit.validate_entry(self.root, dict(row, new_path=blank)), repr(blank))
+        self.assertIsNone(audit.validate_entry(self.root, dict(row, new_path="a b/c")))
+
+    def test_track_drops_new_path_unless_status_is_path_moved(self):
+        # Break: a stale new_path keeps overriding the corrected source after a later review.
+        self.skill("x")
+        row = {"skill": "x", "kind": "github-path", "source": "o/r:old", "ref": "main"}
+        registry = self.registry([row])
+        code, _, err, _, _ = self.track(registry, "--artifact", "x", "--source", "o/r:old", "--status", "path-moved",
+                                        "--new-path", "skills/new", "--today", "2026-10-31")
+        self.assertEqual(code, 0, err)
+        code, _, err, _, _ = self.track(registry, "--artifact", "x", "--source", "o/r:old", "--status", "path-moved",
+                                        "--today", "2026-10-31")
+        self.assertEqual(code, 0, err)
+        self.assertEqual(json.loads(registry.read_text(encoding="utf-8"))[0]["new_path"], "skills/new")
+        code, _, err, _, _ = self.track(registry, "--artifact", "x", "--source", "o/r:old", "--status", "current",
+                                        "--today", "2026-10-31")
+        self.assertEqual(code, 0, err)
+        self.assertNotIn("new_path", json.loads(registry.read_text(encoding="utf-8"))[0])
+
+    def test_judge_profile_evals_list_their_profile_file(self):
+        # Break: the tool-less eval runner never sees the profile the scenario asserts on.
+        data = json.loads((Path(audit.__file__).resolve().parents[2] / "skills/skill-judge/evals/evals.json")
+                          .read_text(encoding="utf-8"))
+        by_id = {e["id"]: e["files"] for e in data["evals"]}
+        self.assertIn("references/profiles/command.md", by_id["judge-command"])
+        self.assertIn("references/profiles/agent.md", by_id["judge-agent"])
+
+    def test_command_symlink_to_an_agent_is_not_a_command(self):
+        # Break: a commands/ symlink to a file outside commands/ validates as that command.
+        self.write("agents/a.md", "---\nname: a\ndescription: x\n---\n")
+        (self.root / "commands").mkdir(exist_ok=True)
+        (self.root / "commands" / "a.md").symlink_to(self.root / "agents" / "a.md")
+        self.assertFalse(audit.artifact_exists(self.root, "a", "command"))
+        self.assertTrue(audit.artifact_exists(self.root, "a", "agent"))
+
+    def test_track_source_updates_one_row_and_reviews_every_row(self):
+        # Break: --source rewrites a sibling row's per-source keys, or skips its last_reviewed.
+        self.skill("humanizer")
+        github = {"skill": "humanizer", "kind": "github", "source": "blader/humanizer", "ref": "main"}
+        wiki = {"skill": "humanizer", "kind": "wikipedia", "source": "Wikipedia:Signs of AI writing", "ref": None}
+        other = {"skill": "x", "kind": "github", "source": "o/r", "ref": "main"}
+        self.skill("x")
+        registry = self.registry([github, wiki, other])
+        code, printed, _, _, _ = self.track(
+            registry, "--artifact", "humanizer", "--source", "blader/humanizer",
+            "--status", "current", "--sha", "abc", "--model", "claude", "--today", "2026-10-30")
+        self.assertEqual(code, 0)
+        rows = json.loads(registry.read_text(encoding="utf-8"))
+        self.assertEqual(rows[0]["status"], "current")
+        self.assertEqual(rows[0]["last_upstream_sha"], "abc")
+        self.assertEqual(rows[0]["reviewed_for_model"], "claude")
+        self.assertEqual(rows[0]["last_reviewed"], "2026-10-30")
+        self.assertEqual(rows[1]["last_reviewed"], "2026-10-30")
+        self.assertEqual(rows[1]["reviewed_for_model"], "claude")
+        self.assertNotIn("status", rows[1])
+        self.assertNotIn("last_upstream_sha", rows[1])
+        self.assertEqual(rows[2], other)
+        self.assertEqual(json.loads(printed)["source"], "blader/humanizer")
+
+    def test_track_without_source_creates_local_row_once_then_updates_it(self):
+        # Break: a second review appends another local row, or the first call never creates one.
+        self.skill("x")
+        registry = self.registry([])
+        code, _, _, _, _ = self.track(registry, "--artifact", "x", "--status", "current", "--today", "2026-10-30")
+        self.assertEqual(code, 0)
+        rows = json.loads(registry.read_text(encoding="utf-8"))
+        self.assertEqual(rows, [{"skill": "x", "kind": "local", "source": "", "ref": "",
+                                 "last_reviewed": "2026-10-30", "last_upstream_sha": None,
+                                 "reviewed_for_model": None, "status": "current"}])
+        code, _, _, _, _ = self.track(registry, "--artifact", "x", "--status", "stale", "--today", "2026-10-31")
+        self.assertEqual(code, 0)
+        rows = json.loads(registry.read_text(encoding="utf-8"))
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["status"], "stale")
+        self.assertEqual(rows[0]["last_reviewed"], "2026-10-31")
+
+    def test_track_rejects_missing_synced_bad_status_and_unknown_source(self):
+        # Break: a rejected track still rewrites the registry.
+        self.skill("x")
+        self.skill("gepetto")
+        entry = {"skill": "x", "kind": "github", "source": "o/r", "ref": "main"}
+        registry = self.registry([entry])
+        cases = (
+            ["--artifact", "missing", "--status", "current"],
+            ["--artifact", "gepetto", "--status", "current"],
+            ["--artifact", "x", "--status", "unversioned"],
+            ["--artifact", "x", "--status", "nope"],
+            ["--artifact", "x", "--source", "no/such", "--status", "current"],
+        )
+        for args in cases:
+            with self.subTest(args=args):
+                code, _, _, before, after = self.track(registry, *args)
+                self.assertEqual(code, 2)
+                self.assertEqual(after, before)
+
+    def test_track_today_makes_output_deterministic(self):
+        # Break: the printed date follows the clock, so the same review is not reproducible.
+        self.skill("x")
+        registry = self.registry([{"skill": "x", "kind": "github", "source": "o/r", "ref": "main"}])
+        code, printed, _, _, _ = self.track(
+            registry, "--artifact", "x", "--source", "o/r", "--status", "current", "--today", "2026-10-30")
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(printed)["last_reviewed"], "2026-10-30")
+
+    def test_track_new_path_on_other_kind_exits_2_and_repo_row_is_unaddressable(self):
+        # Break: --new-path lands on a github row, or track rewrites the fork-origin seed row.
+        self.skill("x")
+        github = {"skill": "x", "kind": "github", "source": "o/r", "ref": "main"}
+        repo = {"skill": None, "kind": "repo", "source": "softaworks/agent-toolkit", "ref": "main"}
+        registry = self.registry([github, repo])
+        code, _, _, before, after = self.track(
+            registry, "--artifact", "x", "--source", "o/r", "--status", "path-moved",
+            "--new-path", "skills/x", "--today", "2026-10-30")
+        self.assertEqual((code, after), (2, before))
+        for args in (["--artifact", "softaworks/agent-toolkit", "--status", "current"],
+                     ["--source", "softaworks/agent-toolkit", "--status", "current"]):
+            with self.subTest(args=args):
+                code, _, _, before, after = self.track(registry, *args)
+                self.assertEqual(code, 2)
+                self.assertEqual(after, before)
+
+    def test_omitted_sha_preserves_last_upstream_sha(self):
+        # Break: a later review that omits --sha clears the sha recorded for that source.
+        self.skill("x")
+        row = {"skill": "x", "kind": "github", "source": "o/r", "ref": "main",
+               "last_upstream_sha": "keep-me", "reviewed_for_model": "keep-model",
+               "last_reviewed": "2026-10-01", "status": "current"}
+        registry = self.registry([row])
+        code, printed, _, _, _ = self.track(
+            registry, "--artifact", "x", "--source", "o/r", "--status", "stale", "--today", "2026-10-30")
+        self.assertEqual(code, 0)
+        rows = json.loads(registry.read_text(encoding="utf-8"))
+        self.assertEqual(rows[0]["last_upstream_sha"], "keep-me")
+        self.assertEqual(rows[0]["reviewed_for_model"], "keep-model")
+        self.assertEqual(rows[0]["status"], "stale")
+        self.assertEqual(rows[0]["last_reviewed"], "2026-10-30")
+        self.assertEqual(json.loads(printed)["last_upstream_sha"], "keep-me")
+
+    def test_omitted_model_preserves_reviewed_for_model(self):
+        # Break: omitting --model writes null over the model recorded on every row of the artifact.
+        self.skill("humanizer")
+        github = {"skill": "humanizer", "kind": "github", "source": "blader/humanizer", "ref": "main",
+                  "reviewed_for_model": "keep-model", "last_upstream_sha": "abc"}
+        wiki = {"skill": "humanizer", "kind": "wikipedia", "source": "Wikipedia:Signs of AI writing",
+                "ref": None, "reviewed_for_model": "keep-model"}
+        registry = self.registry([github, wiki])
+        code, _, _, _, _ = self.track(
+            registry, "--artifact", "humanizer", "--source", "blader/humanizer",
+            "--status", "current", "--sha", "def", "--today", "2026-10-30")
+        self.assertEqual(code, 0)
+        rows = json.loads(registry.read_text(encoding="utf-8"))
+        self.assertEqual(rows[0]["reviewed_for_model"], "keep-model")
+        self.assertEqual(rows[1]["reviewed_for_model"], "keep-model")
+        self.assertEqual(rows[0]["last_upstream_sha"], "def")
+
+    def test_exit_2_after_validation_leaves_registry_byte_identical(self):
+        # Break: track mutates rows, then validation fails and the rewritten file (or the caller's list) keeps the bad update.
+        self.skill("x")
+        good = {"skill": "x", "kind": "github", "source": "o/r", "ref": "main",
+                "last_reviewed": "2026-10-01", "status": "current"}
+        sibling = {"skill": "x", "kind": "wikipedia", "source": "Title", "ref": None,
+                   "last_reviewed": "not-a-date"}
+        path_row = {"skill": "x", "kind": "github-path", "source": "o/r:old", "ref": "main"}
+        cases = (
+            ("invalid today", [good],
+             ["--artifact", "x", "--source", "o/r", "--status", "current", "--today", "not-a-date"]),
+            ("invalid new-path", [path_row],
+             ["--artifact", "x", "--source", "o/r:old", "--status", "path-moved",
+              "--new-path", "../escaped", "--today", "2026-10-30"]),
+            ("malformed sibling", [good, sibling],
+             ["--artifact", "x", "--source", "o/r", "--status", "current", "--today", "2026-10-30"]),
+        )
+        for label, entries, args in cases:
+            with self.subTest(label=label):
+                original = copy.deepcopy(entries)
+                registry = self.registry(entries)
+                code, _, err, before, after = self.track(registry, *args)
+                self.assertEqual(code, 2, err)
+                self.assertEqual(after, before)
+                self.assertEqual(entries, original)
+                self.assertTrue(err.strip())
+
+    def test_two_local_rows_updates_exactly_the_first(self):
+        # Break: several local rows are all rewritten, or the chosen row is not the first local row.
+        self.skill("x")
+        first = {"skill": "x", "kind": "local", "source": "", "ref": "",
+                 "status": "stale", "last_upstream_sha": "sha-1", "last_reviewed": "2026-10-01"}
+        second = {"skill": "x", "kind": "local", "source": "", "ref": "",
+                  "status": "unreachable", "last_upstream_sha": "sha-2", "last_reviewed": "2026-09-01"}
+        registry = self.registry([first, second])
+        code, printed, err, _, _ = self.track(
+            registry, "--artifact", "x", "--status", "current", "--sha", "sha-new", "--today", "2026-10-30")
+        self.assertEqual(code, 0, err)
+        rows = json.loads(registry.read_text(encoding="utf-8"))
+        self.assertEqual(rows[0]["status"], "current")
+        self.assertEqual(rows[0]["last_upstream_sha"], "sha-new")
+        self.assertEqual(rows[0]["last_reviewed"], "2026-10-30")
+        self.assertEqual(rows[1]["status"], "unreachable")
+        self.assertEqual(rows[1]["last_upstream_sha"], "sha-2")
+        self.assertEqual(rows[1]["last_reviewed"], "2026-10-30")
+        self.assertEqual(json.loads(printed)["last_upstream_sha"], "sha-new")
+
+    def test_track_exit_2_names_the_reason(self):
+        # Break: an exit 2 path returns silently, so the caller cannot tell which check failed.
+        self.skill("x")
+        self.skill("gepetto")
+        self.write("commands/cmd.md", "# cmd\n")
+        good = {"skill": "x", "kind": "github", "source": "o/r", "ref": "main"}
+        twin = {"skill": "x", "kind": "github", "source": "o/r", "ref": "dev"}
+        path_row = {"skill": "x", "kind": "github-path", "source": "o/r:old", "ref": "main"}
+        sibling = {"skill": "x", "kind": "wikipedia", "source": "Title", "ref": None,
+                   "last_reviewed": "not-a-date"}
+        cases = (
+            ("missing skill", [good], ["--artifact", "missing", "--status", "current"], "does not exist"),
+            ("missing command", [good],
+             ["--artifact", "absent", "--artifact-kind", "command", "--status", "current"], "command"),
+            ("synced skill", [good], ["--artifact", "gepetto", "--status", "current"], "synced"),
+            ("invalid status", [good], ["--artifact", "x", "--status", "unversioned"], "status"),
+            ("no source match", [good],
+             ["--artifact", "x", "--source", "no/such", "--status", "current"], "source"),
+            ("several source matches", [good, twin],
+             ["--artifact", "x", "--source", "o/r", "--status", "current"], "source"),
+            ("new-path on other kind", [good],
+             ["--artifact", "x", "--source", "o/r", "--status", "path-moved", "--new-path", "skills/x"],
+             "new-path"),
+            ("invalid new-path", [path_row],
+             ["--artifact", "x", "--source", "o/r:old", "--status", "path-moved",
+              "--new-path", "../escaped", "--today", "2026-10-30"], "new_path"),
+            ("malformed sibling", [good, sibling],
+             ["--artifact", "x", "--source", "o/r", "--status", "current", "--today", "2026-10-30"],
+             "last_reviewed"),
+            ("unreadable registry", None,
+             ["--artifact", "x", "--status", "current"], "registry"),
+        )
+        for label, entries, args, needle in cases:
+            with self.subTest(label=label):
+                if entries is None:
+                    registry = self.root / "docs" / "audit" / "missing-registry.json"
+                else:
+                    registry = self.registry(entries)
+                code, _, err, before, after = self.track(registry, *args)
+                self.assertEqual(code, 2)
+                self.assertIn(needle, err)
+                if registry.exists():
+                    self.assertEqual(after, before)
+
+    def test_artifact_exists_rejects_path_separators_and_non_normalized_names(self):
+        # Break: a skills symlink back to the root lets skills/x resolve inside skills/ and pass.
+        self.skill("x")
+        link = self.root / "skills" / "skills"
+        try:
+            link.symlink_to(self.root, target_is_directory=True)
+        except OSError:
+            self.skipTest("symlinks are not available")
+        self.assertFalse(audit.artifact_exists(self.root, "skills/x", "skill"))
+        self.assertFalse(audit.artifact_exists(self.root, "skills/../x", "skill"))
+        self.assertFalse(audit.artifact_exists(self.root, "x/", "skill"))
+        self.assertTrue(audit.artifact_exists(self.root, "x", "skill"))
 
 
 class CheckTests(Base):
@@ -910,6 +1329,18 @@ class DetectTests(Base):
         result = self.detect([row])
         self.assertFalse(result["run_needed"])
         self.assertEqual(result["state"]["upstreams"], {})
+
+    def test_detect_accepts_nine_key_contract_rows_and_rejects_a_failure_row(self):
+        # Break: detect raises on the row upstreams now prints, or swallows a failure row.
+        success = {"skill": "alpha", "source": "o/r", "kind": "github", "source_updated": "2025-01-02T00:00:00Z",
+                   "ours_updated": "2025-01-01T00:00:00Z", "merge_base": None, "stale": True, "error": None,
+                   "new_path": None}
+        moved = {**success, "source": "joshuadavidthomas/agent-skills:old-dir", "kind": "github-path",
+                 "new_path": "skills/old-dir", "stale": False}
+        audit.detect(self.state, False, [success, moved], root=self.root)
+        failed = {**success, "stale": None, "error": "offline"}
+        with self.assertRaises(ValueError):
+            audit.detect(self.state, False, [failed], root=self.root)
 
     def test_detect_accepts_producer_success_rows_and_rejects_non_null_error(self):
         success = {"skill": "alpha", "source": "owner/repo", "kind": "github",
@@ -2581,6 +3012,143 @@ class PiCmdTests(Base):
         self.assertIn("a b", toks)
         self.assertEqual(toks, audit.pi_cmd("judge", "a b"))
         self.assertEqual(shlex.split(self.pi("judge", "--model", "a b")), toks)
+
+
+# Exact texts judge-prompt.md uses for skills, and the four replacements for command/agent.
+JUDGE_LINE = "Judge these skills: {SKILLS}"
+READ_SENTENCES = (
+    "Each skill in the list is a directory under `{ROOT}/skills/`. "
+    "Read its `SKILL.md` and any other file in that directory the rubric needs and, "
+    "when it has `scripts/`, its script tests under `{ROOT}/tests/skills/<name>/`."
+)
+PER_SKILL = "per listed skill"
+SET_SKILL = "Set `skill` to the directory name."
+KIND_LINE = {"command": "Judge this command: {SKILLS}", "agent": "Judge this agent: {SKILLS}"}
+KIND_READ = (
+    "The artifact is the file `{ROOT}/<path>`. Read it and, for a command, its eval file "
+    "`{ROOT}/commands/evals/<name>.json` when that exists; there is no `scripts/` directory "
+    "or script test to read."
+)
+PER_ARTIFACT = "per listed artifact"
+SET_STEM = "Set `skill` to the file stem (the file name without `.md`)."
+TEMPLATE_TEXTS = (JUDGE_LINE, READ_SENTENCES, PER_SKILL, SET_SKILL)
+REPLACEMENT_TEXTS = {"command": (KIND_LINE["command"], KIND_READ, PER_ARTIFACT, SET_STEM),
+                     "agent": (KIND_LINE["agent"], KIND_READ, PER_ARTIFACT, SET_STEM)}
+
+
+def fill_judge_prompt(template: str, root: str, judge: str, skills: str) -> str:
+    """The skill-kind prompt: the three placeholders filled, nothing else rewritten."""
+    return template.replace("{ROOT}", root).replace("{JUDGE}", judge).replace("{SKILLS}", skills)
+
+
+class JudgePromptTests(Base):
+    """audit.py judge-prompt fills judge-prompt.md; command and agent append a profile."""
+
+    def setUp(self):
+        super().setUp()
+        self.template = (audit.default_root() / "skills" / "skill-judge" / "references" / "judge-prompt.md").read_text()
+        self.judge_dir = self.write("skills/skill-judge/references/judge-prompt.md", self.template).parent
+        self.cmd = self.write("commands/ship-it.md", "---\ndescription: Ship it\n---\n# Ship\n")
+        self.agent = self.write("agents/general-purpose.md", "---\nname: general-purpose\ndescription: Do work\n---\n# Agent\n")
+        for kind in ("command", "agent"):
+            marker = f"PROFILE-{kind.upper()}-MARKER\n"
+            self.write(f"skills/skill-judge/references/profiles/{kind}.md", f"# {kind} profile\n\n{marker}")
+
+    def prompt(self, *argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            try:
+                code = audit.main(["--root", str(self.root), "judge-prompt", *argv])
+            except SystemExit as e:
+                code = e.code if isinstance(e.code, int) else 2
+        return code, out.getvalue(), err.getvalue()
+
+    def test_judge_prompt_default_kind_matches_golden_file(self):
+        skill = self.write("skills/pdf-form-filler/SKILL.md", "---\nname: pdf-form-filler\n---\n")
+        golden = fill_judge_prompt(self.template, str(self.root.resolve()), "lane-a", "pdf-form-filler")
+        code, out, err = self.prompt("--artifact", str(skill), "--judge", "lane-a")
+        self.assertEqual((code, err), (0, ""))
+        self.assertEqual(out, golden)
+
+    def test_judge_prompt_kind_skill_equals_default(self):
+        skill = self.root / "skills" / "pdf-form-filler" / "SKILL.md"
+        if not skill.is_file():
+            self.write("skills/pdf-form-filler/SKILL.md", "---\nname: pdf-form-filler\n---\n")
+        default = self.prompt("--artifact", str(skill), "--judge", "lane-a")
+        explicit = self.prompt("--kind", "skill", "--artifact", str(skill), "--judge", "lane-a")
+        self.assertEqual(default[0], 0)
+        self.assertEqual(explicit, default)
+
+    def test_judge_prompt_kind_skill_two_artifacts_fill_both_names(self):
+        a = self.write("skills/alpha/SKILL.md", "---\nname: alpha\n---\n")
+        b = self.write("skills/beta/SKILL.md", "---\nname: beta\n---\n")
+        code, out, err = self.prompt("--kind", "skill", "--artifact", str(a), "--artifact", str(b), "--judge", "j")
+        self.assertEqual((code, err), (0, ""))
+        self.assertEqual(out, fill_judge_prompt(self.template, str(self.root.resolve()), "j", "alpha,beta"))
+
+    def test_judge_prompt_kind_command_uses_profile_and_replacements(self):
+        code, out, err = self.prompt("--kind", "command", "--artifact", str(self.cmd), "--judge", "lane-a")
+        self.assertEqual((code, err), (0, ""))
+        profile = (self.judge_dir / "profiles" / "command.md").read_text().rstrip("\n")
+        self.assertTrue(out.endswith(profile + "\n"))
+        root_s = str(self.root.resolve())
+        self.assertIn(str(self.cmd.resolve()), out)
+        filled = [t.replace("{SKILLS}", "ship-it").replace("{ROOT}/<path>", str(self.cmd.resolve())).replace("{ROOT}", root_s)
+                  for t in REPLACEMENT_TEXTS["command"]]
+        for text in filled:
+            self.assertIn(text, out)
+        for text in (t.replace("{SKILLS}", "ship-it").replace("{ROOT}", root_s) for t in TEMPLATE_TEXTS):
+            self.assertNotIn(text, out)
+        self.assertNotIn("skills/ship-it/SKILL.md", out)
+
+    def test_judge_prompt_kind_agent_uses_profile_and_replacements(self):
+        code, out, err = self.prompt("--kind", "agent", "--artifact", str(self.agent), "--judge", "lane-a")
+        self.assertEqual((code, err), (0, ""))
+        profile = (self.judge_dir / "profiles" / "agent.md").read_text().rstrip("\n")
+        self.assertTrue(out.endswith(profile + "\n"))
+        root_s = str(self.root.resolve())
+        self.assertIn(str(self.agent.resolve()), out)
+        filled = [t.replace("{SKILLS}", "general-purpose").replace("{ROOT}/<path>", str(self.agent.resolve())).replace("{ROOT}", root_s)
+                  for t in REPLACEMENT_TEXTS["agent"]]
+        for text in filled:
+            self.assertIn(text, out)
+        for text in (t.replace("{SKILLS}", "general-purpose").replace("{ROOT}", root_s) for t in TEMPLATE_TEXTS):
+            self.assertNotIn(text, out)
+        self.assertNotIn("skills/general-purpose/SKILL.md", out)
+
+    def test_judge_prompt_command_or_agent_rejects_two_artifacts(self):
+        extra = self.write("commands/other.md", "# Other\n")
+        for kind, first, second in (("command", self.cmd, extra), ("agent", self.agent, self.write("agents/other.md", "# O\n"))):
+            with self.subTest(kind=kind):
+                code, out, err = self.prompt("--kind", kind, "--artifact", str(first), "--artifact", str(second), "--judge", "j")
+                self.assertEqual(code, 2)
+                self.assertEqual(out, "")
+                self.assertTrue(err.strip())
+
+    def test_judge_prompt_unknown_kind_exits_2(self):
+        code, out, err = self.prompt("--kind", "plugin", "--artifact", str(self.cmd), "--judge", "j")
+        self.assertEqual(code, 2)
+        self.assertEqual(out, "")
+        self.assertIn("plugin", err)
+
+
+class CommandAgentMergeTests(MergeTests):
+    """validate-verdict and merge accept command and agent stems; merge has no --kind."""
+
+    def test_validate_and_merge_accept_command_and_agent_stems(self):
+        for name in ("explain-pr-changes", "general-purpose"):
+            self.put("a", skill=name, total=115)
+            self.put("b", skill=name, total=110)
+            path = self.inp / "a" / f"{name}.json"
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
+                code = audit.main(["--root", str(self.root), "validate-verdict", str(path)])
+            self.assertEqual((name, code, err.getvalue()), (name, 0, ""))
+        code, merged, _ = self.merge("--min-judges", "2", judges="a,b", skills="explain-pr-changes,general-purpose")
+        self.assertEqual(code, 0)
+        self.assertEqual([s["name"] for s in merged["skills"]], ["explain-pr-changes", "general-purpose"])
+        merge = next(a for a in audit.build_parser()._actions if isinstance(a, argparse._SubParsersAction)).choices["merge"]
+        self.assertNotIn("kind", {action.dest for action in merge._actions})
 
 
 if __name__ == "__main__":

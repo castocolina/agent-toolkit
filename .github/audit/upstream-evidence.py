@@ -81,6 +81,7 @@ def diff_link(row: dict, ref) -> str | None:
         return f"https://github.com/{source}/commits/{enc(ref)}" if ref else None
     if kind == "github-path":
         repo, _, path = str(row.get("source") or "").partition(":")
+        path = row.get("new_path") or path
         if not (ref and path):
             return None
         return f"https://github.com/{enc_path(repo)}/commits/{enc(ref)}/{enc_path(path)}"
@@ -94,6 +95,7 @@ def fetch_github_commits(row: dict, ref, limit: int) -> str:
     source = str(row["source"])
     if row["kind"] == "github-path":
         repo, _, path = source.partition(":")
+        path = row.get("new_path") or path
         query = (f"repos/{repo}/commits?path={urllib.parse.quote(path, safe='')}"
                  f"&sha={urllib.parse.quote(str(ref), safe='')}&per_page={limit}")
     else:
