@@ -12,6 +12,8 @@ Usage:
     python3 scripts/audit/audit.py run-evals --skills a,b --runner CMD [--timeout S] [--triggers] [--runs N]
         [--out DIR] [--fail-under 0.8]
     python3 scripts/audit/audit.py pi-cmd runner|judge [--model ID] [--print0]
+    python3 scripts/audit/audit.py interval-due --state JSON --days 15|30 [--now ISO] [--event NAME]
+    python3 scripts/audit/audit.py validate-knobs   (reads AUDIT_* knobs from the environment)
 """
 
 import argparse
@@ -30,6 +32,7 @@ import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
+import unicodedata
 from collections import Counter
 from pathlib import Path
 
@@ -95,18 +98,25 @@ def resolve_rubric(root: Path, given: Path | None) -> Path:
 # ---------- skills-ref ----------
 
 
-def source_sha(root: Path) -> str:
-    """The pinned spec sha from SOURCE.json; ValueError when unreadable."""
-    path = judge_refs(root) / "agentskills" / "SOURCE.json"
+def source_sha(root: Path, pin: Path | None = None) -> str:
+    """The pinned spec sha from SOURCE.json; ValueError when unreadable.
+
+    `pin` names the trusted SOURCE.json; without it the data root's own pin is read.
+    """
+    path = pin or judge_refs(root) / "agentskills" / "SOURCE.json"
     try:
         return json.loads(path.read_text())["sha"]
     except (OSError, ValueError, KeyError, TypeError, RecursionError) as e:
         raise ValueError(f"cannot read sha from {path}: {e}") from e
 
 
-def run_skills_ref(root: Path, skill_dir: Path) -> tuple[int, str]:
-    """Run the pinned skills-ref validator; return (exit code, combined output)."""
-    sha = source_sha(root)
+def run_skills_ref(root: Path, skill_dir: Path, pin: Path | None = None) -> tuple[int, str]:
+    """Run the pinned skills-ref validator; return (exit code, combined output).
+
+    The executable dependency is selected by `pin` when given (the trusted copy),
+    never by the data root's SOURCE.json, which a pull request can change.
+    """
+    sha = source_sha(root, pin)
     src = f"git+https://github.com/agentskills/agentskills@{sha}#subdirectory=skills-ref"
     try:
         p = subprocess.run(
@@ -214,13 +224,15 @@ def valid_json_file(p: Path) -> bool:
         return False
 
 
-def skill_issues(root: Path, name: str, allow: set[str]) -> list[tuple[str, str]]:
+def skill_issues(root: Path, name: str, allow: set[str], pin: Path | None = None) -> list[tuple[str, str]]:
     sdir = root / "skills" / name
     synced = name in SYNCED
     found: list[tuple[str, str]] = []
 
-    if judge_refs(root).is_dir():  # the spec pin lives in skill-judge; absent before that skill ships
-        code, text = run_skills_ref(root, sdir)
+    # The spec pin lives in skill-judge; absent before that skill ships. A trusted pin
+    # always runs the validator, so a data root without skill-judge cannot skip it.
+    if pin is not None or judge_refs(root).is_dir():
+        code, text = run_skills_ref(root, sdir, pin)
         details = parse_skills_ref(code, text)
         if details:
             found.append(("skills_ref", "; ".join(details)))
@@ -255,11 +267,13 @@ def skill_issues(root: Path, name: str, allow: set[str]) -> list[tuple[str, str]
 
 def check_skills(
     root: Path, skills: list[str] | None = None, strict: bool = False,
-    ignore: set[str] | None = None, allowlist: Path | None = None,
+    ignore: set[str] | None = None, allowlist: Path | None = None, pin: Path | None = None,
 ) -> dict:
     ignore = ignore or set()
     allow = load_allowlist(allowlist or root / "scripts" / "audit" / "non_latin_allowlist.txt")
-    if not judge_refs(root).is_dir():
+    if pin is not None:
+        source_sha(root, pin)  # a missing or unreadable trusted pin fails before any skill is checked
+    elif not judge_refs(root).is_dir():
         print(f"audit.py: skills-ref skipped: spec pin not found: {judge_refs(root).relative_to(root) / 'agentskills' / 'SOURCE.json'}",
               file=sys.stderr)
     names = skills or sorted(p.name for p in (root / "skills").iterdir() if p.is_dir())
@@ -270,7 +284,7 @@ def check_skills(
     for name in names:
         issues = [
             {"code": c, "detail": d, "ignored": c in ignore}
-            for c, d in skill_issues(root, name, allow)
+            for c, d in skill_issues(root, name, allow, pin)
         ]
         result.append({
             "name": name,
@@ -303,6 +317,62 @@ def load_rubric(path: Path) -> dict:
     return {"version": int(m1.group(1)), "spec_sha": m2.group(1), "max": maxes}
 
 
+def check_source_anchors(rubric_path: Path, ref_dir: Path) -> list[str]:
+    """Validate reference files and heading anchors cited by rubric source cells."""
+    reasons = []
+    skill_root = ref_dir.parent
+    try:
+        lines = rubric_path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return reasons
+    for line in lines:
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if len(cells) < 4:
+            continue
+        for source in (part.strip() for part in cells[3].split(";")):
+            if not source.startswith("references/agentskills/"):
+                continue
+            path_part, separator, anchor = source.partition("#")
+            path = skill_root / path_part
+            if not path.is_file():
+                valid = False
+            elif not separator:
+                # File-only citation (e.g. the validator source a rubric refresh
+                # adds): nothing to anchor, existence is enough.
+                valid = True
+            else:
+                valid = True
+                try:
+                    text = path.read_text(encoding="utf-8")
+                except (OSError, UnicodeDecodeError):
+                    valid = False
+                else:
+                    headings = []
+                    fenced = False
+                    fence_char = None
+                    fence_length = 0
+                    for heading_line in text.splitlines():
+                        fence = re.match(r"^ {0,3}(`{3,}|~{3,})(?:[^`~].*)?$", heading_line)
+                        if fence:
+                            marker = fence.group(1)[0]
+                            length = len(fence.group(1))
+                            if not fenced:
+                                fenced, fence_char, fence_length = True, marker, length
+                            elif marker == fence_char and length >= fence_length and not heading_line[fence.end(1):].strip():
+                                fenced, fence_char, fence_length = False, None, 0
+                            continue
+                        if fenced:
+                            continue
+                        match = re.match(r"^ {0,3}#{1,6}\s+(.+?)\s*#*\s*$", heading_line)
+                        if match:
+                            heading = match.group(1)
+                            headings.append(re.sub(r"[^a-z0-9 -]", "", heading.lower()).replace(" ", "-"))
+                    valid = anchor in headings
+            if not valid:
+                reasons.append(f"broken source anchor: {source}")
+    return reasons
+
+
 def rubric_check(root: Path, rubric: Path) -> list[str]:
     """Return reasons the rubric is invalid (empty = ok)."""
     try:
@@ -316,6 +386,7 @@ def rubric_check(root: Path, rubric: Path) -> list[str]:
         return reasons + [str(e)]
     if r["spec_sha"] != sha:
         reasons.append(f"spec_sha {r['spec_sha']} != SOURCE.json sha {sha}")
+    reasons.extend(check_source_anchors(rubric, root / "skills" / "skill-judge" / "references"))
     return reasons
 
 
@@ -1061,47 +1132,64 @@ def fetch_source_updated(entry: dict) -> str | None:
         raise SourceUnavailable(str(e) or "malformed upstream response") from e
 
 
-def ours_updated(root: Path, entry: dict) -> str | None:
-    if entry["kind"] == "repo":
+def repo_ours_updated(root: Path, entry: dict) -> tuple[str | None, str | None]:
+    """Return (our last-update timestamp, merge-base SHA) for a repo-kind entry.
+
+    The merge-base SHA is None when the histories share no ancestor and only the
+    oldest local root commit could be dated; consumers then link by ref alone.
+    """
+    try:
+        subprocess.run(["git", "fetch", "--quiet", "--", upstream_repo_url(entry), entry["ref"]],
+                       cwd=root, check=True, capture_output=True, text=True)
+    except (subprocess.CalledProcessError, OSError) as exc:
+        raise SourceUnavailable(str(exc)) from exc
+    try:
+        base_proc = subprocess.run(["git", "merge-base", "HEAD", "FETCH_HEAD"], cwd=root,
+                                   capture_output=True, text=True)
+    except OSError as exc:
+        raise SourceUnavailable(str(exc)) from exc
+    merge_base = None
+    if base_proc.returncode == 0:
+        target = base_proc.stdout.strip()
+        merge_base = target or None
+    elif base_proc.returncode == 1:
         try:
-            subprocess.run(["git", "fetch", "--quiet", "--", upstream_repo_url(entry), entry["ref"]],
-                           cwd=root, check=True, capture_output=True, text=True)
-        except (subprocess.CalledProcessError, OSError) as exc:
-            raise SourceUnavailable(str(exc)) from exc
-        try:
-            base_proc = subprocess.run(["git", "merge-base", "HEAD", "FETCH_HEAD"], cwd=root,
-                                       capture_output=True, text=True)
+            local = subprocess.run(["git", "rev-list", "--max-parents=0", "HEAD"], cwd=root,
+                                   capture_output=True, text=True)
         except OSError as exc:
             raise SourceUnavailable(str(exc)) from exc
-        if base_proc.returncode == 0:
-            target = base_proc.stdout.strip()
-        elif base_proc.returncode == 1:
-            try:
-                local = subprocess.run(["git", "rev-list", "--max-parents=0", "HEAD"], cwd=root,
-                                       capture_output=True, text=True)
-            except OSError as exc:
-                raise SourceUnavailable(str(exc)) from exc
-            if local.returncode:
-                raise SourceUnavailable(local.stderr.strip() or "cannot locate earliest local commit")
-            roots = local.stdout.split()
-            if roots:
-                dated = subprocess.run(["git", "show", "-s", "--format=%ct", *roots], cwd=root,
-                                       capture_output=True, text=True)
-                if dated.returncode:
-                    raise SourceUnavailable(dated.stderr.strip() or "cannot date local root commits")
-                dates = [int(date) for date in dated.stdout.splitlines()]
-                target = roots[min(range(len(roots)), key=lambda index: dates[index])]
-            else:
-                target = ""
+        if local.returncode:
+            raise SourceUnavailable(local.stderr.strip() or "cannot locate earliest local commit")
+        roots = local.stdout.split()
+        if roots:
+            dated = subprocess.run(["git", "show", "-s", "--format=%ct", *roots], cwd=root,
+                                   capture_output=True, text=True)
+            if dated.returncode:
+                raise SourceUnavailable(dated.stderr.strip() or "cannot date local root commits")
+            dates = [int(date) for date in dated.stdout.splitlines()]
+            target = roots[min(range(len(roots)), key=lambda index: dates[index])]
         else:
-            raise SourceUnavailable(base_proc.stderr.strip() or f"git merge-base exited {base_proc.returncode}")
-        if not target:
-            return None
-        args = ["git", "show", "-s", "--format=%cI", target]
+            target = ""
     else:
-        name = entry["skill"]
-        paths = [f"skills/{name}/SKILL.md", f"skills/{name}/references/"]
-        args = ["git", "log", "-1", "--format=%cI", "--", *paths]
+        raise SourceUnavailable(base_proc.stderr.strip() or f"git merge-base exited {base_proc.returncode}")
+    if not target:
+        return None, None
+    try:
+        proc = subprocess.run(["git", "show", "-s", "--format=%cI", target], cwd=root,
+                              capture_output=True, text=True)
+    except OSError as exc:
+        raise SourceUnavailable(str(exc)) from exc
+    if proc.returncode:
+        raise SourceUnavailable(proc.stderr.strip() or "git query failed")
+    return (proc.stdout.strip() or None), merge_base
+
+
+def ours_updated(root: Path, entry: dict) -> str | None:
+    if entry["kind"] == "repo":
+        return repo_ours_updated(root, entry)[0]
+    name = entry["skill"]
+    paths = [f"skills/{name}/SKILL.md", f"skills/{name}/references/"]
+    args = ["git", "log", "-1", "--format=%cI", "--", *paths]
     try:
         proc = subprocess.run(args, cwd=root, capture_output=True, text=True)
     except OSError as exc:
@@ -1128,13 +1216,17 @@ def upstreams(root: Path, registry: Path) -> int:
         source_updated = ours = None
         error = None
         stale = None
+        merge_base = None
         if reason:
             error = f"invalid entry: {reason}"
         else:
             try:
                 if entry["kind"] != "unversioned":
                     source_updated = fetch_source_updated(entry)
-                ours = ours_updated(root, entry)
+                if entry["kind"] == "repo":
+                    ours, merge_base = repo_ours_updated(root, entry)
+                else:
+                    ours = ours_updated(root, entry)
                 if ours is None:
                     error = "no local commit for source material"
                 elif entry["kind"] == "unversioned":
@@ -1158,9 +1250,234 @@ def upstreams(root: Path, registry: Path) -> int:
             failed = True
             stale = None
         rows.append({"skill": skill, "source": source, "kind": kind, "source_updated": source_updated,
-                     "ours_updated": ours, "stale": stale, "error": error})
+                     "ours_updated": ours, "merge_base": merge_base, "stale": stale, "error": error})
     print(json.dumps(rows, indent=2))
     return 1 if failed else 0
+
+
+# ---------- scheduled audit ----------
+
+
+def git_output(root: Path, *args: str) -> str:
+    proc = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True)
+    if proc.returncode:
+        raise ValueError(proc.stderr.strip() or f"git {' '.join(args)} failed")
+    return proc.stdout.strip()
+
+
+def detect(state, spec_changed: bool, upstreams: list[dict], force: bool = False, root: Path | None = None) -> dict:
+    """Compare committed skill trees and upstream timestamps with the saved audit state."""
+    root = (root or default_root()).resolve()
+    skills_dir = root / "skills"
+    names = sorted(p.name for p in skills_dir.iterdir() if p.is_dir() and p.name not in SYNCED)
+    judge_sha = git_output(root, "rev-parse", "HEAD:skills/skill-judge")
+    trees = {name: git_output(root, "rev-parse", f"HEAD:skills/{name}") for name in names}
+    old_valid = (isinstance(state, dict) and isinstance(state.get("judge_sha"), str)
+                 and isinstance(state.get("skills"), dict)
+                 and isinstance(state.get("upstreams", {}), dict)
+                 and all(isinstance(v, str) for v in state["skills"].values()))
+    old = state if old_valid else {}
+    old_skills = old.get("skills", {})
+    old_upstreams = old.get("upstreams", {})
+    judge_changed = old_valid and old.get("judge_sha") != judge_sha
+    changed_skills = sorted(name for name, sha in trees.items() if old_skills.get(name) != sha)
+    expected_row_keys = {"skill", "source", "kind", "source_updated", "ours_updated", "stale"}
+    for index, row in enumerate(upstreams):
+        label = row.get("skill") if isinstance(row, dict) else None
+        if (not isinstance(row, dict) or not expected_row_keys.issubset(row)
+                or not isinstance(row.get("stale"), bool) or row.get("error") is not None
+                or not isinstance(row.get("source"), str) or not row["source"]
+                or not isinstance(row.get("kind"), str)
+                or (row.get("skill") is not None and not isinstance(row.get("skill"), str))
+                or (row.get("stale") is True and not isinstance(row.get("source_updated"), str))):
+            raise ValueError(f"invalid upstream row {label or index}: malformed or contains an error")
+    stale_rows = [row for row in upstreams if row["stale"] is True]
+    upstream_new = []
+    upstream_state = {}
+    for row in stale_rows:
+        key = f"{row.get('skill') or '-'}|{row.get('source')}"
+        source_updated = row.get("source_updated")
+        upstream_state[key] = source_updated
+        if key not in old_upstreams or old_upstreams[key] != source_updated:
+            upstream_new.append(row)
+    reasons = []
+    if spec_changed:
+        reasons.append("spec_changed")
+    if judge_changed:
+        reasons.append("judge_changed")
+    if changed_skills:
+        reasons.append("skills_changed")
+    if not old_valid:
+        reasons.append("state_invalid")
+    if force:
+        reasons.append("force")
+    if upstream_new:
+        reasons.append("upstream_stale")
+    full = spec_changed or judge_changed or not old_valid or force
+    selected = names if full else changed_skills
+    return {
+        "run_needed": bool(reasons), "reasons": reasons, "spec_changed": bool(spec_changed),
+        "skills": selected, "upstream_new": upstream_new,
+        # Every other key of the input state (checked_at, last_attempt_at, Phase 2 fields) is carried verbatim;
+        # the detect-owned keys always win.
+        "state": {**(state if isinstance(state, dict) else {}),
+                  "judge_sha": judge_sha, "skills": trees, "upstreams": upstream_state},
+    }
+
+
+INTERVAL_DAYS = (15, 30)
+INTERVAL_SLACK = datetime.timedelta(hours=12)  # cron delay; checked_at is stamped at run end
+FAILURE_BACKOFF_DAYS = 3
+ON_POSITIVE = ("none", "label")
+REVIEW_EFFORTS = ("none", "minimal", "low", "medium", "high", "xhigh", "max")  # CLI 1.0.103 help
+MAX_JUDGE_LANES = 2
+
+
+def parse_stamp(value):
+    """Parse an ISO-8601 UTC stamp written as YYYY-MM-DDTHH:MM:SSZ; anything else is None."""
+    if not isinstance(value, str):
+        return None
+    try:
+        return datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
+    except ValueError:
+        return None
+
+
+def interval_days(value: str) -> int:
+    """AUDIT_INTERVAL_DAYS: only 15 or 30 is accepted (fail-closed on anything else)."""
+    if value.strip() not in [str(d) for d in INTERVAL_DAYS]:
+        raise ValueError(f"AUDIT_INTERVAL_DAYS must be 15 or 30, got {value!r}")
+    return int(value)
+
+
+def interval_due(state, now: datetime.datetime, days: int, event: str) -> bool:
+    """Whether a scheduled run should audit now. Only schedule events are gated by the interval.
+
+    A missing or unparsable checked_at is due. A checked_at or last_attempt_at in the future is
+    treated as absent, so a skewed clock cannot wedge the gate for longer than the cadence.
+    """
+    if days not in INTERVAL_DAYS:
+        raise ValueError(f"AUDIT_INTERVAL_DAYS must be 15 or 30, got {days!r}")
+    if event != "schedule":
+        return True
+    if not isinstance(state, dict):
+        state = {}
+    checked = parse_stamp(state.get("checked_at"))
+    attempted = parse_stamp(state.get("last_attempt_at"))
+    if checked is not None and checked > now:
+        checked = None
+    if attempted is not None and attempted > now:
+        attempted = None
+    interval_due_now = checked is None or now - checked >= datetime.timedelta(days=days) - INTERVAL_SLACK
+    backoff_clear = attempted is None or now - attempted >= datetime.timedelta(days=FAILURE_BACKOFF_DAYS) - INTERVAL_SLACK
+    return interval_due_now and backoff_clear
+
+
+def validate_knobs(env: dict) -> list[str]:
+    """Return the reasons the review and detect knobs are invalid; unset or empty knobs take their defaults."""
+    errors = []
+    raw_models = env.get("AUDIT_RESEARCH_MODELS") or "auto"
+    lanes = [m.strip() for m in raw_models.split(",") if m.strip()]
+    if not lanes:
+        errors.append("AUDIT_RESEARCH_MODELS lists no judge lane")
+    if len(lanes) > MAX_JUDGE_LANES:
+        errors.append(f"AUDIT_RESEARCH_MODELS has {len(lanes)} lanes; at most two are allowed")
+    seen_slugs = {}
+    for lane in lanes:
+        lane_slug = slug(lane)
+        if not lane_slug:
+            errors.append(f"judge lane {lane!r} has an empty slug")
+        elif lane_slug in seen_slugs:
+            errors.append(f"judge lanes {seen_slugs[lane_slug]!r} and {lane!r} collide (slug {lane_slug!r})")
+        else:
+            seen_slugs[lane_slug] = lane
+    try:
+        interval_days(env.get("AUDIT_INTERVAL_DAYS") or "15")
+    except ValueError as e:
+        errors.append(str(e))
+    on_positive = env.get("AUDIT_ON_POSITIVE") or "label"
+    if on_positive not in ON_POSITIVE:
+        errors.append(f"AUDIT_ON_POSITIVE must be one of {', '.join(ON_POSITIVE)}, got {on_positive!r}")
+    effort = env.get("AUDIT_REVIEW_EFFORT") or "high"
+    if effort not in REVIEW_EFFORTS:
+        errors.append(f"AUDIT_REVIEW_EFFORT must be one of {', '.join(REVIEW_EFFORTS)}, got {effort!r}")
+    return errors
+
+
+def branch_name(kind: str, title: str, date: str | None, suffix: str | None = None) -> str:
+    """Build a dated, ASCII-safe audit branch name."""
+    if date is None:
+        date = datetime.datetime.now(datetime.timezone.utc).strftime("%y-%m-%d")
+    if not re.fullmatch(r"[0-9]{2}-[0-9]{2}-[0-9]{2}", date):
+        raise ValueError("date must match YY-MM-DD")
+    try:
+        datetime.datetime.strptime(date, "%y-%m-%d")
+    except ValueError as exc:
+        raise ValueError(f"invalid calendar date: {date}") from exc
+    folded = unicodedata.normalize("NFKD", title).encode("ascii", "ignore").decode("ascii").lower()
+    name = re.sub(r"[^a-z0-9]+", "-", folded).strip("-")[:50].rstrip("-")
+    if suffix:
+        tail = re.sub(r"[^a-z0-9]+", "-", suffix.lower()).strip("-")
+        if tail:
+            name = f"{name}-{tail}" if name else tail
+    dated = f"{date}-{name}".rstrip("-")
+    return f"{kind}/{dated}"
+
+
+DECISION_KEYS = {"update", "type", "title", "targets", "rationale"}
+
+
+def validate_decision(data, spec_changed: bool = False, structure_changed: bool = False,
+                      root: Path | None = None) -> list[str]:
+    """Return reasons a proposed audit decision violates its schema or target constraints."""
+    root = (root or default_root()).resolve()
+    if not isinstance(data, dict):
+        return ["decision must be a JSON object"]
+    errors = []
+    missing = sorted(DECISION_KEYS - data.keys())
+    unknown = sorted(data.keys() - DECISION_KEYS)
+    if missing:
+        errors.append(f"missing key(s): {', '.join(missing)}")
+    if unknown:
+        errors.append(f"unknown key(s): {', '.join(unknown)}")
+    if not isinstance(data.get("type"), str) or data["type"] not in {"feat", "fix"}:
+        errors.append("type must be feat or fix")
+    if not isinstance(data.get("title"), str) or not data["title"].strip():
+        errors.append("title must be non-empty")
+    elif any(unicodedata.category(char) == "Cc" for char in data["title"]):
+        errors.append("title must not contain control characters")
+    rationale = data.get("rationale")
+    if not isinstance(rationale, str) or not rationale.strip():
+        errors.append("rationale must be a non-empty single-paragraph string")
+    elif any(unicodedata.category(char) == "Cc" for char in rationale):
+        errors.append("rationale must be a single paragraph without control characters")
+    if not isinstance(data.get("update"), bool):
+        errors.append("update must be a boolean")
+    targets = data.get("targets")
+    targets_ok = isinstance(targets, list) and all(isinstance(t, str) for t in targets)
+    if not targets_ok:
+        errors.append("targets must be a list of skill names")
+        targets = []
+    judge_skills = {p.name for p in (root / "skills").iterdir() if p.is_dir() and p.name not in SYNCED} \
+        if (root / "skills").is_dir() else set()
+    allowed_targets = judge_skills
+    for target in targets:
+        path = root / "skills" / target
+        valid = (target in allowed_targets and target == Path(target).name
+                 and target not in (".", "..")
+                 and path.is_dir() and path.resolve().is_relative_to((root / "skills").resolve()))
+        if not valid:
+            errors.append(f"invalid target: {target}")
+    update = data.get("update") is True
+    if update and not targets:
+        errors.append("targets must be non-empty when update is true")
+    if data.get("update") is False and targets_ok and targets:
+        errors.append("targets must be empty when update is false")
+    if spec_changed and (not update or "skill-judge" not in targets):
+        errors.append("spec_changed requires update=true and target skill-judge")
+    if structure_changed and (not update or not {"agentskills-research", "skill-judge"}.issubset(targets)):
+        errors.append("structure_changed requires update=true and targets agentskills-research and skill-judge")
+    return errors
 
 
 # ---------- CLI ----------
@@ -1174,6 +1491,26 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--root", type=Path, default=None)
     sub = p.add_subparsers(dest="cmd", required=True)
+    detect_cmd = sub.add_parser("detect")
+    detect_cmd.add_argument("--state", required=True)
+    detect_cmd.add_argument("--spec-changed", choices=["true", "false"], required=True)
+    detect_cmd.add_argument("--upstreams", type=Path, required=True)
+    detect_cmd.add_argument("--force", action="store_true")
+    interval = sub.add_parser("interval-due")
+    interval.add_argument("--state", required=True)
+    interval.add_argument("--now", default=None)
+    interval.add_argument("--days", required=True)
+    interval.add_argument("--event", default="schedule")
+    sub.add_parser("validate-knobs")
+    branch = sub.add_parser("branch-name")
+    branch.add_argument("--type", choices=["feat", "fix"], required=True)
+    branch.add_argument("--title", required=True)
+    branch.add_argument("--date", default=None)
+    branch.add_argument("--suffix", default=None)
+    decision = sub.add_parser("validate-decision")
+    decision.add_argument("file", type=Path)
+    decision.add_argument("--spec-changed", action="store_true")
+    decision.add_argument("--structure-changed", action="store_true")
     up = sub.add_parser("upstreams")
     up.add_argument("--registry", type=Path, required=True)
     c = sub.add_parser("check")
@@ -1181,6 +1518,8 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--skills", type=csv, default=None)
     c.add_argument("--ignore", type=csv, default=[])
     c.add_argument("--allowlist", type=Path, default=None)
+    c.add_argument("--validator-pin", type=Path, default=None,
+                   help="trusted SOURCE.json that selects the skills-ref validator (not the data root's)")
     r = sub.add_parser("rubric-check")
     r.add_argument("--rubric", type=Path, default=None)
     s = sub.add_parser("slug")
@@ -1224,6 +1563,58 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     root = (args.root or default_root()).resolve()
+    if args.cmd == "detect":
+        try:
+            try:
+                state = json.loads(args.state) if args.state.strip() else None
+            except (ValueError, RecursionError):
+                state = None
+            upstream_rows = load_json(args.upstreams)
+            if not isinstance(upstream_rows, list):
+                raise ValueError("upstreams must be a JSON list")
+            result = detect(state, args.spec_changed == "true", upstream_rows, args.force, root)
+        except (OSError, ValueError, TypeError) as e:
+            print(f"detect: {e}", file=sys.stderr)
+            return 1
+        print(json.dumps(result))
+        return 0
+    if args.cmd == "interval-due":
+        try:
+            days = interval_days(args.days)
+            now = datetime.datetime.now(datetime.timezone.utc) if args.now is None else parse_stamp(args.now)
+            if now is None:
+                raise ValueError(f"--now must be YYYY-MM-DDTHH:MM:SSZ, got {args.now!r}")
+            try:
+                state = json.loads(args.state)
+            except (ValueError, RecursionError):
+                state = None
+        except ValueError as e:
+            print(f"interval-due: {e}", file=sys.stderr)
+            return 1
+        print("true" if interval_due(state, now, days, args.event) else "false")
+        return 0
+    if args.cmd == "validate-knobs":
+        errors = validate_knobs(dict(os.environ))
+        for error in errors:
+            print(f"validate-knobs: {error}", file=sys.stderr)
+        return 1 if errors else 0
+    if args.cmd == "branch-name":
+        try:
+            print(branch_name(args.type, args.title, args.date, args.suffix))
+        except ValueError as e:
+            print(f"branch-name: {e}", file=sys.stderr)
+            return 1
+        return 0
+    if args.cmd == "validate-decision":
+        try:
+            decision = load_json(args.file)
+        except ValueError as e:
+            print(e, file=sys.stderr)
+            return 1
+        errors = validate_decision(decision, args.spec_changed, args.structure_changed, root)
+        for error in errors:
+            print(error, file=sys.stderr)
+        return 1 if errors else 0
     if args.cmd == "upstreams":
         return upstreams(root, args.registry)
     if args.cmd == "check":
@@ -1231,7 +1622,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"allowlist not found: {args.allowlist}", file=sys.stderr)
             return 1
         try:
-            res = check_skills(root, args.skills, args.strict, set(args.ignore), args.allowlist)
+            res = check_skills(root, args.skills, args.strict, set(args.ignore), args.allowlist,
+                               args.validator_pin)
         except ValueError as e:
             print(e, file=sys.stderr)
             return 1

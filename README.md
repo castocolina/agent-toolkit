@@ -202,6 +202,59 @@ Each skill contains:
 
 ---
 
+## Automated audits
+
+Scheduled skill audits compare non-synced skills against the pinned skill rubric, collect eval evidence, and may open a review PR. The schedule is opt-in: `AUDIT_ENABLED` must be `true`; workflow dispatch remains available for forced runs and drills. The workflow also uses `AUDIT_PR_DIAGRAMS` (`none`, `mermaid`, or `drawio`; default `mermaid`), `AUDIT_RESEARCH_MODELS` (a comma-separated list of judge model IDs) and `AUDIT_MERGER_MODEL` (the model for rubric refreshes, merge decisions, fixes, upstream recommendations, and evals).
+
+### Phase 1 knobs
+
+All knobs are repository variables. An unset or empty variable takes the default below. The workflows validate the values (`audit.py validate-knobs`) and fail closed on an invalid one.
+
+| Name | Default | Meaning |
+|---|---|---|
+| `AUDIT_ENABLED` | unset | `true` turns the schedule on. Dispatch works either way, so forced runs and drills are possible while it is unset. |
+| `AUDIT_INTERVAL_DAYS` | `15` | `15` or `30`; scheduled runs only. A scheduled run inside the interval does no spec fetch, starts no model and writes no state. |
+| `AUDIT_RESEARCH_MODELS` | `auto` | Comma list of model IDs or `auto`; one or two judge lanes (two lanes must differ). |
+| `AUDIT_MERGER_MODEL` | `auto` | Editing agents: rubric refresh, merge decision, fixer, PR body, upstream recommendations. |
+| `AUDIT_REVIEW_MODEL` | empty (review off) | PR reviewer model, for example Opus; `auto` is allowed. Set it only after the containment drill passes (UNVERIFIED, see below). |
+| `AUDIT_REVIEW_EFFORT` | `high` | Reviewer reasoning effort: `none`, `minimal`, `low`, `medium`, `high`, `xhigh` or `max`. The local CLI 1.0.103 help lists these levels; Actions behavior is UNVERIFIED. |
+| `AUDIT_ON_POSITIVE` | `label` | `none` or `label`. `label` adds `audit-review:positive` to a positive review; `none` adds no label. |
+| `AUDIT_AUTOMERGE` | unset | Accepted, not acted on in Phase 1 (see Automerge below). |
+| `AUDIT_PR_DIAGRAMS` | `mermaid` | `none`, `mermaid` or `drawio`. |
+
+The Phase 1 configuration uses `AUDIT_RESEARCH_MODELS=auto`, `AUDIT_MERGER_MODEL=auto`, `AUDIT_INTERVAL_DAYS=15` and `AUDIT_PR_DIAGRAMS=mermaid`, with `AUDIT_ENABLED`, `AUDIT_REVIEW_MODEL` and `AUDIT_AUTOMERGE` left unset. A second judge lane is a later edit of `AUDIT_RESEARCH_MODELS`.
+
+**PR review.** `skill-audit-review.yaml` reviews each audit PR after `apply`, and on dispatch with a PR number to retry. The reviewer is read-only: `.github/audit/copilot-review.sh` allows the read tool only, has no shell, and gets no GitHub token. A trusted validator checks its answer. The review publishes the commit status `skill-audit/review` on the PR head and one `audit-review:*` label. A push to the PR removes the review labels, and the new head has no status yet. A reviewer error, an `unsure` verdict, an invalid answer, a truncated diff or a failed gate can never produce a positive outcome; it yields `needs-human` or `changes`.
+
+**Fail-safe: the reviewer is off until the containment drill passes.** While `AUDIT_REVIEW_MODEL` is empty, the review job labels the PR `audit-review:skipped`, runs no gate and posts no status. Set `AUDIT_REVIEW_MODEL` only after the drill in `docs/audit/ci-spike.md` (Phase 1 spike additions, item 11) shows that the reviewer cannot run a shell command, write a file or fetch a URL. Until then every review outcome in Actions is UNVERIFIED.
+
+**Automerge.** `AUDIT_AUTOMERGE=true` is accepted but not acted on in Phase 1. When it is set to `true`, the review posts a notice on the PR, once, saying so. No auto-merge is armed and no merge call exists in Phase 1. Automerge returns in Phase 2, after the spike verifies how `gh pr merge --auto` binds to a head SHA (UNVERIFIED).
+
+Before enabling scheduled runs, check the repository's default workflow-token setting with `gh api repos/{owner}/{repo}/actions/permissions/workflow --jq .default_workflow_permissions`. Every audit job declares its own `permissions:`, so the audit must behave the same under `read` and `write`; this check is pending the spike, so do not assume it is verified. The partial spike confirms only local Copilot CLI flags. Its Actions installation/authentication, tool behavior in Actions, review workflow events, repository settings, and available models remain UNVERIFIED until the spike is run. `astral-sh/setup-uv` is pinned to a commit SHA (`0c5e2b8115b80b4c7c5ddf6ffdd634974642d182`, tag `v5.4.1`). The workflow still installs the Copilot CLI with an unversioned `npm install -g @github/copilot`: that version is UNVERIFIED until the spike records it, and pinning it is tracked in `docs/audit/ci-spike.md`.
+
+An `audit-upstream` issue lists stale inspiration sources with update/ignore recommendations. Recommendations do not authorize changes. To approve specific rows, dispatch `skill-audit.yaml` with `approved_upstreams` set to the exact comma-separated `skill|source` keys from that issue. The workflow validates the keys against currently stale rows and treats the approval as applying only to those rows; supplying approvals also forces a run. Unapproved stale sources remain report-only. You can also update a skill manually.
+
+The apply job builds the PR body with a body-only Copilot prompt: the diff stat, a trimmed diff (~60KB cap) and the decision rationale go into the prompt and the body comes back on stdout, following the section structure of `commands/explain-pr-changes.md`; if Copilot fails or returns an empty body, a plain generated summary is used and the fallback is logged. `AUDIT_PR_DIAGRAMS=drawio` currently logs a warning and renders with mermaid: the drawio CLI cannot be installed reliably on a hosted runner yet (UNVERIFIED pending the spike), so xvfb is not installed.
+
+### Required secrets and variables
+
+Secrets and variables must be configured in the repository settings; workflow jobs receive them through their explicit job environments.
+
+| Name | Kind | Purpose |
+|---|---|---|
+| `COPILOT_GITHUB_TOKEN` | Secret | Fine-grained PAT with Copilot Requests access, used by the Copilot CLI jobs, including the PR reviewer in `skill-audit-review.yaml`. |
+| `AUDIT_BOT_TOKEN` | Secret | Fine-grained PAT with read/write Contents, Pull requests, Issues (including labels), and Variables access. Used for PR/issue operations and to write `AUDIT_LAST_STATE`; `variables` is not a `GITHUB_TOKEN` permission. Phase 1 adds no permission to this token: review statuses and labels go through the workflow token (UNVERIFIED in Actions, see `docs/audit/ci-spike.md`). |
+| `AUDIT_RESEARCH_MODELS` | Variable | Comma-separated Copilot judge model IDs; entries are trimmed and blanks removed. |
+| `AUDIT_MERGER_MODEL` | Variable | Model used for rubric refresh, decision, fixer, upstream recommendations, and eval runner. |
+| `AUDIT_PR_DIAGRAMS` | Variable | PR diagram format: `none`, `mermaid` (default), or `drawio`. `drawio` currently falls back to `mermaid` with a warning because the drawio CLI cannot be installed reliably on a hosted runner yet (UNVERIFIED). |
+| `AUDIT_ENABLED` | Variable | Set to `true` to enable scheduled runs; dispatch is not disabled by this switch. |
+| `AUDIT_INTERVAL_DAYS` | Variable | `15` (default) or `30`; scheduled runs only. |
+| `AUDIT_REVIEW_MODEL` | Variable | PR reviewer model. Empty (default) turns the review off. |
+| `AUDIT_REVIEW_EFFORT` | Variable | Reviewer reasoning effort (default `high`). |
+| `AUDIT_ON_POSITIVE` | Variable | `label` (default) or `none`. |
+| `AUDIT_AUTOMERGE` | Variable | Accepted, not acted on in Phase 1. |
+| `AUDIT_LAST_STATE` | Variable | Audit state (`judge_sha`, judged skill tree SHAs, and recorded stale-upstream dates); written by the `state`, `checkpoint` and `attempt` jobs; failures keep the detect-owned baseline and `checked_at`. |
+
 ## 🤝 Contributing
 
 Contributions are welcome! When adding new skills:

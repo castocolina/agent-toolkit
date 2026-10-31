@@ -4,6 +4,8 @@ export PYTHONDONTWRITEBYTECODE=1
 
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 TEST_ROOT="$ROOT/tests/skills"
+AUDIT_TEST_ROOT="$ROOT/tests/audit"
+
 status=0
 
 shopt -s nullglob
@@ -35,6 +37,32 @@ for test_dir in "$TEST_ROOT"/*; do
       status=1
     fi
   done
+done
+
+for test_file in "$AUDIT_TEST_ROOT"/test-*.sh; do
+  [[ -f "$test_file" ]] || continue
+  found=1
+  if output=$(bash "$test_file" 2>&1); then
+    while IFS= read -r line; do printf '  %s\n' "$line"; done <<< "$output"
+    printf 'PASS %s\n' "${test_file#"$ROOT/"}"
+  else
+    while IFS= read -r line; do printf '  %s\n' "$line"; done <<< "$output"
+    printf 'FAIL %s\n' "${test_file#"$ROOT/"}"
+    status=1
+  fi
+done
+
+for test_file in "$AUDIT_TEST_ROOT"/test_*.py; do
+  [[ -f "$test_file" ]] || continue
+  found=1
+  if output=$(cd "$ROOT" && python3 -m unittest discover -s "${AUDIT_TEST_ROOT#"$ROOT/"}" -p "$(basename "$test_file")" 2>&1); then
+    while IFS= read -r line; do printf '  %s\n' "$line"; done <<< "$output"
+    printf 'PASS %s\n' "${test_file#"$ROOT/"}"
+  else
+    while IFS= read -r line; do printf '  %s\n' "$line"; done <<< "$output"
+    printf 'FAIL %s\n' "${test_file#"$ROOT/"}"
+    status=1
+  fi
 done
 
 ((found)) || status=1
