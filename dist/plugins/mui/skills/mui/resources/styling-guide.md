@@ -1,287 +1,50 @@
-# MUI Styling Guide
+# MUI styling: specificity and color mode
 
-## The sx Prop
+Load this for a `styled` component or a theme `styleOverrides` that must beat a state class, or that styles by color mode. The sx-versus-styled choice and the sx multipliers are in `SKILL.md`; theme setup is in `theme-customization.md`.
 
-The `sx` prop is the primary styling method in MUI v7+:
+## Beat a state class at its own specificity
 
-```typescript
-<Box
-  sx={{
-    p: 2,                    // padding: theme.spacing(2)
-    mb: 3,                   // marginBottom: theme.spacing(3)
-    bgcolor: 'primary.main', // theme.palette.primary.main
-    color: 'white',
-    borderRadius: 1,         // theme.shape.borderRadius
-    '&:hover': {
-      bgcolor: 'primary.dark'
-    }
-  }}
-/>
-```
+MUI's default state rules live on the component root and include the state class, so a slot override with one class loses to them.
 
-## Theme-Aware Values
+```tsx
+// Loses: `.MuiOutlinedInput-notchedOutline` is 0,1,0. MUI's default
+// `.root:hover .notchedOutline` and `.root.Mui-focused .notchedOutline`
+// are 0,3,0, so hover and focus keep MUI's colors.
+MuiOutlinedInput: {
+  styleOverrides: {
+    notchedOutline: ({ theme }) => ({ borderColor: theme.palette.divider }),
+  },
+},
 
-```typescript
-// Spacing (multiplied by theme.spacing, default 8px)
-sx={{ p: 2 }}  // padding: 16px
+// Wins: the same 0,3,0 selectors on `root`. Theme overrides are emitted after
+// the defaults, so the tie goes to them.
+import { outlinedInputClasses } from '@mui/material/OutlinedInput';
 
-// Colors from palette
-sx={{ bgcolor: 'primary.main', color: 'text.secondary' }}
-
-// Breakpoints
-sx={{
-  width: { xs: '100%', sm: '50%', md: '33%' }
-}}
-
-// Typography variants
-sx={{ typography: 'h4' }}  // Applies theme.typography.h4
-```
-
-## Responsive Styles
-
-```typescript
-<Box
-  sx={{
-    display: { xs: 'block', md: 'flex' },
-    flexDirection: { xs: 'column', md: 'row' },
-    gap: { xs: 1, sm: 2, md: 3 },
-    p: { xs: 2, sm: 3, md: 4 }
-  }}
-/>
-```
-
-## Pseudo-Selectors and Nested Styles
-
-```typescript
-<Button
-  sx={{
-    '&:hover': {
-      bgcolor: 'primary.dark'
-    },
-    '&:disabled': {
-      opacity: 0.5
-    },
-    '& .MuiButton-startIcon': {
-      mr: 1
-    }
-  }}
-/>
-```
-
-## Dynamic Styles
-
-```typescript
-interface CardProps {
-  isActive: boolean;
-  priority: 'low' | 'medium' | 'high';
-}
-
-function Card({ isActive, priority }: CardProps) {
-  return (
-    <Paper
-      sx={{
-        borderLeft: 4,
-        borderColor: isActive ? 'success.main' : 'grey.300',
-        bgcolor: priority === 'high' ? 'error.light' : 'background.paper',
-        opacity: isActive ? 1 : 0.7
-      }}
-    />
-  );
-}
-```
-
-## Global Styles with GlobalStyles
-
-```typescript
-import { GlobalStyles } from '@mui/material';
-
-<GlobalStyles
-  styles={{
-    body: {
-      margin: 0,
-      padding: 0
-    },
-    '*': {
-      boxSizing: 'border-box'
-    },
-    '.custom-scrollbar::-webkit-scrollbar': {
-      width: 8
-    }
-  }}
-/>
-```
-
-## Styled Components API
-
-For reusable styled components:
-
-```typescript
-import { styled } from '@mui/material/styles';
-
-const StyledCard = styled(Card)(({ theme }) => ({
-  padding: theme.spacing(2),
-  borderRadius: theme.shape.borderRadius * 2,
-  backgroundColor: theme.palette.background.paper,
-  transition: theme.transitions.create(['transform', 'box-shadow']),
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    boxShadow: theme.shadows[8]
-  }
-}));
-
-// With props
-interface StyledButtonProps {
-  tone: 'primary' | 'secondary';
-}
-
-const StyledButton = styled(Button, {
-  shouldForwardProp: (prop) => prop !== 'tone',
-})<StyledButtonProps>(({ theme, tone }) => ({
-  backgroundColor: tone === 'primary'
-    ? theme.palette.primary.main
-    : theme.palette.secondary.main,
-  color: theme.palette.primary.contrastText,
-  '&:hover': {
-    backgroundColor: tone === 'primary'
-      ? theme.palette.primary.dark
-      : theme.palette.secondary.dark
-  }
-}));
-```
-
-## Theme Overrides
-
-```typescript
-import { createTheme } from '@mui/material/styles';
-
-const theme = createTheme({
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          textTransform: 'none',
-          fontWeight: 600
-        },
-        containedPrimary: {
-          boxShadow: 'none',
-          '&:hover': {
-            boxShadow: 'none'
-          }
-        }
+MuiOutlinedInput: {
+  styleOverrides: {
+    root: ({ theme }) => ({
+      [`& .${outlinedInputClasses.notchedOutline}`]: { borderColor: theme.palette.divider },
+      [`&:hover .${outlinedInputClasses.notchedOutline}`]: { borderColor: theme.palette.text.primary },
+      [`&.${outlinedInputClasses.focused} .${outlinedInputClasses.notchedOutline}`]: {
+        borderColor: theme.palette.primary.main,
       },
-      defaultProps: {
-        disableRipple: true
-      }
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-        }
-      }
-    }
-  }
-});
+    }),
+  },
+},
 ```
 
-## CSS Variables (MUI v7+)
+Copy the state selector from the component's source rather than guessing it, use the exported `*Classes` objects instead of string class names, and never target the generated `css-<hash>` classes: they change between builds. Check the result in devtools with the input hovered and focused.
 
-```typescript
-// In theme configuration
-const theme = createTheme({
-  cssVariables: true
-});
+## Style by color mode
 
-// Use in sx prop
-<Box sx={{ color: 'var(--mui-palette-primary-main)' }} />
+With `cssVariables` and `colorSchemes`, `theme.palette.mode` inside a `styled` or `styleOverrides` callback is fixed at the default scheme, so a `mode === 'dark'` branch never switches. Use `theme.applyStyles`:
 
-// Use in CSS
-.custom-element {
-  background-color: var(--mui-palette-background-paper);
-  padding: calc(2 * var(--mui-spacing));
-}
+```tsx
+const Panel = styled('div')(({ theme }) => ({
+  backgroundColor: theme.vars.palette.background.paper,
+  ...theme.applyStyles('dark', { borderColor: theme.vars.palette.divider }),
+}));
 ```
 
-## Common Patterns
-
-### Card with Hover Effect
-```typescript
-<Card
-  sx={{
-    p: 3,
-    transition: 'all 0.3s',
-    '&:hover': {
-      transform: 'scale(1.02)',
-      boxShadow: 4
-    }
-  }}
-/>
-```
-
-### Gradient Background
-```typescript
-<Box
-  sx={{
-    background: (theme) =>
-      `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
-    color: 'white'
-  }}
-/>
-```
-
-### Sticky Header
-```typescript
-<AppBar
-  sx={{
-    position: 'sticky',
-    top: 0,
-    zIndex: (theme) => theme.zIndex.drawer + 1
-  }}
-/>
-```
-
-### Flexbox Layouts
-```typescript
-<Box
-  sx={{
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 2
-  }}
-/>
-```
-
-## Performance Tips
-
-- **Use sx prop for dynamic styles** - Better tree-shaking
-- **Use styled() for static reusable components** - Better performance
-- **Leverage theme tokens** - Consistent and performant
-- An `sx` callback does not itself trigger React renders. Prop identity matters when a changing callback/object is passed to a memoized consumer; profile before memoizing. React rendering, Emotion style generation, and the cost of generating highly dynamic style values are distinct concerns.
-
-```typescript
-// Theme callback is useful when values depend on the theme.
-<Box sx={(theme) => ({ p: theme.spacing(2) })} />
-
-// A direct object is sufficient for static values.
-<Box sx={{ p: 2 }} />
-```
-
-## Debugging Styles
-
-```typescript
-// Inspect theme in console
-<Box sx={(theme) => {
-  console.log('Theme:', theme);
-  return { p: 2 };
-}} />
-
-// Use sx as array for conditional styles
-<Box sx={[
-  { p: 2 },
-  isActive && { bgcolor: 'primary.main' },
-  isDisabled && { opacity: 0.5 }
-]} />
-```
+- `theme.vars.palette.*` resolves to `var(--mui-palette-*)`. The `alpha()` helper cannot parse a `var()`: use `theme.alpha(theme.vars.palette.primary.main, 0.12)` where the installed theme type declares `alpha`, else `` `rgba(${theme.vars.palette.primary.mainChannel} / 0.12)` ``.
+- `theme.vars` exists only when `cssVariables` is on; without it, read `theme.palette` and keep `applyStyles`.
