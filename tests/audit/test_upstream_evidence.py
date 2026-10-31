@@ -3,6 +3,8 @@
 import http.client
 import importlib.util
 import json
+import os
+import stat
 import tempfile
 import unittest
 import urllib.error
@@ -54,6 +56,16 @@ class DiffLinkTests(unittest.TestCase):
         self.assertEqual(
             link, "https://github.com/o/r3/commits/feat%2Fx%231/folder/a%20file-%C3%A9.md")
 
+    def test_new_path_replaces_the_path_in_the_diff_link(self):
+        # Break: a moved source still links the stored path, so the review opens the old tree.
+        row = {"kind": "github-path", "source": "joshuadavidthomas/agent-skills:old-dir",
+               "new_path": "skills/old dir"}
+        link = ue.diff_link(row, "main")
+        self.assertTrue(link.endswith("/skills/old%20dir"), link)
+        self.assertNotIn("old-dir", link)
+        stored = ue.diff_link({"kind": "github-path", "source": "o/r:folder/a.md"}, "main")
+        self.assertTrue(stored.endswith("/folder/a.md"), stored)
+
     def test_repo_compare_ref_is_encoded(self):
         link = ue.diff_link({"kind": "repo", "source": "o/r", "merge_base": "abc123"}, "feat/x#1")
         self.assertEqual(link, "https://github.com/o/r/compare/abc123...feat%2Fx%231")
@@ -61,6 +73,36 @@ class DiffLinkTests(unittest.TestCase):
     def test_repo_commit_ref_is_encoded(self):
         link = ue.diff_link({"kind": "repo", "source": "o/r2", "merge_base": None}, "feat/x#1")
         self.assertEqual(link, "https://github.com/o/r2/commits/feat%2Fx%231")
+
+
+class NewPathFetchTests(unittest.TestCase):
+    """A stub gh on PATH records the query; new_path replaces the path split off source."""
+
+    def fetch(self, row):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        bindir = Path(tmp.name)
+        argv_path = bindir / "argv.txt"
+        stub = bindir / "gh"
+        stub.write_text(
+            "#!/bin/sh\nprintf '%s\\n' \"$@\" > \"" + str(argv_path) + "\"\n"
+            "printf '%s\\n' '[{\"sha\":\"0123456789abcdef\",\"commit\":{\"committer\":{\"date\":\"2026-01-04T00:00:00Z\"},\"message\":\"m\"}}]'\n",
+            encoding="utf-8")
+        stub.chmod(stub.stat().st_mode | stat.S_IEXEC)
+        env = {**os.environ, "PATH": str(bindir) + os.pathsep + os.environ.get("PATH", "")}
+        with mock.patch.dict(os.environ, env, clear=True):
+            text = ue.fetch_github_commits(row, "main", 1)
+        return text, argv_path.read_text(encoding="utf-8")
+
+    def test_query_uses_new_path_when_present_and_source_path_otherwise(self):
+        # Break: the commits query keeps the stored path after the source moved.
+        row = {"kind": "github-path", "source": "joshuadavidthomas/agent-skills:old-dir",
+               "new_path": "skills/old-dir/SKILL.md"}
+        _, argv = self.fetch(row)
+        self.assertIn("path=skills%2Fold-dir%2FSKILL.md", argv)
+        self.assertNotIn("path=old-dir", argv)
+        _, argv = self.fetch({"kind": "github-path", "source": "o/r:folder/a.md"})
+        self.assertIn("path=folder%2Fa.md", argv)
 
 
 class WikipediaFetchTests(unittest.TestCase):
