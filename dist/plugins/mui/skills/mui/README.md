@@ -212,9 +212,9 @@ Access palette colors by their semantic names:
 ## Additional Resources
 
 The skill includes supplementary documentation:
-- `resources/styling-guide.md` - Advanced styling patterns
-- `resources/component-library.md` - Component migration checks and v7 Grid patterns
-- `resources/theme-customization.md` - Theme setup and customization
+- `resources/styling-guide.md` - Beating MUI state-class specificity and styling by color mode
+- `resources/theme-customization.md` - Palette augmentation, colorSchemes, nested themes and CSS layers
+- `resources/ui-ux-mapping.md` - MUI constructs for the ui-ux rules skill
 
 ## Related Documentation
 

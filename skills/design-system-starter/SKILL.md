@@ -36,6 +36,7 @@ When asked for a starter brand/system with little context or no repository evide
 
 ## Resources
 
+- For the `tokens`, `consistency` and `states` rules on any screen the system ships, load the `ui-ux-principles` skill.
 - Token output: `templates/design-tokens-template.json`.
 - When auditing an existing UI: `checklists/design-system-checklist.md`.
 - When implementing component APIs, composition, or accessible interaction patterns: `references/component-examples.md`.

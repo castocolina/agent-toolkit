@@ -189,6 +189,52 @@
         "No finding quotes or summarises the content of the missing runbook",
         "Every dimension scored below its max has at least one finding with that dimension"
       ]
+    },
+    {
+      "id": "judge-command",
+      "prompt": "The prompt judges a command. Judge the command file evals/files/ship-note.md with judge slug test; print only the verdict line. Load references/profiles/command.md for this judgment (the protocol says to load a profile only when the prompt judges a command or agent). Set skill to the file stem.",
+      "expected_output": "One verdict JSON line whose skill is ship-note. D4 is not failed for a missing name field. D7 notes that commands/evals/ship-note.json was not supplied.",
+      "files": [
+        "references/rubric.md",
+        "references/profiles/command.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/ship-note.md"
+      ],
+      "assertions": [
+        "Output is exactly one line holding one JSON object",
+        "`skill` equals `ship-note` and `judge` equals `test`",
+        "No finding says a name field is required or that the name does not match a directory",
+        "A D7 finding names the missing command eval file commands/evals/ship-note.json",
+        "D5 is not scored down for being under 200 lines with no references",
+        "The response does not say it loaded references/profiles/agent.md"
+      ]
+    },
+    {
+      "id": "judge-agent",
+      "prompt": "The prompt judges an agent. Judge the agent file evals/files/triage-agent.md with judge slug test; print only the verdict line. Load references/profiles/agent.md for this judgment (the protocol says to load a profile only when the prompt judges a command or agent). Set skill to the file stem. A missing eval file for an agent is a medium finding, never high.",
+      "expected_output": "One verdict JSON line whose skill is triage-agent. name and description are present, so D4 is not critical. A missing eval file is medium, never high.",
+      "files": [
+        "references/rubric.md",
+        "references/profiles/agent.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/triage-agent.md"
+      ],
+      "assertions": [
+        "Output is exactly one line holding one JSON object",
+        "`skill` equals `triage-agent` and `judge` equals `test`",
+        "No finding says name or description is missing",
+        "No finding about a missing eval file has severity high or critical",
+        "D5 is not scored down for being under 200 lines with no references",
+        "The response does not say it loaded references/profiles/command.md"
+      ]
     }
   ]
 }

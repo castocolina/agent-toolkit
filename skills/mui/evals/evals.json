@@ -7,8 +7,9 @@
       "expected_output": "Typed React MUI card with responsive sx and theme tokens.",
       "assertions": [
         "Imports from `@mui/material`",
-        "Uses responsive `xs` and `md` values in `sx` or the current Grid `size` API, as appropriate",
-        "Uses theme tokens"
+        "On phones (the `xs` breakpoint) the card spans the full width: Grid `size={{ xs: 12 }}` or `sx` width `{ xs: '100%' }`",
+        "From the `md` breakpoint up the card spans half the width: Grid `size={{ md: 6 }}` or `sx` width `{ md: '50%' }`, with no legacy Grid `item`, `xs` or `md` props",
+        "Styles the card with at least one theme token instead of a literal: a numeric spacing key such as `p: 2` or `theme.spacing`, or a palette path such as `'background.paper'` or `'primary.main'`; no hex color or px padding"
       ]
     },
     {
@@ -29,6 +30,57 @@
         "Rejects deep imports",
         "Recommends `onClose`",
         "Mentions `slots` and `slotProps`"
+      ]
+    },
+    {
+      "id": "loading-card",
+      "prompt": "This MUI card shows a spinner while its content loads. Show the layout that is coming instead.",
+      "expected_output": "The title and body stay absent while loading, and Skeleton variants match those missing regions.",
+      "files": [
+        "loading-card.tsx"
+      ],
+      "assertions": [
+        "The title and body are absent while loading, and Skeleton variants match those missing regions: variant=\"text\" for the title and variant=\"rectangular\" or variant=\"rounded\" for the body"
+      ]
+    },
+    {
+      "id": "theme-toggle",
+      "prompt": "This icon-only MUI toggle switches the nested region between light and dark, and the nested theme is built from the resolved outer theme. Fix the accessible name and build the nested theme from shared source options.",
+      "expected_output": "The IconButton has an aria-label naming the target mode, and the nested theme is created from shared ThemeOptions rather than the spread resolved theme.",
+      "files": [
+        "theme-toggle.tsx"
+      ],
+      "assertions": [
+        "Adds an aria-label on the IconButton naming the target action, such as switching to dark or light mode",
+        "Builds the nested theme with createTheme from shared ThemeOptions instead of spreading the resolved theme returned by useTheme"
+      ]
+    },
+    {
+      "id": "dialog-migration",
+      "prompt": "Migrate this MUI v6 dialog to v7. It deletes a project: keep the controlled open state, the backdrop and Escape close paths, the accessible name, and make the Grid and the private deep import valid under v7.",
+      "expected_output": "A controlled v7 Dialog using onClose with reason checks, a public Dialog import, Grid size, and slots/slotProps.",
+      "files": [
+        "migration-dialog.tsx"
+      ],
+      "assertions": [
+        "Keeps the dialog controlled through the open prop and an onClose callback, and handles reason === 'backdropClick' and the Escape key",
+        "Keeps the rendered dialog's accessible name, taken from the DialogTitle text",
+        "Imports Dialog from the public export '@mui/material/Dialog', not the private deep import '@mui/material/Dialog/Dialog'",
+        "Uses Grid's size prop, such as size={{ xs: 12, md: 6 }}, instead of the legacy item, xs, and md props",
+        "Replaces the deprecated `components` prop with `slots` (lowercase keys, such as `slots={{ backdrop: ... }}`) and moves any component props to `slotProps`, or removes the prop because it passes only `undefined` and says `slots`/`slotProps` is the v7 replacement"
+      ]
+    },
+    {
+      "id": "palette-augmentation",
+      "prompt": "This Button uses color=\"tertiary\", which is not a built-in MUI palette color, so it fails to typecheck. Add the module augmentation and the theme entry that make it valid, and show the typecheck command.",
+      "expected_output": "Module augmentation for Palette, PaletteOptions, and ButtonPropsColorOverrides, a tertiary palette entry, and a tsc --noEmit check.",
+      "files": [
+        "palette-consumer.tsx"
+      ],
+      "assertions": [
+        "Augments Palette and PaletteOptions with tertiary and augments ButtonPropsColorOverrides so Button's color=\"tertiary\" typechecks",
+        "Adds tertiary to the theme palette passed to createTheme",
+        "Shows the typecheck command for the consumer: the repo's typecheck script, or `npx tsc --noEmit` when the repo has none"
       ]
     }
   ]

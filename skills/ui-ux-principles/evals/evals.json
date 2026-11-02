@@ -1,0 +1,108 @@
+{
+  "skill_name": "ui-ux-principles",
+  "evals": [
+    {
+      "id": "review-dashboard",
+      "prompt": "Review the attached dashboard.tsx before we ship it.",
+      "files": [
+        "evals/files/dashboard.tsx"
+      ],
+      "expected_output": "The eight-row review table and one summary line. Fail: loading (page-level CircularProgress, line 20), responsive (fixed widths, lines 24-26), a11y (unnamed icon-only delete, line 31), states (no error branch at lines 13-16, no empty branch at line 27, delete at line 31 confirms nothing). Pass: hierarchy (no filled button), tokens (no color, type or spacing literal; the widths belong to responsive), consistency (one component library), interaction (MUI IconButton keeps its focus-visible state).",
+      "assertions": [
+        "The output contains exactly one markdown table and its header row is `| rule | pass/fail/na | evidence file:line | fix |`",
+        "The table has exactly eight data rows, in this order: loading, responsive, hierarchy, tokens, consistency, a11y, states, interaction",
+        "Every verdict cell is exactly pass, fail or na",
+        "Every evidence cell contains `dashboard.tsx:` followed by a line number or a line range",
+        "Before the table there is no prose, and after it there is exactly one summary line",
+        "Every pass row has `-` in its fix cell, and every fail row has a concrete change in its fix cell",
+        "The loading row is fail and its evidence cites dashboard.tsx:20 (the CircularProgress that replaces the whole view)",
+        "The responsive row is fail and its evidence cites a line from dashboard.tsx:24-26 and one of the fixed widths 1200, 240 or 960",
+        "The hierarchy row is pass and its evidence cites dashboard.tsx:31 or says the view has no filled button; the missing name on the icon button is not given as the hierarchy evidence",
+        "The tokens row is pass; the fixed widths are not given as a tokens failure",
+        "The consistency row is pass",
+        "The a11y row is fail and its evidence cites dashboard.tsx:31 or dashboard.tsx:32 as an icon-only IconButton with no accessible name",
+        "The states row is fail and its evidence cites dashboard.tsx:13-16 (no error branch) or dashboard.tsx:27 (no empty branch)",
+        "The interaction row is pass"
+      ]
+    },
+    {
+      "id": "fix-dashboard",
+      "prompt": "Fix the UI problems in the attached dashboard.tsx and give me the updated component.",
+      "files": [
+        "evals/files/dashboard.tsx"
+      ],
+      "expected_output": "An updated OrdersDashboard with skeleton rows while loading, an error branch with a retry, an empty branch only after a successful zero-item response, an aria-label on the delete button, a fluid layout, and visible feedback after a delete. No review table.",
+      "assertions": [
+        "The updated code no longer returns a lone CircularProgress for the whole view; while loading it renders skeleton placeholders shaped like the list rows",
+        "The updated code has an error branch, reached when the request fails or the response is not ok, that renders a message and a retry control",
+        "The updated code renders an empty state with explanatory text when the request succeeded with zero orders, and not while loading or after an error",
+        "The delete IconButton has an aria-label that contains the word Delete",
+        "The updated code no longer sets the fixed widths 1200, 240 and 960 and uses a fluid or breakpoint-based layout",
+        "After a successful delete, the order disappears from the list or a confirmation is shown",
+        "The updated code adds no hex or rgb color literal",
+        "The output does not contain a table with the header `| rule | pass/fail/na | evidence file:line | fix |`"
+      ]
+    },
+    {
+      "id": "review-form",
+      "prompt": "Can you check form.tsx for UX problems? Just give me the verdict per area.",
+      "files": [
+        "evals/files/form.tsx"
+      ],
+      "expected_output": "The eight-row review table and one summary line. Fail: loading (the submit at line 26 stays enabled with no pending state while the fetch at lines 9-13 runs), tokens (#ccc, #1d4ed8, #fff and 8px at lines 19-20), consistency (a <style> element at lines 18-21 restyles every input and button and the submit is a one-off), a11y (#ccc input border at line 19 is about 1.6:1 on white, under 3:1, SC 1.4.11), states (the response at lines 9-13 is ignored: no error, no success), interaction (outline: none at line 19 with no focus-visible replacement). Pass: responsive (no fixed width), hierarchy (one filled submit at line 26).",
+      "assertions": [
+        "The output contains exactly one markdown table and its header row is `| rule | pass/fail/na | evidence file:line | fix |`",
+        "The table has exactly eight data rows, in this order: loading, responsive, hierarchy, tokens, consistency, a11y, states, interaction",
+        "Every verdict cell is exactly pass, fail or na",
+        "Every evidence cell contains `form.tsx:` followed by a line number or a line range",
+        "Before the table there is no prose, and after it there is exactly one summary line",
+        "Every pass row has `-` in its fix cell, and every fail row has a concrete change in its fix cell",
+        "The loading row is fail and its evidence cites form.tsx:26 or form.tsx:9-13: the submit shows no pending state and stays enabled while the request runs",
+        "The responsive row is pass",
+        "The hierarchy row is pass and its evidence cites form.tsx:26, the single Create account submit",
+        "The tokens row is fail and its evidence cites form.tsx:19 or form.tsx:20 and at least one of #ccc, #1d4ed8 or #fff",
+        "The consistency row is fail and its evidence cites form.tsx:18-21: the <style> element restyles every input and button in the document, or the submit is a one-off styled button",
+        "The a11y row is fail and its evidence cites form.tsx:19: the #ccc input border is under the 3:1 non-text contrast line",
+        "The states row is fail and its evidence cites form.tsx:9-13: the response is never checked, so there is no error state and no success confirmation",
+        "The interaction row is fail and its evidence cites form.tsx:19 (outline: none with no focus-visible replacement)",
+        "The interaction fix restores a visible keyboard focus style such as a :focus-visible outline, not only deleting outline: none"
+      ]
+    },
+    {
+      "id": "build-checkout-actions",
+      "prompt": "Add the action row for our checkout step in React with MUI: Pay now, Pay on invoice, Apply code and Cancel order.",
+      "expected_output": "An MUI action row with Pay now as the only contained button, Pay on invoice outlined, Apply code text or outlined, and Cancel order not contained. No review table.",
+      "assertions": [
+        "Exactly one Button in the output has variant=\"contained\", and it is Pay now",
+        "Pay on invoice has variant=\"outlined\"",
+        "Apply code is not variant=\"contained\"",
+        "Cancel order is not variant=\"contained\"",
+        "The output adds no hex or rgb color literal and no string pixel value in sx",
+        "The output does not contain a table with the header `| rule | pass/fail/na | evidence file:line | fix |`"
+      ]
+    },
+    {
+      "id": "non-ui-request",
+      "prompt": "Write the Express route handler for POST /api/signup: validate the email, hash the password with bcrypt and return 201.",
+      "expected_output": "A backend route handler with validation and hashing, with no UI/UX rule review.",
+      "assertions": [
+        "The output contains a route handler for POST /api/signup that validates the email and hashes the password",
+        "The output does not contain a table with the header `| rule | pass/fail/na | evidence file:line | fix |`",
+        "The output does not discuss UI concerns such as skeleton screens, focus styles, empty states, contrast or responsive layouts"
+      ]
+    },
+    {
+      "id": "review-unrendered",
+      "prompt": "Review CheckoutScreen in checkout.tsx. The file is not in the workspace and nothing has been rendered. Give the verdict per rule.",
+      "expected_output": "The eight-row review table with every verdict na and every evidence cell 'checkout.tsx not provided', then one summary line asking for the file or a render.",
+      "assertions": [
+        "The output contains exactly one markdown table and its header row is `| rule | pass/fail/na | evidence file:line | fix |`",
+        "The table has exactly eight data rows, in this order: loading, responsive, hierarchy, tokens, consistency, a11y, states, interaction",
+        "Every verdict cell is na",
+        "Every evidence cell says checkout.tsx not provided",
+        "No cell contains a line number, a rendered width or a screenshot",
+        "The summary line after the table asks for checkout.tsx or a render"
+      ]
+    }
+  ]
+}

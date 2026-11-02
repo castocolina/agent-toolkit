@@ -1,0 +1,110 @@
+{
+  "skill_name": "skill-updater",
+  "evals": [
+    {
+      "id": "registry-moved-path",
+      "prompt": "Review the skill writing-clearly-and-concisely against the source joshuadavidthomas/agent-skills:writing. The registry row, the upstreams row and the upstream tree listing are in evals/files/registry-moved-path.json. The path in source returned no commit. Report the status and the track command. Do not update the source field.",
+      "expected_output": "The error is a path-query miss on a github-path row, so search the tree. Exactly one candidate, the directory skills/writing, so the status is path-moved. Confirm it with the commits-by-path query, then record track --registry docs/audit/upstream-sources.json --status path-moved --new-path skills/writing. Propose any rewrite of source in updates.md; do not change it. This is not no change.",
+      "files": [
+        "evals/files/registry-moved-path.json"
+      ],
+      "assertions": [
+        "Reports the status path-moved",
+        "Names skills/writing as the new path",
+        "Does not say there is no change"
+      ]
+    },
+    {
+      "id": "registry-current",
+      "prompt": "Review the skill react-useeffect against its source. The registry row and the upstreams row are in evals/files/registry-current.json. Report the status and the track command.",
+      "expected_output": "The upstreams row has stale false and error null, so the status is current. Record it with audit.py track --registry docs/audit/upstream-sources.json --artifact react-useeffect --source reactjs/react.dev:src/content/learn/you-might-not-need-an-effect.md --status current.",
+      "files": [
+        "evals/files/registry-current.json"
+      ],
+      "assertions": [
+        "Reports the status current",
+        "Includes a track command with --status current"
+      ]
+    },
+    {
+      "id": "rate-limit-unreachable",
+      "prompt": "Review the skill humanizer against blader/humanizer. audit.py upstreams printed this row: {\"skill\": \"humanizer\", \"source\": \"blader/humanizer\", \"kind\": \"github\", \"source_updated\": null, \"ours_updated\": \"2026-10-20T00:00:00Z\", \"merge_base\": null, \"stale\": null, \"error\": \"gh: API rate limit exceeded (HTTP 403)\", \"new_path\": null}. gh auth status is fine and a retry gives the same error. Report the status and the track command.",
+      "expected_output": "The error is a rate limit, not a path-query miss, so there is no tree search and no new path. The status is unreachable: track --registry docs/audit/upstream-sources.json --artifact humanizer --source blader/humanizer --status unreachable. It is not no change.",
+      "files": [],
+      "assertions": [
+        "Reports the status unreachable",
+        "Does not list the upstream tree or propose a new path",
+        "Does not say there is no change"
+      ]
+    },
+    {
+      "id": "model-rule-probe",
+      "prompt": "The skill humanizer has a rule that tells the model to undo a character substitution: it replaces every em dash with a comma. The current target model may no longer produce that substitution. Decide what to do with the rule. Do not edit the skill.",
+      "expected_output": "The rule exists to counter a model behavior, so run one short prompt that should elicit the em dash once on the current target model. If the em dash appears, keep the rule; if it does not, propose removal in updates.md. Do not delete or edit the rule. Record the model with track --registry docs/audit/upstream-sources.json --model.",
+      "files": [],
+      "assertions": [
+        "Proposes running a probe before any removal",
+        "Does not edit or delete the rule automatically"
+      ]
+    },
+    {
+      "id": "refuse-gepetto",
+      "prompt": "Check whether the gepetto skill is still current against its upstream sources and update it if the source moved.",
+      "expected_output": "Refuse. gepetto is a synced skill, so skill-updater does not review it and does not edit it.",
+      "files": [],
+      "assertions": [
+        "Refuses to review or edit gepetto",
+        "Gives no track command and no source update for gepetto"
+      ]
+    },
+    {
+      "id": "stale-adopt-adapt-ignore",
+      "prompt": "Review the skill writing-clearly-and-concisely against joshuadavidthomas/agent-skills:writing. audit.py upstreams printed error null and stale true for that github-path row, and the contents check on the path returned 200. The upstream diff adds a ban on hedging words, moves the banned-word list into a separate words.txt (our skill keeps its list inline on purpose), and adds a plugin-marketplace install section. Decide each change and give the track command.",
+      "expected_output": "The path exists, so this is a real change. Hedging ban: adopt. Banned words: adapt, port them into the inline list. Marketplace section: ignore, distribution this skill does not do. Each decision goes to updates.md with a reason, and the row is recorded stale: track --registry docs/audit/upstream-sources.json --artifact writing-clearly-and-concisely --source joshuadavidthomas/agent-skills:writing --status stale.",
+      "files": [],
+      "assertions": [
+        "Adopts the hedging ban",
+        "Adapts the banned-word change and keeps the list inline",
+        "Ignores the marketplace install section",
+        "Records the status stale"
+      ]
+    },
+    {
+      "id": "contents-404-moved",
+      "prompt": "Review the skill react-useeffect against its source. The registry row, the upstreams row, the contents check and the upstream tree are in evals/files/registry-deleted-path.json. Report the status and the track command.",
+      "expected_output": "error null with stale true on a github-path row, but the contents check on the source path is a 404, so the path moved and this is not a stale change to classify. The tree search finds one candidate, src/content/learn/escape-hatches/you-might-not-need-an-effect.md, confirmed by its commit. Record track --registry docs/audit/upstream-sources.json --artifact react-useeffect --source reactjs/react.dev:src/content/learn/you-might-not-need-an-effect.md --status path-moved --new-path src/content/learn/escape-hatches/you-might-not-need-an-effect.md --sha 9f1c2d3e4b5a69788796a5b4c3d2e1f0a9b8c7d6.",
+      "files": [
+        "evals/files/registry-deleted-path.json"
+      ],
+      "assertions": [
+        "Treats the contents 404 as a moved path, not as a stale change to adopt, adapt or ignore",
+        "Reports the status path-moved",
+        "Names src/content/learn/escape-hatches/you-might-not-need-an-effect.md as the new path"
+      ]
+    },
+    {
+      "id": "several-tree-candidates",
+      "prompt": "Review the skill writing-clearly-and-concisely against its source. The registry row, the upstreams row and the upstream tree are in evals/files/registry-several-candidates.json. Report what you record.",
+      "expected_output": "A path-query miss, so search the tree. Two candidates match the last segment writing: skills/writing and archive/writing. List both in updates.md, record no path-moved, and ask the user which one is the new path.",
+      "files": [
+        "evals/files/registry-several-candidates.json"
+      ],
+      "assertions": [
+        "Lists both skills/writing and archive/writing as candidates",
+        "Records no path-moved status",
+        "Asks the user which candidate to use"
+      ]
+    },
+    {
+      "id": "command-no-row",
+      "prompt": "Review the command codex-plan (commands/codex-plan.md) for this repo. docs/audit/upstream-sources.json has no row whose skill is codex-plan. Its rules were checked against router-env/my-referee-two and all still hold. Give the track command.",
+      "expected_output": "A command has no source rows, so skip upstreams and run the model-validity pass. Record one source-less call that writes its local row: track --registry docs/audit/upstream-sources.json --artifact codex-plan --artifact-kind command --status current --model router-env/my-referee-two.",
+      "files": [],
+      "assertions": [
+        "Runs or reports the model-validity pass for the command",
+        "Gives a track command with no --source",
+        "The track command passes --artifact-kind command and --status current"
+      ]
+    }
+  ]
+}

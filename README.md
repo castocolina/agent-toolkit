@@ -113,6 +113,7 @@ Add skills to project knowledge or paste SKILL.md contents into the conversation
 | 🔮 Meta | [command-creator](skills/command-creator/README.md) | Create Claude Code slash commands |
 | 🔮 Meta | [plugin-forge](skills/plugin-forge/README.md) | Build Claude Code plugins & manifests |
 | 🔮 Meta | [skill-judge](skills/skill-judge/README.md) | Evaluate skill design quality |
+| 🧩 Meta | [skill-updater](skills/skill-updater/README.md) | Check skills, commands and agents against their sources and models |
 | 📝 Documentation | [backend-to-frontend-handoff-docs](skills/backend-to-frontend-handoff-docs/README.md) | API handoff docs for frontend |
 | 📝 Documentation | [c4-architecture](skills/c4-architecture/README.md) | C4 architecture diagrams with Mermaid |
 | 📝 Documentation | [crafting-effective-readmes](skills/crafting-effective-readmes/README.md) | Write effective README files |
@@ -125,6 +126,7 @@ Add skills to project knowledge or paste SKILL.md contents into the conversation
 | 📝 Documentation | [writing-clearly-and-concisely](skills/writing-clearly-and-concisely/README.md) | Clear, professional writing |
 | 🎨 Design & Frontend | [design-system-starter](skills/design-system-starter/README.md) | Create design systems |
 | 🎨 Design & Frontend | [mui](skills/mui/README.md) | Material-UI v7 patterns |
+| 🎨 Design & Frontend | [ui-ux-principles](skills/ui-ux-principles/README.md) | Eight UI/UX rules for building and reviewing screens |
 | 🎨 Design & Frontend | [openapi-to-typescript](skills/openapi-to-typescript/README.md) | Convert OpenAPI to TypeScript |
 | 🎨 Design & Frontend | [react-dev](skills/react-dev/README.md) | Type-safe React 18-19 with TypeScript |
 | 🎨 Design & Frontend | [react-useeffect](skills/react-useeffect/README.md) | React useEffect best practices |
