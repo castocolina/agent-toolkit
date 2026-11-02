@@ -104,7 +104,7 @@ jobs:
           import json, os
           from pathlib import Path
           data = json.loads(Path(os.environ['FETCH']).read_text())
-          changed = bool(data.get('changed')) or bool(data.get('rubric_stale')) or bool(data.get('structure_changed'))
+          changed = bool(data.get('changed')) or bool(data.get('removed')) or bool(data.get('rubric_stale')) or bool(data.get('structure_changed'))
           spec_changed = 'true' if changed else 'false'
           structure_changed = 'true' if data.get('structure_changed') else 'false'
           Path(os.environ['RUNNER_TEMP'], 'spec_changed').write_text(spec_changed)
