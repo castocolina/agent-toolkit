@@ -1,3 +1,6 @@
+profile_version: 4
+source_digest: f922066dae75510ff7373ba144d20d38d2fc7f63f330fadad7579cf1feebf8c9
+
 # Agent profile
 
 Load this only when the prompt judges an agent. Do not load it for a skill or a command.
@@ -14,28 +17,33 @@ Unchanged. Judge the agent body. Do not look for a `SKILL.md` layout or a skill 
 
 ## D4 — frontmatter
 
-Validity uses the agent fields recorded in `docs/audit/artifact-specs.md`.
+Validity uses the agent fields recorded in `docs/audit/artifact-specs.md`. Every agent in this repository ships in a Claude Code plugin, so judge it as a plugin agent.
 
-- Required: `name` and `description`. Missing either is critical: the host skips the file.
-- `name` is at most 256 characters, must not contain `:`, and must not start with `-`.
-- A filename that differs from `name` is not a finding. Do not apply the skill `name` rules.
+- Required by the spec: `name` and `description`. A missing `description` is high: the agent cannot be routed to. A missing `name` is low: a plugin agent still loads under its file name.
+- `name` is at most 256 characters, must not contain `:` and must not start with `-`.
+- A filename that differs from `name` is not a finding. Do not apply the skill `name` rules. (This repository's own tooling wants name equal to file stem; `audit.py check` reports that, not the judge.)
 - Optional: `tools`, `disallowedTools`, `model`, `permissionMode`, `maxTurns`, `autoCompactWindow`, `skills`, `mcpServers`, `hooks`, `memory`, `background`, `omitClaudeMd`, `effort`, `isolation`, `color`, `initialPrompt`, `experimental`.
+- `permissionMode`, `hooks`, `mcpServers` or `initialPrompt` in a plugin agent is low: the host ignores it. Ship hooks and MCP servers at plugin level instead.
+- A `model` that is not `sonnet`, `opus`, `haiku`, `fable`, `inherit` or a full model ID is low. A `color` outside the eight documented names is low.
 - An unknown field is low: the host ignores it.
+- `skills:` takes a list of skill names. The spec does not say whether a skill of the agent's own plugin is written plain or plugin-namespaced: do not deduct for either form.
 
 ## D5 — progressive disclosure
 
-Score whether bulky material was split out of the agent file.
+Score whether bulky material was split out of the agent file. Preloading a skill through `skills:` counts as splitting bulky rules out of the body.
 
-This repository's convention, not a spec rule: an artifact with no references scores full marks when it is under 200 lines. Over 200 lines with nothing split out scores at most 10.
+This repository's convention, not a spec rule. Score on the agent file's own length:
 
-## D7 — tests and evals
+- 200 lines or fewer: 15, unless a finding shows a concrete split need.
+- Over 200 lines with bulky rules moved into a preloaded skill: 10, with one finding naming what still belongs in the skill.
+- Over 200 lines with nothing split out and no `skills:` preload: 4.
 
-An agent has no required eval file.
+## D7 — tests and evals (15 points)
 
-- A missing eval file is a medium finding, never high.
-- That finding does not by itself put D7 in the bottom band.
-- Agents have no trigger queries. Do not deduct for a missing trigger file.
-- Do not deduct for a missing script test.
+An agent has no eval location and no trigger queries. A missing eval file is never a finding by itself, and a missing script test is never a finding. Score D7 on this ladder only:
+
+- 15, with no D7 finding: the body has a sentence that states when the task is done and it states the output format.
+- At most 8, with one medium finding that names what is missing (the done-sentence, the output format, or both): otherwise.
 
 ## D8 — checks that apply
 
