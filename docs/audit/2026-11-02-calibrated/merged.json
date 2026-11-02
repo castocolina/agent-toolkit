@@ -1,0 +1,1173 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codex-plan",
+      "percent": 43.2,
+      "grade": "F",
+      "judges": {
+        "router-env-my-referee-one": 43.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "commands/codex-plan.md",
+          "line": 35,
+          "evidence": "'Good clarifying questions' includes 'Narrow down scope and requirements' and 'Clarify technology choices', followed by familiar question banks for authentication, APIs, microservices and testing. This substantial section teaches routine requirements gathering rather than Codex-specific expertise.",
+          "fix": "Remove the generic question banks and basic request-analysis guidance. Retain only questions driven by non-obvious Codex handoff constraints or repository-specific decisions."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 123,
+          "evidence": "'Tell Codex to NOT ask any further clarifying questions - it has all the information it needs' assumes that intake is complete without a decision procedure for establishing that completeness.",
+          "fix": "Add a handoff readiness gate: distinguish confirmed requirements, blocking decisions and nonblocking assumptions; resolve blocking decisions before handoff, encode remaining assumptions explicitly, and check that the proposed tasks and acceptance criteria cover the confirmed requirements."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 316,
+          "evidence": "'Do NOT assume - Do not guess what the plan contains' supplies a general caution, but there is no Gotchas section explaining the command's file and CLI-specific traps.",
+          "fix": "Add concise, reasoned gotchas: --output-last-message saves Codex's final reply rather than proving codex-plan.md exists; fixed output filenames can collide with previous runs, so do not overwrite them without approval; transfer example environment keys rather than live secret values into the handoff prompt."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 2,
+          "evidence": "'Create a detailed implementation plan using Codex 5.2 with high reasoning' states a capability but omits concrete use scenarios and the boundary that this command prepares a manual handoff rather than executing Codex.",
+          "fix": "Prepare prompt_to_codex.md for a user-run gpt-5.2-codex implementation plan with high reasoning. Use when planning a feature, API, authentication change, migration or testing strategy, including underspecified requests needing clarification. Gather repository context and provide the manual command that writes codex-plan.md. Not for implementing changes or executing Codex automatically."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "high",
+          "file": "commands/codex-plan.md",
+          "line": 149,
+          "evidence": "The 319-line command embeds '## Example Full Flow', including a long dialogue and complete plan template, and splits none of this material into a bundled skill. It exceeds the command profile's 200-line threshold.",
+          "fix": "Move the worked example and plan template into a skill bundled by the command's plugin, for example skills/codex-planning/references/plan-template.md. Add an explicit read via ${CLAUDE_PLUGIN_ROOT}/skills/codex-planning/references/plan-template.md when composing the plan prompt, and keep the command itself under 200 lines."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 33,
+          "evidence": "'Use AskUser to ask 3-6 targeted clarifying questions' is mandatory, reinforced by 'Always ask clarifying questions first' at line 284, even when the request already supplies all relevant decisions.",
+          "fix": "Ask only unanswered questions that materially affect the plan. Treat three to six questions as an optional upper range, not a minimum; when the request and repository provide sufficient information, proceed and state any bounded assumptions."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "high",
+          "file": "commands/evals/codex-plan.json",
+          "line": null,
+          "evidence": "Reading commands/evals/codex-plan.json returned ENOENT, and the directory listing confirms it is absent. No main-path, failure-path or edge-case scenarios with verifiable assertions are supplied.",
+          "fix": "Add commands/evals/codex-plan.json with at least three realistic scenarios: an ambiguous planning request through successful manual handoff, a prompt-file write failure, and an edge case such as an existing output file. Assert observable behavior including prompt contents, verified context paths, model and reasoning settings, no automatic Codex execution, and explicit failure or collision handling."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 13,
+          "evidence": "The opening instructs 'Execute Codex to generate and save the plan', but line 297 says 'Save the prompt to prompt_to_codex.md (do NOT execute)'. These instructions disagree about who performs execution.",
+          "fix": "Replace the opening's fourth item with 'Save the prompt for manual Codex execution, show the command, and wait for the user to return the plan.' State the manual-only boundary once consistently throughout the workflow."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 180,
+          "evidence": "The worked example's 'You craft prompt for Codex' proceeds through '## Requirements' and '## Plan Structure' without the '## Files to Read for Context' section that Step 4 says to 'Always include'. Following the example therefore violates the command's own context requirement.",
+          "fix": "Add a Files to Read for Context section to the worked example using paths discovered during context gathering. Clearly mark illustrative paths and require their replacement with verified repository paths before saving the prompt."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 127,
+          "evidence": "'Save the crafted prompt to prompt_to_codex.md for manual execution' leads directly to execution instructions, with no branch for a failed write or an unwritable working directory.",
+          "fix": "After writing, verify that the prompt file was saved before presenting the manual command. If writing fails, report the concrete error, provide the prompt inline or ask for a writable destination, and do not claim the handoff file is ready."
+        }
+      ]
+    },
+    {
+      "name": "compose-email",
+      "percent": 51.2,
+      "grade": "F",
+      "judges": {
+        "router-env-my-referee-one": 51.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "commands/compose-email.md",
+          "line": 65,
+          "evidence": "\"Specific and scannable (5-8 words ideal)\" and \"Short paragraphs (2-3 sentences max)\" exemplify the substantial space spent repeating ordinary email-writing knowledge. The workflow adds little expert-only knowledge beyond brief activation guidance.",
+          "fix": "Condense standard subject-line, paragraph, and formatting advice into a short activation checklist. Replace the repetition with developer-specific communication decisions, such as separating committed dates from proposed dates and presenting scope-versus-deadline trade-offs in extension requests."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 44,
+          "evidence": "\"Use the **What-Why-How** structure:\" supplies a composition sequence, but the purposes collected earlier\u2014requests, FYIs, escalations, and follow-ups\u2014receive no corresponding reasoning framework for selecting the message's substance.",
+          "fix": "Add a compact purpose-to-strategy checkpoint: requests identify the smallest decision, decision owner, and needed-by time; escalations distinguish observed impact, uncertainty, and mitigation; FYIs identify what changes for the recipient and whether a response is needed."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 137,
+          "evidence": "\"Anti-Patterns to Avoid\" lists familiar warnings such as \"Wall of text without structure\" and \"CC'ing unnecessarily\", without explaining failure mechanisms or documenting developer-specific communication gotchas.",
+          "fix": "Add specific prohibitions with reasons: never present a proposed delivery date as a commitment without confirmation, because recipients may treat it as an agreed deadline; never copy internal logs or incident links into external messages without checking disclosure and accessibility, because they can expose sensitive details or leave recipients unable to act."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 2,
+          "evidence": "\"Draft a professional email using the What-Why-How framework. Use when you need to compose emails to colleagues, stakeholders, or leadership.\" advertises composing but omits the existing-draft refinement path and implicit intents such as making a message less defensive or following up.",
+          "fix": "Draft or refine professional emails to technical peers, stakeholders, managers, and leadership using What-Why-How. Use for status updates, approval requests, escalations, follow-ups, or rewriting an existing draft for clearer tone and structure, even when the user only asks to make a message shorter or less defensive. Produce a subject and email body; do not send messages."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 134,
+          "evidence": "\"Email body with WHAT/WHY/HOW sections labeled\", together with fixed opening and context sentence counts, prescribes the presentation even when refining a brief existing draft. There is no escape hatch for preserving the user's voice or requested format.",
+          "fix": "Make What-Why-How an internal organizing default rather than mandatory visible labels. Default to a ready-to-paste email that preserves supplied voice, length, and formatting constraints; show framework labels or a subject rationale only when requested or useful for coaching."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "high",
+          "file": "commands/compose-email.md",
+          "line": null,
+          "evidence": "No commands/evals/compose-email.json exists; commands/evals/ contains explain-pr-changes.json and files/. Main-path, failure-path, and edge-case scenarios are all missing.",
+          "fix": "Add commands/evals/compose-email.json with at least three realistic scenarios and verifiable assertions: a fully specified approval request, an empty or substantively insufficient request that must elicit missing facts, and a minimal existing-draft rewrite that preserves facts and requested brevity."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 19,
+          "evidence": "\"If `$ARGUMENTS` is empty or insufficient, use AskUserQuestion to gather:\" leads only to Audience, Purpose, and Urgency questions. Following the empty-input branch still leaves the actual topic, supporting facts, and requested action unknown before Step 4 requires a complete draft.",
+          "fix": "Ask for the message's topic, known facts or source draft, and desired outcome before drafting. Reuse information already supplied, ask only blocking follow-up questions, and use explicit placeholders for nonblocking unknowns rather than inventing facts. If AskUserQuestion is unavailable, ask the same questions in plain text."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 120,
+          "evidence": "\"/soft-skills:draft-email Need to ask team lead for deadline extension on API migration\" uses a different command identity. All three examples invoke draft-email, whereas this file defines compose-email and the marketplace registers it under command-compose-email.",
+          "fix": "Replace all three example invocations with /command-compose-email:compose-email for the packaged plugin, or /compose-email when explicitly demonstrating project-local installation."
+        }
+      ]
+    },
+    {
+      "name": "explain-changes-mental-model",
+      "percent": 42.4,
+      "grade": "F",
+      "judges": {
+        "router-env-my-referee-one": 42.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 65,
+          "evidence": "The separate 'Extract the Diff' section demonstrates `git show <hash> --no-color` and `git diff <range> --no-color`. Most other sections likewise provide familiar Git operations, generic explanation advice, or elementary authentication concepts rather than expert knowledge.",
+          "fix": "Collapse standard Git extraction instructions to the unique large-diff fallback and remove generic explanatory advice. Retain the report contract and source-selection semantics; add non-obvious dependency and review pitfalls grounded in real changesets instead of reteaching native diffing."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 100,
+          "evidence": "'Test/config changes: Usually depend on everything else' substitutes a layer heuristic for a procedure that establishes actual dependency edges.",
+          "fix": "Derive review prerequisites from changed callers, data flow, schema contracts, feature flags, and test fixtures. Require a concrete reason for each dependency, merge inseparable groups, and place configuration or migrations first when they enable later behavior rather than ordering them last by category."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 151,
+          "evidence": "'Gotchas and Non-Obvious Details' contains placeholders such as '[Any tricky parts or things that might be confusing]'; it supplies no concrete traps or reasoned prohibitions.",
+          "fix": "Add actual gotchas with reasons: inspect historical source at the analyzed revision rather than the current working tree, which may contain later changes; distinguish patch-proven behavior from inferred author intent; and verify generated-file or formatting churn before treating it as semantically irrelevant."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 2,
+          "evidence": "'Build a mental model of changes by splitting them into smaller logical chunks' states the output but omits trigger scenarios, Git-specific keywords, and the boundary with defect-focused review.",
+          "fix": "Explain Git diffs, commits, branch comparisons, revision ranges, or pasted changes as dependency-ordered logical groups with file references and a review sequence. Use when the user wants to understand a changeset, asks what to read first, or needs a conceptual walkthrough. Not for editing code or conducting a defect-focused code review."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "high",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 178,
+          "evidence": "The command is 214 lines, with the entire 'Example Output' and report template inline and no bulky material split into a bundled skill.",
+          "fix": "Move the worked example into a skill bundled with this command's plugin, for example skills/change-mental-model/references/examples.md, and add an explicit conditional read when a worked example is needed. Keep the command itself at 200 lines or fewer."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "high",
+          "file": "commands/evals/explain-changes-mental-model.json",
+          "line": null,
+          "evidence": "No commands/evals/explain-changes-mental-model.json exists; commands/evals/ contains only explain-pr-changes.json and files/. Main-path, failure-path, and edge-case scenarios are all missing.",
+          "fix": "Add at least three realistic scenarios with verifiable assertions: a commit or range producing correct file groups and dependency order; an invalid reference or empty diff producing a clear diagnostic without invented changes; and an edge case such as HEAD~3 resolving to a single-commit patch or custom mode waiting for pasted input."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 21,
+          "evidence": "Every usage example invokes '/mental-model', but this file creates the command explain-changes-mental-model; the marketplace entry supplies no mental-model alias.",
+          "fix": "Replace every /mental-model example with /explain-changes-mental-model for project installation, and document /command-explain-changes-mental-model:explain-changes-mental-model for this repository's plugin installation."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 54,
+          "evidence": "'Argument looks like a branch name (contains letters, no `..`)' matches the documented HEAD~3 example and the literal custom. HEAD~3 therefore receives a branch comparison instead of a commit patch, while custom overlaps a branch rule preceding its special case.",
+          "fix": "Make dispatch mutually exclusive: handle exact custom first, then explicit ranges, then verified branch refs, then other verified commit-ish expressions using git show. Recognize HEAD~3 and tags as commit-ish values, validate and quote arguments, and ask for a comparison base when neither main nor master exists."
+        }
+      ]
+    },
+    {
+      "name": "explain-pr-changes",
+      "percent": 83.2,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 83.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 1,
+          "evidence": "The file starts with '# PR workflow' and has no description frontmatter. It still loads, but the fallback listing text does not explain its capabilities, invocation scenarios, or branch-pushing and PR-writing behavior.",
+          "fix": "Generate or update a GitHub pull request from the current branch's committed diff, with changeset triage and optional Mermaid or draw.io diagrams. Use when asked to explain PR changes, refresh a PR summary, promote a release branch, or reuse merged PR bodies and reviewers. Pushes feature branches and writes PRs; not for a read-only explanation of a diff."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 5,
+          "evidence": "'You are analytical, objective, and skilled at visualizing complex code changes' adds no expertise. Sections 5.1\u20135.4 also include familiar review instructions such as 'Understand the intent behind the changes' and 'analyze the diff file by file and group related changes into logical changesets,' which models and native PR helpers already handle.",
+          "fix": "Remove the self-descriptive persona and compress the standard diff-analysis and summary-writing advice into the actual output constraints: a 150-word overview, diagram eligibility, public-contract notes, and conservative changeset triage. Preserve the non-obvious promotion, reuse, quoting, and failure-handling rules."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 106,
+          "evidence": "The command is 505 lines. Phase 4 conditionally loads the bundled draw.io authoring rules, so some material is split out, but '## 4. Mode decision' still contains extensive body-assembly recipes, and section 8 embeds the full report template.",
+          "fix": "Move the detailed mode-specific assembly, attachment, and reviewer procedures into skills/pr-diagrams/references/pr-workflow.md and the report template into skills/pr-diagrams/assets/pr-summary.md. Keep the command at 200 lines or fewer with its arguments, safety gates, ordered phases, and explicit conditional reads for the relevant modes."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 227,
+          "evidence": "The prescribed filter starts with \"awk '/^```mermaid/{skip=1; next}\". Section 3.3 defines a diagram as any fenced block tagged mermaid, but this pattern recognizes only column-zero triple-backtick openers. Valid tilde fences, four-backtick fences, and indented fences survive the --diagrams=none branch and reach the PR body.",
+          "fix": "Make the filter track Markdown fences: accept up to three leading spaces and opening runs of at least three backticks or tildes, recognize the mermaid info string, and require a closing fence of the same character with sufficient length. Preserve surrounding prose and retain the explicit error for an unclosed Mermaid fence."
+        }
+      ]
+    },
+    {
+      "name": "sync-branch",
+      "percent": 37.6,
+      "grade": "F",
+      "judges": {
+        "router-env-my-referee-one": 37.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "commands/sync-branch.md",
+          "line": 6,
+          "evidence": "'Fetch latest upstream refs: `git fetch origin --prune`' begins a standard fetch\u2013rebase\u2013push walkthrough; the body adds no repository-specific knowledge or non-obvious Git decisions.",
+          "fix": "Condense the familiar Git mechanics into a compact execution sequence and spend the remaining instructions on repository-specific remote conventions, branch ownership and history-rewrite edge cases."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "high",
+          "file": "commands/sync-branch.md",
+          "line": 8,
+          "evidence": "'Rebase current branch onto target' prescribes an operation without teaching how to distinguish feature-owned commits from incoming or already-landed changes.",
+          "fix": "Before rebasing, inspect `git log --left-right --cherry-pick --oneline origin/<target>...HEAD`, identify the feature-only patches and state the behavior that must survive. If the base was rewritten or feature patches already landed, identify the correct replay range before proceeding."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "high",
+          "file": "commands/sync-branch.md",
+          "line": 8,
+          "evidence": "'Rebase current branch onto target' and the subsequent push instructions have no accompanying Gotchas or specific NEVER rules with reasons.",
+          "fix": "Add a Gotchas section explaining that rebase conflict sides are counterintuitive: ours is the onto history and theirs is the replayed feature commit. Never select --ours or --theirs solely by the label; inspect the patch intent to avoid discarding feature work."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 2,
+          "evidence": "'description: Sync feature branch with the latest main branch.' omits the rebase and force-push behavior, concrete trigger scenarios and the boundary from merge-based synchronization.",
+          "fix": "Rebase the current feature branch onto the latest origin/main or a supplied target, then update its PR branch with --force-with-lease. Use when a feature branch or PR is behind its base and needs updating; not for merge-based synchronization or updating local main."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "high",
+          "file": "commands/sync-branch.md",
+          "line": 13,
+          "evidence": "'Force-with-lease push to update the PR' is unconditional, with no preflight guard against operating on a protected/shared branch, detached HEAD, a dirty worktree or the wrong PR head remote.",
+          "fix": "Before any mutation, capture the current branch and HEAD; stop for detached HEAD, protected/base branches, dirty or unmerged worktrees, or an existing Git operation. Verify the intended PR head remote/ref and establish authorization before rewriting a shared branch. Push the saved branch explicitly rather than rediscovering it after the rebase."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "high",
+          "file": "commands/evals/sync-branch.json",
+          "line": null,
+          "evidence": "Reading commands/evals/sync-branch.json returned ENOENT; no main-path, failure-path or edge-case eval scenarios are supplied.",
+          "fix": "Add commands/evals/sync-branch.json with at least three realistic scenarios and verifiable assertions: successful synchronization, a conflict or rejected-push failure, and an edge case such as a non-main target or detached HEAD. Assert the resulting branch state, preservation of feature work and whether a push occurred."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 12,
+          "evidence": "'4. Resolve any conflicts' leads directly to the push step without staging resolutions, continuing the rebase, handling repeated conflicts or providing an abort fallback.",
+          "fix": "Make the conflict branch explicit: inspect and resolve each conflict, stage only resolved paths, run `git rebase --continue`, and repeat until the rebase completes. If resolution requires an uncertain semantic choice, ask the user or run `git rebase --abort` and report the blocker. Do not enter the push step while the rebase is incomplete or has failed."
+        }
+      ]
+    },
+    {
+      "name": "sync-skills-readme",
+      "percent": 60.0,
+      "grade": "D",
+      "judges": {
+        "router-env-my-referee-one": 60.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/sync-skills-readme.md",
+          "line": 13,
+          "evidence": "'Use Bash to list all skill directories', the YAML extraction walkthrough at lines 23\u201337, and the Bash/Read/Edit catalog at lines 136\u2013138 spend substantial space restating standard operations. The repository-specific taxonomy and table conventions are diluted by this material.",
+          "fix": "Condense directory enumeration and frontmatter extraction into one instruction, and remove the repeated tool catalog and basic YAML example. Retain the category mapping, precedence, table schema, sorting, edit boundaries and failure policies."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/sync-skills-readme.md",
+          "line": 59,
+          "evidence": "'Assign to the first matching category' supplies a mechanical procedure without explaining its decision principle. Keywords such as 'handoff' and 'requirements' occur in multiple categories, but the workflow never explains why the earlier category should win.",
+          "fix": "Document the intended rationale for category precedence and provide an overlapping-keyword example showing why one category wins. Explain how to extend the mapping without unintentionally shadowing later categories."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/sync-skills-readme.md",
+          "line": 139,
+          "evidence": "'DO NOT use Grep - Read files directly for accurate frontmatter parsing' provides limited reasoning; the other prohibitions primarily restate edit scope. There are no concrete gotchas explaining metadata-to-table hazards.",
+          "fix": "Add a brief Gotchas section: preserve folded and literal YAML descriptions when extracting metadata; escape pipes and normalize newlines before generating table cells; and resolve links from the actual directory path rather than assuming the metadata name is the path. Explain the truncation, malformed-table and broken-link failures these rules prevent."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "commands/sync-skills-readme.md",
+          "line": 2,
+          "evidence": "'Sync root README.md with current skills inventory from skills/ directory' identifies the operation and paths, but omits explicit trigger scenarios and a boundary against broader README rewriting.",
+          "fix": "Synchronize the root README.md Available Skills table with metadata from skills/*/SKILL.md. Use after adding, removing, renaming or updating skills, or when the inventory table is stale. Regenerate categorized skill links and concise descriptions; not for rewriting other README sections."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "high",
+          "file": "commands/sync-skills-readme.md",
+          "line": null,
+          "evidence": "No commands/evals/sync-skills-readme.json exists; commands/evals/ contains 'explain-pr-changes.json' and 'files/'. Main-path, failure-path and edge-case scenarios are all missing.",
+          "fix": "Add commands/evals/sync-skills-readme.json with at least three realistic scenarios and verifiable assertions: inventory changes with correct rows, links and ordering; missing frontmatter or a missing target section with the specified warning or stop behavior; and an edge case such as folded descriptions containing pipes. Assert that content outside the table remains unchanged."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "commands/sync-skills-readme.md",
+          "line": 89,
+          "evidence": "The shortening example converts 'Use when the user asks to run Codex CLI for code analysis, refactoring, or automated editing' into 'Advanced code analysis with GPT-5.2'. The supplied source description contains no model version, so following this example introduces an unsupported factual claim.",
+          "fix": "Replace the shortened example with 'Code analysis, refactoring & automated edits'. Require summaries to retain only capabilities and factual details supported by the extracted metadata; do not introduce model versions or context limits from the illustrative table."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-skills-readme.md",
+          "line": 98,
+          "evidence": "'Find the end of the table (marked by the next --- separator or next ## heading)' followed by 'Replace everything between those markers' can consume prose following the table, conflicting with 'Only replace the table content' at line 104. The branch where neither terminating marker exists also has no defined outcome.",
+          "fix": "Locate and replace only the table header, delimiter and contiguous table rows beneath the existing heading. Preserve the heading, separators, following prose and all attribution. Stop without editing if the table cannot be identified unambiguously. After editing, reread the result and verify row counts and unchanged content outside the table before reporting success."
+        }
+      ]
+    },
+    {
+      "name": "viral-tweet",
+      "percent": 55.2,
+      "grade": "F",
+      "judges": {
+        "router-env-my-referee-one": 55.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "commands/viral-tweet.md",
+          "line": 43,
+          "evidence": "'Pattern interrupt: break expectations' and 'Write like a human, not a marketer' exemplify familiar copywriting advice. The algorithm overview, optimization framework and style sections occupy 79 lines but predominantly repeat known engagement signals and writing techniques rather than expert-only knowledge.",
+          "fix": "Condense the familiar engagement-signal definitions, hook tactics and sentence-style advice into brief activation cues. Retain substantive space for verified X-specific trade-offs, concrete failure cases and corrective choices that general copywriting knowledge would not supply."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/viral-tweet.md",
+          "line": 40,
+          "evidence": "'Optimize across these dimensions:' introduces six sets of tactics, but supplies no diagnostic method for deciding which engagement objective suits the idea or resolving conflicts between curiosity, standalone value and reply generation.",
+          "fix": "Add a diagnostic procedure: identify the intended reader and their payoff, choose one primary engagement objective, identify the strongest supported angle, and apply only tactics that reinforce that objective. Explain when a substantive discussion prompt should take precedence over a self-contained, repostable statement, and vice versa."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/viral-tweet.md",
+          "line": 81,
+          "evidence": "'Spam patterns (excessive hashtags, @mentions, links in first tweet)' and 'Cringe that makes people embarrassed to be on the platform' mix specific prohibitions with subjective warnings, without explaining most failure mechanisms or distinguishing legitimate uses from anti-patterns.",
+          "fix": "Replace subjective labels with observable failure signatures and reasons. Show the difference between a substantive discussion question and reply bait, explain why an unanswered curiosity hook disappoints readers, and distinguish irrelevant promotional links or mentions from links needed to substantiate the post."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/viral-tweet.md",
+          "line": 2,
+          "evidence": "'description: Transform a raw tweet idea into an optimized viral post for X' describes the core task but gives no boundary between drafting advice and publishing or account management.",
+          "fix": "Rewrite tweet ideas and drafts into three X/Twitter post variants, explain their engagement trade-offs, and recommend one. Use when asked to sharpen a hook, improve reply or repost potential, or turn a launch idea into a tweet. Drafting and strategy only; not for publishing posts or managing an X account."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "commands/viral-tweet.md",
+          "line": 56,
+          "evidence": "'Avoid low-arousal states: sadness, contentment, boredom' applies a blanket emotional prescription despite the later instruction to 'Match the author's authentic voice while amplifying it.'",
+          "fix": "Treat high-arousal framing as a default, not a requirement. Preserve the author's emotional intent; for grief, calm reflection or factual updates, prioritize relevance and clarity rather than forcing anger, FOMO or surprise."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "high",
+          "file": "commands/evals/viral-tweet.json",
+          "line": null,
+          "evidence": "Reading commands/evals/viral-tweet.json returned ENOENT. The directory contains explain-pr-changes.json and files/, so no eval scenarios cover this command's main path, failure path or edge cases.",
+          "fix": "Add commands/evals/viral-tweet.json with at least three realistic scenarios and verifiable assertions: a supplied launch idea yielding three distinct rewrites and a recommendation; empty arguments yielding a clarification request without invented drafts; and a long or emotionally sensitive draft yielding appropriately bounded, voice-preserving posts."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "commands/viral-tweet.md",
+          "line": 131,
+          "evidence": "The example input is 'We just launched our new product after 6 months of work', but the endorsed output adds 'we deleted our codebase and mass-resigned the team' and 'the product that almost killed us'. Those events are not supported by the input.",
+          "fix": "Replace the example with a rewrite using only the supplied launch and six-month development facts. Add a factual-grounding check before recommending a version: preserve supplied facts and ask for confirmation of proposed numbers, actions or dramatic events instead of inventing them."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/viral-tweet.md",
+          "line": 98,
+          "evidence": "'**OPTIMIZED VERSION 1:** [hook-focused rewrite]' and the other version templates have no post-length validation. 'Thread potential: [yes/no + why]' does not resolve what to do when a standalone rewrite exceeds the available post budget.",
+          "fix": "Add an ordered validation phase: draft, check each version against X's standard 280-weighted-character limit unless the user specifies an extended-post allowance, shorten, and recheck. If essential content cannot fit, ask whether to use a thread rather than silently returning an over-limit standalone tweet."
+        }
+      ]
+    },
+    {
+      "name": "ascii-ui-mockup-generator",
+      "percent": 48.0,
+      "grade": "F",
+      "judges": {
+        "router-env-my-referee-one": 48.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 39,
+          "evidence": "\"Your ASCII mockups should be production-ready blueprints\" and \"Focus on clarity, consistency, and practical applicability\" are generic quality assurances. The body is almost entirely familiar UX guidance and task activation rather than specialist knowledge.",
+          "fix": "Remove the self-praise and compress generic quality assurances. Replace them with concrete layout heuristics, such as keeping comparison fields aligned across repeated records while reserving stacked layouts for independently scanned items."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 22,
+          "evidence": "\"For each mockup, briefly explain\" the design approach and strengths requests retrospective rationale, but the ordered workflow supplies no decision framework for developing meaningfully different layouts.",
+          "fix": "Before drawing, rank the primary user tasks, identify required content that must remain invariant across alternatives, and assign each variant a distinct trade-off. Evaluate the resulting layouts against those tasks before writing their rationales."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "high",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 20,
+          "evidence": "\"Be properly formatted and easy to read\" is a generic positive instruction; the body contains no concrete anti-patterns, NEVER rules, or rendering gotchas with reasons.",
+          "fix": "Add an ASCII-specific Gotchas section: never align columns with tabs because viewer tab stops differ; never substitute emoji or Unicode box-drawing characters in ASCII-only output because encoding and display-width assumptions can fail; explain how these mistakes damage the mockup."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "high",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 3,
+          "evidence": "The unquoted description contains \"Examples: <example>Context: User\" and additional colon-space sequences. These invalidate a YAML plain scalar. A plugin agent can fall back to its filename, but its routing description and other frontmatter settings are not reliably loaded.",
+          "fix": "Replace the frontmatter with valid YAML, using a folded scalar to satisfy YAML's colon-space constraint:\n---\nname: ascii-ui-mockup-generator\ndescription: >-\n  Create ASCII UI wireframes with distinct layout alternatives, design rationales,\n  and a component handoff. Use when users want to explore dashboard, form,\n  navigation, or screen layouts before implementation, including requests to\n  sketch how an interface could look. Not for implementing UI code or producing\n  high-fidelity visual designs.\nmodel: sonnet\ncolor: green\n---"
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 14,
+          "evidence": "\"Create 3-5 distinct ASCII mockup variations\" is unconditional, including for a requested single layout or a small revision to an already selected design.",
+          "fix": "Default to three structurally distinct alternatives for exploratory requests, but honor an explicit option count and produce only the requested revision when refining an existing mockup."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 41,
+          "evidence": "\"Be ready to iterate based on user feedback\" leaves the task open-ended. Numbered ASCII mockups and rationales specify an output format, but no sentence states when the task is done.",
+          "fix": "Add: \"The initial task is done when the numbered ASCII mockups, their rationales, and a selection question have been delivered. A refinement task is done when the requested changes and any requested implementation handoff have been delivered.\""
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 19,
+          "evidence": "\"Demonstrate responsive considerations when relevant\" leaves the narrow-viewport branch unresolved: there is no target character width, overflow fallback, or validation-and-repair step for layouts whose content does not fit.",
+          "fix": "Establish target character widths before drawing and state assumptions when widths are unspecified. When content exceeds a target width, stack fields or explicitly mark horizontal overflow rather than breaking borders. Before delivery, check required components and row alignment, repair violations, and repeat the check."
+        }
+      ]
+    },
+    {
+      "name": "codebase-pattern-finder",
+      "percent": 56.0,
+      "grade": "F",
+      "judges": {
+        "router-env-my-referee-one": 56.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 50,
+          "evidence": "\"You can use your handy dandy `Grep`, `Glob`, and `LS` tools to to find what you're looking for! You know how it's done!\" restates native search capabilities. Weighted by lines, the body is dominated by familiar responsibilities, standard pagination examples, and generic pattern-category inventories rather than expert knowledge.",
+          "fix": "Delete the native-tool pep talk and generic responsibility/category inventories. Retain the documentarian boundary and source-evidence requirements; replace generic exposition with concise, non-obvious rules for identifying genuinely comparable implementations."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 42,
+          "evidence": "\"First, think deeply about what patterns the user is seeking and which categories to search\" introduces categories, but the subsequent search/read/extract sequence supplies no decision framework for selecting representative analogues rather than superficially similar hits.",
+          "fix": "Add a selection procedure: identify the requested behavior, runtime/framework, and architectural layer; inspect candidate callers and tests; distinguish live implementations from fixtures or wrappers; then report relevant similarities and differences without ranking quality."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 214,
+          "evidence": "\"Don't show patterns without context\" and \"Don't recommend one pattern over another\" establish scope restrictions, but the NEVER list lacks concrete search landmines and explanations of why they produce misleading results.",
+          "fix": "Add reasoned gotchas, such as: when generated or vendored hits appear, do not count their copies as independent local implementations, because one upstream source can falsely look like a repository-wide convention; label provenance and trace copies to their maintained source."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "high",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 58,
+          "evidence": "\"## Output Format\" introduces an extended inline template spanning lines 58\u2013168. The agent is 227 lines long, with no bulky material split out and no `skills:` preload.",
+          "fix": "Reduce the agent to at most 200 lines. If retaining the detailed report examples, move them into a dedicated reporting skill, preload it through `skills: [pattern-report-format]`, and leave only a compact output schema in the agent."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 225,
+          "evidence": "\"Your job is to show existing patterns and examples exactly as they appear in the codebase\" defines the objective, not when the task is complete. An output format is present, but there is no explicit completion sentence.",
+          "fix": "Add: \"The task is done when each requested pattern type has source-verified examples or an explicit no-match result, every example has a file:line citation, and the final report follows the Output Format.\""
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 36,
+          "evidence": "\"Note which approach is preferred\" directly contradicts line 15: \"DO NOT recommend which pattern is \\\"better\\\" or \\\"preferred\\\".\" Following the responsibilities therefore violates the central role constraint.",
+          "fix": "Replace \"Note which approach is preferred\" with \"Describe observed variations without inferring or recommending a preferred approach.\""
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 53,
+          "evidence": "\"Read files with promising patterns\" assumes search succeeds, while \"Don't miss the test examples\" at line 213 assumes relevant tests exist. Neither the no-match branch nor the implementation-without-tests branch has a defined outcome.",
+          "fix": "If initial searches fail, broaden once using behavior synonyms and callers; if no examples remain, report the searched scope and an explicit no-match result. If implementations exist but relevant tests cannot be found, state that limitation and return the verified implementation examples without inventing tests."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 111,
+          "evidence": "\"take: limit + 1\" uses `limit` taken directly from `req.query` at line 108. For a normal HTTP query `?limit=20`, JavaScript evaluates this as the string \"201\", not the intended number 21. The offset example likewise passes an unconverted query-string limit into `take`.",
+          "fix": "In the illustrative handlers, parse and validate numeric query parameters before arithmetic and database calls. Require positive integer limits and pages, and check a non-default `?limit=20` case so the cursor query requests 21 records rather than \"201\"."
+        }
+      ]
+    },
+    {
+      "name": "communication-excellence-coach",
+      "percent": 52.0,
+      "grade": "F",
+      "judges": {
+        "router-env-my-referee-one": 52.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "agents/communication-excellence-coach.md",
+          "line": 189,
+          "evidence": "'Email Best Practices' repeats 'Key message in first 2 sentences', 'Bullets for multiple points', and 'Single clear call-to-action'. The capability catalogue, review questions, and familiar framework definitions likewise provide mostly baseline knowledge or activation rather than expert knowledge.",
+          "fix": "Delete the generic email checklist and repeated capability descriptions; replace framework primers with concise, non-obvious coaching decisions grounded in actual failure cases. Preserve the agent-specific constraints and output requirements."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "agents/communication-excellence-coach.md",
+          "line": 77,
+          "evidence": "'Vary responses - Try different scenarios (cooperative, resistant, confused)' names possible reactions but supplies no method for choosing an objection or diagnosing whether the user's response addressed it.",
+          "fix": "Define a rehearsal procedure: identify a recipient concern tied to the user's goal, introduce it through an in-character objection, assess whether the reply resolves that concern without abandoning the intended request, and use the diagnosis to select the next practice scenario."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "high",
+          "file": "agents/communication-excellence-coach.md",
+          "line": 197,
+          "evidence": "'Constraints' provides scope restrictions such as 'Does NOT send emails or messages for you', but the body contains no communication-specific anti-patterns with reasons or substantive gotchas.",
+          "fix": "Add specific coaching prohibitions with explanations: never remove hedging that communicates genuine uncertainty merely to sound confident; never turn inferred motives into SBI Behavior, because that converts observable feedback into an accusation; never polish away an explicit safety or escalation concern for the sake of friendliness."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "agents/communication-excellence-coach.md",
+          "line": 3,
+          "evidence": "'PROACTIVELY use when reviewing communication drafts or preparing difficult conversations' supplies WHAT, WHEN, and keywords, but the exclusions for writing from scratch and legal/compliance review appear only in the body.",
+          "fix": "Review existing professional or technical communication drafts for clarity, tone, audience fit, and risk; provide suggested edits, presentation feedback, and difficult-conversation roleplay. Use before sending an email or Slack message, presenting an architecture review, or delivering feedback, including requests such as 'does this sound too harsh?' Suggestions and practice only; not for writing from scratch, sending messages, code review, or legal/compliance review."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "high",
+          "file": "agents/communication-excellence-coach.md",
+          "line": 100,
+          "evidence": "The agent file is 230 lines, embeds a roughly 74-line 'Output Format' section, and has no skills: preload; its 'See Also' list does not split those templates out of the body.",
+          "fix": "Move the long output templates into a communication-coaching skill and preload it through skills:. Keep routing, constraints, concise output requirements, and the core coaching workflow in an agent file of 200 lines or fewer."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "agents/communication-excellence-coach.md",
+          "line": 78,
+          "evidence": "'After exchanges, offer coaching on what worked' does not define when the task is done. Output templates are present, but no sentence states a completion condition for reviews or roleplay.",
+          "fix": "Add: 'A review is done after the applicable Markdown template contains the requested analysis and actionable suggestions; a roleplay is done after the agreed number of exchanges (default three), or when the user asks to stop, followed by the Coach Feedback template.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/communication-excellence-coach.md",
+          "line": 82,
+          "evidence": "'The user should provide' lists the roleplay inputs, but the branch where the relationship or goal is missing has no outcome. Similarly, the review path has no fallback when the actual draft or outline is absent.",
+          "fix": "Add an intake branch: require the actual draft or outline for specific review, and the counterpart plus conversation goal for roleplay. If a required input is missing, ask a targeted clarification instead of inventing it; if the user cannot share source text, offer a clearly labeled generic checklist. State assumptions and proceed only when optional context is missing."
+        }
+      ]
+    },
+    {
+      "name": "general-purpose",
+      "percent": 50.4,
+      "grade": "F",
+      "judges": {
+        "router-env-my-referee-one": 50.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 4,
+          "evidence": "'model: default' uses neither a documented model alias nor a full model ID.",
+          "fix": "Replace with 'model: inherit' to use the invoking model through a documented model selector."
+        },
+        {
+          "id": "D4-2",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 3,
+          "evidence": "'Default agent for handling complex, multi-step tasks with automatic delegation capabilities' identifies complexity but omits the programming scope stated in the body and a routing boundary with specialists.",
+          "fix": "Coordinate general programming work across multiple files or components, including debugging, implementation, and validation. Use for complex, multi-step requests that do not fit a single specialist, or when specialist results need integration. Prefer a dedicated specialist for a focused domain task."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "agents/general-purpose.md",
+          "line": 21,
+          "evidence": "'Task Analysis: Understanding and decomposing complex requirements', 'Agent Coordination: Delegating to specialized agents when appropriate', and 'Progress Tracking' restate familiar model and harness capabilities. Across the six H2 sections, the line-weighted content is generic activation or redundancy rather than expert knowledge.",
+          "fix": "Remove repeated capability declarations from Behavioral Mindset, Focus Areas, and the Will list. Replace them with knowledge specific to this agent's environment, such as actual specialist responsibilities, integration constraints, and observed failure modes."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "high",
+          "file": "agents/general-purpose.md",
+          "line": 28,
+          "evidence": "The ordered workflow runs from 'Analyze task complexity and requirements' through 'Execute tasks with appropriate tools' to 'Validate outcomes and iterate if needed'; it supplies no substantive reasoning framework or non-obvious checkpoints.",
+          "fix": "Replace the generic sequence with an explicit reasoning process: map each requirement to an observable acceptance check and its owning component, identify dependency order, establish baseline behavior before changes, and select verification gates according to the affected components."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 49,
+          "evidence": "'Will Not' lists 'Skip validation steps', 'Ignore specialist availability', 'Make assumptions about requirements', and 'Leave tasks incomplete', but gives no specific operational gotchas or reasons.",
+          "fix": "Add delegation-specific prohibitions with reasons: never assign concurrent workers overlapping files because stale snapshots can overwrite changes; never accept a specialist's success summary as verification evidence because it may omit failed or unrun checks\u2014inspect the resulting changes and observed validation output."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 44,
+          "evidence": "'Handle any general programming task' grants broad scope, while 'Execute tasks with appropriate tools' provides the same discretion for routine edits and potentially irreversible operations.",
+          "fix": "Preserve discretion for read-only investigation and reversible local edits, but require a target-and-impact check before destructive or shared-state operations. Require authorization covering the proposed operation and use a preview or recovery plan where available."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 36,
+          "evidence": "'Task execution results' and 'Quality metrics and validation results' describe output content, not its format. 'Leave tasks incomplete' does not state an observable condition for completion. Both the done-sentence and output format are missing.",
+          "fix": "Add: 'The task is complete only when every requested acceptance criterion is satisfied and required validation succeeds. Return Markdown sections for Result, Changes with file paths, Validation with observed checks and outcomes, and Remaining blockers. Label blocked or unverified work as incomplete.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 29,
+          "evidence": "'Determine if delegation to specialist is needed' opens a decision branch without defining its outcomes. Following the delegation-needed path leaves no fallback when no suitable specialist is available or delegation fails.",
+          "fix": "Resolve the branch explicitly: delegate a bounded subtask when an available specialist matches its requirements; otherwise execute it directly if the available tools and scope permit. If delegation fails, inspect the failure and take the direct path when feasible; otherwise return the concrete blocker and needed capability to the caller."
+        }
+      ]
+    },
+    {
+      "name": "mermaid-diagram-specialist",
+      "percent": 45.6,
+      "grade": "F",
+      "judges": {
+        "router-env-my-referee-one": 45.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 115,
+          "evidence": "The 484-line Workflow section is predominantly standard syntax and example diagrams, including '**Node Shapes:**' and '`[Rectangle]` - Process step'. Together with generic prerequisites and best practices, redundant material dominates the body rather than expert-only knowledge.",
+          "fix": "Remove elementary syntax explanations and generic engineering advice. Replace them with tested, non-obvious renderer constraints, diagram-selection trade-offs, and project-specific modeling conventions that the model would otherwise miss."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 83,
+          "evidence": "The decision rule 'System architecture \u2192 **C4 Diagram**' leads to three architecture templates without explaining how to choose context, container or component level. The workflow supplies syntax more than an expert modeling procedure.",
+          "fix": "Add a short procedure: identify the audience and question, choose context for external actors and systems, container for deployable units, or component for internals of one container; derive nodes and relationships from supplied evidence and explicitly record assumptions before drawing."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 562,
+          "evidence": "'**Simplicity**: Keep diagrams focused and uncluttered' typifies the guardrails. There is no concrete Gotchas or NEVER list explaining non-obvious Mermaid failure modes.",
+          "fix": "Add a compact Gotchas section with specific prohibitions and reasons, such as never using unquoted lowercase 'end' in flowchart labels because it can be parsed as a control token, and quoting labels containing parser-significant punctuation rather than relying on plain-label parsing."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 3,
+          "evidence": "'category: tech', 'usage:', 'input:' and 'output:' are unsupported plugin-agent frontmatter fields; Claude Code silently ignores them.",
+          "fix": "Use supported frontmatter only:\n---\nname: mermaid-diagram-specialist\ndescription: >-\n  Mermaid diagram specialist for creating flowcharts, sequence diagrams, ERDs,\n  and architecture visualizations\n---\nMove category, usage, input and output information into the system-prompt body. This avoids relying on agent fields the host ignores."
+        },
+        {
+          "id": "D4-2",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 4,
+          "evidence": "The description says 'Mermaid diagram specialist for creating flowcharts, sequence diagrams, ERDs, and architecture visualizations'. Broader intent-based triggers appear under the ignored 'usage:' field, and the description gives no boundary against non-Mermaid visualization work.",
+          "fix": "Create and revise Mermaid flowcharts, sequence diagrams, ERDs, state machines and C4 architecture diagrams in Markdown. Use when a user wants to visualize workflows, document a data model or explain component interactions, even without naming Mermaid. Not for non-Mermaid artwork or implementing the documented system."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "high",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 59,
+          "evidence": "'## Workflow' begins an extensive inline collection of type-specific examples and syntax. The agent file is 616 lines long, with no split-out resources or skills: preload.",
+          "fix": "Move useful detailed examples and type-specific rules into a Mermaid skill and preload it through skills:. Keep the agent under 200 lines with its role, modeling workflow, validation policy and output contract."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 609,
+          "evidence": "'Maximum complexity: Keep under 20 nodes for readability' imposes a universal cap without an escape hatch for a requested full schema or larger architecture.",
+          "fix": "Make approximately 20 nodes a readability target, not a completeness limit. For larger inputs, preserve all required elements using an overview and focused subdiagrams, or retain a complete diagram when explicitly requested."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 552,
+          "evidence": "'**Success Criteria:**' lists quality properties, ending with 'Renders correctly in markdown', but the body contains no sentence explicitly stating when the task is complete. The output format is already stated as Mermaid code in Markdown.",
+          "fix": "Add: 'The task is complete once the requested diagrams satisfy every Success Criteria item and have been returned as fenced mermaid Markdown blocks.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 190,
+          "evidence": "The sequence reference lists '`database` - Database' as a participant declaration and labels '`->>` - Solid arrow (async message)' and '`-->>` - Dotted arrow (async response)'. A standalone database declaration is not portable Mermaid sequence syntax, and these arrow forms do not establish asynchronous execution.",
+          "fix": "Use 'participant DB as Database' for portable database participants. Describe -> and --> as lines without arrowheads, and ->> and -->> as solid and dotted arrowhead messages. For explicit asynchronous open arrows, use -) or --) only when supported by the target renderer."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 419,
+          "evidence": "The standalone C4Component example ends with 'Rel(models, db, \"Queries\")', but that fenced diagram never declares db. The database declaration in the preceding C4Container fence does not carry into this diagram.",
+          "fix": "Declare 'ContainerDb(db, \"Database\", \"PostgreSQL\", \"Stores all data\")' inside the C4Component fence before the relationship, and check that every relationship endpoint is declared within its own diagram."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 571,
+          "evidence": "'**Testing**: Verify diagrams render in target platform' provides no failure outcome. Following 'System architecture \u2192 **C4 Diagram**' does not resolve what to return if the target renderer lacks C4 support or rendering cannot be checked.",
+          "fix": "Identify the target renderer before using compatibility-sensitive syntax. If C4 is unsupported, return a labeled flowchart preserving the intended boundaries and relationships. On parse failure, revise and revalidate; if rendering is unavailable, perform static checks and explicitly report that rendering was not verified."
+        }
+      ]
+    },
+    {
+      "name": "ui-ux-designer",
+      "percent": 51.2,
+      "grade": "F",
+      "judges": {
+        "router-env-my-referee-one": 51.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "agents/ui-ux-designer.md",
+          "line": 183,
+          "evidence": "\"transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;\" appears in a long elementary CSS demonstration. Weighted by section length, the body is dominated by familiar UX principles, routine styling examples, aesthetic reminders and repeated persona declarations rather than expert-only knowledge.",
+          "fix": "Remove elementary CSS demonstrations and consolidate repeated persona declarations. Spend the remaining instructions on non-obvious critique decisions, evidence-quality checks and concrete project constraints learned from actual reviews. Preserve all author, research-source, version and license credits."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "high",
+          "file": "agents/ui-ux-designer.md",
+          "line": 334,
+          "evidence": "Under \"Must Fix (Critical)\", the workflow includes \"Research-backed issues (violates F-pattern, left-side bias)\". This assigns critical severity from a general heuristic without first establishing an actual task failure or affected users.",
+          "fix": "Add a triage step that records the user task, observed failure, affected population, evidence confidence and implementation effort. Reserve Critical for demonstrated task blockers or accessibility failures; rank scan-pattern recommendations according to contextual evidence rather than automatically escalating them."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "agents/ui-ux-designer.md",
+          "line": 430,
+          "evidence": "\"No alt text\" appears in the Accessibility Sins list alongside other bare prohibitions. Although some later warnings explain consequences, much of this list lacks failure conditions, exceptions and environment-specific gotchas.",
+          "fix": "Add concise gotchas with mechanisms and remedies: decorative images need alt=\"\" rather than descriptive announcements; CSS visual reordering can diverge from keyboard order; overflow clipping can hide focus indicators. Explain when each failure occurs and how to verify the correction."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "high",
+          "file": "agents/ui-ux-designer.md",
+          "line": 113,
+          "evidence": "\"## Aesthetic Guidance: Avoiding Generic Design\" begins a 147-line section of detailed rules and examples, followed by substantial methodology and response-template sections. Even excluding attribution, the file exceeds 200 lines, and its frontmatter has no skills preload.",
+          "fix": "Move bulky aesthetic catalogs, CSS examples, detailed heuristics and extended templates into a dedicated preloaded skill, referenced through skills:. Keep the agent under 200 lines with its role, core review sequence, concise output contract and completion condition. Retain the complete attribution and license content."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "agents/ui-ux-designer.md",
+          "line": 117,
+          "evidence": "\"Never use these generic fonts\" bans Inter and default system fonts, while subsequent instructions require weight extremes and \"3x+\" size jumps. These universal constraints override brand context, readability and performance in a creative advisory task.",
+          "fix": "Make distinctive typography a default direction, not a prohibition. Allow established design systems, accessibility, language coverage, performance and user research to justify conventional fonts and restrained scales; require a context-specific rationale for departures."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "agents/ui-ux-designer.md",
+          "line": 353,
+          "evidence": "\"Format every response like this:\" supplies an explicit Markdown output format, but the body contains no sentence stating when the task is done.",
+          "fix": "Add: \"The task is done when the supplied interface or design question has been assessed, findings have been prioritized with actionable fixes and clearly labeled evidence limitations, and the Markdown response includes the required sections and One Big Win.\""
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "agents/ui-ux-designer.md",
+          "line": 446,
+          "evidence": "The good-feedback example concludes: \"This will increase nav interaction rates by 20-40% based on typical A/B test results.\" Following the example turns an attention observation into a guaranteed conversion-related uplift without identifying a supporting experiment.",
+          "fix": "Keep the NN Group citation, but distinguish its observed attention findings from a navigation-performance hypothesis. Recommend testing alignment against a defined task or interaction metric, and provide quantified uplift only when a matching study or project experiment supports it."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "agents/ui-ux-designer.md",
+          "line": 87,
+          "evidence": "\"Time to acquire target = distance / size\" incorrectly states Fitts's Law as a direct ratio, which would produce incorrect quantitative conclusions if followed.",
+          "fix": "Retain the Fitts attribution and replace the formula with the Shannon formulation MT = a + b \u00d7 log2(1 + D/W), defining distance, effective target width and empirically fitted constants. Alternatively, state only the qualitative relationship without presenting an incorrect equation."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/ui-ux-designer.md",
+          "line": 472,
+          "evidence": "\"Always cite sources - Include NN Group URLs, study names, research papers\" has no failure branch for unavailable or unverifiable research, despite requiring evidence for every recommendation.",
+          "fix": "Add an explicit fallback: when research cannot be retrieved or verified, retain supplied citations but label them unverified, distinguish observations from hypotheses, disclose the evidence limitation and request supporting material rather than inventing studies or presenting unsupported claims as proven."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

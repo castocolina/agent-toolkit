@@ -1,0 +1,122 @@
+{
+  "skill": "codex-plan",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 5,
+    "D2": 8,
+    "D3": 8,
+    "D4": 10,
+    "D5": 4,
+    "D6": 10,
+    "D7": 0,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 54,
+  "max_total": 125,
+  "percent": 43.2,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/codex-plan.md",
+      "line": 35,
+      "evidence": "'Good clarifying questions' includes 'Narrow down scope and requirements' and 'Clarify technology choices', followed by familiar question banks for authentication, APIs, microservices and testing. This substantial section teaches routine requirements gathering rather than Codex-specific expertise.",
+      "fix": "Remove the generic question banks and basic request-analysis guidance. Retain only questions driven by non-obvious Codex handoff constraints or repository-specific decisions."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 123,
+      "evidence": "'Tell Codex to NOT ask any further clarifying questions - it has all the information it needs' assumes that intake is complete without a decision procedure for establishing that completeness.",
+      "fix": "Add a handoff readiness gate: distinguish confirmed requirements, blocking decisions and nonblocking assumptions; resolve blocking decisions before handoff, encode remaining assumptions explicitly, and check that the proposed tasks and acceptance criteria cover the confirmed requirements."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 316,
+      "evidence": "'Do NOT assume - Do not guess what the plan contains' supplies a general caution, but there is no Gotchas section explaining the command's file and CLI-specific traps.",
+      "fix": "Add concise, reasoned gotchas: --output-last-message saves Codex's final reply rather than proving codex-plan.md exists; fixed output filenames can collide with previous runs, so do not overwrite them without approval; transfer example environment keys rather than live secret values into the handoff prompt."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 2,
+      "evidence": "'Create a detailed implementation plan using Codex 5.2 with high reasoning' states a capability but omits concrete use scenarios and the boundary that this command prepares a manual handoff rather than executing Codex.",
+      "fix": "Prepare prompt_to_codex.md for a user-run gpt-5.2-codex implementation plan with high reasoning. Use when planning a feature, API, authentication change, migration or testing strategy, including underspecified requests needing clarification. Gather repository context and provide the manual command that writes codex-plan.md. Not for implementing changes or executing Codex automatically."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "high",
+      "file": "commands/codex-plan.md",
+      "line": 149,
+      "evidence": "The 319-line command embeds '## Example Full Flow', including a long dialogue and complete plan template, and splits none of this material into a bundled skill. It exceeds the command profile's 200-line threshold.",
+      "fix": "Move the worked example and plan template into a skill bundled by the command's plugin, for example skills/codex-planning/references/plan-template.md. Add an explicit read via ${CLAUDE_PLUGIN_ROOT}/skills/codex-planning/references/plan-template.md when composing the plan prompt, and keep the command itself under 200 lines."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 33,
+      "evidence": "'Use AskUser to ask 3-6 targeted clarifying questions' is mandatory, reinforced by 'Always ask clarifying questions first' at line 284, even when the request already supplies all relevant decisions.",
+      "fix": "Ask only unanswered questions that materially affect the plan. Treat three to six questions as an optional upper range, not a minimum; when the request and repository provide sufficient information, proceed and state any bounded assumptions."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "commands/evals/codex-plan.json",
+      "line": null,
+      "evidence": "Reading commands/evals/codex-plan.json returned ENOENT, and the directory listing confirms it is absent. No main-path, failure-path or edge-case scenarios with verifiable assertions are supplied.",
+      "fix": "Add commands/evals/codex-plan.json with at least three realistic scenarios: an ambiguous planning request through successful manual handoff, a prompt-file write failure, and an edge case such as an existing output file. Assert observable behavior including prompt contents, verified context paths, model and reasoning settings, no automatic Codex execution, and explicit failure or collision handling."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 13,
+      "evidence": "The opening instructs 'Execute Codex to generate and save the plan', but line 297 says 'Save the prompt to prompt_to_codex.md (do NOT execute)'. These instructions disagree about who performs execution.",
+      "fix": "Replace the opening's fourth item with 'Save the prompt for manual Codex execution, show the command, and wait for the user to return the plan.' State the manual-only boundary once consistently throughout the workflow."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 180,
+      "evidence": "The worked example's 'You craft prompt for Codex' proceeds through '## Requirements' and '## Plan Structure' without the '## Files to Read for Context' section that Step 4 says to 'Always include'. Following the example therefore violates the command's own context requirement.",
+      "fix": "Add a Files to Read for Context section to the worked example using paths discovered during context gathering. Clearly mark illustrative paths and require their replacement with verified repository paths before saving the prompt."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 127,
+      "evidence": "'Save the crafted prompt to prompt_to_codex.md for manual execution' leads directly to execution instructions, with no branch for a failed write or an unwritable working directory.",
+      "fix": "After writing, verify that the prompt file was saved before presenting the manual command. If writing fails, report the concrete error, provide the prompt inline or ask for a writable destination, and do not claim the handoff file is ready."
+    }
+  ]
+}

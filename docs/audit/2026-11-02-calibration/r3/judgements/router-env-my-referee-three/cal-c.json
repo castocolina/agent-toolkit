@@ -1,0 +1,68 @@
+{
+  "skill": "cal-c",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/cal-c.md",
+      "line": 12,
+      "evidence": "Start from the earliest of `Error`, `FAILED`, `Traceback`, `exit code`, `npm ERR!`, `##[error]`; these are hints, not a complete list.",
+      "fix": "Shorten the generic list of error markers, which the model already knows. Keep only the CI-specific ones, such as `##[error]` and the failed-step summary, and keep the 'first failure, not last' rule."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "agents/cal-c.md",
+      "line": 15,
+      "evidence": "Environment (check first, cheapest to confirm), Test (name the test, expected and actual), Build (name the file and line).",
+      "fix": "Say what evidence confirms the Environment class, such as a missing secret or env var, a runner out of disk or memory, or a dependency registry error. Then the first class in the investigation order has a test as concrete as the ones for Test and Build."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/cal-c.md",
+      "line": 25,
+      "evidence": "NEVER quote more than 10 lines of log. Quote the one decisive line and give its line number.",
+      "fix": "Give the reason, as the other NEVER rules do. For example: long quotes push the decisive line out of the caller's view and defeat the purpose of not opening the log."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 40,
+      "evidence": "**Evidence:** `<log file>:<line>` - `<the decisive log line>`",
+      "fix": "Add a rule for pasted log text, which has no file path: use `pasted:<line>`, counting lines from the first pasted line. Also say that a network or timeout error goes to Environment unless the Flake evidence in step 3 is present. Right now the order checks Environment first, so transient evidence never reaches Flake."
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "skill": "cal-d",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 2,
+    "D2": 2,
+    "D3": 4,
+    "D4": 3,
+    "D5": 4,
+    "D6": 2,
+    "D7": 8,
+    "D8": 2
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 27,
+  "max_total": 125,
+  "percent": 21.6,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 12,
+      "evidence": "\"A unit test is a small piece of code\" and \"Create a file named `test_something.py`\" explain basic testing concepts and standard pytest operations. By line count, the body is overwhelmingly redundant templates and generic guidance; the naming and directory conventions contribute little expert knowledge.",
+      "fix": "Delete the testing definitions and pytest tutorial. Replace generic material with verified project-specific fixture constraints, isolation requirements, test-selection decisions, and non-obvious failure modes."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 23,
+      "evidence": "\"## Instructions\" supplies a mechanical run/change sequence but no framework for identifying the expected behavior, choosing test boundaries, or distinguishing a product defect from an incorrect test expectation.",
+      "fix": "Use a short ordered process: establish the behavior oracle, choose the test boundary based on the failure being detected, reproduce the defect, make a justified correction, and validate affected behavior. Explain the criteria governing each choice."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 32,
+      "evidence": "\"Be careful, think about edge cases and write good tests\" is a generic warning. The body contains no substantive gotchas or expert anti-pattern guidance with consequences.",
+      "fix": "Replace vague warnings with concrete prohibitions and reasons, such as never mocking the boundary an integration test is supposed to verify because that can conceal a broken contract. Add verified repository-specific fixture and isolation traps."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 2,
+      "evidence": "The frontmatter contains \"name: cal-d\", \"permissionMode\", \"tools\", and \"model\", but no required description; \"You are a testing agent. You help with tests\" appears only in the body and cannot supply delegation metadata.",
+      "fix": "Create and repair automated tests, reproduce regressions, and diagnose pytest or Jest failures. Use when a user requests regression coverage, missing tests, or investigation of a failing test suite. Not for unrelated feature implementation or removing assertions merely to obtain a passing run."
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "agents/cal-d.md",
+      "line": 3,
+      "evidence": "\"permissionMode: bypassPermissions\" is ignored for plugin agents and therefore does not configure the intended permission behavior.",
+      "fix": "Remove permissionMode from the plugin agent frontmatter; use supported host-level permission configuration if a permission change is genuinely required."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 35,
+      "evidence": "\"## Test naming reference\" occupies lines 35\u2013231. The file has 231 lines, no split-out material, and no skills preload, triggering the agent profile's exact 4/15 convention.",
+      "fix": "Move the extended naming reference into a separate resource with an explicit conditional loading instruction, or preload a dedicated conventions skill. Keep the agent body at 200 lines or fewer."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 30,
+      "evidence": "\"Fix the code or the test, whichever is easier. Delete tests that get in the way\" grants unrestricted freedom to destroy regression evidence without establishing whether the implementation or expectation is wrong.",
+      "fix": "Require evidence from the intended behavior before changing expectations. Preserve failing regression tests, correct product code when the test reflects the contract, and remove tests only when their invalidity or obsolescence is demonstrated and explained."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 33,
+      "evidence": "\"Do your best and make sure everything works\" does not state a concrete completion condition, and the body specifies no output format. Both the done-sentence and output format are missing.",
+      "fix": "Add: 'The task is done when requested behavior is covered and affected tests pass, or a specific blocker is documented. Return Markdown sections for Changes, Validation commands and results, and Remaining blockers or risks.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 25,
+      "evidence": "\"Always run the whole test suite before you change anything\" is immediately contradicted by \"Never run the whole test suite\". The initial execution path cannot satisfy both instructions.",
+      "fix": "Define one consistent default: run the smallest relevant baseline before editing, expand to affected suites afterward, and run the full suite only when required by repository policy or cross-cutting risk."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 28,
+      "evidence": "\"If a test fails, follow the steps in the section 'Recovery' and then go on to step 12\" leads to a nonexistent section and nonexistent step; the ordered list ends at step 6.",
+      "fix": "Replace the broken branch with explicit recovery steps: capture the failure, distinguish baseline or environment problems from regressions, resolve the supported cause, rerun the targeted test, and report a blocker if execution remains impossible."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 45,
+      "evidence": "\"result = run_unit_case()\" and the thirteen corresponding category examples call helpers that are neither defined nor imported. Following the examples as runnable tests produces unresolved names rather than the asserted outcome.",
+      "fix": "Provide one self-contained executable example with a defined subject and meaningful expected result; present the other categories as naming patterns rather than apparently runnable tests."
+    }
+  ]
+}

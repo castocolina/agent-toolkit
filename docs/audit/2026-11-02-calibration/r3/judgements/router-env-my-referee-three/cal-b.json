@@ -1,0 +1,104 @@
+{
+  "skill": "cal-b",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 2,
+    "D2": 2,
+    "D3": 2,
+    "D4": 8,
+    "D5": 4,
+    "D6": 3,
+    "D7": 8,
+    "D8": 3
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 32,
+  "max_total": 125,
+  "percent": 25.6,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 9,
+      "evidence": "\"## What is a release\" and \"## How to use git\" explain releases, tags, semver, and `git log`/`git diff`/`git push`. Lines 42-175 are an 11-type commit-type reference with placeholder examples. Lines 176-226 are five near-identical placeholder release outputs.",
+      "fix": "Delete the two basics sections. Cut the commit-type reference to one line, or drop it. Replace the five example outputs with a single template."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 23,
+      "evidence": "Steps are generic (run tests, tag, push, write notes) with no non-obvious ordering or domain procedure. Step 6 \"Clean up old tags and branches as needed\" is not a procedure.",
+      "fix": "Write one ordered release procedure: verify CI, draft notes, get approval, tag, push. Add a check that the tag does not already exist."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 37,
+      "evidence": "\"Be careful and consider edge cases.\" and \"Always write clean code and good commit messages.\" are generic warnings. There is no NEVER list with reasons.",
+      "fix": "Add specific NEVER items with reasons. For example: never force-push or delete existing tags, because that rewrites published history. Never tag before the notes are approved."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 1,
+      "evidence": "Frontmatter has no `description`, and `name` and `tags` are not accepted command fields.",
+      "fix": "Remove `name` and `tags`. Add: description: Cut a release for version $1. Check that CI is green, write the release notes from the commit messages and get them approved, then create and push tag v$1. Use for release, tag, changelog and version-bump requests."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 226,
+      "evidence": "The command is about 226 lines (over 200). The commit type reference and example outputs are inline, with nothing split out.",
+      "fix": "Move the commit-type reference and example outputs into a referenced file, or delete them. Bring the command under 200 lines."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 35,
+      "evidence": "\"Use force if something is in the way, and fix whatever is broken.\" This is vague, high-freedom guidance for destructive git operations.",
+      "fix": "State exact commands for the tag and push. Forbid force operations without explicit user confirmation. If the tag exists, stop and ask."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "commands/evals/cal-b.json",
+      "line": null,
+      "evidence": "Only one scenario, \"release-1-2-0\", covering the main path. It has no failure-path scenario (CI red, or approval not given) and no edge-case scenario (tag already exists).",
+      "fix": "Add a scenario where the tag v1.2.0 already exists and one where CI is red or notes are unapproved. Give each verifiable assertions, e.g. no push happens before approval."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 25,
+      "evidence": "Step 1 says to run the tests and also not to run them. Step 2 pushes and tags before the notes (step 3) and before the approval required by step 4. Step 5 points to a nonexistent section \"Existing tag\" and a nonexistent step 9. The Output section says only \"Print the notes.\"",
+      "fix": "Remove the contradictions. Order the steps: CI check, notes, approval, tag, push. Define the existing-tag handling inline (stop and ask the user). Fix the step references."
+    }
+  ]
+}

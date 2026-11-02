@@ -1,0 +1,95 @@
+{
+  "skill": "cal-a",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 5,
+    "D5": 15,
+    "D6": 10,
+    "D7": 15,
+    "D8": 7
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 100,
+  "max_total": 125,
+  "percent": 80.0,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "high",
+      "file": "commands/cal-a.md",
+      "line": 3,
+      "evidence": "`argument-hint: [from-ref] [to-ref]` contains two adjacent YAML flow sequences and is invalid YAML. Under the documented host behavior, the body still loads, but the frontmatter fields are discarded.",
+      "fix": "Replace lines 2\u20133 with valid metadata:\ndescription: Draft Markdown release notes from git history between two refs, defaulting to the last stable version tag through HEAD. Use when preparing a release, asking what changed since a version, or writing a changelog entry. Print only; never edit files, create tags, or push. Not for explaining a single pull request (use explain-pr-changes).\nargument-hint: \"[from-ref] [to-ref]\""
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-a.md",
+      "line": 7,
+      "evidence": "`Draft release notes for the range $1..$2` uses shell-style argument positions, but the pinned command specification defines zero-based positions: `$0` is the first argument. With arguments `v3.1.0 v3.2.0`, `$1` becomes `v3.2.0` and the missing `$2` remains literal, so the explicit-range branch does not resolve correctly.",
+      "fix": "Use `$0` for from-ref and `$1` for to-ref throughout the command, including the resolution instructions and Gotchas. Explicitly handle omitted arguments before constructing the range."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-a.md",
+      "line": 21,
+      "evidence": "`The strict glob keeps v1.4.0-rc1 out` is false: the final `*` in `v[0-9]*.[0-9]*.[0-9]*` matches `-rc1`. The default-range branch can therefore select a prerelease tag despite claiming to exclude it.",
+      "fix": "Filter candidate tag names with an anchored stable-version check such as `^v[0-9]+\\.[0-9]+\\.[0-9]+$` before selecting the nearest reachable eligible tag. Do not treat the glob as a strict version validator; explicitly demonstrate that `v1.4.0-rc1` is rejected."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-a.md",
+      "line": 31,
+      "evidence": "`git log --first-parent --format='%h%x09%s' <from>..<to>` reads only merge subjects. A normal subject such as `Merge pull request #230 from org/branch` has no conventional prefix and is consequently sent to Internal by line 58, even when its merge-message body contains a feature title. Breaking footers confined to merged branch commits are also absent from the first-parent footer scan.",
+      "fix": "Keep first-parent traversal for one entry per merged PR, but read generic merge messages with `git show -s --format=%B <sha>` to recover the PR title before grouping. When breaking metadata is not propagated into the merge message, inspect the relevant merged commits for explicit breaking markers without emitting duplicate PR entries."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-a.md",
+      "line": 23,
+      "evidence": "The fallback handles only `If git describe prints No names found`. When matching tags exist but none is reachable, Git can report `No tags can describe ...` instead. The preceding instruction to retry from `HEAD^` also fails when HEAD is a tagged root commit. Neither failure has a defined outcome.",
+      "fix": "Handle the absence of reachable eligible tags separately from invalid revisions and other Git failures. Check that HEAD has a parent before using HEAD^, define the first-release outcome when no earlier tag exists, and stop with an actionable diagnostic if fetching or a retry fails."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "commands/cal-a.md",
+      "line": 24,
+      "evidence": "`run git fetch --tags --unshallow once` contradicts `The command is read-only: print the notes, write nothing.` Fetching writes repository objects, refs, FETCH_HEAD and shallow-history metadata; it is also included in the pre-approved tools.",
+      "fix": "Remove automatic fetching and `Bash(git fetch:*)` from the command. On insufficient shallow history, stop and ask for a locally available start ref or explain how the user can deepen the checkout separately before rerunning."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": 34,
+      "evidence": "`--first-parent yields one line per merged PR in a merge-commit workflow and one line per squashed commit in a squash workflow` spends context explaining standard Git traversal behavior rather than adding task-specific policy.",
+      "fix": "Keep the exact log invocation and the specific warning against combining first-parent traversal with --no-merges, but trim the elementary flag explanation."
+    }
+  ]
+}

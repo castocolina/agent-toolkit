@@ -1,0 +1,95 @@
+{
+  "skill": "cal-a",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-a.md",
+      "line": 24,
+      "evidence": "Otherwise this is the first release: use the whole history as the range and say \"First release\" in the header.",
+      "fix": "State the concrete command for a missing start. Step 2 and the header both use `<from>..<to>`, which has no value here. For example: drop `<from>..` and run `git log --first-parent --format='%h%x09%s' <to>`, and write the header as `## <to> (First release)`."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-a.md",
+      "line": 18,
+      "evidence": "If `$1` is given, it is the start and `$2` defaults to `HEAD`. Skip to step 2. / Otherwise run `git describe ...`",
+      "fix": "Add a branch for an unresolvable `$1`/`$2`: check `git rev-parse --verify <ref>^{commit}` and stop with a clear message if it fails. State whether the range is `$1..$2` or `$1..HEAD`."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": 25,
+      "evidence": "5. If the range holds no commits, stop with `No commits in <from>..<to>.`",
+      "fix": "The check sits in step 1 but needs the `git log` from step 2. Move it to the start of step 2, after the log runs, or say it is checked after collection."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": null,
+      "evidence": "Step 5 rewrites subjects with only a length cap and a one-line rule; no decision rule for subjects that carry several user-visible effects.",
+      "fix": "Add a short rule for choosing the section when one PR subject spans types, or for a subject that is too thin to rewrite. The NEVER list covers only part of this."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": null,
+      "evidence": "Gotchas cover only shallow clones and release-branch tags.",
+      "fix": "Add a gotcha for squash merges that drop `BREAKING CHANGE` footers from the first-parent body, and for the tag-points-at-HEAD case where the older tag is reached by describing `HEAD^`."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": null,
+      "evidence": "Step 4 spells out standard conventional-commit prefixes (feat, fix, docs, ci, test) and the Markdown output template restates section names.",
+      "fix": "Trim the prefix mapping to the non-obvious rules (perf under Fixes, security bumps, `!` marker). The model already knows the prefixes."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": null,
+      "evidence": "Step 5 and the `Unreleased` header rule: `## <to-ref or \"Unreleased\">`",
+      "fix": "State exactly when the header uses `Unreleased` (when `$2` is HEAD or omitted) and when it uses the ref name, so the header is not left to the agent."
+    }
+  ]
+}

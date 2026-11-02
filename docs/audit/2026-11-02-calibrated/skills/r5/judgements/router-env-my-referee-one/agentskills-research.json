@@ -1,0 +1,50 @@
+{
+  "skill": "agentskills-research",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/agentskills-research/scripts/fetch-claude-specs.sh",
+      "line": 69,
+      "evidence": "restore_pin reports \"restore failed; old pin is $BACKUP\" when its mv fails, but then unconditionally prints \"restored previous pin\"; on_exit subsequently executes 'rm -f \"$NEWPIN\" ${BACKUP:+\"$BACKUP\"}'. Following the failed-restoration branch can therefore delete the backup it tells the user to recover from.",
+      "fix": "Make restore_pin return failure when restoration fails. On that branch, preserve BACKUP, report its path, and skip backup deletion in on_exit. Print \"restored previous pin\" only after successful restoration, and document the recovery-failure branch in the Source 2 workflow."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/agentskills-research/evals/evals.json",
+      "line": 227,
+      "evidence": "The combined-one-fails assertion requires \"Leaves the failed source's references and rubric untouched and does not commit for it\", although its supplied stderr says \"recovery failed\". The separate recovery-failed eval and SKILL.md require restoring references from the named backup, which necessarily changes those references.",
+      "fix": "Update combined-one-fails to require restoring the references from the backup named in stderr and verifying that they match SOURCE.json, while leaving the rubric untouched and making no commit for the failed source. Keep the assertions that the other fetcher is attempted and both results are reported."
+    }
+  ]
+}

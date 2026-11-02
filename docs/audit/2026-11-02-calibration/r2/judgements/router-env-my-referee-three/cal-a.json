@@ -1,0 +1,77 @@
+{
+  "skill": "cal-a",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": 9,
+      "evidence": "Copy this checklist and tick each step off: ... five items that repeat the five H2 headings below",
+      "fix": "Delete the checklist and keep the numbered H2 phases, or keep the checklist and drop the numbers from the headings. The harness already tracks todos, so the duplicate is redundant."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": 21,
+      "evidence": "accept it only if it matches `^v[0-9]+\\.[0-9]+\\.[0-9]+$`. If it is a pre-release such as `v1.4.0-rc1`, rerun from `<tag>^`",
+      "fix": "Add one line on why pre-release tags are skipped (the notes should cover everything since the last stable release). Add a short check such as 'before grouping, ask whether the range matches what the user expects'."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": 30,
+      "evidence": "git log --first-parent --format='%h%x09%s%x09%b' <from>..<to> (the Gotchas section lists only shallow clones and release-branch tags)",
+      "fix": "Add a gotcha that multi-line `%b` bodies break one-line-per-commit parsing. Use `%x00` or `%x1e` record separators, or read the body only for generic merge subjects."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-a.md",
+      "line": 42,
+      "evidence": "git log --first-parent --grep='^BREAKING[ -]CHANGE' --format='%h' <from>..<to>",
+      "fix": "Say that in a first release this command also drops `<from>..`, as step 1.4 does for the main log. Currently only the main log has that rule."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": 52,
+      "evidence": "If nothing is left, print `No user-facing changes since <from>.` and stop.",
+      "fix": "State the outcome when only Internal commits remain. The 'nothing left' test never fires then, so say whether to print a lone Internal line or the no-user-facing-changes message. Also say what happens when the pre-release or tag==HEAD rerun finds no earlier stable tag (it falls to step 1.4), and whether a `feat!:` commit appears only under Breaking changes."
+    }
+  ]
+}

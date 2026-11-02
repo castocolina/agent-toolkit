@@ -1,0 +1,104 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 4,
+    "D2": 8,
+    "D3": 4,
+    "D4": 10,
+    "D5": 4,
+    "D6": 15,
+    "D7": 0,
+    "D8": 8
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 53,
+  "max_total": 125,
+  "percent": 42.4,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 65,
+      "evidence": "The separate 'Extract the Diff' section demonstrates `git show <hash> --no-color` and `git diff <range> --no-color`. Most other sections likewise provide familiar Git operations, generic explanation advice, or elementary authentication concepts rather than expert knowledge.",
+      "fix": "Collapse standard Git extraction instructions to the unique large-diff fallback and remove generic explanatory advice. Retain the report contract and source-selection semantics; add non-obvious dependency and review pitfalls grounded in real changesets instead of reteaching native diffing."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 100,
+      "evidence": "'Test/config changes: Usually depend on everything else' substitutes a layer heuristic for a procedure that establishes actual dependency edges.",
+      "fix": "Derive review prerequisites from changed callers, data flow, schema contracts, feature flags, and test fixtures. Require a concrete reason for each dependency, merge inseparable groups, and place configuration or migrations first when they enable later behavior rather than ordering them last by category."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 151,
+      "evidence": "'Gotchas and Non-Obvious Details' contains placeholders such as '[Any tricky parts or things that might be confusing]'; it supplies no concrete traps or reasoned prohibitions.",
+      "fix": "Add actual gotchas with reasons: inspect historical source at the analyzed revision rather than the current working tree, which may contain later changes; distinguish patch-proven behavior from inferred author intent; and verify generated-file or formatting churn before treating it as semantically irrelevant."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 2,
+      "evidence": "'Build a mental model of changes by splitting them into smaller logical chunks' states the output but omits trigger scenarios, Git-specific keywords, and the boundary with defect-focused review.",
+      "fix": "Explain Git diffs, commits, branch comparisons, revision ranges, or pasted changes as dependency-ordered logical groups with file references and a review sequence. Use when the user wants to understand a changeset, asks what to read first, or needs a conceptual walkthrough. Not for editing code or conducting a defect-focused code review."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "high",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 178,
+      "evidence": "The command is 214 lines, with the entire 'Example Output' and report template inline and no bulky material split into a bundled skill.",
+      "fix": "Move the worked example into a skill bundled with this command's plugin, for example skills/change-mental-model/references/examples.md, and add an explicit conditional read when a worked example is needed. Keep the command itself at 200 lines or fewer."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "commands/evals/explain-changes-mental-model.json",
+      "line": null,
+      "evidence": "No commands/evals/explain-changes-mental-model.json exists; commands/evals/ contains only explain-pr-changes.json and files/. Main-path, failure-path, and edge-case scenarios are all missing.",
+      "fix": "Add at least three realistic scenarios with verifiable assertions: a commit or range producing correct file groups and dependency order; an invalid reference or empty diff producing a clear diagnostic without invented changes; and an edge case such as HEAD~3 resolving to a single-commit patch or custom mode waiting for pasted input."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 21,
+      "evidence": "Every usage example invokes '/mental-model', but this file creates the command explain-changes-mental-model; the marketplace entry supplies no mental-model alias.",
+      "fix": "Replace every /mental-model example with /explain-changes-mental-model for project installation, and document /command-explain-changes-mental-model:explain-changes-mental-model for this repository's plugin installation."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 54,
+      "evidence": "'Argument looks like a branch name (contains letters, no `..`)' matches the documented HEAD~3 example and the literal custom. HEAD~3 therefore receives a branch comparison instead of a commit patch, while custom overlaps a branch rule preceding its special case.",
+      "fix": "Make dispatch mutually exclusive: handle exact custom first, then explicit ranges, then verified branch refs, then other verified commit-ish expressions using git show. Recognize HEAD~3 and tags as commit-ish values, validate and quote arguments, and ask for a comparison base when neither main nor master exists."
+    }
+  ]
+}

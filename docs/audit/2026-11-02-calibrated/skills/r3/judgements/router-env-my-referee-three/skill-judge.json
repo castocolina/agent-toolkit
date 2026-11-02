@@ -1,0 +1,68 @@
+{
+  "skill": "skill-judge",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 68,
+      "evidence": "\"Trigger guidance only in the body is a D4 finding. The body is invisible until the skill has already triggered.\" repeats rubric.md D4 (\"Never accept 'when to use' guidance that exists only in the body\") and failure pattern 7; line 72 (\"NEVER reward polish, length or self-praise\") likewise repeats the rubric scoring rule \"Never credit a claim the skill makes about itself\"",
+      "fix": "The rubric is always read in full in step 1, so drop the copies: delete the line-68 gotcha and cut line 72 down to the one part the rubric lacks (\"a 43-line skill can outperform a 500-line one\"). Use the freed lines for protocol-only knowledge."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 63,
+      "evidence": "The Gotchas list has no attribution rule. The protection that credits (\"## Attribution\", \"based on\", \"adapted from\", upstream links) never count against any dimension exists only in references/judge-prompt.md (rule 5), and step 3 forbids reading that file unless skill-judge is the target, so direct-use runs never see it",
+      "fix": "Add a gotcha: \"- **Attribution is never a deduction.** Lines that credit an author, upstream source, inspiration or license (## Attribution, ## Credits, 'based on', 'adapted from', upstream links) do not count against D1 or any other dimension. When a credit sits in `description`, the fix moves it to the end of the body or to README.md and never deletes it.\""
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/skill-judge/evals/evals.json",
+      "line": null,
+      "evidence": "All 11 evals judge a single fixture file (SKILL.md.txt, ship-note.md, triage-agent.md). None gives a full skill directory with evals/ or scripts/, so step 3 (reading evals/evals.json and trigger-queries.json for D7, and the 'scripts/ exists but tests/skills/<name>/ was not checked' branch with its 5/5/5 allocation) is never exercised",
+      "fix": "Add an evals/files/<name>/ fixture directory that has SKILL.md.txt, scripts/ and evals/ but no matching tests/skills/<name>/. Add an eval asserting that D7 keeps the 5/5/5 split, that no point is deducted for the unseen smoke test, and that a D7 finding states the limit."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 19,
+      "evidence": "\"Then classify each H2 section for D1 and weight it by line count: the D1 ratio is in lines, not sections.\" The step does not say how the line ratio maps to the rubric's 0-20 bands, or how to count frontmatter and the H1 preamble, so two judges can compute the same ratio and still pick different bands",
+      "fix": "Append to step 4: \"Count body lines only (exclude frontmatter). Let the preamble before the first H2 count as one section. A ratio that meets the rubric's good ratio (>70% expert, <10% redundant) scores 16-20. Score 11-15 when redundant is 10-20%, and 6-10 when redundant exceeds 20%, unless a red flag caps it at 5.\""
+    }
+  ]
+}

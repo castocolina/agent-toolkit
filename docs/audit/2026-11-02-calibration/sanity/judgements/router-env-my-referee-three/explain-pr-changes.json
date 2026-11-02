@@ -1,0 +1,113 @@
+{
+  "skill": "explain-pr-changes",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 12,
+    "D3": 11,
+    "D4": 6,
+    "D5": 4,
+    "D6": 14,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 90,
+  "max_total": 125,
+  "percent": 72.0,
+  "grade": "C",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 5,
+      "evidence": "You are `Code-Sage`, an expert AI code reviewer and technical writer. ... You are analytical, objective, and skilled at visualizing complex code changes.",
+      "fix": "Delete the persona and goal prose (sections 1-2) and the generic analysis advice in 5.1. The model already knows how to summarise a diff. Keep the gh, jq and size-limit facts."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 189,
+      "evidence": "The drop-first-line step applies only when the first line of the saved source file starts with `# PR Summary:`; otherwise append the whole saved body unchanged (repeated in 4.1, 4.5, 4.6 and phase 3 step 4)",
+      "fix": "State the drop-first-line rule and the no-awk/sed/perl rule once, in 4.5, and refer to it from 4.1, 4.6 and phase 3."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 248,
+      "evidence": "## 5. The Process: phases 1-6 come after about 245 lines of mode rules and are interleaved with 5.1-5.4 content steps",
+      "fix": "Put the phase list first as the spine of the command. Have each phase link to its rule section, and move 5.1-5.4 under the phase that uses them (phase 3/5)."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 51,
+      "evidence": "never run a bare `gh pr view --repo`. ... Never pass `--repo` to `gh api`.",
+      "fix": "Collect the hard-won traps into one Gotchas list near the top, each with its reason: bare gh pr view --repo fails, ${CLAUDE_PLUGIN_ROOT} is not exported to Bash, jq -j drops the trailing newline, PR-title shell injection, the 65,536-char body limit, and gh --attach needs version 2.101 or later."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 1,
+      "evidence": "No frontmatter; the host falls back to the first body line '# PR workflow', which has no WHAT detail, no WHEN and no keywords",
+      "fix": "Add frontmatter with description: \"Create or update a GitHub PR for the current branch with a generated summary, changeset triage and optional Mermaid or draw.io diagram. Use when asked to open, write, explain, describe or refresh a pull request, or to promote develop/staging/main and reuse or consolidate earlier PR bodies. Flags: --diagrams=none|mermaid|drawio, --reuse-from=<PR>, --base=<branch>. Not for reviewing someone else's PR.\" and argument-hint: \"[--diagrams=none|mermaid|drawio] [--reuse-from=<PR>] [--base=<branch>] [issue refs]\""
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "high",
+      "file": "commands/explain-pr-changes.md",
+      "line": 1,
+      "evidence": "Command body is about 505 lines and nothing is split out: mode rules (4.1-4.9), the phase scripts and the output template are all inline",
+      "fix": "Move the reuse/consolidation rules (4.1-4.8) and the output template (section 8) into skill reference files, for example skills/pr-diagrams/references/. Load them only when the head is a promotion head or --reuse-from is given, and keep the command under 200 lines."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 454,
+      "evidence": "**Example:** This diagram illustrates the new data flow for user registration. ```mermaid sequenceDiagram ...",
+      "fix": "Mark the template's example diagram as illustrative and to be replaced, or move it outside the strict template, so it is not copied verbatim into a feature body that 'strictly follows this template'."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 217,
+      "evidence": "When it exceeds 65,000: - A consolidated body replaces ... - A single-source body replaces ...",
+      "fix": "Add the missing branch: a feature body built from the diff that exceeds 65,000 characters. For example, truncate the changeset breakdown to file lists plus triage, and say so in the final message."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 250,
+      "evidence": "phases 1, 2, and 3 run in one Bash call that ends by writing `$AD/state.env`",
+      "fix": "Say how a stop in phase 1 or 2 (when no $AD exists) and the agent's diff analysis (which needs model judgment) fit into the single-Bash-call rule. Or allow phase 3's diff read to end that call."
+    }
+  ]
+}

@@ -1,0 +1,185 @@
+{
+  "skill": "cal-b",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 1,
+    "D2": 1,
+    "D3": 3,
+    "D4": 5,
+    "D5": 5,
+    "D6": 2,
+    "D7": 8,
+    "D8": 2
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 27,
+  "max_total": 125,
+  "percent": 21.6,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 9,
+      "evidence": "## What is a release ... Git is a version control system that stores the history of a project as commits",
+      "fix": "Delete the 'What is a release' section; the model knows what releases, tags and semver are"
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 17,
+      "evidence": "## How to use git ... To see the history run `git log`. ... Always write clean code and good commit messages.",
+      "fix": "Delete the git tutorial and generic advice; keep only project-specific release facts such as the tag format, the CI source and where notes are published"
+    },
+    {
+      "id": "D1-3",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 42,
+      "evidence": "## Commit type reference: 'Use `feat` for a new feature.' and the same block for 11 Conventional Commit types",
+      "fix": "Delete the Conventional Commits restatement; if the notes group commits by type, state only the grouping and ordering rule in one line"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 23,
+      "evidence": "The steps are generic git operations with no reasoning, and the order conflicts: push in step 2, approval in step 4",
+      "fix": "Restructure as an ordered Process pattern: verify CI, check the tag does not exist, draft notes, get user approval, then create and push the tag; give the reason for each gate"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 36,
+      "evidence": "7. Be careful and consider edge cases.",
+      "fix": "Replace with a Gotchas/NEVER list with reasons, e.g. 'NEVER force-push or delete a published tag: consumers and caches have already fetched it; cut a new patch version instead'"
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 1,
+      "evidence": "Frontmatter has no `description`; the host falls back to the first body line '# Release helper'",
+      "fix": "description: Cut a tagged release for the given version: confirm the last CI run is green, check the tag is new, draft release notes from commits since the previous tag, get user approval, then create and push tag v<version>. Use when the user asks to release, ship, tag or publish a version, or to bump to a semver number. Not for writing changelogs without tagging or for rewriting existing tags."
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/cal-b.md",
+      "line": 2,
+      "evidence": "name: cal-b",
+      "fix": "Remove `name`; it is not a command field, because the command name comes from the file name"
+    },
+    {
+      "id": "D4-3",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/cal-b.md",
+      "line": 3,
+      "evidence": "tags: git, release",
+      "fix": "Remove the unknown `tags` field or move it under `metadata`"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 176,
+      "evidence": "The file is about 226 lines with nothing split out; 134 lines of commit type reference and 5 near-identical example outputs",
+      "fix": "Delete the commit reference, keep one example output, and bring the file under 200 lines; split out only material that is really needed and loaded on a condition"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 34,
+      "evidence": "6. Clean up old tags and branches as needed. Use force if something is in the way, and fix whatever is broken.",
+      "fix": "Give destructive steps low freedom: never delete tags or branches or use --force; if something blocks the release, stop and report to the user with the exact error"
+    },
+    {
+      "id": "D6-2",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 29,
+      "evidence": "Write them in a friendly tone, in exactly three sentences, each starting with a verb.",
+      "fix": "Use one template for the notes that matches the examples, such as a bullet list of user-facing changes grouped by type, rather than a rigid sentence count that conflicts with the examples"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "commands/evals/cal-b.json",
+      "line": null,
+      "evidence": "Only one scenario, 'release-1-2-0' (main path); there is no failure path or edge case",
+      "fix": "Add a failure scenario (CI red, or the user rejects the notes, so nothing is pushed) and an edge case (tag v1.2.0 already exists, or the version argument is missing), each with verifiable assertions"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 32,
+      "evidence": "5. If the tag already exists, follow the steps in section \"Existing tag\" and then continue with step 9.",
+      "fix": "The branch does not resolve: there is no 'Existing tag' section and no step 9. Define the outcome, e.g. 'If v<version> exists, stop and ask the user for a new version.'"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 27,
+      "evidence": "2. Push the current branch to origin, then create the tag `v$1` ... 4. Never push anything before the release notes are approved by the user.",
+      "fix": "Resolve the contradiction by ordering the steps: draft the notes, get approval, then push the branch and tag"
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 27,
+      "evidence": "`git tag v$1` with argument-hint [version]: indexed placeholders are 0-based, so a single argument leaves `$1` literal and the tag becomes `v$1`",
+      "fix": "Use `$0` or `$ARGUMENTS`, or declare `arguments: version` and use `$version`; also handle the case where no argument is given"
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 25,
+      "evidence": "1. Run the tests and make sure they pass, but do not run the tests because they are slow; just check that the last CI run is green.",
+      "fix": "State one action: 'Check that the last CI run on this branch is green (e.g. `gh run list -L1`); if it is red or pending, stop and report.'"
+    },
+    {
+      "id": "D8-5",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 29,
+      "evidence": "Notes must be 'exactly three sentences', but every Example output is a bulleted list of three items",
+      "fix": "Make the notes rule and the examples match, and keep one example"
+    }
+  ]
+}

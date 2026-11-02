@@ -1,0 +1,59 @@
+{
+  "skill": "cal-a",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-a.md",
+      "line": 25,
+      "evidence": "The first-release branch specifies `git log --first-parent --format='%h%x09%s' <to>`, omitting the body needed to recover merge PR titles. The breaking-footer scan at line 42 still uses `<from>..<to>`, although this branch has no start ref.",
+      "fix": "Resolve one revision expression: `<from>..<to>` normally and `<to>` for first releases. Use it in both log commands, retaining `--format='%h%x09%s%x09%b'` for commit collection. Give first-release empty-result messages wording that does not reference an undefined `<from>`."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-a.md",
+      "line": 22,
+      "evidence": "\"If the tag resolves to the same commit as `HEAD`, rerun from `HEAD^` and use the older tag as the start.\" When HEAD is a tagged root commit, HEAD^ does not exist; the resulting invalid-object error matches neither documented describe-failure branch. Skipping a prerelease via `<tag>^` has the same boundary problem.",
+      "fix": "Verify that the parent commit exists before describing `HEAD^` or `<tag>^`. If it is unavailable, check whether the repository is shallow: stop and request a locally available start ref when shallow, otherwise enter the first-release branch."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/cal-a.md",
+      "line": 96,
+      "evidence": "The Gotchas section states \"A shallow CI checkout has no tags at all\" and \"Tags created on a release branch are not reachable from `main`.\" Both are overgeneralizations: shallow checkouts can contain tags, and merging release-branch history can make its tagged commits reachable from main.",
+      "fix": "Replace these claims with conditional facts: shallow CI checkouts may lack reachable version tags, so check shallow status after describe fails; release-branch tags are excluded only while their target commits remain unreachable from the selected endpoint."
+    }
+  ]
+}
