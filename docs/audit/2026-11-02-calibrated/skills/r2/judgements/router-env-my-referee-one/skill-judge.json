@@ -1,0 +1,59 @@
+{
+  "skill": "skill-judge",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 18,
+      "evidence": "\"A D4 finding's `fix` is the full replacement description text (WHAT it does, WHEN to trigger, keywords), not advice about it.\" Following this rule for an invalid name, malformed YAML or unsupported frontmatter field produces a description replacement that cannot repair the reported violation.",
+      "fix": "Require full replacement description text only for description-related D4 findings. For other D4 violations, require the corrected field or frontmatter and explain which loading constraint it repairs."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 50,
+      "evidence": "The verdict example gives its D4 finding the fix \"Add 'flatten' to the description\", contradicting the protocol's requirement to supply complete replacement description text. Following the example therefore produces a noncompliant description finding.",
+      "fix": "Replace the example's D4 fix with a complete description containing WHAT, WHEN, keywords and a boundary, rather than advice to add a keyword."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/skill-judge/evals/evals.json",
+      "line": 95,
+      "evidence": "The casual eval expects \"the top three findings (description first)\", but the output contract orders findings by points lost before severity. For doc-helper, the generic-content D1 deficit exceeds the vague-description D4 deficit, so description-first conflicts with the prescribed ranking.",
+      "fix": "Remove the description-first expectation and add an assertion that summary findings follow the contract's points-lost, severity and tie-break ordering."
+    }
+  ]
+}

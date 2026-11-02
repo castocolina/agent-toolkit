@@ -1113,6 +1113,74 @@ class RubricTests(Base):
         self.assertEqual(code, 1)
         self.assertIn("D3", err)
 
+    DIGESTS = {"command": "c" * 64, "agent": "d" * 64}
+
+    def specs_text(self, command=None, agent=None):
+        return ("# Artifact specs\n\n"
+                f"command_digest: {command or self.DIGESTS['command']}\n"
+                f"agent_digest: {agent or self.DIGESTS['agent']}\n")
+
+    def write_profiles(self, digests=None, pin=True, specs=True):
+        digests = digests or self.DIGESTS
+        if specs is True:
+            specs = self.specs_text()
+        if specs:
+            self.write("docs/audit/artifact-specs.md", specs)
+        for kind, d in self.DIGESTS.items():
+            self.write(f"skills/skill-judge/references/profiles/{kind}.md",
+                       f"profile_version: 1\nsource_digest: {d}\n\n# {kind}\n")
+        if pin:
+            self.write("skills/skill-judge/references/claude-code/SOURCE.json", json.dumps({"digests": digests}))
+
+    def test_rubric_check_accepts_matching_profiles(self):
+        self.write_profiles()
+        self.assertEqual(self.run_rubric(), (0, ""))
+
+    def test_rubric_check_rejects_profile_digest_mismatch(self):
+        self.write_profiles(digests={"command": "e" * 64, "agent": "d" * 64})
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn("command.md", err)
+        self.assertNotIn("agent.md", err)
+
+    def test_rubric_check_rejects_profile_without_front_block(self):
+        self.write_profiles()
+        self.write("skills/skill-judge/references/profiles/agent.md", "# agent\n")
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn("agent.md", err)
+
+    def test_rubric_check_rejects_profiles_without_pin(self):
+        self.write_profiles(pin=False)
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn("claude-code/SOURCE.json", err)
+
+    def test_rubric_check_rejects_missing_artifact_specs(self):
+        self.write_profiles(specs=False)
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn("artifact-specs.md", err)
+
+    def test_rubric_check_rejects_specs_digest_mismatch(self):
+        self.write_profiles(specs=self.specs_text(agent="e" * 64))
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn("agent_digest", err)
+        self.assertNotIn("command_digest", err)
+
+    def test_rubric_check_rejects_missing_or_malformed_specs_digest(self):
+        for text in ("# t\n\nagent_digest: " + "d" * 64 + "\n",
+                     self.specs_text().replace("command_digest: " + "c" * 64, "command_digest: nothex")):
+            self.write_profiles(specs=text)
+            code, err = self.run_rubric()
+            self.assertEqual(code, 1)
+            self.assertIn("command_digest", err)
+
+    def test_rubric_check_ignores_specs_without_profiles(self):
+        self.write("docs/audit/artifact-specs.md", "no header\n")
+        self.assertEqual(self.run_rubric(), (0, ""))
+
     def set_rubric_source(self, source):
         rows = "\n".join(f"| D{i} | n | {m} | {source if i == 1 else 's'} |"
                           for i, m in enumerate([20, 15, 15, 15, 15, 15, 15, 15], 1))
@@ -3062,6 +3130,22 @@ class JudgePromptTests(Base):
             except SystemExit as e:
                 code = e.code if isinstance(e.code, int) else 2
         return code, out.getvalue(), err.getvalue()
+
+    def test_judge_prompt_strips_profile_front_block(self):
+        self.write("skills/skill-judge/references/profiles/agent.md",
+                   f"profile_version: 1\nsource_digest: {'d' * 64}\n\n# agent profile\n\nPROFILE-AGENT-MARKER\n")
+        code, out, err = self.prompt("--kind", "agent", "--artifact", str(self.agent), "--judge", "lane-a")
+        self.assertEqual((code, err), (0, ""))
+        self.assertNotIn("profile_version:", out)
+        self.assertNotIn("source_digest:", out)
+        self.assertTrue(out.endswith("# agent profile\n\nPROFILE-AGENT-MARKER\n"))
+
+    def test_judge_prompt_keeps_matching_example_in_headerless_profile(self):
+        body = f"# agent profile\n\nprofile_version: 1\nsource_digest: {'d' * 64}\n\nEXAMPLE\n"
+        self.write("skills/skill-judge/references/profiles/agent.md", body)
+        code, out, err = self.prompt("--kind", "agent", "--artifact", str(self.agent), "--judge", "lane-a")
+        self.assertEqual((code, err), (0, ""))
+        self.assertTrue(out.endswith(body))
 
     def test_judge_prompt_default_kind_matches_golden_file(self):
         skill = self.write("skills/pdf-form-filler/SKILL.md", "---\nname: pdf-form-filler\n---\n")

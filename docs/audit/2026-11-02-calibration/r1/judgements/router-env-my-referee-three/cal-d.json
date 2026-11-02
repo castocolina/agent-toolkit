@@ -1,0 +1,131 @@
+{
+  "skill": "cal-d",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 1,
+    "D2": 1,
+    "D3": 1,
+    "D4": 3,
+    "D5": 4,
+    "D6": 2,
+    "D7": 4,
+    "D8": 2
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 18,
+  "max_total": 125,
+  "percent": 14.4,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 1,
+      "evidence": "Frontmatter has only name, permissionMode, tools and model. There is no description field.",
+      "fix": "Add: description: Write, run and fix pytest tests for a Python repository. Use when the user asks to add unit, integration, API, CLI, database, auth, billing, search, upload, export, email, cache, queue or payment tests, or to diagnose a failing test. Not for non-Python projects or for feature work with no testing component."
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "agents/cal-d.md",
+      "line": 3,
+      "evidence": "permissionMode: bypassPermissions",
+      "fix": "Remove permissionMode. A plugin agent ignores it, and bypassing permissions is unsafe for an agent that can edit and delete tests."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 10,
+      "evidence": "\"A unit test is a small piece of code that checks that another piece of code works... Mocking replaces a dependency with a fake one.\" The next section, \"How to write a test in pytest\", is a basic tutorial (create test_something.py, use assert, run pytest).",
+      "fix": "Delete the Background and pytest tutorial sections. The model already knows them. Keep only project-specific conventions."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 37,
+      "evidence": "Fourteen identical sections from \"### unit tests\" to \"### payment tests\" differ only in the category word. Each has a placeholder example such as `run_unit_case()` and the line \"Repeat the arrange, act and assert pattern...\".",
+      "fix": "Replace them with one rule: name tests `test_<category>_<behavior>` and put them in `tests/<category>/`. Add one real example. Drop the boilerplate."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 23,
+      "evidence": "The Instructions section is generic: \"Be careful, think about edge cases and write good tests.\" It has no domain procedure or expert reasoning.",
+      "fix": "Write an ordered workflow: reproduce the failure, find the root cause, fix, run the affected tests, then run the wider suite. Add guidance on when a test is wrong and when the code is wrong."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 32,
+      "evidence": "\"Be careful, think about edge cases...\" and \"Do your best and make sure everything works.\" There is no specific NEVER list or gotcha with a reason.",
+      "fix": "Add a NEVER list with reasons. Examples: never delete or skip a failing test to get a green run, because that hides a real regression. Never weaken an assertion to match buggy output."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": null,
+      "evidence": "The file is about 230 lines. About 195 of them are the repeated naming sections, with nothing split out and no skills: preload.",
+      "fix": "Collapse the naming reference into a short table or one rule. Or move it to a skill preloaded through `skills:`. This brings the file well under 200 lines."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 30,
+      "evidence": "\"Fix the code or the test, whichever is easier. Delete tests that get in the way.\" The agent has Bash, Edit and Write tools. permissionMode is bypassPermissions.",
+      "fix": "Require a reason before changing or deleting a test. Never delete tests that fail. Give exact commands for running tests. Remove the bypassPermissions setting."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": null,
+      "evidence": "The body has no sentence saying when the task is done. It also gives no output format for the final report.",
+      "fix": "Add: \"Done when the changed test files pass and the full suite shows no new failures. Report the files changed, the commands run and their pass/fail counts, in a short list.\""
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 25,
+      "evidence": "Step 1 says \"Always run the whole test suite before you change anything.\" Step 2 (line 26) says \"Never run the whole test suite, because it is slow\". The two steps directly contradict each other.",
+      "fix": "Pick one rule. For example, run only the affected test file first, and run the full suite once before finishing. Give the reason."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 28,
+      "evidence": "\"If a test fails, follow the steps in the section 'Recovery' and then go on to step 12.\" There is no Recovery section, and the list ends at step 6.",
+      "fix": "Write a real failure-handling section: read the failure, decide whether the test or the code is wrong, fix it, re-run, and stop and report if it still fails after N attempts. Point to a step number that exists."
+    }
+  ]
+}

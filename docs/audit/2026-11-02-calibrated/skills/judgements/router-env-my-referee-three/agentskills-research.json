@@ -1,0 +1,104 @@
+{
+  "skill": "agentskills-research",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 14,
+    "D4": 14,
+    "D5": 14,
+    "D6": 13,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 36,
+      "evidence": "\"slug = lowercase, spaces to hyphens, punctuation dropped\" explains GitHub-style heading slugs, which the model already knows, and rubric-check already verifies anchors",
+      "fix": "Delete the slug explanation and keep only the instruction to check anchors with rubric-check"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 14,
+      "evidence": "\"## Workflow\" is an H2 at the same level as \"## Source 1\" and \"## Source 2\", although it belongs only to Source 1",
+      "fix": "Rename it to \"### Workflow\" under \"## Source 1\", or merge the two Source 1 headings into \"## Source 1: Agent Skills workflow\", so the phased process has the same shape for both sources"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 72,
+      "evidence": "\"The fetcher needs bash 4+.\" gives no symptom or reason",
+      "fix": "Say why it matters: \"The fetcher needs bash 4+ (declare -A). macOS /bin/bash is 3.2 and fails with 'declare: -A: invalid option'. Run it with a Homebrew bash.\""
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 3,
+      "evidence": "Description is about 800 characters and is heavy on internals (\"bump rubric_version, spec_sha or profile_version\", \"profiles\") instead of what the user wants",
+      "fix": "Refresh the specs that skill-judge scores against. Re-fetches the pinned Agent Skills docs and skills-ref validator from agentskills.io, and the Claude Code skills, sub-agents and plugins-reference pages from code.claude.com. Reports which rules changed and updates the judge rubric or the command/agent profiles to match. Use when the maintainer of this repo asks to refresh, sync or update the agentskills spec, the skill-judge rubric, or the vendored Claude Code subagent or command docs, or asks whether upstream skill-format rules changed since the last pin, even without naming the fetch scripts. Works only from a checkout of this repo. Not for writing, judging, or validating a skill (use skill-judge or skills-ref)."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 59,
+      "evidence": "The rare structure-repair procedure (\"Update the fetcher's source map, fixture, and tests ... --pages-dir ...\") is loaded inline on every run",
+      "fix": "Move it to references/structure-change.md and gate it with: \"Read references/structure-change.md only when structure_changed is true or rubric-check reports a broken anchor\""
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 59,
+      "evidence": "\"Update the fetcher's source map, fixture, and tests for added or removed pages; add or delete the matching reference copy; remap every affected rubric source\" is a fragile multi-file edit with no exact commands or order",
+      "fix": "Give exact steps: edit the FILES array in scripts/fetch-spec.sh, copy <page>.mdx from --pages-dir into tests/skills/agentskills-research/fixtures/upstream/docs/, run `bash tests/skills/agentskills-research/test-fetch-spec.sh`, re-run fetch-spec.sh, then run rubric-check"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/agentskills-research/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "13 should-trigger and 8 should-not-trigger queries. Several negatives are easy and share no keywords (\"write me a new skill from scratch\", \"bump the version of a vendored dependency\")",
+      "fix": "Cut the positives to 10. Replace the easy negatives with near-misses such as \"summarize what changed in the Claude Code subagents docs this week\" and \"update the rubric's D3 bands to be stricter\" (rubric edit with no refresh)"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 20,
+      "evidence": "Repair branch says \"record the pending commit without performing it\", but step 6 (line 37) says the repair branch must build, run rubric-check and \"Commit only after both checks succeed\"",
+      "fix": "Make one rule for both: either \"Repair branch: run build_plugins.py and rubric-check, then report the pending commit without committing\", or let step 6 commit in both branches and remove \"without performing it\""
+    }
+  ]
+}

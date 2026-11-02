@@ -376,6 +376,24 @@ test_default_dest_requires_repo_root() {
   check help_exit "$CODE" 0
 }
 
+test_removed_files_entry_prunes_manifest_and_reference() {
+  setup; run $A; copy_sha $C
+  cp "$FETCH" "$T/fetch-spec.sh"
+  sed -i '/using-scripts.md|docs\/skill-creation\/using-scripts.mdx/d' "$T/fetch-spec.sh"
+  local old_fetch=$FETCH before; FETCH=$T/fetch-spec.sh
+  before=$(snap)
+  run $C env FETCH_SPEC_FAIL_AT=metadata
+  check rollback_exit "$CODE" 1
+  check rollback_same "$(snap)" "$before"
+  run $C
+  check exit "$CODE" 0
+  check manifest_pruned "$(jq -c '.files | has("using-scripts.md")' "$T/dest/SOURCE.json")" false
+  check file_removed "$([ -e "$T/dest/using-scripts.md" ] && echo yes || echo no)" no
+  check pin_kept "$(jq -r .sha "$T/dest/SOURCE.json")" "$A"
+  check removed_reported "$(jq -c '[.removed, .changed]' <<<"$OUT")" '[["using-scripts.md"],[]]'
+  FETCH=$old_fetch
+}
+
 for f in $(declare -F | awk '{print $3}' | grep '^test_'); do t "$f"; done
 [ $FAILS = 0 ] || { echo "$FAILS assertion(s) failed"; exit 1; }
 echo "all passed"

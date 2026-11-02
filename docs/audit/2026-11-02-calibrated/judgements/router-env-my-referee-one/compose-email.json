@@ -1,0 +1,104 @@
+{
+  "skill": "compose-email",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 5,
+    "D2": 7,
+    "D3": 5,
+    "D4": 13,
+    "D5": 15,
+    "D6": 11,
+    "D7": 0,
+    "D8": 8
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 64,
+  "max_total": 125,
+  "percent": 51.2,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/compose-email.md",
+      "line": 65,
+      "evidence": "\"Specific and scannable (5-8 words ideal)\" and \"Short paragraphs (2-3 sentences max)\" exemplify the substantial space spent repeating ordinary email-writing knowledge. The workflow adds little expert-only knowledge beyond brief activation guidance.",
+      "fix": "Condense standard subject-line, paragraph, and formatting advice into a short activation checklist. Replace the repetition with developer-specific communication decisions, such as separating committed dates from proposed dates and presenting scope-versus-deadline trade-offs in extension requests."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 44,
+      "evidence": "\"Use the **What-Why-How** structure:\" supplies a composition sequence, but the purposes collected earlier\u2014requests, FYIs, escalations, and follow-ups\u2014receive no corresponding reasoning framework for selecting the message's substance.",
+      "fix": "Add a compact purpose-to-strategy checkpoint: requests identify the smallest decision, decision owner, and needed-by time; escalations distinguish observed impact, uncertainty, and mitigation; FYIs identify what changes for the recipient and whether a response is needed."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 137,
+      "evidence": "\"Anti-Patterns to Avoid\" lists familiar warnings such as \"Wall of text without structure\" and \"CC'ing unnecessarily\", without explaining failure mechanisms or documenting developer-specific communication gotchas.",
+      "fix": "Add specific prohibitions with reasons: never present a proposed delivery date as a commitment without confirmation, because recipients may treat it as an agreed deadline; never copy internal logs or incident links into external messages without checking disclosure and accessibility, because they can expose sensitive details or leave recipients unable to act."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 2,
+      "evidence": "\"Draft a professional email using the What-Why-How framework. Use when you need to compose emails to colleagues, stakeholders, or leadership.\" advertises composing but omits the existing-draft refinement path and implicit intents such as making a message less defensive or following up.",
+      "fix": "Draft or refine professional emails to technical peers, stakeholders, managers, and leadership using What-Why-How. Use for status updates, approval requests, escalations, follow-ups, or rewriting an existing draft for clearer tone and structure, even when the user only asks to make a message shorter or less defensive. Produce a subject and email body; do not send messages."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 134,
+      "evidence": "\"Email body with WHAT/WHY/HOW sections labeled\", together with fixed opening and context sentence counts, prescribes the presentation even when refining a brief existing draft. There is no escape hatch for preserving the user's voice or requested format.",
+      "fix": "Make What-Why-How an internal organizing default rather than mandatory visible labels. Default to a ready-to-paste email that preserves supplied voice, length, and formatting constraints; show framework labels or a subject rationale only when requested or useful for coaching."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "commands/compose-email.md",
+      "line": null,
+      "evidence": "No commands/evals/compose-email.json exists; commands/evals/ contains explain-pr-changes.json and files/. Main-path, failure-path, and edge-case scenarios are all missing.",
+      "fix": "Add commands/evals/compose-email.json with at least three realistic scenarios and verifiable assertions: a fully specified approval request, an empty or substantively insufficient request that must elicit missing facts, and a minimal existing-draft rewrite that preserves facts and requested brevity."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 19,
+      "evidence": "\"If `$ARGUMENTS` is empty or insufficient, use AskUserQuestion to gather:\" leads only to Audience, Purpose, and Urgency questions. Following the empty-input branch still leaves the actual topic, supporting facts, and requested action unknown before Step 4 requires a complete draft.",
+      "fix": "Ask for the message's topic, known facts or source draft, and desired outcome before drafting. Reuse information already supplied, ask only blocking follow-up questions, and use explicit placeholders for nonblocking unknowns rather than inventing facts. If AskUserQuestion is unavailable, ask the same questions in plain text."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 120,
+      "evidence": "\"/soft-skills:draft-email Need to ask team lead for deadline extension on API migration\" uses a different command identity. All three examples invoke draft-email, whereas this file defines compose-email and the marketplace registers it under command-compose-email.",
+      "fix": "Replace all three example invocations with /command-compose-email:compose-email for the packaged plugin, or /compose-email when explicitly demonstrating project-local installation."
+    }
+  ]
+}

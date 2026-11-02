@@ -208,6 +208,8 @@ Each skill contains:
 
 Scheduled skill audits compare non-synced skills against the pinned skill rubric, collect eval evidence, and may open a review PR. The schedule is opt-in: `AUDIT_ENABLED` must be `true`; workflow dispatch remains available for forced runs and drills. The workflow also uses `AUDIT_PR_DIAGRAMS` (`none`, `mermaid`, or `drawio`; default `mermaid`), `AUDIT_RESEARCH_MODELS` (a comma-separated list of judge model IDs) and `AUDIT_MERGER_MODEL` (the model for rubric refreshes, merge decisions, fixes, upstream recommendations, and evals).
 
+The maintainer-only `agentskills-research` skill refreshes the pinned specs by hand: `fetch-spec.sh` for the Agent Skills docs and `fetch-claude-specs.sh` for the Claude Code command and agent pages.
+
 ### Phase 1 knobs
 
 All knobs are repository variables. An unset or empty variable takes the default below. The workflows validate the values (`audit.py validate-knobs`) and fail closed on an invalid one.

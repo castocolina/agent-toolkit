@@ -1,0 +1,95 @@
+{
+  "skill": "agentskills-research",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 14,
+    "D4": 14,
+    "D5": 15,
+    "D6": 13,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 57,
+      "evidence": "The pin `sha` is also what `uvx --from \"git+https://github.com/agentskills/agentskills@<sha>#subdirectory=skills-ref\" skills-ref validate <dir>` should use.",
+      "fix": "Move this validator-invocation note to README.md. No refresh step uses it, and it is loaded on every run."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 47,
+      "evidence": "update D4, D5 and D7 of the affected profile(s) (`command.md`, `agent.md`)",
+      "fix": "Add a decision rule: a skills page change affects command.md only, a sub-agents change affects agent.md only, and a plugins-reference change affects both profiles. Check each profile separately before bumping its profile_version."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 66,
+      "evidence": "Gotchas / NEVER covers only fetch-spec.sh pitfalls (bash 3.2, git log -S, repair advancing the pin, hand edits)",
+      "fix": "Add Source 2 gotchas with reasons: NEVER copy a kept page into the repo (it has no license grant). A plugins-reference change makes both command and agent stale. The fetcher reads source_digest only from line 2 of each profile."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 3,
+      "evidence": "Use when the maintainer of this repo asks to \"refresh agent skills spec\", ... or whether upstream skill-format rules changed since the last pin",
+      "fix": "Use when the maintainer of this repo asks to refresh or check the specs skill-judge scores against: \"refresh agent skills spec\", \"update skill-judge from agentskills.io\", \"update the subagent spec the judge uses\", \"update the Claude Code docs we vendor\", whether upstream skill-format rules changed since the last pin, or when `audit.py rubric-check` fails on a spec_sha or source_digest mismatch, even without naming the fetch scripts. Re-fetches the pinned Agent Skills docs and skills-ref validator (agentskills.io) and the Claude Code skills, sub-agents and plugins-reference pages (code.claude.com), reports which rules changed, and updates the judge rubric or command/agent profiles to match. Works only from a checkout of this repo. Not for writing, judging, or validating a skill."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 44,
+      "evidence": "set `source_digest` in each stale profile (`skills/skill-judge/references/profiles/<kind>.md`, first lines)",
+      "fix": "State the exact position. The fetcher reads `sed -n '2s/^source_digest: //p'`, so the value must be on line 2 as `source_digest: <digest>`, right after `profile_version`. Anywhere else, profiles_stale never clears."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/agentskills-research/evals/evals.json",
+      "line": null,
+      "evidence": "No eval has structure_changed true or a broken source anchor, and none covers a default run of both fetchers",
+      "fix": "Add an eval with a fetch-spec output showing structure_changed true and new_pages [\"skill-creation/new-page\"]. Assert that the agent reads references/structure-change.md, edits the FILES array, and runs test-fetch-spec.sh before the unchanged early return. Add an 'is everything current?' eval asserting that both fetchers run."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 43,
+      "evidence": "`changed` empty AND `profiles_stale` empty: report \"Claude Code specs unchanged\", edit nothing, stop.",
+      "fix": "The fetcher was run with --keep, so this branch stops before step 5 and leaves the kept temp directory behind. Change it to: delete the `kept` directory, then report \"Claude Code specs unchanged\" and stop."
+    }
+  ]
+}

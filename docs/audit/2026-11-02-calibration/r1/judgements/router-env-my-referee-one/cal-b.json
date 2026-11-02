@@ -1,0 +1,149 @@
+{
+  "skill": "cal-b",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 2,
+    "D2": 4,
+    "D3": 5,
+    "D4": 6,
+    "D5": 10,
+    "D6": 2,
+    "D7": 8,
+    "D8": 2
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 39,
+  "max_total": 125,
+  "percent": 31.2,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 11,
+      "evidence": "\"A release is a version of the software that is given to users\" and \"To see the history run `git log`\" explain basics. Line-weighted H2 classification is overwhelmingly redundant: release definitions, Git instructions, the conventional-commit reference and repetitive examples supply no repository-specific expertise.",
+      "fix": "Remove release and Git tutorials and standard commit-type explanations. Retain only release-specific knowledge the agent would otherwise lack, such as repository release policy, candidate-selection rules and known release hazards."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 29,
+      "evidence": "\"Write the release notes from the commit messages\" supplies a generic action and formatting constraints, but no framework for selecting the release range, distinguishing user-visible changes or deciding release readiness. The ordered Steps section is only a partial Process pattern.",
+      "fix": "Add a compact release decision procedure: establish the previous release and candidate commit, identify user-visible and breaking changes, apply repository readiness criteria, and explain when to block rather than publish."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 36,
+      "evidence": "\"Be careful and consider edge cases\" is generic. The approval warning also gives no rationale, and there is no environment-specific Gotchas section.",
+      "fix": "Replace generic warnings with concrete, reasoned gotchas, such as never treating CI success for another commit as release validation and never assuming a local tag proves the remote tag is absent. Explain the failure each prohibition prevents."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 1,
+      "evidence": "The frontmatter contains \"name\", \"tags\" and \"argument-hint\", but no \"description\". The fallback body line, \"# Release helper\", does not explain when to invoke the command or distinguish it from ordinary Git assistance.",
+      "fix": "Prepare Git release notes and publish a versioned release after CI validation and user approval. Use when releasing a project or creating a release tag from a version argument; not for ordinary commits, history inspection, or tag deletion."
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/cal-b.md",
+      "line": 2,
+      "evidence": "\"name: cal-b\" and \"tags: git, release\" are not accepted command frontmatter fields and are ignored by the host.",
+      "fix": "Replace the frontmatter with:\n---\ndescription: Prepare Git release notes and publish a versioned release after CI validation and user approval. Use when releasing a project or creating a release tag from a version argument; not for ordinary commits, history inspection, or tag deletion.\nargument-hint: \"[version]\"\n---"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 42,
+      "evidence": "The command is 227 lines with no split-out references. \"## Commit type reference\" and \"## Example outputs\" remain inline, so the repository's over-200-line convention caps this dimension at 10.",
+      "fix": "Keep the command below 200 lines. If extensive reference material remains necessary, move it into a separate file and specify the condition under which it should be read."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 34,
+      "evidence": "\"Clean up old tags and branches as needed. Use force if something is in the way, and fix whatever is broken\" gives unrestricted discretion over destructive release operations.",
+      "fix": "Default to no cleanup, deletion or force operations. On a conflict, stop and report the exact ref and failure; require explicit approval for a named destructive action rather than authorizing force generically."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "commands/evals/cal-b.json",
+      "line": 7,
+      "evidence": "The only scenario specifies \"the last CI run is green and the tag `v1.2.0` does not exist\". Its assertions are verifiable, but it covers only the main path; failure-path and edge-case scenarios are missing.",
+      "fix": "Add a failure scenario such as red or unavailable CI, asserting that no publication is attempted, and an edge scenario such as an existing tag or missing version, asserting an explicit safe outcome without overwriting refs."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 27,
+      "evidence": "\"create the tag `v$1`\" and \"git tag v$1\" use the second positional argument. The command advertises one version argument, but the host indexes arguments from zero, so the main path does not substitute that version correctly.",
+      "fix": "Use `$0` for the single version argument, validate its format before constructing the tag, and stop with usage guidance when the argument is missing or invalid."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 27,
+      "evidence": "Step 2 says \"Push the current branch to origin\" and pushes the tag before step 3 writes notes, while step 4 says \"Never push anything before the release notes are approved by the user\". Following the numbered main path violates its approval gate.",
+      "fix": "Order the phases as validation, notes preparation, explicit user approval, then publication. Make approval a blocking checkpoint before either branch or tag pushes."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 32,
+      "evidence": "\"If the tag already exists, follow the steps in section \\\"Existing tag\\\" and then continue with step 9\" points to a nonexistent section and a nonexistent step; the workflow ends at step 7.",
+      "fix": "Define the existing-tag outcome directly: inspect its target, report an already-completed release when appropriate, and stop on a conflicting target. Replace both dangling references with real outcomes."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 25,
+      "evidence": "\"Run the tests and make sure they pass, but do not run the tests\" gives conflicting validation instructions. \"Just check that the last CI run is green\" provides no outcome for red, missing or inaccessible CI.",
+      "fix": "State one unambiguous validation policy: run the required tests or verify successful CI for the exact candidate commit. If validation fails or cannot be established, stop before publication and report the blocker."
+    },
+    {
+      "id": "D8-5",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 183,
+      "evidence": "The example begins \"- First change in 1.0.0\" and repeats the same fragment pattern across five outputs. These are neither complete sentences nor verb-led, contradicting the requirement for \"exactly three sentences, each starting with a verb\".",
+      "fix": "Replace the placeholder outputs with one concrete example containing exactly three complete, verb-led sentences. Add a final check that generated notes satisfy the same contract."
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "skill": "cal-b",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 2,
+    "D2": 4,
+    "D3": 5,
+    "D4": 8,
+    "D5": 4,
+    "D6": 3,
+    "D7": 8,
+    "D8": 2
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 36,
+  "max_total": 125,
+  "percent": 28.8,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 9,
+      "evidence": "\"A release is a version of the software that is given to users\" and \"To see the history run `git log`\" teach basics. By H2-section line count, What is a release (8), How to use git (6), Commit type reference (134), and Example outputs (51) are redundant; Steps (15) and Output (4) provide activation rather than expert knowledge. Approximately 91% of these lines are redundant.",
+      "fix": "Delete the release/Git definitions and standard commit-type tutorial. Replace them with repository-specific release conventions, non-obvious readiness checks, and recovery rules that the agent could not infer independently."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 29,
+      "evidence": "\"Write the release notes from the commit messages\" supplies a generic action without a framework for selecting the release range, validating the requested version, or deciding whether the target is releasable. The ordered list is a partial process pattern, but does not transfer expert release judgment.",
+      "fix": "Document the repository's authoritative release branch, version source, readiness criteria, and breaking-change policy. Use those facts to select the commit range, validate the requested version, and explain when to stop."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 36,
+      "evidence": "\"Be careful and consider edge cases\" is generic. The approval prohibition is specific, but no warning explains its rationale and there are no environment-specific gotchas.",
+      "fix": "Add reasoned release gotchas, such as tags triggering deployment workflows before a hosted release exists and published tag identities being cached by consumers. State the resulting prohibitions and why they matter."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 1,
+      "evidence": "The frontmatter has no \"description\". The host therefore falls back to \"# Release helper\", which does not explain the specific capabilities, invocation scenarios, or boundaries. The command still loads.",
+      "fix": "Prepare Git release notes and publish a version tag after explicit user approval. Use when asked to cut a release, publish a version, or tag a tested commit; not for ordinary commits or branch cleanup."
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/cal-b.md",
+      "line": 2,
+      "evidence": "\"name: cal-b\" and \"tags: git, release\" are unsupported command fields and are ignored. Command identity comes from the file stem.",
+      "fix": "---\ndescription: Prepare Git release notes and publish a version tag after explicit user approval. Use when asked to cut a release, publish a version, or tag a tested commit; not for ordinary commits or branch cleanup.\nargument-hint: \"[version]\"\n---"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 42,
+      "evidence": "The command is 226 lines, with \"## Commit type reference\" and \"## Example outputs\" embedded and nothing split out. The command profile assigns exactly 4/15 to files over 200 lines with nothing split out.",
+      "fix": "Keep the command at 200 lines or fewer, or move genuinely necessary bulky reference material into a separate file with an explicit condition for reading it. Retain only one useful output example inline."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 34,
+      "evidence": "\"Clean up old tags and branches as needed. Use force if something is in the way, and fix whatever is broken\" grants unbounded discretion over destructive operations without identifying refs, approval requirements, or safe limits.",
+      "fix": "Remove automatic cleanup and force escalation. Require a separately approved plan naming each affected ref and its impact before destructive changes; stop on rejected pushes rather than improvising a force operation."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "commands/evals/cal-b.json",
+      "line": 7,
+      "evidence": "The sole scenario specifies argument \"1.2.0\", green CI, and an absent tag. Its assertions verify main-path command ordering and note formatting, but there is no failure-path scenario or edge-case scenario.",
+      "fix": "Add a failure scenario such as failed or unavailable CI, asserting that no push occurs, and an edge scenario such as an existing tag or missing version, asserting a clear stop without deleting or replacing refs. Keep verifiable assertions for each scenario."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 25,
+      "evidence": "\"Run the tests and make sure they pass, but do not run the tests\" is contradictory. \"Just check that the last CI run is green\" neither binds that result to the release commit nor resolves failed or unavailable CI.",
+      "fix": "Choose one validation policy: require successful required CI checks for the exact commit being released. If checks fail, are missing, or cannot be verified, stop without publishing; explicitly define any permitted local-test fallback."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 27,
+      "evidence": "Step 2 says \"Push the current branch to origin\" and push the tag before step 3 writes notes, while step 4 says \"Never push anything before the release notes are approved by the user\". Following the successful main path violates the approval gate.",
+      "fix": "Reorder the phases to validate inputs and repository state, draft and print notes, obtain explicit user approval, then create and push the approved tag and any approved branch update."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 32,
+      "evidence": "\"If the tag already exists, follow the steps in section \\\"Existing tag\\\" and then continue with step 9\" cannot resolve: neither that section nor step 9 exists. The collision check also appears after tag creation and pushing.",
+      "fix": "Check for local and remote tag collisions before any mutation. Define an explicit existing-tag outcome, such as stopping and reporting the tag's target, and remove references to nonexistent sections and steps."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 27,
+      "evidence": "The command advertises one \"[version]\" argument but uses \"v$1\". The pinned command specification defines indexed arguments as zero-based, so $1 selects the second argument and remains unresolved when only one is supplied.",
+      "fix": "Consume the version with $0 or $ARGUMENTS[0]. Require exactly one valid version, reject missing or malformed input before mutation, and verify the expanded tag name before executing Git commands."
+    },
+    {
+      "id": "D8-5",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 183,
+      "evidence": "The example uses \"- First change in 1.0.0\", \"- Second change in 1.0.0\", and \"- Third change in 1.0.0\". All five release examples repeat fragments that neither start with verbs nor satisfy the requirement for three sentences.",
+      "fix": "Replace the examples with one consistent template containing exactly three complete, verb-led sentences, such as \"Add account search. Fix session renewal. Improve startup performance.\", and derive actual note content from the selected release commits."
+    }
+  ]
+}

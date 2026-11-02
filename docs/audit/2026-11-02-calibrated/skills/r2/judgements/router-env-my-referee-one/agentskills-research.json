@@ -1,0 +1,68 @@
+{
+  "skill": "agentskills-research",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 44,
+      "evidence": "For 'changed empty, profiles_stale non-empty', the instruction is to 'set source_digest in each stale profile' and 'then go to step 5'. The fetcher publishes SOURCE.json before profile review, so an interruption immediately after fetching makes the next run take this branch and acknowledge previously unreviewed rule changes without updating the field tables or profile criteria.",
+      "fix": "Route stale profiles through comparison of the kept current pages against artifact-specs.md, even when changed is empty. Apply any missing rule updates and version bumps before advancing the profile and artifact-specs digests; repair only digests when that comparison establishes that the rules already match."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/agentskills-research/references/structure-change.md",
+      "line": 10,
+      "evidence": "The reference says 'The repair job has no network' but then requires 'Re-run bash skills/agentskills-research/scripts/fetch-spec.sh --pages-dir DIR'. That option downloads pages rather than consuming the cache, and the script also performs git ls-remote and curl calls. The ordinary workflow additionally runs with no options, leaving DIR unspecified when structural repair is needed.",
+      "fix": "Provide a genuinely offline structural-repair path that consumes an explicitly supplied page inventory/cache and the existing pin to rebuild references and hashes without network requests. Specify how an online caller prepares that cache, and stop with actionable guidance when the required cache is unavailable."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/agentskills-research/scripts/fetch-spec.sh",
+      "line": 229,
+      "evidence": "'if [ ${#CHANGED[@]} -gt 0 ]; then' is the only gate for publishing SOURCE.json. After a removed page is deleted from FILES, unchanged retained files produce an empty CHANGED list, so the structural-repair rerun leaves the removed page's hash in SOURCE.json even after the reference file is deleted.",
+      "fix": "Treat differences between the recorded manifest keys and FILES as publish-worthy changes. Transactionally remove obsolete manifest entries and corresponding references, preserving rollback behavior, even when every retained file is unchanged."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/agentskills-research/evals/evals.json",
+      "line": 154,
+      "evidence": "The stale-only eval says 'I ran fetch-claude-specs.sh --keep', but its fetch-claude-stale-only.json fixture omits the kept field that every successful --keep run emits. Consequently, the fixture does not supply the directory required by the workflow's cleanup step.",
+      "fix": "Add a realistic kept value and corresponding synthetic page inputs to the stale-only fixture, and assert that the supplied temporary directory is cleaned up after review."
+    }
+  ]
+}

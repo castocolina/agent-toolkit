@@ -69,6 +69,10 @@ Gaps: no path-moved detection, no review dates, no check that a skill's own rule
 - Plan 5 Phase 2 is blocked on the CI spike (10 open issues) and user inputs: jev provider and key, Copilot token, bot token.
 - Main checkout hygiene: tooling edits (`graphify-out`, `.codegraph`, merge driver) now live in `.git/info/{exclude,attributes}`; the old local `main` is kept as `backup/main-pre-sync-2026-10-30`.
 
+- Plan 12 follow-up for plan 9: `skill-audit.yaml` runs only `fetch-spec.sh`; nothing runs `fetch-claude-specs.sh` on a schedule, so a change to the Claude Code command or subagent pages is detected only when `agentskills-research` is run by hand.
+
+- Plan 12 review leftovers (lane one re-review, 2026-11-02): `fetch-claude-specs.sh` canonicalizes worktree paths through `$(realpath ...)`, which drops a trailing newline in a worktree name (exotic; NUL-safe canonicalization would close it); `calibrate.sh` picks the first lane at a tied highest or lowest score when attributing the lane gap, so a tie can hide a profile-driven gap.
+
 ## 8. Decisions still open for the user
 
 Accept or fix the 26 high findings and 4 suites; port the Orwell material or not; where each agent ends up (agent, skill, delete); whether to trigger CI on #7; jev provider and key; Copilot token.

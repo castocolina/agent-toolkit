@@ -417,6 +417,43 @@ def load_rubric(path: Path) -> dict:
     return {"version": int(m1.group(1)), "spec_sha": m2.group(1), "max": maxes}
 
 
+PROFILE_BLOCK_RE = re.compile(r"\Aprofile_version: (\d+)\nsource_digest: ([0-9a-f]{64})\n\n")
+
+
+def check_profiles(root: Path) -> list[str]:
+    """Reasons the judge profiles do not match the pinned Claude Code sources."""
+    refs = judge_refs(root)
+    profiles = sorted((refs / "profiles").glob("*.md"))
+    if not profiles:
+        return []
+    pin = refs / "claude-code" / "SOURCE.json"
+    try:
+        digests = json.loads(pin.read_text())["digests"]
+        if not isinstance(digests, dict):
+            raise TypeError("digests is not an object")
+    except (OSError, ValueError, KeyError, TypeError, RecursionError) as e:
+        return [f"profiles exist but cannot read digests from {pin.relative_to(root)}: {e}"]
+    reasons = []
+    for p in profiles:
+        m = PROFILE_BLOCK_RE.match(p.read_text(encoding="utf-8"))
+        if not m:
+            reasons.append(f"{p.name}: front block must be 'profile_version: <int>', 'source_digest: <64 hex>' and a blank line")
+        elif m.group(2) != digests.get(p.stem):
+            reasons.append(f"{p.name}: source_digest {m.group(2)} != claude-code/SOURCE.json digest {digests.get(p.stem)}")
+    specs = root / "docs" / "audit" / "artifact-specs.md"
+    try:
+        head = specs.read_text(encoding="utf-8").splitlines()[2:4]
+    except OSError as e:
+        return reasons + [f"profiles exist but docs/audit/artifact-specs.md is unreadable: {e}"]
+    for kind, line in zip(("command", "agent"), head + [""] * (2 - len(head))):
+        m = re.fullmatch(kind + r"_digest: ([0-9a-f]{64})", line)
+        if not m:
+            reasons.append(f"artifact-specs.md line {3 + (kind == 'agent')}: expected '{kind}_digest: <64 hex>'")
+        elif m.group(1) != digests.get(kind):
+            reasons.append(f"artifact-specs.md {kind}_digest {m.group(1)} != claude-code/SOURCE.json digest {digests.get(kind)}")
+    return reasons
+
+
 def check_source_anchors(rubric_path: Path, ref_dir: Path) -> list[str]:
     """Validate reference files and heading anchors cited by rubric source cells."""
     reasons = []
@@ -487,6 +524,7 @@ def rubric_check(root: Path, rubric: Path) -> list[str]:
     if r["spec_sha"] != sha:
         reasons.append(f"spec_sha {r['spec_sha']} != SOURCE.json sha {sha}")
     reasons.extend(check_source_anchors(rubric, root / "skills" / "skill-judge" / "references"))
+    reasons.extend(check_profiles(root))
     return reasons
 
 
@@ -779,7 +817,8 @@ def render_judge_prompt(root: Path, kind: str, artifacts: list[Path], judge: str
     )
     text = text.replace("{ROOT}/<path>", str(artifacts[0].resolve()))
     text = text.replace("{ROOT}", root_s).replace("{JUDGE}", judge).replace("{SKILLS}", names)
-    profile = (judge_refs(root) / "profiles" / f"{kind}.md").read_text(encoding="utf-8").rstrip("\n")
+    profile = (judge_refs(root) / "profiles" / f"{kind}.md").read_text(encoding="utf-8")
+    profile = PROFILE_BLOCK_RE.sub("", profile, count=1).rstrip("\n")
     return text.rstrip("\n") + "\n\n" + profile + "\n"
 
 

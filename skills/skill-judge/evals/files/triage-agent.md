@@ -10,4 +10,6 @@ model: sonnet
 2. If no frame is inside this repo, say `owner: unknown` and stop.
 3. Reply with `owner: <directory>` and one sentence why. Do not edit files.
 
+The task is done once the `owner:` line is sent; send nothing after it.
+
 NEVER propose a patch: this agent only names an owner.

@@ -1,0 +1,95 @@
+{
+  "skill": "sync-skills-readme",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 10,
+    "D2": 9,
+    "D3": 7,
+    "D4": 10,
+    "D5": 15,
+    "D6": 15,
+    "D7": 0,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 75,
+  "max_total": 125,
+  "percent": 60.0,
+  "grade": "D",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 13,
+      "evidence": "'Use Bash to list all skill directories', the YAML extraction walkthrough at lines 23\u201337, and the Bash/Read/Edit catalog at lines 136\u2013138 spend substantial space restating standard operations. The repository-specific taxonomy and table conventions are diluted by this material.",
+      "fix": "Condense directory enumeration and frontmatter extraction into one instruction, and remove the repeated tool catalog and basic YAML example. Retain the category mapping, precedence, table schema, sorting, edit boundaries and failure policies."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 59,
+      "evidence": "'Assign to the first matching category' supplies a mechanical procedure without explaining its decision principle. Keywords such as 'handoff' and 'requirements' occur in multiple categories, but the workflow never explains why the earlier category should win.",
+      "fix": "Document the intended rationale for category precedence and provide an overlapping-keyword example showing why one category wins. Explain how to extend the mapping without unintentionally shadowing later categories."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 139,
+      "evidence": "'DO NOT use Grep - Read files directly for accurate frontmatter parsing' provides limited reasoning; the other prohibitions primarily restate edit scope. There are no concrete gotchas explaining metadata-to-table hazards.",
+      "fix": "Add a brief Gotchas section: preserve folded and literal YAML descriptions when extracting metadata; escape pipes and normalize newlines before generating table cells; and resolve links from the actual directory path rather than assuming the metadata name is the path. Explain the truncation, malformed-table and broken-link failures these rules prevent."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 2,
+      "evidence": "'Sync root README.md with current skills inventory from skills/ directory' identifies the operation and paths, but omits explicit trigger scenarios and a boundary against broader README rewriting.",
+      "fix": "Synchronize the root README.md Available Skills table with metadata from skills/*/SKILL.md. Use after adding, removing, renaming or updating skills, or when the inventory table is stale. Regenerate categorized skill links and concise descriptions; not for rewriting other README sections."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "commands/sync-skills-readme.md",
+      "line": null,
+      "evidence": "No commands/evals/sync-skills-readme.json exists; commands/evals/ contains 'explain-pr-changes.json' and 'files/'. Main-path, failure-path and edge-case scenarios are all missing.",
+      "fix": "Add commands/evals/sync-skills-readme.json with at least three realistic scenarios and verifiable assertions: inventory changes with correct rows, links and ordering; missing frontmatter or a missing target section with the specified warning or stop behavior; and an edge case such as folded descriptions containing pipes. Assert that content outside the table remains unchanged."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/sync-skills-readme.md",
+      "line": 89,
+      "evidence": "The shortening example converts 'Use when the user asks to run Codex CLI for code analysis, refactoring, or automated editing' into 'Advanced code analysis with GPT-5.2'. The supplied source description contains no model version, so following this example introduces an unsupported factual claim.",
+      "fix": "Replace the shortened example with 'Code analysis, refactoring & automated edits'. Require summaries to retain only capabilities and factual details supported by the extracted metadata; do not introduce model versions or context limits from the illustrative table."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 98,
+      "evidence": "'Find the end of the table (marked by the next --- separator or next ## heading)' followed by 'Replace everything between those markers' can consume prose following the table, conflicting with 'Only replace the table content' at line 104. The branch where neither terminating marker exists also has no defined outcome.",
+      "fix": "Locate and replace only the table header, delimiter and contiguous table rows beneath the existing heading. Preserve the heading, separators, following prose and all attribution. Stop without editing if the table cannot be identified unambiguously. After editing, reread the result and verify row counts and unchanged content outside the table before reporting success."
+    }
+  ]
+}

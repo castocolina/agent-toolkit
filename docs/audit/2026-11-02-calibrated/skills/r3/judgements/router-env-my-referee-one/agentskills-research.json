@@ -1,0 +1,59 @@
+{
+  "skill": "agentskills-research",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/agentskills-research/references/structure-change.md",
+      "line": 11,
+      "evidence": "The helper says to \"bump `rubric_version`\" and then \"Finish with ... rubric-check ... passing\", but its preceding fetch can advance SOURCE.json.sha and no helper step updates rubric.spec_sha. That assignment occurs only later in the caller's workflow, so the helper's required check can fail before control returns; its version bump can also be repeated by the caller.",
+      "fix": "After repairing the mapping and fixtures, return the latest fetcher JSON to the main workflow and resume Source 1 steps 3\u20136. Perform the BASE comparison, rule classification, spec_sha update and any single version bump there, then build and run rubric-check plus the fetch-spec test. Remove the helper's independent version bump and premature final-check gate."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 45,
+      "evidence": "\"Read each changed page (or, in step 2, each page of a stale kind)\" excludes stale-only kinds whenever changed is non-empty. For example, changed=[\"skills\"] with profiles_stale=[\"command\",\"agent\"] reviews the command page but skips the interrupted agent review, leaving rubric-check failing without a specified review path.",
+      "fix": "Always review the union of changed pages and pages belonging to every profiles_stale kind: command maps to skills plus plugins-reference; agent maps to sub-agents plus plugins-reference. Deduplicate that union and compare all its pages before updating any affected profile digest."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 18,
+      "evidence": "\"A validator-only change is a rule change\" conflicts with step 4's distinction between changed validator checks and editorial changes. A comment-only or formatting-only validator diff enters this branch without changing any validation rule.",
+      "fix": "Replace the blanket statement with: \"Docs and the validator both require review. A validator-only change must not take the unchanged early return; changed validation behavior is a rule change, while comment-only or formatting-only changes are editorial and update spec_sha without bumping rubric_version.\""
+    }
+  ]
+}

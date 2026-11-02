@@ -1,0 +1,77 @@
+{
+  "skill": "agentskills-research",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 57,
+      "evidence": "The pin `sha` is also what `uvx --from \"git+https://github.com/agentskills/agentskills@<sha>#subdirectory=skills-ref\" skills-ref validate <dir>` should use.",
+      "fix": "Move this sentence to README.md. Validating a skill is not part of either refresh workflow, and the description excludes validation, so this line costs tokens on every run without helping any refresh step."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 29,
+      "evidence": "When unsure, treat it as a rule change. Example: \"description max 1024 -> 512 chars\" is a rule change",
+      "fix": "Add a short check to run before classifying a change: \"Before calling a change editorial, ask: would a skill that passed the old rubric now score differently? If yes, it is a rule change.\" The rule/editorial split then rests on a reason the agent can apply, not just on examples."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/agentskills-research/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "Negatives such as \"judge this SKILL.md\", \"install the agentskills CLI\" and \"fix the frontmatter of my skill\" are terse and have no context. There are 9 negatives and 10 positives.",
+      "fix": "Add one more near-miss negative and rewrite 2 or 3 terse negatives with realistic context. Examples: \"skills-ref validate on skills/foo/SKILL.md says description too long, can you shorten it?\" or \"bump rubric D7 to 20 points and rebalance the grades\"."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 8,
+      "evidence": "with no source named, run both.",
+      "fix": "State how the two runs combine: \"When running both, finish Source 1 through its rubric edit, then Source 2 through its profile edit. Run build_plugins.py and rubric-check once at the end, and make one commit. If one fetcher exits 1, still run the other and report both results.\" As written, each source ends with its own build, rubric-check and commit, and nothing says what happens to Source 2 when Source 1 fails."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 17,
+      "evidence": "read `references/structure-change.md` and follow it before considering the unchanged early return.",
+      "fix": "Say where the workflow resumes after structure-change.md, for example: \"then re-run step 1 and continue from step 2.\" structure-change.md step 5 already bumps rubric_version. Without this, an agent can bump it a second time in step 5, or stop early because `changed` looks empty."
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "skill": "explain-pr-changes",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 15,
+    "D3": 15,
+    "D4": 7,
+    "D5": 10,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 104,
+  "max_total": 125,
+  "percent": 83.2,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 1,
+      "evidence": "The file starts with '# PR workflow' and has no description frontmatter. It still loads, but the fallback listing text does not explain its capabilities, invocation scenarios, or branch-pushing and PR-writing behavior.",
+      "fix": "Generate or update a GitHub pull request from the current branch's committed diff, with changeset triage and optional Mermaid or draw.io diagrams. Use when asked to explain PR changes, refresh a PR summary, promote a release branch, or reuse merged PR bodies and reviewers. Pushes feature branches and writes PRs; not for a read-only explanation of a diff."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 5,
+      "evidence": "'You are analytical, objective, and skilled at visualizing complex code changes' adds no expertise. Sections 5.1\u20135.4 also include familiar review instructions such as 'Understand the intent behind the changes' and 'analyze the diff file by file and group related changes into logical changesets,' which models and native PR helpers already handle.",
+      "fix": "Remove the self-descriptive persona and compress the standard diff-analysis and summary-writing advice into the actual output constraints: a 150-word overview, diagram eligibility, public-contract notes, and conservative changeset triage. Preserve the non-obvious promotion, reuse, quoting, and failure-handling rules."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 106,
+      "evidence": "The command is 505 lines. Phase 4 conditionally loads the bundled draw.io authoring rules, so some material is split out, but '## 4. Mode decision' still contains extensive body-assembly recipes, and section 8 embeds the full report template.",
+      "fix": "Move the detailed mode-specific assembly, attachment, and reviewer procedures into skills/pr-diagrams/references/pr-workflow.md and the report template into skills/pr-diagrams/assets/pr-summary.md. Keep the command at 200 lines or fewer with its arguments, safety gates, ordered phases, and explicit conditional reads for the relevant modes."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 227,
+      "evidence": "The prescribed filter starts with \"awk '/^```mermaid/{skip=1; next}\". Section 3.3 defines a diagram as any fenced block tagged mermaid, but this pattern recognizes only column-zero triple-backtick openers. Valid tilde fences, four-backtick fences, and indented fences survive the --diagrams=none branch and reach the PR body.",
+      "fix": "Make the filter track Markdown fences: accept up to three leading spaces and opening runs of at least three backticks or tildes, recognize the mermaid info string, and require a closing fence of the same character with sufficient length. Preserve surrounding prose and retain the explicit error for an unclosed Mermaid fence."
+    }
+  ]
+}

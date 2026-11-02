@@ -1,0 +1,77 @@
+{
+  "skill": "cal-c",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 113,
+  "max_total": 125,
+  "percent": 90.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/cal-c.md",
+      "line": 17,
+      "evidence": "- Build: a compile, type or lint error. Name the file and line.",
+      "fix": "Cut the generic class definitions for Test and Build down to the non-obvious parts. For example, keep only the rule that a lint error after a dependency bump is classed as Environment. The model already knows what an assertion or compile error is."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 12,
+      "evidence": "Later errors are usually fallout from it.",
+      "fix": "Add a check after step 3: before you report the first failure as root cause, confirm that it explains the later errors, for example a missing module that matches a later ImportError. If it does not, treat the later errors as unrelated and list them under 'Also failing'."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 12,
+      "evidence": "Find the first failure, not the last. Search the log for the earliest of `Error`, `FAILED`, ...",
+      "fix": "Add a Gotchas entry for CI log quirks. Parallel jobs or test shards interleave output, so the first match in the file may not be the first failure in time; order by timestamp prefix when one exists. Also note that `Error` matches harmless strings such as 'ErrorHandler' or '0 errors'."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 14,
+      "evidence": "Classify the failure, and take the first class that fits: ... - Flake: the same job passed on an earlier line of the log",
+      "fix": "Check for Flake before Test. Under first-fit, an assertion failure that also passed on an earlier rerun always becomes Test, so the Flake branch never fires for it. Say: 'If a passing rerun or an unrelated-test timeout is present, class it as Flake; otherwise take the first of Environment, Test, Build.'"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 19,
+      "evidence": "If the line does not exist, the log is from a different revision; say so and stop.",
+      "fix": "Map each early stop (revision mismatch, truncated log, pasted log with no file path) onto the output block. For example: 'Class: Environment, Root cause: log does not match the checked-out revision, Confidence: low', and use `pasted:<line>` for Evidence when there is no log file. As written, these stops leave the required block unfillable."
+    }
+  ]
+}
