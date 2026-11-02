@@ -1,0 +1,113 @@
+{
+  "skill": "communication-excellence-coach",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 4,
+    "D2": 5,
+    "D3": 2,
+    "D4": 11,
+    "D5": 8,
+    "D6": 9,
+    "D7": 5,
+    "D8": 7
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 51,
+  "max_total": 125,
+  "percent": 40.8,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/communication-excellence-coach.md",
+      "line": 174,
+      "evidence": "\"### What-Why-How ... ### SBI Model (Feedback) ... ### Email Best Practices - Subject line reflects content and action - Key message in first 2 sentences\" and the Review Framework checklists (\"Is the main point clear from the first 1-2 sentences?\", \"Is the length appropriate for the context?\")",
+      "fix": "Delete the generic framework definitions and checklists, which the model already knows. Keep only non-obvious expert judgments, such as how to pick a register for a specific audience, which hedges to cut and which to keep, and how to calibrate pushback in roleplay."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/communication-excellence-coach.md",
+      "line": 23,
+      "evidence": "\"## Invocation Examples\" and \"## Capabilities\" restate what the description already says, and \"## When to Use This Agent\" repeats it again",
+      "fix": "Remove the Capabilities, Invocation Examples and Good fit lists. Keep one short scope boundary."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/communication-excellence-coach.md",
+      "line": 71,
+      "evidence": "\"1. Adopt the persona 2. Respond realistically 3. Vary responses 4. Provide feedback\"",
+      "fix": "Replace the generic steps with a real procedure: ask for the missing context first, escalate resistance in stages, stay in character until the user asks to stop, then give coaching tied to quoted lines."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "high",
+      "file": "agents/communication-excellence-coach.md",
+      "line": 197,
+      "evidence": "\"Does NOT send emails... Does NOT access external systems\" is a scope statement. No NEVER items with reasons exist (for example, no warning against rewriting the whole draft in the coach's own voice).",
+      "fix": "Add a short NEVER list with reasons. For example: never rewrite the whole draft, because the user loses their own voice; never soften the roleplay counterpart into a pushover, because the practice then fails; never give a \"Strong\" verdict without naming the risk."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "agents/communication-excellence-coach.md",
+      "line": 3,
+      "evidence": "\"PROACTIVELY use when reviewing communication drafts or preparing difficult conversations. Provides email refinement, tone calibration, roleplay practice, and presentation feedback...\" Has no boundaries and few keywords (Slack, feedback, stakeholder, SBI).",
+      "fix": "description: Use PROACTIVELY when the user shares an email, Slack message, document or presentation outline to review before sending, or wants to rehearse a difficult conversation (feedback, deadline extension, escalation, negotiation). Gives tone and formality calibration, concrete rewrites with reasons, SBI and What-Why-How feedback, and in-character roleplay with coaching. Read-only. Not for drafting from scratch, code review or legal review."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "agents/communication-excellence-coach.md",
+      "line": 230,
+      "evidence": "The file is 230 lines (over the repo's 200-line convention) and nothing is split out: it holds three full output templates, two frameworks and the roleplay example inline.",
+      "fix": "Cut the file to under 200 lines by removing redundant sections. Move the output templates into a referenced file only if they are kept."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "agents/communication-excellence-coach.md",
+      "line": 77,
+      "evidence": "\"Vary responses - Try different scenarios (cooperative, resistant, confused)\" and the fixed rigid templates with no defaults",
+      "fix": "State a default (start moderately resistant, escalate or ease depending on the user's responses) and let short messages skip the full template."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/communication-excellence-coach.md",
+      "line": null,
+      "evidence": "No eval file for this agent was found; a Find for the agent name returned only the agent file and its dist copy.",
+      "fix": "Add an eval file with realistic prompts, such as a deadline-miss email, a Slack tone check and a roleplay with little context, each with verifiable assertions."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/communication-excellence-coach.md",
+      "line": 80,
+      "evidence": "\"The user should provide: Who they're practicing talking to...\" does not say what to do if the user omits it. Also the tools are \"Read, Glob, Grep\" while the Constraints say \"analyzes content you provide\", with no handling for a draft given as a file path or a pasted draft that is missing.",
+      "fix": "Add a fallback: if the persona, goal or draft is missing, ask one clarifying question or state assumptions and proceed. Say how to treat file-path input (Read the file). Say which output template to use for mixed requests."
+    }
+  ]
+}

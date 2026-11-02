@@ -1,0 +1,113 @@
+{
+  "skill": "sync-skills-readme",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 11,
+    "D2": 8,
+    "D3": 4,
+    "D4": 11,
+    "D5": 15,
+    "D6": 12,
+    "D7": 2,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 73,
+  "max_total": 125,
+  "percent": 58.4,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "commands/sync-skills-readme.md",
+      "line": null,
+      "evidence": "commands/evals/sync-skills-readme.json does not exist (ENOENT when read)",
+      "fix": "Add commands/evals/sync-skills-readme.json with 3 realistic cases and verifiable assertions. Cover a normal run, a skill directory with no SKILL.md (expects the skip warning), and a README without the '## \ud83d\udcda Available Skills' heading (expects the error and no edit)."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": null,
+      "evidence": "Only bare prohibitions with no reasons: \"DO NOT use Grep - Read files directly for accurate frontmatter parsing\" and \"Do NOT modify other sections\"",
+      "fix": "Add a short Gotchas or NEVER list with reasons. Examples: multi-line or folded YAML descriptions break line-based extraction; the table end marker can match a '---' inside the table; never rewrite the heading or the trailing '---'."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 57,
+      "evidence": "\"Assign to the first matching category\" while the table has overlapping keywords (handoff in Documentation and Development; requirements in Documentation and Planning; 'ai' as a substring matches most descriptions) and \"Meta\" lists the generic word 'command'",
+      "fix": "State the matching rule precisely. Match against the skill name first, then the description, using whole words. Say that table order is the priority order. Drop or qualify short keywords such as 'ai', 'ui', 'pr' and 'model'. Remove duplicate keywords across categories."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 96,
+      "evidence": "\"Find the end of the table (marked by the next `---` separator or next `##` heading)\" and \"Preserve the `---` separator\"",
+      "fix": "Define the end marker unambiguously, for example the first line after the table that is not a '|' row. Add a post-edit validation step that re-reads README.md and checks that the row count equals the number of valid skills and that the other sections are unchanged. Say what to do if the edit fails."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 70,
+      "evidence": "Rows link to `skills/<name>/README.md`, but no step checks that the file exists. The report promises \"Skills added/updated: [list if any changes detected]\" with no step to detect changes.",
+      "fix": "Add a step that checks each README.md exists and, if one is missing, links to SKILL.md or warns. Say how to detect changes: compare the old table's skill names with the new set. Also say how to treat names that differ from the directory name, and how to handle a missing skills/ directory."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 13,
+      "evidence": "\"Use Bash to list all skill directories: ls -1 skills/\"; the 'Tools to Use' section restates which tool does what; a full YAML frontmatter example shows what frontmatter is",
+      "fix": "Delete the ls tutorial, the frontmatter example and the 'Tools to Use' and 'Success Criteria' sections, which restate the workflow. Keep the category map, table format and edit-boundary rules, which are repo-specific."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 2,
+      "evidence": "description: Sync root README.md with current skills inventory from skills/ directory",
+      "fix": "Use: \"Regenerate the 'Available Skills' table in the root README.md from the SKILL.md frontmatter of every directory under skills/. Use after adding, renaming or removing a skill, or when the README skill list is stale.\" Also add allowed-tools: Read Edit Bash(ls:*) and disable-model-invocation: true, since the command edits a tracked file."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 83,
+      "evidence": "Description shortening examples: \"Advanced code analysis with GPT-5.2\" is not a shortening of the source description, and it adds facts that are not in it",
+      "fix": "Use examples whose output is derivable from the source text. Add a rule that the short description must not add facts absent from the SKILL.md description."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 104,
+      "evidence": "Step 6 prescribes a fixed emoji report template, but the README edit (the fragile part) has no dry-run or confirmation",
+      "fix": "Loosen the report to the key facts (count, skipped skills, changes). Add a rule to show the diff or new table before replacing it when more than a set number of rows change."
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "skill": "viral-tweet",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 9,
+    "D2": 8,
+    "D3": 4,
+    "D4": 10,
+    "D5": 15,
+    "D6": 11,
+    "D7": 1,
+    "D8": 8
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 66,
+  "max_total": 125,
+  "percent": 52.8,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "commands/viral-tweet.md",
+      "line": null,
+      "evidence": "commands/evals/ contains only explain-pr-changes.json and files/; there is no commands/evals/viral-tweet.json",
+      "fix": "Add commands/evals/viral-tweet.json with 3 or more realistic prompts: a casual idea, a precise product-launch idea, and an edge case such as an empty argument, a very long idea, or an idea that is already a thread. Give each an expected output and verifiable assertions, such as 'output has ORIGINAL, ANALYSIS, 3 OPTIMIZED VERSIONS, RECOMMENDED and POSTING STRATEGY sections' and 'no version has hashtags or links'."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/viral-tweet.md",
+      "line": 18,
+      "evidence": "\"The For You feed is powered by a Grok-based transformer that predicts engagement probabilities... Final Score = \u03a3 (weight \u00d7 P(action))\"; the 'Hook Engineering', 'Emotional Resonance' and 'Repost Psychology' sections list generic copywriting advice (curiosity gap, specificity, high-arousal emotions)",
+      "fix": "Cut the generic growth-marketing lists that the model already knows. Keep only the non-obvious knowledge: concrete weights or ordering of signals if they are verified, and X-specific penalties. Compress the P(action) lists into one line."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/viral-tweet.md",
+      "line": 82,
+      "evidence": "\"Never trigger: Spam patterns... Engagement bait... Rage bait... Cringe\" with no reasons or concrete examples",
+      "fix": "Replace the list with specific NEVER items that each give a reason. For example, 'NEVER put a link in the main tweet because X suppresses external links; put it in the first reply', and 'NEVER fabricate stats or backstory in the rewrite, because the author has to stand behind it'."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/viral-tweet.md",
+      "line": 14,
+      "evidence": "\"If no argument provided, ask the user for their tweet idea or topic.\" There is no handling for the 280-character limit, a long input that is really a thread, or an idea that is sensitive or unsafe to optimize. There is no check step before output.",
+      "fix": "State the character limit (280, or longer if the account is premium) and require each version to fit it. Add a self-check list before output: no hashtags or links, within length, still in the author's voice, and no invented facts. Say what to do when the idea is a thread or controversial."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/viral-tweet.md",
+      "line": 2,
+      "evidence": "description: Transform a raw tweet idea into an optimized viral post for X",
+      "fix": "Rewrite as: 'Rewrite a raw tweet idea or draft into three optimized X (Twitter) posts (hook, reply and repost variants) with analysis, a recommended pick and a posting strategy. Use when the user wants a tweet, post, thread idea or X copy made more engaging or viral.'"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/viral-tweet.md",
+      "line": 88,
+      "evidence": "The Output Format fixes three variants (hook, reply, repost) plus a long analysis and posting strategy for every input, even a one-line idea. The 'Style Guidelines' list is terse and unreasoned.",
+      "fix": "Make the long analysis and posting-strategy blocks optional or brief for simple inputs. Give a short reason for each style rule, and keep the exact template only for the section headings."
+    }
+  ]
+}

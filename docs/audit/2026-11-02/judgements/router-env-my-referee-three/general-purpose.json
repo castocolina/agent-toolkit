@@ -1,0 +1,104 @@
+{
+  "skill": "general-purpose",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 2,
+    "D2": 2,
+    "D3": 4,
+    "D4": 6,
+    "D5": 15,
+    "D6": 7,
+    "D7": 7,
+    "D8": 6
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 49,
+  "max_total": 125,
+  "percent": 39.2,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/general-purpose.md",
+      "line": 14,
+      "evidence": "\"**Adaptive**: Adjusts approach based on task complexity\" / \"**Systematic**: Breaks down complex tasks into manageable steps\" / \"**Quality-focused**: Ensures high-quality outcomes through validation\"; the whole body (Behavioral Mindset, Focus Areas, Outputs, Boundaries) is generic engineering advice the model already follows. Progress tracking and sub-agent delegation are also things the harness does natively, so restating them adds nothing.",
+      "fix": "Delete the generic Mindset, Focus Areas and Outputs sections. Replace them with knowledge the model lacks: the names of the specialist agents in this repository (for example mermaid-diagram-specialist), the concrete signals that should route work to each one, and the project conventions or pitfalls they would otherwise get wrong."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "high",
+      "file": "agents/general-purpose.md",
+      "line": 28,
+      "evidence": "\"1. Analyze task complexity and requirements 2. Determine if delegation to specialist is needed 3. Break down complex tasks into manageable steps 4. Execute tasks with appropriate tools 5. Validate outcomes and iterate if needed\": a generic checkbox procedure with no domain ordering and no thinking framework. Its structure is a loose mix of persona and list sections that matches no recognised pattern.",
+      "fix": "Rewrite it as a Process pattern. Give it explicit phases (scope, route, execute, verify), and give each phase a 'before X, ask: ...' question and a concrete checkpoint, for example 'before editing, list the files to touch and the test command that proves the change'."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 49,
+      "evidence": "\"**Will Not:** - Skip validation steps - Ignore specialist availability - Make assumptions about requirements - Leave tasks incomplete\": generic warnings with no reasons and no environment-specific gotchas.",
+      "fix": "Replace the list with specific NEVER items, each with its non-obvious reason. Examples: 'NEVER delegate a task that needs the parent conversation's context, because a subagent sees only its own prompt'; 'NEVER report done without running the project's test command, because ...'. Add a Gotchas section of facts about this repository that defy reasonable assumptions."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 3,
+      "evidence": "description: Default agent for handling complex, multi-step tasks with automatic delegation capabilities. It has no WHEN trigger, no keywords and no boundary against the specialist agents, so the host cannot tell when to delegate to it.",
+      "fix": "Use this agent for open-ended, multi-step coding or research tasks that span several files or need searching across the repository before acting, such as investigating a bug, implementing a feature across modules, or answering a question about how the code works, even when the user does not ask for an agent. It plans the work, runs it and verifies the result with tests. Not for diagrams (use mermaid-diagram-specialist) or for single-file edits the main session can do directly."
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 4,
+      "evidence": "model: default. 'default' is not one of the documented values (sonnet, opus, haiku, fable, full model ID, inherit) in docs/audit/artifact-specs.md.",
+      "fix": "Replace it with 'model: inherit', or delete the line so the host applies its default model order."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 29,
+      "evidence": "\"2. Determine if delegation to specialist is needed\" and \"Delegate to specialists when appropriate\": the highest-consequence decision gets no criteria and no default, while 'Validate outcomes' names no validator.",
+      "fix": "Set a default: execute directly. Then give an escape hatch: delegate only when a named specialist matches stated signals (list them). For validation, name the default check, for example running the project's test or lint command, and say what to do when none exists."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": null,
+      "evidence": "No eval file exists for this agent (no evals for general-purpose found in the repository), so nothing shows the agent works.",
+      "fix": "Add an eval file with 2-3 realistic prompts: a multi-file bug fix, a request that should be delegated to a specialist, and an ambiguous request that should prompt a clarifying question. Give each verifiable assertions, for example 'runs the test command before reporting done' or 'delegates to mermaid-diagram-specialist'."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 29,
+      "evidence": "Following the branch \"Determine if delegation to specialist is needed\": no specialist is named and no criteria are given, so the branch never resolves to a concrete agent or action. \"Validate outcomes and iterate if needed\" has no stop condition and no fallback when validation keeps failing. \"Make assumptions about requirements\" (line 52) is forbidden, yet no step says to ask the user. \"Quality metrics\" (line 39) is never defined.",
+      "fix": "Turn the Key Actions into a checklist with resolvable branches: name the specialists and their trigger signals; state that ambiguous requirements mean asking one clarifying question; set a retry limit for failed validation (for example 2 attempts, then report the failure with evidence); define the output format, or delete 'Quality metrics'."
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "skill": "compose-email",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 5,
+    "D2": 5,
+    "D3": 4,
+    "D4": 12,
+    "D5": 15,
+    "D6": 11,
+    "D7": 0,
+    "D8": 8
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 60,
+  "max_total": 125,
+  "percent": 48.0,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 43,
+      "evidence": "\"Specific and scannable (5-8 words ideal)\", \"Bullets for multiple points (3-5 max)\", \"One topic per email\", plus the tone-by-audience table",
+      "fix": "Cut generic email-writing advice the model already knows (lead with the ask, short paragraphs, tone by audience). Keep only team-specific conventions the model could not guess, such as required subject tags, house style and sign-off rules."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 30,
+      "evidence": "Step 2 \"Use the What-Why-How structure\" followed by generic bullets (\"Provide necessary background\")",
+      "fix": "Replace the generic framework with decision guidance, for example how to handle an escalation versus a request, or what to check before choosing a CTA. Add a pre-draft check such as \"What single action should the reader take, and by when?\""
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 122,
+      "evidence": "\"Anti-Patterns to Avoid\": \"Wall of text without structure\", \"Over-apologizing or excessive hedging\", \"CC'ing unnecessarily\"",
+      "fix": "Turn each item into a specific NEVER with a reason and a bad-to-good rewrite. Add environment-specific gotchas, such as never inventing names, dates or commitments the user did not supply, and flagging missing facts instead of guessing."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 2,
+      "evidence": "description: Draft a professional email using the What-Why-How framework. Use when you need to compose emails to colleagues, stakeholders, or leadership.",
+      "fix": "Draft or refine a professional email (subject line, body, call-to-action) using the What-Why-How framework. Use when the user asks to write, draft, reply to, rewrite or tighten an email to a colleague, stakeholder, manager or customer, even if they do not say 'What-Why-How'. Not for Slack/chat messages or long documents."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 53,
+      "evidence": "Step 5 offers four equal refinement options (tone, length, jargon, format) and Step 1 asks three mandatory questions as menus",
+      "fix": "Pick defaults (infer audience, purpose and urgency from $ARGUMENTS and ask only about what is missing) and offer one or two refinements instead of a four-way menu."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "commands/compose-email.md",
+      "line": null,
+      "evidence": "No commands/evals/compose-email.json exists; commands/evals/ holds only explain-pr-changes.json and its fixtures",
+      "fix": "Add commands/evals/compose-email.json with 3 prompts and verifiable assertions: empty arguments (the command asks the 3 questions), a pasted draft to refine, and an urgent escalation. Assert that the subject carries an action tag, the opening states the ask, and no throat-clearing appears."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 105,
+      "evidence": "Examples call \"/soft-skills:draft-email\" while the file is compose-email.md and the heading is \"Draft Professional Email\"",
+      "fix": "Make the example invocations match the real command name (/compose-email) and the namespace it ships under."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 114,
+      "evidence": "Step 4 template has only a subject and body, but \"Output\" requires \"Subject line with rationale\" and \"WHAT/WHY/HOW sections labeled\"; Step 1 says \"empty or insufficient\" without defining it and does not say what to do with a pasted draft or an unanswered question",
+      "fix": "Reconcile Step 4 with the Output section (decide whether labels and rationale are shown). Define \"insufficient\", and add a branch: if $ARGUMENTS is a draft, refine it and ask only for missing facts. If a question goes unanswered, state the assumption and proceed."
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 5,
+    "D2": 9,
+    "D3": 4,
+    "D4": 9,
+    "D5": 10,
+    "D6": 13,
+    "D7": 0,
+    "D8": 7
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 57,
+  "max_total": 125,
+  "percent": 45.6,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 67,
+      "evidence": "\"Run the appropriate git command and capture the output:\" introduces routine Git operations; other sections largely repeat familiar grouping, dependency ordering and generic explanation advice. Line-weighted content is predominantly activation or redundant rather than expert knowledge.",
+      "fix": "Compress routine Git extraction into a source-to-command table and remove generic coaching. Focus the remaining instructions on non-obvious methods for tracing behavioral dependencies across files and identifying changes that cross architectural boundaries."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 100,
+      "evidence": "\"Test/config changes: Usually depend on everything else\" substitutes a file-category heuristic for demonstrated dependencies; configuration and build changes can instead be prerequisites.",
+      "fix": "Derive review order from actual symbol, schema, build and runtime dependencies. Treat configuration as a possible foundation, place tests beside the behavior they establish, and explain the evidence for each dependency edge."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 151,
+      "evidence": "\"Gotchas and Non-Obvious Details\" is an output-template heading containing placeholders such as \"[Any tricky parts or things that might be confusing]\", not concrete anti-pattern guidance for performing the analysis.",
+      "fix": "Add analysis-specific prohibitions with reasons: never present inferred motivation as established intent, because a diff shows mechanism rather than author intent; never treat an added test as evidence that it passed; distinguish observed changes, inferred rationale and verified outcomes."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 2,
+      "evidence": "\"Build a mental model of changes by splitting them into smaller logical chunks\" describes the output but omits explicit trigger scenarios, Git/diff keywords and a boundary against adjacent review tasks.",
+      "fix": "Explain code diffs, commits, branch comparisons and revision ranges as dependency-ordered change groups with file references and rationale. Use when a user wants to understand a large changeset, learn how changes fit together or choose a review order, even without asking for a mental model. Not for bug-finding reviews or implementing edits."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 178,
+      "evidence": "\"## Example Output\" begins a 37-line worked example after an extensive output template. The command totals 214 lines with nothing split into references, exceeding the command profile's 200-line threshold.",
+      "fix": "Remove the repetitive worked example to bring the command below 200 lines, or extract it into a reference with an explicit instruction to load it only when a worked example is needed."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 109,
+      "evidence": "\"Output the analysis in this format:\" mandates the full concepts, change-groups, review-sequence and gotchas template without an escape hatch for a small or single-group diff.",
+      "fix": "Make the template a default for substantial changesets. Allow a compact summary and one change group for small diffs, and omit concepts, separate review sequences or gotchas when they add no information."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "commands/evals/explain-changes-mental-model.json",
+      "line": null,
+      "evidence": "Reading commands/evals/explain-changes-mental-model.json returned \"ENOENT: no such file or directory\"; the required command eval file is absent.",
+      "fix": "Add the required eval file with realistic prompts, reproducible diff inputs, expected outputs and verifiable assertions. Cover a commit, branch/range comparison, HEAD~3, custom input and an empty or oversized changeset; assert correct source selection and evidence-backed dependency ordering."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 21,
+      "evidence": "\"/mental-model\" is used throughout the usage examples, but the artifact filename defines the command as /explain-changes-mental-model; this file supplies no alias.",
+      "fix": "Replace every /mental-model invocation with /explain-changes-mental-model so all documented examples invoke the actual command."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 54,
+      "evidence": "\"Argument looks like a branch name (contains letters, no `..`)\" also matches the documented HEAD~3 example and the literal custom argument. The rules do not establish precedence, so those inputs can take the branch-comparison path instead of showing a commit or waiting for pasted changes.",
+      "fix": "Handle exact custom input first, then explicit ranges. Verify branch refs explicitly and recognize revision expressions such as HEAD~3 as commit inputs rather than classifying by letters. Define a comparison-base fallback or ask the user when neither main nor master exists."
+    }
+  ]
+}

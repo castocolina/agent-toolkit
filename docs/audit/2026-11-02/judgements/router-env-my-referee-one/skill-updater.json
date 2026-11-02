@@ -1,0 +1,68 @@
+{
+  "skill": "skill-updater",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 35,
+      "evidence": "The recording template makes \"[--new-path PATH]\" optional. Following an already-relocated row through step 4 to current or stale and then recording without that flag loses the relocation: audit.py track removes an existing new_path whenever the status is not path-moved and no replacement path is supplied. Subsequent upstream checks return to the obsolete source path.",
+      "fix": "Require --new-path with the existing row value whenever a row already has new_path, including current, stale and unreachable recordings. Clear that mapping only through an explicit, justified source correction."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 35,
+      "evidence": "\"One call per source row\" is followed by a source-less recording branch only for \"A command or agent\". A skill with no registry rows reaches the model probe but produces zero track calls, so its completed review is never recorded.",
+      "fix": "Add an explicit branch for skills with no external source rows: perform the model-validity pass and record a source-less local review using track --registry docs/audit/upstream-sources.json --artifact NAME --artifact-kind skill --status current --model MODEL. Handle existing local rows through the same branch."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 26,
+      "evidence": "After the contents request, the procedure handles \"A Not Found (HTTP 404)\" and otherwise says \"Then classify\". If upstreams succeeds but the later contents request returns 403 or times out, this branch still leads toward stale/adopt/adapt/ignore without establishing that the effective path exists.",
+      "fix": "Gate classification on a successful contents response. For authentication, rate-limit or network failures in this checkpoint, apply the authentication check and single retry; if verification still fails, record unreachable and do not relocate or classify unseen changes."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/skill-updater/evals/evals.json",
+      "line": 26,
+      "evidence": "The current-row assertion checks only \"Includes a track command with --status current\"; moved-path assertions similarly check the reported status and path without checking the complete recording command. Wrong-registry, wrong-source or missing-SHA commands are not explicitly rejected despite those fields being central to the protocol.",
+      "fix": "Strengthen recording assertions to verify the explicit --registry path, exact artifact and copied source, and required --new-path/--sha on relocation. For the model-probe case, verify the selected model is used in both the probe and track command."
+    }
+  ]
+}

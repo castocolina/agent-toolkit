@@ -1,0 +1,122 @@
+{
+  "skill": "codex-plan",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 5,
+    "D2": 8,
+    "D3": 6,
+    "D4": 10,
+    "D5": 10,
+    "D6": 10,
+    "D7": 0,
+    "D8": 6
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 55,
+  "max_total": 125,
+  "percent": 44.0,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/codex-plan.md",
+      "line": 25,
+      "evidence": "'Look at what the user wants to plan. Identify:' introduces generic goal, technology and ambiguity questions. The lengthy question catalogue and implementation-plan template likewise dominate the body with knowledge models already possess; code inspection and planning are native harness capabilities.",
+      "fix": "Remove the generic planning tutorial and question catalogues. Retain the cross-agent handoff contract, verified context-transfer requirements, model settings and genuinely non-obvious Codex constraints."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 251,
+      "evidence": "'Task Guidelines' specifies task properties such as inputs, outputs, dependencies and complexity scores, but supplies no method for choosing an implementation approach or deciding which risks should determine phase ordering.",
+      "fix": "Add a short decision procedure: compare plausible approaches against constraints, select an initial slice that tests the highest-risk assumption, and derive phase ordering and dependencies from that choice."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 316,
+      "evidence": "'Do NOT assume - Do not guess what the plan contains' is an explicit warning, but the command has no environment-specific gotchas with explanations of non-obvious failure modes.",
+      "fix": "Add concise, reasoned gotchas: relative context paths resolve from Codex's launch directory, so launch from the inspected project root; --output-last-message captures the final response, not necessarily codex-plan.md, so never treat that transcript as proof the plan file was written."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 2,
+      "evidence": "'Create a detailed implementation plan using Codex 5.2 with high reasoning' names the capability but does not explain when to choose this command over ordinary planning or disclose its prompt-only, manual-execution boundary.",
+      "fix": "Prepare prompt_to_codex.md for a user-run gpt-5.2-codex implementation plan with high reasoning. Use when a user wants to plan a feature, migration, API or testing change and hand planning off to Codex. Clarify requirements and include verified repository context. This command prepares the prompt and manual execution instructions only; it does not run Codex or implement changes."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 149,
+      "evidence": "'## Example Full Flow' begins a roughly 130-line example and template inside a 319-line command with no material split into references, exceeding the command profile's 200-line self-contained convention.",
+      "fix": "Move the full worked example and detailed plan template into a companion reference, with an explicit instruction to read it when constructing the Codex prompt. Keep the command's routing and handoff workflow under 200 lines."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 33,
+      "evidence": "'Use AskUser to ask 3-6 targeted clarifying questions' is mandatory, reinforced by 'Always ask clarifying questions first' at line 284, even when the request already supplies all necessary requirements.",
+      "fix": "Inspect available context first and ask only consequential unanswered questions. Permit zero questions for a complete request, and allow the user to approve explicit assumptions instead of requiring a fixed question count."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "commands/evals/codex-plan.json",
+      "line": null,
+      "evidence": "The required commands/evals/codex-plan.json is absent; commands/evals/ lists only explain-pr-changes.json and files/.",
+      "fix": "Add commands/evals/codex-plan.json with realistic prompts, expected outputs and verifiable assertions. Cover an underspecified request, a fully specified request and an unavailable clarification-tool case; assert that the prompt contains verified context paths, the required model settings and a manual-only handoff."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 13,
+      "evidence": "'Execute Codex to generate and save the plan' contradicts line 297, 'Save the prompt to prompt_to_codex.md (do NOT execute)'. The later workflow establishes a manual handoff, but the opening task definition instructs the opposite action.",
+      "fix": "Replace the opening execution instruction with 'Save the Codex prompt, provide the manual execution command, and stop until the user supplies the generated plan.' Use that same execution boundary throughout."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 33,
+      "evidence": "'Use AskUser' is the only clarification path, and Step 3 begins 'After getting answers'. No branch explains how to proceed when that tool is unavailable or the user cannot answer; the manual Codex handoff similarly provides no failure recovery.",
+      "fix": "Use AskUserQuestion when available and ordinary chat questions otherwise. Define how to pause or proceed with user-approved assumptions when answers are unavailable. If manual Codex execution fails, ask for the error and preserve the prompt rather than assuming a plan exists."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 182,
+      "evidence": "The 'Create a detailed implementation plan' worked prompt omits the mandatory 'Files to Read for Context' section required at line 92. It also specifies 'Next.js (App Router)' but illustrates a callback in 'src/routes/auth.ts' at line 265, which is not an App Router route-handler location.",
+      "fix": "Revise the worked example to include context files verified during Step 3 and use paths consistent with the discovered Next.js layout, such as app/api/.../route.ts or its src/app equivalent. Check the saved prompt against the command's mandatory sections before handing it off."
+    }
+  ]
+}

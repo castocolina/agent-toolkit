@@ -1,0 +1,104 @@
+{
+  "skill": "general-purpose",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 2,
+    "D2": 3,
+    "D3": 4,
+    "D4": 5,
+    "D5": 15,
+    "D6": 10,
+    "D7": 7,
+    "D8": 8
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 54,
+  "max_total": 125,
+  "percent": 43.2,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/general-purpose.md",
+      "line": 21,
+      "evidence": "'Task Analysis: Understanding and decomposing complex requirements', 'Agent Coordination', and 'Progress Tracking' restate ordinary model and harness capabilities. None of the six body sections supplies expert-only knowledge; generic reminders and repeated declarations dominate the 46-line body.",
+      "fix": "Remove the duplicated identity, mindset, focus-area, and capability statements. Retain only concise activation guidance and add actual environment-specific constraints or coordination knowledge not already supplied by the host."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "high",
+      "file": "agents/general-purpose.md",
+      "line": 28,
+      "evidence": "'Analyze task complexity and requirements' through 'Validate outcomes and iterate if needed' provides a recognizable ordered process, but no substantive thinking framework or non-obvious procedure.",
+      "fix": "Replace the generic sequence with a dependency-and-risk procedure: identify shared contracts and acceptance checks first, establish ownership of affected files, sequence dependent work, and parallelize only independently verifiable changes."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 50,
+      "evidence": "'Skip validation steps', 'Ignore specialist availability', and 'Make assumptions about requirements' are generic prohibitions without reasons or environment-specific gotchas.",
+      "fix": "Replace generic prohibitions with concrete failure modes and explanations. For example, never let separate workers modify the same generated artifact without one integration owner, because regeneration can silently overwrite another worker's changes; never accept a specialist summary as proof that combined changes pass integration checks."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "high",
+      "file": "agents/general-purpose.md",
+      "line": 4,
+      "evidence": "'model: default' is not a documented model selector in docs/audit/artifact-specs.md; the recorded selectors include 'inherit', named aliases, and full model IDs.",
+      "fix": "Replace 'model: default' with 'model: inherit' to select the parent model explicitly."
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 3,
+      "evidence": "'Default agent for handling complex, multi-step tasks with automatic delegation capabilities' gives only broad task-complexity keywords and does not distinguish programming work, specialist requests, or simple tasks.",
+      "fix": "Use for complex, multi-step programming work spanning investigation, implementation, and validation across multiple files or specialties when no single specialist fits. Coordinate cross-cutting changes and report verified results and blockers. Prefer a dedicated specialist for narrowly scoped domain work; do not delegate simple one-step requests here."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 53,
+      "evidence": "The unconditional 'Will Not: ... Leave tasks incomplete' supplies no escape hatch for missing authorization, unavailable dependencies, or exhausted execution budgets.",
+      "fix": "Replace the absolute completion promise with a bounded stopping rule: continue while authorized and productive, but pause when blocked or at the execution limit and report completed work, remaining work, validation status, and the specific input or permission needed."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": null,
+      "evidence": "No companion output-eval file was found for general-purpose; the agents directory contains only Markdown definitions.",
+      "fix": "Add agent output evals covering a realistic cross-file task, a task with no suitable specialist available, and a validation failure. Include expected outcomes and observable assertions for correct coordination, fallback behavior, and truthful validation reporting."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 29,
+      "evidence": "'Determine if delegation to specialist is needed' branches into delegation or direct execution, but the delegation branch never specifies how to hand off work, consume the result, or proceed when no suitable specialist can be invoked.",
+      "fix": "Resolve both branches explicitly: execute directly when delegation adds no value; otherwise pass the specialist a bounded task, relevant context, ownership constraints, and acceptance checks, then inspect its result. If the specialist is unavailable or fails, perform the bounded task directly when capable or report the precise capability gap."
+    }
+  ]
+}

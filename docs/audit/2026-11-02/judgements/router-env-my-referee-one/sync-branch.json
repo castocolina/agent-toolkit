@@ -1,0 +1,95 @@
+{
+  "skill": "sync-branch",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 4,
+    "D2": 5,
+    "D3": 0,
+    "D4": 10,
+    "D5": 15,
+    "D6": 7,
+    "D7": 0,
+    "D8": 7
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 48,
+  "max_total": 125,
+  "percent": 38.4,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 6,
+      "evidence": "\"1. Fetch latest upstream refs: `git fetch origin --prune`.\" The unsectioned body is a standard fetch/rebase/push recipe; its instructional lines are activation or redundant material, without expert-only decisions or repository-specific knowledge.",
+      "fix": "Condense the familiar Git sequence and add non-obvious guidance about preserving feature intent, handling merge commits, and safely updating a branch that collaborators may also modify."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 8,
+      "evidence": "\"3. Rebase current branch onto target:\" supplies a mechanical action but no reasoning framework for preserving the feature's behavior while replaying it onto changed upstream code.",
+      "fix": "Teach a reusable approach: record the pre-rebase commit range, compare upstream changes with the feature's intended behavior, resolve overlaps against that intent, and inspect a before/after range-diff for unintended changes."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 12,
+      "evidence": "\"4. Resolve any conflicts\" is the entire conflict guidance; the command contains no explicit anti-patterns or environment-specific gotchas with reasons.",
+      "fix": "Add concise Git gotchas: never mechanically choose --ours or --theirs during a rebase because their roles differ from a usual merge, and never use rebase --skip unless the entire commit is intentionally redundant because it discards that commit's changes."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 2,
+      "evidence": "\"description: Sync feature branch with the latest main branch.\" identifies the broad task but omits the history-rewriting method, PR push, target override, and boundaries against merge-only or shared-branch workflows.",
+      "fix": "Rebase the current feature branch onto origin/main or a supplied target and update its existing PR with a force-with-lease push. Use when a feature branch is behind its base and a linear history is wanted; not for merge-only updates or rewriting shared/protected branches."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 15,
+      "evidence": "\"git push --force-with-lease origin $(git branch --show-current)\" rewrites a remote branch without first verifying that the checkout is a named feature branch or that origin and the selected branch identify the intended PR head.",
+      "fix": "Before rebasing, verify a clean worktree, a named branch permitted to be rewritten, and the PR's actual head remote/ref. Stop for detached HEAD, protected/shared branches, or ambiguous identity; push using quoted validated values and an explicit refspec rather than assuming origin and the current branch are correct."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "commands/evals/sync-branch.json",
+      "line": null,
+      "evidence": "Reading commands/evals/sync-branch.json returned \"ENOENT: no such file or directory\"; the required command eval is absent.",
+      "fix": "Add commands/evals/sync-branch.json with realistic prompts, expected outcomes, and verifiable assertions covering a clean rebase, a target override, conflicts requiring continuation or abort, unsafe branch states, and a rejected lease."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 12,
+      "evidence": "\"4. Resolve any conflicts\" leads directly to \"5. Force-with-lease push to update the PR\". The conflict branch never explicitly continues the rebase, verifies completion, or reaches a defined abort outcome.",
+      "fix": "Define the conflict loop: inspect conflicts, resolve and stage only affected files, run git rebase --continue, and repeat until complete. If resolution is uncertain, abort and report the blocker. Halt on fetch or rebase failure, and permit pushing only after verifying rebase completion and the resulting branch state."
+    }
+  ]
+}
