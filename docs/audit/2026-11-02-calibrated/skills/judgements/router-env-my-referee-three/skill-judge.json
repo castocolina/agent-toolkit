@@ -1,0 +1,95 @@
+{
+  "skill": "skill-judge",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 72,
+      "evidence": "NEVER invent facts about files you have not read, and NEVER mark a score up to compensate for something you could not verify",
+      "fix": "Cut this to the non-obvious half ('never raise a score to make up for evidence you could not verify'). The model already avoids inventing file contents, and protocol step 3 and its unreadable-file rule already say so."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 53,
+      "evidence": "Rules, enforced by a schema in `references/verdict.schema.json`: ... `total` is the sum of `scores`, `max_total` the sum of `max`, `percent` is `round(total / max_total * 100, 1)`; `grade` from `percent`: A at 90 or more...",
+      "fix": "Remove the arithmetic and grade bands that protocol step 6 and rubric.md already state. Keep only the rules that are easy to get wrong, such as file paths relative to root, line null, and every sub-max score needing a finding."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 20,
+      "evidence": "Then classify each H2 section for D1 and weight it by line count: the D1 ratio is in lines, not sections.",
+      "fix": "Add a short test for borderline cases. For example: 'Before classifying a section as expert, ask whether a current model would get the task wrong without it. If it would only forget a step, classify it as activation.' This turns the line-count rule into a way of thinking about each section."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 65,
+      "evidence": "**Rubric exemptions are never findings**: the allowlisted Claude Code fields (`user-invocable`, `disable-model-invocation`, `argument-hint`), mandatory reads, repository-required files.",
+      "fix": "Add the reason, as the other gotchas do. For example: 'judges trained on the base spec flag these as unknown fields or unconditional loads, so verdicts from different judges disagree on items the repository requires'."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/skill-judge/evals/evals.json",
+      "line": null,
+      "evidence": "No eval has a target with a scripts/ directory, and none covers the attribution rule. The 5/5/5 allocation, the tests/skills/<name>/ lookup, the 'only directory supplied' limit and the rule that credits never count are all untested.",
+      "fix": "Add an eval with a fixture skill that has scripts/ and no tests/skills/<name>/. Assert that D7 keeps the 5/5/5 split and that the D7 finding states the unchecked smoke test. Add a second eval whose fixture has a credit inside the description. Assert that no finding proposes deleting the credit and that the fix moves it to the end of the body or to README.md."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 3,
+      "evidence": "Description triggers on 'or the user asks if it is ready to publish', but no output-contract rule (lines 34-45) maps a verdict to a ready or not-ready answer. The 'pasted' eval asks exactly this question.",
+      "fix": "Add to output contract rule 2: 'When the user asks whether the skill is ready to publish, answer yes or no on the first line. Say ready only at grade A or B with no critical or high finding; otherwise name the blocking findings.'"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 15,
+      "evidence": "The target is a directory containing `SKILL.md` (or the `SKILL.md` file itself; use its directory).",
+      "fix": "Add a branch to step 2: 'When the target is a command or agent file (a single .md with no SKILL.md), skip the directory listing and use the file stem as `skill`, per the loaded profile.' Without this branch, step 2 dead-ends for the command and agent paths that step 1 enables."
+    }
+  ]
+}

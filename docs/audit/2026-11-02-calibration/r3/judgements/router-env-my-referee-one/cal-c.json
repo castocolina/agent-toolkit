@@ -1,0 +1,50 @@
+{
+  "skill": "cal-c",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 14,
+      "evidence": "\u201ctaking the first class whose evidence links the cause to the failed step\u201d places Environment, Test and Build before Flake. A test with an assertion failure and verified same-revision pass/fail evidence satisfies Test first, so the prescribed classification stops before evaluating the explicit Flake criteria.",
+      "fix": "Evaluate the stated flake evidence before committing to Environment, Test or Build. Choose Flake when that evidence explains the observed failure; otherwise classify the failure as observed."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 47,
+      "evidence": "\u201cDo not continue reading the log after the root cause is confirmed\u201d can prevent step 5 from identifying a later unrelated failure, while the output requires \u201cAlso failing\u201d to contain unrelated failures or \u201cnone\u201d. The early-stop branch has no representation for additional failures not assessed.",
+      "fix": "Before stopping, inspect the failed-job or failed-step summary for additional independent failures. If that check is unavailable or intentionally skipped, permit \u201cnot assessed\u201d in Also failing instead of requiring \u201cnone\u201d."
+    }
+  ]
+}

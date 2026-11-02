@@ -1,0 +1,104 @@
+{
+  "skill": "codebase-pattern-finder",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 5,
+    "D2": 7,
+    "D3": 8,
+    "D4": 15,
+    "D5": 4,
+    "D6": 15,
+    "D7": 8,
+    "D8": 8
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 70,
+  "max_total": 125,
+  "percent": 56.0,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 50,
+      "evidence": "\"You can use your handy dandy `Grep`, `Glob`, and `LS` tools to to find what you're looking for! You know how it's done!\" restates native search capabilities. Weighted by lines, the body is dominated by familiar responsibilities, standard pagination examples, and generic pattern-category inventories rather than expert knowledge.",
+      "fix": "Delete the native-tool pep talk and generic responsibility/category inventories. Retain the documentarian boundary and source-evidence requirements; replace generic exposition with concise, non-obvious rules for identifying genuinely comparable implementations."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 42,
+      "evidence": "\"First, think deeply about what patterns the user is seeking and which categories to search\" introduces categories, but the subsequent search/read/extract sequence supplies no decision framework for selecting representative analogues rather than superficially similar hits.",
+      "fix": "Add a selection procedure: identify the requested behavior, runtime/framework, and architectural layer; inspect candidate callers and tests; distinguish live implementations from fixtures or wrappers; then report relevant similarities and differences without ranking quality."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 214,
+      "evidence": "\"Don't show patterns without context\" and \"Don't recommend one pattern over another\" establish scope restrictions, but the NEVER list lacks concrete search landmines and explanations of why they produce misleading results.",
+      "fix": "Add reasoned gotchas, such as: when generated or vendored hits appear, do not count their copies as independent local implementations, because one upstream source can falsely look like a repository-wide convention; label provenance and trace copies to their maintained source."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "high",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 58,
+      "evidence": "\"## Output Format\" introduces an extended inline template spanning lines 58\u2013168. The agent is 227 lines long, with no bulky material split out and no `skills:` preload.",
+      "fix": "Reduce the agent to at most 200 lines. If retaining the detailed report examples, move them into a dedicated reporting skill, preload it through `skills: [pattern-report-format]`, and leave only a compact output schema in the agent."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 225,
+      "evidence": "\"Your job is to show existing patterns and examples exactly as they appear in the codebase\" defines the objective, not when the task is complete. An output format is present, but there is no explicit completion sentence.",
+      "fix": "Add: \"The task is done when each requested pattern type has source-verified examples or an explicit no-match result, every example has a file:line citation, and the final report follows the Output Format.\""
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 36,
+      "evidence": "\"Note which approach is preferred\" directly contradicts line 15: \"DO NOT recommend which pattern is \\\"better\\\" or \\\"preferred\\\".\" Following the responsibilities therefore violates the central role constraint.",
+      "fix": "Replace \"Note which approach is preferred\" with \"Describe observed variations without inferring or recommending a preferred approach.\""
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 53,
+      "evidence": "\"Read files with promising patterns\" assumes search succeeds, while \"Don't miss the test examples\" at line 213 assumes relevant tests exist. Neither the no-match branch nor the implementation-without-tests branch has a defined outcome.",
+      "fix": "If initial searches fail, broaden once using behavior synonyms and callers; if no examples remain, report the searched scope and an explicit no-match result. If implementations exist but relevant tests cannot be found, state that limitation and return the verified implementation examples without inventing tests."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 111,
+      "evidence": "\"take: limit + 1\" uses `limit` taken directly from `req.query` at line 108. For a normal HTTP query `?limit=20`, JavaScript evaluates this as the string \"201\", not the intended number 21. The offset example likewise passes an unconverted query-string limit into `take`.",
+      "fix": "In the illustrative handlers, parse and validate numeric query parameters before arithmetic and database calls. Require positive integer limits and pages, and check a non-default `?limit=20` case so the cursor query requests 21 records rather than \"201\"."
+    }
+  ]
+}

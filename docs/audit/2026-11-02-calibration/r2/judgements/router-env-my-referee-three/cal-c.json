@@ -1,0 +1,86 @@
+{
+  "skill": "cal-c",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/cal-c.md",
+      "line": 11,
+      "evidence": "Find the first failure, not the last ... Read 30 lines before and 10 after it.",
+      "fix": "Keep the keyword list and the 'later errors are fallout' reason. Cut or shorten the generic context-reading advice, which the model already follows."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "agents/cal-c.md",
+      "line": 13,
+      "evidence": "Classify, in this investigation order, taking the first class whose evidence links the cause to the failed step",
+      "fix": "Add a short 'before classifying, ask: which step failed and what changed since the last green run?' prompt, so the agent has a reasoning frame as well as an ordered list."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/cal-c.md",
+      "line": 28,
+      "evidence": "## Gotchas has only two items (cache-restore failure; tests that expect a failure)",
+      "fix": "Add further CI-specific gotchas, for example: a step with continue-on-error shows errors in a green job; matrix-job failures cancel siblings, so the cancellation messages are not the cause; the log timestamp order differs from the line order in parallel jobs."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "agents/cal-c.md",
+      "line": 41,
+      "evidence": "**Confidence:** high | medium | low - <why>",
+      "fix": "Define when each level applies. For example: high = the log line and the source line both confirm the cause; medium = the log line alone; low = Inconclusive or unconfirmed source correlation."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 39,
+      "evidence": "**Evidence:** `<log file>:<line>` - `<the decisive log line>` (the agent is also given 'pasted log text', line 8)",
+      "fix": "State what to write when the log is pasted and has no file path, for example `pasted-log:<line>`. Say what to do when line numbers cannot be determined."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 46,
+      "evidence": "Do not continue reading the log after the root cause is confirmed. (conflicts with step 5, line 20: list the other unrelated failure as 'also failing')",
+      "fix": "Reconcile the two: after confirming the root cause, grep the rest of the log once for other failure markers to fill 'Also failing'. Do not read it in detail."
+    }
+  ]
+}

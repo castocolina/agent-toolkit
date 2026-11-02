@@ -1,0 +1,113 @@
+{
+  "skill": "cal-d",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 1,
+    "D2": 1,
+    "D3": 1,
+    "D4": 3,
+    "D5": 4,
+    "D6": 2,
+    "D7": 5,
+    "D8": 2
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 19,
+  "max_total": 125,
+  "percent": 15.2,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 1,
+      "evidence": "Frontmatter has name, permissionMode, tools and model, but no `description` field",
+      "fix": "Add `description: Write, run and fix pytest unit, integration, API, CLI, database, auth, billing, search, upload, export, email, cache, queue and payment tests. Use when the user asks to add test coverage, write a failing test, or debug a failing pytest run. Not for production-code refactors that have no test component.`"
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "agents/cal-d.md",
+      "line": 3,
+      "evidence": "permissionMode: bypassPermissions",
+      "fix": "Remove `permissionMode`. The host ignores it for plugin agents. Control permissions at plugin or user settings level."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 10,
+      "evidence": "\"## Background\" defines unit tests, test suites, mocking and coverage. \"## How to write a test in pytest\" explains `test_` files and `assert`. The 14 per-type sections repeat the same stub (`run_unit_case()`, `assert result == \"expected\"`).",
+      "fix": "Delete the Background and pytest tutorial sections. Collapse the 14 near-identical sections into one table of type, name prefix and directory. Keep only conventions specific to the project."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 8,
+      "evidence": "\"You are a testing agent. You help with tests.\" The instructions are generic and teach no domain procedure or thinking framework.",
+      "fix": "Add an ordered workflow: reproduce, write a failing test, make the minimal fix, re-run the affected tests. Add decision rules for choosing a test type and for deciding whether the test or the code is wrong."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 32,
+      "evidence": "\"5. Be careful, think about edge cases and write good tests.\" and \"6. Do your best and make sure everything works.\" The only other warning is \"Delete tests that get in the way\" (line 30), which is harmful.",
+      "fix": "Replace with specific NEVER items that give reasons. For example: NEVER delete or weaken a failing test to make it pass, because it hides the regression. NEVER mock the unit under test."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 35,
+      "evidence": "About 232 lines with no `skills:` preload and nothing split out. The naming reference is 14 repeated blocks.",
+      "fix": "Move the naming reference into a skill and preload it with `skills:`, or shrink it to a single table. This brings the body under 200 lines."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 30,
+      "evidence": "\"4. Fix the code or the test, whichever is easier. Delete tests that get in the way.\" Combined with `permissionMode: bypassPermissions` and Bash/Edit/Write tools, this gives free rein to a destructive operation.",
+      "fix": "Require the agent to say why the test or the code is wrong before changing either. Never allow deleting tests without user confirmation. Give exact commands for running a test, for example `pytest path::test -x`."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": null,
+      "evidence": "No sentence states when the task is done, and no output format is defined for the final report.",
+      "fix": "Add: 'Done when the changed tests pass and the full suite shows no new failures. Report the files changed, the commands run, and the pass/fail counts.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 25,
+      "evidence": "Step 1 says \"Always run the whole test suite before you change anything.\" Step 2 says \"Never run the whole test suite... run only the test file that you changed.\" Step 3 says \"follow the steps in the section \\\"Recovery\\\" and then go on to step 12.\" There is no Recovery section and no step 12.",
+      "fix": "Keep one rule for how much of the suite to run, for example run the affected file first, then the full suite once at the end. Write the failure branch inline: read the traceback, decide whether the test or the code is wrong, fix it, re-run. Remove the dangling references."
+    }
+  ]
+}

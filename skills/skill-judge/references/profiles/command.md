@@ -1,3 +1,6 @@
+profile_version: 4
+source_digest: 564ae70c48564766185724c264b0cf06090f769e55a73ec07382034852564a62
+
 # Command profile
 
 Load this only when the prompt judges a command. Do not load it for a skill or an agent.
@@ -18,7 +21,7 @@ Validity uses the command fields recorded in `docs/audit/artifact-specs.md`.
 
 - No field is required. `description` is recommended. If it is omitted, the host uses the first non-empty body line.
 - Accepted: `description`, `when_to_use`, `argument-hint`, `arguments`, `disable-model-invocation`, `user-invocable`, `allowed-tools`, `disallowed-tools`, `model`, `effort`, `context`, `agent`, `background`, `hooks`, `shell`, `metadata`, `license`, `compatibility`.
-- Not accepted: `name`, `paths`. Do not apply the skill `name` rules or the directory-name check.
+- Not accepted: `name`, `paths`. Do not apply the skill `name` rules or the directory-name check. The command name is the file name.
 - A missing `description` is medium, never critical: the file still loads.
 - An unknown field is low: the host ignores it.
 
@@ -26,15 +29,22 @@ Validity uses the command fields recorded in `docs/audit/artifact-specs.md`.
 
 Score whether bulky material was split out of the command file.
 
-This repository's convention, not a spec rule: an artifact with no references scores full marks when it is under 200 lines. Over 200 lines with nothing split out scores at most 10.
+This repository's convention, not a spec rule. A command cannot ship its own `references/`; material moved into a skill its plugin bundles, and loaded by an explicit path only when needed, counts as split out. Score on the command file's own length:
 
-## D7 — tests and evals
+- 200 lines or fewer: 15, unless a finding shows a concrete split need.
+- Over 200 lines with bulky material split out as above: 10, with one finding naming what still belongs elsewhere.
+- Over 200 lines with nothing split out: 4.
 
-A command requires an eval file at `commands/evals/<stem>.json`.
+## D7 — tests and evals (15 points)
 
-- Missing that file is a high finding and puts D7 in the bottom band.
-- Commands have no trigger queries. Do not deduct for a missing trigger file.
-- Do not deduct for a missing script test.
+A command requires an eval file at `commands/evals/<stem>.json`. Commands have no trigger queries: do not deduct for a missing trigger file and do not deduct for a missing script test. Score D7 on this ladder only:
+
+- 15: the eval file has at least three realistic scenarios that cover the main path, a failure path and an edge case, each with assertions that can be verified.
+- 12: the main path and one failure path are covered.
+- 8: the main path only.
+- At most 3, with a high finding: no eval file.
+
+Every score below 15 needs a finding that names the missing scenario kind. A scenario without verifiable assertions does not count toward a rung.
 
 ## D8 — checks that apply
 

@@ -1,0 +1,77 @@
+{
+  "skill": "skill-judge",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 58,
+      "evidence": "\"`grade` from `percent`: A at 90 or more, B at 80, C at 70, D at 60, otherwise F.\" repeats the grade bands and percent formula that are already in step 6 (line 25) and in references/rubric.md, which is read in full on every run",
+      "fix": "Replace the repeated formula and bands with a pointer: \"`total`, `percent` and `grade` follow the Scoring rules in references/rubric.md\". Keep one copy, in the rubric."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 3,
+      "evidence": "The description only names \"an Agent Skill\" and \"a SKILL.md or skill directory\". The protocol also judges commands and agents (references/profiles/command.md, references/profiles/agent.md), and the description has no keyword for them.",
+      "fix": "Score an Agent Skill, or a Claude Code slash-command or subagent .md file, against the pinned Agent Skills spec and best practices. Use when asked to judge, review, audit, grade, compare or improve a SKILL.md, a skill directory, a command or an agent file, or when a skill never triggers, feels bloated, wastes tokens on what the model already knows, or the user asks if it is ready to publish, even without the word 'judge'. Returns percent, grade, per-dimension scores and fixes, or a machine-readable verdict line; it reports fixes and never edits files. Not for writing a new skill from scratch, and not for refreshing the rubric from agentskills.io (agentskills-research)."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/skill-judge/evals/evals.json",
+      "line": null,
+      "evidence": "None of the 11 evals targets a skill that has a scripts/ directory. The step 3 branch (\"If the skill has `scripts/` and only its directory is supplied ... keep the rubric's 5/5/5 allocation\") and the 5/5/5 versus 8/7 D7 split are never exercised.",
+      "fix": "Add an evals/files/<name>/ fixture with a scripts/ directory, and an eval whose assertions check the 5/5/5 D7 allocation, that no deduction is made for an unseen smoke test, and that a D7 finding states tests/skills/<name>/ was not checked"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 55,
+      "evidence": "\"`skill` is the target directory name\" gives no rule for pasted content, which has no directory. The 'pasted' eval expects `skill` = `doc-helper`, which comes from the frontmatter `name`, but SKILL.md never says to use it.",
+      "fix": "Add: \"For pasted content with no directory, use the frontmatter `name`; if that is missing, use `unknown-skill` and record a D4 finding.\""
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/skill-judge/SKILL.md",
+      "line": 25,
+      "evidence": "Step 6 \"**Compute** ...\" goes straight to step 7 \"Emit\". Nothing checks the verdict before printing, even though the schema rules (unique ids, a finding for every score below max, max copied from the rubric) are easy to break.",
+      "fix": "Insert a step before Emit: \"Check the verdict: every score below max has a finding in its dimension, ids are unique, `max` and `spec_sha` match rubric.md, and total, percent and grade recompute. Fix and re-check until all pass.\""
+    }
+  ]
+}

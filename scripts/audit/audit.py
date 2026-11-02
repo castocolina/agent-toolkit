@@ -45,6 +45,7 @@ SYNCED = {"gepetto", "datadog-cli"}
 C5_FIELDS = {"user-invocable", "disable-model-invocation", "argument-hint"}
 DIMENSIONS = [f"D{i}" for i in range(1, 9)]
 SKILL_NAME_RE = re.compile(r"[a-z0-9]+(-[a-z0-9]+)*")
+KIND_DIR = {"skill": "skills", "command": "commands", "agent": "agents"}
 
 # unicodedata has no script property, so the scripts are listed by codepoint range.
 NON_LATIN_RANGES = [
@@ -273,8 +274,13 @@ def skill_issues(root: Path, name: str, allow: set[str], pin: Path | None = None
 def check_skills(
     root: Path, skills: list[str] | None = None, strict: bool = False,
     ignore: set[str] | None = None, allowlist: Path | None = None, pin: Path | None = None,
+    kind: str = "skill",
 ) -> dict:
+    if kind not in ARTIFACT_KINDS:
+        raise ValueError(f"unknown artifact kind {kind!r}")
     ignore = ignore or set()
+    if kind != "skill":
+        return check_flat(root, kind, skills, ignore)
     allow = load_allowlist(allowlist or root / "scripts" / "audit" / "non_latin_allowlist.txt")
     if pin is not None:
         source_sha(root, pin)  # a missing or unreadable trusted pin fails before any skill is checked
@@ -300,6 +306,95 @@ def check_skills(
     return {"skills": result}
 
 
+def artifact_names(root: Path, kind: str) -> list[str]:
+    """Sorted names of one kind: skills/<dir>/, commands/<name>.md, agents/<name>.md (commands/evals/ is a dir)."""
+    home = root / KIND_DIR[kind]
+    if not home.is_dir():
+        return []
+    if kind == "skill":
+        return sorted(p.name for p in home.iterdir() if p.is_dir())
+    good = []
+    for p, why in _flat_files(root, kind):
+        if why:
+            print(f"skipped {KIND_DIR[kind]}/{p.name}: {why}", file=sys.stderr)
+        else:
+            good.append(p.stem)
+    return sorted(good)
+
+
+FLAT_SKIPS = {"invalid_name": "name is not kebab-case", "uncontained_path": "not a file inside its kind directory"}
+
+
+def _flat_files(root: Path, kind: str) -> list[tuple[Path, str | None]]:
+    """*.md files of a flat kind (README excluded) with the reason each is skipped, or None when usable."""
+    home = root / KIND_DIR[kind]
+    if not home.is_dir():
+        return []
+    out = []
+    for p in sorted(home.glob("*.md")):
+        if p.stem == "README":
+            continue
+        why = None if SKILL_NAME_RE.fullmatch(p.stem) else FLAT_SKIPS["invalid_name"]
+        if why is None and not artifact_exists(root, p.stem, kind):
+            why = FLAT_SKIPS["uncontained_path"]
+        out.append((p, why))
+    return out
+
+
+def list_artifacts(root: Path) -> list[dict]:
+    found = [
+        {"kind": k, "name": n, "path": f"skills/{n}" if k == "skill" else f"{KIND_DIR[k]}/{n}.md"}
+        for k in ("agent", "command", "skill") for n in artifact_names(root, k)
+    ]
+    kinds: dict[str, list[str]] = {}
+    for a in found:
+        kinds.setdefault(a["name"], []).append(a["kind"])
+    dupes = [f"{n} ({', '.join(k)})" for n, k in sorted(kinds.items()) if len(k) > 1]
+    if dupes:
+        raise ValueError("name used by more than one kind: " + "; ".join(dupes))
+    return found
+
+
+def flat_issues(root: Path, kind: str, name: str) -> list[tuple[str, str]]:
+    """Command: non-empty description. Agent: also name == file stem (docs/audit/artifact-specs.md)."""
+    # Stricter than the Claude Code docs (command description required, agent name == stem): plan 7 Task 1, verdict files are keyed by stem.
+    text = (root / KIND_DIR[kind] / f"{name}.md").read_text(encoding="utf-8")
+    fm = parse_frontmatter(text)
+    found = []
+
+    def plain(key: str) -> str:
+        """In an unquoted single-line YAML value ' #' starts a comment; quoted and block values keep '#'."""
+        val = fm.get(key, "")
+        raw = re.search(rf"^{key}:[ \t]*(\S?)", text, re.M)
+        if raw and raw.group(1) and raw.group(1) in "\"'|>":
+            return val.strip()
+        return re.sub(r"(^|\s)#.*$", "", val).strip()
+
+    if kind == "agent" and plain("name") != name:
+        found.append(("name_mismatch", f"frontmatter name {fm.get('name')!r} != file stem {name!r}"))
+    if not plain("description"):
+        found.append(("missing_description", "description absent or empty"))
+    return found
+
+
+def check_flat(root: Path, kind: str, names: list[str] | None, ignore: set[str]) -> dict:
+    codes = {v: k for k, v in FLAT_SKIPS.items()}
+    bad = [] if names else [(p.stem, codes[why]) for p, why in _flat_files(root, kind) if why]
+    names = names or artifact_names(root, kind)
+    for name in names:
+        if not SKILL_NAME_RE.fullmatch(name) or not artifact_exists(root, name, kind):
+            raise ValueError(f"invalid {kind} {name!r}: not a kebab-case file under {KIND_DIR[kind]}/")
+    result = [
+        {"name": n, "ok": c in ignore, "synced": False,
+         "issues": [{"code": c, "detail": FLAT_SKIPS[c], "ignored": c in ignore}]}
+        for n, c in bad
+    ]
+    for name in names:
+        issues = [{"code": c, "detail": d, "ignored": c in ignore} for c, d in flat_issues(root, kind, name)]
+        result.append({"name": name, "ok": all(i["ignored"] for i in issues), "synced": False, "issues": issues})
+    return {"skills": sorted(result, key=lambda r: r["name"])}
+
+
 # ---------- rubric ----------
 
 
@@ -320,6 +415,43 @@ def load_rubric(path: Path) -> dict:
                 raise ValueError(f"{cells[0]}: duplicated dimension row")
             maxes[cells[0]] = int(cells[2])
     return {"version": int(m1.group(1)), "spec_sha": m2.group(1), "max": maxes}
+
+
+PROFILE_BLOCK_RE = re.compile(r"\Aprofile_version: (\d+)\nsource_digest: ([0-9a-f]{64})\n\n")
+
+
+def check_profiles(root: Path) -> list[str]:
+    """Reasons the judge profiles do not match the pinned Claude Code sources."""
+    refs = judge_refs(root)
+    profiles = sorted((refs / "profiles").glob("*.md"))
+    if not profiles:
+        return []
+    pin = refs / "claude-code" / "SOURCE.json"
+    try:
+        digests = json.loads(pin.read_text())["digests"]
+        if not isinstance(digests, dict):
+            raise TypeError("digests is not an object")
+    except (OSError, ValueError, KeyError, TypeError, RecursionError) as e:
+        return [f"profiles exist but cannot read digests from {pin.relative_to(root)}: {e}"]
+    reasons = []
+    for p in profiles:
+        m = PROFILE_BLOCK_RE.match(p.read_text(encoding="utf-8"))
+        if not m:
+            reasons.append(f"{p.name}: front block must be 'profile_version: <int>', 'source_digest: <64 hex>' and a blank line")
+        elif m.group(2) != digests.get(p.stem):
+            reasons.append(f"{p.name}: source_digest {m.group(2)} != claude-code/SOURCE.json digest {digests.get(p.stem)}")
+    specs = root / "docs" / "audit" / "artifact-specs.md"
+    try:
+        head = specs.read_text(encoding="utf-8").splitlines()[2:4]
+    except OSError as e:
+        return reasons + [f"profiles exist but docs/audit/artifact-specs.md is unreadable: {e}"]
+    for kind, line in zip(("command", "agent"), head + [""] * (2 - len(head))):
+        m = re.fullmatch(kind + r"_digest: ([0-9a-f]{64})", line)
+        if not m:
+            reasons.append(f"artifact-specs.md line {3 + (kind == 'agent')}: expected '{kind}_digest: <64 hex>'")
+        elif m.group(1) != digests.get(kind):
+            reasons.append(f"artifact-specs.md {kind}_digest {m.group(1)} != claude-code/SOURCE.json digest {digests.get(kind)}")
+    return reasons
 
 
 def check_source_anchors(rubric_path: Path, ref_dir: Path) -> list[str]:
@@ -392,6 +524,7 @@ def rubric_check(root: Path, rubric: Path) -> list[str]:
     if r["spec_sha"] != sha:
         reasons.append(f"spec_sha {r['spec_sha']} != SOURCE.json sha {sha}")
     reasons.extend(check_source_anchors(rubric, root / "skills" / "skill-judge" / "references"))
+    reasons.extend(check_profiles(root))
     return reasons
 
 
@@ -684,7 +817,8 @@ def render_judge_prompt(root: Path, kind: str, artifacts: list[Path], judge: str
     )
     text = text.replace("{ROOT}/<path>", str(artifacts[0].resolve()))
     text = text.replace("{ROOT}", root_s).replace("{JUDGE}", judge).replace("{SKILLS}", names)
-    profile = (judge_refs(root) / "profiles" / f"{kind}.md").read_text(encoding="utf-8").rstrip("\n")
+    profile = (judge_refs(root) / "profiles" / f"{kind}.md").read_text(encoding="utf-8")
+    profile = PROFILE_BLOCK_RE.sub("", profile, count=1).rstrip("\n")
     return text.rstrip("\n") + "\n\n" + profile + "\n"
 
 
@@ -1093,7 +1227,7 @@ REQUIRED_ENTRY_KEYS = {"skill", "kind", "source", "ref"}
 OPTIONAL_ENTRY_KEYS = {"last_reviewed", "last_upstream_sha", "reviewed_for_model", "status", "new_path",
                        "artifact_kind"}
 REVIEW_STATUSES = {"current", "stale", "path-moved", "unreachable"}
-ARTIFACT_KINDS = {"skill", "command", "agent"}
+ARTIFACT_KINDS = set(KIND_DIR)
 DATE_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
 
 
@@ -1755,10 +1889,13 @@ def build_parser() -> argparse.ArgumentParser:
     c = sub.add_parser("check")
     c.add_argument("--strict", action="store_true")
     c.add_argument("--skills", type=csv, default=None)
+    c.add_argument("--kind", choices=sorted(ARTIFACT_KINDS), default="skill")
     c.add_argument("--ignore", type=csv, default=[])
-    c.add_argument("--allowlist", type=Path, default=None)
+    c.add_argument("--allowlist", type=Path, default=None, help="skill kind only; ignored for command/agent")
     c.add_argument("--validator-pin", type=Path, default=None,
-                   help="trusted SOURCE.json that selects the skills-ref validator (not the data root's)")
+                   help="trusted SOURCE.json that selects the skills-ref validator (not the data root's); skill kind only")
+    ar = sub.add_parser("artifacts", help="list skills, commands and agents as JSON")
+    ar.add_argument("--kind", choices=sorted(ARTIFACT_KINDS), default=None)
     r = sub.add_parser("rubric-check")
     r.add_argument("--rubric", type=Path, default=None)
     s = sub.add_parser("slug")
@@ -1868,18 +2005,26 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(row, indent=2))
         return code
     if args.cmd == "check":
-        if args.allowlist and not args.allowlist.is_file():
+        if args.kind == "skill" and args.allowlist and not args.allowlist.is_file():
             print(f"allowlist not found: {args.allowlist}", file=sys.stderr)
             return 1
         try:
             res = check_skills(root, args.skills, args.strict, set(args.ignore), args.allowlist,
-                               args.validator_pin)
+                               args.validator_pin, args.kind)
         except ValueError as e:
             print(e, file=sys.stderr)
             return 1
         print(json.dumps(res, indent=2))
         bad = any(not s["ok"] for s in res["skills"] if not s["synced"])
         return 1 if args.strict and bad else 0
+    if args.cmd == "artifacts":
+        try:
+            found = list_artifacts(root)
+        except ValueError as e:
+            print(f"artifacts: {e}", file=sys.stderr)
+            return 2
+        print(json.dumps([a for a in found if args.kind in (None, a["kind"])], indent=2))
+        return 0
     if args.cmd == "rubric-check":
         try:
             reasons = rubric_check(root, resolve_rubric(root, args.rubric))

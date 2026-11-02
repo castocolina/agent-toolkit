@@ -1,0 +1,104 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 7,
+    "D2": 8,
+    "D3": 5,
+    "D4": 9,
+    "D5": 15,
+    "D6": 10,
+    "D7": 1,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 64,
+  "max_total": 125,
+  "percent": 51.2,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": null,
+      "evidence": "commands/evals/ has no explain-changes-mental-model.json (only explain-pr-changes.json and a files/ directory exist)",
+      "fix": "Add commands/evals/explain-changes-mental-model.json. Include prompts for no argument, a short hash, HEAD~3, a branch name, a main..HEAD range, an empty diff, a diff over 5000 lines and 'custom'. Give each prompt verifiable assertions, such as 'output contains a Review Sequence section' and 'groups are ordered foundation before dependents'."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 54,
+      "evidence": "'Argument looks like a branch name (contains letters, no `..`)' conflicts with the usage example '/mental-model HEAD~3' (line 25) as a commit. 'HEAD~3' and 'custom' also match the branch rule, and a hex-looking branch name such as 'deadbeef' matches the commit rule. The routing is ambiguous and the order of checks is not stated.",
+      "fix": "State an ordered check. First 'custom'. Then contains '..'. Then `git rev-parse --verify <arg>^{commit}` for any revision, including HEAD~N, which is shown with `git show`. Treat everything else as a branch, and verify it exists before diffing."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 21,
+      "evidence": "Usage block invokes '/mental-model', but the file is explain-changes-mental-model.md, so the slash command is /explain-changes-mental-model",
+      "fix": "Use the real command name in the Usage examples."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 2,
+      "evidence": "description: Build a mental model of changes by splitting them into smaller logical chunks",
+      "fix": "description: Explain a large diff, commit, branch or range as an ordered mental model: logical change groups, dependencies, review sequence and gotchas. Use when the user wants to understand, review or onboard onto changes (\"walk me through this PR/diff\", \"what does this branch do\"), or has a diff too big to read linearly. Not for writing commit messages or code review verdicts."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 10,
+      "evidence": "'What This Command Does' restates the steps below; Step 3 asks to group by 'Purpose / Layer / Feature area / Type'; the JWT Example Output explains JWT, middleware and token refresh",
+      "fix": "Delete 'What This Command Does', the generic categorisation lists and most of the example. Keep the output template, the dependency ordering rule, the large-diff handling and the argument routing."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 128,
+      "evidence": "Important Notes are generic advice: 'Be honest about complexity', 'Highlight the \"aha moments\"', 'Skip trivial changes'. There is no NEVER list with reasons.",
+      "fix": "Add specific NEVERs with reasons. For example: never narrate the diff file by file, because that is what the diff already does. Never invent intent the diff or commit messages do not support; mark it as inferred. Never reorder away from dependency order just to group by directory. Say what to do with generated, lock and rename-only files."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 97,
+      "evidence": "The fully prescribed output template is fine, but the grouping step gives no default for how many groups or how large. The large-diff threshold says '>5000 lines' and then 'selectively read the most important files' with no criteria.",
+      "fix": "Give a default group count, such as 3-7 groups. Give criteria for 'most important' files, such as the highest churn per `--stat` and the files that define types or interfaces."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 78,
+      "evidence": "The dependency-graph step lists generic layers (types before implementation before integration before tests) with little thinking framework for ambiguous or cyclic dependencies.",
+      "fix": "Add a decision rule for changes that do not fit the layering: cycles, cross-cutting renames, and refactors mixed with feature work. Ask 'what would a reviewer need to know before reading this group?'"
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "skill": "cal-d",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 2,
+    "D2": 1,
+    "D3": 4,
+    "D4": 3,
+    "D5": 4,
+    "D6": 3,
+    "D7": 3,
+    "D8": 2
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 22,
+  "max_total": 125,
+  "percent": 17.6,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 12,
+      "evidence": "A unit test is a small piece of code that checks that another piece of code works. A test suite is a collection of tests.",
+      "fix": "Delete the Background section. The model already knows what unit tests, mocking and coverage are."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 19,
+      "evidence": "Create a file named `test_something.py`. Import the module. Write a function that starts with `test_`.",
+      "fix": "Delete the pytest tutorial. Replace it with project-specific facts the model lacks, such as fixtures, test markers, slow suites and how flaky tests are handled."
+    },
+    {
+      "id": "D1-3",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 35,
+      "evidence": "14 near-identical '### <area> tests' subsections, each repeating 'Repeat the arrange, act and assert pattern for every <area> test you write.'",
+      "fix": "Collapse them into one rule: 'Name tests test_<area>_<behavior> and put them in tests/<area>/'. Then list the valid areas on one line."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 23,
+      "evidence": "Instructions are generic ('Be careful', 'Do your best') and give no domain sequence or expert reasoning.",
+      "fix": "Write an ordered process: reproduce the failure, then find the root cause (code or test), then fix it, then rerun the affected tests, then rerun the full suite before reporting. Add a 'before you edit a test, ask whether the test or the code is wrong' check."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 32,
+      "evidence": "5. Be careful, think about edge cases and write good tests.",
+      "fix": "Replace this line with a NEVER list that gives reasons. For example: NEVER delete or skip a failing test to make the suite pass, because that hides regressions. NEVER weaken an assertion to match buggy output."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 2,
+      "evidence": "Frontmatter has `name: cal-d` but no `description`, so the agent cannot be routed to.",
+      "fix": "description: Writes, fixes and runs Python tests (pytest) for this repository. Use when the user asks to add tests, fix a failing or flaky test, raise coverage, or check that a change did not break anything, even if they do not say 'pytest'. Follows the test_<area>_<behavior> naming under tests/<area>/. Not for CI pipeline configuration or for load and performance testing."
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "agents/cal-d.md",
+      "line": 3,
+      "evidence": "permissionMode: bypassPermissions",
+      "fix": "Remove permissionMode. The host ignores it for plugin agents."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 35,
+      "evidence": "The file is about 231 lines, over 200. The naming reference is repetitive bulk, and nothing is split out or preloaded through `skills:`.",
+      "fix": "Shrink the naming reference to a single rule, or move it to a skill and preload it with `skills:`. Keep the body under 200 lines."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 30,
+      "evidence": "4. Fix the code or the test, whichever is easier. Delete tests that get in the way.",
+      "fix": "Give low freedom for this destructive action. Never delete or rewrite an existing test without stating why the test is wrong and getting user confirmation. By default, fix the code under test."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 33,
+      "evidence": "6. Do your best and make sure everything works. The body states neither a done-sentence nor an output format.",
+      "fix": "Add: 'You are done when the affected tests and the full suite pass. Report the files changed, the tests added or modified, and the pass/fail counts as a short bullet list.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 25,
+      "evidence": "1. Always run the whole test suite before you change anything. / 2. Never run the whole test suite, because it is slow",
+      "fix": "Resolve the contradiction with one rule. For example: run only the changed test file while iterating, and run the full suite once before finishing."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 28,
+      "evidence": "3. If a test fails, follow the steps in the section \"Recovery\" and then go on to step 12. The failure branch cannot be completed because there is no Recovery section and no step 12.",
+      "fix": "Add a Recovery section with concrete steps, or inline them. Point to a step that exists."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 45,
+      "evidence": "result = run_unit_case() \u2014 the examples call undefined placeholder functions and have no arrange step, so they cannot run.",
+      "fix": "Replace them with one working example that imports a real module, arranges inputs and asserts on a concrete value."
+    }
+  ]
+}

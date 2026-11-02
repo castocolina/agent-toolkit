@@ -1,0 +1,58 @@
+{
+  "skill_name": "cal-a",
+  "subject": "commands/cal-a.md",
+  "evals": [
+    {
+      "id": "default-range-squash-repo",
+      "prompt": "Scenario: no arguments. `git describe --tags --abbrev=0 --match 'v[0-9]*' HEAD` prints `v1.4.0` (it matches the stable-version regex), and `git rev-parse HEAD` differs from `git rev-parse v1.4.0^{commit}`. `git log --first-parent --format='%h%x09%s%x09%b' v1.4.0..HEAD` prints these three lines: `a1b2c3d<TAB>feat(report): add CSV export (#230)`, `b2c3d4e<TAB>fix(config): handle an empty config file (#241)`, `c3d4e5f<TAB>docs: fix typo in README`. The BREAKING CHANGE grep prints nothing. You cannot run commands. Show the exact git commands you would run and the final output.",
+      "assertions": [
+        "The range command uses `git describe --tags --abbrev=0` with a `v[0-9]*` match, ends with HEAD, and the result is checked against an anchored stable-version regex",
+        "The log command contains `--first-parent` and does not contain `--no-merges`",
+        "The output has a Features section containing the CSV export line with (#230)",
+        "The output has a Fixes section containing the empty config file line with (#241)",
+        "The docs commit appears only in a single Internal line with a count, not as its own bullet",
+        "No Breaking changes section is printed and no `git tag`, `git push` or file write is made",
+        "The header says `Unreleased` because no `to` argument was given"
+      ]
+    },
+    {
+      "id": "empty-range",
+      "prompt": "Scenario: no arguments. The last tag is `v2.0.0` and `git log --first-parent --format='%h%x09%s' v2.0.0..HEAD` prints nothing, and the tag does not point at HEAD. You cannot run commands. Show the commands you run and the final output.",
+      "assertions": [
+        "The command stops with the text `No commits in v2.0.0..HEAD.`",
+        "No section headings are printed",
+        "No `git tag`, `git push` or file write is made"
+      ]
+    },
+    {
+      "id": "shallow-clone-no-tags",
+      "prompt": "Scenario: no arguments, in a CI checkout. `git describe --tags --abbrev=0 --match 'v[0-9]*' HEAD` fails with `fatal: No names found, cannot describe anything.` and `git rev-parse --is-shallow-repository` prints `true`. You cannot run commands. Show the commands you run in order and the final reply.",
+      "assertions": [
+        "`git rev-parse --is-shallow-repository` is checked after the describe failure",
+        "No `git fetch` or other command that changes the repository runs",
+        "The reply asks the user for a start ref that is available locally and prints no release notes",
+        "The notes are not labelled `First release`"
+      ]
+    },
+    {
+      "id": "first-release-merge-subjects",
+      "prompt": "Scenario: no arguments, a full (not shallow) clone. `git describe --tags --abbrev=0 --match 'v[0-9]*' HEAD` fails with `fatal: No tags can describe 'HEAD'.` and `git rev-parse --is-shallow-repository` prints `false`. `git log --first-parent --format='%h%x09%s%x09%b' HEAD` prints: `aaaaaaa<TAB>Merge pull request #7 from dev/csv<TAB>feat: add CSV export` and `bbbbbbb<TAB>fix: handle empty config (#8)<TAB>`. The BREAKING CHANGE grep prints nothing. You cannot run commands. Show the log command and the final output.",
+      "assertions": [
+        "The log command has no `<from>..` prefix and ends with HEAD",
+        "The header says `First release`",
+        "The CSV export entry is worded from the PR title `feat: add CSV export` with (#7), not from `Merge pull request`",
+        "The empty config fix is listed under Fixes with (#8)"
+      ]
+    },
+    {
+      "id": "revert-pair-and-breaking-footer",
+      "prompt": "Scenario: arguments `v3.1.0 v3.2.0`. `git log --first-parent --format='%h%x09%s' v3.1.0..v3.2.0` prints: `1111111<TAB>feat(auth): add SSO login (#310)`, `2222222<TAB>Revert \"feat(auth): add SSO login\"`, `3333333<TAB>refactor(api): drop the v1 routes (#322)`, `4444444<TAB>fix(db): retry on deadlock (#325)`. The BREAKING CHANGE grep prints `3333333`. Show the final output only.",
+      "assertions": [
+        "Neither the SSO login commit nor its revert appears in the output",
+        "The v1 routes change is listed under Breaking changes, because of the footer",
+        "The deadlock retry is listed under Fixes with (#325)",
+        "The header names the range v3.1.0..v3.2.0"
+      ]
+    }
+  ]
+}

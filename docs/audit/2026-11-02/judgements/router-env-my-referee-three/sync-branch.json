@@ -1,0 +1,104 @@
+{
+  "skill": "sync-branch",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 4,
+    "D2": 4,
+    "D3": 2,
+    "D4": 9,
+    "D5": 15,
+    "D6": 8,
+    "D7": 1,
+    "D8": 6
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 49,
+  "max_total": 125,
+  "percent": 39.2,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 6,
+      "evidence": "Fetch latest upstream refs: `git fetch origin --prune`. ... Rebase current branch onto target ... Force-with-lease push",
+      "fix": "Drop the standard fetch/rebase/push tutorial, which the model already knows. Keep only project-specific facts: the remote and base-branch convention, whether the repo prefers merge over rebase for shared branches, protected-branch rules, and required checks after the rebase."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 8,
+      "evidence": "3. Rebase current branch onto target",
+      "fix": "Add decision points before acting: check that the tree is clean (stash or abort if not), check whether others have pushed to the branch (prefer merge if so), and refuse to run when the current branch is the target. Then give the ordered steps."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 13,
+      "evidence": "5. Force-with-lease push to update the PR",
+      "fix": "Add a Gotchas/NEVER list. NEVER use plain --force, because it overwrites collaborators' commits. NEVER rebase while on main or the target branch. --force-with-lease without an explicit expected ref can still clobber work after a background fetch, so pass --force-with-lease=<branch>:<sha-before-rebase>."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 2,
+      "evidence": "description: Sync feature branch with the latest main branch.",
+      "fix": "Rebase the current feature branch onto the latest origin/main (or a target branch given as the argument), resolve conflicts, and force-with-lease push to update the PR. Use when the user says the branch is behind main, the PR is out of date, there are merge conflicts with main, or asks to update/rebase/sync the branch. Not for merging a PR or creating a new branch."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 12,
+      "evidence": "4. Resolve any conflicts",
+      "fix": "The rebase and force push are high-risk, so give exact low-freedom steps here: list the conflicting files with `git status`, resolve them, `git add` the files, run `git rebase --continue`, run the project's tests, and show the user `git log --oneline origin/<target>..HEAD` before pushing."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": null,
+      "evidence": "commands/evals/sync-branch.json does not exist",
+      "fix": "Add commands/evals/sync-branch.json with realistic prompts (a casual 'my PR is behind main', an explicit target argument, and edge cases for a dirty tree and rebase conflicts), each with verifiable assertions such as 'uses --force-with-lease, never --force' and 'runs git rebase --abort on unresolvable conflict'."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 10,
+      "evidence": "git rebase origin/${target:-main}",
+      "fix": "Nothing sets `$target`, so the argument override never takes effect and the branch always resolves to main. Bind it to the command argument instead, for example `target=\"${ARGUMENTS:-main}\"`, before the rebase."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 12,
+      "evidence": "4. Resolve any conflicts",
+      "fix": "Add a fallback for when conflicts cannot be resolved: run `git rebase --abort` and report the conflicting files to the user. Also handle a dirty working tree before step 3, and a detached HEAD, where `git branch --show-current` is empty and the push on line 15 would fail."
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "skill": "ascii-ui-mockup-generator",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 4,
+    "D2": 7,
+    "D3": 0,
+    "D4": 3,
+    "D5": 15,
+    "D6": 12,
+    "D7": 8,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 60,
+  "max_total": 125,
+  "percent": 48.0,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "critical",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 3,
+      "evidence": "The unquoted description contains 'Examples: <example>Context: User'. These colon-space sequences are invalid inside a YAML plain scalar, so the frontmatter does not parse and the host skips the agent.",
+      "fix": "description: >-\n  Create and compare low-fidelity ASCII UI wireframes for dashboards, forms,\n  tables, navigation, and responsive layouts before implementation. Use when\n  a user wants to visualize a screen, explore layout options, or revise a\n  text-based mockup, even without explicitly requesting ASCII. Not for coding\n  the interface or producing polished graphical designs."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 12,
+      "evidence": "'Break down the user's idea into core components, data relationships, layout constraints, and functional elements.' The body is dominated by familiar requirements analysis, rationale, selection, and implementation advice; its concrete output instructions provide activation rather than expert knowledge.",
+      "fix": "Compress the generic analysis, rationale, and implementation bullets into a short task contract. Replace the saved space with actual project conventions: supported viewport budgets, component and state notation, and approved layout patterns with their data-density trade-offs."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 14,
+      "evidence": "'Create 3-5 distinct ASCII mockup variations that explore different approaches to the same concept' specifies an outcome but provides no method for making alternatives meaningfully different or comparing them.",
+      "fix": "Add a decision sequence: identify the primary user task, rank information by frequency and importance, identify the dominant layout trade-off, generate alternatives that vary that trade-off, and compare all alternatives against the same task and density criteria."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "high",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 39,
+      "evidence": "'Focus on clarity, consistency, and practical applicability' supplies general aspirations, but the body has no concrete anti-patterns, reasons, or rendering gotchas.",
+      "fix": "Add a short Gotchas/NEVER section: never use tabs because tab stops can shift borders; never present diagrams outside fenced text blocks because rendering can collapse spacing; never mix variable-width Unicode glyphs into an ASCII-only diagram because displayed alignment can differ across viewers."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 14,
+      "evidence": "'Create 3-5 distinct ASCII mockup variations' is unconditional, including when a user requests one mockup or a focused revision of an existing choice.",
+      "fix": "Default to three alternatives for open-ended exploration, honor an explicitly requested count, and produce one focused revision when the user has already chosen a layout."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": null,
+      "evidence": "No accompanying output eval was found for this agent; agents/ contains only Markdown agent definitions.",
+      "fix": "Add agents/evals/ascii-ui-mockup-generator.json with realistic dashboard and contact-form prompts plus an underspecified or narrow-screen case. Include expected outputs and verifiable assertions for required components, ASCII alignment, option counts, and selection or handoff behavior."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 10,
+      "evidence": "'When given a UI concept with data shapes and display requirements' assumes complete inputs. The dashboard and form examples reach the ordinary mockup-and-selection path, but the branch where data shapes or viewport constraints are missing has no stated fallback.",
+      "fix": "Define the incomplete-input branch: state reasonable assumptions and use labeled sample data when details are nonblocking; ask a focused clarification when a missing constraint would change the layout. Specify a default character-width budget and a reflow fallback when required content does not fit."
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "skill": "sync-skills-readme",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 10,
+    "D2": 11,
+    "D3": 8,
+    "D4": 10,
+    "D5": 15,
+    "D6": 15,
+    "D7": 0,
+    "D8": 8
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 77,
+  "max_total": 125,
+  "percent": 61.6,
+  "grade": "D",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 13,
+      "evidence": "'Use Bash to list all skill directories' introduces an ls tutorial; step 2 explains reading ordinary YAML frontmatter, and 'Tools to Use' repeats native tool capabilities. These generic instructions substantially dilute the repository-specific taxonomy and table conventions.",
+      "fix": "Collapse scanning and metadata extraction into one instruction to enumerate skills/*/SKILL.md and parse their frontmatter. Remove the repeated tool-capability list while retaining repository-specific formatting, categorization and editing constraints."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 116,
+      "evidence": "'Skills added/updated: [list if any changes detected]' requires a change summary, but the ordered workflow never captures the existing inventory or reconciles it against the discovered skills before replacement.",
+      "fix": "Add a pre-edit reconciliation phase that compares existing table rows with the valid source inventory, records added, removed, changed and skipped entries, and carries that recorded delta into the final report."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 139,
+      "evidence": "'DO NOT use Grep - Read files directly for accurate frontmatter parsing' provides a limited rationale, while the other prohibitions primarily protect edit scope. There are no environment-specific gotchas explaining metadata and Markdown-table hazards.",
+      "fix": "Add concise gotchas with reasons: parse folded and multiline YAML descriptions before shortening them; escape pipes and normalize newlines because they can split table cells; derive link paths from discovered directories rather than assuming every frontmatter name is a valid directory path."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 2,
+      "evidence": "'Sync root README.md with current skills inventory from skills/ directory' states WHAT and relevant paths, but leaves WHEN implicit and does not distinguish inventory synchronization from per-skill README maintenance.",
+      "fix": "Sync only the root README.md Available Skills table from skills/*/SKILL.md metadata. Use when skills are added, removed or renamed, their descriptions change, or the skills inventory is stale. Not for editing individual skill READMEs or synchronizing agents and commands."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "commands/evals/sync-skills-readme.json",
+      "line": null,
+      "evidence": "Reading commands/evals/sync-skills-readme.json returned ENOENT; the required command eval file does not exist.",
+      "fix": "Add commands/evals/sync-skills-readme.json with realistic prompts and fixture inventories covering ordinary additions/removals, overlapping categories, missing metadata and a missing README section. Assert exact inventory coverage, source-grounded descriptions, valid links and preservation of content outside the table."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/sync-skills-readme.md",
+      "line": 59,
+      "evidence": "'Assign to the first matching category' searches both names and entire descriptions. Following this rule for qa-test-planner matches 'design' in 'Figma design-validation checklists', selecting Design & Frontend before Testing despite the skill's primary QA purpose.",
+      "fix": "Classify by the skill's primary deliverable before considering incidental description keywords. Add explicit overrides for ambiguous skills, use token-aware matching for short keywords, and exclude negative-scope text from matching. Include a worked QA example that resolves to Testing."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/sync-skills-readme.md",
+      "line": 89,
+      "evidence": "The shortening example transforms 'Use when the user asks to run Codex CLI for code analysis, refactoring, or automated editing' into 'Advanced code analysis with GPT-5.2'. The input does not establish that model version or the added capability claim.",
+      "fix": "Replace the example output with 'Code analysis, refactoring & editing' and explicitly require shortened descriptions to preserve source-supported meaning without adding model versions, context limits or capabilities."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 108,
+      "evidence": "'After updating README.md, report to the user' proceeds directly to 'README.md updated successfully' without a post-edit validation step; the Success Criteria section does not require checking those criteria or retrying on failure.",
+      "fix": "Before reporting success, re-read the table, compare its rows and counts against the valid source inventory, verify links and formatting, and inspect the diff to confirm that only table content changed. Correct failures and repeat validation; report a blocker instead of success if validation cannot pass."
+    }
+  ]
+}

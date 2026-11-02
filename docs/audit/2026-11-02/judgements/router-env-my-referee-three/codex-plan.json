@@ -1,0 +1,104 @@
+{
+  "skill": "codex-plan",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 8,
+    "D2": 7,
+    "D3": 3,
+    "D4": 9,
+    "D5": 6,
+    "D6": 9,
+    "D7": 1,
+    "D8": 7
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 50,
+  "max_total": 125,
+  "percent": 40.0,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "commands/codex-plan.md",
+      "line": null,
+      "evidence": "commands/evals/ has no codex-plan.json (only explain-pr-changes.json and its fixtures)",
+      "fix": "Add commands/evals/codex-plan.json with 3 or more realistic prompts, for example a vague 'help me implement auth', a precise request with a stack named, and an edge case where the user answers none of the questions. Give each verifiable assertions: AskUser is called with 3-6 questions, prompt_to_codex.md is written, the prompt contains a 'Files to Read for Context' section and a 'do NOT ask questions' instruction, codex is not executed, and the agent stops after showing the command."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 13,
+      "evidence": "Intro says '4. Execute Codex to generate and save the plan' and 'Always uses: gpt-5.2-codex', but Step 5 (line 125) and line 305 say 'do NOT execute'. The flow also numbers 'Step 7' (line 308) after a task flow whose own step 7 (line 306) is the stop, and says 'Your job is DONE after step 6' (line 319).",
+      "fix": "Rewrite the intro goal 4 as 'Save the prompt for the user to run manually'. Keep one ordered list of steps 1-7 and delete the duplicate 'Your Task Flow' and 'Step 7' sections. Fix the 'after step 6' reference."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 33,
+      "evidence": "'Use AskUser to ask 3-6 targeted clarifying questions' and 'Always ask clarifying questions first - Don't skip this step', with no branch for empty $ARGUMENTS, a user who declines or skips the questions, a request that is already fully specified, or an unavailable AskUser tool.",
+      "fix": "Add edge-case rules. If $ARGUMENTS is empty, ask what to plan. If the request is already specific, ask only the questions that remain. If the user declines, record the assumptions in the prompt and continue. If AskUser is unavailable, ask in plain chat."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 149,
+      "evidence": "The file is 319 lines with nothing split out. About 130 lines (149-280) are an auth example that embeds the full plan template.",
+      "fix": "Move the plan template and the auth example to a file such as commands/codex-plan/plan-template.md. Load it at Step 4 ('read it when crafting the prompt'). Keep the command body under 200 lines."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 37,
+      "evidence": "Four sets of generic question patterns ('What authentication methods do you need?', 'REST or GraphQL?', 'Expected scale/traffic?'), plus 'Good clarifying questions: Narrow down scope...'",
+      "fix": "Cut the per-domain lists to one short example. The model already knows what to ask when planning auth, an API or testing. Keep only the non-obvious parts: the Codex prompt must be self-contained, include file references, and forbid questions."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 284,
+      "evidence": "Important Notes: '- Always ask clarifying questions first', '- Tell Codex not to ask questions - It should just execute'. These are bare directives with no reasons and no failure modes.",
+      "fix": "Add a short Gotchas or NEVER list with reasons. For example: NEVER run codex yourself, because the user wants to review the prompt and exec runs with --full-auto. NEVER leave out the no-questions instruction, because 'codex exec' is non-interactive and would hang or produce an empty plan. NEVER give vague file references, because Codex has no conversation context."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 2,
+      "evidence": "description: Create a detailed implementation plan using Codex 5.2 with high reasoning",
+      "fix": "description: Interview the user with clarifying questions, then write a self-contained prompt_to_codex.md that a gpt-5.2-codex (high reasoning) run turns into a phased, test-first implementation plan in codex-plan.md. Use when the user runs /codex-plan or wants a Codex-generated plan for a feature, migration, API or refactor. It saves the prompt and prints the codex exec command; it does not run Codex."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 132,
+      "evidence": "Bash comments are in Portuguese ('Executa automaticamente sem intera\u00e7\u00e3o humana', 'Quando o Codex terminar, me envie...') and the rest of the file is in English. 'allowed-tools' lists Bash even though the command never runs anything.",
+      "fix": "Use one language for the comments and the wait message, or tell the agent to answer in the user's language. Drop Bash from allowed-tools, or state that it is for reading files only."
+    }
+  ]
+}

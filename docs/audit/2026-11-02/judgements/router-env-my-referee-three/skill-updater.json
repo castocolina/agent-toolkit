@@ -1,0 +1,95 @@
+{
+  "skill": "skill-updater",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 36,
+      "evidence": "Step 8 says \"`ours_updated` reads `git log` on those two paths only and ignores `README.md`, `evals/` and `scripts/`\". The step 3 table row (line 23) already says \"`git log` covers only those two paths, so a README, eval or script commit does not count\".",
+      "fix": "Keep the full explanation in one place, the step 3 table row. Shorten step 8 to: \"Judge the artifact with `skill-judge` when its content changed; the commit must touch `SKILL.md` or `references/` (see step 3).\""
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 50,
+      "evidence": "\"Write one short prompt that should elicit the behavior: the task the rule guards, without the skill loaded.\" The skill gives no guidance on how to write a prompt that actually provokes the behavior, or how to read an ambiguous output.",
+      "fix": "Add a short heuristic. Use the rule's own trigger task, phrased as a user would ask it, long enough for the habit to appear (for example a 150-word prose answer for an em dash rule). Count the behavior as present when it appears at least once."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 24,
+      "evidence": "\"still failing: `unreachable`, never relocate\". The same \"never relocate\" appears on line 23 with no reason given. The NEVER items in the procedure tables are not explained, so an agent may treat a repo-level 404 as a moved path.",
+      "fix": "Add a Gotchas bullet that gives the reason. Example: \"Never run a tree search or record `path-moved` on an auth, rate-limit or repo-level error: the tree query fails the same way, and a wrong `new_path` silently redirects every future `upstreams` run.\""
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/skill-updater/evals/evals.json",
+      "line": 6,
+      "evidence": "The registry-moved-path expected_output gives \"track --registry docs/audit/upstream-sources.json --status path-moved --new-path skills/writing\". It has no --artifact, --source or --sha, but SKILL.md step 5 requires `path-moved --new-path <candidate> --sha <sha>` and step 7 requires --artifact and --source.",
+      "fix": "Make the expected track command complete: --artifact writing-clearly-and-concisely --source joshuadavidthomas/agent-skills:writing --status path-moved --new-path skills/writing --sha <sha from the commits query>. Add a sha to the fixture, and add an assertion that the command includes --sha."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/skill-updater/evals/evals.json",
+      "line": null,
+      "evidence": "No output eval covers the `invalid entry:` branch, the `no local commit for source material` branch or a `kind: unversioned` source. Every eval prompt uses precise, formal phrasing; none is casual.",
+      "fix": "Add an eval for the `no local commit` error, where the agent must stop and must not commit to make the row pass. Add an eval for an unversioned blog-post row that expects `current` with no --sha. Rephrase one existing prompt casually, for example \"hey is humanizer still up to date?\"."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 15,
+      "evidence": "\"Only a skill can have source rows; commands and agents have none, so go to step 6\". If a skill has zero rows in the registry, step 7 makes \"One call per source row\", which is zero calls, and the source-less call is only for `--artifact-kind command|agent`. The model probe result for that skill is never recorded.",
+      "fix": "Add a branch to step 2: \"A skill with no rows: run step 6, then record with the source-less `track --artifact NAME --status current --model MODEL` (or say in updates.md that the skill has no registry row and propose one).\""
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 26,
+      "evidence": "\"`stale: true`: read both versions, decide `adopt`, `adapt` or `ignore` per upstream change\". The step does not say which two versions to compare or how to fetch them. The upstreams row has `merge_base` and `source_updated`, but neither is mentioned here.",
+      "fix": "Spell out how to get the diff. Example: \"Diff the upstream path from `merge_base` to `ref`: `gh api 'repos/<o>/<r>/compare/<merge_base>...<ref>' --jq '.files[] | select(.filename | startswith(\"<path>\")) | .patch'`. Classify each hunk.\""
+    }
+  ]
+}

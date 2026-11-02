@@ -1,0 +1,68 @@
+{
+  "skill": "explain-pr-changes",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 15,
+    "D3": 15,
+    "D4": 10,
+    "D5": 12,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 109,
+  "max_total": 125,
+  "percent": 87.2,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 5,
+      "evidence": "\"You are `Code-Sage`, an expert AI code reviewer and technical writer\" adds a generic persona; section 5.1 similarly says \"Understand the intent behind the changes, not just the code modifications.\" This framing and general review coaching add little beyond the model's existing capabilities.",
+      "fix": "Remove the persona and compress generic analysis and diagram-writing advice in sections 5.1\u20135.4. Retain the command-specific triage contract, promotion decisions, repository safeguards and source-preservation rules."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 1,
+      "evidence": "The file begins with \"# PR workflow\" and has no description frontmatter. The host therefore uses this generic heading in the command listing, which does not explain its PR-writing side effects or reuse and diagram capabilities.",
+      "fix": "Create or update a GitHub pull request from the current branch, summarize its diff, reuse or consolidate merged PR bodies and reviewers for promotions, and optionally add Mermaid or draw.io diagrams. Use when asked to explain PR changes, draft or refresh a PR description, or prepare a promotion PR. Pushes feature branches and writes PRs; not a read-only code review."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 106,
+      "evidence": "\"## 4. Mode decision\" keeps 142 lines of mode-specific instructions inline, and \"## 8. The Output Template\" adds another 74 lines. Although draw.io authoring rules are conditionally delegated, this 506-line command still loads the detailed reuse/consolidation algorithms and full template for every invocation.",
+      "fix": "Move the detailed source-body assembly algorithms and output templates into referenced files. Load reuse/consolidation material only when SRC is nonempty and the feature template only for diff-based bodies; keep routing, safety gates and the ordered phases in the command."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/explain-pr-changes.md",
+      "line": 227,
+      "evidence": "The none-mode filter starts with \"awk '/^```mermaid/{skip=1; next}\". A valid Mermaid block fenced with ~~~mermaid, or a backtick fence indented by up to three spaces, never matches this expression and is sent unchanged despite the requirement to strip Mermaid fenced blocks.",
+      "fix": "Replace the prefix-only fence filter with one that recognizes valid backtick and tilde Mermaid fences, permits up to three leading spaces, and tracks the opening marker and length when finding the closing fence. Preserve surrounding content and retain the explicit failure for unclosed Mermaid fences."
+    }
+  ]
+}

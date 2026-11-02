@@ -1,0 +1,122 @@
+{
+  "skill": "codebase-pattern-finder",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 4,
+    "D2": 6,
+    "D3": 6,
+    "D4": 13,
+    "D5": 10,
+    "D6": 12,
+    "D7": 8,
+    "D8": 7
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 66,
+  "max_total": 125,
+  "percent": 52.8,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 50,
+      "evidence": "'You can use your handy dandy `Grep`, `Glob`, and `LS` tools to to find what you're looking for! You know how it's done!' restates native file-search capabilities. The line-weighted body is dominated by generic responsibilities, search instructions, pagination examples and standard pattern categories rather than expert-only knowledge.",
+      "fix": "Remove native-tool reminders and generic engineering taxonomies. Replace them with verified repository conventions and non-obvious discovery heuristics, such as how to distinguish active implementations from generated code, fixtures and compatibility layers."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 42,
+      "evidence": "'First, think deeply about what patterns the user is seeking and which categories to search' introduces a search/read/extract process, but supplies no criteria for deciding whether a superficially similar hit is a relevant implementation precedent.",
+      "fix": "Add a relevance procedure: identify the requested behavior and runtime layer, inspect candidate implementation boundaries and call sites, check associated tests, then group examples by observed structural differences without ranking their quality."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 209,
+      "evidence": "'What NOT to Do' includes 'Don't include overly complex examples' and 'Don't show patterns without context', but the prohibitions provide no failure mechanisms or environment-specific gotchas.",
+      "fix": "Add reasoned discovery pitfalls: do not present mocks or generated stubs as production precedent because keyword matches can resemble real integrations; label their source role. Do not combine excerpts from different implementations into one attributed snippet because the cited source would not contain it. Include verified repository-specific traps when available."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 3,
+      "evidence": "The description promises 'existing patterns that can be modeled after' and distinguishes the agent from a locator, but does not expose its important no-review, no-ranking boundary; those restrictions appear only after delegation.",
+      "fix": "Find existing implementation patterns and usage or test examples in a codebase. Use when asked to find a precedent, show how this repository implements a feature, or provide concrete source examples for similar work, even when the request does not mention patterns. Return source excerpts with file:line references and observed variations. For discovery and documentation, not code review, root-cause analysis, ranking approaches, or implementation changes; use a locator when only file locations are needed."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 58,
+      "evidence": "'## Output Format' begins a 112-line inline example section. The complete agent is 227 lines with nothing split into referenced material, exceeding this repository's 200-line convention for self-contained agents.",
+      "fix": "Replace the long inline example with a compact template covering pattern name, source location, verbatim excerpt, usage and tests. Move optional worked examples into a referenced file with an explicit loading condition, or shorten the agent below 200 lines."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 201,
+      "evidence": "'Show working code - Not just snippets' imposes a full-code requirement even when a small source excerpt would completely answer a read-only pattern-discovery request.",
+      "fix": "Default to the smallest verbatim excerpt that preserves the relevant context. Include a full handler or module only when dependencies or control flow would otherwise be unclear, and let the request determine the useful number of examples."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": null,
+      "evidence": "No companion output-eval file for codebase-pattern-finder was found in the supplied repository; agents/ contains only agent Markdown files.",
+      "fix": "Add output evals for a realistic similar-implementation request, multiple existing variations, and a no-match or deprecated-only case. Assert accurate source citations, verbatim excerpts, correctly attributed tests, neutral descriptions and an explicit outcome when no verified precedent exists."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 36,
+      "evidence": "'Note which approach is preferred' directly conflicts with line 15's 'DO NOT recommend which pattern is \"better\" or \"preferred\"'. The output template also evaluates cursor pagination as 'More efficient for large datasets'.",
+      "fix": "Remove the instruction to identify a preferred approach and remove unsupported comparative claims from the template. Report preferences only when explicitly documented in repository sources, with citations and without adding an independent recommendation."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 53,
+      "evidence": "The workflow proceeds from 'Search!' to 'Read files with promising patterns'. Following the zero-match branch leaves no next step or terminal report, and there is no stated outcome when implementation matches exist but test examples do not.",
+      "fix": "Add a bounded fallback: broaden terminology and inspect relevant call sites or structural equivalents, then report the searched scope and that no verified match was found. Explicitly report missing test examples rather than forcing every output-template section to contain an example."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 111,
+      "evidence": "The cursor example reads limit directly from req.query and computes 'take: limit + 1'. Tracing ?limit=20 produces the string '201', not the intended numeric 21. The offset example likewise passes an unparsed query-string limit to the database call.",
+      "fix": "Convert and validate page and limit as bounded positive integers before pagination arithmetic and database calls. Use the numeric values consistently, and ensure an example with an explicit ?limit=20 returns no more than 20 records."
+    }
+  ]
+}

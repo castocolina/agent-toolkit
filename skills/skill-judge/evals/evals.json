@@ -92,7 +92,7 @@
     {
       "id": "casual",
       "prompt": "is my skill any good? it's in evals/files/doc-helper/SKILL.md.txt, no idea what to fix first",
-      "expected_output": "A short readable summary for doc-helper with percent, grade and the top three findings (description first), ending in one fenced json block.",
+      "expected_output": "A short readable summary for doc-helper with percent, grade and the top three findings, ending in one fenced json block.",
       "files": [
         "references/rubric.md",
         "references/agentskills/specification.md",
@@ -106,7 +106,8 @@
         "Output is a readable summary followed by exactly one fenced json block, not a bare JSON line",
         "The summary names a percent and a grade",
         "A D4 finding quotes the vague description and proposes replacement text",
-        "The fenced json has `judge` set to `direct`"
+        "The fenced json has `judge` set to `direct`",
+        "The summary findings follow the contract order (points lost, then severity, then tie-break)"
       ]
     },
     {
@@ -215,8 +216,8 @@
     },
     {
       "id": "judge-agent",
-      "prompt": "The prompt judges an agent. Judge the agent file evals/files/triage-agent.md with judge slug test; print only the verdict line. Load references/profiles/agent.md for this judgment (the protocol says to load a profile only when the prompt judges a command or agent). Set skill to the file stem. A missing eval file for an agent is a medium finding, never high.",
-      "expected_output": "One verdict JSON line whose skill is triage-agent. name and description are present, so D4 is not critical. A missing eval file is medium, never high.",
+      "prompt": "The prompt judges two agents. Judge evals/files/triage-agent.md and then evals/files/vague-agent.md, each with judge slug test; print only the two verdict lines, triage-agent first. Load references/profiles/agent.md for this judgment (the protocol says to load a profile only when the prompt judges a command or agent). Set skill to the file stem. Agents have no eval location: a missing eval file is never a finding.",
+      "expected_output": "Two verdict JSON lines, skill triage-agent then vague-agent. triage-agent states when the task is done and its output format, so it gets no D7 finding and D7 is 15. vague-agent has no sentence stating when the task is done, so it gets one medium D7 finding and D7 is at most 8. No finding says an eval file is missing.",
       "files": [
         "references/rubric.md",
         "references/profiles/agent.md",
@@ -225,14 +226,17 @@
         "references/agentskills/evaluating-skills.md",
         "references/agentskills/optimizing-descriptions.md",
         "references/agentskills/using-scripts.md",
-        "evals/files/triage-agent.md"
+        "evals/files/triage-agent.md",
+        "evals/files/vague-agent.md"
       ],
       "assertions": [
-        "Output is exactly one line holding one JSON object",
-        "`skill` equals `triage-agent` and `judge` equals `test`",
-        "No finding says name or description is missing",
-        "No finding about a missing eval file has severity high or critical",
-        "D5 is not scored down for being under 200 lines with no references",
+        "Output is exactly two lines, each holding one JSON object",
+        "The first line has `skill` equal to `triage-agent`, the second `vague-agent`, and `judge` equals `test` on both",
+        "The triage-agent verdict has no finding with dimension D7 and its D7 score is 15",
+        "The vague-agent verdict has exactly one D7 finding, with severity medium, that says the done-condition is missing",
+        "The vague-agent D7 score is at most 8",
+        "No finding on either agent is about a missing eval file, missing trigger queries or a missing script test",
+        "No finding says name or description is missing, and D5 is not scored down for being under 200 lines with no references",
         "The response does not say it loaded references/profiles/command.md"
       ]
     }

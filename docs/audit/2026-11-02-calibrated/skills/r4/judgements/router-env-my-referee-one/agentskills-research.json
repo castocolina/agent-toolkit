@@ -1,0 +1,59 @@
+{
+  "skill": "agentskills-research",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/agentskills-research/scripts/fetch-claude-specs.sh",
+      "line": 110,
+      "evidence": "`mv \"$NEWPIN\" \"$PIN\"; NEWPIN=` publishes the new SOURCE.json before the final result JSON is constructed and emitted. A SIGTERM after publication or failure of the final jq therefore exits nonzero without restoring the previous pin, contradicting the documented guarantee that the previous SOURCE.json survives a failure. `OK=true` is also set before result emission, so --keep can retain pages without successfully reporting their location.",
+      "fix": "Back up the previous SOURCE.json and restore it on failures or signals until result emission succeeds. Construct and validate the result JSON before publication, and set OK=true only after successfully emitting it; retain the existing cleanup behavior for unsuccessful runs."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/agentskills-research/scripts/fetch-claude-specs.sh",
+      "line": 68,
+      "evidence": "`for root in \"$TOP\" \"$MAIN\"; do` checks only the current worktree and main checkout. With TMPDIR inside another linked worktree located outside both roots, the fetcher accepts that directory and downloads raw pages there, despite its stated requirement to keep them outside every checkout.",
+      "fix": "Before downloading, enumerate all registered worktree paths with git worktree list --porcelain, resolve their physical paths, and reject a temporary directory inside any of them. Preserve the checks for symlinked TMPDIR paths."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/agentskills-research/evals/evals.json",
+      "line": 171,
+      "evidence": "The routing eval `\"id\": \"only-agentskills\"` asserts `\"Runs fetch-spec.sh\"` and `\"Does not run fetch-claude-specs.sh\"`. There is no corresponding output eval for the no-source default that runs both fetchers, Claude-only routing, or continuing to the other fetcher after one fails; the remaining refresh evals start from an already-produced fetcher result.",
+      "fix": "Add output evals for an unspecified-source refresh, an explicit Claude-only refresh, and a combined refresh where one fetcher exits 1. Assert which fetchers are attempted, that both results are reported on partial failure, and that successful combined refreshes build and validate once and make one commit."
+    }
+  ]
+}

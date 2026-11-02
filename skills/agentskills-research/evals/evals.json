@@ -102,6 +102,131 @@
         "Does not run build_plugins.py before the references match SOURCE.json",
         "Does not use git checkout as the default restore"
       ]
+    },
+    {
+      "id": "claude-rule-change",
+      "prompt": "I ran fetch-claude-specs.sh --keep; its output is in fetch-claude-changed.json. The kept sub-agents page excerpt is sub-agents-new-rule.md and the current agent rows and provenance header of artifact-specs.md are in artifact-specs-agent-rows.md. What do you do next?",
+      "files": [
+        "evals/files/fetch-claude-changed.json",
+        "evals/files/sub-agents-new-rule.md",
+        "evals/files/artifact-specs-agent-rows.md"
+      ],
+      "assertions": [
+        "Treats the new timeoutSeconds field as a rule change",
+        "Compares the kept page with the field table in artifact-specs.md, not with an old copy of the page",
+        "Edits the agent profile, not the command profile",
+        "Sets source_digest and the provenance header to the agent digest from the fetcher output",
+        "Bumps profile_version from 3 to 4",
+        "Finishes by running audit.py rubric-check and expecting exit 0"
+      ],
+      "expected_output": "Compares the kept page with the field table in artifact-specs.md (no old page is kept), finds the new timeoutSeconds field as a rule change, adds the row, updates D4 (and D5/D7 if affected) of the agent profile, sets source_digest to the agent digest, updates the provenance header, bumps profile_version from 3 to 4, deletes the kept directory, builds, and ends with rubric-check (exit 0)."
+    },
+    {
+      "id": "claude-editorial",
+      "prompt": "I ran fetch-claude-specs.sh --keep; its output is in fetch-claude-changed.json. The kept sub-agents page excerpt is sub-agents-new-editorial.md and the current agent rows and provenance header of artifact-specs.md are in artifact-specs-agent-rows.md. What do you do next?",
+      "files": [
+        "evals/files/fetch-claude-changed.json",
+        "evals/files/sub-agents-new-editorial.md",
+        "evals/files/artifact-specs-agent-rows.md"
+      ],
+      "assertions": [
+        "Classifies the change as editorial because the fields and values are the same",
+        "Updates source_digest and the provenance header",
+        "Does not edit any field row or profile rule",
+        "Does not bump profile_version"
+      ],
+      "expected_output": "Finds the excerpt reworded with the same fields and values (editorial); updates only source_digest and the provenance header of artifact-specs.md; no rule row edit and no profile_version bump (stays 3); builds and ends with rubric-check (exit 0)."
+    },
+    {
+      "id": "claude-unchanged",
+      "prompt": "I ran fetch-claude-specs.sh --keep; its output is in fetch-claude-unchanged.json. What do you do next?",
+      "files": [
+        "evals/files/fetch-claude-unchanged.json"
+      ],
+      "assertions": [
+        "Reports that the Claude Code specs are unchanged",
+        "Edits no profile, no artifact-specs.md and no SOURCE.json",
+        "Deletes the kept directory"
+      ],
+      "expected_output": "Reports that the Claude Code specs are unchanged and edits nothing."
+    },
+    {
+      "id": "claude-stale-only",
+      "prompt": "I ran fetch-claude-specs.sh --keep; its output is in fetch-claude-stale-only.json. An earlier refresh was interrupted. The kept sub-agents page excerpt is sub-agents-new-editorial.md and the current agent rows and provenance header of artifact-specs.md are in artifact-specs-agent-rows.md. What do you do next?",
+      "files": [
+        "evals/files/fetch-claude-stale-only.json",
+        "evals/files/sub-agents-new-editorial.md",
+        "evals/files/artifact-specs-agent-rows.md"
+      ],
+      "assertions": [
+        "Does not stop at unchanged because profiles_stale is not empty",
+        "Compares the kept sub-agents page with the agent rows of artifact-specs.md before moving any digest",
+        "Finding the excerpt editorial, sets the agent profile source_digest (line 2) and the agent_digest header line to the agent digest in the output",
+        "Leaves the command profile alone and does not bump profile_version",
+        "Deletes the kept directory"
+      ],
+      "expected_output": "Does not return early although changed is empty: compares the kept sub-agents page against the artifact-specs.md agent rows, finds only editorial rewording, then sets the agent profile source_digest and the agent_digest header line to the fetched agent digest; no profile_version bump; deletes kept; builds and ends with rubric-check (exit 0)."
+    },
+    {
+      "id": "only-agentskills",
+      "prompt": "refresh only the Agent Skills spec",
+      "files": [],
+      "assertions": [
+        "Runs fetch-spec.sh",
+        "Does not run fetch-claude-specs.sh"
+      ],
+      "expected_output": "Runs fetch-spec.sh alone and follows the Agent Skills workflow; does not run fetch-claude-specs.sh."
+    },
+    {
+      "id": "attribution-kept",
+      "prompt": "After a refresh I want to save space in the references and artifact-specs.md by trimming the credit and CC-BY license lines. Fine?",
+      "files": [],
+      "assertions": [
+        "Refuses to remove or shorten credit, upstream link or license lines",
+        "Names the CC-BY-4.0 attribution of the agentskills docs as one that must stay",
+        "Names rule 5 of judge-prompt.md as one that must stay"
+      ],
+      "expected_output": "Refuses: attribution, credits, upstream links and license lines are never removed or shortened; the agentskills docs are CC-BY-4.0 and keep their attribution and the SOURCE.json license, and judge-prompt.md rule 5 stays."
+    },
+    {
+      "id": "unspecified-source-both",
+      "prompt": "refresh the specs the judge uses. For reference, the fetchers' outputs are in fetch-unchanged.json (fetch-spec.sh) and fetch-claude-unchanged.json (fetch-claude-specs.sh --keep). What do you do next?",
+      "files": [
+        "evals/files/fetch-unchanged.json",
+        "evals/files/fetch-claude-unchanged.json"
+      ],
+      "assertions": [
+        "Treats the request as naming no source and runs both fetch-spec.sh and fetch-claude-specs.sh",
+        "Reports both sources as unchanged",
+        "Edits nothing and makes no commit"
+      ],
+      "expected_output": "No source is named, so both fetchers run; reports 'spec unchanged at bbbb...' and 'Claude Code specs unchanged'; deletes the kept directory; edits nothing."
+    },
+    {
+      "id": "claude-only-explicit",
+      "prompt": "refresh only the Claude Code docs the judge pins (sub-agents, skills, plugins-reference). The fetcher output is in fetch-claude-unchanged.json. What do you do next?",
+      "files": [
+        "evals/files/fetch-claude-unchanged.json"
+      ],
+      "assertions": [
+        "Runs only fetch-claude-specs.sh and does not run fetch-spec.sh",
+        "Reports 'Claude Code specs unchanged' and edits nothing"
+      ],
+      "expected_output": "Only fetch-claude-specs.sh is run (never fetch-spec.sh); reports Claude Code specs unchanged and stops."
+    },
+    {
+      "id": "combined-one-fails",
+      "prompt": "refresh all the specs. fetch-spec.sh exited 1; its stderr is in fetch-recovery-failed.stderr.txt. fetch-claude-specs.sh --keep succeeded; its output is in fetch-claude-unchanged.json. What do you do next?",
+      "files": [
+        "evals/files/fetch-recovery-failed.stderr.txt",
+        "evals/files/fetch-claude-unchanged.json"
+      ],
+      "assertions": [
+        "Attempted both fetchers and does not skip the second one because the first failed",
+        "Reports both results: the fetch-spec.sh failure with its stderr and the Claude Code specs as unchanged",
+        "Leaves the failed source's references and rubric untouched and does not commit for it"
+      ],
+      "expected_output": "Both fetchers were attempted; reports the fetch-spec.sh failure (references untouched, nothing built or committed for it) and 'Claude Code specs unchanged'."
     }
   ]
 }

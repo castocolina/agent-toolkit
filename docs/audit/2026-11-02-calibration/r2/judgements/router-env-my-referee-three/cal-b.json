@@ -1,0 +1,131 @@
+{
+  "skill": "cal-b",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 2,
+    "D2": 2,
+    "D3": 3,
+    "D4": 6,
+    "D5": 4,
+    "D6": 2,
+    "D7": 8,
+    "D8": 3
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 30,
+  "max_total": 125,
+  "percent": 24.0,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 9,
+      "evidence": "## What is a release / ## How to use git: \"A release is a version of the software that is given to users... Always write clean code and good commit messages.\"",
+      "fix": "Delete both sections. They define releases, tags, semver and basic git, which the model already knows. Keep only repo-specific release rules."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 42,
+      "evidence": "The Commit type reference (lines 42-174) and the five near-identical example outputs (lines 176-226) are about 185 of 226 lines. They are placeholder text (\"example of a feat commit\", \"First change in 1.0.0\") and restate the standard Conventional Commits types.",
+      "fix": "Remove the 11 commit-type blocks. Replace the five release examples with one template that shows the real notes format."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 23,
+      "evidence": "Steps are generic (tag, push, write notes). There are no domain decisions, no ordering rationale and no verification before the irreversible push.",
+      "fix": "Use an ordered procedure: verify CI is green, check the tag does not exist, draft the notes, get user approval, then tag and push. Give the reason for each ordering."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 36,
+      "evidence": "\"Be careful and consider edge cases.\" is the only warning. It is generic and has no specifics or reasons.",
+      "fix": "Replace it with specific NEVER items that each give a reason. For example: never force-push or delete tags/branches without user confirmation, because published tags are consumed downstream."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 1,
+      "evidence": "The frontmatter has no `description`. The host falls back to the first body line, \"# Release helper\".",
+      "fix": "Add `description: Create and push a git release tag v<version> and draft three-sentence release notes from commit messages. Use when the user asks to cut, tag or publish a release.`"
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/cal-b.md",
+      "line": 2,
+      "evidence": "`name: cal-b` and `tags: git, release` are not accepted command fields.",
+      "fix": "Remove `name` and `tags`. The command name is the file name. Put any keywords in `description` or `metadata`."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 42,
+      "evidence": "The file is 226 lines and nothing is split out. The commit reference and example outputs make up most of it.",
+      "fix": "Delete the bulky reference and example material, or move it to a separate file loaded only when needed. Bring the command to 200 lines or fewer."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 34,
+      "evidence": "\"Clean up old tags and branches as needed. Use force if something is in the way, and fix whatever is broken.\" This is high freedom on a destructive, hard-to-reverse operation.",
+      "fix": "Remove the instruction. Give exact commands and say to stop and ask the user before any delete or force operation."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "commands/evals/cal-b.json",
+      "line": null,
+      "evidence": "There is one scenario (release-1-2-0, the main path). It has no failure path and no edge case.",
+      "fix": "Add a failure-path scenario, e.g. the tag already exists or CI is red, with assertions that the command stops or branches correctly. Add an edge-case scenario, e.g. no version argument or push before approval, with verifiable assertions."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 25,
+      "evidence": "Step 1 says \"make sure they pass, but do not run the tests\". Step 2 pushes the branch and tag, but step 4 says \"Never push anything before the release notes are approved\". Step 5 sends the reader to a section \"Existing tag\" that does not exist, then to \"step 9\", but the list ends at step 7.",
+      "fix": "Resolve the contradictions. Put approval before any push. Say how to check CI. Add an \"Existing tag\" section or an inline fallback, such as stopping and asking the user. Fix the step reference."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 38,
+      "evidence": "\"## Output\\n\\nPrint the notes.\" The Output section gives no format. The `$1` missing-argument case is not handled.",
+      "fix": "State the output format as one template. Say what to do when no version is given, e.g. ask the user."
+    }
+  ]
+}

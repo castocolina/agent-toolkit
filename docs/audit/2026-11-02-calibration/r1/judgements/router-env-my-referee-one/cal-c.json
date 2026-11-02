@@ -1,0 +1,86 @@
+{
+  "skill": "cal-c",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 10,
+    "D2": 11,
+    "D3": 11,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 8
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 100,
+  "max_total": 125,
+  "percent": 80.0,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 16,
+      "evidence": "\"Test: an assertion failure\" and \"Build: a compile, type or lint error\" explain familiar categories. Much of the procedure similarly repeats standard first-error and context-reading advice rather than adding expert CI knowledge.",
+      "fix": "Condense the familiar taxonomy and generic triage reminders, preserving the required diagnostic fields. Add concrete log-analysis discriminants, such as mapping a wrapper's exit error back to the failing command within its job and step."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 14,
+      "evidence": "\"Classify the failure, and take the first class that fits\" makes category priority the selection method without requiring confirmation that the selected condition caused the failed step.",
+      "fix": "Treat the class order as a hypothesis-investigation order. For each candidate, require evidence connecting it to the failed command and distinguishing the cause from downstream symptoms before selecting the diagnosis."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 25,
+      "evidence": "\"NEVER propose a code change\" and \"NEVER quote more than 10 lines of log\" establish scope and formatting limits, but the Rules section lacks CI-specific gotchas with explanations beyond the false-flake warning.",
+      "fix": "Add a short Gotchas section explaining that cache-restore failures can be recoverable and that diagnostic text printed by expected-failure tests can resemble real errors. Require checking the enclosing step's outcome before treating either as causal."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/cal-c.md",
+      "line": 18,
+      "evidence": "\"Flake: the same job passed on an earlier line of the log, or the failure is a timeout in a test that does not depend on the change.\" An unrelated timeout can be persistent, and an earlier pass may involve different inputs; neither necessarily establishes nondeterminism.",
+      "fix": "Require a pass and failure under the same revision and materially equivalent configuration, or explicit evidence of a transient condition, before diagnosing a flake. Otherwise report the observed timeout or failure with qualified confidence rather than declaring it flaky."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/cal-c.md",
+      "line": 19,
+      "evidence": "\"If the line does not exist, the log is from a different revision; say so and stop.\" Missing source locations can also result from generated files, dependency paths, source mappings or an incomplete checkout.",
+      "fix": "Verify the run's commit against the checkout before asserting a revision mismatch. If verification is unavailable, state that source correlation could not be confirmed and retain only the diagnosis supported by the log."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 34,
+      "evidence": "\"**Class:** Environment | Test | Build | Flake\" provides no inconclusive outcome. The instruction to report a truncated log without guessing therefore cannot always satisfy the required template; a complete log with no recognized failure also has no fallback.",
+      "fix": "Allow an Inconclusive class and define its template values: describe the missing evidence, cite the last available step or line when possible, and set confidence to low. Explicitly use this outcome for truncated logs, unreadable inputs and logs without a recognizable failure."
+    }
+  ]
+}

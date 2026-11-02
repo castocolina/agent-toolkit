@@ -1113,6 +1113,74 @@ class RubricTests(Base):
         self.assertEqual(code, 1)
         self.assertIn("D3", err)
 
+    DIGESTS = {"command": "c" * 64, "agent": "d" * 64}
+
+    def specs_text(self, command=None, agent=None):
+        return ("# Artifact specs\n\n"
+                f"command_digest: {command or self.DIGESTS['command']}\n"
+                f"agent_digest: {agent or self.DIGESTS['agent']}\n")
+
+    def write_profiles(self, digests=None, pin=True, specs=True):
+        digests = digests or self.DIGESTS
+        if specs is True:
+            specs = self.specs_text()
+        if specs:
+            self.write("docs/audit/artifact-specs.md", specs)
+        for kind, d in self.DIGESTS.items():
+            self.write(f"skills/skill-judge/references/profiles/{kind}.md",
+                       f"profile_version: 1\nsource_digest: {d}\n\n# {kind}\n")
+        if pin:
+            self.write("skills/skill-judge/references/claude-code/SOURCE.json", json.dumps({"digests": digests}))
+
+    def test_rubric_check_accepts_matching_profiles(self):
+        self.write_profiles()
+        self.assertEqual(self.run_rubric(), (0, ""))
+
+    def test_rubric_check_rejects_profile_digest_mismatch(self):
+        self.write_profiles(digests={"command": "e" * 64, "agent": "d" * 64})
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn("command.md", err)
+        self.assertNotIn("agent.md", err)
+
+    def test_rubric_check_rejects_profile_without_front_block(self):
+        self.write_profiles()
+        self.write("skills/skill-judge/references/profiles/agent.md", "# agent\n")
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn("agent.md", err)
+
+    def test_rubric_check_rejects_profiles_without_pin(self):
+        self.write_profiles(pin=False)
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn("claude-code/SOURCE.json", err)
+
+    def test_rubric_check_rejects_missing_artifact_specs(self):
+        self.write_profiles(specs=False)
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn("artifact-specs.md", err)
+
+    def test_rubric_check_rejects_specs_digest_mismatch(self):
+        self.write_profiles(specs=self.specs_text(agent="e" * 64))
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn("agent_digest", err)
+        self.assertNotIn("command_digest", err)
+
+    def test_rubric_check_rejects_missing_or_malformed_specs_digest(self):
+        for text in ("# t\n\nagent_digest: " + "d" * 64 + "\n",
+                     self.specs_text().replace("command_digest: " + "c" * 64, "command_digest: nothex")):
+            self.write_profiles(specs=text)
+            code, err = self.run_rubric()
+            self.assertEqual(code, 1)
+            self.assertIn("command_digest", err)
+
+    def test_rubric_check_ignores_specs_without_profiles(self):
+        self.write("docs/audit/artifact-specs.md", "no header\n")
+        self.assertEqual(self.run_rubric(), (0, ""))
+
     def set_rubric_source(self, source):
         rows = "\n".join(f"| D{i} | n | {m} | {source if i == 1 else 's'} |"
                           for i, m in enumerate([20, 15, 15, 15, 15, 15, 15, 15], 1))
@@ -3063,6 +3131,22 @@ class JudgePromptTests(Base):
                 code = e.code if isinstance(e.code, int) else 2
         return code, out.getvalue(), err.getvalue()
 
+    def test_judge_prompt_strips_profile_front_block(self):
+        self.write("skills/skill-judge/references/profiles/agent.md",
+                   f"profile_version: 1\nsource_digest: {'d' * 64}\n\n# agent profile\n\nPROFILE-AGENT-MARKER\n")
+        code, out, err = self.prompt("--kind", "agent", "--artifact", str(self.agent), "--judge", "lane-a")
+        self.assertEqual((code, err), (0, ""))
+        self.assertNotIn("profile_version:", out)
+        self.assertNotIn("source_digest:", out)
+        self.assertTrue(out.endswith("# agent profile\n\nPROFILE-AGENT-MARKER\n"))
+
+    def test_judge_prompt_keeps_matching_example_in_headerless_profile(self):
+        body = f"# agent profile\n\nprofile_version: 1\nsource_digest: {'d' * 64}\n\nEXAMPLE\n"
+        self.write("skills/skill-judge/references/profiles/agent.md", body)
+        code, out, err = self.prompt("--kind", "agent", "--artifact", str(self.agent), "--judge", "lane-a")
+        self.assertEqual((code, err), (0, ""))
+        self.assertTrue(out.endswith(body))
+
     def test_judge_prompt_default_kind_matches_golden_file(self):
         skill = self.write("skills/pdf-form-filler/SKILL.md", "---\nname: pdf-form-filler\n---\n")
         golden = fill_judge_prompt(self.template, str(self.root.resolve()), "lane-a", "pdf-form-filler")
@@ -3149,6 +3233,177 @@ class CommandAgentMergeTests(MergeTests):
         self.assertEqual([s["name"] for s in merged["skills"]], ["explain-pr-changes", "general-purpose"])
         merge = next(a for a in audit.build_parser()._actions if isinstance(a, argparse._SubParsersAction)).choices["merge"]
         self.assertNotIn("kind", {action.dest for action in merge._actions})
+
+
+class ArtifactListTests(Base):
+    def setUp(self):
+        super().setUp()
+        shutil.rmtree(self.root / "skills" / "skill-judge")
+
+    def run_cli(self, *argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = audit.main(["--root", str(self.root), *argv])
+        return code, out.getvalue(), err.getvalue()
+
+    def tree(self):
+        self.skill("s1")
+        self.write("commands/b.md", "---\ndescription: d\n---\n")
+        self.write("commands/a.md", "---\ndescription: d\n---\n")
+        self.write("commands/evals/x.json", "{}")
+        self.write("agents/g.md", "---\nname: g\ndescription: d\n---\n")
+
+    def test_lists_four_sorted(self):
+        self.tree()
+        code, out, _ = self.run_cli("artifacts")
+        self.assertEqual(code, 0)
+        self.assertEqual([(a["kind"], a["name"]) for a in json.loads(out)],
+                         [("agent", "g"), ("command", "a"), ("command", "b"), ("skill", "s1")])
+        self.assertEqual(json.loads(out)[1]["path"], "commands/a.md")
+
+    def test_kind_filters(self):
+        self.tree()
+        _, out, _ = self.run_cli("artifacts", "--kind", "agent")
+        self.assertEqual([(a["kind"], a["name"]) for a in json.loads(out)], [("agent", "g")])
+
+    def test_stray_non_markdown_is_ignored(self):
+        self.tree()
+        self.write("commands/notes.txt", "n")
+        self.assertEqual(len(json.loads(self.run_cli("artifacts")[1])), 4)
+
+    def test_missing_agents_dir_is_fine(self):
+        self.skill("s1")
+        code, out, _ = self.run_cli("artifacts", "--kind", "agent")
+        self.assertEqual((code, json.loads(out)), (0, []))
+
+    def test_name_under_two_kinds_exits_2(self):
+        self.skill("x")
+        self.write("commands/x.md", "---\ndescription: d\n---\n")
+        code, out, err = self.run_cli("artifacts")
+        self.assertEqual((code, out), (2, ""))
+        self.assertIn("x", err)
+
+    def check_kind(self, kind, name, *extra):
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = audit.main(["--root", str(self.root), "check", "--kind", kind, "--skills", name, *extra])
+        return code, json.loads(out.getvalue())["skills"][0]
+
+    def test_check_command_valid(self):
+        self.write("commands/c.md", "---\ndescription: does a thing\n---\nbody\n")
+        code, res = self.check_kind("command", "c", "--strict")
+        self.assertEqual((code, res["ok"], res["synced"], res["issues"]), (0, True, False, []))
+
+    def test_check_command_without_description(self):
+        self.write("commands/c.md", "---\ndescription:\n---\nbody\n")
+        code, res = self.check_kind("command", "c", "--strict")
+        self.assertEqual((code, [i["code"] for i in res["issues"]]), (1, ["missing_description"]))
+
+    def test_check_agent_valid_with_folded_description(self):
+        self.write("agents/a.md", "---\nname: a\ndescription:\n  folded\n  text\n---\n")
+        self.assertEqual(self.check_kind("agent", "a")[1]["issues"], [])
+
+    def test_check_agent_name_mismatch_and_no_description(self):
+        self.write("agents/a.md", "---\nname: other\n---\n")
+        _, res = self.check_kind("agent", "a")
+        self.assertEqual([i["code"] for i in res["issues"]], ["name_mismatch", "missing_description"])
+
+    def test_check_unknown_command_is_rejected(self):
+        with self.assertRaises(ValueError):
+            audit.check_skills(self.root, ["nope"], kind="command")
+
+    def test_stray_readme_is_neither_listed_nor_breaks_check(self):
+        self.write("commands/ok.md", "---\ndescription: d\n---\n")
+        self.write("commands/README.md", "# readme\n")
+        names = [x["name"] for x in json.loads(self.run_cli("artifacts", "--kind", "command")[1])]
+        self.assertEqual(names, ["ok"])
+        code, out, _ = self.run_cli("check", "--kind", "command")
+        self.assertEqual((code, [x["name"] for x in json.loads(out)["skills"]]), (0, ["ok"]))
+
+    def test_flat_symlink_outside_the_repo_is_neither_listed_nor_checked(self):
+        # Break: a commands/ or agents/ symlink to a file outside the repo is enumerated and validated.
+        outside = Path(tempfile.mkdtemp()) / "x.md"
+        outside.write_text("---\nname: c\ndescription: x\n---\n")
+        self.addCleanup(shutil.rmtree, outside.parent)
+        for kind, home in (("command", "commands"), ("agent", "agents")):
+            (self.root / home).mkdir(exist_ok=True)
+            (self.root / home / "c.md").symlink_to(outside)
+            self.assertEqual(audit.artifact_names(self.root, kind), [])
+            with self.assertRaises(ValueError):
+                audit.check_flat(self.root, kind, ["c"], set())
+
+    def test_flat_yaml_comments(self):
+        # Break: 'name: a # x' mismatches the stem, or 'description: # TODO' counts as a description.
+        self.write("agents/a.md", "---\nname: a # the agent\ndescription: d\n---\n")
+        self.assertEqual(audit.flat_issues(self.root, "agent", "a"), [])
+        self.write("commands/c.md", "---\ndescription: # TODO\n---\n")
+        self.assertEqual([c for c, _ in audit.flat_issues(self.root, "command", "c")], ["missing_description"])
+
+    def test_flat_uncontained_symlink_fails_strict_check(self):
+        # Break: a commands/ symlink to a file outside the repo is dropped silently and --strict passes.
+        outside = Path(tempfile.mkdtemp()) / "x.md"
+        outside.write_text("---\ndescription: x\n---\n")
+        self.addCleanup(shutil.rmtree, outside.parent)
+        self.write("commands/ok.md", "---\ndescription: d\n---\n")
+        (self.root / "commands" / "c.md").symlink_to(outside)
+        code, out, err = self.run_cli("check", "--kind", "command", "--strict")
+        self.assertEqual(code, 1)
+        self.assertEqual([(x["name"], [i["code"] for i in x["issues"]]) for x in json.loads(out)["skills"]],
+                         [("c", ["uncontained_path"]), ("ok", [])])  # sorted by name
+        self.assertIn("commands/c.md", self.run_cli("artifacts", "--kind", "command")[2])
+
+    def test_flat_quoted_and_block_values_keep_hash(self):
+        # Break: '#' inside a quoted or block value is stripped as a YAML comment.
+        self.write("commands/q.md", '---\ndescription: "# Heading helper"\n---\n')
+        self.assertEqual(audit.flat_issues(self.root, "command", "q"), [])
+        self.write("agents/a.md", "---\nname: 'a #x'\ndescription: d\n---\n")
+        self.assertEqual([c for c, _ in audit.flat_issues(self.root, "agent", "a")], ["name_mismatch"])
+
+    def test_non_kebab_markdown_is_noted_unlisted_and_fails_check(self):
+        # Break: a commands/Bad_Name.md vanishes silently from check --strict.
+        self.write("commands/ok.md", "---\ndescription: d\n---\n")
+        self.write("commands/Bad_Name.md", "---\ndescription: d\n---\n")
+        code, out, err = self.run_cli("artifacts", "--kind", "command")
+        self.assertEqual([x["name"] for x in json.loads(out)], ["ok"])
+        self.assertIn("Bad_Name.md", err)
+        code, out, _ = self.run_cli("check", "--kind", "command", "--strict")
+        res = {x["name"]: x for x in json.loads(out)["skills"]}
+        self.assertEqual(code, 1)
+        self.assertEqual(res["Bad_Name"]["issues"][0]["code"], "invalid_name")
+
+    def test_unknown_kind_is_rejected(self):
+        with self.assertRaises(ValueError):
+            audit.check_skills(self.root, kind="plugin")
+
+    def test_cli_rejects_path_traversal_for_command(self):
+        self.tree()
+        code, out, err = self.run_cli("check", "--kind", "command", "--skills", "../agents/g")
+        self.assertEqual((code, out), (1, ""))
+        self.assertIn("invalid command", err)
+
+    def test_check_agent_enumerates_without_skills(self):
+        self.tree()
+        code, out, _ = self.run_cli("check", "--kind", "agent")
+        self.assertEqual((code, [x["name"] for x in json.loads(out)["skills"]]), (0, ["g"]))
+
+    def test_ignore_makes_command_ok(self):
+        self.write("commands/c.md", "---\ndescription:\n---\n")
+        _, res = self.check_kind("command", "c", "--ignore", "missing_description")
+        self.assertTrue(res["ok"])
+
+    def test_strict_fails_invalid_agent(self):
+        self.write("agents/a.md", "---\nname: other\ndescription: d\n---\n")
+        self.assertEqual(self.check_kind("agent", "a", "--strict")[0], 1)
+
+    def test_artifact_paths(self):
+        self.tree()
+        paths = {a["name"]: a["path"] for a in json.loads(self.run_cli("artifacts")[1])}
+        self.assertEqual((paths["s1"], paths["g"]), ("skills/s1", "agents/g.md"))
+
+    def test_skill_and_agent_name_clash_exits_2(self):
+        self.skill("g")
+        self.write("agents/g.md", "---\nname: g\ndescription: d\n---\n")
+        self.assertEqual(self.run_cli("artifacts")[0], 2)
 
 
 if __name__ == "__main__":

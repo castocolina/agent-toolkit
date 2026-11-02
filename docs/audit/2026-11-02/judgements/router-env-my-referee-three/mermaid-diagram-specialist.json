@@ -1,0 +1,131 @@
+{
+  "skill": "mermaid-diagram-specialist",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 4,
+    "D2": 6,
+    "D3": 1,
+    "D4": 7,
+    "D5": 4,
+    "D6": 9,
+    "D7": 2,
+    "D8": 8
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 41,
+  "max_total": 125,
+  "percent": 32.8,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 105,
+      "evidence": "\"**Node Shapes:** - `[Rectangle]` - Process step ... **Direction Options:** `TD` - Top to Down\" plus Cardinality Symbols, Relationship Types and a Step 2-7 syntax tutorial for each diagram type",
+      "fix": "Delete the syntax tutorials the model already knows (node shapes, directions, cardinality symbols, basic sequence/ERD/state syntax). Keep only the non-obvious parts: pitfalls, version quirks, and the project conventions (Hospeda entities, brand colors)."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 22,
+      "evidence": "\"## When to Use This Skill\", \"## Prerequisites\", \"## Overview\" and generic \"## Best Practices\" such as \"Simplicity: Keep diagrams focused and uncluttered\"",
+      "fix": "Remove the generic best-practice, overview and prerequisite sections. They state nothing the model lacks."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "high",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": null,
+      "evidence": "There is no NEVER list or Gotchas section. The only warnings are generic: \"Test rendering in target platform before committing\" and \"Keep under 20 nodes\".",
+      "fix": "Add a Gotchas/NEVER list with reasons. Examples: a node id of lowercase `end` breaks flowcharts; unquoted special characters in labels break parsing; C4 diagrams render inconsistently on GitHub; every Rel() target must be declared."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 4,
+      "evidence": "description: \"Mermaid diagram specialist for creating flowcharts, sequence diagrams, ERDs, and architecture visualizations\". The WHEN text sits in the unknown field `usage`.",
+      "fix": "Replace the description with: \"Create and fix Mermaid diagrams in markdown: flowcharts, sequence diagrams, ERDs, C4 architecture, state machines, class diagrams, Gantt charts. Use when the user asks to visualize a workflow, data model, API flow or system architecture, or to document design in a README or docs, even if they do not name Mermaid. Not for image-based diagram tools (Figma, draw.io) or for charts built from raw data files.\" Move `usage` into it."
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 3,
+      "evidence": "Frontmatter has the unrecognised fields `category`, `usage`, `input` and `output`",
+      "fix": "Remove these fields. The host ignores them. Fold anything useful into the description or body. Optionally add `tools` and `model`."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "high",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": null,
+      "evidence": "The agent file is about 560 lines with every example inline (full Hospeda ERD, three C4 levels, two state diagrams) and nothing split out",
+      "fix": "Cut the file to under 200 lines. Move the long examples (full ERD, C4, booking state machine) to reference files that the body loads per diagram type, or drop them."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": null,
+      "evidence": "No eval file exists for this agent",
+      "fix": "Add evals with 3 realistic prompts, such as an ERD from a schema description, a sequence diagram of an auth flow, and a malformed-diagram repair. Give each verifiable assertions, such as \"output contains a ```mermaid block\" and \"all Rel() targets are declared\"."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": null,
+      "evidence": "The C4Component example ends with `Rel(models, db, \"Queries\")` but `db` is never declared. The arrow list says `->` is \"Solid line (synchronous)\" and `->>` is \"async message\". The participant list includes `database`.",
+      "fix": "Declare `db` (for example `ContainerDb(db, ...)`). Correct the arrow semantics: `->>` is a solid line with an arrowhead, `->` has no arrowhead. Drop the `database` participant type or give its valid syntax. Run each example through a renderer."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": null,
+      "evidence": "There is no fallback if rendering or syntax validation fails, and no handling of ambiguous input. The checklists are unchecked boxes with no fix loop.",
+      "fix": "Add a validate-and-fix loop: render or lint, fix the reported error, repeat. Add a rule to ask for clarification, or state assumptions, when the input is underspecified. Add a fallback to a simpler diagram type when a complex one will not render."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 57,
+      "evidence": "The Step 1 decision matrix is a plain list mapping content to diagram type. Steps 2-7 are an independent catalogue of diagram types, not a sequential workflow.",
+      "fix": "Add expert reasoning for non-obvious choices, such as sequence vs flowchart, C4 vs flowchart with subgraphs, and when to split a diagram. Add an ordered procedure: clarify, choose, draft, validate, style."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 11,
+      "evidence": "Step 1 lists ten diagram types, and the decision matrix covers only seven",
+      "fix": "Give a default diagram type per scenario and state the escape hatch. Cover or drop Pie, Git Graph and User Journey so the menu matches the matrix."
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "skill": "cal-a",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-a.md",
+      "line": 25,
+      "evidence": "The first-release branch specifies `git log --first-parent --format='%h%x09%s' <to>`, omitting the bodies required by the merge-title extraction on line 35. The breaking-change scan on line 42 still uses `<from>..<to>`, although this branch has no start ref.",
+      "fix": "Define first-release mode consistently: retain `%h%x09%s%x09%b` when collecting commits, run both collection and breaking-change scanning against `<to>` without a range, and provide first-release wording for the all-filtered stop message."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-a.md",
+      "line": 22,
+      "evidence": "\"If the tag resolves to the same commit as `HEAD`, rerun from `HEAD^` and use the older tag as the start.\" This retry does not explicitly reapply stable-tag validation, and `HEAD^` does not exist when the tagged HEAD is a root commit; that error is not covered by the listed describe-failure branches.",
+      "fix": "Route every retry through the same stable-tag validation loop. Before following a parent, check that it exists; if history is exhausted, use the shallow-check/first-release fallback rather than leaving the branch unresolved."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-a.md",
+      "line": 61,
+      "evidence": "\"A subject without a conventional prefix goes under Internal.\" Prefixed commits such as `build: update packaging` or `style: normalize formatting` match none of the listed groups and do not satisfy this fallback.",
+      "fix": "Make Internal the explicit catch-all for every retained commit not already classified as breaking, feature or fix, including build, style and custom conventional-commit types."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": 37,
+      "evidence": "\"`--first-parent` yields one line per merged PR in both merge-commit and squash workflows; `--no-merges` lists every feature-branch commit.\" This repeats familiar flag explanations alongside the collection command and the more useful, specific warning on line 91.",
+      "fix": "Delete this explanatory sentence; retain the exact collection command and the specific NEVER warning about combining `--no-merges` with `--first-parent`."
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "skill": "general-purpose",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 3,
+    "D2": 4,
+    "D3": 5,
+    "D4": 11,
+    "D5": 15,
+    "D6": 9,
+    "D7": 8,
+    "D8": 8
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 63,
+  "max_total": 125,
+  "percent": 50.4,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "agents/general-purpose.md",
+      "line": 4,
+      "evidence": "'model: default' uses neither a documented model alias nor a full model ID.",
+      "fix": "Replace with 'model: inherit' to use the invoking model through a documented model selector."
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 3,
+      "evidence": "'Default agent for handling complex, multi-step tasks with automatic delegation capabilities' identifies complexity but omits the programming scope stated in the body and a routing boundary with specialists.",
+      "fix": "Coordinate general programming work across multiple files or components, including debugging, implementation, and validation. Use for complex, multi-step requests that do not fit a single specialist, or when specialist results need integration. Prefer a dedicated specialist for a focused domain task."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/general-purpose.md",
+      "line": 21,
+      "evidence": "'Task Analysis: Understanding and decomposing complex requirements', 'Agent Coordination: Delegating to specialized agents when appropriate', and 'Progress Tracking' restate familiar model and harness capabilities. Across the six H2 sections, the line-weighted content is generic activation or redundancy rather than expert knowledge.",
+      "fix": "Remove repeated capability declarations from Behavioral Mindset, Focus Areas, and the Will list. Replace them with knowledge specific to this agent's environment, such as actual specialist responsibilities, integration constraints, and observed failure modes."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "high",
+      "file": "agents/general-purpose.md",
+      "line": 28,
+      "evidence": "The ordered workflow runs from 'Analyze task complexity and requirements' through 'Execute tasks with appropriate tools' to 'Validate outcomes and iterate if needed'; it supplies no substantive reasoning framework or non-obvious checkpoints.",
+      "fix": "Replace the generic sequence with an explicit reasoning process: map each requirement to an observable acceptance check and its owning component, identify dependency order, establish baseline behavior before changes, and select verification gates according to the affected components."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 49,
+      "evidence": "'Will Not' lists 'Skip validation steps', 'Ignore specialist availability', 'Make assumptions about requirements', and 'Leave tasks incomplete', but gives no specific operational gotchas or reasons.",
+      "fix": "Add delegation-specific prohibitions with reasons: never assign concurrent workers overlapping files because stale snapshots can overwrite changes; never accept a specialist's success summary as verification evidence because it may omit failed or unrun checks\u2014inspect the resulting changes and observed validation output."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 44,
+      "evidence": "'Handle any general programming task' grants broad scope, while 'Execute tasks with appropriate tools' provides the same discretion for routine edits and potentially irreversible operations.",
+      "fix": "Preserve discretion for read-only investigation and reversible local edits, but require a target-and-impact check before destructive or shared-state operations. Require authorization covering the proposed operation and use a preview or recovery plan where available."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 36,
+      "evidence": "'Task execution results' and 'Quality metrics and validation results' describe output content, not its format. 'Leave tasks incomplete' does not state an observable condition for completion. Both the done-sentence and output format are missing.",
+      "fix": "Add: 'The task is complete only when every requested acceptance criterion is satisfied and required validation succeeds. Return Markdown sections for Result, Changes with file paths, Validation with observed checks and outcomes, and Remaining blockers. Label blocked or unverified work as incomplete.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 29,
+      "evidence": "'Determine if delegation to specialist is needed' opens a decision branch without defining its outcomes. Following the delegation-needed path leaves no fallback when no suitable specialist is available or delegation fails.",
+      "fix": "Resolve the branch explicitly: delegate a bounded subtask when an available specialist matches its requirements; otherwise execute it directly if the available tools and scope permit. If delegation fails, inspect the failure and take the direct path when feasible; otherwise return the concrete blocker and needed capability to the caller."
+    }
+  ]
+}

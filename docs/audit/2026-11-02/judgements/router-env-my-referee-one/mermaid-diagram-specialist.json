@@ -1,0 +1,140 @@
+{
+  "skill": "mermaid-diagram-specialist",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 4,
+    "D2": 7,
+    "D3": 4,
+    "D4": 9,
+    "D5": 5,
+    "D6": 12,
+    "D7": 8,
+    "D8": 7
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 56,
+  "max_total": 125,
+  "percent": 44.8,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 117,
+      "evidence": "'[Rectangle] - Process step' exemplifies the elementary syntax instruction dominating Workflow (lines 59\u2013542, roughly 80% of the body). Overview, Prerequisites, Best Practices and Common Patterns are also predominantly redundant; When to Use, Input, Output and Notes mainly provide activation rather than expert-only knowledge.",
+      "fix": "Delete standard syntax tables, generic advice and repetitive booking examples. Retain concise activation guidance and add source-grounded modeling trade-offs, repository-specific renderer constraints and non-obvious decisions that a general model would otherwise miss."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 82,
+      "evidence": "'System architecture \u2192 C4 Diagram' selects a format but does not teach how to choose context, container or component boundaries. The subsequent workflow supplies templates rather than a procedure for deriving an accurate model from technical sources.",
+      "fix": "Add a reusable modeling procedure: identify the audience and question, extract source-backed actors/entities/transitions, record unknowns, choose the abstraction boundary, and verify relationships against the source before drawing. Explain criteria for selecting each C4 level."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 612,
+      "evidence": "'Keep diagram source in markdown files, not images' is a generic exclusion without a reason. There is no Mermaid-specific Gotchas or NEVER section explaining concrete parsing or modeling landmines.",
+      "fix": "Add concise prohibitions with causes and remedies, such as avoiding unquoted lowercase 'end' in flowcharts because it can terminate parsing, and separating stable node IDs from punctuation-rich display labels to avoid tokenization errors."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 4,
+      "evidence": "'Mermaid diagram specialist for creating flowcharts, sequence diagrams, ERDs, and architecture visualizations' states capabilities and keywords, but explicit delegation scenarios appear only in the ignored 'usage' field and the body. The description also lacks a scope boundary.",
+      "fix": "Create documentation-ready Mermaid flowcharts, sequence diagrams, ERDs, C4 views, and state diagrams from process descriptions, schemas, or architecture requirements. Use when asked to visualize workflows, service interactions, data models, system architecture, or lifecycles, even without naming Mermaid. Return fenced Mermaid Markdown; not for implementing application logic or editing image-based diagrams."
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 3,
+      "evidence": "The frontmatter fields 'category', 'usage', 'input' and 'output' are not recognized agent fields and are ignored by the host.",
+      "fix": "Replace the frontmatter with:\n---\nname: mermaid-diagram-specialist\ndescription: >-\n  Create documentation-ready Mermaid flowcharts, sequence diagrams, ERDs,\n  C4 views, and state diagrams from process descriptions, schemas, or\n  architecture requirements. Use when asked to visualize workflows, service\n  interactions, data models, system architecture, or lifecycles, even without\n  naming Mermaid. Return fenced Mermaid Markdown; not for implementing\n  application logic or editing image-based diagrams.\n---"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "high",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 59,
+      "evidence": "'## Workflow' contains nearly 500 lines of inline recipes, and the complete agent exceeds 600 lines with no supporting files referenced. Every task therefore loads every diagram tutorial, exceeding the repository's 200-line convention for self-contained agents.",
+      "fix": "Keep the agent prompt under 200 lines with modeling principles, diagram selection, routing and validation checklists. Move detailed recipes into separate references and explicitly load only the reference for the selected diagram type."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 609,
+      "evidence": "'Maximum complexity: Keep under 20 nodes for readability' imposes a fixed cap without an escape hatch for schemas or architectures whose accurate representation requires more nodes.",
+      "fix": "Treat approximately 20 nodes as a readability heuristic, not a correctness limit. Prefer an overview plus focused detail views for larger systems, and retain a complete diagram when explicitly required rather than silently omitting entities."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": null,
+      "evidence": "No agent output-eval file was found alongside the artifact or under a matching eval filename. Inline examples and validation checklists do not provide realistic task prompts, expected outputs and verifiable assertions.",
+      "fix": "Add optional output evals with at least three realistic prompts: a branching workflow, a source-backed ERD, and a renderer-compatibility edge case. Assert that generated diagrams parse in the selected renderer, declare every relationship endpoint and preserve required success/failure paths."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 190,
+      "evidence": "The sequence recipe lists '`database` - Database' as a participant declaration type and labels '`->>` - Solid arrow (async message)' and '`-->>` - Dotted arrow (async response)'. A standalone 'database DB' is not the portable Mermaid declaration syntax, and these arrowheads do not denote asynchronous messages.",
+      "fix": "Use 'participant DB as Database' for a portable database participant. Describe ->/--> as lines without arrowheads and ->>/-->> as lines with arrowheads; use -)/--) for asynchronous open-arrow notation when supported by the target renderer."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 419,
+      "evidence": "The C4 component example ends with 'Rel(models, db, \"Queries\")' but never declares 'db' in that Mermaid block. The declaration in the preceding container diagram is not shared across fenced diagrams.",
+      "fix": "Declare the database inside the component example, for example with 'ContainerDb(db, \"Database\", \"PostgreSQL\", \"Stores all data\")', and check that every Rel endpoint is declared within its own diagram."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 142,
+      "evidence": "'PaymentSuccess -->|No| CancelBooking' followed by 'CancelBooking --> ShowError' routes payment failure to 'Show Unavailable Message', the date-availability error. Following the example's failure branch therefore produces the wrong user-facing outcome.",
+      "fix": "Give payment failure its own error node, such as 'ShowPaymentError[Show Payment Failure Message]', and route cancellation there before ending or offering an explicitly modeled retry."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 571,
+      "evidence": "'Testing: Verify diagrams render in target platform' provides no recovery loop or unavailable-renderer fallback. In particular, the 'System architecture \u2192 C4 Diagram' branch has no alternative when the destination does not support C4.",
+      "fix": "Identify the destination renderer and supported diagram types before generation. Validate when rendering is available, fix failures and retry; when rendering is unavailable, explicitly mark the result unverified. Provide a conventional flowchart fallback when the target does not support C4."
+    }
+  ]
+}

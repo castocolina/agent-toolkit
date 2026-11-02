@@ -1,0 +1,95 @@
+{
+  "skill": "explain-pr-changes",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 13,
+    "D3": 12,
+    "D4": 5,
+    "D5": 6,
+    "D6": 12,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 89,
+  "max_total": 125,
+  "percent": 71.2,
+  "grade": "C",
+  "findings": [
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 1,
+      "evidence": "The file has no frontmatter, so no description. The host falls back to the first non-empty body line, `# PR workflow`.",
+      "fix": "Add frontmatter: `description: Summarize the current branch as a pull request and create or update it with gh: a changeset breakdown with NEEDS_REVIEW or APPROVED triage, plus an optional Mermaid or draw.io diagram. Handles feature branches and promotion PRs (develop, staging, main) that reuse or consolidate earlier PR bodies. Use when asked to explain, summarize, open or update a PR.` Also add `argument-hint: [--diagrams=none|mermaid|drawio] [--reuse-from=<PR>] [--base=<branch>] [Close ...]`."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "high",
+      "file": "commands/explain-pr-changes.md",
+      "line": null,
+      "evidence": "The command is about 470 lines in a single file, with nothing split out. That includes the promotion and reuse logic (sections 4.1-4.9), the drawio render, attach and fallback logic (phases 4-5), and the Output Template at line 433.",
+      "fix": "Keep the core phases in the command. Move the promotion, reuse and consolidation rules (4.x) and the drawio render and attach details into files loaded only when needed. For example, read the reuse reference only on a promotion head or with `--reuse-from`, and the drawio reference only when `--diagrams=drawio`."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 3,
+      "evidence": "`You are `Code-Sage`, an expert AI code reviewer and technical writer...` and the generic 5.1 `Understand the intent behind the changes`",
+      "fix": "Delete the persona and the generic holistic-analysis text. The model already does this, and the expert content is in the gh, branch and reuse rules."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": null,
+      "evidence": "The head == base guard (3.6) creates `pr/<short-slug>` from `main` and continues toward a PR. It does not say what happens when the new branch has no commits beyond base, so the diff `origin/$base...HEAD` is empty. The unpushed local commits on `main` may also not be carried over to the new branch.",
+      "fix": "State the empty-diff outcome, for example stop with a named error such as `no changes between origin/<base> and HEAD`. Also state that the new branch starts from the current HEAD, so local commits are kept."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": null,
+      "evidence": "The six phases are described in prose across about 100 lines, with detail scattered into sections 3 and 4. There is no checklist or compact ordered summary.",
+      "fix": "Add a short ordered phase checklist at the top of section 5, with a one-line stop condition per phase."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": null,
+      "evidence": "The 150-word summary and the diagram guidelines in 5.3 are low-risk, but are mixed with long, rigid, exact-string instructions.",
+      "fix": "Keep exact commands only for the fragile gh, git and body-assembly steps. Reduce the summary, diagram and triage guidance to brief principles."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": null,
+      "evidence": "Warnings such as `Never run a bare gh pr view --repo` and `never substitute PR-derived text into shell source` are spread through the prose. There is no consolidated Gotchas or NEVER section.",
+      "fix": "Add a short Gotchas list collecting these items, each with its reason."
+    }
+  ]
+}

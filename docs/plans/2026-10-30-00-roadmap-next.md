@@ -14,6 +14,7 @@
 | 6 | [New skills](2026-10-30-06-new-skills.md) | 4 merged, plan 5 merged (registry validator) | `ui-ux-principles`, `skill-updater`, `audit.py track`, judge profiles for commands and agents | **Executed: PR #11.**
 | 7 | [Artifact audit](2026-10-30-07-artifact-audit.md) | 6 | verdicts and a disposition table for 7 commands, 6 agents and 2 new skills |
 | 8 | [Artifact fixes](2026-10-30-08-artifact-fixes.md) | 7 | the 26 high findings and every other finding, in batches of at most 3 artifacts; Mermaid rules moved into the diagram skills |
+| 12 | [Artifact judge specs](2026-11-02-12-artifact-judge-specs.md) | 7 | pinned Claude Code specs for commands and agents, calibrated judge profiles, re-judge of the 13 (added 2026-11-02 by user ruling; runs before plan 8 Task 5) |
 | 10 | [pr-diagrams branch and CI triggers](2026-10-30-10-pr-diagrams-branch.md) | 8 Task 4 | single `pr-diagrams` branch fallback, CI on any PR base |
 | 11 | [Scheduled audit Phase 2](2026-10-30-11-scheduled-audit-phase2.md) | 5 merged, tokens set by the user | draft, own review after #8 merges. Copilot spike, Phase 2 cut to the keyless decision protocol, first real run |
 | 9 | [CI artifact flow](2026-10-30-09-ci-artifact-flow.md) | 5 merged, 6, 7, 11 | draft, own review after #8 merges. Two-stage CI: refresh the judge, then review every artifact in rotation |

@@ -31,6 +31,7 @@ stdout: one JSON object with these fields
   resolved      the commit fetched
   sha           the pin recorded in SOURCE.json (stays the old sha when nothing changed)
   changed       reference files rewritten (new upstream, missing or hand-edited)
+  removed       obsolete reference files deleted (no longer in FILES)
   unchanged     reference files already matching upstream
   rubric_stale  true when the rubric's spec_sha differs from sha, or the rubric is missing
   structure_changed, new_pages, removed_pages report navigation drift
@@ -190,13 +191,22 @@ for entry in "${FILES[@]}"; do
   fi
 done
 
+# Manifest entries whose page left FILES: pruned (with their reference file) in the same publish.
+OBSOLETE=()
+if [ -f "$META" ]; then
+  while IFS= read -r name; do
+    [[ $name =~ ^[A-Za-z0-9._-]+$ ]] || die "invalid manifest entry in $META: $name"
+    [[ " ${FILES[*]%%|*} " == *" $name "* ]] || OBSOLETE+=("$name")
+  done < <(jq -r '.files // {} | keys[]' "$META") || die "cannot read $META"
+fi
+
 PINNED=$OLD_SHA
 [ ${#CHANGED[@]} -gt 0 ] && PINNED=$RESOLVED
 
 publish() {
   local name
   mkdir -p "$DEST" || return 1
-  for name in "${CHANGED[@]}" SOURCE.json; do
+  for name in "${CHANGED[@]}" "${OBSOLETE[@]}" SOURCE.json; do
     [ -f "$DEST/$name" ] && { cp -p "$DEST/$name" "$STAGE/backup/$name" || { rmdir "$DEST" 2>/dev/null; return 2; }; }
     # status 2 = nothing modified yet, so the caller must not restore
     [ "$FETCH_SPEC_FAIL_AT" = backup ] && { rmdir "$DEST" 2>/dev/null; return 2; }
@@ -206,6 +216,7 @@ publish() {
     mv "$STAGE/new/$name" "$DEST/$name" || return 1
     [ "$FETCH_SPEC_FAIL_AT" = term ] && kill -TERM $$
   done
+  for name in "${OBSOLETE[@]}"; do rm -f "$DEST/$name" || return 1; done
   [ "$FETCH_SPEC_FAIL_AT" = metadata ] && return 1
   {
     for entry in "${FILES[@]}"; do name=${entry%%|*}; printf '%s\t%s\n' "$name" "${NEWHASH[$name]}"; done
@@ -218,7 +229,7 @@ publish() {
 
 restore() { # non-zero when any step fails
   local name rc=0
-  for name in "${CHANGED[@]}" SOURCE.json; do
+  for name in "${CHANGED[@]}" "${OBSOLETE[@]}" SOURCE.json; do
     if [ -f "$STAGE/backup/$name" ]; then cp -p "$STAGE/backup/$name" "$DEST/$name" || rc=1; else rm -f "$DEST/$name" || rc=1; fi
   done
   rm -f "$DEST/SOURCE.json.tmp" || rc=1
@@ -226,7 +237,7 @@ restore() { # non-zero when any step fails
   return $rc
 }
 
-if [ ${#CHANGED[@]} -gt 0 ]; then
+if [ ${#CHANGED[@]} -gt 0 ] || [ ${#OBSOLETE[@]} -gt 0 ]; then
   publish || { [ $? = 2 ] && die "backup failed, references untouched"; die "publish failed"; }
 fi
 
@@ -237,9 +248,10 @@ if [ -f "$RUBRIC" ]; then
 fi
 
 CH=$(printf '%s\n' "${CHANGED[@]}" | jq -R 'select(length>0)' | jq -s .) || die "cannot build changed list"
+RM=$(printf '%s\n' "${OBSOLETE[@]}" | jq -R 'select(length>0)' | jq -s .) || die "cannot build removed list"
 UN=$(for entry in "${FILES[@]}"; do n=${entry%%|*}; [[ " ${CHANGED[*]} " == *" $n "* ]] || echo "$n"; done | jq -R 'select(length>0)' | jq -s .) || die "cannot build unchanged list"
 jq -n --arg ref "$REF" --arg resolved "$RESOLVED" --arg sha "$PINNED" --argjson stale "$STALE" \
-  --argjson changed "$CH" --argjson unchanged "$UN" --argjson structure_changed "$STRUCTURE_CHANGED" \
+  --argjson changed "$CH" --argjson removed "$RM" --argjson unchanged "$UN" --argjson structure_changed "$STRUCTURE_CHANGED" \
   --argjson new_pages "$NEW_PAGES" --argjson removed_pages "$REMOVED_PAGES" \
-  '{ref:$ref,resolved:$resolved,sha:$sha,changed:$changed,unchanged:$unchanged,rubric_stale:$stale,
+  '{ref:$ref,resolved:$resolved,sha:$sha,changed:$changed,removed:$removed,unchanged:$unchanged,rubric_stale:$stale,
     structure_changed:$structure_changed,new_pages:$new_pages,removed_pages:$removed_pages}' || die "cannot print result"

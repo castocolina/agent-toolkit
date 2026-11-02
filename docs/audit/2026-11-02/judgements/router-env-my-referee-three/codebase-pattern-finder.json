@@ -1,0 +1,113 @@
+{
+  "skill": "codebase-pattern-finder",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 8,
+    "D2": 7,
+    "D3": 8,
+    "D4": 9,
+    "D5": 8,
+    "D6": 10,
+    "D7": 3,
+    "D8": 7
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 60,
+  "max_total": 125,
+  "percent": 48.0,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 3,
+      "evidence": "description: codebase-pattern-finder is a useful subagent_type for finding similar implementations... It's sorta like codebase-locator, but it will not only tell you the location of files, it will also give you code details!",
+      "fix": "Use this agent when you need concrete, existing code examples to model new work on: similar implementations, usage examples, conventions, and test patterns (pagination, routes, middleware, state management, mocks), with file:line references and snippets. Read-only; it documents patterns as they exist and does not critique or recommend one. Use codebase-locator when you only need file locations."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 36,
+      "evidence": "\"Note which approach is preferred\" contradicts \"DO NOT recommend which pattern is 'better' or 'preferred'\" (line 15) and \"Don't suggest which pattern to use for new work\"",
+      "fix": "Delete 'Note which approach is preferred'. Replace it with 'Note which approach is used where, and how often, without ranking them'."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": null,
+      "evidence": "The output template's key aspects say \"More efficient for large datasets\" and \"Stable pagination (no skipped items)\". The rules also say \"Don't show broken or deprecated patterns\", \"Don't include overly complex examples\", and \"Show working code - Not just snippets\" next to \"Include actual code snippets\".",
+      "fix": "Make the template example purely descriptive, with no efficiency claims. Resolve the snippet-versus-full-code rule by saying to quote the smallest complete unit with file:line. Delete the complexity filter, or define it, so it doesn't conflict with the no-judgment rule."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": null,
+      "evidence": "There is no fallback or edge-case handling. Nothing covers no pattern found, only one instance, a huge number of matches, or a pattern that appears only in tests.",
+      "fix": "Add a short section: if nothing is found, say so and list the searches tried. For many matches, cap at 3-5 representative examples and report the count. If the user's wording is ambiguous, state the interpretation used."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": null,
+      "evidence": "The file is over 200 lines (about 222), with a long pagination output example and a category list, and nothing is split out.",
+      "fix": "Trim the sample output to one short pattern. Merge the duplicated DO NOT, What NOT to Do and REMEMBER lists. Target under 200 lines."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": null,
+      "evidence": "The 'Pattern Categories to Search' lists (Route structure, Middleware usage, Hooks usage...) and Step 2 ('You know how it's done!') tell the model what it already knows. The no-critique rule is stated about 4 times in different forms.",
+      "fix": "Delete the category lists and the Step 2 filler. State the documentarian constraint once. Keep the output template."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": null,
+      "evidence": "The 'What NOT to Do' bullets are bare ('Don't miss the test examples', 'Don't show patterns without context') with no reasons or failure modes. 'Don't miss the test examples' is a goal, not an anti-pattern.",
+      "fix": "Keep a few specific NEVERs with reasons. For example: never paraphrase code instead of quoting it, because the file:line can't then be verified. Never rank patterns, because the caller's synthesis step decides."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": null,
+      "evidence": "There is no eval file for this agent in the supplied files.",
+      "fix": "Add a small eval set. It needs prompts, expected outputs, and assertions such as 'includes file:line', 'contains no recommendation', and 'includes a test example'."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": null,
+      "evidence": "The 'Search Strategy' section is 3 generic steps (identify, search, read) with no search heuristics, such as starting from tests or naming conventions, or deciding how many examples to show.",
+      "fix": "Add expert search heuristics: find the nearest sibling feature first, search test files for usage, and cap and rank examples by similarity to the request."
+    }
+  ]
+}
