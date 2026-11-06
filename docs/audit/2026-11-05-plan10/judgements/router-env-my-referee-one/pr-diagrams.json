@@ -1,0 +1,68 @@
+{
+  "skill": "pr-diagrams",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 77,
+      "evidence": "The partial-attachment recovery says \"if publish also fails, restore body-fallback.md as the body\", but the skill never instructs a standalone caller to prepare that file or defines its contents. Following this failure branch therefore reaches an undefined recovery artifact.",
+      "fix": "Before the attach examples, require saving a fallback body and specify its path and contents: preserve the intended prose and replace the local PNG reference with an inline Mermaid diagram or omit the diagram. Use that saved file in the recovery edit and report any failed recovery edit without recreating the PR."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+      "line": 297,
+      "evidence": "\"case \"$dups\" in *\" $base \"*) usage_err \"duplicate basename $base\" ;; esac\" searches a space-delimited string rather than comparing complete filenames. Publishing distinct valid inputs named \"a.png b.png\" and \"a.png\", in that order, incorrectly rejects the second as a duplicate.",
+      "fix": "Track publish basenames in an array and compare each new basename with previous entries using exact string equality, as cmd_render already does. Add a regression test that publishes these two distinct spaced basenames successfully while still rejecting genuinely identical basenames."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+      "line": 308,
+      "evidence": "\"local gpath=${rurl#*://}; gpath=${gpath#*/}\" removes gh's returned host before the repository-mismatch check. An origin on ghe.example.com/acme/widgets and a gh response for github.com/acme/widgets pass the guard, so publication pushes to origin but returns an image URL for a different host.",
+      "fix": "Retain the normalized origin host and compare both host and owner/repository against gh's returned URL before creating the worktree or pushing. On mismatch, report both full repository identities and exit 2. Add a same-path, different-host refusal test."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+      "line": 342,
+      "evidence": "The dispatcher sends --help to \"die \\\"usage: pr-diagrams.sh repo|related|reviewers|render|capability|publish ...\\\"\" and exits 1. Although substantial runnable tests are present, the helper lacks the --help interface required by the script-test sub-check.",
+      "fix": "Implement -h/--help with exit 0, documenting subcommand syntax, options, environment overrides, output formats and exit codes without performing repository or network operations. Add a smoke test for the help path."
+    }
+  ]
+}

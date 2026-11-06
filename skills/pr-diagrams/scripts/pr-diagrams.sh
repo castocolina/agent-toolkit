@@ -5,7 +5,12 @@ set -euo pipefail
 
 GH=${GH:-gh}
 TMPS=()
-cleanup() { [ ${#TMPS[@]} -gt 0 ] && rm -rf "${TMPS[@]}"; return 0; }
+WT=""
+cleanup() {
+  [ -z "$WT" ] || git worktree remove --force "$WT" >/dev/null 2>&1 || true
+  [ ${#TMPS[@]} -gt 0 ] && rm -rf "${TMPS[@]}"
+  return 0
+}
 trap cleanup EXIT
 
 die() { echo "pr-diagrams: $*" >&2; exit 1; }
@@ -211,15 +216,160 @@ cmd_render() {
   jq -s '.' "$manifest"
 }
 
+usage_err() { echo "pr-diagrams: $*" >&2; exit 2; }
+
+# Host of a URL per the host rule: text after scheme:// up to the first /, lowercased.
+url_host() {
+  local u=$1 rest
+  case "$u" in *://*) ;; *) return 0 ;; esac
+  rest=${u#*://}
+  printf '%s\n' "${rest%%/*}" | tr '[:upper:]' '[:lower:]'
+}
+
+# Sets O_HOST (lowercased), O_PATH (<owner>/<repo> of origin) and O_ARG (what to hand gh repo view). Fails if origin is unparsable.
+# The test hook may carry a host as <host>/<owner>/<repo>; without one the host is not compared.
+# shortcut: a URL with a port or a nested group path is taken verbatim, upgrade if such a host appears.
+origin_target() {
+  local url rest host path
+  O_HOST=""; O_PATH=""; O_ARG=""
+  if [ -n "${PR_DIAGRAMS_REPO:-}" ] && [ -n "${GH:-}" ] && [ "$GH" != "gh" ]; then
+    O_PATH=$PR_DIAGRAMS_REPO; O_ARG=$PR_DIAGRAMS_REPO
+    if [[ "$O_PATH" == */*/* ]]; then O_HOST=${O_PATH%%/*}; O_HOST=${O_HOST,,}; O_PATH=${O_PATH#*/}; fi
+    return 0
+  fi
+  url=$(git remote get-url origin 2>/dev/null) || return 1
+  case "$url" in
+    *://*) rest=${url#*://}; rest=${rest#*@}; host=${rest%%/*}; path=${rest#*/} ;;
+    *@*:*) rest=${url#*@}; host=${rest%%:*}; path=${rest#*:} ;;
+    *) return 1 ;;
+  esac
+  path=${path%/}; path=${path%.git}
+  [ -n "$host" ] && [[ "$path" == */* ]] || return 1
+  O_HOST=${host,,}; O_PATH=$path; O_ARG=https://$host/$path
+}
+
+cmd_capability() {
+  [ $# -eq 0 ] || usage_err "usage: pr-diagrams.sh capability"
+  case "${PR_DIAGRAMS_MODE:-}" in
+    attach|branch) printf '%s\n' "$PR_DIAGRAMS_MODE"; return 0 ;;
+    "") ;;
+    *) usage_err "PR_DIAGRAMS_MODE must be attach or branch, got: $PR_DIAGRAMS_MODE" ;;
+  esac
+  local t=${PR_DIAGRAMS_PROBE_TIMEOUT:-10} out rc=0 ver url host bound=()
+  if command -v timeout >/dev/null 2>&1; then bound=(timeout -k 1 "$t")
+  elif command -v gtimeout >/dev/null 2>&1; then bound=(gtimeout -k 1 "$t")
+  # shortcut: with no timeout/gtimeout a hung gh hangs capability; add a portable bound if that is ever reported.
+  else echo "pr-diagrams: timeout(1) not found (nor gtimeout), running gh probes unbounded" >&2
+  fi
+  out=$(${bound[@]+"${bound[@]}"} "$GH" --version 2>/dev/null) || rc=$?
+  if [ "$rc" -eq 124 ] || [ "$rc" -eq 137 ]; then echo "pr-diagrams: gh --version timed out after ${t}s, using branch" >&2; echo branch; return 0; fi
+  if [ "$rc" -ne 0 ]; then echo "pr-diagrams: gh --version failed, using branch" >&2; echo branch; return 0; fi
+  ver=$(printf '%s\n' "$out" | head -n 1)
+  if [[ ! "$ver" =~ ^gh\ version\ ([0-9]+)\.([0-9]+) ]]; then
+    echo "pr-diagrams: cannot parse gh version [$ver], using branch" >&2; echo branch; return 0
+  fi
+  if [ "${BASH_REMATCH[1]}" -lt 2 ] || { [ "${BASH_REMATCH[1]}" -eq 2 ] && [ "${BASH_REMATCH[2]}" -lt 101 ]; }; then
+    echo "pr-diagrams: gh ${BASH_REMATCH[1]}.${BASH_REMATCH[2]} has no --attach, using branch" >&2; echo branch; return 0
+  fi
+  rc=0
+  origin_target || O_ARG=""  # no parsable origin: fall back to gh's own repository
+  url=$(${bound[@]+"${bound[@]}"} "$GH" repo view ${O_ARG:+"$O_ARG"} --json url --jq .url 2>/dev/null) || rc=$?
+  if [ "$rc" -eq 124 ] || [ "$rc" -eq 137 ]; then echo "pr-diagrams: gh repo view timed out after ${t}s, using branch" >&2; echo branch; return 0; fi
+  if [ "$rc" -ne 0 ]; then echo "pr-diagrams: gh repo view failed, using branch" >&2; echo branch; return 0; fi
+  host=$(url_host "$url")
+  if [ -z "$host" ]; then echo "pr-diagrams: no host in repository URL [$url], using branch" >&2; echo branch; return 0; fi
+  if [ "$host" = github.com ]; then echo attach; else echo "pr-diagrams: host $host is not github.com, using branch" >&2; echo branch; fi
+}
+
+# Build one commit of <N>/<basename> files on top of $1 (empty = orphan) in worktree $WT.
+publish_commit() {
+  local parent=$1 n=$2 f tree commit; shift 2
+  if [ -n "$parent" ]; then git -C "$WT" read-tree "$parent"; else git -C "$WT" read-tree --empty; fi
+  mkdir -p "$WT/$n"  # keep images published earlier for this PR; only the given basenames are replaced
+  # The worktree is --no-checkout, so add each file by path: -A would drop earlier ones from the index.
+  for f in "$@"; do cp "$f" "$WT/$n/$(basename "$f")"; git -C "$WT" add -- "$n/$(basename "$f")"; done
+  tree=$(git -C "$WT" write-tree)
+  if [ -n "$parent" ]; then commit=$(git -C "$WT" commit-tree "$tree" -p "$parent" -m "docs: diagrams for PR $n")
+  else commit=$(git -C "$WT" commit-tree "$tree" -m "docs: diagrams for PR $n"); fi
+  git -C "$WT" update-ref HEAD "$commit"
+}
+
+cmd_publish() {
+  [ $# -ge 2 ] || usage_err "usage: pr-diagrams.sh publish <N> <png>..."
+  local n=$1 f base i seen=(); shift
+  [[ "$n" =~ ^[0-9]+$ ]] || usage_err "PR number must be digits only: $n"
+  for f in "$@"; do
+    base=$(basename "$f")
+    case "$base" in .|..) usage_err "bad PNG path: $f" ;; esac
+    if [ ! -f "$f" ] || ! png_ok "$f"; then usage_err "not a PNG file: $f"; fi
+    for ((i = 0; i < ${#seen[@]}; i++)); do
+      [ "${seen[i]}" = "$base" ] && usage_err "duplicate basename $base"
+    done
+    seen+=("$base")
+  done
+  local stray
+  stray=$( { git for-each-ref --format='%(refname:short)' 'refs/heads/pr-diagrams-*' 'refs/heads/pr-diagrams/*'
+             git ls-remote --heads origin 'pr-diagrams-*' 'pr-diagrams/*' | sed 's|.*refs/heads/||'; } | tr '\n' ' ')
+  [ -z "$stray" ] || usage_err "stray branch(es), only 'pr-diagrams' is allowed: $stray"
+  local rurl
+  origin_target || usage_err "cannot determine origin's repository from its URL"
+  rurl=$("$GH" repo view "$O_ARG" --json url --jq .url) || die "gh repo view failed"
+  rurl=${rurl%/}
+  local gpath=${rurl#*://} ghost; ghost=$(url_host "$rurl"); gpath=${gpath#*/}
+  if [ "${gpath,,}" != "${O_PATH,,}" ] || { [ -n "$O_HOST" ] && [ "$ghost" != "$O_HOST" ]; }; then
+    usage_err "gh resolves ${ghost:+$ghost/}$gpath but origin is ${O_HOST:+$O_HOST/}$O_PATH; refusing to publish"
+  fi
+  local dir parent="" attempt
+  dir=$(mktemp -d); TMPS+=("$dir")
+  git worktree add -q --detach --no-checkout "$dir/wt" HEAD || die "cannot create worktree"
+  WT=$dir/wt
+  for attempt in 1 2; do
+    if [ -n "$(git ls-remote --heads origin refs/heads/pr-diagrams)" ]; then
+      git fetch -q origin refs/heads/pr-diagrams || die "fetch of pr-diagrams failed"
+      parent=$(git rev-parse FETCH_HEAD)
+    fi
+    publish_commit "$parent" "$n" "$@"
+    if git -C "$WT" push -q origin HEAD:refs/heads/pr-diagrams; then break; fi
+    [ "$attempt" -eq 1 ] || die "push of pr-diagrams failed after retry"
+    echo "pr-diagrams: push rejected, fetching and retrying once" >&2
+  done
+  for f in "$@"; do
+    base=$(basename "$f")
+    jq -nc --arg png "$f" --arg url "$rurl/blob/pr-diagrams/$n/$(jq -rn --arg s "$base" '$s|@uri')?raw=true" '{png: $png, url: $url}'
+  done
+}
+
+cmd_help() {
+  printf '%s\n' \
+    'usage: pr-diagrams.sh <subcommand> [args]' \
+    '' \
+    '  capability                              print attach or branch, always exit 0' \
+    '  render <file.drawio>...                 stdout [{"drawio","png"}]; each PNG embeds its diagram, next to its source' \
+    '  publish <N> <png>...                    commit <N>/<name> on branch pr-diagrams; stdout one {"png","url"} line per file' \
+    '  related <base> <head> [--exclude-pr N]  stdout [{"pr","title","head_ref","base_ref","merged_at"}], merged PRs, newest first' \
+    '  reviewers <PR>... [--exclude LOGIN]     stdout sorted JSON array of human reviewer logins' \
+    '  repo                                    stdout <owner>/<repo> parsed from origin' \
+    '  help | --help | -h                      this text' \
+    '' \
+    'env: GH (gh binary), DRAWIO_CONVERTER (converter script), PR_DIAGRAMS_MODE=attach|branch (forces capability),' \
+    '     PR_DIAGRAMS_PROBE_TIMEOUT (capability probe seconds, default 10)' \
+    'exit: 0 ok; 1 failure (gh, git or converter error, bad arguments to repo/related/reviewers/render, unknown subcommand);' \
+    '      2 usage error of capability or publish, or a publish refusal (stray branch, gh and origin name different repositories)' \
+    'Status goes to stderr; stdout is empty on any failure.'
+}
+
 main() {
   local cmd=${1:-}
   [ $# -gt 0 ] && shift
   case "$cmd" in
+    help|--help|-h) cmd_help ;;
     repo) repo_of ;;
     related) cmd_related "$@" ;;
     reviewers) cmd_reviewers "$@" ;;
     render) cmd_render "$@" ;;
-    *) die "usage: pr-diagrams.sh repo|related|reviewers|render ..." ;;
+    capability) cmd_capability "$@" ;;
+    publish) cmd_publish "$@" ;;
+    *) die "usage: pr-diagrams.sh repo|related|reviewers|render|capability|publish|help ..." ;;
   esac
 }
 
