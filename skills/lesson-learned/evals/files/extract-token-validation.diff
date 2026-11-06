@@ -1,0 +1,72 @@
+commit 4f2a9c1e7b3d0a58c6e2f1b9d4a7c3e8f0b1d2a6
+Author: Dev <dev@example.com>
+Date:   Mon Nov 2 10:14:03 2026 -0300
+
+    refactor(auth): decouple token validation into its own module
+
+diff --git a/src/auth/handler.ts b/src/auth/handler.ts
+index 3b1c2d4..8e9f0a1 100644
+--- a/src/auth/handler.ts
++++ b/src/auth/handler.ts
+@@ -1,27 +1,17 @@
+ import { Request, Response } from "express";
+-import { verify } from "jsonwebtoken";
++import { validateToken, tokenCache } from "./token";
+ 
+-const tokenCache = new Map<string, { sub: string; exp: number }>();
+-
+-function parseAuthHeader(req: Request): string | null {
++export function parseAuthHeader(req: Request): string | null {
+   const h = req.headers.authorization;
+   return h && h.startsWith("Bearer ") ? h.slice(7) : null;
+ }
+ 
++export const SECRET = process.env.JWT_SECRET ?? "";
++
+ export function handle(req: Request, res: Response) {
+-  const raw = parseAuthHeader(req);
+-  if (!raw) return res.status(401).end();
+-  const cached = tokenCache.get(raw);
+-  if (cached && cached.exp > Date.now() / 1000) {
+-    (req as any).user = cached.sub;
+-    return next(req, res);
+-  }
+-  try {
+-    const claims = verify(raw, process.env.JWT_SECRET ?? "") as { sub: string; exp: number };
+-    tokenCache.set(raw, claims);
+-    (req as any).user = claims.sub;
+-    return next(req, res);
+-  } catch {
+-    return res.status(401).end();
+-  }
++  const user = validateToken(req);
++  if (!user) return res.status(401).end();
++  if (tokenCache.size > 10_000) tokenCache.clear();
++  (req as any).user = user;
++  return next(req, res);
+ }
+diff --git a/src/auth/token.ts b/src/auth/token.ts
+new file mode 100644
+index 0000000..c4d5e6f
+--- /dev/null
++++ b/src/auth/token.ts
+@@ -0,0 +1,19 @@
++import { Request } from "express";
++import { verify } from "jsonwebtoken";
++import { parseAuthHeader, SECRET } from "./handler";
++
++export const tokenCache = new Map<string, { sub: string; exp: number }>();
++
++export function validateToken(req: Request): string | null {
++  const raw = parseAuthHeader(req);
++  if (!raw) return null;
++  const cached = tokenCache.get(raw);
++  if (cached && cached.exp > Date.now() / 1000) return cached.sub;
++  try {
++    const claims = verify(raw, SECRET) as { sub: string; exp: number };
++    tokenCache.set(raw, claims);
++    return claims.sub;
++  } catch {
++    return null;
++  }
++}

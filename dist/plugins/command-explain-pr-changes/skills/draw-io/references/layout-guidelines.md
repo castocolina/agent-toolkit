@@ -1,12 +1,10 @@
 # Layout guidelines
 
-## 1. Grouping
+Read from SKILL.md when drawing an AWS architecture or a diagram with several flow types. Arrow targets, routing, containment, labels and background live in SKILL.md; this file only adds group nesting, line meaning and placement direction.
 
-- AWS Cloud is the outermost group
-- Create subgroups by function
-- Place groups side by side, following the data flow
+## 1. AWS group nesting
 
-### 1.1. Group hierarchy
+AWS Cloud is the outermost group. Inside it, subgroups follow function, and sibling groups sit side by side in data-flow order. Each level is the `parent` of the next.
 
 ```text
 AWS Cloud (outermost)
@@ -17,47 +15,32 @@ AWS Cloud (outermost)
 │       └── ECS, RDS, and similar
 ├── S3
 ├── CloudWatch
-└── other services
+└── other regional services
 ```
 
-## 2. Connectors
+Regional services with no VPC attachment (S3, CloudWatch, DynamoDB) sit in AWS Cloud, beside the VPC, not inside it.
 
-### 2.1. Line meaning
+## 2. Line meaning
 
-| Flow | Line | Use |
-|------|------|-----|
-| Ingestion Flow | dashed | data intake |
-| Query Flow | solid | query, read |
-| Control Flow | dotted | control, management |
+Line style carries the kind of flow; the route (straight or orthogonal) is decided separately in SKILL.md.
 
-Dashed, solid, and dotted distinguish meaning. The path is separate. A straight `A -> B` is allowed only when both ends share an axis and the span is empty. Otherwise use a curved orthogonal connector:
+| Flow | Line | Style fragment | Use |
+|------|------|----------------|-----|
+| Ingestion | dashed | `dashed=1;` | data intake |
+| Query | solid | (default) | query, read |
+| Control | dotted | `dashed=1;dashPattern=1 4;` | control, management |
 
-```text
-edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;
-```
+Arrows follow the direction of the data. Add a legend when more than one line style appears.
 
-### 2.2. Direction and target
+## 3. Placement direction
 
-- The arrow follows the direction of the data
-- Prefer two unidirectional arrows over one bidirectional arrow. A double-headed arrow hides which call is which.
-- Choose the target per case. Block-to-block talk ends on the parent container. A call into a specific service ends on that node. Not always the container, and not always the node
-- The elbow runs through the gutter between groups. Do not cut through a container
-- Put the label in the gutter. Never under a container or under text. Keep it at least 20px from the line and from any box
-- Do not put every arrow on the back layer. A back-layer arrow hides its label under a container
-
-### 2.3. A group is a parent
-
-A container is not a rectangle drawn behind siblings. Set each child's `parent` to the container. Coordinates are relative to the container origin. Keep at least 30px of inner margin. Dragging the container moves its contents.
-
-## 3. Placement
-
-### 3.1. Left to right
+Default left to right, in data-flow order:
 
 ```text
 [data source] -> [process] -> [storage] -> [analysis / display]
 ```
 
-### 3.2. Top to bottom (alternative)
+Top to bottom when the flow is request-shaped (a client calling down a stack):
 
 ```text
 [user / client]
@@ -69,21 +52,4 @@ A container is not a rectangle drawn behind siblings. Set each child's `parent` 
 [database]
 ```
 
-## 4. Readability
-
-- Place labels near their elements
-- Adjust placement so arrows do not cross
-- Group related elements and keep them close
-- Keep enough whitespace to stay readable
-- Judge proportion against a 16:9 slide. Do not stretch horizontally and shrink the text. One idea per diagram
-
-## 5. Background and contrast
-
-The user chooses the background: transparent, light (`#ffffff`), dark (`#1e1e1e`), or another color. Those values are suggestions, not a closed default. Do not strip `background` to force transparency.
-
-Contrast is not a fixed color. It is harmony of the whole diagram.
-
-- Text separates from its component fill
-- The component separates from its container
-- The container and the arrows separate from the page
-- A transparent background must still read on both a light slide and a dark slide. If it will not, ask for the theme before export
+Pick one direction per diagram and keep it; a flow that doubles back forces arrows to cross.

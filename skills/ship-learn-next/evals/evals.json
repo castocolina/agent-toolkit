@@ -3,31 +3,98 @@
   "evals": [
     {
       "id": "tutorial-to-action",
-      "prompt": "I watched a tutorial about newsletters and want to actually use it. Help me turn it into something I can ship.",
-      "expected_output": "Extract actionable lessons, define goal/first rep, and save Markdown quest plan.",
+      "prompt": "watched a youtube tutorial on starting a newsletter last night (https://www.youtube.com/watch?v=abc123) and this time I actually want to do something with it instead of just watching more. help me turn it into something I can ship",
+      "expected_output": "No transcript is available, so it asks for the transcript or text, or gives a plan headed as provisional and not derived from the source, with lessons labelled as assumptions. It names no lesson, section or timestamp as coming from the video, and does not claim a plan file was saved.",
       "assertions": [
-        "Frames Ship-Learn-Next quest, not study plan",
-        "Asks for measurable goal or shippable rep if unknown",
-        "Names saved Markdown plan"
+        "Asks the user to paste or upload the transcript or text of the video, or labels any plan it gives as provisional and not derived from the source",
+        "Does not attribute any specific lesson, quote, section or timestamp to the video",
+        "Does not claim that a plan file was written or saved"
       ]
     },
     {
       "id": "provided-content",
-      "prompt": "Notes: ask 5 customers about checkout friction; ship one copy change; compare conversion after a week. Goal: tested improvement by June 20. Make a plan.",
-      "expected_output": "Create small first rep grounded in notes, with criteria, timeline, reflection, and incremental later reps.",
+      "prompt": "Here are my notes from a CRO course: evals/files/checkout-course-notes.md. Goal: a tested checkout improvement by June 20. I can put in about 4 hours a week. Make me a plan.",
+      "files": [
+        "evals/files/checkout-course-notes.md"
+      ],
+      "expected_output": "A Ship-Learn-Next plan grounded in the notes: Rep 1 combines the customer conversations with one checkout copy change, done-when criteria the user controls, conversion as a learning metric with a process measure because a small shop's numbers are noisy, steps that fit about 4 hours a week, reflection questions, and one-line later reps each naming one change, toward June 20. The mindset quotes are not turned into lessons or reps.",
       "assertions": [
-        "Rep 1 includes checkout change and customer learning",
-        "Measurable criteria and June 20 timeline",
+        "Rep 1 includes talking to customers and shipping exactly one checkout copy change",
+        "Rep 1 completion criteria are actions the user controls (for example interviews held, change shipped); conversion is a learning metric, not a completion gate",
+        "Uses the June 20 deadline and keeps Rep 1 steps within about 4 hours a week",
+        "Includes reflection questions for after Rep 1",
+        "Later reps are provisional outlines that each name a single change from the rep before",
+        "Does not turn the module 3.3 mindset quotes into a lesson or a rep"
+      ]
+    },
+    {
+      "id": "noisy-outcome",
+      "prompt": "Rep 1 done. Shipped the new checkout button copy (\"Pay securely\" instead of \"Continue\") on May 30, exactly as planned, nothing else changed. Conversion went from 3.1% to 3.4% over 6 days, about 400 checkout sessions. Did it work? I'd like to also cut the phone-number field next week.",
+      "expected_output": "Treats Rep 1 as shipped and consistently executed, says 3.1% to 3.4% on about 400 sessions is too noisy to call a win or a loss, keeps the single copy change and extends the sample or time rather than also removing the phone field now, and ends with a concrete next commitment.",
+      "assertions": [
+        "Treats Rep 1 as shipped (completed) regardless of the conversion result",
+        "Says the 3.1% to 3.4% change on about 400 sessions is too small or noisy to conclude the copy worked or failed",
+        "Recommends keeping the single copy change and extending the sample or time before testing the phone-number field, rather than shipping both changes together",
+        "Ends with a ship date request or a named next concrete commitment"
+      ]
+    },
+    {
+      "id": "inconsistent-execution",
+      "prompt": "Here's how my first rep went: evals/files/linkedin-rep-log.md. The two posts that took off make me think the format works. Should I move on to short videos next?",
+      "files": [
+        "evals/files/linkedin-rep-log.md"
+      ],
+      "expected_output": "Classifies the rep as shipped but inconsistently executed (4 of 10 days), names the recurring blocker (no idea in the morning), recommends repeating the same posting rep once with that blocker removed (for example an idea backlog prepared ahead) within 20 minutes a day, and does not move on to video or treat two posts' reactions as proof the format works.",
+      "assertions": [
+        "Identifies that execution was inconsistent (4 of 10 days posted)",
+        "Names \"no idea in the morning\" as the main blocker and proposes a way to remove it",
+        "Recommends repeating the same posting rep rather than moving on to short videos now",
+        "Does not treat the reactions on two posts as evidence that the format works",
+        "Keeps the next rep within about 20 minutes a day"
+      ]
+    },
+    {
+      "id": "failed-repeat",
+      "prompt": "Second week in a row I didn't finish Rep 1 (deploy my portfolio site with one project on my own domain). Got stuck on the DNS settings again. I only have Saturday mornings for this. Should I just try the same thing again this Saturday?",
+      "expected_output": "Does not prescribe the unchanged rep a third time. Shrinks it (for example deploy on the host's default subdomain and move the custom domain to a later rep), removes the DNS blocker, or renegotiates the target, and fits the next rep into one Saturday morning.",
+      "assertions": [
+        "Does not recommend repeating the unchanged rep a third time",
+        "Proposes shrinking the rep, removing the DNS blocker, or renegotiating the target (for example shipping on a default subdomain first)",
+        "Fits the next rep into one Saturday morning"
+      ]
+    },
+    {
+      "id": "existing-plan-review",
+      "prompt": "Update my plan in evals/files/ship-learn-next-plan-cold-email.md. Rep 1 report: sent all 10 by Thursday, every one followed the one-ask template, about 9 minutes each. 2 replies, 1 call booked. Same 2 hours next week. What's Rep 2?",
+      "files": [
+        "evals/files/ship-learn-next-plan-cold-email.md"
+      ],
+      "expected_output": "Reads Rep 1 as shipped and consistently executed, adds a Rep 1 review section (evidence read, row taken) and expands Rep 2 in the Rep 1 shape within 2 hours, naming its single change (the plan's personalized first line, or keeping the template and extending the sample because 2 replies in 10 is noise), marked to append to evals/files/ship-learn-next-plan-cold-email.md. It keeps the existing plan and reps, and says the file was not saved because it cannot write.",
+      "assertions": [
+        "The reply contains a \"Rep 1 review\" section and an expanded Rep 2, marked to append to evals/files/ship-learn-next-plan-cold-email.md",
+        "Rep 2 names the single thing it changes from Rep 1 (for example the plan's personalized first line, or a larger sample with the same template) and fits about 2 hours",
+        "Does not create a new plan or rewrite the existing Rep 1 or later-rep entries",
+        "Does not claim the plan file was saved or updated"
+      ]
+    },
+    {
+      "id": "chat-only",
+      "prompt": "Don't create any files, just give me the plan right here. From an article on public speaking: \"Record yourself giving a 2-minute talk and watch it back. Cut filler words by pausing instead. Confidence comes to those who believe in themselves.\" I have a team demo in 10 days and maybe 30 minutes a day.",
+      "expected_output": "The complete plan in the reply with no file written or claimed: Rep 1 records a 2-minute talk with controllable done-when criteria, uses the pause-instead-of-filler lesson, fits 30 minutes a day before the demo in 10 days, includes reflection questions, and does not build a rep on the confidence quote.",
+      "assertions": [
+        "Gives the complete plan in the reply and does not claim a saved file path",
+        "Rep 1 has controllable completion criteria such as recording and reviewing a 2-minute talk",
+        "Uses the 10-day demo deadline and 30 minutes a day",
         "Includes reflection questions",
-        "Later reps add one element"
+        "Does not build a lesson or a rep on \"Confidence comes to those who believe in themselves\""
       ]
     },
     {
       "id": "study-plan",
       "prompt": "I want a list of ten books to read about product management, not an implementation quest.",
-      "expected_output": "Answer requested reading-list intent; do not force implementation plan.",
+      "expected_output": "Answers the reading-list request; does not force an implementation plan.",
       "assertions": [
-        "Provides or offers reading list",
+        "Provides or offers a reading list",
         "Does not demand a shipping rep"
       ]
     }

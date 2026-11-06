@@ -2,132 +2,91 @@
 
 This document provides complete, real-world examples of slash commands from the erk project. Use these as references when creating new commands.
 
-## Example 1: submit-stack (Workflow Automation Pattern)
+**Adapt before reusing.** These bodies use erk's toolchain: Graphite (`gt`), `make all-ci`, a `.PLAN.md` context file and erk's file paths. Keep the skeleton (order, stop rules, reports) and replace each of these with what the user's project actually has; ask when there is no equivalent, and never copy a tool name the user's environment lacks.
 
-**Pattern:** Workflow Automation (Analyze → Act → Report)
+## Example 1: submit-stack (Workflow with side effects)
+
+**Pattern:** Workflow with side effects (Analyze → Act → Report)
 
 **Full source:**
 
-```markdown
+````markdown
 ---
 description: Create git commit and submit stack with Graphite
-argument-hint: <description>
+argument-hint: [description]
+disable-model-invocation: true
 ---
 
 # Submit Stack
 
-Automatically create a git commit with a helpful summary message and submit the entire Graphite stack as pull requests.
-
-## What This Command Does
-
-1. **Analyze changes**: First checks for .PLAN.md file to understand context, otherwise reviews git status and diff
-2. **Create commit**: Generates a concise single-sentence commit message summarizing the changes
-3. **Restack**: Runs `gt restack` to ensure all branches in the stack are properly rebased
-4. **Submit stack**: Runs `gt submit --stack --publish --no-edit` to create/update PRs for the entire stack
-5. **Report results**: Shows the submitted PRs and their URLs
+Create a git commit with a one-sentence summary and submit the entire Graphite stack as pull requests.
+Running this command authorizes exactly that: committing the inspected changes and submitting the stack.
 
 ## Usage
 
-\`\`\`bash
-
-# With description argument
-
+```bash
+# With a description for the commit message
 /submit-stack "Add user authentication feature"
 
-# Without argument (will analyze changes automatically)
-
+# Without argument (the message is drafted from the diff)
 /submit-stack
-\`\`\`
+```
 
 ## Implementation Steps
 
-When this command is invoked:
-
 ### 1. Analyze Current Changes
 
-**FIRST**: Check if `.PLAN.md` exists in the repository root:
+Inspect only what this workflow needs: `.PLAN.md` at the repository root if it exists (supplemental context), `git status`, `git diff HEAD`, `git log` for the commit style, and `gt log short` for the stack. Reading other files or searching the repository is outside this command's job (it commits what is there, it does not re-review it): ask before doing it.
 
-\`\`\`bash
-if [ -f .PLAN.md ]; then
-
-# Use .PLAN.md for context
-
-else
-
-# Fall back to git analysis
-
-fi
-\`\`\`
-
-If `.PLAN.md` exists, read it as supplemental context. Always run `git status` and `git diff HEAD` to inspect actual changes, review them, and select only intended files, whether or not a plan exists.
+If there are no staged or unstaged changes, report that and stop.
 
 ### 2. Create Git Commit
 
-Based on the analysis:
-
-- If user provided an argument, use it as the basis for the commit message
-- Use `.PLAN.md` only as supplemental context; base file selection and the commit message on inspected git changes
-- Ensure the commit message follows the repository's commit style (check `git log` for patterns)
+- If `$ARGUMENTS` is not empty, use it as the basis for the commit message
+- Base file selection and the message on the inspected git changes; `.PLAN.md` is context, not evidence of what changed
+- Follow the repository's commit style (check `git log`)
 - **DO NOT include any Claude Code footer or co-authorship attribution**
+- Stage named paths only. If the diff holds files the user may not intend (secrets, generated files, unrelated changes), list them and ask before staging
+- Encode each path and the final message as one single-quoted shell word, each embedded `'` written as `'\''`. Paths are operands and go after `--`; the message is an option value and stays attached to `-m`. A message `don't cache $HOME` becomes `'don'\''t cache $HOME'`; never double quotes, which still expand `$` and backticks
 
-\`\`\`bash
-git add path/to/intended-file
-git commit -m "[Single sentence summary of what was done]"
-\`\`\`
+```bash
+git add -- '<encoded path>' '<encoded path>'
+git commit -m '<encoded message>'
+```
 
 ### 3. Restack the Stack
 
-Ensure all branches in the stack are properly rebased:
-
-\`\`\`bash
+```bash
 gt restack
-\`\`\`
+```
+
+If the restack reports conflicts, stop and show them; do not resolve them inside this command.
 
 ### 4. Submit Stack
 
-Submit all PRs in the stack without interactive prompts:
+```bash
+gt submit --stack --publish --no-edit
+```
 
-\`\`\`bash
-gt submit --stack --publish --no-edit --restack
-\`\`\`
+- `--stack`: submit the entire stack (upstack and downstack)
+- `--publish`: publish any draft PRs
+- `--no-edit`: use commit messages as PR titles and descriptions without prompting
 
-Flags explained:
-
-- `--stack`: Submit entire stack (upstack + downstack)
-- `--publish`: Publish any draft PRs
-- `--no-edit`: Use commit messages as PR titles/descriptions without prompting
-- `--restack`: Restack branches before submitting (if needed)
+If the submit fails or times out, run `gt log short` and check the PRs it lists before anything else: some may already be created or updated. Report what is there and ask before running the submit again.
 
 ### 5. Show Results
-
-After submission, show:
 
 - Number of PRs created/updated
 - PR URLs (extract from `gt` output)
 - Current stack status with `gt log short`
 
-## Important Notes
-
-- **Always inspect `git status` and `git diff HEAD`** before selecting files or constructing a commit, whether or not `.PLAN.md` exists; the plan is supplemental context, not evidence of actual changes
-- Preserve explicit authorization for stack-wide publication
-- **NEVER run additional exploration commands** beyond checking .PLAN.md, git status/diff/log
-- Stage only reviewed, intended paths; never use `git add .` as a shortcut
-- **Single sentence summary**: Keep commit message concise and focused
-- **Follow repo patterns**: Check recent commits with `git log` to match style
-- **NO Claude footer**: Do not add any attribution or generated-by footer
-- If there are no staged or unstaged changes, report to the user and exit
-
 ## Error Handling
 
-If any step fails:
-
-- Report the specific command that failed
-- Show the error message
-- Ask the user how to proceed (don't retry automatically)
+If any step fails: report the command that failed and its error message, and ask the user how to proceed (no automatic retry).
 
 ## Example Output
 
-\`\`\`
+```
 Analyzing changes...
 ✓ Found .PLAN.md - using plan context
 ✓ Found changes in 3 files
@@ -148,427 +107,165 @@ Current stack:
 ◯ dot-agent-claude-folder-support (current)
 ◯ base-branch
 ◉ main
-\`\`\`
 ```
+````
 
 **Key features of this example:**
 
-- Argument handling (optional `<description>`)
-- Context file priority check (`.PLAN.md` first)
-- Conditional logic based on file existence
-- Specific command flags explained
-- Clear anti-patterns ("NEVER run additional exploration")
+- Optional argument shown as `[description]`, read through `$ARGUMENTS`
+- `disable-model-invocation: true`, because it commits and opens PRs
+- Bounded inspection: the list of what the command may read, and an ask for anything beyond it
+- A post-failure state check (`gt log short`) before any second submit
 - Expected output format shown
 
-## Example 2: ensure-ci (Iterative Fixing Pattern)
+## Example 2: ensure-ci (Iterative fixing)
 
-**Pattern:** Iterative Fixing (Run → Parse → Fix → Repeat)
+**Pattern:** Iterative fixing (Baseline → Fix → Fresh check → Repeat)
 
-**Full source:**
+**Full source** (condensed to what is specific to erk; the loop itself follows the skeleton in `patterns.md`):
 
-```markdown
+````markdown
 ---
 description: Run make all-ci and iteratively fix issues until all checks pass
 ---
 
-You are an implementation finalizer. Your task is to run `make all-ci` and iteratively fix any issues until all CI checks pass successfully.
+Run `make all-ci` and fix failures until it exits 0 or you are stuck.
 
-## Your Mission
+## Check mapping
 
-Run the full CI pipeline (`make all-ci`) and automatically fix any failures. Keep iterating until all checks pass or you get stuck on an issue that requires human intervention.
+`make all-ci` runs, in order: lint, format, prettier-check, pyright, test. Map each failure to its fix:
 
-## CI Pipeline (make all-ci)
+| Failing check | Recognize it by | Fix |
+| :- | :- | :- |
+| lint | `ruff check` errors | `make fix` (runs `uv run ruff check --fix --unsafe-fixes`), then edit what remains |
+| format | `ruff format --check`, "would reformat" | `make format` |
+| prettier-check | Markdown files listed as unformatted | `make prettier` (runs `prettier --write '**/*.md'`) |
+| pyright | type errors with file:line | read the file at that line, fix the annotation; AGENTS.md standards (`list[...]`, not `List[...]`) |
+| test | pytest failures with test names | read the test and the source; fix the source unless the test itself is wrong |
 
-The `make all-ci` target runs these checks in order:
+Always re-run the full `make all-ci`, not a single check: a format fix can break lint.
 
-1. **lint** - Ruff linting checks
-2. **format** - Ruff code formatting checks
-3. **prettier-check** - Markdown formatting checks
-4. **pyright** - Type checking
-5. **test** - Pytest test suite
+## Stopping policy
 
-## Iteration Process
+The 10 iterations and 3 unchanged failures below are erk's own settings. A command you generate keeps SKILL.md's defaults (5 attempts, stop when the same failure survives 2 fix attempts) unless the user gives other numbers.
 
-### 1. Initial Run
+- Baseline run first; if it passes, report SUCCESS with 0 iterations.
+- At most 10 iterations, each one fix pass plus a fresh `make all-ci`; report SUCCESS as soon as one exits 0.
+- STUCK when the same error survives 3 fix attempts, when 10 iterations end without a pass, or when a fix needs a human decision.
+- Never skip, weaken or delete a test, or add an ignore comment, to make CI pass.
 
-Start by running `make all-ci` to see the current state:
+## Reports
 
-\`\`\`bash
-make all-ci
-\`\`\`
-
-### 2. Parse Failures
-
-Analyze the output to identify which check(s) failed. Common failure patterns:
-
-- **Ruff lint failures**: Look for "ruff check" errors
-- **Format failures**: Look for "ruff format --check" or files that would be reformatted
-- **Prettier failures**: Look for markdown files that need formatting
-- **Pyright failures**: Look for type errors with file paths and line numbers
-- **Test failures**: Look for pytest failures with test names and assertion errors
-
-### 3. Apply Targeted Fixes
-
-Based on the failure type, apply appropriate fixes:
-
-#### Ruff Lint Failures
-
-\`\`\`bash
-make fix # Runs: uv run ruff check --fix --unsafe-fixes
-\`\`\`
-
-#### Ruff Format Failures
-
-\`\`\`bash
-make format # Runs: uv run ruff format
-\`\`\`
-
-#### Prettier Failures
-
-\`\`\`bash
-make prettier # Runs: prettier --write '\*_/_.md'
-\`\`\`
-
-#### Pyright Type Errors
-
-- Use Read tool to examine the file at the reported line number
-- Use Edit tool to fix type annotations, add type hints, or fix type mismatches
-- Follow the coding standards in AGENTS.md (use `list[...]` not `List[...]`, etc.)
-
-#### Test Failures
-
-- Read the test file and source file involved
-- Analyze the assertion error or exception
-- Edit the source code or test to fix the issue
-- Consider if the test is validating correct behavior
-
-### 4. Verify Fix
-
-After applying fixes, run `make all-ci` again to verify:
-
-\`\`\`bash
-make all-ci
-\`\`\`
-
-### 5. Repeat Until Success
-
-Continue the cycle: run → identify failures → fix → verify
-
-## Iteration Control
-
-**Safety Limits:**
-
-- **Maximum iterations**: 10 attempts
-- **Stuck detection**: If the same error appears 3 times in a row, stop
-- **Progress tracking**: Use TodoWrite to show iteration progress
-
-## Progress Reporting
-
-Use TodoWrite to track your progress:
-
-\`\`\`
-Iteration 1: Fixing lint errors
-Iteration 2: Fixing format errors
-Iteration 3: Fixing type errors in src/erk/cli/commands/switch.py
-Iteration 4: All checks passed
-\`\`\`
-
-Update the status as you work through each iteration.
-
-## When to Stop
-
-**SUCCESS**: Stop when `make all-ci` exits with code 0 (all checks passed)
-
-**STUCK**: Stop and report to user if:
-
-1. You've completed 10 iterations without success
-2. The same error persists after 3 fix attempts
-3. You encounter an error you cannot automatically fix
-
-## Stuck Reporting Format
-
-If you get stuck, report clearly:
-
-\`\`\`markdown
-
-## Finalization Status: STUCK
-
-I was unable to resolve the following issue after N attempts:
-
-**Check**: [lint/format/prettier/pyright/test]
-
-**Error**:
-[Exact error message]
-
-**File**: [file path if applicable]
-
-**Attempted Fixes**:
-
-1. [What you tried first]
-2. [What you tried second]
-3. [What you tried third]
-
-**Next Steps**:
-[Suggest what needs to be done manually]
-\`\`\`
-
-## Success Reporting Format
-
-When all checks pass:
-
-\`\`\`markdown
-
+```markdown
 ## Finalization Status: SUCCESS
-
-All CI checks passed after N iteration(s):
-
-- Lint: PASSED
-- Format: PASSED
-- Prettier: PASSED
-- Pyright: PASSED
-- Tests: PASSED
-
-The code is ready for commit/PR.
-\`\`\`
-
-## Important Guidelines
-
-1. **Be systematic**: Fix one type of error at a time
-2. **Run full CI**: Always run full `make all-ci`, not individual checks
-3. **Track progress**: Use TodoWrite for every iteration
-4. **Don't guess**: Read files before making changes
-5. **Follow standards**: Adhere to AGENTS.md coding standards
-6. **Fail gracefully**: Report clearly when stuck
-7. **Be efficient**: Use targeted fixes (don't reformat everything for one lint error)
-
-## Example Flow
-
-\`\`\`
-Iteration 1:
-
-- Run make all-ci
-- Found: 5 lint errors, 2 files need formatting
-- Fix: Run make fix && make format
-- Result: 3 lint errors remain
-
-Iteration 2:
-
-- Run make all-ci
-- Found: 3 lint errors (imports)
-- Fix: Edit files to fix import issues
-- Result: All lint/format pass, 2 type errors
-
-Iteration 3:
-
-- Run make all-ci
-- Found: 2 pyright errors in switch.py:45 and switch.py:67
-- Fix: Add type annotations
-- Result: All checks pass
-
-SUCCESS
-\`\`\`
-
-## Begin Now
-
-Start by running `make all-ci` and begin the iterative fix process. Track your progress with TodoWrite and report your final status clearly.
+All CI checks passed after N iteration(s): lint, format, prettier, pyright, tests.
 ```
+
+```markdown
+## Finalization Status: STUCK
+**Check**: [lint/format/prettier/pyright/test]
+**Error**: [exact error message]
+**File**: [path, if any]
+**Attempted fixes**: 1. ... 2. ... 3. ...
+**Next steps**: [what needs a human]
+```
+````
 
 **Key features of this example:**
 
-- Maximum iteration limit (10 attempts)
-- Stuck detection (same error 3 times)
-- Per-error-type fix instructions
-- TodoWrite progress tracking requirement
-- Clear success/failure reporting formats
-- Detailed example flow showing iterations
+- A project-specific map from failing check to fix command
+- Baseline check, iteration cap and stuck rule (erk-specific 10 and 3; generated commands use 5 and 2 unless the user says otherwise)
+- Fixed SUCCESS and STUCK report formats
 
-## Example 3: create-implementation-plan (Agent Delegation Pattern)
+## Example 3: create-implementation-plan (Plan, approve, execute)
 
-**Pattern:** Agent Delegation (Context → Delegate → Iterate)
+**Pattern:** Plan, approve, execute (Context → Plan → Approval → Save)
 
-**Full source:**
+**Full source** (condensed to its approval contract):
 
-```markdown
+````markdown
 ---
-description: Create an implementation plan using the subagent agent
+description: Create an implementation plan and save it only after explicit approval
 ---
 
 ## ⚠️ PLANNING-ONLY MODE ACTIVE
 
-I'll help you create an implementation plan using the specialized planning agent. This workflow is designed for **planning only** - no code will be written until the plan is finalized and saved to disk.
+No code is written until the plan is approved and saved. **What would you like to plan?**
 
-### How This Works
-
-1. **You provide context** about what needs to be built
-2. **The agent creates a plan** (displayed in terminal for review)
-3. **We iterate together** until the plan is perfect
-4. **Plan is saved to disk** as a markdown file
-5. **Then (and only then)** implementation can begin
-
-### Provide Your Planning Context
-
-You can share:
-
-- A feature you want to implement
-- An error message or bug to fix
-- Performance issues to optimize
-- A refactoring goal
-- Any relevant context or requirements
-
-**What would you like to plan?**
-
----
-
-**IMPORTANT AGENT INSTRUCTIONS:**
-
-When invoking the subagent agent:
-
-1. **DO NOT write any code during planning phase**
-2. **DO NOT use Edit, Write, or any modification tools**
-3. **ONLY output the plan to terminal for iterative review**
-4. **ONLY persist to disk after explicit user approval**
-5. The agent should remain in "Phase 1: Human-Readable Planning" mode until the user explicitly approves with signals like "looks good", "approved", or "ready to implement"
-
-The goal is to create a comprehensive implementation plan that will be saved as a `.md` file at the repository root, which can then guide future implementation work.
-```
+1. **Write boundary:** do not use Edit, Write or any modification tool until the plan is approved. Read-only searches that locate the goal's implementation and tests are fine; ask before exploring beyond them.
+2. **Delegation:** optional. If a registered agent type fits (for example the built-in `Plan` agent for a large search), hand it the goal and context; otherwise draft directly. Either way the plan is shown here: the approval conversation stays in the main thread, because a subagent cannot wait for the user's reply.
+3. **Approval signal:** only an explicit "looks good", "approved" or "ready to implement" approves. Every other reply is feedback: revise and show the plan again.
+4. **Output location:** after approval, save the plan as a `.md` file at the repository root; implementation starts only then.
+````
 
 **Key features of this example:**
 
-- User-facing explanation of the workflow
-- Clear phase boundaries (planning vs implementation)
-- Explicit anti-patterns ("DO NOT write code")
-- User approval trigger ("looks good", "approved")
-- Tells agent which specialized agent to invoke
-- Specifies where to save output (`.md` at root)
+- Explicit approval signal; anything else is feedback
+- Write boundary until approval, with scoped read-only inspection allowed
+- Output location (`.md` at the repository root)
+- Delegation only when a registered agent type fits, with the approval kept in the main thread
 
-## Example 4: codex-review (Simple Execution Pattern)
+## Example 4: codex-review (Simple execution)
 
-**Pattern:** Simple Execution (Parse Arguments → Execute → Return Output)
+**Pattern:** Simple execution (Parse Arguments → Execute → Return Output)
 
 **Minimal example structure:**
 
-```markdown
+````markdown
 ---
 description: Perform a local code review using repository standards and best practices
 argument-hint: [base-branch]
+arguments: base
 ---
 
 # Codex Review
 
 Performs a thorough code review of changes between the current branch and the base branch.
 
-## What This Command Does
-
-1. Determines base branch (uses provided argument or defaults to main/master)
-2. Runs codex-review script with the base branch
-3. Displays review findings and suggestions
-
 ## Usage
 
-\`\`\`bash
-
+```bash
 # With explicit base branch
-
 /codex-review develop
 
 # Without argument (auto-detects main/master)
-
 /codex-review
-\`\`\`
+```
 
 ## Implementation Steps
 
 ### 1. Determine Base Branch
 
-If `[base-branch]` argument is provided:
+If `$base` is not empty:
 
-- Use the specified branch
+- Encode `refs/heads/$base` as one single-quoted shell word (each `'` inside it written as `'\''`)
+- Check it with `git rev-parse -q --verify --end-of-options <encoded ref>`; if that fails, stop and say the branch was not found
 
-If no argument:
+If `$base` is empty:
 
-- Check if `main` branch exists: `git rev-parse --verify main`
-- If yes, use `main`
-- If no, use `master`
+- Use `main` if `git rev-parse -q --verify --end-of-options refs/heads/main` succeeds, else `master` if the same check on `refs/heads/master` succeeds
+- If neither exists, stop and ask for an explicit base branch; never run the script with an unverified base
 
 ### 2. Run Review Script
 
-Execute the review script with the determined base branch:
+Execute the review script with the determined base branch, encoded the same way and placed after `--` (or the script's own end-of-options form):
 
-\`\`\`bash
-scripts/codex-review.py [base-branch]
-\`\`\`
+```bash
+scripts/codex-review.py -- <encoded branch>
+```
 
 ### 3. Display Results
 
-Show the script output directly to the user, including:
-
-- Files reviewed
-- Issues found
-- Suggestions for improvements
-- Compliance with coding standards
+Show the script output directly to the user: files reviewed, issues found, suggestions.
 
 ## Error Handling
 
-If the script fails:
-
-- Show the error message
-- Check if the base branch exists
-- Verify the script is executable
-
-## Notes
-
-- Square brackets `[base-branch]` indicate optional argument
-- Script handles actual review logic
-- Command is a simple wrapper for convenience
-```
+If the script fails: show the error message, and check that the script exists and is executable.
+````
 
 **Key features of this example:**
 
-- Optional argument handling (square brackets)
-- Argument defaulting logic
-- Direct script invocation
-- Minimal additional logic
+- Optional argument handling (square brackets, a named `$base` that is empty when omitted)
+- Argument validation before use, and defaulting logic
+- Direct script invocation with a quoted value
 - Clear output pass-through
-
-## Pattern Comparison
-
-| Feature               | submit-stack             | ensure-ci          | create-implementation-plan | codex-review             |
-| --------------------- | ------------------------ | ------------------ | -------------------------- | ------------------------ |
-| **Pattern**           | Workflow Automation      | Iterative Fixing   | Agent Delegation           | Simple Execution         |
-| **Arguments**         | Optional `<description>` | None               | None                       | Optional `[base-branch]` |
-| **Context Files**     | Checks `.PLAN.md`        | Checks `AGENTS.md` | None                       | None                     |
-| **Iterations**        | Single pass              | Up to 10           | Iterative (user-driven)    | Single pass              |
-| **Tool Usage**        | Git, Graphite            | Make, Edit tools   | Task tool (agent)          | Script execution         |
-| **Progress Tracking** | Inline reporting         | TodoWrite required | None (user reviews)        | None                     |
-| **Error Handling**    | Ask user                 | Stop if stuck      | None specified             | Show error message       |
-| **Success Criteria**  | PRs submitted            | Exit code 0        | User approves plan         | Script completes         |
-
-## Usage Guidance
-
-**Use submit-stack as a reference when:**
-
-- Command needs to check context files first
-- Workflow has clear sequential steps
-- Git operations are involved
-- Results need clear reporting
-
-**Use ensure-ci as a reference when:**
-
-- Command needs to iterate until success
-- Multiple error types need different fixes
-- Progress tracking is important
-- Stuck detection is needed
-
-**Use create-implementation-plan as a reference when:**
-
-- Command delegates to specialized agent
-- User review/approval is required
-- No direct code modification should happen
-- Output is saved to specific location
-
-**Use codex-review as a reference when:**
-
-- Command is a simple wrapper
-- Main logic is in external script
-- Argument handling is straightforward
-- Output is passed through directly

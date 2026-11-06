@@ -15,7 +15,7 @@ paginate: true
 }
 
 section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(135deg, #3b3f9e 0%, #6a2c91 50%, #a3286f 100%);
   color: var(--color-foreground);
   font-family: var(--font-default);
   font-weight: 400;
@@ -26,20 +26,13 @@ section {
   padding: 56px;
 }
 
-section:nth-child(2n) {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* Per-slide variants via the _class directive (warm, teal): section:nth-child never matches in Marp Core. */
+section.warm {
+  background: linear-gradient(135deg, #8e2a6e 0%, #b4232f 100%);
 }
 
-section:nth-child(3n) {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-section:nth-child(4n) {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-}
-
-section:nth-child(5n) {
-  background: linear-gradient(135deg, #167a45 0%, #087c75 100%);
+section.teal {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f5257 100%);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -98,6 +91,10 @@ li {
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
+section::after {
+  color: rgba(255, 255, 255, 0.85);
+}
+
 footer {
   font-size: 16px;
   color: rgba(255, 255, 255, 0.7);
@@ -110,7 +107,6 @@ footer {
 }
 
 section.lead {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -151,6 +147,18 @@ Gradient Background
 - Topic3
 
 ---
+
+<!-- _class: warm -->
+
+## Slide
+
+- Point1
+- Point2
+- Point3
+
+---
+
+<!-- _class: teal -->
 
 ## Slide
 

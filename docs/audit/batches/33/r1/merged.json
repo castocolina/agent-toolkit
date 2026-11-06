@@ -1,0 +1,98 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "skill-updater",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 43,
+          "evidence": "\"adopt: the upstream rule still applies to this artifact unchanged. Port it as written.\"",
+          "fix": "Shorten the three adopt/adapt/ignore definitions to one line each. The model can infer what the words mean. Keep only the repo-specific parts: adapt must name the deliberate divergence, and ignore must name the repo ruling or the feature this artifact does not have. The worked example at line 47 already shows the rest."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 15,
+          "evidence": "Step 2 packs four branches into one paragraph: the local-only row, the credited upstream that has no row, the upstreams run, and \"exits 1 ... read the rows, not the exit code\"",
+          "fix": "Split step 2 into sub-bullets, one per branch: (a) only a local row: go to step 6; (b) a credited upstream has no row: propose the row in updates.md; (c) otherwise run upstreams and read the rows, not the exit code. The checkpoints in the Process pattern are then as easy to scan as steps 3 and 5."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 54,
+          "evidence": "\"MODEL is the model the invoker names, else router-env/my-referee-two: ... pi-cmd runner --model MODEL\" (scripts/audit/audit.py line 80: DEFAULT_JUDGE_MODEL = \"router-env/my-referee-one\")",
+          "fix": "Add a gotcha: \"`pi-cmd` defaults to router-env/my-referee-one, not the probe default router-env/my-referee-two. If you leave out `--model`, the probe runs on a different model from the one you pass to `track --model`, and `reviewed_for_model` then records a model that was never probed. Always pass `--model` to both.\""
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 3,
+          "evidence": "The description is almost all WHEN. Its only WHAT is \"Records the result with audit.py track\", so it never names the adopt/adapt/ignore decision, the moved-path tree search or the model probe",
+          "fix": "Use when checking whether a skill, command or agent in this repo is still current, has drifted or is out of date against its upstream sources in docs/audit/upstream-sources.json and against the models it targets, even without the word \"upstream\": stale content, a source that moved or was renamed, an unreachable source, or a rule that may no longer match model behavior. Classifies each upstream change as adopt, adapt or ignore, finds a moved source path, probes model-countering rules, and records the result with audit.py track. Not for creating a skill, not for judging or grading one (skill-judge), not for refreshing the Agent Skills spec pin (agentskills-research), not for only running audit.py upstreams, not for fixing audit.py itself, and not for editing the synced skills gepetto and datadog-cli."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/skill-updater/evals/evals.json",
+          "line": null,
+          "evidence": "13 evals, but none covers the `invalid entry:` branch, the credited upstream that has no row (step 2), or the `last_upstream_sha` compare path. The stale-adopt-adapt-ignore expected track command also has no --sha, while SKILL.md line 29 requires \"--sha set to the newest commit you read\"",
+          "fix": "Add evals for an `invalid entry:` row (propose the corrected row, record nothing) and for an artifact that credits an upstream with no row (propose the row with `credit` copied verbatim). In stale-adopt-adapt-ignore, give the newest upstream commit sha in the prompt and add the assertion \"The track command passes --sha <that sha>\"."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/skill-updater/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "There are 11 should-not-trigger queries against 9 should-trigger ones. Most positives are short and formal, with no file paths, typos or personal context",
+          "fix": "Rebalance the queries to 10 and 10. Rewrite three positives so they read like real requests, with backstory and casual wording, for example \"my manager says the react-useeffect skill is probably outdated since react.dev reorganized their docs, can u check and log it\"."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 28,
+          "evidence": "Without last_upstream_sha the step runs \"gh api 'repos/<o>/<r>/commits?path=<path>&sha=<ref>&since=...'\". The note \"(drop the select on a github row)\" covers only the compare branch, but a `github` row has no path",
+          "fix": "Add to the no-last_upstream_sha branch: \"On a `github` row, drop `path=<path>&` from the query.\" Then a whole-repo source can follow the branch without guessing a path."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 39,
+          "evidence": "\"Judge the artifact with skill-judge when its content changed; the commit must touch SKILL.md or references/ (step 3).\"",
+          "fix": "Reword step 8: \"If you edited the artifact, put the change in SKILL.md or references/ (only those count as `ours_updated`, see step 3), then run skill-judge on it. If you edited nothing, skip this step.\""
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

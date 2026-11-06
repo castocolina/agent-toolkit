@@ -1,1 +1,121 @@
-{"skill_name":"c4-architecture","evals":[{"id":"context-container-commerce","prompt":"Can you sketch our online shop architecture? Customers use a React web app; it calls a Node.js order API; API stores orders in PostgreSQL and charges through Stripe. Need docs for product and engineering.","expected_output":"Audience-suitable C4 context and container Mermaid diagrams, documented with assumptions and clear labeled relationships, saved under the architecture docs convention.","assertions":["Provides both C4Context and C4Container diagrams for the stated audience and request","Includes React app, Node.js API, PostgreSQL, Stripe, and customer with directional labeled relationships","Uses Mermaid C4 syntax and a docs/architecture location"]},{"id":"specific-flow","prompt":"Diagram this production sign-in request flow as C4 Dynamic: browser submits credentials to Express auth controller over HTTPS; controller asks JWT service to validate; service queries PostgreSQL user records via SQL. Keep the diagram focused.","expected_output":"A focused, titled C4Dynamic Mermaid diagram with numbered relationships matching the described sequence and technologies.","assertions":["Uses a C4Dynamic diagram with a descriptive title","Shows the ordered browser/controller/JWT service/database flow","Labels relationships with numbered actions and relevant HTTPS or SQL technologies"]},{"id":"no-invented-architecture","prompt":"Create architecture diagrams for our app. All I know is that it has users and a backend. Please include our cloud provider, database, language, and deployment setup too.","expected_output":"A context diagram limited to confirmed facts and explicit unknowns rather than fabricated infrastructure, with necessary follow-up questions or stated assumptions.","assertions":["Does not assert an unprovided cloud provider, database, language, or deployment as fact","Represents the known user and backend at an appropriate abstraction","Clearly marks unknowns or asks for information needed for detailed containers/deployment"]}]}
+{
+  "skill_name": "c4-architecture",
+  "evals": [
+    {
+      "id": "context-container-commerce",
+      "prompt": "Can you sketch our online shop architecture? Customers use a React web app; it calls a Node.js order API; API stores orders in PostgreSQL and charges through Stripe. Need docs for product and engineering.",
+      "expected_output": "Audience-suitable C4 context and container Mermaid diagrams, documented with assumptions and clear labeled relationships, saved under the architecture docs convention.",
+      "assertions": [
+        "Provides both C4Context and C4Container diagrams for the stated audience and request",
+        "Includes React app, Node.js API, PostgreSQL, Stripe, and customer with directional labeled relationships",
+        "Writes the context view to a file under docs/architecture/ (such as c4-context.md) that contains a C4Context block",
+        "Writes the container view to a separate file under docs/architecture/ (such as c4-containers.md) that contains a C4Container block"
+      ]
+    },
+    {
+      "id": "specific-flow",
+      "prompt": "Diagram this production sign-in request flow as C4 Dynamic: browser submits credentials to Express auth controller over HTTPS; controller asks JWT service to validate; service queries PostgreSQL user records via SQL. Keep the diagram focused.",
+      "expected_output": "A focused, titled C4Dynamic Mermaid diagram whose relationships follow the described sequence in statement order, so Mermaid numbers them, with the stated technologies.",
+      "assertions": [
+        "Uses a C4Dynamic diagram with a descriptive title",
+        "Shows the ordered browser/controller/JWT service/database flow",
+        "Writes the relationships in flow order with action labels and the HTTPS or SQL technologies, without hand-written step numbers in the labels (Mermaid C4Dynamic numbers them)"
+      ]
+    },
+    {
+      "id": "no-invented-architecture",
+      "prompt": "Create architecture diagrams for our app. All I know is that it has users and a backend. Please include our cloud provider, database, language, and deployment setup too.",
+      "expected_output": "A context diagram limited to confirmed facts and explicit unknowns rather than fabricated infrastructure, with necessary follow-up questions or stated assumptions.",
+      "assertions": [
+        "Does not assert an unprovided cloud provider, database, language, or deployment as fact",
+        "Contains a C4Context with one Person for the users and one System for the backend, and no Container, ContainerDb or Deployment_Node elements",
+        "Clearly marks unknowns or asks for information needed for detailed containers/deployment"
+      ]
+    },
+    {
+      "id": "repo-evidence",
+      "prompt": "Here's our shop monorepo: the compose file, the package.json files and the k8s manifest for the API. Can you generate the C4 docs from it? Engineering will read them.",
+      "files": [
+        "evals/files/shop-repo/docker-compose.yml",
+        "evals/files/shop-repo/apps/web/package.json",
+        "evals/files/shop-repo/apps/api/package.json",
+        "evals/files/shop-repo/apps/worker/package.json",
+        "evals/files/shop-repo/packages/money/package.json",
+        "evals/files/shop-repo/k8s/api-deployment.yaml"
+      ],
+      "expected_output": "C4Context and C4Container Mermaid diagrams under docs/architecture/ derived from the files: web, api and worker containers, PostgreSQL and Redis data stores, an order.placed queue, Stripe and SendGrid as external systems, the shared money package kept out of the containers, and an evidence table marking each element observed or inferred.",
+      "assertions": [
+        "Models web, api and worker as separate Container elements and PostgreSQL (db) and Redis as ContainerDb elements",
+        "Does not draw @shop/money (packages/money) as a container; it is omitted or shown only as a component inside its consumers",
+        "Models order.placed as its own ContainerQueue that the api publishes to and the worker consumes, not one Kafka box wired to every service",
+        "Shows Stripe (used by the api) and SendGrid (used by the worker) as System_Ext elements",
+        "Shows the api as one container in the container diagram; the 3 replicas from k8s/api-deployment.yaml appear only in a deployment view, if one is drawn",
+        "Includes an evidence table that names the source file for each element or relationship and marks each as Observed or Inferred"
+      ]
+    },
+    {
+      "id": "renderer-downgrade",
+      "prompt": "Our internal wiki can't render the diagram in this page, the error is at the bottom. I need something on that wiki page today, what do I paste?",
+      "files": [
+        "evals/files/wiki-context.md"
+      ],
+      "expected_output": "A Mermaid flowchart translation of the C4Context diagram that keeps the C4 element types in node labels and the labeled, directional relationships, with an explicit note that it is a downgrade and that the C4 version stays the source of truth.",
+      "assertions": [
+        "Provides a Mermaid flowchart instead of the C4Context block, containing Customer, Online Shop, Stripe and SendGrid",
+        "Node labels keep the C4 element types, such as Person, Software System and External System",
+        "Keeps all three relationships directional, with their labels and the HTTPS technology",
+        "States explicitly that the flowchart is a downgrade of the C4 diagram and that the C4 version stays the source of truth"
+      ]
+    },
+    {
+      "id": "component-order-api",
+      "prompt": "Devs want a component view of the Order API. Inside it we have routes/orders.ts (Express router), services/checkout.ts (business logic), clients/stripe.ts (Stripe SDK wrapper), repos/orders-repo.ts (pg queries against Postgres) and events/publisher.ts (kafkajs producer to order.placed). The React web app calls the router.",
+      "expected_output": "One C4Component diagram saved as docs/architecture/c4-components-order-api.md (or a similar per-container name) with a Container_Boundary for the Order API holding the five modules and the web app, PostgreSQL, the order.placed topic and Stripe outside it.",
+      "assertions": [
+        "Uses a C4Component diagram with exactly one Container_Boundary, for the Order API, containing the five modules as Component elements",
+        "Places the web app, PostgreSQL, the order.placed topic and Stripe outside that boundary, as Container, ContainerDb, ContainerQueue and System_Ext elements",
+        "Draws the web app to the router and the Stripe client, repository and publisher outward to Stripe, PostgreSQL and order.placed, each with a verb label",
+        "Saves to a per-container file under docs/architecture/, such as c4-components-order-api.md"
+      ]
+    },
+    {
+      "id": "deployment-production",
+      "prompt": "Ops wants the production deployment diagram for the shop. Only the API's k8s manifest is in the repo; I honestly don't know where the worker, Postgres, Redis or Kafka run in prod.",
+      "files": [
+        "evals/files/shop-repo/docker-compose.yml",
+        "evals/files/shop-repo/k8s/api-deployment.yaml"
+      ],
+      "expected_output": "A C4Deployment titled for production that shows the api once in a node labeled with 3 replicas from the k8s manifest, does not reuse the local compose topology as production fact, and marks the worker, PostgreSQL, Redis and Kafka hosting as unknown or asks about it.",
+      "assertions": [
+        "Uses a C4Deployment diagram whose title names the production environment",
+        "Shows the api container once inside a node whose label carries the 3 replicas (for example shop-api x3), not as three duplicate api containers",
+        "Does not state a cloud provider, cluster or host for the worker, PostgreSQL, Redis or Kafka as observed fact; marks them unknown or inferred, or asks",
+        "Does not present the docker-compose.yml topology as the production deployment, or says explicitly that compose describes a local setup"
+      ]
+    },
+    {
+      "id": "system-boundaries",
+      "prompt": "Three teams work on our shop. Team A owns the storefront web app and the order API, Team B owns the payment worker that charges orders from the order API's queue, and Team C owns the catalog service, which our wholesale partner portal also uses through its own public API and which ships on its own release cycle. Draw the C4 overview.",
+      "expected_output": "A C4Context with the shop system and a separate catalog system, and a C4Container for the shop in which the web app, order API and payment worker are containers of one system, with a one-line rationale for each system boundary.",
+      "assertions": [
+        "Models the catalog service as its own System, separate from the shop",
+        "Keeps the web app, order API and payment worker as containers of one shop system, although two teams own them",
+        "States the reason for the catalog system boundary from its other consumers, public API or release cycle, not from team count alone"
+      ]
+    },
+    {
+      "id": "render-fix",
+      "prompt": "This page breaks our docs build, the error is pasted under the diagram. Can you fix it so it renders?",
+      "files": [
+        "evals/files/broken-containers.md"
+      ],
+      "expected_output": "A corrected C4Container block: the api Container has no body (its components are dropped or moved to a separate C4Component view in a Container_Boundary), cache is declared or its relationship removed, both causes are named, and the answer says whether the fix was rendered.",
+      "assertions": [
+        "No Container in the fixed diagram has a { } body; any kept components sit inside a Container_Boundary, in this view or a separate C4Component view",
+        "Every alias used in a Rel of the fixed diagram is declared (cache is declared, for example as a Redis ContainerDb, or its relationship is removed with a note)",
+        "Names both causes: the Container body that triggers the parse error and the undeclared cache alias that would fail next",
+        "Does not claim the fixed file rendered with exit 0 unless it shows mmdc output; otherwise says it was not rendered"
+      ]
+    }
+  ]
+}

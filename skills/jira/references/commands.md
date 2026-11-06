@@ -1,253 +1,67 @@
-# Commands Reference
+# jira CLI reference
 
-Complete reference for the `jira` CLI.
+Syntax for [ankitpokhrel/jira-cli](https://github.com/ankitpokhrel/jira-cli), checked against its README and source (main branch, 2026-11). Every command below runs without a prompt only with the arguments shown; dropping a required argument opens an interactive prompt that an agent cannot answer.
 
----
-
-## Viewing Issues
+## Read
 
 ```bash
-# View single issue
-jira issue view ISSUE-KEY
-
-# View with more comments
-jira issue view ISSUE-KEY --comments 5
-
-# Get raw JSON
-jira issue view ISSUE-KEY --raw
+jira issue view KEY --comments 5        # --raw prints the API JSON, --plain prints plain text
+jira issue list --plain --paginate 1    # cheapest authenticated read; jira me only prints the saved login
+jira issue list --plain --no-headers --columns key,summary,status,assignee
+jira issue list -a"$(jira me)" -s"In Progress" -yHigh -tBug -lbackend --created week --updated -2d
+jira issue list -q"assignee = currentUser() AND statusCategory != Done"   # raw JQL; configured project ANDed in unless the JQL names a project (SKILL.md gotcha)
+jira issue list --paginate 10:50        # start:limit
+jira epic list EPIC-1 --plain           # issues in an epic
+jira sprint list --current --plain      # issues in the active sprint; --next = next planned sprint
+jira sprint list --table --plain --columns id,name,start,state --state future
+jira me                                 # prints the login saved by jira init
+jira serverinfo                         # prints Version and Deployment Type
 ```
 
----
+`jira sprint list` covers only the board saved as `board.id` in the CLI config (SKILL.md gotcha; `-c FILE` or `JIRA_CONFIG_FILE` selects another config) and at most 25 recent sprints. `jira board list` lists the boards of the project.
 
-## Listing Issues
-
-```bash
-# List all issues in project
-jira issue list
-
-# List my issues
-jira issue list -a$(jira me)
-
-# Filter by status (use quotes for multi-word statuses)
-jira issue list -s"In Progress"
-jira issue list -s"To Do"
-jira issue list -sDone
-
-# Filter by type
-jira issue list -tBug
-jira issue list -tStory
-jira issue list -tTask
-jira issue list -tEpic
-
-# Filter by priority
-jira issue list -yHigh
-jira issue list -yCritical
-
-# Filter by label
-jira issue list -lurgent -lbug
-
-# Combine filters
-jira issue list -a$(jira me) -s"In Progress" -yHigh
-
-# Search with text
-jira issue list "login error"
-
-# Recently accessed
-jira issue list --history
-
-# Issues I'm watching
-jira issue list -w
-
-# Created/updated filters
-jira issue list --created today
-jira issue list --created week
-jira issue list --updated -2d
-
-# Plain output for scripting
-jira issue list --plain --no-headers
-
-# Specific columns
-jira issue list --plain --columns key,summary,status,assignee
-
-# Raw JQL query
-jira issue list -q"status = 'In Progress' AND assignee = currentUser()"
-
-# Paginate results
-jira issue list --paginate 20
-jira issue list --paginate 10:50 # start:limit
-```
-
----
-
-## Creating Issues
-
-```bash
-# Interactive creation
-jira issue create
-
-# Non-interactive: discover required fields first, then provide all of them
-jira issue create --no-input \
-    -tBug \
-    -s"Login button not working" \
-    -b"Users cannot click the login button on Safari" \
-    -yHigh \
-    -lbug -lurgent
-
-# Create and assign to self
-jira issue create -tTask -s"Summary" -a$(jira me)
-
-# Create subtask (requires parent)
-jira issue create -tSub-task -P"PROJ-123" -s"Subtask summary"
-
-# Create with custom fields
-jira issue create -tStory -s"Summary" --custom story-points=3
-
-# Skip prompts for optional fields
-jira issue create -tTask -s"Quick task" --no-input
-
-# Open in browser after creation
-jira issue create -tBug -s"Bug title" --web
-
-# Read description from file
-jira issue create -tStory -s"Summary" --template /path/to/template.md
-
-# Read description from stdin
-echo "Description here" | jira issue create -tTask -s"Summary"
-```
-
-**Multi-line content:** Pass a file with the documented `--template` option to preserve line breaks without shell reconstruction. Use a unique temporary file and remove it afterward:
+## Create and edit
 
 ```bash
 body_file=$(mktemp)
 trap 'rm -f "$body_file"' EXIT
 cat > "$body_file" <<'EOF'
-## Description
-User needs ability to export data...
-
-## Acceptance Criteria
-- Export works for CSV
-- Export works for JSON
+Markdown body; the CLI converts it to Jira wiki markup.
 EOF
+jira issue create --no-input --raw -pPROJ -tStory -s"Summary" \
+  -a"$(jira me)" -P EPIC-1 -CCheckout -yHigh -lbackend --template "$body_file"
 
-jira issue create --no-input \
-  -tStory \
-  -pPROJ \
-  -s"Add export functionality" \
-  --template "$body_file"
+jira issue edit KEY --no-input -s"New summary" < "$body_file"   # edit has no --template; body from stdin replaces the whole description
+jira issue edit KEY --no-input -P EPIC-1          # set or change the parent epic
+jira issue edit KEY --no-input --label -old --label new --skip-notify
 ```
 
----
+- Always pass `--no-input`: without it, create and edit end in an interactive Submit / Add metadata / Cancel menu even when every flag is set. With it, a missing `-s` or `-t` fails at once, but a project-required custom field you did not pass fails only at the API. Get the required list from create-field metadata first (mcp.md); the CLI has no metadata command.
+- `-b` beats `--template` and stdin. For multi-line bodies use `--template FILE` on create and stdin on edit, never `$(...)` substitution, which mangles quotes and newlines.
+- `--raw` on create prints JSON with the new key for the read-back.
+- `--custom name=value` works only for custom fields declared under `issue.fields.custom` in the CLI config; anything else needs MCP or REST.
+- On edit, `-l` and `-C` add to the existing labels and components and a leading minus removes one: `--component -OLD --component NEW`. The `-C` help text says "Replace components", but the source sends add/remove operations (VERIFIED, jira-cli `issue/edit` and `pkg/jira/edit.go`).
+- `-P` sends `parent` on team-managed projects and writes the epic key into the Epic Link field named by `epic.link` in the CLI config on company-managed ones (VERIFIED, jira-cli source). Whether Cloud still accepts that Epic Link write is UNVERIFIED: re-read the parent and fall back to `jira epic add`.
 
-## Transitioning Issues
+## Transition, assign, comment
 
 ```bash
-# Move to a state
-jira issue move ISSUE-KEY "In Progress"
-jira issue move ISSUE-KEY "Done"
-jira issue move ISSUE-KEY "To Do"
-
-# Move with comment
-jira issue move ISSUE-KEY "Done" --comment "Completed the implementation"
-
-# Move and set resolution
-jira issue move ISSUE-KEY "Done" -R"Fixed"
-
-# Move and reassign
-jira issue move ISSUE-KEY "In Review" -a"reviewer@example.com"
-
-# Open in browser after transition
-jira issue move ISSUE-KEY "Done" --web
+jira issue move KEY Done --comment "Shipped in 2.4" -RFixed   # exact target status name
+jira issue assign KEY "$(jira me)"     # also: default (project default), x (unassign)
+jira issue comment add KEY --template "$body_file"
 ```
 
----
+- `--comment`, `-R` and `-a` on `move` work only if the transition screen has those fields.
 
-## Assigning Issues
+## Epics, sprints, links
 
 ```bash
-# Assign to specific user
-jira issue assign ISSUE-KEY "user@example.com"
-jira issue assign ISSUE-KEY "John Doe"
-
-# Assign to self
-jira issue assign ISSUE-KEY $(jira me)
-
-# Assign to default assignee
-jira issue assign ISSUE-KEY default
-
-# Unassign
-jira issue assign ISSUE-KEY x
+jira epic add EPIC-1 KEY-1 KEY-2        # Agile epic API, up to 50 issues; not for team-managed epics (use edit -P)
+jira epic remove KEY-1
+jira sprint add SPRINT_ID KEY-1 KEY-2   # up to 50 issues
+jira issue link KEY-1 KEY-2 Blocks      # link type name as configured on the instance
+jira issue link remote KEY https://github.com/org/repo/pull/7 "PR #7"
+jira issue unlink KEY-1 KEY-2
 ```
 
----
-
-## Comments
-
-```bash
-# Add comment
-jira issue comment add ISSUE-KEY -b"This is my comment"
-
-# Add comment from file
-jira issue comment add ISSUE-KEY --template /path/to/comment.md
-```
-
----
-
-## Sprints
-
-```bash
-# List sprints
-jira sprint list
-
-# Active sprint only
-jira sprint list --state active
-
-# Add issue to sprint
-jira sprint add SPRINT-ID ISSUE-KEY
-
-# Close sprint
-jira sprint close SPRINT-ID
-```
-
----
-
-## Linking Issues
-
-| Relationship | Meaning |
-|--------------|---------|
-| `Blocks` | First ticket blocks second |
-| `Relates` | General relationship |
-| `Duplicate` | Same work |
-| `Epic-Story` | Story belongs to Epic |
-
-```bash
-# Basic link
-jira issue link PROJ-123 PROJ-456 "Relates"
-
-# Blocker (blocker comes first)
-jira issue link PROJ-100 PROJ-200 "Blocks"
-# Meaning: PROJ-100 blocks PROJ-200
-
-# Link to epic
-jira issue link PROJ-EPIC PROJ-STORY "Epic-Story"
-```
-
----
-
-## Other Commands
-
-```bash
-# Open issue in browser
-jira open ISSUE-KEY
-
-# Show current user
-jira me
-
-# Server info
-jira serverinfo
-
-# List projects
-jira project list
-
-# List boards
-jira board list
-```
+- The CLI has no attachment command; use MCP or REST (mcp.md).

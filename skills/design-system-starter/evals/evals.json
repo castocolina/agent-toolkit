@@ -8,7 +8,9 @@
       "assertions": [
         "Outputs a token file with color, typography, and spacing roles",
         "Outputs a component list with primitive, composed, and product levels",
-        "Documents a 4.5:1 pair and a 3:1 pair"
+        "Lists at least one text/background pair with hex values and a computed ratio of 4.5 or more, and one UI-boundary pair (a border or focus ring against its surface) with hex values and a ratio of 3 or more",
+        "Includes a component documentation guide that lists each component's props with defaults and its states",
+        "The token file is parseable JSON in the DTCG 2025.10 shape ($type on every token, colors as {colorSpace, components} objects, dimensions as {value, unit} objects), or the answer explicitly says it uses legacy string values for an older toolchain"
       ]
     },
     {
@@ -18,28 +20,57 @@
       "assertions": [
         "Distinguishes semantic color tokens from primitive values",
         "Provides light and dark theme mapping through CSS variables or equivalent",
-        "States 4.5:1 normal-text and 3:1 large-text/UI contrast targets"
+        "States 4.5:1 normal-text and 3:1 large-text/UI contrast targets",
+        "Defines Button props with their defaults (intent, size and type, with type defaulting to button) and maps its hover, focus-visible, disabled and loading states to semantic token roles",
+        "Defines FormField props with a required control id tied to the label, a hint, and an error that sets aria-invalid and points aria-describedby at the displayed message",
+        "For both the light and the dark theme, lists at least one text/background pair as resolved hex values with a computed contrast ratio of 4.5 or more"
+      ],
+      "files": [
+        "templates/design-tokens-template.json",
+        "templates/component-template.tsx",
+        "references/component-examples.md"
       ]
     },
     {
       "id": "legacy-ui-audit",
-      "prompt": "Our legacy UI has low-contrast buttons, inconsistent spacing, and icon-only controls. Give an audit-and-migration plan that avoids a risky big-bang rewrite.",
+      "prompt": "Here's our legacy settings page (legacy-settings.html). It has low-contrast buttons, inconsistent spacing, and icon-only controls. Give an audit-and-migration plan that avoids a risky big-bang rewrite.",
       "expected_output": "A phased audit and adoption plan addressing contrast, spacing tokens, accessible control names, and incremental migration.",
       "assertions": [
-        "Includes contrast review and WCAG AA target thresholds",
+        "Lists the Save button pair from legacy-settings.html with its hex values (#ffffff on #8ab4f8) and a computed ratio, marks it below the 4.5:1 WCAG AA threshold, and names a passing replacement token",
         "Calls for accessible names and keyboard operation for icon-only controls",
-        "Recommends incremental adoption rather than a big-bang rewrite"
+        "Recommends incremental adoption rather than a big-bang rewrite",
+        "Names at least one hardcoded hex or pixel value from legacy-settings.html and the semantic token that replaces it"
+      ],
+      "files": [
+        "legacy-settings.html"
       ]
     },
     {
       "id": "primitive-token-file",
       "prompt": "Turn this token file into semantic design tokens. The components should consume roles, light and dark should be two value sets on the same tokens, and say what the empty, error, and success states look like.",
       "expected_output": "Semantic roles aliasing the primitive values, a light and a dark value set on those roles, and empty, error, and success state guidance.",
-      "files": ["tokens.json"],
+      "files": [
+        "tokens.json"
+      ],
       "assertions": [
         "Defines semantic color, typography, and spacing roles that alias the primitive values in the file rather than exposing blue-500, gray-100, or raw pixel sizes to components",
         "Provides a light and a dark value set on the same semantic tokens",
-        "Describes the empty, error, and success states a component must render"
+        "Describes the empty, error, and success states a component must render",
+        "The token file is parseable JSON in the DTCG 2025.10 shape ($type on every token, colors as {colorSpace, components} objects, dimensions as {value, unit} objects), or the answer explicitly says it uses legacy string values for an older toolchain"
+      ]
+    },
+    {
+      "id": "broken-token-file",
+      "prompt": "Build a React Button and a TextInput on our existing tokens in broken-tokens.json. Helper text uses text.secondary.",
+      "expected_output": "The token defects are reported and fixed (or block the component work) before any component code: the brand.primary/action.default cycle, the missing color.gray.350 target, and the failing text.secondary on surface.default pair.",
+      "files": [
+        "broken-tokens.json"
+      ],
+      "assertions": [
+        "Identifies the circular reference between color.semantic.brand.primary and color.semantic.action.default",
+        "Identifies color.semantic.border.default as referencing the missing token color.gray.350",
+        "Reports text.secondary on surface.default as below 4.5:1 and proposes a replacement value that passes",
+        "Fixes all three defects before writing component code, or states that component work is blocked until they are fixed"
       ]
     }
   ]

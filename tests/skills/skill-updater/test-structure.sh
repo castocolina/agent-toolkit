@@ -14,6 +14,7 @@ need "$S/evals/files/registry-moved-path.json"
 need "$S/evals/files/registry-current.json"
 need "$S/evals/files/registry-deleted-path.json"
 need "$S/evals/files/registry-several-candidates.json"
+need "$S/evals/files/registry-kept-new-path.json"
 if [ -f "$S/SKILL.md" ]; then
   name="$(sed -n '2,/^---$/p' "$S/SKILL.md" | sed -n 's/^name: *//p' | head -1 | tr -d '"')"
   [ "$name" = "skill-updater" ] || { echo "FAIL frontmatter name is '$name'" >&2; fail=1; }

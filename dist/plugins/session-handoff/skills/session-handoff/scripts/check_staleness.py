@@ -9,17 +9,19 @@ Analyzes:
 - Branch divergence
 - Modified files status
 
-Usage:
-    python check_staleness.py <handoff-file>
-    python check_staleness.py .claude/handoffs/2024-01-15-143022-auth.md
+Run with --help for usage, exit codes and examples.
 """
 
-import os
+import argparse
+import json
 import re
 import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
+
+sys.dont_write_bytecode = True  # keep the installed skill free of __pycache__
+from validate_handoff import extract_file_references  # sibling script; one owner for reference parsing
 
 
 def run_cmd(cmd: list[str], cwd: str = None) -> tuple[bool, str]:
@@ -72,11 +74,7 @@ def parse_handoff_metadata(filepath: str) -> dict:
     if match:
         metadata["baseline_commit"] = match.group(1)
 
-    # Parse modified files from table
-    table_matches = re.findall(r'\|\s*([a-zA-Z0-9_\-./]+\.[a-zA-Z]+)\s*\|', content)
-    for f in table_matches:
-        if '/' in f and not f.startswith('['):
-            metadata["modified_files"].append(f)
+    metadata["modified_files"] = sorted(extract_file_references(content))
 
     return metadata
 
@@ -118,24 +116,36 @@ def get_changed_files_since(baseline_commit: str, project_path: str) -> tuple[li
     if not success:
         return None, ancestry_diverged
     files = set(output.splitlines()) if output else set()
-    success, working = run_cmd(["git", "status", "--porcelain", "--untracked-files=all"], cwd=project_path)
-    if not success:
+    # Raw NUL-delimited records: stripping would eat the leading space of " M path".
+    try:
+        status = subprocess.run(
+            ["git", "status", "--porcelain=v1", "-z", "--untracked-files=all"],
+            capture_output=True, text=True, cwd=project_path, timeout=10,
+        )
+    except (subprocess.TimeoutExpired, FileNotFoundError):
         return None, ancestry_diverged
-    for line in working.splitlines():
-        entry = line[3:].split(" -> ")[-1].strip()
-        if entry:
-            files.add(entry)
-    return sorted(files), ancestry_diverged
+    if status.returncode != 0:
+        return None, ancestry_diverged
+    records = iter(status.stdout.split("\0"))
+    for record in records:
+        if len(record) < 4:
+            continue
+        files.add(record[3:])
+        if "R" in record[:2] or "C" in record[:2]:
+            source = next(records, "")  # rename/copy: the next record is the source path
+            if source:
+                files.add(source)
+    # Handoff files themselves are not project changes.
+    return sorted(f for f in files if not f.startswith(".claude/handoffs/")), ancestry_diverged
 
 
-def check_files_exist(files: list[str], project_path: str) -> tuple[list[str], list[str]]:
-    """Check which files from handoff still exist."""
+def check_files_exist(files: list[str], base_dirs: list[str]) -> tuple[list[str], list[str]]:
+    """Check which files from handoff still exist (project root or handoff directory)."""
     existing = []
     missing = []
 
     for f in files:
-        full_path = Path(project_path) / f
-        if full_path.exists():
+        if any((Path(base) / f).exists() for base in base_dirs):
             existing.append(f)
         else:
             missing.append(f)
@@ -283,7 +293,7 @@ def check_staleness(handoff_path: str) -> dict:
             return result
 
         # Check if handoff's modified files still exist
-        existing, missing = check_files_exist(metadata["modified_files"], project_path)
+        existing, missing = check_files_exist(metadata["modified_files"], [project_path, str(path.parent)])
         result["referenced_files_exist"] = len(existing)
         result["referenced_files_missing"] = missing
 
@@ -316,10 +326,6 @@ def check_staleness(handoff_path: str) -> dict:
 
 def print_report(result: dict):
     """Print staleness report."""
-    if "error" in result:
-        print(f"Error: {result['error']}")
-        return
-
     print(f"\n{'='*60}")
     print(f"Handoff Staleness Report")
     print(f"{'='*60}")
@@ -379,16 +385,32 @@ def print_report(result: dict):
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python check_staleness.py <handoff-file>")
-        print("Example: python check_staleness.py .claude/handoffs/2024-01-15-auth.md")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="Report how stale a handoff is against the current git state of its project.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""exit codes:
+  0  FRESH or SLIGHTLY_STALE
+  1  STALE
+  2  VERY_STALE, UNKNOWN (no baseline, not a git repo, or baseline not an ancestor of HEAD),
+     or handoff file not found (message on stderr)
 
-    handoff_path = sys.argv[1]
-    result = check_staleness(handoff_path)
-    print_report(result)
+examples:
+  python3 scripts/check_staleness.py .claude/handoffs/2026-01-15-143022-auth.md
+  python3 scripts/check_staleness.py --json .claude/handoffs/2026-01-15-143022-auth.md""",
+    )
+    parser.add_argument("handoff_file", help="Path to the handoff markdown file")
+    parser.add_argument("--json", action="store_true", help="Print the result as one JSON object on stdout")
+    args = parser.parse_args()
 
-    # Exit code based on staleness
+    result = check_staleness(args.handoff_file)
+    if "error" in result:
+        print(f"Error: {result['error']}", file=sys.stderr)
+        sys.exit(2)
+    if args.json:
+        print(json.dumps(result, indent=2, default=str))
+    else:
+        print_report(result)
+
     level = result.get("staleness_level", "UNKNOWN")
     if level in ["FRESH", "SLIGHTLY_STALE"]:
         sys.exit(0)

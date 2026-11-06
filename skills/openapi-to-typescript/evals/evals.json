@@ -3,33 +3,169 @@
   "evals": [
     {
       "id": "spec-types",
-      "prompt": "Convert `{\"openapi\":\"3.0.2\",\"paths\":{\"/pets\":{\"get\":{\"responses\":{\"200\":{\"description\":\"ok\"}}}}},\"components\":{\"schemas\":{\"Pet\":{\"type\":\"object\",\"required\":[\"id\"],\"properties\":{\"id\":{\"type\":\"integer\"},\"name\":{\"type\":\"string\"}}}}}}` to TS.",
-      "expected_output": "Pet required numeric id, optional name, ApiError and guard; no invented GET response type.",
+      "prompt": "Convert evals/files/pets-min.json to TS, with a runtime type guard for Pet.",
+      "files": [
+        "evals/files/pets-min.json",
+        "references/guards.md"
+      ],
+      "expected_output": "`export interface Pet { id: number; name?: string; [key: string]: unknown }` and an `isPet` guard that checks `id` is a number and, when `name` is present (`\"name\" in value`), that it is a string, so a present `undefined` fails. No `ApiError` (the spec defines none). No type for GET /pets 200; the report says that response has no documented body.",
       "assertions": [
-        "`Pet.id` required `number`",
-        "`Pet.name` optional `string`",
-        "Includes the documented `Pet` type and a runtime guard; includes `ApiError` only if defined by the supplied spec",
-        "Does not invent a GET response type or alias an undocumented response to `unknown`"
+        "`Pet.id` is a required `number`",
+        "`Pet.name` is an optional `string`",
+        "The `isPet` guard rejects a present `name` that is not a string, including a present `name: undefined`, by testing presence with `in`",
+        "Does not emit an `ApiError` type, since the spec does not define one",
+        "Does not invent a GET response type or alias the undocumented response to `unknown`, and reports that it has no documented body"
+      ]
+    },
+    {
+      "id": "pets-operations",
+      "prompt": "Generate TypeScript types from our evals/files/pets-api.yaml into types/api.ts. Types only, no runtime guards.",
+      "files": [
+        "evals/files/pets-api.yaml"
+      ],
+      "expected_output": "Owner, Pet (response view: required `id`, no `microchipCode`), PetWrite (request view: no `id`, required `microchipCode`), Problem. ListPetsQueryParams { limit?: number }, ListPetsHeaderParams { \"X-Request-Id\": string } (Authorization ignored), ListPetsResponse200 = Pet[], ListPetsResponseDefault = Problem, CreatePetRequestBody = PetWrite, CreatePetResponse201 = Pet, GetPetPathParams, GetPetResponse200, GetPet2PathParams, GetPet2Response200 (get_pet renamed), DeletePetsByPetIdPathParams with no 204 type. `tag?: string | null`, `owner?: Owner` with the ignored nullable sibling reported, `labels?: Record<string, string>`, `bornAt?: string`. Report lists the rename, the ignored header, the ignored sibling, and the 404/204 responses with no documented body. Every schema-derived object interface carries `[key: string]: unknown`; the `*Params` interfaces do not.",
+      "assertions": [
+        "`Pet` has a required `id: string` and no `microchipCode` property",
+        "Emits `PetWrite` with a required `microchipCode: string` and no `id`, and `CreatePetRequestBody` is `PetWrite`",
+        "`Pet.tag` is `tag?: string | null`, while `Pet.owner` is `owner?: Owner` without `| null` and the ignored `nullable` sibling of the `$ref` is reported",
+        "`ListPetsHeaderParams` keeps the quoted wire name `\"X-Request-Id\"` and has no `Authorization` member",
+        "The `get_pet` operation's types are named `GetPet2PathParams` and `GetPet2Response200`, and the rename is reported",
+        "The DELETE operation without `operationId` produces `DeletePetsByPetIdPathParams` and no type for its 204 response",
+        "The `default` response is emitted as `ListPetsResponseDefault = Problem`",
+        "Emits no type guards and no `ApiError` type"
+      ]
+    },
+    {
+      "id": "shapes-guards",
+      "prompt": "Generate types and runtime type guards for evals/files/shapes.yaml; we validate websocket messages with them.",
+      "files": [
+        "evals/files/shapes.yaml",
+        "references/guards.md"
+      ],
+      "expected_output": "Animal = (Cat & { petType: \"cat\" }) | (Dog & { petType: \"Dog\" }) marked Approximate (the branches overlap), with isAnimal selecting the candidate by petType and rejecting a value that also matches the other branch; Shape = Circle | Square marked Approximate and isShape requiring exactly one match; TreeNode with children?: TreeNode[] and a cycle-safe isTreeNode(value) that delegates to a private helper holding the visited state; Metadata with a widened index signature marked Approximate and an isMetadata that requires every non-version key to be a string. Report: no operations, the Approximate types, and the mutation tests run (or that they could not run). Object interfaces carry `[key: string]: unknown`.",
+      "assertions": [
+        "`Animal` uses the literal discriminator values `\"cat\"` (from `mapping`) and `\"Dog\"` (the implicit schema name), and is marked approximate because `Cat` and `Dog` type `petType` as plain `string`",
+        "The `Animal` guard selects the candidate branch by `petType`, returns false for an unknown value, and still rejects a value that matches both `Cat` and `Dog`, such as `{ petType: \"cat\", livesLeft: 9, bark: \"x\" }`",
+        "`Shape` is `Circle | Square`, marked approximate, and its guard requires exactly one branch to match",
+        "`TreeNode` refers to itself by name, and its guard tracks visited objects so a cyclic value cannot loop forever",
+        "`Metadata` is marked approximate with an index signature that admits `number`, and its guard requires every key other than `version` to hold a string",
+        "Reports whether the type-check and guard mutation tests ran, without claiming success for a check that did not run",
+        "Every exported guard takes only `value: unknown`; the visited-object state for `TreeNode` lives in a private helper that the exported `isTreeNode` calls with fresh state"
       ]
     },
     {
       "id": "union-ref",
-      "prompt": "OpenAPI 3.0 Pet oneOf refs Cat and Dog; explain $ref.",
-      "expected_output": "Pet union Cat | Dog; refs are direct named types.",
+      "prompt": "quick q: in our OpenAPI 3.0 spec Pet is `oneOf: [{$ref: '#/components/schemas/Cat'}, {$ref: '#/components/schemas/Dog'}]` with no discriminator. what TS do I get for Pet, and do I lose anything?",
+      "expected_output": "`export type Pet = Cat | Dog;` with Cat and Dog kept as named types (refs are not inlined). It is approximate: a TypeScript union is not exclusive, so a value matching both Cat and Dog compiles although oneOf rejects it.",
       "assertions": [
-        "oneOf union",
-        "Uses Cat and Dog types",
-        "Explains direct `$ref` mapping"
+        "Maps `Pet` to the union `Cat | Dog`",
+        "States that the `$ref`s stay named types `Cat` and `Dog` rather than being inlined",
+        "Marks the union as approximate because a TypeScript union cannot express oneOf exclusivity"
       ]
     },
     {
       "id": "unsupported-version",
-      "prompt": "Spec is OpenAPI 3.1.0; generate types anyway?",
-      "expected_output": "Stop: only 3.0.x supported.",
+      "prompt": "Generate TS types from this anyway please: `openapi: 3.1.0`, `components.schemas.User: {type: object, properties: {nickname: {type: [string, 'null']}}}`.",
+      "expected_output": "Stops: OpenAPI 3.1 is not supported; it uses JSON Schema 2020-12 (type arrays such as [string, 'null'], no nullable), so the 3.0 rules would mistype it. No types are emitted.",
       "assertions": [
-        "Identifies 3.1 unsupported",
-        "States 3.0.x support",
-        "Does not fabricate types"
+        "Identifies OpenAPI 3.1 as unsupported",
+        "States that only 3.0.x is supported and gives the reason (3.1 type arrays and no `nullable`)",
+        "Does not emit any TypeScript types"
+      ]
+    },
+    {
+      "id": "external-ref",
+      "prompt": "Make types/api.ts from this OpenAPI 3.0.3 doc: `{\"openapi\":\"3.0.3\",\"info\":{\"title\":\"A\",\"version\":\"1\"},\"paths\":{\"/orders\":{\"get\":{\"operationId\":\"listOrders\",\"responses\":{\"200\":{\"description\":\"ok\",\"content\":{\"application/json\":{\"schema\":{\"type\":\"array\",\"items\":{\"$ref\":\"#/components/schemas/Order\"}}}}},\"default\":{\"description\":\"err\",\"content\":{\"application/json\":{\"schema\":{\"$ref\":\"./common.yaml#/components/schemas/Error\"}}}}}}}},\"components\":{\"schemas\":{\"Order\":{\"type\":\"object\",\"required\":[\"id\"],\"properties\":{\"id\":{\"type\":\"string\"}}}}}}`",
+      "expected_output": "Stops before writing: the external ref `./common.yaml#/components/schemas/Error` (used by the default response of GET /orders) cannot be resolved. Lists the ref and its location; offers a partial result with that type as `unknown` marked Unresolved only if the user accepts.",
+      "assertions": [
+        "Stops before writing `types/api.ts`",
+        "Names the ref `./common.yaml#/components/schemas/Error` and where it is used (the `default` response of `GET /orders`)",
+        "Does not silently substitute `unknown`; offers a partial result only with the user's consent"
+      ]
+    },
+    {
+      "id": "no-components",
+      "prompt": "Our health service spec has no components at all: `{\"openapi\":\"3.0.1\",\"info\":{\"title\":\"Health\",\"version\":\"1\"},\"paths\":{\"/health\":{\"get\":{\"responses\":{\"200\":{\"description\":\"ok\",\"content\":{\"application/json\":{\"schema\":{\"type\":\"object\",\"required\":[\"status\"],\"properties\":{\"status\":{\"type\":\"string\",\"enum\":[\"ok\",\"degraded\"]}}}}}}}}}}}`. Give me the TS.",
+      "expected_output": "`export type GetHealthResponse200 = { status: \"ok\" | \"degraded\"; [key: string]: unknown };` with the inline enum kept inline; the report says 0 named schemas.",
+      "assertions": [
+        "Proceeds instead of stopping on the missing `components`",
+        "Names the type from the method and path: `GetHealthResponse200`",
+        "Keeps the inline enum inline as `\"ok\" | \"degraded\"` without inventing a named type for it",
+        "Reports 0 named schemas"
+      ]
+    },
+    {
+      "id": "swagger-2",
+      "prompt": "Can you turn evals/files/swagger2.json into TS types for the legacy pets app?",
+      "files": [
+        "evals/files/swagger2.json"
+      ],
+      "expected_output": "Stops: the file is Swagger 2.0 (`swagger: \"2.0\"`, `definitions`), which the skill does not support; the user must convert it to OpenAPI 3.0 first. No types are emitted.",
+      "assertions": [
+        "Identifies the input as Swagger 2.0 from its `swagger: \"2.0\"` field",
+        "States that it must be converted to OpenAPI 3.0 before types can be generated",
+        "Does not emit any TypeScript types"
+      ]
+    },
+    {
+      "id": "conflicts",
+      "prompt": "Generate types only for evals/files/conflicts.yaml.",
+      "files": [
+        "evals/files/conflicts.yaml"
+      ],
+      "expected_output": "`Base { id?: string; [key: string]: unknown }`, `Item = Base & { id?: number; [key: string]: unknown }` with the conflicting `id` (string vs integer, so `never`) reported, and `Tags { name: string; note?: string; [key: string]: string | undefined }`. The report lists the allOf conflict and 0 operations.",
+      "assertions": [
+        "`Item` is emitted as an intersection of `Base` and the inline branch, not as `interface ... extends`",
+        "Reports that `id` conflicts across the `allOf` branches (string vs integer) and therefore becomes `never`",
+        "`Tags` has an index signature `[key: string]: string | undefined`, with `| undefined` because `note` is optional",
+        "Emits no type guards"
+      ]
+    },
+    {
+      "id": "local-pointers",
+      "prompt": "Generate types only for evals/files/local-pointers.yaml into types/api.ts.",
+      "files": [
+        "evals/files/local-pointers.yaml"
+      ],
+      "expected_output": "`Address { postcode: string; country?: string; [key: string]: unknown }`; `ListPetsResponse200 = { name: string; [key: string]: unknown }[]`; `SearchPetsResponse200 = { name: string; [key: string]: unknown }[]` inlined from the decoded `/paths/~1pets/...` pointer; `ValidatePostcodeRequestBody = { postcode: string; [key: string]: unknown }` with `postcode` inlined from the Address property pointer; `ValidatePostcodeResponse200 = Address`. No invented names for the sub-schema pointers. `CopyPetsResponse200 = { name: string; [key: string]: unknown }[]` from the substituted Response Object; `GetHealthResponse200` and `GetStatusResponse200 = { up: boolean; [key: string]: unknown }` from the substituted Path Item.",
+      "assertions": [
+        "`SearchPetsResponse200` is the inlined array type `{ name: string; [key: string]: unknown }[]`, resolved by decoding `~1` to `/` and `application~1json` to `application/json`",
+        "The `postcode` property of `ValidatePostcodeRequestBody` is inlined as `string` from `#/components/schemas/Address/properties/postcode`",
+        "No new named type is invented for either sub-schema pointer",
+        "`ValidatePostcodeResponse200` is the named type `Address`",
+        "`CopyPetsResponse200` is `{ name: string; [key: string]: unknown }[]`, from the Response Object substituted from `#/paths/~1pets/get/responses/200`",
+        "The `/status` Path Item `$ref` yields `GetStatusResponse200 = { up: boolean; [key: string]: unknown }`, named from the referencing path"
+      ]
+    },
+    {
+      "id": "bodies",
+      "prompt": "Types only for evals/files/bodies.yaml please.",
+      "files": [
+        "evals/files/bodies.yaml"
+      ],
+      "expected_output": "`CreateNoteRequestBody = unknown | undefined` (optional body, no schema), `CreateNoteResponse201 = unknown` (no schema; the example is not used as a shape), `GetNoteTextPathParams { id: string }`, `GetNoteTextResponse200 = string` (text/plain). The report lists both schema-less bodies under 'body present, schema undocumented' and follows the report template.",
+      "assertions": [
+        "`CreateNoteRequestBody` is `unknown | undefined`, because the body is optional and its media type has no schema",
+        "`CreateNoteResponse201` is `unknown`, not a shape inferred from the `example`",
+        "Reports both schema-less bodies as \"body present, schema undocumented\"",
+        "`GetNoteTextResponse200` is `string` for the `text/plain` response",
+        "The report uses the template lines `Output:`, `Named schemas:`, `Approximate:` and `Type-check:`"
+      ]
+    },
+    {
+      "id": "open-objects",
+      "prompt": "Generate types and runtime guards for evals/files/open-objects.yaml.",
+      "files": [
+        "evals/files/open-objects.yaml",
+        "references/guards.md"
+      ],
+      "expected_output": "`Ref { id: unknown; [key: string]: unknown }`, `Item { name: string; [key: string]: unknown }`, `Scores { total: number; [key: string]: number }`; a fresh literal `{ name: \"a\", extra: 1 }` is a valid `Item`; `isRef({})` is false; guards do not reject extra keys on open objects.",
+      "assertions": [
+        "`Ref` keeps `id` as a required key typed `unknown`, alongside `[key: string]: unknown`",
+        "`Item` carries `[key: string]: unknown`, so a fresh literal with an extra key such as `{ name: \"a\", extra: 1 }` compiles",
+        "`Scores` has a required `total: number` and the index signature `[key: string]: number` from its `additionalProperties` schema",
+        "The `Ref` guard rejects `{}` because the required `id` key is missing",
+        "The guards accept extra keys on `Ref` and `Item`"
       ]
     }
   ]

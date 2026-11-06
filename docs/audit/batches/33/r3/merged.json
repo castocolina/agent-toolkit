@@ -1,0 +1,71 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "skill-updater",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 43,
+          "evidence": "\"**adopt**: the upstream rule still applies to this artifact unchanged. Port it as written.\" The adopt/adapt/ignore glosses mostly restate what the words mean; the worked example on line 47 carries the non-obvious part.",
+          "fix": "Merge the three bullets into one line that keeps only the repo-specific parts: adapt must name the deliberate local difference, ignore must name the repo ruling or the out-of-scope feature. Keep the line 47 example as it is."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/skill-updater/evals/evals.json",
+          "line": null,
+          "evidence": "Step 6 runs the model probe \"for every artifact, rows or not\" and the Gotcha says \"Always pass --model MODEL to both pi-cmd runner and track\". The expected_output of registry-current, stale-adopt-adapt-ignore, kept-new-path, rate-limit-unreachable and unversioned-current gives track commands with no --model, so the evals reward a call the skill forbids.",
+          "fix": "Add --model router-env/my-referee-two to the track command in each of those expected_output strings. Add an assertion such as \"The track command passes --model router-env/my-referee-two\" to at least registry-current and stale-adopt-adapt-ignore."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/skill-updater/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "9 should-trigger and 11 should-not-trigger queries; the guidance is 8-10 of each",
+          "fix": "Drop one weak negative such as \"Add a slash command that syncs the README table\", or add a 10th should-trigger query with an indirect phrasing, for example \"the react skill still cites a docs page, is that page still the same?\""
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 35,
+          "evidence": "\"Several: list them in `updates.md`, record no `path-moved`, ask the user which one.\" Step 7 then says \"One call per source row\", so following this branch leaves it unclear whether to record `unreachable`, keep the old status or record nothing. The README says \"nothing\".",
+          "fix": "Say it outright: \"Several: list them in `updates.md`, give no `track` call for this row (not even `unreachable`), and ask the user which one; re-run the review once they pick.\" In step 7, add \"except rows that steps 3 and 5 say to leave unrecorded\"."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 38,
+          "evidence": "Step 7's template shows \"[--model MODEL]\" as optional, but step 6 probes every artifact and the Gotcha on line 65 says to always pass --model to track",
+          "fix": "Make --model mandatory in the step 7 template: \"track --registry docs/audit/upstream-sources.json --artifact NAME --source SOURCE --status STATUS --model MODEL [--sha SHA] [--new-path PATH]\", with MODEL being the model the step 6 probe ran on."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

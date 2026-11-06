@@ -1,0 +1,77 @@
+{
+  "skill": "session-handoff",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 26,
+      "evidence": "\"4. Decisions with the options rejected (the rationale, not just the outcome).\" and \"5. A first next step concrete enough to run without asking.\"",
+      "fix": "Merge items 4 and 5 into one line, because the model already writes rationale and a next step in a handoff. Spend the saved lines on facts specific to this tool, such as the -2 per deleted recommended section in the validator score."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 22,
+      "evidence": "\"Fill. Before writing, ask: 'What would the next agent waste an hour rediscovering?' Write in this priority order:\" (says what to write but gives no procedure for collecting it)",
+      "fix": "Add a short harvest sub-step before writing. Run `git status` and `git log --oneline <baseline>..HEAD`, scan the session for the commands that were run and their observed output, and list untracked files. This way the 'observed result and its date' comes from evidence and not from memory."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 67,
+      "evidence": "\"The scanner only matches quoted assignments (`api_key = \"...\"`)... Unquoted assignments pass as clean\" but validate_handoff.py's Private key pattern `private[_-]?key[\"']?\\s*[:=]` also matches unquoted assignments",
+      "fix": "Reword to: \"The scanner matches quoted assignments, any `private_key=` assignment, `scheme://user:password@` URLs, 20+ character Bearer values and known prefixes; other unquoted assignments such as `export API_KEY=abcd1234efgh5678` pass as clean, so check them by hand.\""
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/session-handoff/evals/evals.json",
+      "line": 16,
+      "evidence": "\"Continue from 2026-10-23-api-start.md\" does not follow the mandated `YYYY-MM-DD-HHMMSS-<slug>.md` name; the pause-work assertions only check that a command and the facts are present",
+      "fix": "Rename the predecessor in the prompt to a compliant name, for example `2026-10-23-101500-api-start.md`. Add a pause-work assertion that the handoff marks unverified facts (such as client rollout status) as `Unknown` and does not guess them. Replace the easy negative \"Draft a sprint planning meeting agenda\" with a near-miss such as \"summarize today's session in the standup channel\"."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 44,
+      "evidence": "\"`[WARN] referenced file(s) not found` does not block READY\" together with line 29 \"Delete optional scaffold sections that do not apply\". The validator deducts 5 per missing file (cap 20) and 2 per missing recommended section (6 sections), so 4 missing files plus 6 deleted sections scores 68 and gives NEEDS_WORK",
+      "fix": "Replace line 44 with: \"Each missing referenced file costs 5 points (max 20) and each deleted recommended section (Architecture Overview, Critical Files, Files Modified, Decisions Made, Assumptions Made, Potential Gotchas) costs 2. Together they can push the score below 70 and give NEEDS_WORK. Fix or delete each listed path, and keep the recommended headings with one line of content rather than deleting them.\""
+    }
+  ]
+}

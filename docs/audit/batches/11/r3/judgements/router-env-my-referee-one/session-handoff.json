@@ -1,0 +1,50 @@
+{
+  "skill": "session-handoff",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 123,
+  "max_total": 125,
+  "percent": 98.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/scripts/check_staleness.py",
+      "line": 359,
+      "evidence": "The default report prints \"Files changed: {result.get('files_changed_count', 0)}\" but never prints result['files_changed']. The SLIGHTLY_STALE branch in SKILL.md:54 instructs the agent to \"Read the listed commits and changed files\", so the documented command omits the paths needed for that action.",
+      "fix": "Print changed-file paths in the default report and explicitly indicate truncation. Document how to retrieve the complete comparison using git diff --name-only '<baseline>' HEAD plus git status --porcelain=v1 --untracked-files=all, or provide a full-list option."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 59,
+      "evidence": "\"UNKNOWN by cause (the report's Issues line says which)\" covers ancestry divergence, an absent baseline and a non-git project. However, check_staleness.py:289-292 also returns UNKNOWN for a missing/invalid timestamp or a failed comparison, combining these into \"Missing timestamp/baseline commit or git comparison unavailable\". Those inputs do not reliably reach a documented recovery branch.",
+      "fix": "Add an UNKNOWN fallback for missing/invalid Created metadata and failed git comparisons. Require restoring only trustworthy metadata or manually verifying cited files, assumptions, environment and next steps before treating the handoff as STALE. Make the script's Issues entries distinguish the actual missing input or failed operation."
+    }
+  ]
+}

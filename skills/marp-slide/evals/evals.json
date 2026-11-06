@@ -14,10 +14,13 @@
     {
       "id": "precise-slides",
       "prompt": "Create exactly 5 Marp slides for a developer meetup on diagnosing slow API requests, including tracing and database queries.",
-      "expected_output": "A five-slide Marp deck with lead title and requested topics.",
+      "files": [
+        "assets/template-tech.md"
+      ],
+      "expected_output": "A five-slide Marp deck built on the tech template, with lead title and requested topics.",
       "assertions": [
         "Has `marp: true` frontmatter and exactly five slide sections, excluding frontmatter delimiters.",
-        "Has lead title styling and embedded styling from the selected template.",
+        "Keeps the tech template's frontmatter (`theme: default`) and its `<style>` block, and uses `<!-- _class: lead -->` on the title slide.",
         "Includes tracing and database-query content.",
         "Contains no unresolved template placeholders."
       ]
@@ -29,6 +32,38 @@
       "assertions": [
         "Asks for a specific topic or audience.",
         "Does not claim a file was saved to `/mnt/user-data/outputs/`."
+      ]
+    },
+    {
+      "id": "redesign-existing-deck",
+      "prompt": "Here's my deck for Thursday's incident review (incident-review.md). It feels crowded and the alternating dark slides I set up never show up. Clean it up but don't lose any of the facts. I don't have Marp CLI on this machine.",
+      "files": [
+        "evals/files/incident-review.md"
+      ],
+      "expected_output": "A redesigned incident-review deck that keeps every fact, number, the code line, the image path and the speaker note; splits the nine-bullet slide; shortens the long heading; replaces the dead nth-child rule and the inline style attribute; and says the deck was linted, not rendered. The image file is not supplied, so the path stays and the report flags that it was not verified.",
+      "assertions": [
+        "Keeps every figure from the fixture: 4.18.0, 14:02, 210 ms, 840 ms, 3.2%, 14 minutes, 5%, 14:31, 14:38, 92%, 61%, 312 tickets and 41,000 EUR.",
+        "Keeps the `ConnectionPool(max_size=50, timeout_s=2)` code line, the `img/latency-chart.png` image and the speaker-note comment about the 5% threshold.",
+        "No slide has more than five bullets, and the long 'What happened...' heading is replaced by a short one-line heading.",
+        "Removes the `section:nth-child(2n)` rule and explains that it never matches in Marp; any dark slides use a `<!-- _class: ... -->` directive with a matching `section.<name>` rule.",
+        "Replaces the inline `style=` attribute on the 840 ms paragraph with a class or Markdown emphasis, or explains that Marp strips it without `--html`.",
+        "Says the deck was checked without rendering (no Marp CLI) and does not claim a visual check."
+      ]
+    },
+    {
+      "id": "gradient-keynote-images",
+      "prompt": "Build a 4-slide opener for my design conference keynote, \"Calm interfaces\", in the gradient style. Put photos/hero.jpg behind the title, give one slide a side-by-side of photos/before.png and photos/after.png, and don't make every slide the same color. I'll export it to PDF with marp.",
+      "files": [
+        "assets/template-gradient.md",
+        "references/image-patterns.md"
+      ],
+      "expected_output": "A four-slide deck on the gradient template with a darkened hero background on the title, a two-image bg comparison slide, per-slide warm/teal class variants, and the --allow-local-files flag in the PDF command. The photos are not supplied: the deck uses the given paths and tells the user they must exist next to the deck.",
+      "assertions": [
+        "Has exactly four slide sections, keeps `theme: default` and the gradient template's `<style>` block, and never sets `theme: gradient`.",
+        "Varies slide backgrounds with `<!-- _class: warm -->` or `<!-- _class: teal -->` and adds no `section:nth-child` rule.",
+        "The title slide uses `![bg ...](photos/hero.jpg)` with a darkening or blur filter (for example `brightness:0.5`) so the white title stays readable.",
+        "One slide holds both `photos/before.png` and `photos/after.png` as `bg` images side by side: either both unmarked (full-width split) or sharing one `left`/`right` region; it never marks one image `left` and the other `right`.",
+        "The PDF export command includes `--pdf` and `--allow-local-files`, with the reason that local photos are otherwise blank."
       ]
     }
   ]

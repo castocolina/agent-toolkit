@@ -1,0 +1,72 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "openapi-to-typescript",
+      "percent": 97.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0,
+        "router-env-my-referee-one": 99.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 38,
+          "evidence": "**PascalCase:** split on non-alphanumerics and lower-to-upper boundaries, capitalise each part, keep the rest: `listPets`, `list_pets` \u2192 `ListPets`.",
+          "fix": "Cut this to the example alone (`listPets`, `list_pets` \u2192 `ListPets`). The model already knows how to PascalCase, so keep the words for the Schema/Operation prefix and collision rules that follow."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 34,
+          "evidence": "**report**: output path, named-schema count, every `Approximate` type and why, every ignored or unsupported construct, every rename, responses with no documented body, and the validation result.",
+          "fix": "Add a short report template after step 5, with one line or list per item: `Output:`, `Named schemas:`, `Approximate:` (origin and 'via' containers), `Ignored/unsupported:`, `Renames:`, `No documented body:`, `Unchecked constraints:`, `Type-check:`. Agents follow a concrete structure more reliably than a list in prose."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/evals/evals.json",
+          "line": 9,
+          "evidence": "\"files\": [\"evals/files/pets-min.json\", \"references/guards.md\"]",
+          "fix": "Remove `references/guards.md` from the `files` of `spec-types` and `shapes-guards`. It is a skill resource, not an eval input, and listing it hands the without-skill baseline the guard rules, which blurs the with/without comparison."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 73,
+          "evidence": "A response with no `content` (a bare `404`, a `204`) gets no type: never alias it to `unknown` or `void`; report \"no body documented\".",
+          "fix": "Cover the branches that are left open. If a media type has no `schema` (`content: {application/json: {}}`), emit no type and report \"body present, schema undocumented\". For non-JSON media (`text/plain`, `application/xml`), say whether the schema maps directly or is reported as unsupported. The agent should not have to guess between `unknown` and skipping the type."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 73,
+          "evidence": "\"A response with no `content` (a bare `404`, a `204`) gets no type\" handles absent content, but the workflow has no explicit outcome for a valid Media Type Object that has content/examples but no `schema`. That conversion branch leaves the agent to choose between omitting the type, emitting `unknown`, or inferring a shape from examples.",
+          "fix": "Add an explicit missing-schema branch for request and response media types: emit `unknown` for the documented body whose shape is unspecified, preserve `| undefined` for optional request bodies, report \"body documented; schema unspecified\", never infer a contract from examples, and omit schema-validation guards for that body with the reason reported."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

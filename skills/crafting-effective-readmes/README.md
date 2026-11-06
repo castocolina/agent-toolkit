@@ -1,176 +1,56 @@
 # Crafting Effective READMEs
 
-A skill for Claude Code that helps you write, update, and improve README files tailored to your specific project type and audience.
+A skill for Claude Code that writes, updates, and audits README files so the intended reader reaches a first success the repository actually supports.
 
-## Purpose
+## What It Does
 
-Not all READMEs are the same. An open-source library needs different documentation than a personal project or an internal tool. This skill provides:
+- Settles which README is in scope (root or monorepo package) and who reads it, from the user's statement first and repository evidence second.
+- Derives install commands and prerequisites from manifests and CI instead of the local machine.
+- Validates the first-use path in a clean environment, or labels each claim `executed`, `static`, or `unverified` when it cannot run it.
+- Flags README traps: workspace-root commands, unreleased examples, generated regions, registry rendering, anchor slugs, and badges.
 
-- **Audience-aware guidance** - Different readers need different information
-- **Project-type templates** - Ready-to-use structures for OSS, personal, internal, and config projects
-- **Task-specific workflows** - Whether creating, updating, adding to, or reviewing READMEs
-- **Quality checks** - Style guidance and section checklists to avoid common mistakes
+`SKILL.md` holds the workflow and gotchas; `references/section-checklist.md` holds the per-type sections.
 
 ## When to Use
 
-Use this skill when you need to:
-
-- Create a README for a new project
-- Add a new section to an existing README
-- Update stale documentation after changes
-- Review and refresh README content
-- Choose the right sections for your project type
-
-**Trigger phrases:**
-
 - "Write a README for this project"
-- "Help me document this"
-- "Create documentation for..."
-- "Update the README"
-- "Review my README"
+- "Update the README after this change"
+- "Review my README against package.json"
 - "What sections should my README have?"
+- "Make this README Standard Readme compliant"
 
-## How It Works
+Not for API references, user manuals, changelogs, contributor guides, or docstrings.
 
-The skill follows a three-step process:
+## Installation
 
-### Step 1: Identify the Task
-
-The skill determines what README task you are working on:
-
-| Task | When to Use |
-|------|-------------|
-| **Creating** | New project with no README yet |
-| **Adding** | Need to document something new in existing README |
-| **Updating** | Capabilities changed, content is stale |
-| **Reviewing** | Checking if README is still accurate |
-
-### Step 2: Gather Context
-
-Based on the task, the skill infers context from the repository first and asks only when an ambiguity would materially change the result:
-
-- **Creating**: What type of project? What problem does it solve? What is the quickest path to "it works"?
-- **Adding**: What needs documenting? Where should it go? Who needs this info most?
-- **Updating**: What changed? Which sections are stale?
-- **Reviewing**: Compares README against actual project state (package.json, main files, etc.)
-
-### Step 3: Generate and Refine
-
-The skill uses the appropriate template and delivers the result directly; it adds a closing question only when a consequential fact is still unresolved.
-
-## Key Features
-
-### Project Type Templates
-
-| Type | Audience | Template |
-|------|----------|----------|
-| **Open Source** | Contributors, users worldwide | `templates/oss.md` |
-| **Personal** | Future you, portfolio viewers | `templates/personal.md` |
-| **Internal** | Teammates, new hires | `templates/internal.md` |
-| **Config** | Future you (confused) | `templates/xdg-config.md` |
-
-### Section Checklist by Project Type
-
-| Section | OSS | Personal | Internal | Config |
-|---------|-----|----------|----------|--------|
-| Name/Description | Yes | Yes | Yes | Yes |
-| Badges | Yes | Optional | No | No |
-| Installation | Yes | Yes | Yes | No |
-| Usage/Examples | Yes | Yes | Yes | Brief |
-| What's Here | No | No | No | Yes |
-| How to Extend | No | No | Optional | Yes |
-| Contributing | Yes | Optional | Yes | No |
-| License | Yes | Optional | No | No |
-| Architecture | Optional | No | Yes | No |
-| Gotchas/Notes | Optional | Optional | Yes | Yes |
-| Last Reviewed | No | No | Optional | Yes |
-
-### Reference Materials
-
-The skill includes curated reference materials for deeper understanding:
-
-- **art-of-readme.md** - Philosophy behind great READMEs, cognitive funneling
-- **make-a-readme.md** - Practical, section-by-section guidance
-- **standard-readme-spec.md** - Formal specification for OSS consistency
-
-## Usage Examples
-
-### Creating a New README
-
-```
-User: I need a README for my new CLI tool
-
-Claude: What type of project is this - open source, personal, or internal?
-
-User: Open source, it's a Node.js package
-
-Claude: [Uses OSS template, asks about installation, usage, and contributing]
+```bash
+cp -r skills/crafting-effective-readmes ~/.claude/skills/
 ```
 
-### Updating an Existing README
-
-```
-User: Update my README, I added a new feature
-
-Claude: [Reads current README, identifies where to add the new feature,
-        proposes specific edits]
-```
-
-### Reviewing for Accuracy
-
-```
-User: Check if my README is still accurate
-
-Claude: [Compares README against package.json, main files, etc.
-        Flags outdated sections and suggests updates]
-```
-
-## Best Practices
-
-1. **Settle the audience** - Infer it from evidence, ask only if it changes the result; don't assume OSS defaults for everything
-2. **Show, don't just tell** - Include examples and code samples
-3. **Use structure** - Headers, tables, and lists improve scannability
-4. **Keep it current** - Add "last reviewed" dates for internal/config projects
-5. **Include installation steps** - Never assume setup is obvious
-6. **Write for YOUR audience** - Avoid generic tone
-
-## Common Mistakes to Avoid
-
-- No installation steps (never assume setup is obvious)
-- No examples (show, don't just tell)
-- Wall of text (use headers, tables, lists)
-- Stale content (add "last reviewed" date)
-- Generic tone (write for YOUR audience)
-
-## Essential Sections (All Types)
-
-Every README needs at minimum:
-
-1. **Name** - Self-explanatory title
-2. **Description** - What + why in 1-2 sentences
-3. **Usage** - How to use it (examples help)
+On claude.ai, add the skill to project knowledge or paste `SKILL.md` into the conversation.
 
 ## Directory Structure
 
 ```
 crafting-effective-readmes/
-  SKILL.md                 # Skill definition
+  SKILL.md                              # Workflow, validation, gotchas, gated reference list
   references/
-    section-checklist.md   # Quick reference for sections by project type
-    style-guide.md         # Common mistakes and prose guidance
-    using-references.md    # Guide to reference materials
-    art-of-readme.md       # README philosophy
-    make-a-readme.md       # Section-by-section guidance
-    standard-readme-spec.md # Formal specification
-    standard-readme-example-minimal.md # Minimal compliant example
-    standard-readme-example-maximal.md # Full-featured example
-  templates/
-    oss.md                 # Open source project template
-    personal.md            # Personal/portfolio project template
-    internal.md            # Internal/team project template
-    xdg-config.md          # Configuration directory template
+    section-checklist.md                # Sections by project type
+    standard-readme-spec.md             # Standard Readme specification
+    standard-readme-example-minimal.md  # Minimal compliant example
+    standard-readme-example-maximal.md  # Full-featured compliant example
+    art-of-readme.md                    # Reader-funnel ordering
+    make-a-readme.md                    # Purpose of common sections
+  evals/                                # Output evals, trigger queries, fixtures
 ```
 
 ## Related Skills
 
-- `writing-clearly-and-concisely` - For general prose quality, clear writing, and avoiding AI patterns
+- `writing-clearly-and-concisely` - general prose quality
+
+## Attribution
+
+- Original skill by @joshuadavidthomas from [joshuadavidthomas/agent-skills](https://github.com/joshuadavidthomas/agent-skills) (MIT)
+- `references/art-of-readme.md` from [hackergrrl/art-of-readme](https://github.com/hackergrrl/art-of-readme), licensed under the [Creative Commons Attribution License 2.0](http://creativecommons.org/licenses/by/2.0/)
+- `references/standard-readme-spec.md` and the two `standard-readme-example-*.md` files from [Standard Readme](https://github.com/RichardLitt/standard-readme) by Richard Litt
+- `references/make-a-readme.md` from [Make a README](https://www.makeareadme.com) by Danny Guo

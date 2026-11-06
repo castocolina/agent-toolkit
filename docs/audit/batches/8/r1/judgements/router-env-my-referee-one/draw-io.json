@@ -1,0 +1,68 @@
+{
+  "skill": "draw-io",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 105,
+      "evidence": "\u201cTo align boxes, match centers (`x + width/2`, `y + height/2`), not top-left corners.\u201d This and the general contrast reminder at line 60 add familiar layout advice amid otherwise high-value mxGraph and CLI-specific knowledge.",
+      "fix": "Remove the elementary centering arithmetic and consolidate general contrast reminders into the existing checklist; retain the concrete coordinate-system, font and export gotchas."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "line": 85,
+      "evidence": "The background override branches on `grep -q 'background=\"'` and otherwise inserts another background attribute. Valid uncompressed XML such as `<mxGraphModel background='#ffffff'>` takes the insertion branch and acquires duplicate background attributes, making the temporary XML invalid. The line-based substitution also misses subsequent models on the same line.",
+      "fix": "Parse the temporary XML and set the background attribute on each mxGraphModel instead of using grep/sed. Preserve the source file and add regression cases for single-quoted attributes and multiple pages."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "line": 64,
+      "evidence": "`is_png()` checks only that the first eight bytes equal the PNG signature. The test stub at tests/skills/draw-io/test-convert-drawio-to-png.sh:38 emits that signature followed by `NEW`, which this check accepts before replacing the previous PNG. Neither a complete image nor the promised embedded diagram is verified.",
+      "fix": "Before replacing the previous PNG, validate the complete PNG structure and the presence of decodable embedded draw.io data. Treat truncated images or missing diagram data as export failures, and cover both with regression tests that verify the previous PNG remains unchanged."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "line": 92,
+      "evidence": "`if ! drawio --disable-update -x -f png -e -s 2 ...` invokes the desktop CLI without a timeout, although SKILL.md:146 explicitly advises using one. If the CLI hangs, the converter never reaches its failure result or normal temporary-file cleanup.",
+      "fix": "Bound each CLI invocation with a documented, configurable timeout. Report a timeout as a per-file failure, preserve the previous PNG, clean up temporary files, and continue processing remaining inputs. Apply the same bound to the compressed-input decoding example."
+    }
+  ]
+}

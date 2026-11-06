@@ -1,0 +1,72 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "react-useeffect",
+      "percent": 92.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-one",
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": 14,
+          "evidence": "| Value computable from props/state | Render; `useMemo` only for measured cost | and the next row 'Work caused by a specific user action ... | That event handler'",
+          "fix": "Merge the derived-value and event-handler rows into one line, for example 'Derived values go in render and user-caused work goes in its handler', so the table spends its rows on the cases the model gets wrong: partial reset, store subscription, data layer and useEffectEvent."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": 34,
+          "evidence": "If a step fails, fix it and repeat from step 2.",
+          "fix": "Add a branch for step 1: 'If step 1 names no external system, stop and route the logic with the table in section 1. Otherwise fix the failing step and repeat from step 2.' Without it, an Effect with no external system still enters steps 2 to 6 and gets polished when it should be removed."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/react-useeffect/evals/trigger-queries.json",
+          "line": 35,
+          "evidence": "\"query\": \"Fetch response arrives out of order\", \"should_trigger\": false",
+          "fix": "The description promises to fix 'stale or out-of-order fetch responses', so this label conflicts with it. Turn it into a real near-miss, such as 'My Node script's parallel fetch calls resolve out of order; how do I keep the results in request order?' (should_trigger false). Also add realistic context, like file paths or the component name, to terse negatives such as 'React Testing Library mocks' and 'Type React mouse event'."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/react-useeffect/evals/evals.json",
+          "line": 8,
+          "evidence": "derived-name assertions: \"Computes fullName during render\", \"Removes fullName useState\", \"Does not add an Effect\" (the query-race and external-widget assertions are just as basic)",
+          "fix": "A baseline model passes these with no skill, so replace or tighten them with assertions that need the skill. For query-race, require that the catch and finally writes are also guarded and that response.ok is checked. For external-widget, require that cleanup destroys the same widget instance it created and that the Effect depends on zoom only. Add one casual-phrasing case that has an input file."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/react-useeffect/references/anti-patterns.md",
+          "line": 94,
+          "evidence": "Calling `ensureAppInit()` from an `App` Effect is then safe under the Strict Mode replay and remounts.",
+          "fix": "Show the call site: `useEffect(() => { ensureAppInit().catch(setInitError); }, []);` and state what triggers the retry after a failure (a retry button that calls ensureAppInit again). Called bare in an Effect, the rethrown error is an unhandled rejection, and nothing re-attempts the work after the cache is cleared."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

@@ -23,12 +23,132 @@
     },
     {
       "id": "no-backend",
-      "prompt": "Show me PROJ-9, but assume neither jira CLI nor Atlassian MCP is available.",
+      "prompt": "Show me PROJ-9, but assume neither the jira CLI nor the Atlassian MCP is available and no Jira REST credentials are configured on this machine.",
       "expected_output": "Explains no backend is available, gives documented setup guidance, and avoids invented issue details.",
       "assertions": [
-        "States neither backend can access the issue and does not invent its contents.",
+        "States that no backend (CLI, MCP or REST credentials) can access the issue and does not invent its contents.",
         "Gives jira CLI installation URL and jira init setup guidance.",
         "Mentions Atlassian MCP as an alternative."
+      ]
+    },
+    {
+      "id": "approved-create-followup",
+      "prompt": "Here's the draft you wrote and I approved last turn: approved-draft-proj-bug.md. Our jira CLI is set up for Cloud. I pulled the create-field metadata for PROJ Bug into createmeta-proj-bug.json. Go ahead and create it.",
+      "files": [
+        "evals/files/approved-draft-proj-bug.md",
+        "evals/files/createmeta-proj-bug.json",
+        "references/commands.md"
+      ],
+      "expected_output": "Notices from the metadata that Component/s is required and missing from the approved draft, asks the user to pick one of Checkout, Payments or Search (or confirm a proposed one) because that changes the approved content, shows the exact non-interactive create command with the component added, and says it will read the issue back after creating it.",
+      "assertions": [
+        "Identifies Component/s (`components`) as a required field in the metadata that the approved draft does not set, and names its allowed values Checkout, Payments and Search.",
+        "Asks the user to choose or confirm the component before creating, treating the added field as a change that needs approval, instead of silently picking one.",
+        "Shows the exact create command with `--no-input`, `-tBug`, the approved summary, `-yHigh`, a `-C` component flag and the description passed through `--template` with a file, not `$(...)`, and the template content is the approved description unchanged (steps to reproduce, expected, actual).",
+        "Says it will make a separate read of the created issue after the create (for example `jira issue view KEY --raw` or GET /rest/api/{v}/issue/KEY) and report what that read shows; does not treat the create response as verification.",
+        "Does not claim the issue was created."
+      ]
+    },
+    {
+      "id": "post-create-dropped-field",
+      "prompt": "The approved PROJ Bug (approved-draft-proj-bug.md, Priority High) was created with the jira CLI. The create output is in create-response.json and the follow-up issue read is in readback-proj-88.json. Report the result.",
+      "files": [
+        "evals/files/approved-draft-proj-bug.md",
+        "evals/files/create-response.json",
+        "evals/files/readback-proj-88.json"
+      ],
+      "expected_output": "Reports PROJ-88 as created but flags that the read-back shows the requested priority High was dropped (it is Medium), and offers to fix it rather than declaring success.",
+      "assertions": [
+        "Bases the verification on the separate read-back (readback-proj-88.json), not on the create response.",
+        "Identifies that the requested priority High was silently dropped and the issue has Medium.",
+        "Does not report the issue as fully created as requested; the final report names the mismatch and asks how to proceed."
+      ]
+    },
+    {
+      "id": "batch-partial-failure",
+      "prompt": "Keep going with the approved batch: label q3-cleanup on PROJ-201 through PROJ-206 with the jira CLI. The run log so far is in batch-relabel-log.txt.",
+      "files": [
+        "evals/files/batch-relabel-log.txt"
+      ],
+      "expected_output": "Stops at the PROJ-203 failure, reports PROJ-201 and PROJ-202 as done, PROJ-203 as failed with the labels-not-on-screen error, PROJ-204 to PROJ-206 as not attempted, and asks how to continue.",
+      "assertions": [
+        "Does not run or propose running the edits for PROJ-204, PROJ-205 or PROJ-206 before the user decides how to handle the failure.",
+        "Reports PROJ-201 and PROJ-202 as done (labels verified), PROJ-203 as failed with its error (the labels field is not on that issue's screen), and PROJ-204 to PROJ-206 as not attempted.",
+        "Asks the user how to continue (for example skip PROJ-203, add labels to the Sub-task screen, or stop) instead of retrying PROJ-203 unchanged.",
+        "Does not claim the whole batch succeeded."
+      ]
+    },
+    {
+      "id": "story-statement-cloud",
+      "prompt": "Draft a Jira story for our Cloud site: finance analysts need to export the monthly revenue report to CSV so they stop retyping the numbers into spreadsheets. Just the draft card for now, I'll review it before anything gets created.",
+      "files": [
+        "references/story-anatomy.md"
+      ],
+      "expected_output": "A draft card opening with the three-line bold statement for a named persona, followed by the house sections in order, with a business benefit estimate or a needs-data note, and a request for review before creation.",
+      "assertions": [
+        "Opens with a statement on three separate lines starting 'As a', 'I want' and 'so that', with the role, the want and the why in bold.",
+        "The role is a named persona such as Finance Analyst, not 'user', 'developer' or 'system'.",
+        "The 'so that' line states the gain (for example no retyping, fewer errors or a faster month-end close) rather than restating the export itself.",
+        "Includes the sections Problem, Proposed solution, Business benefits, Technical benefits, Acceptance criteria, Definition of Done, Out of scope, Risks and References, in that order.",
+        "Business benefits give a revenue or cost estimate or say explicitly that the estimate needs data.",
+        "Does not claim the story was created and asks for review before creating it."
+      ]
+    },
+    {
+      "id": "cloud-vs-dc-payload",
+      "prompt": "We run Jira Cloud and an older Jira Data Center side by side. For this story statement, show me the description payload for a Cloud REST v3 create and for a DC REST v2 create. Role: Support Agent. Want: filter tickets by customer tier. So that: premium customers get answered first. Bold the role, want and why, one per line.",
+      "files": [
+        "references/story-anatomy.md"
+      ],
+      "expected_output": "An ADF document for Cloud with strong marks and hardBreak nodes, a wiki-markup string for DC with *bold* and \\\\ line breaks, a note that wiki markup is not a valid v3 description, and a note that the payloads were not run against Jira.",
+      "assertions": [
+        "The Cloud payload is ADF JSON (`\"type\":\"doc\"`, `\"version\":1`) in which the role, want and why are text nodes with a `strong` mark, separated by `hardBreak` nodes.",
+        "The Data Center payload is a wiki-markup string that bolds with single asterisks (`*Support Agent*`), breaks lines with `\\\\` or blank lines, and contains no `**`.",
+        "States that wiki markup or a plain string is not a valid Cloud v3 description because v3 takes ADF.",
+        "Says the payloads were not executed against Jira or tells the user to re-read the created issue to check the rendering."
+      ]
+    },
+    {
+      "id": "sprint-epic-assignee-plan",
+      "prompt": "Create that CSV-export story in PROJ on our Cloud site with the jira CLI. Board 12 has sprint 40 (active) and sprints 41 and 42 (future). The epic is PROJ-100 \"Finance reporting\". I'm the one creating it. Show me the plan before you run anything.",
+      "files": [
+        "references/story-anatomy.md",
+        "references/commands.md"
+      ],
+      "expected_output": "A plan that creates the story under PROJ-100 as parent, assigned to the creator, then adds it to future sprint 41 rather than active sprint 40, and asks for approval before running anything.",
+      "assertions": [
+        "Puts the story in sprint 41, the next future sprint, not the active sprint 40, and gives a reason for avoiding the active sprint.",
+        "Sets PROJ-100 as the parent epic (`-P PROJ-100` or the `parent` field), not with `jira issue link`.",
+        "Assigns the story to the creator explicitly (`-a\"$(jira me)\"` or an account id from `/myself`) rather than leaving it to the project default.",
+        "Adds the issue to the sprint with `jira sprint add 41 <KEY>` (or a discovered Sprint field) without a hardcoded custom field id.",
+        "Asks for approval before creating and says it will re-read the issue to check assignee, parent and sprint."
+      ]
+    },
+    {
+      "id": "rest-only-read",
+      "prompt": "No jira CLI here and no Atlassian MCP, but my shell already exports JIRA_BASE_URL=https://acme.atlassian.net, JIRA_EMAIL and JIRA_API_TOKEN. What's the status of PROJ-9?",
+      "files": [
+        "references/mcp.md"
+      ],
+      "expected_output": "Uses the existing credentials for an authenticated REST v3 read of PROJ-9 before any setup advice, without printing the token, and reports only what the response shows.",
+      "assertions": [
+        "Proposes or makes an authenticated read first, such as `GET $JIRA_BASE_URL/rest/api/3/issue/PROJ-9` (or `/myself`) with basic auth from `$JIRA_EMAIL:$JIRA_API_TOKEN`.",
+        "Does not offer jira-cli or MCP setup guidance before that read has been tried.",
+        "Does not print or ask for the token value.",
+        "Does not invent the status of PROJ-9."
+      ]
+    },
+    {
+      "id": "mcp-only-transition",
+      "prompt": "only the atlassian mcp is connected (v2 tools), no cli. pls move PROJ-77 to In Review",
+      "files": [
+        "references/mcp.md"
+      ],
+      "expected_output": "Plans to fetch PROJ-77 and its available transitions with listJiraIssueTransitions, pick the transition id that leads to In Review, show it for approval, then call transitionJiraIssue and re-read the issue.",
+      "assertions": [
+        "Calls or proposes `listJiraIssueTransitions` for PROJ-77 before `transitionJiraIssue`.",
+        "Uses the transition id from that list rather than a guessed id or the status name.",
+        "Asks for approval before transitioning and does not claim the move was made.",
+        "Says it will re-read PROJ-77 afterwards to confirm the new status."
       ]
     }
   ]

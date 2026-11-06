@@ -1,0 +1,81 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "humanizer",
+      "percent": 91.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 91.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-one",
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 15,
+          "evidence": "1. Brief: take audience, genre, stance, house style and edit depth from the request and source; ask only for missing information that changes the edit.",
+          "fix": "Shorten this to the non-obvious default only: 'When depth is unspecified, make the minimal consequential edit and state that scope in the change note.' The model already gathers audience and genre without being told."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 30,
+          "evidence": "A cluster, three or more distinct cues in one paragraph, justifies a style pass; below that, edit only cues that carry an evidence or inflation problem.",
+          "fix": "Move this threshold into Workflow step 3 as an explicit gate: 'Count distinct cues per paragraph; with fewer than three, fix only evidence and inflation cues and skip the style pass.' The key decision then sits in the sequence instead of in a paragraph after the diagnostics."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 30,
+          "evidence": "Not tells on their own, so never edit for them alone: perfect grammar, formal or academic register, bland prose, mixed registers, transition words (\"Additionally\", \"Moreover\") in isolation, or one or two listed \"AI words\".",
+          "fix": "Give a reason for each item, for example: 'human academic and corporate prose uses these at similar rates, so editing them changes voice without fixing a defect.' Grouping these with the era facts under a short '## Gotchas' heading would make them easier to find."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 36,
+          "evidence": "Never silently rewrite direct quotations or primary-source excerpts: a reworded quote puts words in someone's mouth. Flag them or ask permission.",
+          "fix": "Pick a default with an escape hatch: 'Leave quotations character-identical and list any cue inside them in the change note; ask permission only when the user explicitly wants quotes edited.'"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/humanizer/evals/evals.json",
+          "line": null,
+          "evidence": "No eval covers the first-priority Evidence diagnostic (claims credited to \"experts\" or \"several sources\", coverage standing in for content). The wrapper-and-identifier eval lists \"references/pattern-catalog.md\" under files, which is a skill reference, not an input file.",
+          "fix": "Add an eval such as 'Humanize this bio: \"Experts widely regard her as a pivotal figure; she has been profiled in trade publications.\"' with these assertions: it names no source absent from the input; it removes \"experts widely regard\" or reduces it to a supported claim; it adds no publication names. Remove the files entry from wrapper-and-identifier, or replace it with a real input under evals/files/."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 46,
+          "evidence": "Return the edited text and a brief neutral, mechanical change note (scope, patterns changed, exemptions)",
+          "fix": "Add a branch for file inputs, since allowed-tools grants Write and Edit and trigger queries pass paths like ~/drafts/launch_post.md: 'When the user supplies a file path, edit the file in place with Edit, preserve its Markdown and front matter, and put the change note in the reply; when the user pastes text, return the revised text inline.'"
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

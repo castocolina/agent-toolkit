@@ -1,213 +1,41 @@
 # Database Schema Designer
 
-A comprehensive skill for designing production-ready database schemas with built-in best practices for both SQL and NoSQL databases.
+Designs and reviews SQL and MongoDB schemas: tables or collections, keys, constraints, multi-tenant isolation, query-aligned indexes and staged live migrations. PostgreSQL is the default engine. MySQL, SQLite and MongoDB differences are called out where they change the design.
 
-## Purpose
+## When to use
 
-The Database Schema Designer skill helps you create robust, scalable database schemas by providing:
+- Sketching tables for a new app from a list of entities or screens
+- Choosing between embedding and referencing in MongoDB
+- Reviewing an existing schema for integrity, tenancy and index gaps
+- Planning a change to a live table (NOT NULL, rename, retype, new index)
 
-- **Normalization guidance** - Apply proper normal forms (1NF, 2NF, 3NF) to eliminate data redundancy
-- **Indexing strategies** - Optimize query performance with the right indexes
-- **Migration patterns** - Evolve schemas safely with reversible, zero-downtime migrations
-- **Constraint design** - Ensure data integrity with proper foreign keys, checks, and unique constraints
-- **Performance optimization** - Design for your specific access patterns (OLTP vs OLAP)
+It is not for REST or GraphQL API models, ORM classes for an existing schema, BI dashboards, database deployment, backups or connection pooling, or tuning a query without a schema change.
 
-Whether you are starting a new project or evolving an existing database, this skill ensures your schema follows industry best practices and avoids common pitfalls.
-
-## When to Use
-
-Use this skill when you need to:
-
-- Design a new database schema from scratch
-- Normalize an existing table structure
-- Add indexes to improve query performance
-- Create migration scripts for schema changes
-- Review and audit existing schemas
-- Choose between SQL and NoSQL approaches
-
-### Trigger Phrases
-
-| Trigger | Example |
-|---------|---------|
-| `design schema` | "design a schema for user authentication" |
-| `database design` | "database design for multi-tenant SaaS" |
-| `create tables` | "create tables for a blog system" |
-| `schema for` | "schema for inventory management" |
-| `model data` | "model data for real-time analytics" |
-| `I need a database` | "I need a database for tracking orders" |
-| `design NoSQL` | "design NoSQL schema for product catalog" |
-
-## How It Works
-
-The skill follows a four-phase process:
-
-### Phase 1: Analysis
-- Identify entities and their relationships
-- Determine access patterns (read-heavy vs write-heavy)
-- Choose SQL or NoSQL based on requirements
-
-### Phase 2: Design
-- Normalize to 3NF for SQL or determine embed/reference strategy for NoSQL
-- Define primary keys and foreign keys
-- Choose appropriate data types
-- Add constraints (UNIQUE, CHECK, NOT NULL)
-
-### Phase 3: Optimize
-- Plan indexing strategy based on query patterns
-- Consider denormalization for read-heavy queries
-- Add audit timestamps (created_at, updated_at)
-
-### Phase 4: Migrate
-- Generate reversible migration scripts (up + down)
-- Ensure backward compatibility
-- Plan for zero-downtime deployment
-
-## Key Features
-
-### SQL Schema Design
-- **Normalization** - Automatic application of 1NF, 2NF, and 3NF rules
-- **Data Types** - Appropriate type selection (DECIMAL for money, proper VARCHAR sizing)
-- **Constraints** - Foreign keys with ON DELETE strategies, CHECK constraints, UNIQUE constraints
-- **Indexes** - Planned from query patterns, selectivity, and execution plans, not by reflex
-
-### NoSQL Schema Design (MongoDB)
-- **Embedding vs Referencing** - Guidance on when to embed documents vs use references
-- **Index Strategies** - Chosen from the access patterns the collection must serve
-- **Document Structure** - Optimal document design based on access patterns
-
-### Relationship Patterns
-- One-to-Many relationships
-- Many-to-Many with junction tables
-- Self-referencing hierarchies
-- Polymorphic associations
-
-### Migration Support
-- Zero-downtime migration patterns
-- Reversible migration templates
-- Safe column addition/rename strategies
-- Backward compatible changes
-
-## Usage Examples
-
-### Basic Schema Design
+## Example requests
 
 ```
-design a schema for an e-commerce platform with users, products, orders
+design the tables for a tiny online shop
+review this schema for a multi-tenant SaaS
+make users.phone NOT NULL on a live table with millions of rows
+should MongoDB comments be embedded in the post document?
 ```
 
-Output:
+Include the engine and version, rough row counts, whether the data is live, and the queries that matter. When these are missing, the skill states labeled assumptions instead of asking.
 
-```sql
-CREATE TABLE users (
-  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
+## What is in the skill
 
-CREATE TABLE orders (
-  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  user_id BIGINT NOT NULL REFERENCES users(id),
-  total DECIMAL(10,2) NOT NULL
-);
+| File | Purpose |
+|------|---------|
+| `SKILL.md` | Defaults, the design workflow and engine gotchas |
+| `references/migrations.md` | Expand-contract, NOT NULL on live tables, PostgreSQL and MySQL lock rules |
+| `references/schema-design-checklist.md` | Review checks and report format |
+| `assets/templates/migration-template.sql` | PostgreSQL migration skeleton with a MySQL variant (SQLite uses the rebuild order in `migrations.md`) |
 
--- Only if "orders by user" is a real query:
-CREATE INDEX idx_orders_user ON orders (user_id);
-```
+## Install
 
-### Available Commands
+Claude Code: `cp -r skills/database-schema-designer ~/.claude/skills/`
 
-| Command | Purpose |
-|---------|---------|
-| `design schema for {domain}` | Generate a complete schema from scratch |
-| `normalize {table}` | Apply normalization rules to fix an existing table |
-| `add indexes for {table}` | Generate an index strategy for performance |
-| `migration for {change}` | Create reversible migration scripts |
-| `review schema` | Audit an existing schema for issues |
-
-### Request Tips
-
-Include these details in your request for best results:
-
-- **Entities** - users, products, orders
-- **Key relationships** - users have orders, orders have items
-- **Scale hints** - high-traffic, millions of records
-- **Database preference** - SQL or NoSQL (defaults to SQL if not specified)
-- **Access patterns** - read-heavy analytics, write-heavy transactions
-
-## Prerequisites
-
-No special tools or dependencies required. The skill generates standard SQL or NoSQL schema definitions that work with:
-
-- MySQL / MariaDB
-- PostgreSQL
-- SQLite
-- MongoDB
-- And other compatible databases
-
-## Output
-
-The skill produces:
-
-1. **Schema DDL** - Complete CREATE TABLE statements with all constraints
-2. **Index Definitions** - Optimized indexes for your query patterns
-3. **Migration Scripts** - Reversible UP and DOWN migrations
-4. **Mermaid Diagrams** - Entity-relationship diagrams (when requested)
-5. **Verification Checklist** - Items to review before deploying
-
-### Verification Checklist
-
-After designing a schema, verify:
-
-- [ ] Every table has a primary key
-- [ ] All relationships have foreign key constraints
-- [ ] ON DELETE strategy defined for each FK
-- [ ] Indexes support representative queries and integrity operations where needed
-- [ ] Indexes exist on frequently queried columns
-- [ ] Appropriate data types (DECIMAL for money, etc.)
-- [ ] NOT NULL on required fields
-- [ ] UNIQUE constraints where needed
-- [ ] CHECK constraints for validation
-- [ ] created_at and updated_at timestamps
-- [ ] Migration scripts are reversible
-- [ ] Tested on staging with production data
-
-## Best Practices
-
-### Do
-
-- Start with domain modeling, not UI requirements
-- Normalize to 3NF first, then selectively denormalize
-- Use DECIMAL for money (never FLOAT)
-- Always define foreign key constraints
-- Plan indexes from query patterns; do not index every foreign key or low-selectivity field by reflex
-- Size VARCHAR columns appropriately
-- Store dates in DATE/TIMESTAMP types
-- Plan a tested rollback or recovery path; a DOWN script alone is not proof of reversibility
-- Test migrations on staging with production-like data
-
-### Avoid
-
-| Anti-Pattern | Problem | Solution |
-|--------------|---------|----------|
-| VARCHAR(255) everywhere | Wastes storage, hides intent | Size appropriately per field |
-| FLOAT for money | Rounding errors | DECIMAL(10,2) |
-| Missing FK constraints | Orphaned data | Always define foreign keys |
-| Unplanned indexes | Write amplification and unnecessary maintenance | Check query patterns, selectivity, existing composite prefixes, and execution plans |
-| Storing dates as strings | Cannot compare/sort properly | Use DATE/TIMESTAMP types |
-| Untested rollback | Cannot recover safely | Plan and test a rollback or recovery path and state any data loss |
-
-## Key Terminology
-
-| Term | Definition |
-|------|------------|
-| **Normalization** | Organizing data to reduce redundancy (1NF to 2NF to 3NF) |
-| **3NF** | Third Normal Form - no transitive dependencies between columns |
-| **OLTP** | Online Transaction Processing - write-heavy, needs normalization |
-| **OLAP** | Online Analytical Processing - read-heavy, benefits from denormalization |
-| **Foreign Key (FK)** | Column that references another table's primary key |
-| **Index** | Data structure that speeds up queries (at cost of slower writes) |
-| **Access Pattern** | How your app reads/writes data (queries, joins, filters) |
-| **Denormalization** | Intentionally duplicating data to speed up reads |
+claude.ai: add `SKILL.md` to project knowledge or paste it into the conversation.
 
 ## License
 

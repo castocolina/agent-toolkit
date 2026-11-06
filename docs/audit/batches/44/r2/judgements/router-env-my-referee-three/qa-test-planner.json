@@ -1,0 +1,77 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 144,
+      "evidence": "\"Every case seeds and cleans its own data.\" repeats the Gotchas rule at line 94 (\"Seed its data in the preconditions and reset it in cleanup\") and the section 2 Unknown/Open Questions rule is restated at line 145",
+      "fix": "Cut section 8 down to checks that appear nowhere else (critical requirement to case mapping, the release gate applied), or make each item a short pointer (\"section 6, first gotcha\") so the same rule is not loaded twice"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 101,
+      "evidence": "\"## 7. Optional scripts: files on disk\" takes about 40 of 151 lines (two long command examples, a flag table and a five-branch run-log procedure), even though the section says to use the scripts only when the user wants a file",
+      "fix": "Move the flag table, the example commands and the run-log or exit-code reading procedure to references/scripts.md. Leave one line in SKILL.md: \"When the user wants a Markdown file written, read references/scripts.md first\". Keep the stdin-hang warning inline. The core then reads as a clean Process pattern."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 96,
+      "evidence": "\"- Failed-case reruns, safe reproduction and the reproduction rate follow section 3b.\" is a cross-reference inside Gotchas, not an environment fact that defies assumptions",
+      "fix": "Delete the line, or replace it with a concrete gotcha, for example: NEVER count a rerun on a fresh account as reproducing the original failure, because seeded state such as saved cards or a prior coupon is often the trigger"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/qa-test-planner/evals/evals.json",
+      "line": 23,
+      "evidence": "checkout-cases assertion 1 \"each with a seeded precondition\" and assertion 2 \"Each case lists a seeded account or data item in its preconditions\" check the same thing, and no assertion checks that the empty-cart case asserts no order is created, which expected_output requires",
+      "fix": "Replace assertion 2 with \"The empty-cart case asserts that checkout is refused and no order or charge exists afterwards\" so every claim in expected_output has its own check"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 128,
+      "evidence": "\"Reading the result, in this order:\" follows the previous bullet with no blank line, so Markdown renders it as part of the single-quote bullet and the numbered exit-code procedure loses its heading",
+      "fix": "Insert a blank line before line 128 and make it a bold lead-in or an H3 (\"### Reading the result\") so the exit-code branches show as their own step"
+    }
+  ]
+}

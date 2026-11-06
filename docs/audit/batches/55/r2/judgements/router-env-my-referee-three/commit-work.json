@@ -1,0 +1,77 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 28,
+      "evidence": "Whole file: `git add -- <paths>`. Never `git add -A` or `git add .`: they sweep in untracked artifacts.",
+      "fix": "Shorten the general reminders the model already knows (path-scoped `git add`, and in step 6 'a bare `git commit` opens an editor') to a single clause each. Keep the space for the non-obvious index and tree checks."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 25,
+      "evidence": "Step 3 packs the run-directory setup, the index choice, temporary-index bootstrap, whole-file staging and partial-hunk patching into one 5-line paragraph with nested bullets",
+      "fix": "Split step 3 into 3a (create the run directory), 3b (pick the index) and 3c (pick the staging method). Add a short progress checklist for steps 1-8 so the Process pattern has clear checkpoints."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 3,
+      "evidence": "Description opens with implementation detail ('splitting mixed hunks without an interactive terminal, verifying the staged version rather than the working tree') and has no 'even if the user doesn't say commit' clause",
+      "fix": "Stage and commit Git changes so each commit holds only the approved change: keep what the user already staged untouched, split mixed files into separate commits, check the exact staged content, and write Conventional Commits messages. Use when asked to commit, check in, save or wrap up work in git, stage selected files or hunks, split a mixed tree into commits, review what is staged before a push, or draft a commit message, even if the user never says 'commit'. Not for rebasing, squashing, amending or force-pushing history, resolving merge conflicts, opening pull requests, or code review unrelated to a commit."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/commit-work/evals/evals.json",
+      "line": null,
+      "evidence": "Ten evals, but none covers the untracked-file partial-staging branch ('never build a patch from /dev/null'), the unborn-HEAD `read-tree --empty` branch, or a draft-message request with no diff supplied",
+      "fix": "Add an eval whose fixture has a new untracked file with only some content approved, with assertions that the agent asks and builds no /dev/null patch. Add an eval for a repository with no commits, asserting `GIT_INDEX_FILE=<run>/index git read-tree --empty`."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 16,
+      "evidence": "Stage route runs 'steps 1-4 in the real index, stop after the review', but the run directory created in step 3 is removed only in step 8 ('remove only your own directory with `rm -rf -- <run>`'); the step 5 and step 7 'stop, report and ask' exits never clean up either",
+      "fix": "Add to step 3: 'Whatever route or stop ends the run (stage-only after step 4, a failed check in step 5 or 7), remove your own `<run>` with `rm -rf -- <run>` before replying, or name it in the report as yours.' Without this, the next run's leftover-directory check reports stale directories it is told never to delete."
+    }
+  ]
+}

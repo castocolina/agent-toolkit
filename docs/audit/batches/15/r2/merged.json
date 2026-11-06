@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "c4-architecture",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8,
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 50,
+          "evidence": "- Keep aliases and names identical across views, so the views can be compared.",
+          "fix": "Shorten this to a clause on the element-budget bullet, or delete it. The model already knows to keep names consistent across related diagrams, and common-mistakes.md already covers this under 'Inconsistent names across views'."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 55,
+          "evidence": "Default destination `docs/architecture/`: `c4-context.md`, `c4-containers.md`, ... One view per file, an explicit destination wins.",
+          "fix": "Step 4 only gives a file-naming convention. Add one check before writing, for example: 'Before writing, ask: does each element description tell this audience what the element is responsible for, not what it is built with?' This makes Write a thinking step and not just a filename list."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 59,
+          "evidence": "Render every file: `mmdc -i docs/architecture/c4-containers.md -o \"$(mktemp -d)/out.md\"`.",
+          "fix": "Add a short Gotchas list next to the NEVER list with environment facts about the renderer. For example: mmdc launches headless Chromium through Puppeteer, and when it runs as root or in a container it fails on the sandbox unless you pass `-p` with a puppeteer config containing `{\"args\":[\"--no-sandbox\"]}`. Say that this error is an environment problem and not a diagram parse error."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 3,
+          "evidence": "Not for ER diagrams, plain flowcharts or sequence diagrams, draw.io or cloud-icon diagrams, explaining C4 theory without a diagram, implementation work, or ADR prose.",
+          "fix": "Generate architecture documentation as C4 model Mermaid diagrams (context, container, component, dynamic, deployment) from a description or from repository evidence such as docker-compose, Kubernetes manifests and package files. Use when users ask to map or document a software system, its deployable applications, data stores, external actors, team boundaries, request flows or production infrastructure, even without naming C4. Not for ER diagrams, plain flowcharts or sequence diagrams, draw.io or cloud-icon diagrams, explaining C4 theory without a diagram, reviewing existing C4 diagrams without regenerating them, implementation work, or ADR prose."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 59,
+          "evidence": "No `mmdc`: `npx -y -p @mermaid-js/mermaid-cli mmdc -i <file> -o <tmp>/out.md`.",
+          "fix": "Pin the fallback to the Mermaid major version that the NEVER list depends on ('Mermaid 11 fails the whole diagram'), for example `npx -y -p @mermaid-js/mermaid-cli@11 mmdc ...`. Then the validation loop checks the same parser behaviour the skill describes."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/c4-architecture/evals/evals.json",
+          "line": 11,
+          "evidence": "\"Uses Mermaid C4 syntax and a docs/architecture location\"",
+          "fix": "Split this into verifiable checks, for example 'Each file under docs/architecture/ contains a C4Context or C4Container block that mmdc renders with exit 0'. Also add an edge-case eval whose input diagram has an undeclared alias or a `Container(...) {` body, and assert that the step 5 render-fix loop repairs it."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 65,
+          "evidence": "If the target renderer rejects the diagram (`No diagram type detected` for `C4Context`, ...) keep the C4 file as the source of truth and add a `flowchart` translation. Translate only the notation: keep every element ... and every relationship's direction, label and technology.",
+          "fix": "Add a rule for C4Dynamic and C4Deployment sources. A flowchart does not number edges automatically, so when translating a Dynamic view, prefix each edge label with its statement-order number (this is the one place hand numbering is right). When translating a Deployment view, map nested Deployment_Node to nested subgraphs. Without this, the branch for a Dynamic diagram loses the flow order."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 8,
+          "evidence": "\u201cA C4 view is a model of deployable units, ownership boundaries and runtime dependencies\u201d introduces familiar C4 concepts. The 64-line Workflow section also includes standard reminders such as \u201cExternal systems are black boxes\u201d and \u201cKeep aliases and names identical across views\u201d; the 11-line NEVER section supplies substantially more distinctive Mermaid-specific knowledge.",
+          "fix": "Remove the introductory definition and consolidate elementary abstraction, external-system and naming reminders into a compact model-check checklist. Preserve the evidence-to-element mapping, environment reconciliation, boundary decision criteria and Mermaid-specific failure rules."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 59,
+          "evidence": "The fallback command uses \u201cnpx -y -p @mermaid-js/mermaid-cli mmdc\u201d without a version, while references/c4-syntax.md identifies mermaid-cli 11.17 as the renderer used for its examples. This fallback can therefore silently use a different parser and rendering behavior.",
+          "fix": "Pin the fallback to the exact CLI version used to validate the examples, for example `npx -y -p @mermaid-js/mermaid-cli@11.17.0 mmdc -i <file> -o <tmp>/out.md`, and recommend that pinned invocation when an installed mmdc has incompatible syntax support."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

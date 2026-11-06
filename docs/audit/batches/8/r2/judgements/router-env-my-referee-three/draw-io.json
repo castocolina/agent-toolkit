@@ -1,0 +1,68 @@
+{
+  "skill": "draw-io",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 15,
+      "evidence": "New diagram: before writing XML, ask (or infer and state): ... Which nodes, which arrows, and what does each arrow mean?",
+      "fix": "Keep only the questions specific to draw.io: medium, page background, and font that must be installed where drawio runs. Drop the generic 'which nodes, which arrows' requirements gathering, which the model already does. Keep the one-sentence split test that points to Staging."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 205,
+      "evidence": "In Quarto, set `auto-stretch: false` under `format: revealjs:` in the YAML header so diagram images keep their size on mobile.",
+      "fix": "Move this slide-only fact into the 'Slide (Quarto, reveal.js)' row of the Medium and canvas table (Decisions), so the Tool pattern stays in workflow order instead of trailing after the Checklist as an orphan section."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/draw-io/evals/trigger-queries.json",
+      "line": 71,
+      "evidence": "\"Build a database ERD in a browser-based diagramming app other than draw.io.\"",
+      "fix": "Replace it with a realistic near-miss that names the competing tool, for example \"can you lay out our orders/customers ERD in Lucidchart? I'll import it from a CSV\", so the negative tests the boundary and not a phrase that negates the keyword."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 139,
+      "evidence": "A missing font does not fail the export; it silently renders a fallback. For Japanese text on Quarto slides use `Noto Sans JP`.",
+      "fix": "Add a check and a fallback: before exporting, run `fc-list | grep -i \"Noto Sans JP\"` (or the chosen font). If nothing matches, tell the user the PNG will use a fallback font and either install the font or pick an installed one, then re-export and check the glyphs in the PNG."
+    }
+  ]
+}

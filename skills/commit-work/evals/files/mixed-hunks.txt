@@ -1,0 +1,27 @@
+$ git status
+On branch fix/token-expiry
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   src/auth.ts
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+$ git diff --cached
+$ git diff -U1 -- src/auth.ts
+diff --git a/src/auth.ts b/src/auth.ts
+index 2b8d7e4..5e0a9c3 100644
+--- a/src/auth.ts
++++ b/src/auth.ts
+@@ -12,3 +12,3 @@ export function isExpired(token: Token, now: number = Date.now()): boolean {
+   }
+-  return now > token.expiresAt;
++  return now >= token.expiresAt;
+ }
+@@ -18,2 +18,3 @@ export function isExpired(token: Token, now: number = Date.now()): boolean {
+ export async function refresh(token: Token): Promise<Token> {
++  console.debug("refresh", token.id, token.expiresAt);
+   const res = await fetch(`${AUTH_URL}/refresh`, {
+
+$ cat package.json | grep '"test"'
+    "test": "vitest run",

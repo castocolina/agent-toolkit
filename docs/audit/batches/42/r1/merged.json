@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "command-creator",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 54,
+          "evidence": "Before delegating any step, ask: what does a subagent give here that the main thread lacks: isolation from a large search, a specialized registered agent, or parallel work? If none, run it directly. When it does help, name an agent type that exists (built-ins: `Explore`, `Plan`, `general-purpose`...)",
+          "fix": "Cut this to the command-specific fact: 'A context: fork body runs as one subagent task and cannot wait for approval; keep approval gates in the main thread.' Drop the general when-to-delegate advice and the list of built-in agents, because the harness already provides subagent dispatch."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 93,
+          "evidence": "A same-named skill in `.claude/skills/` or `~/.claude/skills/` shadows the command with no warning ... Check before writing (Workflow step 2).",
+          "fix": "Delete this Gotcha bullet. Workflow step 2 (line 15) already states the shadowing fact and the check, so here it only repeats tokens."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 15,
+          "evidence": "Step 2 inlines an 11-line collision reply template (lines 17-25) in the middle of the phased workflow",
+          "fix": "Move the collision reply template to a 'Name collision' section in references/patterns.md. Leave a one-line trigger in step 2: 'If any exists, write nothing and read the Name collision section of references/patterns.md.' This keeps the Process pattern's steps scannable."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/command-creator/evals/trigger-queries.json",
+          "line": 2,
+          "evidence": "{\"query\":\"Create a prompt template for asking an AI to review pull requests.\",\"should_trigger\":false}",
+          "fix": "Relabel this query or replace it. The description triggers on a user who 'keeps pasting the same long prompt' and wants 'one thing to type', so a reusable PR-review prompt is a plausible positive. Replace it with an unambiguous near-miss, for example 'Write a CLAUDE.md section telling Claude how to review PRs in this repo'."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 15,
+          "evidence": "look for `<name>` in `.claude/skills/<name>/`, `~/.claude/skills/<name>/` and the target commands directory",
+          "fix": "Also check the other commands scope before writing: `~/.claude/commands/<name>.md` when writing a project command, and `.claude/commands/<name>.md` when writing a personal one. State which one the user gets on a clash and handle it with the same template. As written, a project /release that clashes with an existing personal /release is never flagged."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/command-creator/evals/evals.json",
+          "line": 40,
+          "evidence": "The release eval expects a command that \"keeps the transcript's order (main and up to date, clean tree, npm test, npm version, push with tags, npm publish)\". However, the fixture starts with `git checkout main` and `git pull --ff-only` before checking cleanliness. Workflow step 1 requires proposing a safer order and obtaining approval when a side effect precedes a read-only check, so the expected immediate write conflicts with the skill's protocol.",
+          "fix": "Make this a two-turn eval: first require a proposed safe ordering and no file write; then supply approval and verify the generated command follows that approved order, including a cleanliness check before checkout/pull. Update the expected output and ordering assertion accordingly."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/references/patterns.md",
+          "line": 65,
+          "evidence": "The side-effect skeleton defines only \"Already done: continue to step 6\" and \"Not done: show the error and ask before one retry.\" Following the branch where the state query itself fails or times out reaches no defined outcome; neither does a timeout of the permitted retry. SKILL.md prohibits blind retries, but this reusable skeleton leaves the corresponding recovery and reporting behavior unspecified.",
+          "fix": "Add explicit outcomes for confirmed completion, confirmed absence, unknown state, and conflicting or partial completion. Stop and report uncertainty or conflict without retrying; after an approved retry fails or times out, repeat the state check and report success only when completion is verified."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

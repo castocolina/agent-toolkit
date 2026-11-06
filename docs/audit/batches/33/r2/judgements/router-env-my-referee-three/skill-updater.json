@@ -1,0 +1,95 @@
+{
+  "skill": "skill-updater",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 43,
+      "evidence": "\"- **adopt**: the upstream rule still applies to this artifact unchanged. Port it as written.\" The three bullets on lines 43-45 define the labels in general terms. The worked example on line 47 already shows each decision.",
+      "fix": "Cut the three definitions down to the repo-specific part: an adapt note must name the repo convention or ruling it keeps, and an ignore note must name the ruling or scope it falls outside. Let the line-47 example carry the rest."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 15,
+      "evidence": "Step 2 packs four branches into one paragraph: local-only rows, a credit with no row, running upstreams, and the exit-1 caveat. Step 4 (line 26) does the same with the contents test and three diff-retrieval variants. This blurs the Process pattern's checkpoint structure.",
+      "fix": "Split step 2 into sub-bullets (no rows / credit without row / rows present). Move the three diff-retrieval commands in step 4 into a small table keyed by row kind and whether last_upstream_sha is set, matching the error table in step 3."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 66,
+      "evidence": "\"**`status`** is the comparison state only. `adopt`, `adapt` and `ignore` live in `updates.md`, never in the registry.\" The rule gives no reason.",
+      "fix": "Add the reason in one clause, for example: track rejects or misreads a decision label as a status, and the next upstreams run compares from the status. Use whatever the real failure is, so the agent knows why the label must stay out of the registry."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/skill-updater/evals/evals.json",
+      "line": null,
+      "evidence": "The expected output of eval 'stale-adopt-adapt-ignore' is \"track ... --status stale\" with no --sha. SKILL.md step 4 says to record stale \"with `--sha` set to the newest commit you read\". The prompt supplies no commit sha, so the eval cannot check that requirement.",
+      "fix": "Add the newest upstream commit sha to the prompt or a fixture file. Add the assertion \"The track command passes --status stale and --sha <that sha>\"."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/skill-updater/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "9 should-trigger and 11 should-not-trigger queries; optimizing-descriptions.md asks for 8-10 of each. Most should-trigger queries are clean, formal phrasings with no file paths or casual wording.",
+      "fix": "Drop one weak negative (for example \"Add a slash command that syncs the README table\"). Rewrite two positives casually and with context, for example \"ugh the gh api call for humanizer's source keeps 404ing, did they move it? docs/audit/upstream-sources.json has it under skills/humanizer\"."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 15,
+      "evidence": "Followed the 'credit with no row' branch (eval credit-without-row, mui). Step 2 says \"No row other than kind: local ...: go to step 6, then record the source-less call in step 7\", so the agent writes a local row via track. The same step says to propose the missing source row, and the eval expects \"record nothing for it via track\". The two instructions conflict, and following both marks a credited skill as local.",
+      "fix": "Add an explicit branch to step 2: \"Credit without a row: propose the row in updates.md with credit verbatim, still run step 6, and record no track call (neither a source row nor a source-less local row) until the user adds the row.\""
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 39,
+      "evidence": "\"**Judge** the artifact with `skill-judge` when its content changed; the commit must touch `SKILL.md` or `references/` (step 3).\" The step ends the workflow with no check that updates.md has an entry for every row. The `<date>` format of docs/audit/<date>/updates.md is never given.",
+      "fix": "Add a closing checklist: every source row has one track call or a reason in updates.md for none; every probed rule has a keep or propose-removal line. State the date format, for example docs/audit/YYYY-MM-DD/updates.md."
+    }
+  ]
+}

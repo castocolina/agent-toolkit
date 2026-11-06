@@ -1,0 +1,80 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "naming-analyzer",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 18,
+          "evidence": "use the language's dominant convention (PEP 8, Effective Go, the TypeScript handbook style)",
+          "fix": "Cut the list of style guides, which the model already knows. Keep only the rule to write \"no project convention found; using <convention>\" in the report."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 33,
+          "evidence": "Anti-patterns are spread across the Decide table, the Cases table and Hidden consumers (\"Never rename to match one caller: that hides the bug\"), but no NEVER or Gotchas section collects them",
+          "fix": "Add a short '## NEVER' list after Scales that points back to the existing reasoning: NEVER plain-rename a contract or generated name, because the wire, column or regenerated code reverts or breaks it; NEVER rename to match one caller, because that hides the unit bug; NEVER trust symbol search alone, because string-key, DI and task-queue consumers miss it."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 25,
+          "evidence": "Ask one focused question, or list candidates marked `tentative` with the fact that would settle each",
+          "fix": "Make one option the default. For example: 'Default: list tentative candidates, each with the fact that would settle it. Ask a question instead only when no candidate can be stated without guessing the behavior.'"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/naming-analyzer/evals/evals.json",
+          "line": null,
+          "evidence": "Six evals cover getters that write, units, conflicting callers, name-only input, serialized contracts and conventional names, but none covers folder-wide triage (step 0: top 10 plus a remaining count) or an ORM or DI hidden consumer",
+          "fix": "Add an eval with a small multi-file fixture under evals/files/ (for example a Django model with usr_nm and a pytest fixture used by parameter name). Assert that the report caps at 10 issues, states how many candidates remain, and rates the Django field rename as contract with a db_column alias."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 13,
+          "evidence": "Collect evidence for each identifier, stopping once its meaning is settled",
+          "fix": "State that settling the meaning never ends the search early: 'Stop reading for meaning once it is settled, but always finish the Boundaries check (string-literal search, hidden consumers) before assigning compatibility.' This brings step 1 in line with step 0's full-search rule."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 29,
+          "evidence": "| Otherwise | Role plus unit |",
+          "fix": "Spell out the fallback for identifiers that have no unit, such as classes, functions and config objects like `usrCfg`. For example: 'Otherwise: name the role (noun for values, verb phrase for actions), and add the unit or time basis when the value has one.'"
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

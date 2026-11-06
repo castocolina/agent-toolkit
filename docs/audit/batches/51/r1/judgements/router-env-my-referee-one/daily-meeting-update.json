@@ -1,0 +1,59 @@
+{
+  "skill": "daily-meeting-update",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 49,
+      "evidence": "By H2 line count, Fast path (4 lines) and Output (28 lines) are mostly activation; Optional integrations (17), Gotchas (8), Interview (9), and Never (6) carry the expert workflow. The familiar '## Yesterday', '## Today', '## Blockers', and '## Topics for Discussion' template leaves roughly 56% of section lines classified as expert, below the rubric's >70% target.",
+      "fix": "Replace the expanded conventional standup example with a compact section-order specification and one PR/Jira formatting example. Retain the custom meeting-date rule, optional-section conditions, title requirement, and bullet budget."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 24,
+      "evidence": "The window is defined as '00:00-24:00 in the user's local timezone', but GitHub discovery uses '--updated \">=DATE\"', whose date-only boundary is UTC. For a Tokyo-local November 2 window, a PR merged November 1 at 15:30Z belongs to Yesterday but can be excluded from discovery. The later event-time gate cannot recover an undiscovered PR.",
+      "fix": "Compute the selected local day's start and end as timezone-aware instants, convert them to UTC, and use the UTC start timestamp for GitHub discovery. Filter mergedAt and submittedAt against the resulting half-open interval. When the user's zone differs from the machine's, also run the digest with an explicit TZ setting for that zone."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/evals/evals.json",
+      "line": 36,
+      "evidence": "The integration prompt says 'Daily update please' and 'yesterday' without fixing the meeting date or timezone, while its fixtures use date '2026-11-02' and mergedAt '2026-11-02T16:40:00Z'. Assertions require that merge in Yesterday, leaving the expected result dependent on temporal assumptions outside the test.",
+      "fix": "Anchor the integration eval to meeting date 2026-11-03 and timezone UTC, either explicitly in the prompt or through a documented frozen evaluation clock. Add a case containing both an in-window event and a today-only event to verify the event-time gate."
+    }
+  ]
+}

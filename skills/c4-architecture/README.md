@@ -1,174 +1,62 @@
 # C4 Architecture Skill
 
-Generate software architecture documentation using C4 model diagrams in Mermaid syntax.
-
-## Purpose
-
-This skill helps you create professional architecture documentation using the C4 (Context, Container, Component, Code) model. It generates Mermaid diagrams that visualize your system's architecture at different abstraction levels, making it easy to communicate design decisions to different audiences.
+Generate software architecture documentation as C4 model diagrams in Mermaid syntax: context, container, component, dynamic and deployment views, built from a description or from repository evidence (docker-compose, Kubernetes manifests, package files).
 
 ## When to Use
 
-Use this skill when you need to:
-
-- Create architecture diagrams for documentation
-- Visualize software structure and relationships
-- Document system architecture for different audiences (executives, developers, DevOps)
-- Generate C4 Context, Container, Component, or Deployment diagrams
-- Create dynamic diagrams showing request flows
-- Document microservices or event-driven architectures
+- Document or map a software system, its deployable applications, data stores and external actors
+- Produce views for a given audience (executives, product, architects, developers, DevOps)
+- Show one request or event flow as a numbered dynamic view
+- Show production infrastructure as a deployment view
+- Translate a C4 diagram for a renderer without C4 support
 
 **Trigger phrases**: "architecture diagram", "C4 diagram", "system context", "container diagram", "component diagram", "deployment diagram", "document architecture", "visualize architecture"
 
-## How It Works
+Not for ER diagrams, plain flowcharts or sequence diagrams, draw.io or cloud-icon diagrams, or ADR prose.
 
-The skill follows a systematic workflow:
+## Installation
 
-1. **Understand scope** - Determines which C4 level(s) are needed based on your audience
-2. **Analyze codebase** - Explores the system to identify components, containers, and relationships
-3. **Generate diagrams** - Creates Mermaid C4 diagrams at appropriate abstraction levels
-4. **Document** - Writes diagrams to markdown files with explanatory context
+**Claude Code:**
 
-### C4 Diagram Levels
-
-| Level | Diagram Type | Audience | Shows | When to Create |
-|-------|-------------|----------|-------|----------------|
-| 1 | **C4Context** | Everyone | System + external actors | Always (required) |
-| 2 | **C4Container** | Technical | Apps, databases, services | Always (required) |
-| 3 | **C4Component** | Developers | Internal components | Only if adds value |
-| 4 | **C4Deployment** | DevOps | Infrastructure nodes | For production systems |
-| - | **C4Dynamic** | Technical | Request flows (numbered) | For complex workflows |
-
-**Key Insight**: "Context + Container diagrams are sufficient for most software development teams." Only create Component/Code diagrams when they genuinely add value.
-
-## Key Features
-
-- **Multiple abstraction levels** - Generate Context, Container, Component, Deployment, and Dynamic diagrams
-- **Audience-appropriate detail** - Automatically selects the right level of detail for your audience
-- **Best practices built-in** - Follows C4 model conventions and anti-patterns to avoid
-- **Microservices support** - Special handling for microservices and event-driven architectures
-- **Mermaid syntax** - Uses widely-supported Mermaid diagram format
-- **Comprehensive references** - Includes syntax guide, common mistakes, and advanced patterns
-
-## Usage Examples
-
-### Example 1: Document a Simple Web Application
-
-**Request**: "Create architecture diagrams for my workout tracker app"
-
-**Output**: Generates:
-- System Context diagram showing users and external systems
-- Container diagram showing the Vue.js SPA, state management (Pinia), and IndexedDB
-
-```mermaid
-C4Context
-  title System Context - Workout Tracker
-
-  Person(user, "User", "Tracks workouts and exercises")
-  System(app, "Workout Tracker", "Vue PWA for tracking strength and CrossFit workouts")
-  System_Ext(browser, "Web Browser", "Stores data in IndexedDB")
-
-  Rel(user, app, "Uses")
-  Rel(app, browser, "Persists data to", "IndexedDB")
+```bash
+cp -r skills/c4-architecture ~/.claude/skills/
 ```
 
-### Example 2: Document a Microservices Architecture
+**claude.ai:** add the skill to project knowledge, or paste the contents of `SKILL.md` into the conversation.
 
-**Request**: "Create a container diagram for our e-commerce microservices"
+Rendering checks use mermaid-cli (`mmdc`) when it is installed, or `npx -y -p @mermaid-js/mermaid-cli@11.17.0 mmdc` with network access.
 
-**Output**: Generates a Container diagram showing:
-- Order Service with PostgreSQL
-- Inventory Service with MongoDB
-- Message queues for inter-service communication
+## What It Does
+
+`SKILL.md` holds the workflow: pick views for the audience, map repository evidence to C4 elements, draw boundaries, write to `docs/architecture/`, then render and check in a loop. It also holds the NEVER list of Mermaid C4 traps, such as hand-numbered dynamic labels and `Container` bodies.
+
+## Example
+
+**Request**: "Create C4 context and container diagrams for our shop: a React web app calls a Node.js order API, which stores orders in PostgreSQL and charges cards through Stripe."
+
+**Output**: `docs/architecture/c4-context.md` and `docs/architecture/c4-containers.md`, each with a titled Mermaid diagram and an evidence table that marks every element as observed or inferred.
 
 ```mermaid
 C4Container
-  title Microservices - E-commerce Platform
-
-  System_Boundary(platform, "E-commerce Platform") {
-    Container(orderApi, "Order Service", "Spring Boot", "Order processing")
-    ContainerDb(orderDb, "Order DB", "PostgreSQL", "Order data")
-    Container(inventoryApi, "Inventory Service", "Node.js", "Stock management")
-    ContainerDb(inventoryDb, "Inventory DB", "MongoDB", "Stock data")
+  title Containers - Online Shop
+  Person(customer, "Customer", "Buys products online")
+  System_Ext(stripe, "Stripe", "Card payments")
+  System_Boundary(shop, "Online Shop") {
+    Container(web, "Web App", "React", "Storefront in the browser")
+    Container(api, "Order API", "Node.js", "Orders and checkout")
+    ContainerDb(db, "Orders DB", "PostgreSQL", "Orders")
   }
+  Rel(customer, web, "Places orders", "HTTPS")
+  Rel(web, api, "Calls", "JSON/HTTPS")
+  Rel(api, db, "Reads and writes", "SQL")
+  Rel(api, stripe, "Charges cards", "HTTPS")
 ```
-
-### Example 3: Show a Request Flow
-
-**Request**: "Diagram the user sign-in flow"
-
-**Output**: Generates a Dynamic diagram with numbered steps:
-
-```mermaid
-C4Dynamic
-  title Dynamic Diagram - User Sign In Flow
-
-  ContainerDb(db, "Database", "PostgreSQL", "User credentials")
-  Container(spa, "Single-Page App", "React", "Banking UI")
-
-  Container_Boundary(api, "API Application") {
-    Component(signIn, "Sign In Controller", "Express", "Auth endpoint")
-    Component(security, "Security Service", "JWT", "Validates credentials")
-  }
-
-  Rel(spa, signIn, "1. Submit credentials", "JSON/HTTPS")
-  Rel(signIn, security, "2. Validate")
-  Rel(security, db, "3. Query user", "SQL")
-```
-
-### Example 4: Document Production Deployment
-
-**Request**: "Create a deployment diagram for our AWS infrastructure"
-
-**Output**: Generates a Deployment diagram showing:
-- Browser deployment node
-- AWS Cloud with ECS and RDS nodes
-- Infrastructure relationships
-
-## Output Location
-
-Architecture documentation is written to `docs/architecture/` with this naming convention:
-
-- `c4-context.md` - System context diagram
-- `c4-containers.md` - Container diagram
-- `c4-components-{feature}.md` - Component diagrams per feature
-- `c4-deployment.md` - Deployment diagram
-- `c4-dynamic-{flow}.md` - Dynamic diagrams for specific flows
-
-## Best Practices
-
-### Essential Rules
-
-1. **Every element must have**: Name, Type, Technology (where applicable), and Description
-2. **Use unidirectional arrows only** - Bidirectional arrows create ambiguity
-3. **Label arrows with action verbs** - "Sends email using", "Reads from", not just "uses"
-4. **Include technology labels** - "JSON/HTTPS", "JDBC", "gRPC"
-5. **Stay under 20 elements per diagram** - Split complex systems into multiple diagrams
-
-### Clarity Guidelines
-
-1. **Start at Level 1** - Context diagrams help frame the system scope
-2. **One diagram per file** - Keep diagrams focused on a single abstraction level
-3. **Meaningful aliases** - Use descriptive aliases (e.g., `orderService` not `s1`)
-4. **Concise descriptions** - Keep descriptions under 50 characters when possible
-5. **Always include a title** - "System Context diagram for [System Name]"
-
-## Audience-Appropriate Detail
-
-| Audience | Recommended Diagrams |
-|----------|---------------------|
-| Executives | System Context only |
-| Product Managers | Context + Container |
-| Architects | Context + Container + key Components |
-| Developers | All levels as needed |
-| DevOps | Container + Deployment |
 
 ## References
 
-The skill includes comprehensive reference documentation:
-
-- **c4-syntax.md** - Complete Mermaid C4 syntax reference
-- **common-mistakes.md** - Anti-patterns to avoid
-- **advanced-patterns.md** - Microservices, event-driven, deployment patterns
+- `references/c4-syntax.md`: Mermaid C4 macros, styling, layout, unsupported features, one rendered example per diagram type
+- `references/advanced-patterns.md`: team ownership, event-driven flows, failure paths, deployment views, system landscape
+- `references/common-mistakes.md`: wrong and correct versions of each modeling mistake
 
 ## Additional Resources
 

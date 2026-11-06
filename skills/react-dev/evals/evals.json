@@ -2,34 +2,161 @@
   "skill_name": "react-dev",
   "evals": [
     {
-      "id": "typed-button",
-      "prompt": "Create a React 19 TypeScript Button with native button props, primary/secondary variants, children, and a ref.",
-      "expected_output": "A typed component uses native button props, a variant union, ReactNode children, and React 19 ref-as-prop.",
+      "id": "button-unknown-version",
+      "prompt": "Write a TypeScript Button component with primary/secondary variants that passes a ref through to the native button.",
+      "expected_output": "With no package.json and no requested React major, writes React 18-compatible code: forwardRef<HTMLButtonElement, Props> with a closed variant union and native button props, and says it assumed React 18 compatibility (noting React 19 could take ref as a prop).",
       "assertions": [
-        "Defines primary | secondary variant",
-        "Uses ComponentPropsWithoutRef<'button'>",
-        "Uses ReactNode for children",
-        "Does not use forwardRef"
+        "Uses forwardRef<HTMLButtonElement, ...> rather than ref as a plain prop",
+        "States that no React version was given or visible and that it assumed React 18 compatibility",
+        "Restricts `variant` to 'primary' | 'secondary' and accepts native button attributes"
       ]
     },
     {
-      "id": "submit-handler",
-      "prompt": "How should I type a form submit handler that reads FormData and an input change handler?",
-      "expected_output": "Use FormEvent<HTMLFormElement>, ChangeEvent<HTMLInputElement>, and currentTarget for the form.",
+      "id": "shared-lib-ref",
+      "prompt": "Our app is on React 19 now. Add ref support to TextInput in packages/ui-kit (evals/files/TextInput.tsx, package.json at evals/files/ui-kit-package.json) so the app can focus it. Should I just use the new ref prop?",
+      "files": [
+        "evals/files/TextInput.tsx",
+        "evals/files/ui-kit-package.json"
+      ],
+      "expected_output": "Keeps forwardRef because the package's peerDependencies still allow React 18, where ref is not passed as a prop; types the ref as HTMLInputElement and keeps the native input props.",
       "assertions": [
-        "Uses React.FormEvent<HTMLFormElement>",
-        "Uses React.ChangeEvent<HTMLInputElement>",
-        "Builds FormData from e.currentTarget"
+        "Uses forwardRef<HTMLInputElement, ...> rather than ref as a plain prop",
+        "Justifies the choice with the peerDependencies range that still allows React 18, not with the app's React version",
+        "Keeps the existing label, error and native input props working, with the ref attached to the <input>"
+      ]
+    },
+    {
+      "id": "submitter-intent",
+      "prompt": "In evals/files/PostEditor.tsx every post gets saved as a draft even when I click Publish. Fix it.",
+      "files": [
+        "evals/files/PostEditor.tsx"
+      ],
+      "expected_output": "Reads the clicked button from (e.nativeEvent as SubmitEvent).submitter and passes it to new FormData(e.currentTarget, submitter) (or reads its value), because FormData built from the form alone omits the submit button's name/value; replaces the `as Intent` cast with a check that the value is 'publish' or 'draft'.",
+      "assertions": [
+        "Gets the clicked button from (e.nativeEvent as SubmitEvent).submitter",
+        "Passes the submitter to new FormData(e.currentTarget, submitter), or reads the submitter's value directly",
+        "Explains that FormData built from the form alone does not include the clicked submit button's name and value",
+        "Replaces the `as Intent` cast with a runtime check that the value is 'publish' or 'draft'"
       ]
     },
     {
       "id": "react19-form-action",
-      "prompt": "I am upgrading a React 18 form using useFormState. Show the React 19 replacement and boundary concerns.",
-      "expected_output": "Use useActionState and preserve Server/Client component boundaries.",
+      "prompt": "We're upgrading to React 19. Update evals/files/ProfileForm.tsx and its server action evals/files/actions.ts to the React 19 API and tell me anything else that's wrong with them.",
+      "files": [
+        "evals/files/ProfileForm.tsx",
+        "evals/files/actions.ts"
+      ],
+      "expected_output": "Replaces react-dom useFormState with useActionState from react, uses the [state, formAction, isPending] tuple, makes the action return the same state type on every path (the success path currently returns undefined), and adds authentication plus an ownership or role check inside the action because the bound userId is client-controlled.",
       "assertions": [
-        "Recommends useActionState, not useFormState",
-        "Identifies state, form action, and pending tuple values",
-        "Mentions separating Server and Client components"
+        "Imports useActionState from 'react' in place of useFormState from 'react-dom'",
+        "Destructures the [state, formAction, isPending] tuple",
+        "Points out that the success path returns nothing and makes every path return the same state type as the initial state",
+        "Adds an authentication check and an authorization check (the caller owns userId or is an admin) inside updateProfile, because the bound userId can be tampered with",
+        "Keeps the action in the 'use server' module rather than defining an inline 'use server' function in the client file"
+      ]
+    },
+    {
+      "id": "generic-columns",
+      "prompt": "In evals/files/DataTable.tsx a Date column happily accepts a string formatter and crashes at runtime. Fix the column types so TypeScript catches it.",
+      "files": [
+        "evals/files/DataTable.tsx"
+      ],
+      "expected_output": "Explains that render's parameter is T[keyof T], a union of all field types, so the key and its renderer are not tied; introduces a per-column type parameter K extends keyof T (for example a column builder) so render receives T[K]; shows the dueDate string renderer is now rejected while the valid columns still compile.",
+      "assertions": [
+        "Identifies `T[keyof T]` in `render` as the cause: the value type is not tied to the column's own key",
+        "Captures each column's key with its own type parameter K extends keyof T (a builder or helper function) so render receives T[K]",
+        "Shows the mismatched dueDate renderer being rejected, with @ts-expect-error or the stated compile error",
+        "Keeps the customer and total columns valid without casts"
+      ]
+    },
+    {
+      "id": "rr8-context",
+      "prompt": "We bumped to React Router 8 (evals/files/rr8-package.json) and now context.userId in evals/files/rr8-dashboard.tsx doesn't type-check. Our load context setup is evals/files/rr8-load-context.ts. Fix it properly.",
+      "files": [
+        "evals/files/rr8-package.json",
+        "evals/files/rr8-load-context.ts",
+        "evals/files/rr8-dashboard.tsx"
+      ],
+      "expected_output": "Removes the AppLoadContext augmentation, defines a typed context with createContext, makes getLoadContext return a RouterContextProvider with the value set, reads it in the loader with context.get, types the loader with Route.LoaderArgs from ./+types/dashboard, and runs react-router typegen before tsc.",
+      "assertions": [
+        "Removes the `declare module 'react-router' { interface AppLoadContext }` augmentation",
+        "Creates a typed context value with createContext from 'react-router' and reads it with context.get(...) in the loader",
+        "Makes getLoadContext return a RouterContextProvider and set the user id on it instead of returning a plain object",
+        "Types the loader with Route.LoaderArgs from './+types/dashboard' instead of a hand-written context type",
+        "Runs react-router typegen before tsc, for example in the typecheck script"
+      ]
+    },
+    {
+      "id": "ssr-storage",
+      "prompt": "evals/files/ThemeToggle.tsx has three bugs listed at the bottom of the file. Fix the component.",
+      "files": [
+        "evals/files/ThemeToggle.tsx"
+      ],
+      "expected_output": "Explains that 'use client' components still render on the server, starts from a hydration-stable default, reads storage after mount inside try/catch and validates the stored value, and stops writing until the current key has been read so a userId change cannot copy the previous user's theme to the new key.",
+      "assertions": [
+        "Explains that a 'use client' component is still rendered on the server, which causes the ReferenceError and the hydration mismatch",
+        "Removes the localStorage read from the useState initializer and reads it after mount, starting from a hydration-stable default",
+        "Wraps storage access in try/catch and checks the stored value is 'light' or 'dark' instead of casting",
+        "Prevents writing before the current key has been read (or writes only on explicit toggle), so a userId change cannot save the previous user's theme under the new key"
+      ]
+    },
+    {
+      "id": "no-router-fallback",
+      "prompt": "Can you make the screen params type-safe in evals/files/AppShell.tsx? orderId is sometimes undefined. package.json is evals/files/no-router-package.json.",
+      "files": [
+        "evals/files/AppShell.tsx",
+        "evals/files/no-router-package.json"
+      ],
+      "expected_output": "Keeps the zustand navigation and types it as a discriminated union where order-detail requires orderId, without recommending a router install, writes React 18-compatible code and says what stays unchecked (no URL or deep-link validation).",
+      "assertions": [
+        "Does not recommend installing TanStack Router or React Router",
+        "Replaces the Record<string, string> params with a discriminated union in which 'order-detail' requires an orderId string",
+        "Makes go() reject an order-detail navigation without orderId at compile time",
+        "States what stays untyped or unvalidated, such as URLs or deep links"
+      ]
+    },
+    {
+      "id": "tanstack-search-required",
+      "prompt": "Every <Link to=\"/products\"> now fails to compile because search is required (error at the bottom of evals/files/tanstack-products.tsx). Deps are in evals/files/tanstack-package.json. Fix the route, don't just add search to every link.",
+      "files": [
+        "evals/files/tanstack-products.tsx",
+        "evals/files/tanstack-package.json"
+      ],
+      "expected_output": "Identifies that a Zod 3 schema with .default() passed directly to validateSearch makes search required on Link; wraps it in zodValidator from @tanstack/zod-adapter with fallback(); narrows loaderDeps to page and sort, excluding the display-only locale; regenerates routeTree.gen.ts through the router plugin rather than by hand.",
+      "assertions": [
+        "Names the cause: the installed Zod 3 schema with .default() is passed straight to validateSearch, so the route's search input type requires search on Link",
+        "Wraps the schema with zodValidator from @tanstack/zod-adapter and uses fallback(...) for the defaulted fields (or states that upgrading to Zod 4 allows passing the schema directly)",
+        "Does not fix it by adding a search prop to every Link",
+        "Changes loaderDeps to return only page and sort and to exclude locale, so changing locale alone neither reloads the route nor creates a new loader cache entry"
+      ]
+    },
+    {
+      "id": "optimistic-rollback",
+      "prompt": "evals/files/CommentList.tsx has the three problems listed at the bottom. Fix it with useOptimistic done properly.",
+      "files": [
+        "evals/files/CommentList.tsx"
+      ],
+      "expected_output": "Runs the optimistic update inside an Action or startTransition, uses a unique temporary id, treats a non-ok response as failure, commits the server's comment to base state only after success inside a new startTransition, and on failure leaves base state unchanged so the optimistic comment rolls back, with an error shown.",
+      "assertions": [
+        "Calls the optimistic setter inside an Action (form action) or startTransition, not from a plain click handler",
+        "Replaces the fixed 'temp' id with a unique temporary id per optimistic item",
+        "Removes the setComments call made before the request and checks res.ok (or equivalent) before treating the request as successful",
+        "Commits the server's saved comment to base state only on success, wrapping that post-await update in startTransition",
+        "On failure leaves the base state unchanged so the optimistic comment disappears, and surfaces an error to the user"
+      ]
+    },
+    {
+      "id": "ime-enter-to-send",
+      "prompt": "Fix the three bug reports at the bottom of evals/files/ChatComposer.tsx, and let the parent component focus the textarea through a ref.",
+      "files": [
+        "evals/files/ChatComposer.tsx"
+      ],
+      "expected_output": "The keydown handler returns early for non-Enter keys, Shift+Enter and composition (isComposing or keyCode 229 for Safari), calls preventDefault only for the handled Enter, then requestSubmit once. The component takes ref as a regular React 19 prop (Ref<HTMLTextAreaElement>) attached to the textarea, without forwardRef.",
+      "assertions": [
+        "Ignores the IME-confirm Enter by checking e.nativeEvent.isComposing and also e.nativeEvent.keyCode === 229 for Safari",
+        "Lets Shift+Enter fall through to the textarea's default newline instead of sending",
+        "Calls e.preventDefault() only for the plain Enter it handles, which removes the stray newline, and then calls requestSubmit() once",
+        "Takes `ref` as a regular prop (typed Ref<HTMLTextAreaElement> or equivalent) attached to the <textarea>, and does not use forwardRef, since the fixture is a React 19 app component"
       ]
     }
   ]

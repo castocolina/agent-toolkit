@@ -10,14 +10,11 @@ Creates a new handoff document with auto-detected metadata:
 - Modified/staged files
 - Handoff chain linking
 
-Usage:
-    python create_handoff.py [task-slug] [--continues-from <previous-handoff>]
-    python create_handoff.py "implementing-auth"
-    python create_handoff.py "auth-part-2" --continues-from 2024-01-15-auth.md
-    python create_handoff.py  # auto-generates slug from timestamp
+Run with --help for usage, exit codes and examples.
 """
 
 import argparse
+import json
 import os
 import re
 import subprocess
@@ -171,13 +168,9 @@ def generate_handoff(
     slug = slug.lower().replace(" ", "-").replace("_", "-")
     slug = "".join(c for c in slug if c.isalnum() or c == "-")
 
-    filename = f"{file_timestamp}-{slug}.md"
-
     # Create handoffs directory
     handoffs_dir = Path(project_path) / ".claude" / "handoffs"
     handoffs_dir.mkdir(parents=True, exist_ok=True)
-
-    filepath = handoffs_dir / filename
 
     # Gather git info
     git_info = get_git_info(project_path)
@@ -327,59 +320,74 @@ def generate_handoff(
 
 ---
 
-**Security Reminder**: Before finalizing, run `validate_handoff.py` to check for accidental secret exposure.
+**Security Reminder**: Before finalizing, run validate_handoff.py to check for accidental secret exposure.
 """
 
-    # Write the file
-    filepath.write_text(content)
-
-    return str(filepath)
+    # Exclusive create: a same-second collision gets -2, -3, ... instead of overwriting.
+    for n in range(1, 100):
+        suffix = "" if n == 1 else f"-{n}"
+        filepath = handoffs_dir / f"{file_timestamp}-{slug}{suffix}.md"
+        try:
+            with open(filepath, "x") as handle:
+                handle.write(content)
+            return str(filepath)
+        except FileExistsError:
+            continue
+    raise ValueError(f"Could not find a free filename for {file_timestamp}-{slug}.md after 99 attempts.")
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Create a new handoff document with smart scaffolding"
+        description="Create a new handoff scaffold in <cwd>/.claude/handoffs/ (run from the project root). Never overwrites: a same-second name collision gets a -2, -3, ... suffix.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""exit codes:
+  0  scaffold created (path on stdout)
+  2  usage error, or --continues-from names no existing handoff (message on stderr)
+
+examples:
+  python3 scripts/create_handoff.py implementing-user-auth
+  python3 scripts/create_handoff.py auth-part-2 --continues-from 2026-01-15-143022-implementing-user-auth.md
+  python3 scripts/create_handoff.py --json auth-part-2""",
     )
     parser.add_argument(
         "slug",
         nargs="?",
         default=None,
-        help="Short identifier for the handoff (e.g., 'implementing-auth')"
+        help="Short identifier for the handoff (default: 'handoff')"
     )
     parser.add_argument(
         "--continues-from",
         dest="continues_from",
-        help="Filename of previous handoff this continues from"
+        help="Exact filename (not a path) of an existing handoff in .claude/handoffs/ that this one continues"
     )
+    parser.add_argument("--json", action="store_true", help="Print the result as one JSON object on stdout")
 
     args = parser.parse_args()
 
     # This script is resolved from its installation path; retain caller cwd as project root.
     project_path = os.path.realpath(os.getcwd())
 
-    # Check for existing handoffs to suggest chaining
+    suggested = None
     if not args.continues_from:
         prev_handoffs = find_previous_handoffs(project_path)
         if prev_handoffs:
-            print(f"Found {len(prev_handoffs)} existing handoff(s).")
-            print(f"Most recent: {prev_handoffs[0]['filename']}")
-            print(f"Use --continues-from <filename> to link handoffs.\n")
+            suggested = prev_handoffs[0]["filename"]
+            print(f"Found {len(prev_handoffs)} existing handoff(s); most recent: {suggested}. "
+                  "Use --continues-from <filename> to link it.", file=sys.stderr)
 
-    # Generate handoff
     try:
         filepath = generate_handoff(project_path, args.slug, args.continues_from)
     except ValueError as error:
         parser.error(str(error))
 
-    print(f"Created handoff document: {filepath}")
-    print(f"\nNext steps:")
-    print(f"1. Open {filepath}")
-    print(f"2. Replace [TODO: ...] placeholders with actual content")
-    print(f"3. Focus especially on 'Important Context' and 'Immediate Next Steps'")
-    print(f"4. Run: python validate_handoff.py {filepath}")
-    print(f"   (Checks for completeness and accidental secrets)")
+    if args.json:
+        print(json.dumps({"path": filepath, "continues_from": args.continues_from, "suggested_predecessor": suggested}))
+        return
 
-    return filepath
+    validator = Path(__file__).resolve().parent / "validate_handoff.py"
+    print(f"Created handoff document: {filepath}")
+    print("Next: replace every [TODO: ...] placeholder, then run:")
+    print(f"  python3 {validator} {filepath}")
 
 
 if __name__ == "__main__":

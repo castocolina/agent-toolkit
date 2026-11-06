@@ -1,206 +1,65 @@
-# SBI Feedback Model - Complete Guide
+# SBI Worked Examples
 
-The Situation-Behavior-Impact (SBI) model, developed by the Center for Creative Leadership, provides a structured approach to giving clear, objective feedback that minimizes defensiveness and promotes improvement.
+The Situation-Behavior-Impact (SBI) model was developed by the Center for Creative Leadership. The method and its rules live in `SKILL.md`; this file holds calibrated examples for the cases where a plain opener goes wrong.
 
-## The SBI Formula
+## Observation versus interpretation
 
-```text
-Situation + Behavior + Impact = Effective Feedback
-```
+| Interpretation (do not say) | Observable (say) |
+| --- | --- |
+| "You don't care about quality." | "The last two PRs had no tests, and CI failed on both." |
+| "You're not engaged." | "In the last three planning sessions you gave no estimates." |
+| "You were being defensive." | "You said 'that's not my fault' before I finished the example." |
+| "...which made Alex visibly frustrated." | "...Alex stopped before describing the dependency, and we only learned about it the next day." |
+| "I know you're eager to help." | "What was going on for you when you jumped in?" |
 
-| Component | What It Is | What It's NOT |
-| --- | --- | --- |
-| **Situation** | When and where the behavior occurred | Vague timing or generalizations |
-| **Behavior** | Observable actions the person took | Assumptions about motives or character |
-| **Impact** | Effect on you, the team, or the project | Judgment or evaluation |
+The last two rows are the common slip: the feeling or motive sneaks in through the impact or the follow-up question.
 
-## Why SBI Works
+## Interrupting in standup (constructive)
 
-1. **Specificity** - Concrete examples are harder to dismiss than vague complaints
-2. **Checkability** - Observable accounts can still be disputed; check them against records, witnesses, or other available evidence before treating them as established.
-3. **Actionability** - Clear situations and behaviors can be repeated or changed
-4. **Non-threatening** - Impact focuses on effects, not character attacks
-
-## SBI Examples: Positive Feedback
-
-### Code Review Excellence
-
-> **Situation:** "In the code review for the payment processing module last Tuesday..."
+> **Situation:** "In yesterday's standup, while Alex was describing their blocker..."
 >
-> **Behavior:** "...you not only caught the edge case that would have caused data loss, but you also suggested a more elegant solution using the repository pattern and included tests that demonstrated the issue..."
+> **Behavior:** "...you interrupted three times to suggest fixes before they finished..."
 >
-> **Impact:** "...which prevented a potentially costly bug in production and taught our junior developers about defensive coding. The whole team learned from your thoroughness."
+> **Impact:** "...Alex stopped before mentioning the dependency on the auth service, and we lost a day finding it."
 
-### Meeting Contribution
+**Follow-up:** "How did that exchange look from your side?" Then, if needed: "Going forward I'd like people to finish their update before we suggest fixes. Can you hold suggestions until then?"
 
-> **Situation:** "During our architecture decision meeting this morning..."
->
-> **Behavior:** "...you asked three questions that reframed the problem and suggested we document our trade-offs in an ADR..."
->
-> **Impact:** "...which helped us reach consensus in half the usual time and gave us documentation we can reference later."
+## Recognition without an add-on
 
-### Mentorship
+> "In Tuesday's review of the payment module, you caught the rounding edge case and added a test that reproduces it. That stopped a data-loss bug before release, and two juniors asked about the test in retro."
 
-> **Situation:** "Over the past month while onboarding Maya..."
->
-> **Behavior:** "...you've been setting up daily 15-minute check-ins, creating a shared doc of resources, and giving her progressively more complex tasks..."
->
-> **Impact:** "...which has accelerated her ramp-up significantly. She submitted her first independent PR two weeks ahead of our typical onboarding timeline."
+Stop there. Do not append "next time, also..."; save development points for a separate conversation.
 
-### Cross-Team Collaboration
+## Disputed evidence
 
-> **Situation:** "When the DevOps team asked for help migrating the deployment pipeline last week..."
->
-> **Behavior:** "...you volunteered to pair with their engineer, documented the process as you went, and stayed late to ensure the cutover succeeded..."
->
-> **Impact:** "...which built goodwill between our teams and created documentation that will help us next time."
+The user says a direct report pushed to `main` without review; the direct report says a reviewer approved in chat.
 
-## SBI Examples: Constructive Feedback
+> "On Thursday the deploy log shows a push to `main` at 16:10 with no PR attached [situation, behavior]. The build broke for two hours [impact]. If it was approved somewhere else, I haven't seen it. Can you walk me through what happened?"
 
-### Missed Deadlines
+State the record, name the open question, and settle it with the chat history or the reviewer before treating the behavior as established. If it stays unresolved, the agreed step is about process ("approvals go on the PR"), not blame.
 
-> **Situation:** "This sprint, the API endpoint work was due on Wednesday..."
->
-> **Behavior:** "...it was delivered on Friday without any communication about the delay..."
->
-> **Impact:** "...which blocked the frontend team for two days, caused them to miss their milestone, and created tension between our teams."
+## Power gap
 
-**Follow-up prompt:** "What happened? Is there something blocking you that I should know about?"
+**Downward (manager to report), required change:**
 
-### Code Quality Issues
+> "...the API work landed Friday instead of Wednesday with no heads-up, and the frontend team was blocked two days. I need a message as soon as a date is at risk. What would make that easy to do?"
 
-> **Situation:** "In the last three PRs you submitted..."
->
-> **Behavior:** "...there were no unit tests and several of the changes broke existing tests that weren't updated..."
->
-> **Impact:** "...which caused the CI pipeline to fail repeatedly, blocked other developers' merges, and required the tech lead to spend time debugging."
+The expectation is stated as a requirement; the question is about how, not whether.
 
-**Follow-up prompt:** "I want to understand what's making testing difficult. Is there something about our test setup or your workload that's contributing to this?"
+**Upward (report to manager):**
 
-### Meeting Behavior
+> "In Monday's planning, the release date was set before engineering estimated it. We've since dropped two stories. Could we get estimates in before dates are committed?"
 
-> **Situation:** "In yesterday's standup..."
->
-> **Behavior:** "...when Alex was describing their blocker, you interrupted three times to offer solutions before they finished explaining..."
->
-> **Impact:** "...which made Alex visibly frustrated and may have prevented them from sharing the full context of the problem."
+An observation and a request, no verdict on the manager.
 
-**Follow-up prompt:** "I know you're eager to help, and that's great. Can we try letting people finish before jumping in?"
+## Third-party report
 
-### Communication Gaps
+A teammate told the user, in confidence, that a colleague's review comments feel dismissive. The user has not seen it.
 
-> **Situation:** "When the production issue happened on Monday..."
->
-> **Behavior:** "...you started investigating immediately but didn't post updates in the incident channel for 45 minutes..."
->
-> **Impact:** "...which left leadership and customer support without information to share with affected clients, and caused multiple people to ask for status updates, further distracting you."
+Do not deliver it as "people have told me...". Either read the review threads and give feedback on what the user can see ("In PR #412 your comments were 'wrong' and 'redo' with no reason; the author asked twice what to change"), or encourage the teammate to raise it directly. Never reveal the source without consent.
 
-**Follow-up prompt:** "During incidents, even brief updates help. What would make it easier to communicate while you're troubleshooting?"
+## Recurring pattern
 
-### Lack of Engagement
+> "We talked on the 3rd about PRs failing CI before review. Since then, two of the last four have. The latest, on Monday, blocked Sam's merge for half a day. What's getting in the way of running the suite before opening a PR?"
 
-> **Situation:** "In our last three sprint planning sessions..."
->
-> **Behavior:** "...you haven't provided estimates or raised concerns about any of the stories..."
->
-> **Impact:** "...which means we're missing your technical perspective, and some stories have turned out to be much larger than expected."
-
-**Follow-up prompt:** "Your input is valuable. Is there something about our planning process that's making it hard to participate?"
-
-## Common Mistakes to Avoid
-
-### Mistake 1: Vague Situation
-
-❌ "Recently..."
-❌ "In general..."
-❌ "Sometimes..."
-
-✅ "In yesterday's standup..."
-✅ "During the deployment on March 15th..."
-✅ "In the code review for PR #1234..."
-
-### Mistake 2: Interpreting Instead of Observing
-
-❌ "You don't care about quality" (interpretation)
-✅ "The PR had 12 bugs caught in QA" (observable)
-
-❌ "You're not engaged" (interpretation)
-✅ "You were on your phone during the demo" (observable)
-
-❌ "You're being defensive" (interpretation)
-✅ "You raised your voice and said 'that's not my fault'" (observable)
-
-### Mistake 3: Generalizing Behavior
-
-❌ "You always miss deadlines" (generalization)
-✅ "The last three deliverables were past their due date" (specific)
-
-❌ "You never test your code" (generalization)
-✅ "The last two PRs had no unit tests" (specific)
-
-### Mistake 4: Making Impact Personal
-
-❌ "...which made me angry" (personal feeling as impact)
-✅ "...which caused the release to be delayed" (business impact)
-
-Personal feelings can be part of impact, but should be secondary to business/team impact:
-"...which delayed the release and, honestly, created frustration for the team."
-
-### Mistake 5: Forgetting the "So What"
-
-Feedback needs clear impact to be meaningful. Without it:
-
-❌ "In the meeting, you interrupted Alex three times." (So what?)
-
-✅ "In the meeting, you interrupted Alex three times, which prevented them from fully explaining the problem and may have led to us missing important context."
-
-## Extended SBI: Adding Intent and Next Steps
-
-Some practitioners extend SBI to **SBI-I** (adding Intent) or **SBI-NS** (adding Next Steps):
-
-### SBI-I: Checking Intent
-
-After delivering SBI feedback, ask about intent:
-
-> **SBI:** "When you pushed to main without a PR yesterday, it broke the build and blocked five developers for two hours."
->
-> **I (Intent):** "What was happening when you pushed to main without a PR? Help me understand your perspective."
-
-### SBI-NS: Proposing Next Steps
-
-End with a collaborative discussion of what to do differently:
-
-> **SBI:** "When you gave estimates without checking with the backend team, the sprint became overcommitted and we had to drop two stories."
->
-> **NS:** "Going forward, could we establish a quick sync with backend before finalizing sprint commitments? What would make that work for you?"
-
-## When to Use SBI
-
-| Scenario | Use SBI? | Notes |
-| --- | --- | --- |
-| Formal performance feedback | ✅ Yes | SBI provides documentation |
-| Quick in-the-moment feedback | ✅ Yes | Keep it brief but structured |
-| Positive recognition | ✅ Yes | Makes praise specific and meaningful |
-| Annual reviews | ✅ Yes | Have multiple examples ready |
-| Giving yourself feedback | ✅ Yes | Use for self-reflection |
-| Venting frustration | ❌ No | Get calm first, then use SBI |
-
-## Practice Exercise
-
-Take a recent situation where you wanted to give feedback. Fill in:
-
-**Situation:** ________________________________________________
-
-**Behavior:** ________________________________________________
-
-**Impact:** ________________________________________________
-
-Now check:
-
-- [ ] Is the situation specific (time/place)?
-- [ ] Is the behavior observable (not an interpretation)?
-- [ ] Is the impact clear (business/team effect)?
-
----
-
-**Related:** Return to `feedback-mastery` skill for the full Preparation-Delivery-Follow-up framework.
+One recent example plus a reference to the earlier conversation, not a list of every instance. If the earlier conversation never happened, say so: "I should have raised this sooner."

@@ -1,0 +1,50 @@
+{
+  "skill": "excalidraw",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 60,
+      "evidence": "The worker allows each element the task names or creates '(and per arrow it rebinds)' and must 'undo each listed change' when preservation fails. Moving a box requires changing incident-arrow geometry without necessarily rebinding those arrows. The strict diff therefore rejects the required geometry changes; undoing them can leave detached arrows while the structural check passes.",
+      "fix": "Define the permitted dependency set before editing: requested elements, incident arrows whose geometry changes even without rebinding, their bound labels, and old/new endpoint shapes whose reciprocal bindings must change. Use that set consistently in worker step 2 and the strict-diff allowlist. Add a regression test that moves a connected box without changing binding targets and verifies both preservation and updated arrow endpoints."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 46,
+      "evidence": "'`--connect` and `new` edges refuse ... a self-loop ... use the worker route', but the worker begins 'Copy the original; edit the copy only.' For a new diagram containing a self-loop, scene.py aborts before writing OUT, leaving no original scene for that fallback.",
+      "fix": "Add an explicit creation fallback for unsupported edges: build a temporary scaffold containing the requested nodes and supported edges, then have the worker add the self-loop to a copy. Validate that copy and run strict preservation against the scaffold before publishing OUT; clean up temporary files afterward."
+    }
+  ]
+}

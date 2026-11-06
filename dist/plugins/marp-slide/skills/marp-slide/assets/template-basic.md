@@ -28,7 +28,7 @@ section {
   padding: 56px;
 }
 
-section:last-of-type {
+section.final {
   border-bottom: none;
 }
 
@@ -138,6 +138,8 @@ Month XX, 2024
 - Point3
 
 ---
+
+<!-- _class: final -->
 
 ## Conclusion
 

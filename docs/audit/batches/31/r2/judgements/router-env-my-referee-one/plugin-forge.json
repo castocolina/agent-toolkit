@@ -1,0 +1,59 @@
+{
+  "skill": "plugin-forge",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/plugin-forge/scripts/bump_version.py",
+      "line": 55,
+      "evidence": "The branch `if \"version\" not in plugin_data:` reports `the plugin is versioned by commit SHA` before reading the marketplace. A versionless plugin.json can instead inherit a pinned marketplace-entry version, as SKILL.md's version-precedence rule acknowledges. In that case, the instruction to push without bumping leaves users on the cached release.",
+      "fix": "Read the matching marketplace entry before deciding how the plugin is versioned. When only the entry supplies a version, bump that effective version; report SHA-versioning only when both manifests omit version. Update the script contract and replace the existing versionless test with separate marketplace-versioned and genuinely SHA-versioned cases."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 26,
+      "evidence": "The remote-source branch says `push the plugin repository before testing it from the marketplace`, but never advances a pinned source. references/marketplace-schema.md explicitly permits `ref` and `sha` pins and gives a GitHub example pinned to `v1.0.0`; pushing a newer plugin commit alone still installs the old target.",
+      "fix": "Add a pinned-remote release branch: publish the new target commit or tag, update the marketplace source's ref or sha to that target, then install from the revised marketplace entry and verify the loaded version. Keep plugin-repository and marketplace-repository publication separate and within user authorization."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/plugin-forge/scripts/bump_version.py",
+      "line": 53,
+      "evidence": "`plugin_data = json.load(f)` is followed by a membership test without checking that the result is an object. A plugin.json containing valid JSON `null` raises an uncaught TypeError rather than the documented exit 2 with an actionable bad-input diagnostic.",
+      "fix": "Validate that plugin_data is a JSON object before inspecting its fields and raise ValueError with the manifest path when it is not. Add subprocess tests for null, array and scalar manifests that assert exit 2, empty stdout, a useful stderr message and unchanged files."
+    }
+  ]
+}

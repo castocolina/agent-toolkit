@@ -54,6 +54,10 @@ class GenerateCliTests(unittest.TestCase):
             out,
         )
 
+    def test_generate_alt_flag_sets_markdown_alt_text(self):
+        out = run_cli("generate", "fine", "a", "b", "--markdown", "--alt", "Dog in fire: prod is fine")
+        self.assertEqual(out.strip(), f"![Dog in fire: prod is fine]({BASE_URL}/images/fine/a/b.png)")
+
     def test_generate_extension_flag_sets_extension(self):
         out = run_cli("generate", "buzz", "a", "b", "--extension", "jpg")
         self.assertTrue(out.strip().endswith("/images/buzz/a/b.jpg"), out)
@@ -64,19 +68,29 @@ class GenerateCliTests(unittest.TestCase):
         )
         self.assertIn("width=800&height=600&layout=top", out)
 
-    def test_generate_without_bottom_text_uses_placeholder(self):
-        out = run_cli("generate", "buzz", "memes")
-        self.assertEqual(out.strip(), f"{BASE_URL}/images/buzz/memes/_.png")
+    def test_generate_font_style_background_flags_are_query_encoded(self):
+        out = run_cli(
+            "generate", "custom", "a", "b", "--font", "impact", "--style", "default",
+            "--background", "https://example.com/x.png",
+        )
+        self.assertIn("style=default&font=impact&background=https%3A%2F%2Fexample.com%2Fx.png", out)
+
+    def test_generate_single_caption_is_one_segment(self):
+        out = run_cli("generate", "cmm", "tabs beat spaces")
+        self.assertEqual(out.strip(), f"{BASE_URL}/images/cmm/tabs_beat_spaces.png")
+
+    def test_generate_three_captions_for_db(self):
+        out = run_cli("generate", "db", "me", "new JS framework", "a/b tested code")
+        self.assertEqual(out.strip(), f"{BASE_URL}/images/db/me/new_JS_framework/a~sb_tested_code.png")
+
+    def test_remaining_reserved_characters_are_percent_encoded(self):
+        out = run_cli("generate", "buzz", "C++ @ 9:00!", "ok")
+        self.assertEqual(out.strip(), f"{BASE_URL}/images/buzz/C%2B%2B_%40_9%3A00%21/ok.png")
 
 
 class SuggestCliTests(unittest.TestCase):
-    def test_suggest_prints_template_for_context(self):
-        out = run_cli("suggest", "deployment success")
-        self.assertIn(out.strip(), MEME.MemeGenerator.CONTEXT_MAP["deployment"])
-
-    def test_ambiguous_deployment_context_uses_neutral_template(self):
-        out = run_cli("suggest", "deployment update")
-        self.assertEqual(out.strip(), "fry")
+    def test_suggest_json_prints_template(self):
+        self.assertEqual(run_cli("--json", "suggest", "deployment success").strip(), '{"template": "success"}')
 
     def test_suggest_falls_back_to_buzz_for_unknown_context(self):
         out = run_cli("suggest", "an unrelated situation entirely")
@@ -88,6 +102,39 @@ class SuggestCliTests(unittest.TestCase):
 
     def test_ambiguous_deployment_uses_neutral_template(self):
         self.assertEqual(run_cli("suggest", "deployment update").strip(), "fry")
+
+
+class SuggestOutcomeTests(unittest.TestCase):
+    """Negation and uncertainty win over outcome words; matching is per word."""
+
+    def suggest(self, context):
+        return MEME.MemeGenerator().suggest_template_for_context(context)
+
+    def test_negated_success_is_neutral(self):
+        self.assertEqual(self.suggest("the deploy is not working"), "fry")
+        self.assertEqual(self.suggest("tests haven't passed yet"), "fry")
+
+    def test_negated_failure_is_neutral(self):
+        self.assertEqual(self.suggest("the build didn't fail this time"), "fry")
+
+    def test_uncertainty_is_neutral(self):
+        self.assertEqual(self.suggest("release might be broken"), "fry")
+        self.assertEqual(self.suggest("not sure if bug or feature"), "fry")
+
+    def test_substring_collisions_do_not_match(self):
+        self.assertEqual(self.suggest("unsuccessful rollout"), "fine")
+        self.assertEqual(self.suggest("download page for passwords"), "buzz")
+
+    def test_failure_wins_over_success_in_mixed_outcome(self):
+        self.assertEqual(self.suggest("flaky tests failing even though lint passed"), "fine")
+
+    def test_topic_keyword_maps_to_template(self):
+        self.assertEqual(self.suggest("manual vs automated testing"), "drake")
+
+    def test_every_suggestion_is_a_listed_template(self):
+        known = set(MEME.MemeGenerator.TEMPLATES)
+        self.assertLessEqual(set(MEME.MemeGenerator.TOPIC_TEMPLATES.values()), known)
+        self.assertIn("fry", known)
 
 
 class ListTemplatesCliTests(unittest.TestCase):
@@ -118,6 +165,16 @@ class ModuleApiTests(unittest.TestCase):
     def test_generate_encodes_special_characters_per_memegen_rules(self):
         url = self.generator.generate("buzz", "hello world?", "50% a/b")
         self.assertEqual(url, f"{BASE_URL}/images/buzz/hello_world~q/50~p_a~sb.png")
+
+    def test_generate_matches_memegen_canonical_escaping(self):
+        # Expected path is what POST https://api.memegen.link/images returned for the same text.
+        url = self.generator.generate("buzz", 'a & "q" it\'s x-y_z #1', "a<b>c \\ d\nnew")
+        self.assertEqual(
+            url, f"{BASE_URL}/images/buzz/a_~a_''q''_it's_x--y__z_~h1/a~lb~gc_~b_d~nnew.png"
+        )
+
+    def test_empty_top_uses_placeholder_segment(self):
+        self.assertEqual(self.generator.generate("custom", "", "b"), f"{BASE_URL}/images/custom/_/b.png")
 
     def test_suggest_template_for_context_returns_first_keyword_match(self):
         self.assertEqual(self.generator.suggest_template_for_context("celebrating success"), "success")
