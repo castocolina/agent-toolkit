@@ -1,0 +1,30 @@
+# RDAP checks I ran last night for my home-energy app names (curl -sS -L -w '%{http_code} %{url_effective}')
+# Shortlist so far: voltnest, wattly, kilowren
+
+$ curl -sSL https://rdap.org/domain/voltnest.com
+checked: 2026-11-02T21:14:05Z
+final URL: https://rdap.verisign.com/com/v1/domain/voltnest.com
+HTTP 200
+{"objectClassName":"domain","ldhName":"VOLTNEST.COM","status":["client transfer prohibited"],
+ "events":[{"eventAction":"registration","eventDate":"2019-04-02T17:30:11Z"},
+           {"eventAction":"expiration","eventDate":"2027-04-02T17:30:11Z"}]}
+
+$ curl -sSL https://rdap.org/domain/voltnest.app
+checked: 2026-11-02T21:14:09Z
+final URL: https://pubapi.registry.google/rdap/domain/voltnest.app
+HTTP 404
+{"rdapConformance":["rdap_level_0","icann_rdap_response_profile_1"],"lang":"en","description":["voltnest.app not found"],"errorCode":404,"title":"Not Found"}
+
+$ curl -sSL https://rdap.org/domain/voltnest.io
+checked: 2026-11-02T21:14:12Z
+final URL: https://rdap.org/domain/voltnest.io
+HTTP 404
+{"rdapConformance":["rdap_level_0"],"lang":"en","errorCode":404,"title":"No RDAP service is available for this resource"}
+
+$ curl -sSL https://rdap.org/domain/wattly.com
+checked: 2026-11-02T21:14:15Z
+final URL: https://rdap.verisign.com/com/v1/domain/wattly.com
+HTTP 429
+{"errorCode":429,"title":"Too Many Requests"}
+
+# kilowren: not checked yet

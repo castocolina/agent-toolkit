@@ -1,0 +1,68 @@
+{
+  "skill": "domain-name-brainstormer",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 8,
+      "evidence": "\u201cIdeation is cheap; the skill's value is screening names hard and never presenting a guess as a lookup.\u201d This introductory declaration repeats the operational rules below rather than adding knowledge.",
+      "fix": "Remove the introductory paragraph and begin with Defaults; retain the concrete screening rules, lookup distinctions and gotchas."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/domain-name-brainstormer/evals/trigger-queries.json",
+      "line": 79,
+      "evidence": "\u201cSuggest names for a sustainable clothing store and explain the brand fit.\u201d is labeled false, while \u201cGive me brandable names for a secure family photo-sharing product.\u201d at line 27 is labeled true. Both request brand names without mentioning domains, leaving the intended implicit-domain boundary inconsistent.",
+      "fix": "Keep the implicit-business positive and rewrite the clothing-store negative to explicitly exclude domains, for example: \u201cSuggest names for a sustainable clothing store and explain the brand fit; do not suggest domains.\u201d"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 20,
+      "evidence": "\u201cSame name, another TLD: when the audience types the name more than it searches for it on `.com`\u201d. Following this branch for a direct-navigation-heavy audience selects the option most exposed to the acknowledged .com traffic and email leakage.",
+      "fix": "Prefer another TLD when discovery is mainly through search or links, users can reliably retain the full address, and the .com holder is unrelated. Prefer a new name when users habitually type the bare .com or significant email confusion is expected; retain the explicit leakage warning."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 28,
+      "evidence": "The prescribed command is \u201ccurl -sS -L -o rdap.json -w '%{http_code} %{url_effective}' https://rdap.org/domain/<name>\u201d, without a connection or total deadline, although line 35 provides a timeout fallback. A server that accepts a connection and then stalls can prevent that fallback from being reached promptly.",
+      "fix": "Add explicit limits such as --connect-timeout 5 --max-time 20 to curl, and bound WHOIS execution with a tool deadline as well. Route expired lookups to unverified without retrying."
+    }
+  ]
+}
