@@ -1,0 +1,59 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 44,
+      "evidence": "**Unique keys accept many NULLs** in PostgreSQL, MySQL and SQLite. If a missing value must also be unique, use PostgreSQL 15+ `UNIQUE NULLS NOT DISTINCT` or make the column `NOT NULL`.",
+      "fix": "Shorten this to the non-obvious part: 'For a nullable column that must also be unique when missing, use PostgreSQL 15+ `UNIQUE NULLS NOT DISTINCT`.' The model already knows that NULLs do not collide in unique keys. Apply the same trim to the MyISAM line (line 40), keeping only the 'no warning' fact."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 42,
+      "evidence": "Use one nullable FK per parent type plus `CHECK (num_nonnulls(article_id, photo_id) = 1)` on PostgreSQL, or a shared supertype table the FK can target.",
+      "fix": "Choose a default and give the condition for the alternative: 'Default: one nullable FK per parent type plus `CHECK (num_nonnulls(...) = 1)`. Switch to a shared supertype table only when there are more than about three parent types, or when new parent types are added often.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 33,
+      "evidence": "When auditing an existing schema or finalizing a design, read `references/schema-design-checklist.md` instead and report in its format: every finding carries its own complete corrected DDL with every statement written in full, never \"same as F7\" or a \"then: ...\" shorthand list, and every alternative path written in full too, and a finding that is not a schema change ...",
+      "fix": "Split step 4 into two branches with separate sub-bullets: '4a. Sketch: confirm entities, ON DELETE, money/instant types, index-to-query mapping.' and '4b. Audit or sign-off: read `references/schema-design-checklist.md` and follow its Report format section.' The report-format rules are already in the checklist, so remove the restated copy here."
+    }
+  ]
+}

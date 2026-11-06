@@ -1,3 +1,4 @@
+import json
 import re
 import subprocess
 import sys
@@ -76,10 +77,39 @@ class FindAwsIconTests(unittest.TestCase):
                 self.assertNotIn(f"Style: shape=mxgraph.aws4.resourceIcon;resIcon={icon};", output)
 
     def test_duplicate_names_retain_distinct_variants(self):
+        output = subprocess.run([sys.executable, str(SCRIPT), "Generic database"], capture_output=True, text=True, check=True).stdout
+        icons = re.findall(r"Service: Generic Database\nresIcon: (mxgraph\.aws4\.[a-z0-9_]+)", output)
+        self.assertEqual(icons, ["mxgraph.aws4.database", "mxgraph.aws4.generic_database"])
+
+    def test_identical_duplicate_rows_are_both_kept(self):
         output = subprocess.run([sys.executable, str(SCRIPT), "Amazon API Gateway"], capture_output=True, text=True, check=True).stdout
-        self.assertEqual(output.count("Service: Amazon API Gateway"), 2)
-        self.assertIn("resIcon: mxgraph.aws4.api_gateway", output)
-        self.assertIn("resIcon: mxgraph.aws4.api_gateway", output)
+        self.assertEqual(output.count("Service: Amazon API Gateway\nresIcon: mxgraph.aws4.api_gateway\n"), 2)
+
+    def test_help_exits_zero_and_documents_json(self):
+        result = subprocess.run([sys.executable, str(SCRIPT), "--help"], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("usage: find_aws_icon.py", result.stdout)
+        self.assertIn("--json", result.stdout)
+
+    def test_missing_query_is_usage_error(self):
+        result = subprocess.run([sys.executable, str(SCRIPT)], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout, "")
+
+    def test_json_mode_returns_rows_with_styles(self):
+        result = subprocess.run([sys.executable, str(SCRIPT), "--json", "VPC"], capture_output=True, text=True, check=True)
+        rows_out = json.loads(result.stdout)
+        self.assertIn({"name": "VPC", "icon": "mxgraph.aws4.group_vpc", "kind": "group",
+                       "style": "shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc;"}, rows_out)
+        self.assertIn("icon(s) for 'VPC'", result.stderr)
+
+    def test_no_match_reports_on_stderr_and_exits_1(self):
+        for extra in ([], ["--json"]):
+            with self.subTest(extra=extra):
+                result = subprocess.run([sys.executable, str(SCRIPT), *extra, "no-such-service-xyz"], capture_output=True, text=True)
+                self.assertEqual(result.returncode, 1)
+                self.assertIn("No icons found for: no-such-service-xyz", result.stderr)
+                self.assertEqual(result.stdout.strip(), "[]" if extra else "")
 
 
 if __name__ == "__main__":

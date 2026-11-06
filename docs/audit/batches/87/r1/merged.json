@@ -1,0 +1,53 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "explain-changes-mental-model",
+      "percent": 96.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 74,
+          "evidence": "Hunk headers `@@ -a,b +c,d @@`: cite new code by the `+c` post-image lines, not working-tree lines.",
+          "fix": "Shorten to the part the model may get wrong: 'Cite new code by post-image (+) line numbers from the hunk header, not working-tree lines.' The model already knows the unified-diff hunk header format."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 43,
+          "evidence": "Before writing the report, compare the groups with the selected patch's file list (the manifest, built from the same source: no argument, `git diff HEAD --name-only` plus the untracked list from step 1 ... `custom`, the `diff --git` headers of the pasted patch)",
+          "fix": "Turn the manifest commands into a short per-source list (no argument / no commits / commit / merge / range or branch / PR / custom), placed after the check sentence. That keeps the validation gate of the process pattern easy to follow instead of hiding it in one long parenthetical."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 30,
+          "evidence": "Measure size before reading: run `--shortstat` on the same source (for a PR, `gh pr diff \"<pr>\" --color=never | wc -l`; for `custom`, judge the pasted patch).",
+          "fix": "For the no-argument source, add the untracked files to the size count, for example: 'plus the line count of each untracked file from step 1, since `--shortstat` omits them'. Without this, a large untracked addition skips the large-diff procedure and runs into the truncation gotcha."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

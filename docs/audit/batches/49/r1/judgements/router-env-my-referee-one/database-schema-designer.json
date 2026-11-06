@@ -1,0 +1,59 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 42,
+      "evidence": "The live MongoDB branch says: \"deploy readers that accept both shapes, backfill with batched `updateMany` scripts, then tighten the validator.\" It never transitions or drains old-shape writers. Those writers can recreate legacy documents during backfill and start failing when validation tightens.",
+      "fix": "Deploy compatible readers everywhere first, then deploy new-shape writers and drain every old writer and worker before completing the backfill. Use idempotent batches, reconcile existing documents, and gate collMod tightening on zero remaining legacy documents and no legacy producers. When moving data between collections, capture concurrent writes through dual writes or a change-stream reconciliation phase before reader cutover."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 29,
+      "evidence": "After covering both PostgreSQL and MySQL, the shared recovery step says: \"dropping the constraint (`DROP CONSTRAINT`, or `DROP NOT NULL` on PostgreSQL) is instant\". MySQL NOT NULL is a column attribute, not a constraint removable with DROP CONSTRAINT; relaxing it can require another table rebuild.",
+      "fix": "Separate recovery by engine. Retain PostgreSQL DROP CONSTRAINT or DROP NOT NULL guidance. For the MySQL orders.total example, use `ALTER TABLE orders MODIFY total DECIMAL(12,2) NULL, ALGORITHM=INPLACE, LOCK=NONE;`, preserving the original column attributes. State that this can rebuild the table, requires the same lock and version checks as the forward change, and must not be promised instant."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 20,
+      "evidence": "\"Include every named entity as its own table or collection unless you explain the equivalent representation\" is generic modeling activation rather than expert knowledge, and the named-entity check is repeated in workflow step 4. The substantive engine-specific Gotchas provide much stronger knowledge delta.",
+      "fix": "Keep the non-obvious users-versus-membership distinction, but consolidate the generic named-entity reminder into the existing sketch validation check instead of stating it twice."
+    }
+  ]
+}

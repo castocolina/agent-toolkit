@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "react-dev",
+      "percent": 94.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0,
+        "router-env-my-referee-one": 92.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 105,
+          "evidence": "- Handlers: `ChangeEvent<El>` plus `e.currentTarget`, never `any` or `e.target.value as string`; ... | NEVER wrap `use()` in `try/catch`: it throws to suspend.",
+          "fix": "Cut these lines to the parts current models get wrong. Keep the pointer to the submitter and IME traps in event-handlers.md. Drop the restatement of ChangeEvent/currentTarget, which the activation checklist and event-handlers.md already cover, and merge the use() try/catch point into the use() promise gotcha as one clause."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 113,
+          "evidence": "NEVER mismatch `useActionState`'s initial state and the action's return type: the tuple's state type is inferred from both and errors surface far from the cause.",
+          "fix": "Replace this with the trap it hides: an action whose success path falls through and returns `undefined` widens the state to `State | undefined`, so the error appears where `state.errors` is read, not in the action. Tell the agent to annotate the action's return type as `Promise<State>` so the missing return fails at the action itself."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/react-dev/evals/evals.json",
+          "line": null,
+          "evidence": "\"id\": \"submit-handler\" ... \"Types the submit event as FormEvent<HTMLFormElement>\"; \"id\": \"typed-button\" asserts ComponentPropsWithoutRef and ReactNode children",
+          "fix": "Replace the assertions that a baseline model passes without the skill with ones that test skill-specific knowledge. For example, in submit-handler, assert that the submitter is read from `e.nativeEvent.submitter` (or `new FormData(form, submitter)`) when a form has several submit buttons. In typed-button, add an edge case with no package.json and no stated major, and assert that the answer falls back to React 18-compatible code and says so."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 95,
+          "evidence": "// columns.type-test.tsx: compile-only, never called or imported by app code.\nfunction columnContract() {",
+          "fix": "Export the contract function (`export function columnContract() { ... }`), and say so in Validate step 3. A non-exported, never-called function in a module fails `tsc --noEmit` with TS6133 under `noUnusedLocals`, which most strict tsconfigs enable. When that happens the type-test file breaks the typecheck for the wrong reason."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 35,
+          "evidence": "The browser-only row includes \"React Router with `ssr: false`\" and concludes \"`window` is safe in render; no hydration constraint\". React Router Framework SPA mode still renders the root at build time to produce index.html, and configured prerendering can render additional routes without a browser.",
+          "fix": "Do not infer browser-only execution from React Router's ssr:false setting. Classify build-time-rendered roots and prerendered routes alongside SSR components: browser globals only after mount and hydration-stable initial output. Reserve the browser-only branch for confirmed client-only subtrees; distinguish SPA mode from prerender configuration."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 16,
+          "evidence": "\"First matching row wins\" places \"`react` 18 in `dependencies`\" before \"Runtime and `@types/react` majors differ | Fix that first\". With React 18 and @types/react 19, the React 18 row wins and the promised mismatch repair is never reached.",
+          "fix": "Make installed runtime/type-major consistency a preflight before the first-match API-compatibility table. After resolving mismatches, apply the peerDependencies rule to decide whether the emitted API must remain React 18-compatible."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/react-dev/references/event-handlers.md",
+          "line": 48,
+          "evidence": "\"if (e.key === 'Enter' && !e.nativeEvent.isComposing) e.currentTarget.form?.requestSubmit();\" manually submits without preventing Enter's native implicit form submission. An ordinary input inside a form can therefore submit twice.",
+          "fix": "Prefer native form submission when no custom Enter behavior is needed. If this handler must submit explicitly, guard non-Enter/composing events, call e.preventDefault() for the handled Enter event, and then call requestSubmit() exactly once."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/react-dev/references/event-handlers.md",
+          "line": 28,
+          "evidence": "\"onValue: ChangeEventHandler<HTMLInputElement>\" and \"Inline handlers need no annotation; JSX infers `e` from the element\" repeat routine React typing knowledge. The surrounding native-input reads also include basic checkbox, file-input and multi-select operations.",
+          "fix": "Compress routine handler aliases, inline inference and basic native-input reads into a short activation checklist. Retain the higher-delta material about submitter extraction, passive listeners, focus movement and custom-event producer typing."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/react-dev/references/react-19-patterns.md",
+          "line": 32,
+          "evidence": "The `useActionState` section supplies a full ordinary form example around \"const [state, formAction, isPending] = useActionState(...)\" although SKILL.md already provides the tuple, action signature and return-state invariant.",
+          "fix": "Reduce this example to the explicitly typed state/action signature and hook call. Keep the migration differences and Server Action authorization reference, but omit the standard input/form/button scaffold that adds no new typing decision."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

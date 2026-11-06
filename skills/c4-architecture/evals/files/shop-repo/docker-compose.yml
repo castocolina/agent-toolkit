@@ -1,0 +1,30 @@
+services:
+  web:
+    build: ./apps/web
+    ports: ["3000:80"]
+    environment:
+      VITE_API_URL: http://localhost:4000
+  api:
+    build: ./apps/api
+    ports: ["4000:4000"]
+    environment:
+      DATABASE_URL: postgres://shop:shop@db:5432/shop
+      REDIS_URL: redis://redis:6379
+      KAFKA_BROKERS: kafka:9092
+      ORDER_PLACED_TOPIC: order.placed
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+    depends_on: [db, redis, kafka]
+  worker:
+    build: ./apps/worker
+    environment:
+      DATABASE_URL: postgres://shop:shop@db:5432/shop
+      KAFKA_BROKERS: kafka:9092
+      ORDER_PLACED_TOPIC: order.placed
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+    depends_on: [db, kafka]
+  db:
+    image: postgres:16
+  redis:
+    image: redis:7
+  kafka:
+    image: bitnami/kafka:3.7

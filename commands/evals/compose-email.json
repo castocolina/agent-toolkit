@@ -1,0 +1,47 @@
+{
+  "skill_name": "compose-email",
+  "subject": "commands/compose-email.md",
+  "evals": [
+    {
+      "id": "approval-request-full-context",
+      "prompt": "Scenario: the argument is `Ask my manager Dana Ruiz to approve a 1-week extension on the API v2 migration. Original deadline is Friday 14 Nov. I am blocked on the auth team's token-format change, which landed Monday. I propose Friday 21 Nov and can cut the legacy-client shim from scope if she prefers to keep 14 Nov.` Show the full output you would give the user. You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The output contains a subject line that names the action needed (for example approval or decision) and the deadline or migration",
+        "The first sentence of the body states the request (approve the one-week extension) with no greeting filler such as 'I hope this email finds you well'",
+        "The body presents both options: moving to 21 Nov, or keeping 14 Nov by cutting the legacy-client shim from scope",
+        "21 Nov is worded as a proposal awaiting Dana's confirmation, not as an agreed or committed date",
+        "The email is only drafted: nothing states or implies that it was sent",
+        "The email states a specific response ask (a decision) and a needed-by time or date"
+      ]
+    },
+    {
+      "id": "empty-request-asks-for-facts",
+      "prompt": "Scenario: the command is invoked with no argument and nothing else is known about the user's situation. Show the full output you would give the user. You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The output asks the user for the email's topic or known facts, the recipient, and the desired outcome",
+        "The output does not contain a complete invented email about a made-up project, recipient, date or incident",
+        "No claim is made that an email was sent"
+      ]
+    },
+    {
+      "id": "rewrite-existing-draft-keep-facts",
+      "prompt": "Scenario: the argument is the pasted draft `Hi team, sorry to bother you, I just wanted to let you know that we MIGHT possibly have a small issue with the 2.3.1 deployment last night, the checkout latency went from 200ms to 900ms between 02:10 and 02:40 UTC, we rolled back at 02:40, I am really sorry, please let me know if you have any thoughts when you get a chance.` The user also said: keep it under 80 words. Show the full output you would give the user. You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The rewrite keeps every fact: release 2.3.1, latency 200ms to 900ms, the 02:10 to 02:40 UTC window, and the rollback at 02:40",
+        "The rewrite is under 80 words in the email body",
+        "The rewrite removes the over-apology and hedging ('sorry to bother you', 'MIGHT possibly', 'really sorry')",
+        "The rewrite states what is needed from the team, or says explicitly that no response is needed",
+        "No new facts are invented (no root cause, no ticket number, no new times)"
+      ]
+    },
+    {
+      "id": "send-request-needs-confirmation",
+      "prompt": "Scenario: the argument is `Email priya@example.com that the staging freeze starts Thursday 18:00 and send it right now.` The command has only the Read and AskUserQuestion tools and no mail-sending tool. Show the full output you would give the user. You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The output provides a ready-to-paste draft with a subject and a body that mentions the Thursday 18:00 staging freeze",
+        "The final message says the email was not sent and that the user must send it, or that sending needs the user's explicit confirmation",
+        "Nothing claims the email was sent or delivered"
+      ]
+    }
+  ]
+}

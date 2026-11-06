@@ -1,0 +1,107 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "explain-pr-changes",
+      "percent": 84.0,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 84.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 422,
+          "evidence": "5.4 Detailed changeset breakdown: 'A meaningful title for the group of changes (for example, \"Refactor Authentication Logic\"...)' plus NEEDS_REVIEW/APPROVED definitions, and 5.2 'Draft a concise, high-level summary'",
+          "fix": "Shrink 5.2-5.4 to the non-obvious rules (150-word cap, 'When in doubt, NEEDS_REVIEW', no breakdown on copied bodies). The model already knows how to group a diff into changesets."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 460,
+          "evidence": "## 7. Recorded behavior: 'The command pushes a feature head and never a promotion head.' / 'It has the detached-HEAD stop and the head == base guard above.'",
+          "fix": "Delete section 7 and the repeated final-message ordering paragraphs in Phase 2 and section 8. Each rule is already stated once where it applies (3.6, Phase 6)."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 389,
+          "evidence": "'### 5.1 Holistic analysis' comes after '### Phase 6: Reviewers, the final message, cleanup', and numbering starts at '## 3. The Input' (line 20)",
+          "fix": "Renumber the sections from 1. Move 5.1-5.4 (summary, diagram, breakdown) under Phase 3b Compose, where they run, so the process pattern reads in execution order."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 168,
+          "evidence": "'With squash or rebase merges an older cycle's commits stay in the range and the detection may pick wrong sources.' is buried in 4.2, not in ## Gotchas",
+          "fix": "Add to ## Gotchas: 'Squash or rebase merges break related-source detection: an older cycle's PRs can be picked as sources (4.2)' and 'A pasted screenshot is a user-attachments URL, so it counts as a diagram and is stripped in none mode (3.3)'."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 3,
+          "evidence": "'Use when asked to \"explain PR changes\", \"open or refresh the PR summary\", \"promote develop to main\", or \"reuse merged PR bodies\".' has no intent-level trigger for users who just want a PR opened",
+          "fix": "Create or update the GitHub pull request for the current branch from its committed diff: summary, changeset triage, optional Mermaid or draw.io diagram, promotion-branch bodies (develop, staging, main) reused from merged PRs, and reviewers. Use when asked to open, write, refresh or describe a pull request, \"explain PR changes\", promote develop or staging to main, or reuse merged PR bodies, even without the word \"PR summary\". Pushes feature branches and writes PRs. Not for a read-only explanation of a diff (use explain-changes-mental-model)."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 236,
+          "evidence": "The file is 542 lines. Mermaid and draw.io rules are loaded by path, but the 4.8 awk/sed filter, the 4.1/4.5/4.6 assembly snippets and the section 8 template stay inline",
+          "fix": "Move the 4.8 none-mode filter and the body-assembly snippets into a pr-diagrams script subcommand (for example `pr-diagrams.sh strip-diagrams`, `assemble`). Move the section 8 template into skills/pr-diagrams/references/pr-template.md and read it only on the feature or consolidated path."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 91,
+          "evidence": "'Create the branch with one of:' followed by 'git checkout -b \"pr/<short-slug>\"' and 'git switch -c \"pr/<short-slug>\"'",
+          "fix": "Give one default: `git switch -c \"pr/<short-slug>\"`. Mention `git checkout -b` only as the fallback for git older than 2.23."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 234,
+          "evidence": "4.7: the feature branch says 'if the body still exceeds 65,000, stop before the PR write naming the size', but the next line says 'The run continues. The final message says the body was reduced to links.'",
+          "fix": "Scope the sentence: 'For consolidated and single-source bodies the run continues and the final message says the body was reduced to links. A feature body that is still over 65,000 after compaction is a terminal failure (phase 6 cleanup runs).'"
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 95,
+          "evidence": "The head == base guard creates 'pr/<short-slug>' from main and continues, but no branch covers an empty 'origin/$base...HEAD' diff, where gh pr create fails only after the push",
+          "fix": "Add a check after the base fetch: when `git rev-list --count \"origin/$base..HEAD\"` is 0, stop with `no commits between <base> and <head>` before any gh pr create. Delete the just-pushed branch only if this run created it."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

@@ -1,0 +1,71 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "ascii-ui-mockup-generator",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 36,
+          "evidence": "NEVER write implementation code: no layout is picked yet, so code locks in one alternative and is wasted.",
+          "fix": "Cut this line. The description already says 'Not for implementing UI code', and the step 3 to step 5 flow already holds code back until the user picks a layout. Use the freed lines for expert content such as display-width pitfalls."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 33,
+          "evidence": "NEVER align columns with tabs: viewers use different tab stops, so columns drift. Use spaces.",
+          "fix": "Fold this into the step 4 width check as a short activation clause, for example 'spaces only, no tabs'. The model already knows that tab stops vary between viewers."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 23,
+          "evidence": "map each ASCII label to a component name, list states the ASCII cannot show (hover, empty, error, loading), note the responsive behavior ... and give build priorities",
+          "fix": "Replace the generic handoff checklist with domain ordering the model would not derive on its own. Example: derive build priorities from the step 1 task ranking (the top-ranked task's components first). Also flag every abbreviation or detail view from step 2 as a component that needs a full-label or tooltip state."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 35,
+          "evidence": "Keep comparison fields aligned across repeated records (tables, lists of the same shape); reserve stacked layouts for items scanned independently.",
+          "fix": "Replace this generic layout advice with a gotcha that defies assumptions. Example: 'NEVER trust a chat renderer to keep trailing spaces or non-breaking spaces inside a fence; pad the right border explicitly so every row ends in a border character, or rows look ragged after copy-paste.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 29,
+          "evidence": "Per mockup: a `### N. Title` heading matching the layout drawn, the fenced mockup, then four bullets: **Approach**, **Favors**, **Drawback**, **Best fit**.",
+          "fix": "Add a short worked template: one 5-row bordered mockup under a `### 1. Title` heading, followed by the four filled bullets. The agent can then pattern-match border width, `^`/`v` scroll marks and bullet wording rather than rebuilding them from prose."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

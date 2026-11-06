@@ -1,0 +1,50 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 39,
+      "evidence": "\u201cScope: for each area, ask \u2018which change could break it?\u2019 No answer means out of scope, with that reason.\u201d When the requester lacks a change list or dependency information, this branch excludes areas because their impact is unknown, rather than establishing that they are unaffected. The plan branch does not load the regression reference's broader critical-journey fallback by default.",
+      "fix": "Distinguish confirmed non-impact from missing impact information. Exclude an area only when the available evidence establishes that it is unrelated. Otherwise record the impact as Unknown, request the missing change or dependency information, and provisionally retain critical journeys or list their checks as Blocked with an owner."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/evals/evals.json",
+      "line": 91,
+      "evidence": "The script-bug-file assertion requires only: \u201cSays to check for exit 0, parse the JSON line and open the file it names to confirm it exists\u201d. The script-test-case-file assertion similarly checks what the response says to verify, rather than requiring evidence that the generated artifact was actually opened and checked.",
+      "fix": "For both file-generation evals, require an actual successful script invocation, a parsed manifest, and a read of the named Markdown file. Assert the supplied values and Unknown/Open Questions fields directly against that artifact; a proposed command or description of future verification must not satisfy these checks."
+    }
+  ]
+}

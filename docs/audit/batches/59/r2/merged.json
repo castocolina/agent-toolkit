@@ -1,0 +1,172 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "ascii-ui-mockup-generator",
+      "percent": 90.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.0,
+        "router-env-my-referee-one": 89.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 23,
+          "evidence": "6. **Ask which to pick**, numbered. Be ready to modify one or combine elements.",
+          "fix": "Shorten step 6 to the non-obvious part: 'If the user rejects all, ask which ranked task each option got wrong, then redraw.' The model already asks for a choice and offers to modify or combine options without being told."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 30,
+          "evidence": "Each mockup in its own fenced code block under a numbered heading, rationale as short bullets below it.",
+          "fix": "Replace the prose with a short literal template: a numbered heading such as '### 1. Sidebar + table', then an 80-column fenced block with a +---+ border and one sample row, then the four bullets (Approach / Favors / Drawback / Best fit). Agents copy a concrete structure more reliably than a description of one."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 38,
+          "evidence": "Always put mockups in fenced blocks: outside one, Markdown uses a proportional font and collapses repeated spaces.",
+          "fix": "Keep the rule, but add a gotcha the model will actually trip on: a mockup that contains backticks (for example code samples inside the UI) closes a ``` fence early. Use a four-backtick or ~~~ fence for those mockups."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 35,
+          "evidence": "NEVER use emoji or Unicode box-drawing characters; stay with `| - + = * #`.",
+          "fix": "Make ASCII the default and add an escape hatch: 'Default to `| - + = * #`; use Unicode box-drawing only when the user explicitly asks for it (common for TUI mockups), and then check border alignment in a monospace font.' The description invites TUI requests, so a flat NEVER clashes with an explicit user preference."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 26,
+          "evidence": "Done: the initial task ends when the numbered mockups, their rationales and the selection question are delivered. A refinement task ends when the requested changes (and any requested handoff) are delivered.",
+          "fix": "Add the branch that does not resolve: 'A pick task (the user chooses an option and asks for no changes) ends when the step 7 handoff is delivered.' Also state a fallback for step 1: if a clarifying question goes unanswered, draw with stated assumptions and list them above mockup 1."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 18,
+          "evidence": "\"Rank the primary user tasks and list the content that must appear in every alternative\" and \"Ask which to pick\" largely activate familiar UX and conversation practices. Much of the workflow specifies standard activities rather than transferring expert-only ASCII layout knowledge.",
+          "fix": "Condense routine elicitation and selection instructions, and add concrete ASCII layout constraints: derive minimum column widths from required labels, preserve shared column positions when truncating comparison values, and define when insufficient width requires moving secondary fields into a detail view."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 20,
+          "evidence": "\"Classify the dominant task (compare records, inspect one item, complete a sequence), then vary one structural axis per alternative\" supplies a useful framework but leaves the connection between task classification and structural choice implicit.",
+          "fix": "Add a short decision rule connecting task to structure: comparisons favor persistent aligned fields; inspection favors master/detail when both panes remain readable, otherwise a single detail view; sequences favor a wizard when later steps depend on earlier answers, otherwise a single-page form. Generate alternatives around those constraints rather than varying axes without a selection rule."
+        }
+      ]
+    },
+    {
+      "name": "general-purpose",
+      "percent": 90.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 85.6,
+        "router-env-my-referee-one": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 15,
+          "evidence": "4. Integrate: compare producer and consumer interfaces across workers' changes and reconcile assumptions.",
+          "fix": "Replace the generic integration advice with a concrete check the model would skip, for example: diff each worker's changed signatures, schemas and config keys against their callers before you run the gates."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 12,
+          "evidence": "1. Map each requirement to an observable acceptance check and the file or component that owns it, in dependency order.",
+          "fix": "Add a decision frame for decomposition, for example 'before splitting, ask: which subtasks share files (keep them in one worker), and which acceptance check proves each one'. Also add a checkpoint after step 1 that records the plan before any edit."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 25,
+          "evidence": "## NEVER list has reasons but no Gotchas of environment-specific facts",
+          "fix": "Add a short Gotchas list of host facts that defy assumptions, for example: delegated specialists start without your conversation context, so pass file paths and acceptance checks explicitly; a specialist may run in another checkout."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 3,
+          "evidence": "description: Coordinate general programming work across multiple files or components, including debugging, implementation and validation. ... (no distinction from Claude Code's built-in general-purpose agent of the same name; keywords thin)",
+          "fix": "Coordinate multi-file, multi-component programming work end to end: break the request down, delegate to matching specialists or implement directly, integrate their changes and run the project's verification gates. Use for complex, multi-step debugging, implementation or refactoring requests that span several files or components, or when specialist results need integrating and verifying, even if the user does not ask for coordination. Not for trivial one-step edits or a focused single-domain task a dedicated specialist owns. Unlike the built-in general-purpose agent, it returns Result, Changes, Validation and Remaining blockers."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 13,
+          "evidence": "If the bug does not reproduce or baseline tests already fail, note those pre-existing failures under Validation",
+          "fix": "Resolve the branch where the bug does not reproduce: say whether to stop and report it under Remaining blockers with the reproduction attempted, or to continue with a fix based on reading the code, and how to mark it (for example as unverified)."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 16,
+          "evidence": "the project's own check, lint and test commands named in its AGENTS.md, CLAUDE.md or Makefile",
+          "fix": "Add a fallback for when none of these files names a command: look for the standard runner of the detected toolchain (package.json scripts, pyproject, go test) and run it, or report that no verification gate was found and mark the work as unverified."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 12,
+          "evidence": "\"Map each requirement to an observable acceptance check and the file or component that owns it, in dependency order\" and \"Record baseline behavior before changing anything\" restate standard engineering practices. They add less knowledge than the concrete delegation-cost, stale-worker and checkout/revision safeguards.",
+          "fix": "Condense the generic setup into one checklist item: \"Before dispatch, record component ownership, dependency order, acceptance checks and baseline results for this worktree.\" Retain the explicit handling of non-reproducing bugs and pre-existing failures, and preserve the specialist and checkout/revision safeguards."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

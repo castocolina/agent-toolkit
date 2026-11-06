@@ -1,0 +1,86 @@
+{
+  "skill": "daily-meeting-update",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 41,
+      "evidence": "Ask only for the required answers still missing, in one grouped message.",
+      "fix": "Cut this generic interview advice, which the model already follows, and keep only the non-obvious part: 'Ask for topics even when tools found plenty: no tool can detect them.'"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 30,
+      "evidence": "## Gotchas sits between '## 2. Optional integrations' and '## 3. Interview', splitting the numbered process flow",
+      "fix": "Move the Gotchas section after step 4, or nest it as a step-2 subsection. Also add a one-line checklist (fast path \u2192 consent \u2192 queries \u2192 gates \u2192 render) so the Process pattern has explicit checkpoints."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 23,
+      "evidence": "`gh search prs ... --updated \">=DATE\"` while the digest filters by local calendar day",
+      "fix": "Add a gotcha saying that GitHub search date qualifiers are evaluated in UTC while claude_digest.py uses the local day. Late-evening work can land on the wrong day, so widen DATE by one day and confirm borderline items with the user."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/evals/evals.json",
+      "line": 36,
+      "evidence": "gh-prs.json is `gh pr list --repo acme/payments --author @me --state all --json number,title,state,isDraft,headRefName,mergedAt`",
+      "fix": "Regenerate evals/files/gh-prs.json in the output shape of the skill's own `gh search prs` queries (authored and reviewed). Add an eval where a PR and a session must be merged without a headRefName field, so the eval exercises the commands the skill actually prescribes."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 45,
+      "evidence": "Merge only the same work item: entries become one bullet when they share a ticket key, a PR (or its head branch)... \u2014 but the step-2 query requests only `--json number,title,state,isDraft,url`",
+      "fix": "Followed the branch 'digest session on branch X + authored PR': the prescribed `gh search prs` output has no head branch, so this merge condition cannot fire. For each PR you plan to merge, add `gh pr view NUMBER --repo OWNER/REPO --json headRefName` to the table, or change the gate to merge on PR number or ticket key and otherwise ask the user."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 25,
+      "evidence": "Jira (MCP first, CLI only without it) | JQL `assignee = currentUser() AND updated >= \"DATE\"`",
+      "fix": "Name the MCP operation to call, for example the Atlassian MCP JQL search tool with this JQL. State the fallback when neither MCP nor `jira` is present: skip Jira in one line and continue to the interview."
+    }
+  ]
+}

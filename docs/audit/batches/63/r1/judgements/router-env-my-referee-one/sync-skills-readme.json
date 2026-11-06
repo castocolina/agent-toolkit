@@ -1,0 +1,50 @@
+{
+  "skill": "sync-skills-readme",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/sync-skills-readme.md",
+      "line": 29,
+      "evidence": "\u201cTo pin a skill, add its name as a keyword to the category you want\u201d conflicts with step 2's requirement that a keyword equal \u201ca hyphen-separated token of the skill name.\u201d A complete hyphenated name cannot equal one of its individual tokens, so the documented pinning branch does not work. Multi-token keywords such as `c4-architecture` likewise cannot match during the name pass.",
+      "fix": "In step 2, check each category's keywords against both the complete skill name and its individual hyphen-separated tokens, retaining the existing category precedence and name-before-description ordering. This makes full-name pins effective when placed before any competing match."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 33,
+      "evidence": "\u201cSave a copy of README.md (`cp README.md \"$(mktemp)\"`)\u201d does not retain or display the temporary filename, but the next step requires agents to \u201cdiff the saved copy\u201d and restore it on a mismatch. Following the supplied command leaves no recorded backup path for those operations.",
+      "fix": "Capture and display the backup path, for example `backup=$(mktemp) && cp README.md \"$backup\" && printf '%s\\n' \"$backup\"`, and stop before editing if backup creation or copying fails. Use the recorded path for both the verification diff and restoration."
+    }
+  ]
+}

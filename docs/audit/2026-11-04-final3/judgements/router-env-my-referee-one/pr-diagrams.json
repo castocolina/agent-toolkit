@@ -1,0 +1,59 @@
+{
+  "skill": "pr-diagrams",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 10,
+      "evidence": "\u201cA harness that does not substitute `${CLAUDE_SKILL_DIR}` uses `bash ~/.claude/skills/pr-diagrams/scripts/pr-diagrams.sh`.\u201d This fallback assumes a Claude user-level installation; it does not resolve project-local installations, plugin installations, or other harnesses' skill directories.",
+      "fix": "Resolve scripts/pr-diagrams.sh relative to the SKILL.md actually loaded. Use CLAUDE_SKILL_DIR when available; otherwise use that skill's resolved absolute directory rather than assuming ~/.claude/skills."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+      "line": 65,
+      "evidence": "`git fetch origin \"$base\" \"$head\"` is followed by `shas=$(git rev-list --reverse \"origin/$base..origin/$head\")`. In a single-branch clone whose remote fetch mapping includes only the base branch, fetching the head this way does not establish origin/<head>, so discovery fails despite a successful fetch.",
+      "fix": "Fetch both branches with explicit destination refspecs, such as \"+refs/heads/$base:refs/remotes/origin/$base\" and \"+refs/heads/$head:refs/remotes/origin/$head\", before computing the range. Add a regression test with a narrow remote.origin.fetch mapping and no existing head tracking ref."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+      "line": 217,
+      "evidence": "The command dispatch accepts only `repo`, `related`, `reviewers`, and `render`; `--help` falls through to `die \"usage: pr-diagrams.sh repo|related|reviewers|render ...\"`, exiting 1 without documenting arguments or flags.",
+      "fix": "Add -h/--help handling that exits 0 and documents subcommand arguments, exclusion flags, environment overrides, prerequisites, and output formats. Add a smoke test for the help interface."
+    }
+  ]
+}

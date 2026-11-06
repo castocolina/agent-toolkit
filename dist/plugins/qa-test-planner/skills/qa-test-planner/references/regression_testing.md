@@ -1,22 +1,38 @@
 # Regression Testing
 
-## Select scope by change risk
+How to select a regression or smoke suite from a change, keep its results trustworthy, and record the release decision. Ordering follows the precedence in SKILL.md section 5.
 
-Run targeted regression on changed behavior, its dependencies, and integration boundaries. Expand to critical paths when impact is broad, dependency ownership is unclear, or release risk warrants it. Run smoke checks before the selected suite; stop and investigate if a smoke failure invalidates later results. Prioritize by user/business impact and data/security consequences, not merely feature visibility.
+## Select scope by change
 
-## Preserve test validity
+1. List what changed (tickets, commits, config, dependency bumps) and, for each, the behavior it touches.
+2. Add the direct dependencies and the integration boundaries each change crosses (an API, a queue, a payment provider).
+3. Widen to every critical journey when the impact is broad, ownership of a dependency is unclear, or a shared component (auth, checkout, a design-system token) changed.
+4. Smoke first: the few P0 checks that prove the build is testable at all. If smoke fails, stop and report; later results on a broken build are noise.
+5. Fit the time box: order by the SKILL.md precedence, run down the list, and list every case that did not fit as residual risk with its owner. A cut case is never reported as passing.
 
-- **Isolation:** Control test data and state; make cases order-independent. Record shared accounts, fixtures, or environment mutations and reset them explicitly. A prior case must not make a later case pass or fail.
-- **Visual comparisons:** Match viewport, device scale, browser, fonts, theme, locale, data, and loading state to the approved reference. A mismatch is not evidence of a product regression.
-- **Intermittent failures:** Preserve the initial failure and environment details. Repeat under the same conditions to characterize frequency; do not convert a failure to pass by retrying or suppress it as flaky without evidence. Separate product defects from test/environment instability, and track both.
-- **Release risk:** A failing test is not waived by a workaround or schedule pressure. Only the authorized release-risk owner may accept a documented residual risk, rationale, affected scope, mitigation/workaround, owner, and follow-up plan. Acceptance does not erase the failure or override a non-waivable gate such as a P0/security/data-loss blocker.
+## Keep results valid
 
-## Reusable test and report schemas
+- **Visual comparisons:** match viewport, device-pixel ratio, theme, fonts, content and color profile to the reference before counting a difference (SKILL.md routes the full procedure).
+- **Intermittent failures:** keep the first failure's evidence and environment. Rerun under the same conditions to measure the rate (3/10). Never turn a failure into a pass by retrying until green, and never label it flaky without evidence that the product is not at fault; track product defects and test or environment instability separately.
+- **Environment drift:** record the build, data snapshot and feature flags for the run; a pass against a different flag set says nothing about the release.
 
-Use these fields; omit inapplicable fields rather than inventing facts.
+## Release decision
 
-**Case:** ID | priority/risk | changed behavior and oracle | prerequisites/isolation | steps with expected result | data | cleanup | evidence.
+The release gate and its single waiver exception are defined in SKILL.md section 3, step 4. A waiver record holds:
 
-**Run report:** build/environment and matched visual conditions | selected scope and rationale | pass/fail/blocked with linked evidence | intermittent reproduction details | unresolved risks and owner | release decision and authorized acceptance, if any.
+- the failing case and its evidence,
+- the owner's name and role,
+- the rationale and the affected scope,
+- the mitigation or workaround, with who applies it,
+- the follow-up: ticket, owner and date, and when the waiver expires.
 
-An oracle must state an observable expected result, not “works as expected.” Record unknowns as unknown. Keep evidence sufficient to reproduce and distinguish an application failure from setup or test instability.
+A waiver does not erase the failure: the run report still shows it as failing. Security and data-loss failures get no other exception.
+
+## Run report
+
+- Build, environment, feature flags, and the visual conditions matched.
+- Selected scope and why; cases cut for time, listed as residual risk.
+- Pass / fail / blocked per case, each with linked evidence.
+- Intermittent failures with their measured rate.
+- Unresolved risks and their owners.
+- Release decision, with the waiver record when one exists.

@@ -1,0 +1,117 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "reducing-entropy",
+      "percent": 84.8,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 85.6,
+        "router-env-my-referee-one": 84.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/reducing-entropy/references/expensive-to-add-later.md",
+          "line": 32,
+          "evidence": "\"Automated deploys and CI from day one\" ... \"Vulnerability disclosure policy and security@ email\" (line 36)",
+          "fix": "Delete the PAGNI items that are never a candidate for code deletion (CI from day one, security@ email, disclosure policy). Keep the items a deletion can actually remove: timestamps, audit logs, API versioning, pagination, session invalidation. SKILL.md line 16 routes here only for those."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 12,
+          "evidence": "\"## Pick the lens\" comes before \"## Procedure\", but its triggers (\"A candidate deletion touches timestamps...\") only apply once step 3 has produced candidates",
+          "fix": "Move lens selection into the procedure as step 3b: \"For each ranked candidate, check the lens triggers below and load the matching reference before you decide.\" Lenses are then chosen per candidate, not guessed before any candidate exists."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 30,
+          "evidence": "The NEVER list has two items. There is no Gotchas section on code that looks dead but is still reachable, and the skill's own eval depends on that case (__all__ makes format_amount public).",
+          "fix": "Add a ## Gotchas section, for example: \"A grep showing no callers does not make code dead. Names in __all__, package entry points, plugin registries, getattr/importlib string lookups, framework decorators (routes, signals, fixtures) and serialized class names are all reachable without a textual call site. Treat them as public contracts from step 1.\""
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 23,
+          "evidence": "\"for example `git ls-files 'src/*.py' | xargs wc -l`\" is the only measurement default, and it covers one language in one directory",
+          "fix": "Give a language-agnostic default with exclusions and an escape hatch: \"Default: `git ls-files -z -- <scope> ':(exclude)**/test*/**' ':(exclude)**/vendor/**' ':(exclude)*.lock' | xargs -0 wc -l | tail -1`. Use `tokei`/`cloc` with the same scope if installed.\""
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/evals/evals.json",
+          "line": null,
+          "evidence": "The not-explicit eval has the assertion \"Does not invoke skill without explicit request\" and the expected output \"Do not apply manual-only skill absent explicit request.\" Neither can be checked from the output, and the eval has no input files. The feature-cost eval also has no fixture.",
+          "fix": "Give not-explicit a fixture diff with duplication. Make its assertions observable, for example: \"Output contains no before/after line counts\", \"Does not propose deleting any function\", \"Reviews correctness of the refactor.\" Move the trigger check to trigger-queries.json."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 26,
+          "evidence": "\"5. **Report.** Baseline, after count, net change...\" With file access, the path goes from deletion to report, and no step runs the tests to confirm that the step-1 behavior boundary survived.",
+          "fix": "Insert before Report: \"Run the existing test suite (and a smoke import of every public name from step 1). If anything fails, restore the candidate or fix forward, then re-measure with the step-2 command. Report only after tests pass.\""
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 24,
+          "evidence": "'code that changes for different reasons stays separate' repeats familiar refactoring guidance. Line-weighted classification finds task-specific routing in 'Pick the lens', predominantly activation in 'Procedure' and 'NEVER', and substantial repetition of standard coupling and YAGNI principles across the optional lenses. Expert-only knowledge is a minority of the instructional content.",
+          "fix": "Keep the brief activation guardrails, consolidate repeated coupling/YAGNI explanations, and replace that repetition with a worked decision table showing invariant evidence, compatibility exceptions and contract-preserving alternatives for proposed merges or deletions. Preserve all attribution and upstream credits."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 32,
+          "evidence": "'NEVER delete tests' and 'NEVER drop schema columns, migrations or stored data' provide specific prohibitions with reasons, but the list lacks deletion-specific gotchas about runtime reachability: code without textual callers may still be used through registries, package entry points, reflection or import side effects.",
+          "fix": "Add a NEVER item prohibiting classification of code as dead solely from an empty caller search. Require checking runtime registration, packaging entry points, reflective loading and import side effects, and explain why textual searches miss these consumers."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 23,
+          "evidence": "'git ls-files \\'src/*.py\\' | xargs wc -l' enumerates the Git index rather than existing working-tree implementation files. Following the add/delete or rename branches before staging omits new untracked files and passes deleted paths to wc; filenames containing whitespace also break the pipeline.",
+          "fix": "Replace the example with a working-tree counter using fixed inclusion/exclusion rules, NUL-safe path handling, inclusion of untracked additions and filtering of nonexistent paths. Reuse that counter unchanged so additions, deletions and renames produce accurate comparable totals without requiring staging."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 26,
+          "evidence": "The procedure moves from 'Check displacement' directly to 'Report'. Although it requires preserving behavior and contracts, it supplies no validation loop before reporting an implemented reduction as successful.",
+          "fix": "Insert a verification gate before reporting: run relevant tests and available build/type checks, compare the preserved public contracts against the boundary inventory, repair or revert regressions, and repeat validation before remeasuring. If validation cannot run, explicitly report the reduction as unverified rather than claiming behavior was preserved."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

@@ -1,0 +1,154 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codebase-pattern-finder",
+      "percent": 92.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 90.4,
+        "router-env-my-referee-one": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 19,
+          "evidence": "1. Pin down the requested behavior, the runtime/framework and the architectural layer. ... 2. Search on the behavior and its synonyms ... 4. Read each promising file and extract the smallest self-contained section that works",
+          "fix": "Cut steps 1, 2 and 4 down to the parts the model would not do by itself: always open callers and tests, and keep a snippet small but complete. The model already knows to search with synonyms and read the files it finds. Use the freed lines for repository-specific signals, such as how to tell generated or vendored copies apart from maintained code."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 19,
+          "evidence": "Pattern types to cover when relevant: feature, structural, integration, testing.",
+          "fix": "Add a decision rule that maps the request to pattern types, for example: 'how do we call X' -> integration + testing; 'where does Y live' -> structural; otherwise feature + testing. This turns the list of types into a way of thinking about the request."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 55,
+          "evidence": "## Gotchas has two items (.gitignore-hidden scope, mock-only tests)",
+          "fix": "Add one more trap that runs against expectation: a barrel or re-export file (index.ts, __init__.py) often matches first and looks like the definition. Follow it to the defining file before you cite it, or the caller will copy an import path instead of the code."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 51,
+          "evidence": "Report one example per materially distinct approach ... at most 3 variations per pattern type, unless the caller asks for more. / Never ... rank",
+          "fix": "Resolve what happens when there are more than 3 distinct approaches without ranking them. For example: 'If more than 3 distinct approaches exist, show the 3 with the most call sites (state the count), and list the rest by file:line under Related Utilities with \"N further approaches not expanded\".' Also say what to do when the request names no clear behavior: report the interpretation you assumed at the top of the report."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 18,
+          "evidence": "\u201cPin down the requested behavior, the runtime/framework and the architectural layer\u201d and \u201cSearch on the behavior and its synonyms\u201d restate ordinary code-search practice rather than adding expert knowledge. The body mixes this generic activation material with stronger provenance, mock-versus-usage and explicit-status guidance.",
+          "fix": "Compress steps 1\u20132 into: \u201cFor the requested feature, structural, integration or testing patterns, locate behavior-relevant implementations in the appropriate runtime and layer, then verify their callers and tests.\u201d Retain the provenance deduplication, mock-versus-usage distinction and explicit-status rules as the substantive guidance."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 21,
+          "evidence": "\u201cReport one example per materially distinct approach\u201d conflicts with the later limit \u201cat most 3 variations per pattern type\u201d when a search finds four or more distinct approaches. Equivalent variants have a grouping rule, but omitted distinct approaches have no reporting outcome.",
+          "fix": "Make step 4 explicitly bounded: return up to three distinct approaches in file-path order, list any additional distinct approaches with citations under an \u201cAdditional approaches not expanded\u201d heading, and expand those snippets when the caller requests exhaustive coverage."
+        }
+      ]
+    },
+    {
+      "name": "sync-skills-readme",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.0,
+        "router-env-my-referee-one": 98.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/sync-skills-readme.md",
+          "line": 47,
+          "evidence": "Gotchas repeat rules the Workflow already states: 'Reading only the first description line truncates a folded or literal summary' (step 1 already says 'Join folded (`>`) or literal (`|`) description lines'), 'Hyphenated keywords ... match only as a contiguous run' (step 2 line 14) and 'A link built from `name:` breaks' (step 3 line 32 'The link uses the directory name')",
+          "fix": "Keep each rule in one place: shorten step 1, step 2 and step 3 to the bare instruction and keep the reason in Gotchas, or delete the three duplicate Gotcha bullets, so the command spends its lines on each rule only once"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/sync-skills-readme.md",
+          "line": 14,
+          "evidence": "Categorization is purely mechanical: 'If still none, use Utilities.' Nothing tells the agent to question a result that looks wrong",
+          "fix": "Add a check after step 2: 'Before building rows, look at each skill that was placed by the description-word pass or that fell back to Utilities. If its category contradicts what the skill obviously does, keep the mechanical result and list it in the report under Warnings with the keyword to pin it (for example: add `skill-judge` to Meta).'"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/sync-skills-readme.md",
+          "line": 45,
+          "evidence": "Gotchas cover parsing and table-splitting traps, but none warns that the description-word fallback misroutes skills on common words such as 'model', 'tool', 'system', 'plan' or 'test' (for example 'what the model already knows' sends a skill to AI Tools)",
+          "fix": "Add a Gotcha: '- The description-word pass matches generic words: `model`, `tool`, `system`, `plan` and `test` show up in many descriptions that are not about those topics, so a skill can land in AI Tools or Planning by accident. Pin such a skill by its name instead of adding broader keywords.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-skills-readme.md",
+          "line": 14,
+          "evidence": "'repeat on the words of the description (single-token keywords only)': the command never says how description words are tokenized. It is not clear whether 'slash-command' or 'frontend,' contains the tokens 'command' or 'frontend', so this branch has no single outcome",
+          "fix": "Define it: 'Description words are the description lowercased and split on any character other than a-z and 0-9 (so `slash-command,` gives `slash` and `command`). Ignore a trailing `s` on each word, as for names.'"
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-skills-readme.md",
+          "line": 33,
+          "evidence": "Step 4 stops only on a missing heading or table. A missing `skills/` directory, or zero valid skills, still reaches the replace step and leaves an empty table. Step 5's check 'row count must equal the number of valid skills' then passes with 0 = 0. The missing-README warning on line 32 also has no text, while every other warning has one",
+          "fix": "In step 4, add: 'If `skills/` is missing or no valid skills remain, stop without editing: `\u274c No valid skills found in skills/`.' On line 32, give the warning text: '\u26a0\ufe0f <dir>: skills/<dir>/README.md not found, link will be broken'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-skills-readme.md",
+          "line": 32,
+          "evidence": "The summary rule says to \"drop the `Use when...` clause, keep the leading verb and object\", but commands/evals/files/skill-zeta.SKILL.md consists entirely of \"Use when the user needs documentation written for an API or a handoff document for frontend developers after backend work.\" Following the stripping rule leaves no capability text, and no fallback is specified.",
+          "fix": "Strip a trailing trigger clause only when capability text remains. For descriptions consisting entirely of trigger wording, extract the requested action instead; for the zeta-docs fixture, use a factual summary such as \"Write API docs & frontend handoff documents\"."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

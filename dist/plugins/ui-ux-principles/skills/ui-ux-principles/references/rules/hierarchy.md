@@ -14,16 +14,12 @@ Apple HIG Buttons allows one or two prominent buttons per view and says to mark 
 | Settings | Save, Export, Delete workspace all filled | fail: three filled; fix to Save filled, Export text, Delete workspace text with the danger role |
 | Delete confirmation dialog | Cancel text, Delete outlined with the danger role | pass: no button needs to be filled, and a filled destructive button invites the reflex press |
 | Editor with an open dialog | Publish filled on the page, Confirm filled in the dialog | pass: the dialog is its own view |
-| Product grid | Add to cart filled on every card | fail: one filled per card is N primaries; make it outlined or text |
+| Product grid | Add to cart filled on every card, rendered from one product list, no recommended item, nothing else filled | pass: equal-priority independent product choices (the exception in SKILL.md); cite the list map in the evidence |
+| Product grid | Add to cart filled on every card, plus a filled Checkout in the header | fail: the header fill competes with the cards; make Checkout outlined or the cards outlined |
+| Orders list | Edit filled on every order row | fail: one task repeated per record is N primaries, not product choices; make it text |
+| Auth page | Sign in filled in the sign-in panel, Create account filled in the separate sign-up panel | pass: two bounded panels, each an independent task, are two views |
+| Admin app whose design system says "one filled button per toolbar" | two toolbars, one filled each | pass: the documented rule wins; cite the design-system page in the evidence |
 | Orders list | icon-only Delete per row, no filled button | pass: zero filled is within "at most one" |
-
-```tsx
-<Stack direction="row" spacing={1}>
-  <Button variant="contained">Pay now</Button>
-  <Button variant="outlined">Pay on invoice</Button>
-  <Button variant="text">Apply code</Button>
-</Stack>
-```
 
 ## Judgment aids (never a fail line)
 
@@ -37,4 +33,3 @@ Use these to improve a screen, not to fail it:
 ## Gotchas
 
 - Color alone does not mark priority or status: pair it with weight, an icon or text (NN/g). A red text button reads as destructive only to people who see red.
-- A MUI `Button` with no `variant` is `text`, so it never counts as filled; a custom `.btn` with a background color does.

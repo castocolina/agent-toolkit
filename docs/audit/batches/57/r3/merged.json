@@ -1,0 +1,99 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codex-plan",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8,
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 39,
+          "evidence": "Tasks must be small and independently testable (\"Add Google OAuth config to env\", not \"Implement Google OAuth\"). Check that tasks and criteria cover every confirmed requirement.",
+          "fix": "Keep the required section and per-task field list. Cut the general advice about small tasks, which the model already follows. The coverage check is already in the post-plan review on line 33, so drop it here."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 19,
+          "evidence": "1. **Context first.** Read what the plan depends on. Write down only paths that exist (`ls`/Read); the prompt may cite nothing else.",
+          "fix": "Add a short selection rule for step 1, for example: start with the manifest (package.json, pyproject.toml), the schema or models, the entry points and middleware the topic touches, and .env.example. Stop after about 10 files. Prefer files a task would edit over files that only document."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 28,
+          "evidence": "codex exec -s workspace-write -c model_reasoning_effort=high [-m <id>] \"$(cat prompt_to_codex.md)\"",
+          "fix": "Add a gotcha: `-s workspace-write` gives Codex write access to the whole workspace, so the planning-only instruction is the only guard against source edits. When the plan arrives, ask the user for `git status --short` (or check it yourself) and flag any changed file other than the chosen plan file before reviewing the plan."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 2,
+          "evidence": "Use when planning a feature, API, auth change, migration or test strategy, including underspecified requests.",
+          "fix": "Prepare prompt_to_codex.md so the user can run the Codex CLI themselves and get an implementation plan in codex-plan.md. Use when planning a feature, API, auth change, migration, refactor or test strategy, or when the user wants a plan handed off to Codex or another agent, even without the word \"Codex\", including underspecified requests. Gathers repo context, asks only blocking questions, shows the manual `codex exec` command. Not for implementing changes; never runs Codex."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 15,
+          "evidence": "If it contains `--model <id>`, strip it from the topic and pass it to Codex with `-m <id>`.",
+          "fix": "Resolve the malformed branch: if `--model` has no id after it, or the next token looks like part of the topic, ask for the model id with AskUserQuestion (or drop the flag and use the default). Never pass `-m` with an empty or guessed value."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 57,
+          "evidence": "\"Package installs and other network calls fail because the sandbox has no network\" treats a configurable environment property as unconditional. The presented command selects workspace-write but does not explicitly disable network access.",
+          "fix": "Replace this gotcha with: \"A planning run reads context and writes only the plan; do not install packages, call external services or run tests. Network access depends on Codex configuration, so do not rely on the sandbox to block execution.\""
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 19,
+          "evidence": "\"Write down only paths that exist (`ls`/Read); the prompt may cite nothing else\" conflicts with the normal branch where codex-plan.md does not exist, yet the prompt must name it as its output. The same wording also excludes legitimate proposed new implementation paths.",
+          "fix": "Scope the restriction explicitly: \"In Files to Read for Context, list only paths verified with ls/Read. Output filenames and proposed new implementation paths may be named, but label them as planned/new rather than existing context files.\""
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 55,
+          "evidence": "\"Fixed output names collide with earlier runs; overwriting a previous plan loses work\" repeats the collision policy already made actionable in Workflow step 3 and adds only an obvious consequence.",
+          "fix": "Remove this repeated warning while retaining step 3's explicit overwrite confirmation and paired numeric-suffix selection."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

@@ -26,6 +26,9 @@
       "assertions": [
         "Outputs literal greentext line prefixes in a text code block",
         "Does not call or construct a memegen image URL"
+      ],
+      "files": [
+        "references/markdown-memes-guide.md"
       ]
     },
     {
@@ -39,11 +42,21 @@
     },
     {
       "id": "encoding-edge",
-      "prompt": "Make a meme about “50% of routes / are broken?” using a suitable template.",
+      "prompt": "Make a meme with the top caption exactly “50% of routes / are broken?” (one caption, the slash is part of the text) using a suitable template.",
       "expected_output": "A valid URL encodes percent, slash and question mark using memegen tokens.",
       "assertions": [
         "Encodes percent as `~p`, slash as `~s`, and question mark as `~q`.",
         "Provides a complete memegen.link image URL with `.png`."
+      ]
+    },
+    {
+      "id": "three-panel-template",
+      "prompt": "distracted boyfriend meme pls: me / some shiny new JS framework / our perfectly working codebase",
+      "expected_output": "A Distracted Boyfriend meme built on template id `db` with all three captions as three path segments, not the 404-ing `distracted` id and not squeezed into two lines.",
+      "assertions": [
+        "Uses the template id `db`, not `distracted`.",
+        "The URL has three caption path segments after `/images/db/`, one per panel, ending in `.png`.",
+        "Spaces in the captions are written as `_`."
       ]
     }
   ]

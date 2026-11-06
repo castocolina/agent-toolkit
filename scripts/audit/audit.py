@@ -190,6 +190,70 @@ def parse_frontmatter(text: str) -> dict[str, str]:
     return fm
 
 
+def bad_flow_collection(v: str) -> bool:
+    """True when a '['/'{' value has no matching close at depth 0 or text (not a ' #' comment) after it.
+
+    v may span lines joined by newlines; a '#' at a line start or after a blank is a comment to the line end."""
+    depth, quote, i = 0, "", 0
+    while i < len(v):
+        c = v[i]
+        if quote:
+            quote = "" if c == quote else quote
+        elif c == "#" and (i == 0 or v[i - 1] in " \t\n"):
+            nl = v.find("\n", i)
+            i = len(v) if nl < 0 else nl
+            continue
+        elif c in "\"'":
+            quote = c
+        elif c in "[{":
+            depth += 1
+        elif c in "]}":
+            depth -= 1
+            if depth == 0:
+                first, _, others = v[i + 1:].partition("\n")
+                tail_ok = not first.strip() or re.match(r"[ \t]+#", first)
+                return not (tail_ok and all(not ln.strip() or ln.lstrip().startswith("#") for ln in others.split("\n")))
+        i += 1
+    return True
+
+
+def invalid_plain_scalars(text: str) -> list[str]:
+    """Top-level keys whose unquoted one-line value a YAML parser rejects (no PyYAML here, so a line heuristic)."""
+    lines = text.splitlines()
+    bad = []
+    if lines and lines[0].strip() == "---":
+        fm = []
+        for ln in lines[1:]:
+            if ln.strip() == "---":
+                break
+            fm.append(ln)
+        for i, ln in enumerate(fm):
+            m = re.match(r"^([A-Za-z0-9_-]+):[ \t]+(\S.*)$", ln)
+            if not m:
+                continue
+            val = m.group(2)
+            if val[0] in "[{":
+                if bad_flow_collection(val):
+                    # a multiline flow collection: join the lines up to the next top-level key before judging it
+                    cont = []
+                    for nxt in fm[i + 1:]:
+                        if re.match(r"^[A-Za-z0-9_-]+:", nxt):
+                            break
+                        cont.append(nxt.strip())
+                    if not cont or bad_flow_collection("\n".join([val] + cont)):
+                        bad.append(m.group(1))
+            elif val[0] not in "\"'|>":
+                plain = re.split(r"\s#", val, maxsplit=1)[0]  # a ' #' comment may hold ': '; quoted and block values are skipped above
+                if ": " in plain or plain[0] in "@`%*&!":
+                    bad.append(m.group(1))
+    return bad
+
+
+def yaml_issues(text: str) -> list[tuple[str, str]]:
+    return [("frontmatter_yaml", f"{k}: unquoted value is not a valid YAML plain scalar (quote it or use >-)")
+            for k in invalid_plain_scalars(text)]
+
+
 # ---------- check ----------
 
 
@@ -249,6 +313,7 @@ def skill_issues(root: Path, name: str, allow: set[str], pin: Path | None = None
     if n_lines >= 500:
         found.append(("lines_over_500", f"SKILL.md has {n_lines} lines"))
     fm = parse_frontmatter(content)
+    found.extend(yaml_issues(content))
     if len(fm.get("description", "")) > 1024:
         found.append(("description_too_long", f"{len(fm['description'])} chars"))
     if fm.get("name") != name:
@@ -268,7 +333,23 @@ def skill_issues(root: Path, name: str, allow: set[str], pin: Path | None = None
         tdir = root / "tests" / "skills" / name
         if has_scripts and not (list(tdir.glob("test-*.sh")) + list(tdir.glob("test_*.py"))):
             found.append(("missing_script_tests", f"scripts/ has files but no tests/skills/{name}/test-*.sh or test_*.py"))
+    found.extend(credit_issues(root, name, content))
     return found
+
+
+def credit_issues(root: Path, name: str, skill_text: str) -> list[tuple[str, str]]:
+    """Each registry `credit` for this skill must appear in SKILL.md, README.md or references/*.md; no registry, no check."""
+    reg = root / "docs" / "audit" / "upstream-sources.json"
+    try:
+        rows = json.loads(reg.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    sdir = root / "skills" / name
+    extra = [sdir / "README.md", *sorted((sdir / "references").glob("*.md"))]
+    text = skill_text + "".join(f.read_text(encoding="utf-8") for f in extra if f.is_file())
+    return [("missing_credit", f"credit {r['credit']!r} not in SKILL.md, README.md or references/*.md")
+            for r in rows if isinstance(r, dict) and r.get("skill") == name
+            and isinstance(r.get("credit"), str) and r["credit"] not in text]
 
 
 def check_skills(
@@ -374,7 +455,7 @@ def flat_issues(root: Path, kind: str, name: str) -> list[tuple[str, str]]:
         found.append(("name_mismatch", f"frontmatter name {fm.get('name')!r} != file stem {name!r}"))
     if not plain("description"):
         found.append(("missing_description", "description absent or empty"))
-    return found
+    return found + yaml_issues(text)
 
 
 def check_flat(root: Path, kind: str, names: list[str] | None, ignore: set[str]) -> dict:
@@ -1080,6 +1161,24 @@ def write_inside(base: Path, path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
+def write_atomic(base: Path, path: Path, text: str) -> None:
+    """write_inside, but via a same-directory temp file and os.replace so a crash never leaves a torn file."""
+    if not path.resolve().is_relative_to(base):
+        raise HarnessError(f"refusing to write {path} outside {base}")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(text)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+    except BaseException:
+        with contextlib.suppress(OSError):
+            os.unlink(tmp)
+        raise
+
+
 def summarise(skill: str, mode: str, passed: int, total: int, failures: list) -> dict:
     return {"skill": skill, "mode": mode, "pass_rate": round(passed / total, 4),
             "passed": passed, "total": total, "failures": failures}
@@ -1170,6 +1269,21 @@ def run_eval_file(root: Path, eval_file: Path, runner: str, timeout: float, out:
     return 1 if summary["passed"] / summary["total"] < fail_under else 0
 
 
+def parse_trigger(text: str, what: str):
+    """A trigger answer is one small object; accept it on the last line after a sentence of prose."""
+    try:
+        return parse_object(text, what)
+    except HarnessError:
+        last = (text.strip().splitlines() or [""])[-1].strip()
+        try:
+            data = json.loads(last)
+        except ValueError:
+            data = None
+        if isinstance(data, dict) and set(data) == {"skill"}:
+            return data
+        raise
+
+
 def eval_trigger_mode(root, name, runner, timeout, runs) -> dict:
     queries, cat = load_trigger_queries(root, name), catalog(root)
     passed, failures = 0, []
@@ -1177,7 +1291,10 @@ def eval_trigger_mode(root, name, runner, timeout, runs) -> dict:
         prompt = build_trigger_prompt(name, i, q["query"], cat)
         hits = 0
         for _ in range(runs):
-            data = parse_object(call_runner(runner, prompt, timeout), f"{name}/q{i} trigger")
+            try:
+                data = parse_trigger(call_runner(runner, prompt, timeout), f"{name}/q{i} trigger")
+            except HarnessError:  # models sometimes wrap the answer in prose: ask once more
+                data = parse_trigger(call_runner(runner, prompt, timeout), f"{name}/q{i} trigger")
             pick = data.get("skill") if isinstance(data, dict) and set(data) == {"skill"} else None
             if not isinstance(pick, str) or pick not in {*cat, "none"}:
                 raise HarnessError(f"{name}/q{i}: invalid trigger answer {data!r}")
@@ -1225,7 +1342,7 @@ class SourceUnavailable(Exception):
 
 REQUIRED_ENTRY_KEYS = {"skill", "kind", "source", "ref"}
 OPTIONAL_ENTRY_KEYS = {"last_reviewed", "last_upstream_sha", "reviewed_for_model", "status", "new_path",
-                       "artifact_kind"}
+                       "artifact_kind", "credit"}
 REVIEW_STATUSES = {"current", "stale", "path-moved", "unreachable"}
 ARTIFACT_KINDS = set(KIND_DIR)
 DATE_RE = re.compile(r"[0-9]{4}-[0-9]{2}-[0-9]{2}")
@@ -1291,6 +1408,11 @@ def validate_entry(root: Path, entry) -> str | None:
             return f"artifact {skill!r} does not exist as a {artifact_kind} {label}"
     if "artifact_kind" in entry and kind != "local":
         return "artifact_kind is valid only on local rows"
+    if "credit" in entry:
+        if kind in ("repo", "local"):
+            return "credit is not valid on repo or local rows"
+        if not isinstance(entry["credit"], str) or not entry["credit"].strip():
+            return "credit must be a non-empty string"
     component = r"[A-Za-z0-9._-]+"
     repo_pattern = rf"{component}/{component}"
     if kind in ("github", "repo"):
@@ -1846,6 +1968,198 @@ def validate_decision(data, spec_changed: bool = False, structure_changed: bool 
 # ---------- CLI ----------
 
 
+# ---------- batches ----------
+
+BATCH_STATUSES = ("queued", "open", "closed", "requeued")
+MAX_REQUEUES = 2
+
+
+def finding_key(artifact: str, finding: dict) -> tuple:
+    """Finding identity: merge's dedup key plus the artifact (verdict ids repeat and are renumbered)."""
+    return (artifact, finding["dimension"], finding["file"], finding["fix"].lower())
+
+
+def load_merged_entries(files: list[Path]) -> dict[str, dict]:
+    """Artifact entries by name; later files win."""
+    entries: dict[str, dict] = {}
+    for f in files:
+        data = load_json(f)
+        if not isinstance(data, dict) or not isinstance(data.get("skills"), list):
+            raise ValueError(f"{f}: no top-level skills array")
+        for e in data["skills"]:
+            entries[e["name"]] = e
+    return entries
+
+
+def batch_counts(entry: dict) -> dict:
+    c = Counter(f["severity"] for f in entry.get("findings", []))
+    return {s: c.get(s, 0) for s in SEVERITIES}
+
+
+def brief_order(findings: list[dict]) -> list[dict]:
+    """Critical, high and D7/D8 first, then the rest; report order inside each group."""
+    first = [f for f in findings if f["severity"] in ("critical", "high") or f["dimension"] in ("D7", "D8")]
+    return first + [f for f in findings if f not in first]
+
+
+def render_brief(batch_id: int, artifacts: list[dict], entries: dict[str, dict]) -> str:
+    lines = [f"# Batch {batch_id:02d}", ""]
+    for a in artifacts:
+        lines += [f"## {a['name']} ({a['kind']})", ""]
+        for f in brief_order(entries[a["name"]].get("findings", [])):
+            loc = f["file"] if f.get("line") is None else f"{f['file']}:{f['line']}"
+            lines += [f"### {a['name']}#{f['id']}", f"- severity: {f['severity']}", f"- dimension: {f['dimension']}",
+                      f"- location: {loc}", f"- fix: {f['fix']}", ""]
+    return "\n".join(lines)
+
+
+def batch_artifact(name: str, entry: dict, kinds: dict[str, str]) -> dict:
+    if name not in kinds:
+        raise ValueError(f"{name}: not a skill, command or agent in this repo")
+    return {"kind": kinds[name], "name": name, "percent": entry.get("percent"), "findings": batch_counts(entry)}
+
+
+def write_batch_brief(root: Path, out: Path, batch: dict, entries: dict[str, dict]) -> None:
+    path = root / batch["brief"] if not Path(batch["brief"]).is_absolute() else Path(batch["brief"])
+    write_inside(out, path, render_brief(batch["id"], batch["artifacts"], entries))
+
+
+def brief_path(root: Path, out: Path, batch_id: int, artifacts: list[dict]) -> str:
+    name = f"{batch_id:02d}-{'-'.join(a['name'] for a in artifacts)}.md"
+    base = out.resolve()
+    rel = base.relative_to(root) if base.is_relative_to(root) else base
+    return str(rel / "batches" / name)
+
+
+def is_queued(e: dict) -> bool:
+    pct = e.get("percent")
+    return not e.get("synced") and ((pct is None or pct < TARGET_CLOSE)
+                                   or any(f["severity"] in ("critical", "high") for f in e.get("findings", [])))
+
+
+TARGET_CLOSE = 90
+
+
+def generate_batches(root: Path, out: Path, files: list[Path], max_art: int, max_find: int, exclude: set[str]) -> int:
+    entries = load_merged_entries(files)
+    path = out / "batches.json"
+    queue = load_json(path) if path.is_file() else []
+    present = {a["name"] for b in queue for a in b["artifacts"]}
+    todo = sorted((e for n, e in entries.items() if n not in present and n not in exclude and is_queued(e)),
+                  key=lambda e: -1 if e.get("percent") is None else e["percent"])  # stable: report order on ties
+    kinds = {a["name"]: a["kind"] for a in list_artifacts(root)}
+    groups: list[list[dict]] = []
+    cur, size = [], 0
+    for e in todo:
+        n = len(e.get("findings", []))
+        a = batch_artifact(e["name"], e, kinds)
+        if n > max_find:
+            groups += [g for g in (cur, [a]) if g]
+            cur, size = [], 0
+        elif cur and (len(cur) >= max_art or size + n > max_find):
+            groups.append(cur)
+            cur, size = [a], n
+        else:
+            cur.append(a)
+            size += n
+    if cur:
+        groups.append(cur)
+    next_id = max((b["id"] for b in queue), default=0) + 1
+    new = []
+    for i, g in enumerate(groups):
+        bid = next_id + i
+        new.append({"id": bid, "artifacts": g, "brief": brief_path(root, out, bid, g), "status": "queued",
+                    "rounds": 0, "requeues": 0, "waived": []})
+    for b in new:
+        write_batch_brief(root, out, b, entries)
+    save_queue(out, queue + new)
+    return 0
+
+
+def save_queue(out: Path, queue: list[dict]) -> None:
+    write_atomic(out, out / "batches.json", json.dumps(queue, indent=2) + "\n")
+
+
+def load_queue(out: Path) -> list[dict]:
+    if not (out / "batches.json").is_file():
+        raise ValueError(f"{out / 'batches.json'} does not exist")
+    return load_json(out / "batches.json")
+
+
+def find_batch(queue: list[dict], batch_id: int) -> dict:
+    for b in queue:
+        if b["id"] == batch_id:
+            return b
+    raise ValueError(f"no batch with id {batch_id}")
+
+
+def batches_op(root: Path, args) -> int:
+    out = Path(os.path.abspath(args.out)) if args.out else root / "docs" / "audit"  # absolute, unresolved: write_inside compares against it
+    if args.op == "generate":
+        return generate_batches(root, out, args.merged, args.max_artifacts, args.max_findings, set(args.exclude))
+    queue = load_queue(out)
+    if args.op == "set":
+        if args.status not in BATCH_STATUSES:
+            raise ValueError(f"status must be one of {', '.join(BATCH_STATUSES)}")
+        find_batch(queue, args.id)["status"] = args.status
+    elif args.op == "waive":
+        batch = find_batch(queue, args.id)
+        if not args.reason.strip():
+            raise ValueError("waive needs a non-empty reason")
+        hits = [f for f in load_merged_entries(args.merged).get(args.artifact, {}).get("findings", [])
+                if f["dimension"] == args.dimension and f["file"] == args.file]
+        if not hits:
+            raise ValueError(f"no finding of {args.artifact} matches {args.dimension} {args.file}")
+        have = {finding_key(w["artifact"], w) for w in batch["waived"]}
+        for f in hits:
+            if finding_key(args.artifact, f) not in have:
+                batch["waived"].append({"artifact": args.artifact, "dimension": f["dimension"], "file": f["file"],
+                                        "fix": f["fix"], "reason": args.reason})
+    elif args.op == "requeue":
+        batch = find_batch(queue, args.id)
+        entries = load_merged_entries(args.merged)
+        if args.artifact not in [a["name"] for a in batch["artifacts"]] or args.artifact not in entries:
+            raise ValueError(f"{args.artifact} is not in batch {args.id} or has no verdict")
+        if batch["requeues"] + 1 > MAX_REQUEUES:
+            print(f"requeue: {args.artifact} was requeued {MAX_REQUEUES} times; waive or stop", file=sys.stderr)
+            return 3
+        kinds = {a["name"]: a["kind"] for a in list_artifacts(root)}
+        art = batch_artifact(args.artifact, entries[args.artifact], kinds)
+        batch["artifacts"] = [a for a in batch["artifacts"] if a["name"] != args.artifact]
+        if not batch["artifacts"]:
+            batch["status"] = "requeued"
+        bid = max(b["id"] for b in queue) + 1
+        new = {"id": bid, "artifacts": [art], "brief": brief_path(root, out, bid, [art]), "status": "queued",
+               "rounds": 0, "requeues": batch["requeues"] + 1,
+               "waived": [w for w in batch["waived"] if w["artifact"] == args.artifact]}  # waivers follow the artifact
+        at = next((i for i, b in enumerate(queue) if b["status"] == "queued"), len(queue))
+        queue.insert(at, new)
+        write_batch_brief(root, out, new, entries)
+    elif args.op == "check":
+        entries = load_merged_entries(args.merged)
+        bad = False
+        for b in queue:
+            if b["status"] != "closed":
+                continue
+            keys = {finding_key(w["artifact"], w) for w in b["waived"]}
+            for a in b["artifacts"]:
+                e = entries.get(a["name"])
+                if e is None or e.get("percent") is None or e["percent"] < TARGET_CLOSE:
+                    print(f"batch {b['id']}: {a['name']} has no verdict or scores below {TARGET_CLOSE}")
+                    bad = True
+                if e is None:
+                    continue
+                for f in e.get("findings", []):
+                    if f["severity"] == "low":
+                        print(f"residual low: {a['name']}#{f['id']} {f['dimension']} {f['file']}")
+                    elif finding_key(a["name"], f) not in keys:
+                        print(f"batch {b['id']}: unwaived {f['severity']} {a['name']}#{f['id']} {f['dimension']} {f['file']}")
+                        bad = True
+        return 1 if bad else 0
+    save_queue(out, queue)
+    return 0
+
+
 def csv(value: str) -> list[str]:
     return [v for v in value.split(",") if v]
 
@@ -1894,6 +2208,26 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--allowlist", type=Path, default=None, help="skill kind only; ignored for command/agent")
     c.add_argument("--validator-pin", type=Path, default=None,
                    help="trusted SOURCE.json that selects the skills-ref validator (not the data root's); skill kind only")
+    bt = sub.add_parser("batches", help="generate and track fix batches from merged verdicts")
+    bt_sub = bt.add_subparsers(dest="op", required=True)
+    for op in ("generate", "set", "waive", "requeue", "check"):
+        o = bt_sub.add_parser(op)
+        o.add_argument("--out", type=Path, default=None)
+        if op in ("generate", "waive", "requeue", "check"):
+            o.add_argument("--merged", type=lambda v: [Path(x) for x in csv(v)], required=True)
+        if op != "generate" and op != "check":
+            o.add_argument("--id", type=int, required=True)
+    bg = bt_sub.choices["generate"]
+    bg.add_argument("--max-artifacts", type=int, default=3)
+    bg.add_argument("--max-findings", type=int, default=15)
+    bg.add_argument("--exclude", type=csv, default=[])
+    bt_sub.choices["set"].add_argument("--status", required=True)
+    bw = bt_sub.choices["waive"]
+    bw.add_argument("--artifact", required=True)
+    bw.add_argument("--dimension", required=True)
+    bw.add_argument("--file", required=True)
+    bw.add_argument("--reason", required=True)
+    bt_sub.choices["requeue"].add_argument("--artifact", required=True)
     ar = sub.add_parser("artifacts", help="list skills, commands and agents as JSON")
     ar.add_argument("--kind", choices=sorted(ARTIFACT_KINDS), default=None)
     r = sub.add_parser("rubric-check")
@@ -2017,6 +2351,12 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(res, indent=2))
         bad = any(not s["ok"] for s in res["skills"] if not s["synced"])
         return 1 if args.strict and bad else 0
+    if args.cmd == "batches":
+        try:
+            return batches_op(root, args)
+        except (OSError, ValueError, KeyError, TypeError, HarnessError) as e:
+            print(f"batches {args.op}: {e}", file=sys.stderr)
+            return 2
     if args.cmd == "artifacts":
         try:
             found = list_artifacts(root)

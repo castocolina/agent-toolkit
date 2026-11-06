@@ -8,16 +8,7 @@ description: Some things you Probably Are Gonna Need - know when YAGNI doesn't a
 
 > "When should you override YAGNI? When the cost of adding something later is so dramatically expensive compared with the cost of adding it early on that it's worth taking the risk."
 
-YAGNI is a good default. But some things are genuinely cheaper to build in from the start than to retrofit later. Know the difference.
-
-## Why This Matters
-
-Ruthless YAGNI application can backfire when:
-- Adding it later requires touching everything (logging, timestamps, audit trails)
-- You can't add it retroactively at all (API versioning, mobile app kill switches)
-- The cost of not having it is catastrophic (security fundamentals, data you threw away)
-
-The avoiding-complexity skill pushes toward less. This mindset identifies the exceptions where "add it now" beats "add it later."
+The exceptions are things that touch everything when added late, cannot be added retroactively at all, or lose data for good when missing.
 
 ## Common PAGNIs
 
@@ -29,11 +20,9 @@ The avoiding-complexity skill pushes toward less. This mindset identifies the ex
 **Infrastructure that's painful to retrofit:**
 - API versioning (even if v1 is the only version)
 - API pagination (even if lists are small now)
-- Automated deploys and CI from day one
 - Logging infrastructure
 
 **Security fundamentals:**
-- Vulnerability disclosure policy and security@ email
 - Session/password invalidation mechanisms
 - Safe ways to move redacted data out of production
 
@@ -44,13 +33,9 @@ Before invoking PAGNI, ask:
 2. **Is this a known pattern from experience?** (not speculative)
 3. **Is the cost of adding it now actually low?** (minutes/hours, not days)
 
-If yes to all three, it's a PAGNI candidate, not automatic authorization. Correctness, security, compliance, and explicit user-approved data-retention behavior override the size gate; validate behavior before retaining or adding it. Otherwise prefer net deletion. When evidence or scope is contested, name the tension and ask the user.
+If yes to all three, it's a PAGNI candidate: keep it (or add it) and say why. Otherwise prefer net deletion. When the answers are contested, name the tension and ask the user.
 
-## The Balance
-
-PAGNI is not an escape hatch for over-engineering. It's a small, specific list of exceptions learned from painful experience. When in doubt, YAGNI wins.
-
-**Most features: YAGNI. Infrastructure and data collection: probably PAGNI.**
+PAGNI is a short list learned from painful experience, not an escape hatch: when in doubt, YAGNI wins.
 
 ## External References
 

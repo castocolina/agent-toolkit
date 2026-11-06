@@ -1,0 +1,68 @@
+{
+  "skill": "plugin-forge",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/plugin-forge/evals/evals.json",
+      "line": 17,
+      "evidence": "\"Minor bump expected 1.5.0 in both manifests.\" The prompt does not establish that both manifests contain version fields, while the script contract explicitly says never to add an entry version.",
+      "fix": "Make this expectation conditional: plugin.json wins when it contains version; otherwise bump the existing entry version. Require synchronization only when both already contain version, and explicitly assert that no redundant entry version is added."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/plugin-forge/evals/evals.json",
+      "line": 40,
+      "evidence": "The stale-update assertion accepts \"bump_version.py lint-kit minor` (or `patch`)\" even though the fixture adds a new skill and the skill's version policy requires minor for a new skill.",
+      "fix": "Require a minor bump to 1.3.0 for this fixture, or accept the documented alternative of removing version from both manifests. Do not accept a patch bump for the new-skill release."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/plugin-forge/scripts/bump_version.py",
+      "line": 49,
+      "evidence": "\"if not plugin_json_path.exists():\" immediately raises \"Plugin manifest not found\". However, references/plugin-structure.md documents plugin.json as optional, and the workflow routes standard-layout plugins to this script without a manifest-less fallback.",
+      "fix": "Add a manifest-existence check before selecting the standard bump script. For a manifest-less plugin, route to manually bumping an existing marketplace-entry version, or leave a SHA-versioned plugin unbumped; explicitly state that bump_version.py requires plugin.json."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 37,
+      "evidence": "\"A relative source ... must start with `./`\" contradicts references/marketplace-schema.md, which permits a bare source such as \"formatter\" under metadata.pluginRoot. The source decision tree also lacks a branch for that supported form.",
+      "fix": "Resolve a bare source through metadata.pluginRoot before classifying it as standard or other-local. Qualify the ./ requirement as applying to explicit relative paths, document the pluginRoot exception, and retain traversal restrictions on the resolved path."
+    }
+  ]
+}

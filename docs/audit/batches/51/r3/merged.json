@@ -1,0 +1,99 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "daily-meeting-update",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8,
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 59,
+          "evidence": "Sections, in order: `# Daily Update - YYYY-MM-DD` ..., `## Yesterday`, `## Today`, `## Blockers` (\"No blockers\") ... `## Topics for Discussion` (\"None\")",
+          "fix": "Keep only the parts the model would not choose by itself: the meeting date versus window rule, the conditional PRs and Jira sections, the item format and the 15-bullet fold rule. Cut the standard Yesterday/Today/Blockers headings down to a single template line, because the model already knows the standup layout."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 9,
+          "evidence": "The user's answers are the source of truth; integrations only jog memory. Work through the steps in order.",
+          "fix": "This is a Process-pattern skill, but it has no final checkpoint. Add a closing step: 'Before sending, re-check every Yesterday bullet against the Provenance and window gates and confirm no unpicked session or unapproved repo appears.' That gives the phased workflow a gate at the end."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 3,
+          "evidence": "Generate concise Markdown daily standup or scrum updates ... Use when preparing for a daily team sync or short yesterday/today update, even without saying standup.",
+          "fix": "Use this skill to draft a concise Markdown daily standup or scrum update (yesterday, today, blockers, discussion topics). Use when the user prepares for a daily sync, morning update, scrum or team check-in, or asks what they did yesterday for the meeting, even without saying standup. Interviews only for missing facts and can use explicitly approved GitHub PRs, Jira issues or Claude Code session history. Not for weekly reports, meeting agendas, performance reviews, timesheets, release summaries or retrospectives."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 33,
+          "evidence": "Jira (MCP first, CLI only without it) | JQL `project IN (\"KEY\") AND assignee = currentUser() AND updated >= \"FIRST_DAY\"`",
+          "fix": "The CLI path gets an exact command, but the preferred MCP path does not. Name the MCP search tool (for example the Atlassian JQL search tool) and the fields to request (status, resolution, resolutiondate), so the default path is just as precise as the fallback."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 33,
+          "evidence": "reading `status`, `resolution`, `resolutiondate`; CLI: `jira issue list --jql '<JQL>' --plain`",
+          "fix": "jira-cli's default --plain columns do not include resolution or resolutiondate, so the CLI branch cannot apply the [START, END) resolution window and drops to asking every time. Request those fields explicitly (for example with `--raw` or an issue view per key), or state that on the CLI path each candidate's resolution must be fetched with `jira issue view KEY --raw` before it can be reported as done."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 22,
+          "evidence": "python3 -c 'import sys,datetime as d,zoneinfo as z;...' FIRST_DAY ZONE [DAYS]",
+          "fix": "Add a fallback for when the window one-liner fails (no python3 3.9+, or zoneinfo cannot find the zone, for example Windows without tzdata). For example: 'If it errors, ask the user to confirm the UTC offset for the window and compute START/END from it.' Otherwise the window gate has no path forward."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 33,
+          "evidence": "The Jira CLI branch prescribes `jira issue list --jql '<JQL>' --plain` while requiring `resolutiondate`. The plain list does not expose that timestamp, so this branch cannot apply the required event-time window without an additional retrieval or user clarification.",
+          "fix": "After the scoped list returns candidate keys, retrieve each candidate using `jira issue view KEY --raw` and extract `fields.status`, `fields.resolution`, and `fields.resolutiondate` before applying the completion and time-window gates. If those fields remain unavailable, explicitly fall back to asking the user."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/scripts/claude_digest.py",
+          "line": 110,
+          "evidence": "`git_branch = entry.get('gitBranch') or git_branch` preserves the previous branch even when a later message explicitly records an empty or null `gitBranch`. Following that branch produces stale digest metadata that can incorrectly match subsequent activity to the previous branch's PR.",
+          "fix": "Distinguish an absent key from an explicitly empty value: when `gitBranch` is present, assign `entry['gitBranch'] or None`; inherit only when the key is absent. Add regression cases in tests/skills/daily-meeting-update/test_claude_digest.py covering a populated branch followed by an empty or null branch, and assert that subsequent activity is grouped with branch null."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

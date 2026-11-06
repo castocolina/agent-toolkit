@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "commit-work",
+      "percent": 95.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4,
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 28,
+          "evidence": "Whole file: `git add -- <paths>`. Never `git add -A` or `git add .`: they sweep in untracked artifacts.",
+          "fix": "Shorten the general reminders the model already knows (path-scoped `git add`, and in step 6 'a bare `git commit` opens an editor') to a single clause each. Keep the space for the non-obvious index and tree checks."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 25,
+          "evidence": "Step 3 packs the run-directory setup, the index choice, temporary-index bootstrap, whole-file staging and partial-hunk patching into one 5-line paragraph with nested bullets",
+          "fix": "Split step 3 into 3a (create the run directory), 3b (pick the index) and 3c (pick the staging method). Add a short progress checklist for steps 1-8 so the Process pattern has clear checkpoints."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 3,
+          "evidence": "Description opens with implementation detail ('splitting mixed hunks without an interactive terminal, verifying the staged version rather than the working tree') and has no 'even if the user doesn't say commit' clause",
+          "fix": "Stage and commit Git changes so each commit holds only the approved change: keep what the user already staged untouched, split mixed files into separate commits, check the exact staged content, and write Conventional Commits messages. Use when asked to commit, check in, save or wrap up work in git, stage selected files or hunks, split a mixed tree into commits, review what is staged before a push, or draft a commit message, even if the user never says 'commit'. Not for rebasing, squashing, amending or force-pushing history, resolving merge conflicts, opening pull requests, or code review unrelated to a commit."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/commit-work/evals/evals.json",
+          "line": null,
+          "evidence": "Ten evals, but none covers the untracked-file partial-staging branch ('never build a patch from /dev/null'), the unborn-HEAD `read-tree --empty` branch, or a draft-message request with no diff supplied",
+          "fix": "Add an eval whose fixture has a new untracked file with only some content approved, with assertions that the agent asks and builds no /dev/null patch. Add an eval for a repository with no commits, asserting `GIT_INDEX_FILE=<run>/index git read-tree --empty`."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 16,
+          "evidence": "Stage route runs 'steps 1-4 in the real index, stop after the review', but the run directory created in step 3 is removed only in step 8 ('remove only your own directory with `rm -rf -- <run>`'); the step 5 and step 7 'stop, report and ask' exits never clean up either",
+          "fix": "Add to step 3: 'Whatever route or stop ends the run (stage-only after step 4, a failed check in step 5 or 7), remove your own `<run>` with `rm -rf -- <run>` before replying, or name it in the report as yours.' Without this, the next run's leftover-directory check reports stale directories it is told never to delete."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 34,
+          "evidence": "Step 8 instructs temporary-index runs to execute \"git reset -q -- <committed paths>\". If a file contains an excluded, previously staged hunk and a separate approved hunk, the temporary-index patch procedure can commit only the approved hunk, but this path-wide reset then removes the user's excluded hunk from the real index.",
+          "fix": "Before staging, detect whether excluded pre-existing staged content shares any approved path. For that overlap, stop and ask rather than using the current temporary-index cleanup. Restrict the path-wide reset to committed paths proven not to contain excluded user-staged content; supporting overlapping paths requires preserving and reconciling those staged changes against the new HEAD."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 27,
+          "evidence": "The instruction to \"put that same GIT_INDEX_FILE= prefix on every git command of steps 3-7\" also encompasses step 3's source read, \"git diff --cached --binary -- <path> > <run>/staged.diff\". In the branch with an approved staged path and another excluded staged path, reading the newly initialized temporary index instead of the real index produces an empty patch and cannot copy the approved staged version.",
+          "fix": "Explicitly capture approved staged patches from the real index before initializing the temporary index, with no temporary GIT_INDEX_FILE prefix on those source reads. Exempt those reads from the blanket prefix rule; retain the prefix on temporary-index staging, review, verification and commit commands."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

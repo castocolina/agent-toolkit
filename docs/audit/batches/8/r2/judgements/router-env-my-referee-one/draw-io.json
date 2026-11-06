@@ -1,0 +1,59 @@
+{
+  "skill": "draw-io",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "line": 116,
+      "evidence": "The validator checks 'kinds[0] != b\"IHDR\" or kinds[-1] != b\"IEND\" or not xml', then calls 'ET.fromstring(xml)'. A CRC-correct stream containing IHDR, embedded XML and IEND but no IDAT passes despite having no image data; unrelated parseable XML also passes. This branch can replace a previous PNG with an unusable export.",
+      "fix": "Before replacing the previous PNG, validate IHDR length and dimensions, require valid IDAT image data and a zero-length terminal IEND, and verify that the embedded XML has a draw.io document root and diagram structure. Add regression fixtures for a CRC-valid PNG without IDAT and for embedded non-draw.io XML."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "line": 120,
+      "evidence": "'# shortcut: escapes only backslash and double quote; a filename with control characters breaks the JSON.' Accepted filenames containing tabs or newlines therefore produce invalid stdout instead of the documented JSON array.",
+      "fix": "Serialize result objects with Python's json.dumps, preserving filename values while escaping control characters. Add tests that pass filenames containing tabs and newlines and parse stdout as JSON."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "line": 74,
+      "evidence": "'warning: timeout(1) not found, drawio calls are not time-bounded' is followed by exporting with an empty bounded array. On this branch DRAWIO_TIMEOUT provides no bound, contrary to SKILL.md, and the known hanging-export failure can block the entire batch.",
+      "fix": "Fail before launching drawio when timeout(1) is unavailable, with an actionable dependency message; document timeout(1) in the requirements. Add a test for the missing-timeout branch that verifies drawio is not launched and existing PNGs remain untouched."
+    }
+  ]
+}

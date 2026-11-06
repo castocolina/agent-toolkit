@@ -1,0 +1,71 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "mermaid-diagram-specialist",
+      "percent": 90.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 90.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 37,
+          "evidence": "A clean validator run does not prove GitHub renders it: name any version-specific construct.",
+          "fix": "Delete this gotcha. The preloaded mermaid-diagrams skill already says it in its Validate step and in its GitHub gotcha (skills/mermaid-diagrams/SKILL.md lines 27 and 46). Use the line for a fact only the delegate role needs."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 13,
+          "evidence": "1. First check the material can support a diagram: if not, return the specific missing facts and stop; stop only when the core question or entities are unknown, and if just details are missing, proceed and list each as an assumption. Then name the task kind and make its first decision:",
+          "fix": "Split step 1 into two steps: '1. Gate: stop and list the missing facts only when the core question or entities are unknown; otherwise record each missing detail as an assumption.' and '2. Classify the task kind (new, repair, extend/update, restyle, mixed) and take its first decision:'. Gating and classification are separate checkpoints, and splitting them makes the Process pattern clearer."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 34,
+          "evidence": "## Gotchas has two items, and one of them repeats the preloaded skill",
+          "fix": "Add a gotcha specific to the delegate role, for example: 'Callers often paste the diagram inside its surrounding Markdown with the ```mermaid fence. Validate only the block contents, because mmdc rejects the fence line. Return the block in place so the caller can paste it back.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 23,
+          "evidence": "2. If asked for a non-Mermaid format, say so and stop.",
+          "fix": "Move the non-Mermaid check before the material gate and task classification, as the new step 1: 'If asked for PlantUML, Graphviz, draw.io or another non-Mermaid format, say so and stop.' As written, the agent gates the material and picks a diagram type for a request it will refuse anyway."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 46,
+          "evidence": "Done when every requested diagram is returned in its own block, validated or marked unverified, with the assumptions (and change list for a repair) complete.",
+          "fix": "Give the two stop branches (missing core facts in step 1 and non-Mermaid format in step 2) their own outcome in the Output contract: 'If you stopped, reply with no mermaid block, give the reason, and list the facts needed or the supported alternative; that reply also counts as done.' As written, those branches never meet the done-sentence."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

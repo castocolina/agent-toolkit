@@ -1,584 +1,72 @@
-# Generic Component Patterns
+# Generic Components
 
-Generic components provide type safety while maintaining reusability. TypeScript infers generic type parameters from prop values — no manual type annotations needed at call site.
+The column builder in SKILL.md owns the key/value pairing rule. This file covers the rest of generic inference: where `T` is inferred from, how to stop it widening, and the syntax traps. Every snippet type-checks under TypeScript 5.6 with `@types/react` 19.
 
-## Generic Table Component
+## A table that consumes the builder's columns
 
-Full-featured table with typed columns, custom rendering, sorting.
+```tsx
+// Column<T> and columnsFor<T>() as in SKILL.md
+type TableProps<T> = { rows: readonly T[]; columns: readonly Column<T>[]; rowKey: (row: T) => string | number };
+declare function Table<T>(props: TableProps<T>): ReactElement; // body: map rows x columns, calling column.cell(row)
 
-```typescript
-type Column<T> = {
-  key: keyof T;
-  header: string;
-  render?: (item: T) => React.ReactNode;
-  sortable?: boolean;
-};
-
-type TableProps<T> = {
-  data: T[];
-  columns: Column<T>[];
-  keyExtractor: (item: T) => string | number;
-  onSort?: (key: keyof T, direction: 'asc' | 'desc') => void;
-  className?: string;
-};
-
-function Table<T>({
-  data,
-  columns,
-  keyExtractor,
-  onSort,
-  className,
-}: TableProps<T>) {
-  const [sortKey, setSortKey] = React.useState<keyof T | null>(null);
-  const [sortDir, setSortDir] = React.useState<'asc' | 'desc'>('asc');
-
-  const handleSort = (key: keyof T) => {
-    const newDir = sortKey === key && sortDir === 'asc' ? 'desc' : 'asc';
-    setSortKey(key);
-    setSortDir(newDir);
-    onSort?.(key, newDir);
-  };
-
-  return (
-    <table className={className}>
-      <thead>
-        <tr>
-          {columns.map((col) => (
-            <th key={String(col.key)}>
-              {col.sortable ? (
-                <button onClick={() => handleSort(col.key)}>
-                  {col.header}
-                  {sortKey === col.key && (sortDir === 'asc' ? ' ↑' : ' ↓')}
-                </button>
-              ) : (
-                col.header
-              )}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((item) => (
-          <tr key={keyExtractor(item)}>
-            {columns.map((col) => (
-              <td key={String(col.key)}>
-                {col.render
-                  ? col.render(item)
-                  : String(item[col.key])}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
+<Table rows={users} columns={columns} rowKey={(u) => u.id} />; // T = User, so u.id is number without annotation
 ```
 
-Usage:
+Sorting belongs to the owner of `rows` (derive a sorted copy during render); a `useState(props.rows)` copy inside the table goes stale when the parent's rows change.
 
-```typescript
-type User = {
-  id: number;
-  name: string;
-  email: string;
-  role: 'admin' | 'user';
-  createdAt: Date;
-};
+## Choose the inference source with `NoInfer` (TypeScript 5.4+)
 
-function UserTable({ users }: { users: User[] }) {
-  const [sortedUsers, setSortedUsers] = React.useState(users);
+`T` is inferred from every prop that mentions it. A secondary prop such as `value` or `defaultValue` can widen `T` instead of being checked against it:
 
-  const handleSort = (key: keyof User, direction: 'asc' | 'desc') => {
-    const sorted = [...users].sort((a, b) => {
-      if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
-      if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
-      return 0;
-    });
-    setSortedUsers(sorted);
-  };
-
-  return (
-    <Table
-      data={sortedUsers}
-      columns={[
-        { key: 'name', header: 'Name', sortable: true },
-        {
-          key: 'email',
-          header: 'Email',
-          render: (user) => <a href={`mailto:${user.email}`}>{user.email}</a>,
-        },
-        {
-          key: 'role',
-          header: 'Role',
-          render: (user) => (
-            <span className={user.role === 'admin' ? 'badge-admin' : 'badge-user'}>
-              {user.role}
-            </span>
-          ),
-        },
-        {
-          key: 'createdAt',
-          header: 'Created',
-          render: (user) => user.createdAt.toLocaleDateString(),
-          sortable: true,
-        },
-      ]}
-      keyExtractor={(user) => user.id}
-      onSort={handleSort}
-    />
-  );
-}
-```
-
-## Generic Select/Dropdown
-
-Type-safe select with custom option rendering, searching.
-
-```typescript
+```tsx
 type SelectProps<T> = {
-  options: T[];
-  value: T | null;
+  options: readonly T[];
+  value: NoInfer<T> | null;          // checked against T, never a source for it
   onChange: (value: T) => void;
+  getKey: (option: T) => string;     // identity for <option value> and for finding the selection
   getLabel: (option: T) => string;
-  getValue: (option: T) => string | number;
-  placeholder?: string;
-  disabled?: boolean;
-  searchable?: boolean;
 };
 
-function Select<T>({
-  options,
-  value,
-  onChange,
-  getLabel,
-  getValue,
-  placeholder = 'Select...',
-  disabled = false,
-  searchable = false,
-}: SelectProps<T>) {
-  const [search, setSearch] = React.useState('');
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  const filtered = searchable
-    ? options.filter((opt) =>
-        getLabel(opt).toLowerCase().includes(search.toLowerCase())
-      )
-    : options;
-
-  const handleSelect = (option: T) => {
-    onChange(option);
-    setIsOpen(false);
-    setSearch('');
-  };
-
+export function Select<T>({ options, value, onChange, getKey, getLabel }: SelectProps<T>) {
   return (
-    <div className="select-wrapper">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        disabled={disabled}
-        className="select-trigger"
-      >
-        {value ? getLabel(value) : placeholder}
-      </button>
-
-      {isOpen && (
-        <div className="select-dropdown">
-          {searchable && (
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search..."
-              autoFocus
-            />
-          )}
-          <ul>
-            {filtered.map((option) => (
-              <li
-                key={getValue(option)}
-                onClick={() => handleSelect(option)}
-                className={value === option ? 'selected' : ''}
-              >
-                {getLabel(option)}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+    <select
+      value={value === null ? '' : getKey(value)}
+      onChange={(e) => {
+        const next = options.find((o) => getKey(o) === e.currentTarget.value);
+        if (next !== undefined) onChange(next);
+      }}
+    >
+      <option value="" disabled>Select…</option>
+      {options.map((o) => <option key={getKey(o)} value={getKey(o)}>{getLabel(o)}</option>)}
+    </select>
   );
 }
 ```
 
-Usage:
+With `value: T | null`, `<Select options={['asc', 'desc'] as const} value="random" … />` compiles because `T` widens to `'asc' | 'desc' | 'random'`; with `NoInfer` it is an error. Before TypeScript 5.4, get the same effect with a second parameter: `<T, V extends T = T>` and `value: V | null`.
 
-```typescript
-type Country = {
-  code: string;
-  name: string;
-  flag: string;
-};
+Match options by `getKey`, not by reference (`value === option`): the selected object usually comes from a different fetch or a copy and is never `===` to an option.
 
-const countries: Country[] = [
-  { code: 'US', name: 'United States', flag: '🇺🇸' },
-  { code: 'CA', name: 'Canada', flag: '🇨🇦' },
-  { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
-];
+## Literal unions from a prop: `const` type parameters (TypeScript 5.0+)
 
-function CountrySelector() {
-  const [country, setCountry] = React.useState<Country | null>(null);
-
-  return (
-    <Select
-      options={countries}
-      value={country}
-      onChange={setCountry}
-      getLabel={(c) => `${c.flag} ${c.name}`}
-      getValue={(c) => c.code}
-      searchable
-      placeholder="Select country"
-    />
-  );
+```tsx
+export function Tabs<const T extends readonly string[]>({ tabs, active }: { tabs: T; active: T[number] }) {
+  return <div>{tabs.map((t) => <button key={t} aria-pressed={t === active}>{t}</button>)}</div>;
 }
+
+<Tabs tabs={['profile', 'billing']} active="billing" />;
+// @ts-expect-error 'security' is not one of the tabs
+<Tabs tabs={['profile', 'billing']} active="security" />;
 ```
 
-## Generic List with Render Props
+Without `const`, `tabs` infers as `string[]` and any `active` string passes. On TypeScript 5.0 to 5.2 the constraint must be `readonly string[]` (a mutable constraint silently falls back to `string[]`); from 5.3 either works.
 
-Flexible list rendering with type-safe render props.
+## Syntax traps
 
-```typescript
-type ListProps<T> = {
-  items: T[];
-  renderItem: (item: T, index: number) => React.ReactNode;
-  renderEmpty?: () => React.ReactNode;
-  keyExtractor: (item: T, index: number) => string | number;
-  className?: string;
-  as?: 'ul' | 'ol' | 'div';
-};
-
-function List<T>({
-  items,
-  renderItem,
-  renderEmpty,
-  keyExtractor,
-  className,
-  as: Component = 'ul',
-}: ListProps<T>) {
-  if (items.length === 0 && renderEmpty) {
-    return <>{renderEmpty()}</>;
-  }
-
-  return (
-    <Component className={className}>
-      {items.map((item, index) => {
-        const key = keyExtractor(item, index);
-        const element = renderItem(item, index);
-
-        return Component === 'div' ? (
-          <div key={key}>{element}</div>
-        ) : (
-          <li key={key}>{element}</li>
-        );
-      })}
-    </Component>
-  );
-}
-```
-
-Usage:
-
-```typescript
-type Task = {
-  id: string;
-  title: string;
-  completed: boolean;
-  priority: 'low' | 'medium' | 'high';
-};
-
-function TaskList({ tasks }: { tasks: Task[] }) {
-  return (
-    <List
-      items={tasks}
-      keyExtractor={(task) => task.id}
-      renderItem={(task) => (
-        <div className={`task priority-${task.priority}`}>
-          <input type="checkbox" checked={task.completed} readOnly />
-          <span className={task.completed ? 'completed' : ''}>{task.title}</span>
-        </div>
-      )}
-      renderEmpty={() => (
-        <div className="empty-state">No tasks yet. Add one to get started!</div>
-      )}
-      as="div"
-    />
-  );
-}
-```
-
-## Constrained Generic Components
-
-Use constraints to ensure required properties or methods.
-
-```typescript
-// Constraint: items must have `id` property
-type HasId = { id: string | number };
-
-type GridProps<T extends HasId> = {
-  items: T[];
-  renderCard: (item: T) => React.ReactNode;
-  columns?: 2 | 3 | 4;
-};
-
-function Grid<T extends HasId>({
-  items,
-  renderCard,
-  columns = 3,
-}: GridProps<T>) {
-  return (
-    <div className={`grid grid-cols-${columns}`}>
-      {items.map((item) => (
-        <div key={item.id} className="grid-item">
-          {renderCard(item)}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// Usage - type must have `id` property
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-};
-
-<Grid
-  items={products}
-  renderCard={(product) => (
-    <div>
-      <img src={product.image} alt={product.name} />
-      <h3>{product.name}</h3>
-      <p>${product.price}</p>
-    </div>
-  )}
-  columns={3}
-/>;
-```
-
-## Multiple Generic Parameters
-
-Components with multiple type parameters.
-
-```typescript
-type PairProps<K, V> = {
-  pairs: Array<[K, V]>;
-  renderKey: (key: K) => React.ReactNode;
-  renderValue: (value: V) => React.ReactNode;
-};
-
-function KeyValueList<K, V>({ pairs, renderKey, renderValue }: PairProps<K, V>) {
-  return (
-    <dl>
-      {pairs.map(([key, value], index) => (
-        <React.Fragment key={index}>
-          <dt>{renderKey(key)}</dt>
-          <dd>{renderValue(value)}</dd>
-        </React.Fragment>
-      ))}
-    </dl>
-  );
-}
-
-// Usage
-type MetricKey = 'cpu' | 'memory' | 'disk';
-type MetricValue = { current: number; max: number };
-
-const metrics: Array<[MetricKey, MetricValue]> = [
-  ['cpu', { current: 45, max: 100 }],
-  ['memory', { current: 8, max: 16 }],
-  ['disk', { current: 250, max: 500 }],
-];
-
-<KeyValueList
-  pairs={metrics}
-  renderKey={(key) => <strong>{key.toUpperCase()}</strong>}
-  renderValue={(val) => (
-    <span>
-      {val.current}/{val.max}
-    </span>
-  )}
-/>;
-```
-
-## Generic Form Field Component
-
-Reusable form field with type-safe value handling.
-
-```typescript
-type FieldProps = {
-  name: string;
-  label: string;
-  error?: string;
-  required?: boolean;
-} & (
-  | { type: 'number'; value: number; onChange: (value: number) => void }
-  | { type: 'text' | 'email' | 'password'; value: string; onChange: (value: string) => void }
-);
-
-function FormField({
-  name,
-  label,
-  value,
-  onChange,
-  type,
-  error,
-  required = false,
-}: FieldProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
-    if (type !== 'number') {
-      onChange(raw);
-      return;
-    }
-    if (raw.trim() === '') return;
-    const parsed = e.target.valueAsNumber;
-    if (Number.isFinite(parsed)) onChange(parsed);
-  };
-
-  return (
-    <div className="form-field">
-      <label htmlFor={name}>
-        {label}
-        {required && <span className="required">*</span>}
-      </label>
-      <input
-        id={name}
-        name={name}
-        type={type}
-        value={value}
-        onChange={handleChange}
-        required={required}
-        aria-invalid={!!error}
-        aria-describedby={error ? `${name}-error` : undefined}
-      />
-      {error && (
-        <span id={`${name}-error`} className="error">
-          {error}
-        </span>
-      )}
-    </div>
-  );
-}
-
-// Usage
-function UserForm() {
-  const [name, setName] = React.useState('');
-  const [age, setAge] = React.useState(0);
-
-  return (
-    <form>
-      <FormField
-        name="name"
-        label="Name"
-        value={name}
-        onChange={setName}
-        type="text"
-        required
-      />
-      <FormField
-        name="age"
-        label="Age"
-        value={age}
-        onChange={setAge}
-        type="number"
-      />
-    </form>
-  );
-}
-```
-
-## Generic Modal/Dialog
-
-Type-safe modal with generic result type.
-
-```typescript
-type ModalProps<T> = {
-  isOpen: boolean;
-  onClose: (result?: T) => void;
-  title: string;
-  children: (submit: (result: T) => void) => React.ReactNode;
-};
-
-function Modal<T>({ isOpen, onClose, title, children }: ModalProps<T>) {
-  if (!isOpen) return null;
-
-  const handleSubmit = (result: T) => {
-    onClose(result);
-  };
-
-  return (
-    <div className="modal-overlay">
-      <div className="modal">
-        <header>
-          <h2>{title}</h2>
-          <button onClick={() => onClose()}>×</button>
-        </header>
-        <div className="modal-body">{children(handleSubmit)}</div>
-      </div>
-    </div>
-  );
-}
-
-// Usage
-type UserFormData = { name: string; email: string };
-
-function App() {
-  const [showModal, setShowModal] = React.useState(false);
-  const [formData, setFormData] = React.useState<UserFormData>({
-    name: '',
-    email: '',
-  });
-
-  const handleModalClose = (result?: UserFormData) => {
-    if (result) {
-      console.log('User submitted:', result);
-    }
-    setShowModal(false);
-  };
-
-  return (
-    <>
-      <button onClick={() => setShowModal(true)}>Add User</button>
-
-      <Modal<UserFormData>
-        isOpen={showModal}
-        onClose={handleModalClose}
-        title="Add New User"
-      >
-        {(submit) => (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              submit(formData);
-            }}
-          >
-            <input
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Name"
-            />
-            <input
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              placeholder="Email"
-            />
-            <button type="submit">Submit</button>
-          </form>
-        )}
-      </Modal>
-    </>
-  );
-}
-```
+| Trap | Fix |
+|---|---|
+| `const f = <T>(x: T) => x` in a `.tsx` file parses as JSX | `<T,>(x: T) => x` or `<T extends unknown>` |
+| Inference picks the wrong `T` and the error lands deep in a callback | pass it explicitly: `<List<Row> items={rows} render={(r) => r.id} />` |
+| `forwardRef` or `memo` around a generic component makes `T` `unknown` | cast the result to a generic call signature (react-19-patterns.md), or use the React 19 `ref` prop and skip `forwardRef` |
+| Discriminated props destructured in the parameter list stop narrowing after one is reassigned | keep destructured bindings `const`; narrowing of destructured unions needs TypeScript 4.6+ and unassigned bindings |
+| `Record<string, T>` lookups typed as always present | enable `noUncheckedIndexedAccess`, or type the map as `Partial<Record<K, T>>` |

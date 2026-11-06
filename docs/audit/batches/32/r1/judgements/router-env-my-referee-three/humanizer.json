@@ -1,0 +1,86 @@
+{
+  "skill": "humanizer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 12,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 113,
+  "max_total": 125,
+  "percent": 90.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/humanizer/SKILL.md",
+      "line": 27,
+      "evidence": "\"**Promotion:** seamless, powerful, innovative, vibrant, nestled, stacked praise.\" Current models already treat these words as press-release clich\u00e9s.",
+      "fix": "Shorten the word list to one example. Keep the expert part: blatant press-release tone is an older-model signal, and current output promotes through award and coverage lists."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/humanizer/SKILL.md",
+      "line": 17,
+      "evidence": "\"Diagnose in priority order: evidence risks ... first, then inflation and promotion, then structure, then vocabulary and mechanics.\" The process skill has no inline worked example of this ordering.",
+      "fix": "Add one short before/after pair under Workflow. It should show a vague attribution cut back to its supported claim before any vocabulary is touched, so the agent sees the evidence-first ordering applied."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/humanizer/SKILL.md",
+      "line": 30,
+      "evidence": "The over-correction gotcha (\"Replacing every dash with commas and periods produces the over-uniform short-sentence rhythm that is itself a current cue\") exists only in references/pattern-catalog.md. That file is not loaded for narrow edits.",
+      "fix": "Add one line to the 'Not tells' paragraph: 'Never mechanically replace every em dash or flagged word; uniform 8-20-word sentences are themselves a current cue, so vary the fix or keep the original.'"
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/humanizer/SKILL.md",
+      "line": 5,
+      "evidence": "\"Use when a draft sounds robotic or the user asks to humanize text or remove AI writing patterns.\" It has no trigger for requests that never mention AI (salesy, breathless, clich\u00e9-heavy copy) and few keywords.",
+      "fix": "Edit existing drafts to remove formulaic AI-like prose, promotional filler, vague attributions, inflated significance and repetitive sentence patterns while preserving facts, quotations, author voice and house style. Use when a draft sounds robotic, generic, salesy or breathless, or the user asks to humanize text, make it sound natural, or remove AI writing patterns, chatbot phrasing, clich\u00e9s or em-dash overuse, even without the word 'AI'. Not for authorship detection, factual research, translation, spelling-only proofreading, or writing from scratch."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/humanizer/evals/trigger-queries.json",
+      "line": 3,
+      "evidence": "\"make this paragraph sound more natural and human\". All 21 queries are terse one-liners with no file paths, personal context or typos. Neither evals.json nor the trigger queries covers the reference-loading path (chatbot correspondence, disclaimers) or protected code identifiers.",
+      "fix": "Rewrite about half the queries with realistic context, for example 'my manager says ~/drafts/launch_post.md reads like ChatGPT wrote it, can u fix it'. Add an evals.json case with a chatbot wrapper plus an inline API identifier, asserting that the wrapper is deleted and the identifier stays character-identical."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/humanizer/SKILL.md",
+      "line": 44,
+      "evidence": "\"Check before returning: every factual claim in the revision appears in the source; ...\" The check has no failure branch. Separately, \"Only a dense cluster of cues counts\" (line 30) gives no threshold. For a paragraph with only 'serves as' and 'pivotal', the decision whether to edit is left to guesswork.",
+      "fix": "Add: 'If any check fails, revert that sentence to the original or cut the unsupported part, then re-run the check.' Define a cluster, for example: three or more distinct cues from different diagnostic groups in one paragraph, or one evidence risk alone."
+    }
+  ]
+}

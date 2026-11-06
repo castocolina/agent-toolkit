@@ -1,0 +1,113 @@
+{
+  "skill": "mermaid-diagrams",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 13,
+    "D2": 12,
+    "D3": 12,
+    "D4": 14,
+    "D5": 13,
+    "D6": 13,
+    "D7": 11,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 100,
+  "max_total": 125,
+  "percent": 80.0,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/references/sequence-diagrams.md",
+      "line": 219,
+      "evidence": "The type references are syntax tutorials: '## Comprehensive Example: User Authentication Flow', '## Common Use Cases', and in erd-diagrams.md '## Tips for Database Design' and 'Best Practices'. The model already knows this Mermaid syntax and generic design advice.",
+      "fix": "Trim each type reference to non-obvious facts: version-specific syntax, silent failures, and renderer limits. Delete the generic examples, 'Common Use Cases' and 'Tips' sections."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 22,
+      "evidence": "The classification table in SKILL.md duplicates section 1 of references/authoring-rules.md, including the 'Reject the flowchart when\u2026' list, and 'Best Practices' has generic items such as 'Keep the .mmd source next to the code'.",
+      "fix": "Keep the table in one place, preferably SKILL.md, and have authoring-rules.md cover only sections 2-5. Drop the generic best-practice bullets."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 34,
+      "evidence": "'After the type is chosen, apply the rest of authoring-rules.md' sits next to line 14, 'Repairing a broken diagram: keep the intended meaning, fix only the syntax'. The procedure does not say which one wins for repairs or for edits to an existing diagram.",
+      "fix": "Add a short branch: for a repair, skip the palette, shape and proportion rules and change only syntax; for a new diagram, apply them in full."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": null,
+      "evidence": "The 'Common Pitfalls' section has good specific items (reserved `end`, inner-to-inner subgraph edges silently dropping `direction`). It has no gotchas for the duplicate-ID C4 failure, which the evals cover, or for version-dependent syntax.",
+      "fix": "Add pitfalls: duplicate C4 ids silently redirect Rel arrows; architecture-beta needs Mermaid 11.1+; C4 and gitGraph are rendered differently on GitHub. Give the reason for each."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 3,
+      "evidence": "Description includes 'Classify the question before choosing sequenceDiagram, classDiagram, ...', a body procedure, in the metadata. It has no keywords for mermaid.live, mmdc or export/render failures, although the body covers them.",
+      "fix": "description: Create, edit, and repair Mermaid diagrams (.mmd or fenced ```mermaid blocks in Markdown). Use when users ask to diagram, visualize, model, map out, or show software interactions, schemas, architecture, lifecycles, processes, schedules, proportions, or Git history, or when a Mermaid diagram fails to render or export (mmdc, GitHub), even without naming Mermaid. Picks among sequenceDiagram, classDiagram, erDiagram, C4, stateDiagram-v2, flowchart, architecture-beta, gantt, pie and gitGraph. Not for prose-only explanations, PlantUML or draw.io editing, matplotlib data charts, or interactive diagram-canvas components."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 18,
+      "evidence": "Line 18 and line 38 both say authoring-rules.md is mandatory, and the SKILL.md classification table (lines 22-30) repeats its section 1. The 'Do NOT load' column lists the other types by name. No row covers state, git, gantt or pie as separate files, and the architecture row's 'Do NOT load' column carries a warning that belongs in the body.",
+      "fix": "State the mandatory read once. Collapse the 'Do NOT load' column to one rule ('load only the file for the chosen type'). Move the icon warning to 'Renderer and host constraints'."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+      "line": null,
+      "evidence": "The palette section gives three blocks (A, B, C) and then says 'Copy a block' without a default. It also gives a theme-variable block with 'dark ink on a light page', and offers 'ask which theme it will sit on' as an alternative.",
+      "fix": "Name a default palette (A for structure, B for status) and a default light-page theme config. Mention dark-page handling only as an escape hatch."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "There are 20 queries, 10 true and 10 false. Most are terse one-liners with no file paths or context, e.g. 'Architecture mobile client, API, database, email provider.' Several negatives are easy ('Make infographic using HTML/CSS.'). 'Fix syntax error in this Mermaid snippet.' is labelled true but supplies no snippet. evals.json has no eval for a prose-only request (the 'stays prose' rule), no state/gantt/pie eval, and no case where the user asks for a flowchart that the skill would reject.",
+      "fix": "Rewrite the queries with realistic context (file paths, casual phrasing, typos). Add near-miss negatives such as 'explain this mermaid diagram', or 'build a bar chart from data in a CSV'. Add evals for a prose-only request, a state diagram, and 'flowchart of our API' (which should yield a sequence diagram)."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 14,
+      "evidence": "'Validate in the actual host or with mmdc' is advice, not a loop: there is no command, no 'fix and re-run until it passes', and no fallback when mmdc is unavailable. Line 18 says to read authoring-rules before classifying, while line 16 says to classify first.",
+      "fix": "Add a validation step: run `npx -y @mermaid-js/mermaid-cli -i in.mmd -o out.svg`, fix the reported parse error, and repeat. If mmdc cannot run, say so and name the unverified syntax. Make the order explicit: ground, read authoring-rules, classify, read the type file, draw, validate."
+    }
+  ]
+}

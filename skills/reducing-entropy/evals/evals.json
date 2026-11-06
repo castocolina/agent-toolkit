@@ -3,31 +3,58 @@
   "evals": [
     {
       "id": "explicit-minimize",
-      "prompt": "Please explicitly reduce entropy in this module. We have 14 wrappers around the same formatter; choose the smallest end state.",
-      "expected_output": "Load and name a reference mindset, compare final code amount, and identify deletion opportunities.",
+      "prompt": "billing/formatters.py has 14 wrappers around the same formatter (formatters.py, plus the test file and repo-wide caller, dynamic-lookup and registry searches in callers.txt). Shrink it to the least code that still works and delete whatever we don't need.",
+      "files": [
+        "evals/files/formatters.py",
+        "evals/files/test_formatters.py",
+        "evals/files/callers.txt",
+        "references/data-over-abstractions.md"
+      ],
+      "expected_output": "Applies the data-over-abstractions lens: deletes the uncalled format_cost, format_refund and format_deposit, collapses the remaining pure delegations into one function, keeps format_amount and format_price importable because __all__ makes them public SDK names, keeps format_invoice_total separate because it uses ROUND_HALF_EVEN, and reports a baseline for formatters.py that excludes test_formatters.py with the after count labelled projected.",
       "assertions": [
-        "Recognizes explicit request for manual-only skill",
-        "Names loaded reference mindset and principle",
-        "Compares end-state size and identifies deletion"
+        "Names the data-over-abstractions lens and states its principle.",
+        "Proposes deleting format_cost, format_refund and format_deposit, resting that on the reachability checks callers.txt covers (__all__, dynamic getattr/importlib lookups, registries or entry points, and external SDK consumers), not on an empty textual caller search alone.",
+        "Keeps format_invoice_total separate from the shared formatter because it rounds with ROUND_HALF_EVEN while _format uses ROUND_HALF_UP.",
+        "Keeps format_amount and format_price importable (for example as one function plus an alias) because __all__ marks them as public SDK names, or says removing them needs explicit approval.",
+        "States a baseline line count for formatters.py, keeps test_formatters.py out of the implementation count, and labels the after count as projected or to be re-measured with the same command.",
+        "Does not delete or weaken any test in test_formatters.py to reduce the count."
       ]
     },
     {
       "id": "feature-cost",
       "prompt": "I explicitly want a reducing-entropy review of adding a second config abstraction. What questions govern the decision?",
-      "expected_output": "Ask for the smallest solution, net code change, and what can be deleted.",
+      "expected_output": "Without code to measure, asks whether the second abstraction needs to exist and what the smallest codebase for the need is, names a likely deletion or consolidation as a hypothesis, and states how before/after totals will be measured while marking them pending.",
       "assertions": [
-        "Asks what smallest codebase solves the need",
-        "Measures total code before and after",
-        "Considers what can be deleted"
+        "Asks what smallest codebase solves the need, including whether the second abstraction needs to exist at all.",
+        "Specifies how before and after totals will be measured (one fixed scope and exclusions, for example a wc -l command) and marks the totals pending instead of stating measured numbers.",
+        "Considers what can be deleted, such as whether the existing config abstraction becomes obsolete.",
+        "Gives the decision framework now instead of only asking for the code."
+      ]
+    },
+    {
+      "id": "pagni-data-deletion",
+      "prompt": "we're shrinking the codebase. nobody reads audit_log or the created_at/updated_at columns, so drop them plus the migrations that add them.",
+      "files": [
+        "references/expensive-to-add-later.md"
+      ],
+      "expected_output": "Declines to drop the table, columns or migrations as entropy reduction, names PAGNI (timestamps and audit logs cannot be backfilled), and says dropping them is a separate data-retention change that needs explicit approval and a rollback plan.",
+      "assertions": [
+        "Does not drop the audit_log table, the timestamp columns or their migrations as part of the code reduction.",
+        "Names PAGNI and explains that timestamps and audit history cannot be recovered once dropped.",
+        "Says removing them is a separate data-retention change that needs explicit approval and a rollback plan."
       ]
     },
     {
       "id": "not-explicit",
-      "prompt": "Can you review this refactor? It might be nice to reduce duplication, but I have not asked for entropy minimization.",
-      "expected_output": "Do not apply manual-only skill absent explicit request.",
+      "prompt": "Can you review this refactor (refactor-email-validation.diff)? It might be nice to reduce duplication, but I have not asked for entropy minimization.",
+      "expected_output": "An ordinary correctness review: flags that signup() no longer runs email.strip().lower() before validating and checking for an existing user, so mixed-case or padded emails are now rejected or bypass the duplicate check; may mention the leftover EMAIL_RE copy in profile.py as optional, with no deletion plan and no line counts.",
       "assertions": [
-        "Does not invoke skill without explicit request",
-        "Does not impose deletion bias"
+        "Output contains no before/after line counts or net line-change figures.",
+        "Proposes deleting no function or file and makes no change required for size; any mention of the duplicate EMAIL_RE in profile.py or of folding code into is_valid_email is framed as optional.",
+        "Flags that signup() dropped email.strip().lower(), so padded or mixed-case emails now fail validation or slip past the existing-user check."
+      ],
+      "files": [
+        "evals/files/refactor-email-validation.diff"
       ]
     }
   ]

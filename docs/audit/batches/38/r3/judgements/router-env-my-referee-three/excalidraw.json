@@ -1,0 +1,77 @@
+{
+  "skill": "excalidraw",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 8,
+      "evidence": "Labels and connections are under 10% of a scene file; the rest is per-element styling and geometry.",
+      "fix": "Fold this motivation into the NEVER line on line 10 as its reason, for example '(labels are under 10% of the file)'. The README already explains the token measurements in full."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 46,
+      "evidence": "For a new diagram there is no original yet: run `new` with every node and only the supported edges to a temporary scaffold, have the worker add the unsupported edge to a copy of it, run `check` and `diff SCAFFOLD COPY --strict --allow ...`, publish the copy as OUT only on exit 0, then delete the scaffold.",
+      "fix": "Move this five-step scaffold procedure out of the Commands bullet list into a numbered sub-procedure under 'Worker contract', titled 'New diagram with a self-loop or rotated shape'. That keeps the Commands list as reference material and puts the phased steps where the Process pattern expects them."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 52,
+      "evidence": "## Worker contract (for changes no command expresses) ... Repairing the usual `check` errors: | Error | Fix |",
+      "fix": "Move the worker contract and the repair table (about 20 lines) to references/worker-contract.md. In the routing table, change the worker row to 'Read references/worker-contract.md and pass it as the worker brief'. Add 'Do NOT load it for summary, diff, new or edit routes', so the common command-only routes do not load it."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/excalidraw/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "\"Write a text-only step-by-step process description, no diagram needed.\" and \"Create a sequence diagram using PlantUML syntax.\" share no Excalidraw cues and test nothing.",
+      "fix": "Replace them with near-misses, for example 'Open whiteboard.excalidraw in the browser and export it as a PDF for the board deck' (export only, no scene edit) and 'My Obsidian vault has Excalidraw enabled; how do I change the default font in the plugin settings?'. Also add an output eval for `edit --remove` that checks no dangling arrows remain."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 43,
+      "evidence": "`edit` applies `--remove`, then `--relabel`, then `--add-node`, then `--connect`.",
+      "fix": "Add: '`--relabel` does not refuse a box label that already exists (only `new` and `--add-node` do); before relabelling a box, check `summary` for the target label, or a later `--connect` by label fails with `matches 2 elements` and needs ids.' Better still, make `edit` refuse a duplicate box label on relabel, as it already does for --add-node."
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "ui-ux-principles",
+      "percent": 92.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-one": 89.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 69,
+          "evidence": "**Trap.** `outline: none` with no replacement: keyboard users lose their place (SC 2.4.7). A control that looks disabled and still submits.",
+          "fix": "Shorten these activation-level traps to the bare reminder (`outline: none` without a `:focus-visible` replacement fails). Use the saved lines for a non-obvious fact, for example a MUI `disableRipple` or `focusVisibleClassName` override that removes the visible ring."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 18,
+          "evidence": "4. Review or verdict: pick the row of Input that matches what you have, then emit the table under Review output.",
+          "fix": "Add a short evidence-gathering sequence for reviews: (1) open the stylesheets and shared components the target imports, (2) find the theme so a `var()` or theme reference can be resolved before tokens and a11y are decided, (3) trace every request to its branches before states and loading are decided, then fill the table."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 121,
+          "evidence": "## NEVER \u2014 three items: no second theme, no invented line numbers, no UNVERIFIED figure as a fail line",
+          "fix": "Add: 'NEVER pass a11y contrast for a color read through a theme reference you have not resolved: the token name passes tokens, but its value can still sit under 3:1 in the dark theme.'"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "26 queries: 15 should-trigger and 11 should-not-trigger. Five of the positives are bare phrases ('review this page', 'make this look polished before the demo') that repeat the description's own trigger wording.",
+          "fix": "Bring the set to about 10 positives and 10 negatives. Replace the phrases taken from the description with indirect, context-heavy positives (file paths, a component name, a symptom) so the file tests whether the description generalises."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 74,
+          "evidence": "Exactly this header, then eight rows in this order ... One defect, one row \u2014 but nothing says how to report several defects of the same rule, or several files or views, in one row",
+          "fix": "Add under Review output: 'When a rule has several defects, put each file:line in the one evidence cell, separated by `; `, and one imperative fix per defect in the same order in the fix cell. With several files or views, prefix each piece of evidence with its file.'"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 64,
+          "evidence": "\u201cNames contain the visible text; every action is keyboard-operable.\u201d Several rule sections primarily reactivate familiar knowledge: accessibility thresholds here, fetch resolving on HTTP errors at line 71, and outline removal breaking keyboard navigation at line 77. The rule references also repeat elementary CSS and JSX patterns, diluting the stronger framework-specific gotchas and evidence-routing procedures.",
+          "fix": "Keep standard requirements as terse activation checks, trim repeated explanations and elementary fix-pattern snippets, and concentrate the remaining detail on non-obvious exceptions, framework behavior and adjudication decisions. Preserve required rule definitions and all attribution."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/evals/evals.json",
+          "line": 65,
+          "evidence": "\u201cThe a11y row is fail and its evidence cites form.tsx:19: the #ccc input border is under the 3:1 non-text contrast line\u201d. The supplied form.tsx specifies the border color but no adjacent background color or render, so this assertion requires a contrast verdict from an unprovided color pair, contrary to the source-only uncertainty policy.",
+          "fix": "Supply explicit adjacent background values or render notes establishing the white background. Otherwise expect na with unverified: needs render instead of requiring a contrast failure."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 40,
+          "evidence": "\u201cWith only code, no fixed container width and no page-level overflow-x is a pass.\u201d Following this branch for a non-wrapping flex row or intrinsically oversized content produces a responsive pass even though the page can overflow. Neither a fixed container width nor an explicit overflow-x declaration is necessary for horizontal overflow; line 99 separately requires uncertainty when width depends on content.",
+          "fix": "Remove the automatic source-only pass. Fail when source demonstrates an overflow defect, pass only when the available constraints establish reflow and primary-action reachability, and otherwise return na with unverified: needs render. Explicitly include nowrap, intrinsic sizing and flex/grid minimum-size behavior among source checks."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

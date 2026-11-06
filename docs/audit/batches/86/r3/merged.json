@@ -1,0 +1,62 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "sync-branch",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 28,
+          "evidence": "Never rebase onto local `main` (often stale, so the branch lands on an old base), never `git pull` (...), never `git merge` (...)",
+          "fix": "Remove this restatement. Step 3 (line 19) already says \"Rebase onto the remote ref, never local `main`; never `git pull` or `git merge`\". Move the three short reasons into that line so the rule appears once."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 15,
+          "evidence": "Step 2 puts the fetch, the remote-ancestry check with `git cherry`, the ownership question and the merge-commit question in one run of dense bullets, and step 3 (lines 20-22) packs three conditional rebase forms into prose",
+          "fix": "Split step 2 into ordered checks, each with a single outcome: fetch, remote ahead, ownership, merge commits. Write step 3(c) as a three-row decision table (condition, then the rebase command) so each branch can be scanned and followed without re-reading the paragraph."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 26,
+          "evidence": "The Gotchas section has three bullets, and two of them (lines 28-29) repeat rules already stated in steps 3 and 5",
+          "fix": "Replace the duplicated rules with facts the body does not cover. Example: with `rebase.updateRefs=true` in the user's config, `git rebase` also moves other local branches stacked on this one. Those branches are not pushed, so list them with `git branch --contains \"$orig\"` and report them."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 21,
+          "evidence": "If the fork range is shorter, ask \"fork-point would drop N commits; use the plain merge-base rebase instead, or stop?\"",
+          "fix": "`--fork-point` always returns a commit at least as recent as the plain merge-base. So whenever `fork` differs from `plain`, the fork range is shorter, the question always fires, and the `git rebase --onto \"$base/$target\" \"$fork\" \"$branch\"` form in step 3(c) can never run. It also labels the legitimate case (old upstream commits rewritten by a force-push or squash-merge) as dropped feature work. Before asking, list the dropped commits with `git log --oneline \"$plain..$fork\"`. Ask only when some of them are not in `$base/$target` by patch, checked with `git cherry \"$base/$target\" \"$fork\" \"$plain\"` showing `+` lines. Otherwise use the `--onto \"$fork\"` form."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

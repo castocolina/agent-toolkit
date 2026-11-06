@@ -1,0 +1,59 @@
+{
+  "skill": "c4-architecture",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": 30,
+      "evidence": "The extraction table includes routine mappings such as 'Compose service with `build:`, Dockerfile, Kubernetes Deployment, package with a `start` script' to Container, and postgres/redis/mongo images to ContainerDb. Together with familiar abstraction reminders, these dilute the otherwise valuable environment-reconciliation and renderer-specific knowledge in the dominant Workflow section.",
+      "fix": "Collapse the routine application/database mappings into one short reminder. Reserve the extraction table for the non-obvious shared-image command roles, library packaging, topic granularity and environment conflicts; retain the renderer-specific gotchas."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": 16,
+      "evidence": "'Developers or architects naming a container: add its Component view.' For a developer overview that names an API but supplies no internal responsibilities, this branch mandates a Component view without the evidence needed to draw it. The later instruction 'When there are no files, model only what the user stated' prevents inventing those internals, but no explicit fallback resolves this branch.",
+      "fix": "Add a Component view for developers or architects only when explicitly requested or when evidenced internal responsibilities justify it. If a Component view is requested but its internals are unknown, ask for module/responsibility evidence; otherwise provide Context + Container and offer the deeper view."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/c4-architecture/references/c4-syntax.md",
+      "line": 124,
+      "evidence": "'Rel(signIn, security, \"Validates with\")' omits technology, as do the facade relationship at line 126 and the dynamic internal call at line 140. Following these examples produces diagrams that fail SKILL.md's mandatory check: 'Every relationship is one-way, with a verb and a technology.'",
+      "fix": "Make the examples satisfy the verification rule: add an appropriate technology to internal calls, such as Rel(signIn, security, \"Validates with\", \"In-process call\"), and apply the same correction to other examples. Explicitly label genuinely unknown transports as unknown rather than inventing them."
+    }
+  ]
+}

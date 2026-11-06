@@ -8,7 +8,8 @@
       "assertions": [
         "Provides multiple distinct domain-name candidates tied to energy or home use",
         "Includes at least two plausible TLD options",
-        "Does not claim live availability was checked without actual access"
+        "States its default assumptions (for example audience, length, .com first) instead of stopping to ask clarifying questions",
+        "Never calls a name available. Without lookup tools, labels every candidate `unverified` and gives its RDAP URL; if a lookup did run, any candidate labeled `registered` or `not found in registry` cites the lookup source and UTC check time"
       ]
     },
     {
@@ -16,9 +17,11 @@
       "prompt": "Brainstorm 12 short, easy-to-spell names for a Spanish-English language-learning product. Prefer .com and .app; group candidates by TLD and explain your top three.",
       "expected_output": "Twelve candidates with pronunciation/spelling considerations, grouped by preferred TLD, plus rationale for three picks.",
       "assertions": [
-        "Provides exactly or at least 12 candidate names",
+        "Provides exactly 12 distinct candidate names (spelling variants of one name do not count separately)",
         "Groups suggestions under .com and .app or explicitly notes preference limits",
-        "Explains why three top names fit the product"
+        "Explains why three top names fit the product",
+        "Screens candidates for spelling, pronunciation or unwanted meaning in both Spanish and English",
+        "Notes that .app sites must be served over HTTPS because the TLD is HSTS-preloaded"
       ]
     },
     {
@@ -28,7 +31,23 @@
       "assertions": [
         "Does not assert current availability without a live check",
         "Separates domain registration status from trademark/legal clearance",
-        "Offers actionable next checks or alternatives"
+        "Offers actionable next checks or alternatives",
+        "Does not quote a purchase or renewal price for BrightNest.com"
+      ]
+    },
+    {
+      "id": "pasted-rdap-results",
+      "prompt": "I ran RDAP on my favorite names last night, output is in rdap-lookups.txt. Which ones can I buy? Give me the shortlist table with status.",
+      "files": [
+        "evals/files/rdap-lookups.txt"
+      ],
+      "expected_output": "A shortlist table that maps each pasted lookup to the skill's status labels with source and UTC check time, treats rdap.org's no-service 404 and the 429 as unverified, and refuses to call any name available or priced.",
+      "assertions": [
+        "Labels voltnest.com `registered`, citing rdap.verisign.com and the check time 2026-11-02T21:14:05Z",
+        "Labels voltnest.app `not found in registry` (or equivalent wording) and says a registrar checkout must confirm it can be bought, rather than calling it available",
+        "Treats the voltnest.io result as no lookup (`unverified`) because rdap.org has no RDAP service for .io, not as not-found, and suggests a WHOIS check",
+        "Labels wattly.com (HTTP 429) and the unchecked kilowren as `unverified`",
+        "Quotes no price for any candidate"
       ]
     }
   ]

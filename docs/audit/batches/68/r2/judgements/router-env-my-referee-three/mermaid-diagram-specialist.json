@@ -1,0 +1,77 @@
+{
+  "skill": "mermaid-diagram-specialist",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 9,
+      "evidence": "Delegate for producing Mermaid diagrams in a separate context. The preloaded `mermaid-diagrams` skill owns every rule: type choice, layout, styling, label syntax and validation.",
+      "fix": "Shorten this to 'Follow the preloaded `mermaid-diagrams` skill for all diagram rules; this file adds only the delegate role.' The description and the `skills:` field already say the rest."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 20,
+      "evidence": "restyle: change styling only; every node, edge and label stays.",
+      "fix": "Add a checkpoint: 'Before returning a restyle, list node IDs, edges and labels from the original and from the result and confirm the two lists match; report any difference as a repair change.' This makes the rule something the agent can check."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 32,
+      "evidence": "## Gotchas has two items; none covers a validator that crashes for reasons unrelated to the diagram",
+      "fix": "Add a gotcha: 'mmdc needs headless Chromium. A browser launch or sandbox error is not a parse error. Do not edit the diagram to fix it; report the diagram as unverified.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 16,
+      "evidence": "parse failure: validate the original first, fix the first reported error, re-run until clean.",
+      "fix": "Give the loop an exit: 'If the same error persists after 3 fix attempts, or the validator is unavailable, stop and return the best repair marked unverified, with the remaining error quoted.' As written, this branch never ends if the error persists or the validator cannot run."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 21,
+      "evidence": "2. If asked for a non-Mermaid format, say so and stop. If the supplied material cannot support a diagram, return the specific missing facts and stop.",
+      "fix": "Move these stop checks to step 1, before the task-kind decision. Otherwise the agent picks a type or starts a repair before it finds out it must stop."
+    }
+  ]
+}

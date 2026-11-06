@@ -1,0 +1,59 @@
+{
+  "skill": "plugin-forge",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/plugin-forge/scripts/bump_version.py",
+      "line": 49,
+      "evidence": "`if not plugin_json_path.exists():` immediately raises `Plugin manifest not found`. However, references/plugin-structure.md explicitly identifies plugin.json as optional, and SKILL.md step 3 directs standard-layout plugins to this helper. A valid standard-layout plugin with only a marketplace entry version therefore fails before the helper reads that version.",
+      "fix": "After verifying the plugin directory and marketplace entry, treat an absent optional plugin.json as an empty manifest. Bump an entry-only version without creating plugin.json, or report SHA versioning when neither location contains a version. Add regression tests for both manifestless cases while retaining errors for genuinely missing plugin directories."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 37,
+      "evidence": "The gotcha says a relative source `must start with ./`, and step 1 classifies local sources only by their ./ prefix. Yet references/marketplace-schema.md:33 explicitly supports bare sources such as `\"source\": \"formatter\"` through `metadata.pluginRoot`. That valid input has no workflow branch and contradicts the gotcha.",
+      "fix": "Resolve bare sources through metadata.pluginRoot before classifying their layout. Route the resolved plugins/<name> layout to the scripts and other local layouts to manual editing, and use the resolved directory for validation. Qualify the ./ requirement so it does not reject the documented pluginRoot shorthand."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/plugin-forge/evals/evals.json",
+      "line": 17,
+      "evidence": "The version eval expects `Minor bump expected 1.5.0 in both manifests` without supplying their initial contents, although the contract deliberately never adds an entry version. The stale-update assertion also permits `minor` or `patch` for a newly added skill, contrary to the documented minor-bump rule.",
+      "fix": "Supply initial manifest fixtures for the version eval and assert that only existing version fields are updated, with no new marketplace version field. Tighten the stale-update assertion to require a minor bump to 1.3.0, or the explicitly supported switch to SHA versioning, rather than accepting a patch bump."
+    }
+  ]
+}

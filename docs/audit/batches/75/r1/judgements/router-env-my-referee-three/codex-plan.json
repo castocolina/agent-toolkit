@@ -1,0 +1,68 @@
+{
+  "skill": "codex-plan",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 49,
+      "evidence": "Plan structure: Overview, Prerequisites, Phases with tasks, Testing Strategy, Dependency Graph, Risks, Rollback ... Complexity 1-10, Test-First Approach and testable Acceptance Criteria.",
+      "fix": "Shorten this to the parts the model would not produce without being told: task IDs in Dependencies so tasks can run in parallel, and Location as verified file paths. The model already knows a generic plan outline, so drop the rest of the section list."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 43,
+      "evidence": "check that every confirmed requirement maps to a task with acceptance criteria, list gaps, and do not implement unless asked.",
+      "fix": "Give step 7 a short expert review checklist. Check that each task's Location path exists or is listed as a new file. Check that the Dependencies form no cycles. Check that each stated assumption is either confirmed or flagged. Check that the Rollback covers destructive migrations. This makes the review step teach judgment, not only a mapping check."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 35,
+      "evidence": "codex exec -s workspace-write -c model_reasoning_effort=high [-m <id>] \"$(cat prompt_to_codex.md)\"",
+      "fix": "Add a gotcha. A long prompt passed through \"$(cat ...)\" goes on the command line as one argument and can hit ARG_MAX or get mangled by shell quoting. If the prompt file is large, have the user pipe it on stdin with `codex exec ... - < prompt_to_codex.md`."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 28,
+      "evidence": "git status --porcelain=v1 --untracked-files=all > /tmp/codex-plan-before.txt; git diff --stat >> /tmp/codex-plan-before.txt",
+      "fix": "Step 5 asks for 'a literal absolute path', but the command shown has none, and the fixed /tmp file name lets a second run (for example the -2 suffix case) or another project overwrite the baseline. Show the exact form: `cd /abs/project && git status --porcelain=v1 --untracked-files=all > /tmp/codex-plan-<plan-file-stem>-before.txt; git diff --stat >> /tmp/codex-plan-<plan-file-stem>-before.txt`. Use the same stem for the `after` file in step 7."
+    }
+  ]
+}

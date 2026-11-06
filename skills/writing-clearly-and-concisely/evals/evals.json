@@ -3,22 +3,135 @@
   "evals": [
     {
       "id": "tighten-prose",
-      "prompt": "Rewrite: \u201cThis groundbreaking update leverages cutting-edge systems to provide a seamless experience, ensuring users can effortlessly enjoy robust performance.\u201d",
+      "prompt": "The team wants this line in CHANGELOG.md (v2.4 entry) rewritten before release: “This groundbreaking update leverages cutting-edge systems to provide a seamless experience, ensuring users can effortlessly enjoy robust performance.”",
       "expected_output": "Produce shorter, specific prose without puffery or invented detail.",
       "assertions": [
-        "Removes promotional phrases",
+        "Removes the promotional phrases \"groundbreaking\", \"cutting-edge\", \"seamless\" and \"effortlessly\"",
         "Removes unsupported promotional claims without adding unsupported specifics; if no concrete fact is supplied, uses accurate neutral wording or notes the limitation",
         "The rewritten sentence itself is shorter than the supplied original; any explanation is brief and clearly separate"
       ]
     },
     {
       "id": "active-docs",
-      "prompt": "Make clearer for technical docs: \u201cThe configuration is loaded by the service when it is started.\u201d",
+      "prompt": "Make clearer for technical docs: “The configuration is loaded by the service when it is started.”",
       "expected_output": "Use active voice and retain meaning.",
       "assertions": [
         "Service is grammatical subject",
         "Uses active verb such as loads",
         "Preserves startup timing and configuration"
+      ]
+    },
+    {
+      "id": "policy-invariants",
+      "prompt": "Our data retention page (evals/files/retention-policy.md) is way too wordy for the internal wiki. Tighten it up.",
+      "files": [
+        "evals/files/retention-policy.md"
+      ],
+      "expected_output": "A shorter policy that keeps: exports must be deleted within `RETENTION_DAYS`; unless under an active legal hold, which must not be deleted until legal releases it; teams should use the `export-purge` job wherever reasonably possible (manual deletions are not in the audit log); authorised staff may request a one-off extension of up to 30 days via the DATA queue; the portal message \"Export blocked: legal hold active\" quoted exactly, with the outcome that the download does not proceed. en-GB spellings kept. No change log or word counts appended.",
+      "assertions": [
+        "The deletion rule is still a must-level requirement tied to `RETENTION_DAYS`, and the legal-hold exception is kept, including that held exports must not be deleted until the legal team releases the hold",
+        "The `export-purge` recommendation stays should-level: it is not dropped and not turned into a bare imperative or a must",
+        "Keeps the feasibility qualifier on the `export-purge` recommendation (\"wherever reasonably possible\" or an equivalent such as \"where possible\")",
+        "The extension stays a permission (may or equivalent) for authorised staff, with the 30-day limit and the DATA queue",
+        "`RETENTION_DAYS`, `export-purge` and the message \"Export blocked: legal hold active\" appear verbatim",
+        "Keeps the blocked-download outcome: when the message shows, the download does not proceed",
+        "Keeps the source's en-GB spellings (for example \"authorised\") rather than switching to en-US",
+        "The rewrite is shorter than the original and drops the throat-clearing such as \"It is important to note that\"",
+        "Returns the rewritten policy without an appended list of changes or word counts"
+      ]
+    },
+    {
+      "id": "unknown-actor",
+      "prompt": "Put this in active voice for the postmortem: “The feature flag was disabled at 14:05 UTC, and the cache was flushed shortly after.”",
+      "expected_output": "Keeps the passive (or another actor-free wording) because the source names no actor, and says so in one short line; keeps both events and 14:05 UTC.",
+      "assertions": [
+        "Does not name an actor (an engineer, the on-call, a team, a system) that the source does not name",
+        "Keeps both events, their order, and the time 14:05 UTC",
+        "Explains in one short line that the source names no actor, so active voice would invent one, or asks who performed the actions"
+      ]
+    },
+    {
+      "id": "already-minimal",
+      "prompt": "can you make this shorter? “Never force-push to `main`.”",
+      "expected_output": "Returns the sentence unchanged with a short note that it is already minimal.",
+      "assertions": [
+        "Keeps the negation, the force-push action and `main` verbatim",
+        "Does not return a version that drops the negation, the action or the branch just to be shorter",
+        "Says briefly that the sentence is already minimal"
+      ]
+    },
+    {
+      "id": "brand-voice-readme",
+      "prompt": "Here's our README (evals/files/brand-readme.md). Marketing wants to keep the playful brand voice, but can you point out where it's wordy?",
+      "files": [
+        "evals/files/brand-readme.md"
+      ],
+      "expected_output": "Numbered suggestions only, each quoting an original fragment with a proposed replacement and a reason; no rewritten README or section; commands untouched.",
+      "assertions": [
+        "Does not return a rewritten README or a rewritten section in place of the original",
+        "Gives numbered suggestions, each quoting a fragment of the original and proposing replacement text",
+        "No suggestion changes `brew install pocketbrew` or `pocketbrew sync --dry-run`",
+        "No suggestion adds a feature, metric or contact that the README does not state"
+      ]
+    },
+    {
+      "id": "draft-error-message",
+      "prompt": "Write the error message our CLI prints when the user's API token has expired. They fix it by running `acme login`.",
+      "expected_output": "A one- or two-sentence message: the token expired, run `acme login` to sign in again. No invented lifetime, URL or contact.",
+      "assertions": [
+        "States that the API token has expired",
+        "Tells the user to run `acme login`, verbatim",
+        "Does not invent a token lifetime, URL, support contact or error code",
+        "The message leads with what failed and what to do, with no apology, preamble or puffery"
+      ]
+    },
+    {
+      "id": "no-text",
+      "prompt": "can you tighten this up? it's going in the release notes",
+      "expected_output": "One short line asking for the text to tighten; no invented sample and no rewrite.",
+      "assertions": [
+        "Asks the user to supply the text to tighten",
+        "Does not invent sample release-note text or present a rewrite of text that was not supplied"
+      ]
+    },
+    {
+      "id": "quoted-testimonial",
+      "prompt": "Tighten this case study for the blog: evals/files/case-study.md",
+      "files": [
+        "evals/files/case-study.md"
+      ],
+      "expected_output": "The surrounding prose is shorter (Fernwood Logistics, Leeds, Formline, start of the 2025 financial year, nine to three working days, rollout to warehouse staff kept); Priya Nair's quotation is reproduced word for word; any suggestion about the quotation comes after the rewrite as a numbered suggestion, not applied.",
+      "assertions": [
+        "Priya Nair's quotation appears word for word as in the source, including \"basically drowning in paper\" and \"really, really great\"",
+        "The prose outside the quotation is shorter and drops filler such as \"It is worth mentioning that\" and \"At the present time\"",
+        "Keeps the facts: Leeds, Formline, the start of the 2025 financial year, nine to three working days, and the rollout to warehouse staff",
+        "Any suggestion to shorten the quotation is listed after the rewrite as a separate suggestion and is not applied to the quoted text"
+      ]
+    },
+    {
+      "id": "brand-voice-no-sample",
+      "prompt": "write the empty-state copy for our Saved Searches page in our brand voice",
+      "expected_output": "Short plain copy for an empty Saved Searches page (no saved searches yet), with no invented tone and no invented button or menu names, ending with `Needs: a sample of the brand voice` (other Needs lines allowed for missing product details).",
+      "assertions": [
+        "Gives short empty-state copy saying there are no saved searches yet",
+        "The copy is plain: it does not invent a tone such as jokes, slang, emoji or exclamation-heavy enthusiasm",
+        "Ends with a `Needs:` line asking for a sample of the brand voice",
+        "Does not name a button, menu path or feature the prompt does not give, unless it is marked with a `Needs:` line"
+      ]
+    },
+    {
+      "id": "merge-duplicate-sections",
+      "prompt": "evals/files/setup-guide.md repeats itself. Clean it up and merge the duplicate install sections.",
+      "files": [
+        "evals/files/setup-guide.md"
+      ],
+      "expected_output": "One install section that keeps `pip install ledgerline`, the Python 3.9 condition requiring `pip install \"pip<24\"` first, and the `ledgerline --version` check; the database section kept with its heading; a note naming the removed or renamed heading and its old anchor.",
+      "assertions": [
+        "Produces a single install section instead of two",
+        "The merged section keeps the Python 3.9 condition and the exact command `pip install \"pip<24\"`, with must-level force",
+        "Keeps `pip install ledgerline`, `ledgerline --version` and `LEDGERLINE_DB_URL` verbatim",
+        "Keeps the \"Configuring the database\" heading and its facts",
+        "Adds a note naming the heading that was removed or renamed (and so its anchor)"
       ]
     },
     {

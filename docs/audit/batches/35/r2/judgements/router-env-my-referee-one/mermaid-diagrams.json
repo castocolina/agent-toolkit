@@ -1,0 +1,68 @@
+{
+  "skill": "mermaid-diagrams",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/references/other-diagrams.md",
+      "line": 18,
+      "evidence": "The state example repeats basic transitions such as `[*] --> Draft`, followed by the syntax catalogue '`<<choice>>` for a branch, `<<fork>>` and `<<join>>` for parallel paths'. This is familiar Mermaid syntax rather than the renderer-specific knowledge that makes the rest of the skill valuable.",
+      "fix": "Condense the basic state example and syntax catalogue; retain the classDef restrictions, non-obvious parser traps, and any example needed to demonstrate those traps."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 57,
+      "evidence": "`NEVER leave out or mark optional the reply to a request in a sequence: every ->> call gets its -->> reply unless the user says it is fire-and-forget`. Sequence diagrams can legitimately omit unimportant returns; this universal rule also pressures syntax-only repairs to add edges despite their preservation constraint.",
+      "fix": "Default to explicit replies for detailed synchronous request/response diagrams, but permit deliberate omission in overviews. Never add reply edges during syntax-only repairs, and do not infer an interaction that the supplied facts do not establish."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/evals/evals.json",
+      "line": 14,
+      "evidence": "The login eval lists `references/authoring-rules.md` as an input file, and numerous other evals similarly supply skill references through `files`. Passing these inputs to both with-skill and without-skill runs exposes the baseline to the skill's instructions.",
+      "fix": "Keep `files` limited to task inputs such as the fixtures under `evals/files/`. Let the with-skill agent discover references through SKILL.md, and exclude those instructional references from baseline inputs."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/references/sequence-diagrams.md",
+      "line": 18,
+      "evidence": "Following the login example's invalid branch reaches `API--x U: 401`, depicting a lost message rather than a delivered HTTP error response. The API activation is also closed only inside the valid branch by `API-->>-U: 200 + token`, leaving the alternative's activation lifetime misleading.",
+      "fix": "Use ordinary dashed response arrows for both outcomes (`API-->>U: 200 + token` and `API-->>U: 401`), then put `deactivate API` immediately after the alt block so the activation encloses either outcome."
+    }
+  ]
+}

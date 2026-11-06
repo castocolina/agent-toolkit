@@ -1,0 +1,135 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "mermaid-diagrams",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 92.0,
+        "router-env-my-referee-three": 92.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+          "line": 75,
+          "evidence": "The 16-line 'Shapes mean roles' section teaches familiar mappings such as 'Step | Rectangle | A[Step]' and 'Decision ... | Diamond | A{Valid?}'. Together with standard grammar surveys in the type references, this dilutes the renderer-specific expertise with knowledge current models already possess.",
+          "fix": "Compress the standard shape vocabulary and basic grammar surveys into brief activation reminders. Retain the stadium-versus-rounded-rectangle trap, house-style overrides, host constraints, silent failures, and examples that demonstrate non-obvious behavior."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/evals/evals.json",
+          "line": 189,
+          "evidence": "The fulfilment prompt requests 'colour-code it by team', but the color-related assertion only requires 'Every `classDef` sets `fill`, `stroke`, and `color` together'. It passes vacuously without classDefs and does not verify that nodes actually receive consistent team colors.",
+          "fix": "Add assertions requiring distinct, consistently applied team colors for Sales, Warehouse, Shipping, and Support, including a check that every team-owned node receives the corresponding styling."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/mermaid-diagrams/references/erd-diagrams.md",
+          "line": 31,
+          "evidence": "The example uses 'CUSTOMER ||--o{ ORDER : \"places\"', while ORDER declares 'int id PK' and 'int customer_id FK'. This contradicts step 5, which requires a non-identifying '..' relationship when the foreign key is not part of the child's primary key. Following the example produces a semantically wrong relationship that still renders successfully.",
+          "fix": "Replace that relationship with 'CUSTOMER ||..o{ ORDER : \"places\"' so the worked example matches its declared surrogate primary key and the schema-to-diagram procedure."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 18,
+          "evidence": "The fork covers parse repair, semantic repair, and new diagrams, but not appearance-only edits. Its semantic-repair row reads section 7 and, for flowcharts, section 4\u2014not section 6, 'Contrast and classDef palette'. Thus the supported request to change an existing node's fill color has no explicit path to the required contrast and text-color checks.",
+          "fix": "Add an appearance-only editing branch that reads authoring-rules.md section 6, loads advanced-features.md when changing theme/config, preserves diagram semantics, and checks text/fill contrast before validation."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/references/advanced-features.md",
+          "line": 28,
+          "evidence": "Export block lists `-b transparent`, `-w 900 -s 2`, `-c config.json` and the Built-in themes list: standard mmdc flags and theme names the model already knows",
+          "fix": "Keep only the non-obvious facts (the `-i README.md -o out.md` rewrite, `themeVariables` honored only with `theme: base`, `click` stripped on GitHub). Drop the generic flag examples."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 10,
+          "evidence": "The fork table routes by job type. It gives no 'before drawing, ask' check for an unclear request, e.g. what to do when the user's facts do not settle the type or the cardinalities.",
+          "fix": "Add one line to step 1: if the diagram type or a cardinality is not settled by the supplied material, state the assumption in the reply, or ask one question when two types are plausible."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 50,
+          "evidence": "The last two Gotchas bullets only point elsewhere ('the causes are in authoring-rules.md section 4...', 'the fixes are in authoring-rules.md section 7') and give no reason or consequence",
+          "fix": "Write the one-line consequence inline, e.g. 'NEVER link a node inside a subgraph to an outside node while relying on that subgraph's `direction`: Mermaid silently drops it.' Keep the pointer after it."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 3,
+          "evidence": "description: \"Create, edit, and repair Mermaid diagrams ... Picks the diagram type from the question being answered, with flowchart as the last resort. Not for prose-only explanations...\" The middle sentence describes mechanics, not user intent or an imperative trigger.",
+          "fix": "Replace with: \"Create, edit, and repair Mermaid diagrams (.mmd files or ```mermaid blocks in Markdown). Use when users ask to diagram, visualize, model, map out or show sequence flows, class models, ER diagrams or database schemas, state machines, flowcharts, C4 or architecture-beta software and infrastructure architecture (including terse requests such as 'architecture: mobile client, API, database, email provider'), Gantt schedules, pie proportions or Git branch history, or when a Mermaid diagram fails to render or export (mmdc, GitHub), even without naming Mermaid. Choose the type from the question the diagram answers, using flowchart only as a last resort. Not for prose-only explanations, explaining an existing diagram without changing it, PlantUML or draw.io work, matplotlib data charts, or interactive diagram-canvas components.\""
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+          "line": 3,
+          "evidence": "\"Other files cite sections by number and heading, so keep both stable.\" SKILL.md step 2 depends on numeric section citations (sections 1-3, 6-7, 4-5) into a single 7-section file.",
+          "fix": "Keep the numbers, but note in SKILL.md that the citations are fixed. Optionally split sections 4-6 (flowchart-only) into a flowchart reference so non-flowchart work never loads them."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+          "line": 104,
+          "evidence": "Three palettes A/B/C are offered, plus 'Any other palette ... is fine' for custom colors, with no rule for choosing between them",
+          "fix": "Add a default selector: A for architecture or service maps, B when the diagram shows status, C for before/after. Say that mixing palettes in one diagram is an error."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "Most should-trigger queries name the diagram type (class diagram, ERD, gitGraph, Gantt); the one on GitHub version support is labelled should_trigger false although the description claims GitHub rendering problems and version-gated architecture-beta.",
+          "fix": "Add 2-3 should-trigger queries that do not name a diagram (e.g. 'show how a request moves through auth, cache and DB for the wiki'). Relabel or reword the GitHub-version query so it is a clear near-miss, e.g. one asking about Mermaid version history with no diagram task."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 18,
+          "evidence": "Step 4 validates with mmdc until exit 0, but authoring-rules.md section 2 sets a size rule (height/width at or above 0.4, under about three screens, split otherwise) that no workflow step checks",
+          "fix": "Add to step 4: after exit 0, check the rendered size against authoring-rules.md section 2 and split the diagram if it fails."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

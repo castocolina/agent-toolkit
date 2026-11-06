@@ -1,0 +1,68 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 106,
+      "evidence": "Two full example commands (lines 106-118) followed by a table listing every flag of both scripts (lines 120-124), while each script's --help already documents the same flags, defaults and examples",
+      "fix": "Keep one short example per script and only the required flags plus the --type enum in the table; point to `bash scripts/<name>.sh --help` for the full optional-flag list, keeping the non-obvious rules (single quotes, never zero field flags, exact source values)"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 40,
+      "evidence": "\"4. **The release gate** (the plan's exit gates and every release decision use this one rule)\" sits inside the test-plan branch, but the routing table sends release decisions there as \"section 3, step 4\", and sections 6 and 8 refer back to it as well",
+      "fix": "Move the release gate and its waiver exception into its own numbered section (for example '## 5. Release gate'), route the release-decision row and the plan's exit gates to it, and leave plan step 4 as a one-line pointer, so the Process pattern has one branch per deliverable"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/evals/evals.json",
+      "line": 23,
+      "evidence": "Several assertions are too vague to grade: \"Preconditions/data for each\" (line 23), \"Specific checkout title\" (line 37), \"Identifies expiry and one-time risks\" (line 10)",
+      "fix": "Make them checkable: 'Each case lists a seeded account or data item in its preconditions'; 'Title names the checkout submit action and the no-op symptom (e.g. [Checkout] Submit click does nothing)'; 'Has a K risk for link use after 30 minutes with a boundary case on both sides (29:59 / 30:01) and a K risk for link reuse whose case asserts the password is unchanged'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 129,
+      "evidence": "\"Exit 0 (if a run log is supplied, do not rerun: report its exit code and JSON fields verbatim and check its command against the rules above): parse the JSON line, read the `file` it names, quote each supplied field's actual value back...\" packs the run-log branch, about seven post-run steps and the exit 2 and exit 1 branches into one bullet",
+      "fix": "Split it into a short exit-code decision list (0 / 2 / 1 'does not exist' / 1 'already exists'), with the run-log case as its own first bullet, and turn the exit-0 follow-up into a numbered checklist: read file, quote supplied values, confirm Unknowns, run section 8, edit, ask the user for each Open Question"
+    }
+  ]
+}

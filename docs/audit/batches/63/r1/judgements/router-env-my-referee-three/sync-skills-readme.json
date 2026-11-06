@@ -1,0 +1,86 @@
+{
+  "skill": "sync-skills-readme",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 12,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 46,
+      "evidence": "Gotcha 'Folded or literal descriptions: reading only the first line truncates the summary to `>` or `|`.' repeats step 1 line 11: 'Descriptions may be folded (`>`) or literal (`|`) YAML: join their lines with single spaces.'",
+      "fix": "Keep one copy. Leave the instruction in step 1 and either delete the gotcha or cut step 1 to 'join folded/literal lines (see Gotchas)'."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 32,
+      "evidence": "'Summary: an action-oriented phrase of about 50 characters or fewer, built only from facts in that description'",
+      "fix": "Add a short shortening procedure: drop the 'Use when...' trigger clause, keep the leading verb and object, join two capabilities with '&', and cut qualifiers until the text is 50 characters or fewer."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 50,
+      "evidence": "'Do not use Grep to parse frontmatter; read the file.' gives no reason, and there is no gotcha for hyphenated keywords that can never match a single token",
+      "fix": "Add the reason, e.g. 'Grep returns one line per match, so it misses folded descriptions and matches `name:` in body text'. Add a gotcha: 'Hyphenated keywords (command-creator, web-to-markdown, c4-architecture) never equal a single token; match them against the whole name instead.'"
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 2,
+      "evidence": "'Regenerate the \"Available Skills\" table in the root README.md from skills/*/SKILL.md. Use after adding, removing, renaming or re-describing a skill, or when the table is stale.' has no casual user-intent phrasings",
+      "fix": "Regenerate the \"Available Skills\" table in the root README.md from each skills/*/SKILL.md name and description. Use after adding, removing, renaming or re-describing a skill, when the skills list or table in the README is stale or missing an entry, or when asked to update or sync the README skill list, even without the word \"table\". Not for editing any other README section or for a skill's own README.md."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 33,
+      "evidence": "'Save a copy of README.md (`cp README.md \"$(mktemp)\"`)' throws away the temp path, so step 5 ('`diff` the saved copy against README.md' and 'restore the copy') has no file to diff or restore",
+      "fix": "Use `backup=$(mktemp) && cp README.md \"$backup\"` in step 4, `diff \"$backup\" README.md` in step 5, and `cp \"$backup\" README.md` on a mismatch."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 14,
+      "evidence": "'take the first category whose keyword equals a hyphen-separated token of the skill name' conflicts with the hyphenated keywords 'command-creator', 'web-to-markdown', 'c4-architecture', 'game-changing', 'soft-skill' and 'pull-request', which can never equal one token, so those branches never resolve",
+      "fix": "State the rule as: 'a keyword matches when its hyphen-separated tokens appear as a contiguous run of the name's tokens (trailing s ignored)'. Alternatively, split the hyphenated keywords into single tokens."
+    }
+  ]
+}

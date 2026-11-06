@@ -1,0 +1,68 @@
+{
+  "skill": "mermaid-diagram-specialist",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 11,
+    "D3": 11,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 18,
+      "evidence": "3. Draft, then validate as the skill prescribes; on failure fix and re-validate.",
+      "fix": "Cut the generic fix-and-retry loop, which the preloaded skill already prescribes in its Validate step. Keep only what the delegate adds, for example: \"Validate each diagram separately; for a repair, validate the original first so you can report whether the failure was a parse error.\""
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 15,
+      "evidence": "repair: decide first whether it fails to parse or renders with wrong meaning, then edit; a minimal diff beats a rewrite.",
+      "fix": "Give each outcome of the decision its own action: \"parse failure: run the validator, fix only the first reported error and re-run until it is clean; wrong meaning: compare each edge and cardinality with the source material, then list each corrected relationship.\" The fork then changes what the agent does."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 25,
+      "evidence": "- Change the diagram type in a repair without stating why.",
+      "fix": "Add the reason, as the other items do, for example: \"Change the diagram type in a repair without stating why: the caller's surrounding prose and links assume the original type.\" Also give line 23 a why: \"an invented edge reads as fact to the caller.\""
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 13,
+      "evidence": "1. Name the task kind and make its first decision: new / repair / restyle",
+      "fix": "Cover the cases the three branches miss: \"If the request mixes kinds (for example restyle plus a fix), do the repair first, then the restyle, and report both change lists. If the caller asks for a non-Mermaid format, say so and stop.\" Also make line 24 consistent with line 16: a restyle never drops or renames nodes, even with a note."
+    }
+  ]
+}

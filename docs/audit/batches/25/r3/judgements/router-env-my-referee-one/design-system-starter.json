@@ -1,0 +1,59 @@
+{
+  "skill": "design-system-starter",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 41,
+      "evidence": "The wide-gamut conversion uses `formatHex(toGamut('rgb', 'oklch')(parse(value)))`. `formatHex` drops alpha, so a foreground such as `oklch(0 0 0 / 0.4)` becomes opaque #000000. Against white, the subsequent script reports 21:1 instead of approximately 2.85:1 for the rendered translucent foreground, falsely passing normal-text contrast.",
+      "fix": "Preserve foreground alpha with `formatHex8(toGamut('rgb', 'oklch')(parse(value)))` and pass that eight-digit hex to the existing compositing calculation. Require translucent backgrounds to be resolved over their actual underlying surface before using the opaque-background calculation."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/design-system-starter/references/component-examples.md",
+      "line": 110,
+      "evidence": "\u201cAdd variants as optional props with a default matching existing behavior\u201d is followed by a basic optional union and token lookup example. This repeats familiar additive-API advice rather than demonstrating the skill's less-obvious compatibility-window and migration contracts.",
+      "fix": "Replace the generic union/lookup demonstration with a compact renamed-token or deprecated-prop alias example showing the old contract remaining functional through the next major release and its announced removal in the following major."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/design-system-starter/evals/evals.json",
+      "line": 9,
+      "evidence": "\u201cOutputs a token file with color, typography, and spacing roles\u201d checks coverage, but none of the token-output assertions requires parseable JSON or validates the DTCG value shapes. An output using obsolete string colors and dimensions could satisfy the assertions while claiming the stable 2025.10 format.",
+      "fix": "Add verifiable assertions to the token-generating cases requiring JSON parseability and validation against the selected token format, including object-valued colors and dimensions for DTCG 2025.10. Include an older-toolchain case that permits legacy strings only when the output explicitly selects that compatibility format."
+    }
+  ]
+}

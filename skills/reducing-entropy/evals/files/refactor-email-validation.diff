@@ -1,0 +1,47 @@
+diff --git a/users/validators.py b/users/validators.py
+new file mode 100644
+--- /dev/null
++++ b/users/validators.py
+@@ -0,0 +1,6 @@
++import re
++
++EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
++
++def is_valid_email(email):
++    return bool(EMAIL_RE.match(email))
+diff --git a/users/signup.py b/users/signup.py
+--- a/users/signup.py
++++ b/users/signup.py
+@@ -1,14 +1,12 @@
+-import re
+-
+ from users.models import User
+-
+-EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
++from users.validators import is_valid_email
+ 
+ 
+ def signup(email, password):
+-    email = email.strip().lower()
+-    if not EMAIL_RE.match(email):
++    if not is_valid_email(email):
+         raise ValueError("invalid email")
+     if User.objects.filter(email=email).exists():
+         raise ValueError("email already registered")
+     return User.objects.create_user(email=email, password=password)
+diff --git a/users/profile.py b/users/profile.py
+--- a/users/profile.py
++++ b/users/profile.py
+@@ -1,12 +1,13 @@
+ import re
+ 
+ EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+ 
+ 
+ def change_email(user, new_email):
+     new_email = new_email.strip().lower()
+     if not EMAIL_RE.match(new_email):
+         raise ValueError("invalid email")
+     user.email = new_email
+     user.save(update_fields=["email"])
++    return user

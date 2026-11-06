@@ -1,0 +1,16 @@
+{
+  "findings": [
+    {
+      "severity": "medium",
+      "file": "scripts/audit/audit.py",
+      "line": 234,
+      "summary": "The multiline flow check counts brackets inside YAML comments as closing delimiters, allowing invalid frontmatter to pass strict checking.",
+      "failure_scenario": "A command containing `---\\ndescription: Inspect changes\\nallowed-tools: [\\n  Read\\n  # ]\\n---\\n` has an unclosed YAML list, but concatenation produces `[ Read # ]` and bad_flow_collection treats the commented bracket as the closing delimiter. Consequently, `check --kind command --strict` succeeds although the frontmatter cannot parse; the pre-change check rejected it.",
+      "fix": "Preserve continuation-line boundaries and make the flow scanner skip YAML comments outside quoted values before counting delimiters. Add a strict-check regression where the only closing bracket is commented out."
+    }
+  ],
+  "verdict": "approve",
+  "scope": "59ab5ae1..76b06797 (fix wave for the 5 mediums)",
+  "lane": "router-env/my-referee-one",
+  "resolution": "medium fixed in the next commit"
+}

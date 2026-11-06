@@ -1,0 +1,104 @@
+{
+  "skill": "feedback-mastery",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 13,
+    "D3": 13,
+    "D4": 13,
+    "D5": 14,
+    "D6": 13,
+    "D7": 12,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 106,
+  "max_total": 125,
+  "percent": 84.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/feedback-mastery/SKILL.md",
+      "line": null,
+      "evidence": "Section 4 steps \"Acknowledge the concern, not the conclusion\" and \"Reflect back what was heard\", and section 5 steps \"Acknowledge the business goal\" and \"Show the evidence\", are generic active-listening and negotiation advice. references/difficult-conversation-scripts.md also gives stock lines such as \"Upset\" and \"Shutting down\" (\"You've gone quiet. What are you thinking?\").",
+      "fix": "Cut the steps the model already produces unprompted. Keep only the non-obvious parts: work on instances, not the label; name what would settle each disputed claim; ask how the manager wants the next instance flagged; the ramp-up cost of adding people. Drop the generic reaction lines for upset, shutting down and anger, or compress them to one line."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/feedback-mastery/SKILL.md",
+      "line": null,
+      "evidence": "Sections 3 to 6 are linear numbered steps with little \"before X, ask yourself\" reasoning. The reasoning that exists (an SBI built on an impression is still an accusation) is concentrated in section 1.",
+      "fix": "Add one or two decision questions at the delivery and reset steps, for example \"Before drafting, ask: could the other person disagree with this sentence on factual grounds? If not, it is probably an inference.\""
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/feedback-mastery/SKILL.md",
+      "line": null,
+      "evidence": "The Gotchas are strong, but some entries are general advice (\"Never put performance feedback in a public channel\"). The environment-specific failure modes are missing, such as a chat-quoted feedback draft being pasted into the channel, or an AI-drafted recap sent verbatim.",
+      "fix": "Add one or two gotchas about mistakes the agent itself makes. Examples: adding praise to soften a recognition message; padding an SBI opener with \"I feel like...\"; promising confidentiality the user cannot guarantee."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/feedback-mastery/SKILL.md",
+      "line": 4,
+      "evidence": "allowed-tools: Read, Glob, Grep (comma-separated). The spec defines allowed-tools as a space-separated string.",
+      "fix": "allowed-tools: Read Glob Grep (space-separated, so tool pre-approval parses on strict clients)."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/feedback-mastery/SKILL.md",
+      "line": null,
+      "evidence": "The path table's Load column says \"scripts\" without a filename, and the reference-gating rules repeat in both the table and the final Reference routing section.",
+      "fix": "Use the filename in the Load column (references/difficult-conversation-scripts.md). Keep the Do NOT Load conditions in one place."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/feedback-mastery/SKILL.md",
+      "line": null,
+      "evidence": "Section 6 fixes defaults (\"within one working day\", \"two weeks\") and a recap template. Section 5 requires \"at least two concrete options\" in every case, with no escape for a situation where only one option is viable.",
+      "fix": "Add a short escape hatch: if only one option is feasible, say so, name the cost of refusing it, and still record the decision."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/feedback-mastery/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "\"Two engineers can\u2019t agree on an approach; how can I facilitate a fair discussion?\" is labelled should_trigger false. The description claims \"giving feedback to two people in a conflict you lead\", and SKILL.md section 2 has a facilitation row. The evals also have no case for the follow-up recap or for recognition.",
+      "fix": "Relabel or rewrite the query so it is clearly a technical disagreement, not interpersonal conflict. Add evals/evals.json cases for a recognition message and a recap, with verifiable assertions such as \"stops after the effect with no 'but next time'\" and \"recap lists owner, action, date and open items\"."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/feedback-mastery/SKILL.md",
+      "line": null,
+      "evidence": "The path table has no row for the user who has no concrete example and is unsure whether the issue is a pattern or a one-off. It also has no row for feedback that spans several people or a team.",
+      "fix": "Add a row or a sentence covering team-wide feedback, with a default (give it individually, not as a group announcement), plus a fallback for when the user cannot supply a single dated instance."
+    }
+  ]
+}

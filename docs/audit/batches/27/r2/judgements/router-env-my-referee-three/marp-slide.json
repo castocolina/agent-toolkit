@@ -1,0 +1,68 @@
+{
+  "skill": "marp-slide",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/marp-slide/SKILL.md",
+      "line": 68,
+      "evidence": "Write to the requested path; else next to the user's existing deck, else a workspace path such as `slides/<topic>.md`. ... If writing is impossible, return the Markdown inline and never claim a save.",
+      "fix": "Cut the Save section to one line: \"Use `/mnt/user-data/outputs/` only if it exists; report whether the deck was rendered or only linted.\" The model already knows the rest of the path fallback order and not to claim a save it did not make."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/marp-slide/SKILL.md",
+      "line": 20,
+      "evidence": "Apply the smallest fix per defect: split a dense slide, shorten a heading, repair a directive, or swap in one template's `<style>` block when the colors themselves are the problem.",
+      "fix": "Add a decision rule for when to keep the user's own CSS and when to replace it with a template style block. For example: keep the user's CSS when it defines classes the deck uses; when you swap, carry over every `section.<class>` the deck references so no `_class` directive is left without a rule."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/marp-slide/evals/evals.json",
+      "line": 11,
+      "evidence": "\"Content headings are concise and slides have at most five bullets each.\"",
+      "fix": "Make the check measurable, for example \"Every `##` heading is at most 45 characters and no slide has more than five bullets\". Also drop `assets/template-tech.md` from `files` in precise-slides, because it is a skill asset and not a user input file."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/marp-slide/SKILL.md",
+      "line": 35,
+      "evidence": "gradient | `template-gradient.md` | visual keynote, little text | dark gradient; `<!-- _class: warm -->` or `teal` per slide",
+      "fix": "Add to the gradient row or to Gotchas: \"`_class` replaces classes. To use a variant on a title or divider slide, write `<!-- _class: lead warm -->`. A bare `warm` drops `lead` and loses the centering.\" Today this only appears in references/marp-syntax.md, which the gradient path does not load."
+    }
+  ]
+}

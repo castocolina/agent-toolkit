@@ -1,0 +1,86 @@
+{
+  "skill": "sync-branch",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 10,
+    "D2": 11,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 9,
+    "D7": 15,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 97,
+  "max_total": 125,
+  "percent": 77.6,
+  "grade": "C",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 13,
+      "evidence": "The workflow largely activates familiar Git operations: \"git fetch origin --prune\", \"git rebase\" and the standard conflict-resolution loop. The Gotchas section mixes valuable history hazards with familiar explanations such as \"Plain --force overwrites commits\"; weighted by lines, expert-only knowledge is a minority.",
+      "fix": "Keep the exact execution commands, but remove explanations of common CLI behavior already enforced by the procedure, such as the repeated definition of --force. Concentrate explanatory prose on non-obvious history decisions and environment-specific failure modes."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 22,
+      "evidence": "\"If the base was rewritten ... check git log --left-right --cherry-pick ... first so only feature-only patches are replayed.\" Inspecting this log does not constrain the unconditional rebase in step 2; dropped old-base commits can appear on the HEAD side alongside feature commits.",
+      "fix": "Add a rewritten-base procedure before rebasing: establish and verify the original base and feature-only range, then use git rebase --onto \"origin/$target\" \"$old_base\" \"$branch\" for that case. If the original base cannot be established reliably, stop and report rather than replaying an unverified range."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 21,
+      "evidence": "\"Unquoted branch names break on $ or spaces in the name.\" Git branch names cannot contain spaces, and a dollar sign produced by expanding $branch is not recursively expanded by the shell; literal names and variable expansions have different hazards.",
+      "fix": "Replace this gotcha with: Quote saved variables as \"$branch\" to prevent word splitting and glob expansion. Single-quote literal names such as 'feature/weird$name' so the shell does not expand $name. Git refnames cannot contain spaces."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 15,
+      "evidence": "\"git push --force-with-lease origin \\\"$branch\\\"\" follows a fetch without checking whether the remote feature branch contains commits absent locally. The fetch can update origin/$branch to another contributor's existing tip, allowing the subsequent lease-protected push to overwrite those commits.",
+      "fix": "After fetching and before rebasing, save the local HEAD and remote feature tip, and verify that the remote tip is an ancestor of the saved local HEAD; stop on remote-only commits. Push using an explicit expected-tip lease, --force-with-lease=\"refs/heads/$branch:$expected_oid\". If the remote branch does not exist, use an explicit expected-absence lease instead."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 14,
+      "evidence": "Step 3 instructs the agent to resolve conflicts and continue, or to \"git rebase --abort\", but then mandates a final message saying the rebase stopped and directing the user to resolve and continue. That message is false after successful resolution and unusable after aborting. It also treats every nonzero rebase exit as a conflict.",
+      "fix": "Make step 3 a consistent fail-closed branch matching the conflict eval: when conflicts occur, leave the rebase paused, name unresolved paths, state that nothing was pushed, and give manual --continue/--abort guidance. For non-conflict failures, report the actual error without claiming conflicts or suggesting continuation of a nonexistent rebase."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 12,
+      "evidence": "The in-progress-operation check names only \".git/rebase-merge\" and \"MERGE_HEAD\". It omits cherry-pick and apply-backend rebase markers, and a literal .git/rebase-merge path does not work in linked worktrees where .git is a file.",
+      "fix": "Resolve operation-state paths with git rev-parse --git-path rather than assuming .git is a directory. Stop when rebase-merge, rebase-apply, MERGE_HEAD, CHERRY_PICK_HEAD or sequencer state exists."
+    }
+  ]
+}

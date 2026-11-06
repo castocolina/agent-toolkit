@@ -1,0 +1,59 @@
+{
+  "skill": "mermaid-diagram-specialist",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 9,
+    "D5": 15,
+    "D6": 15,
+    "D7": 8,
+    "D8": 15
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 4,
+      "evidence": "The description says \"Mermaid diagram specialist for creating flowcharts, sequence diagrams, ERDs, and architecture visualizations\". Delegation scenarios appear under the ignored \"usage\" field, while repair and restyling scenarios and scope boundaries appear only in the body.",
+      "fix": "Create, repair, and restyle Mermaid diagrams in Markdown or .mmd files: flowcharts, sequences, ERDs, class and state diagrams, and C4 or infrastructure views. Use when asked to visualize a process, schema, call chain, or architecture, or fix a Mermaid diagram that fails to render or communicates the wrong relationships, even without naming Mermaid. Not for prose-only explanations or non-Mermaid formats."
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 3,
+      "evidence": "\"category: tech\", \"usage:\", \"input:\", and \"output:\" are unsupported plugin-agent frontmatter fields; Claude Code silently ignores them.",
+      "fix": "Replace the frontmatter with:\n---\nname: mermaid-diagram-specialist\ndescription: >-\n  Create, repair, and restyle Mermaid diagrams in Markdown or .mmd files: flowcharts, sequences, ERDs, class and state diagrams, and C4 or infrastructure views. Use when asked to visualize a process, schema, call chain, or architecture, or fix a Mermaid diagram that fails to render or communicates the wrong relationships, even without naming Mermaid. Not for prose-only explanations or non-Mermaid formats.\nskills: [mermaid-diagrams]\n---\nThis leaves only supported agent fields and places routing guidance in the description the host actually reads. Keep any additional input guidance in the body."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 25,
+      "evidence": "\"## Output contract\" specifies fenced Mermaid source, a type rationale, validation status, assumptions, and repair explanations, but the body has no sentence stating when the task is done.",
+      "fix": "Add: \"The task is done when every requested diagram has been produced within scope, validation has passed or its limits and unverified constructs have been reported, and the Mermaid source, type rationale, assumptions, and any repair explanation have been returned.\""
+    }
+  ]
+}

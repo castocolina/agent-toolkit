@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "command-creator",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 52,
+          "evidence": "Before delegating any step, ask: what does a subagent give here that the main thread lacks: isolation from a large search, a specialized registered agent, or parallel work? If none, run it directly.",
+          "fix": "Shorten this to the parts specific to commands: 'Delegate only with an agent type that exists (built-ins: Explore, Plan, general-purpose) or with context: fork plus agent:, and honor \"no agents\".' Drop the generic when-to-delegate reasoning, which the model and harness already handle."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 43,
+          "evidence": "The Process workflow (## Workflow) is followed by Tool-style reference tables (## Location, ## Patterns, ## Frontmatter, ## Arguments and pre-run context), so the phased checkpoints and the lookup material are interleaved",
+          "fix": "Mark each table as the lookup for its workflow step (for example 'Step 3 lookup' over ## Location and 'Step 5 lookup' over ## Frontmatter), so the Process pattern stays the spine and the tables read as its reference."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/command-creator/evals/evals.json",
+          "line": null,
+          "evidence": "Six evals cover iterative fixing, simple execution, a side-effect workflow, arguments that are special to the shell and a name collision, but none covers the Plan, approve, execute pattern or the approved-update path (step 2 option 2)",
+          "fix": "Add an eval that asks for a plan-then-implement command, with assertions that it writes nothing before an explicit approval signal and that it names where the plan is saved. Add a second eval in which the user approves updating an existing command, with assertions that it reads the file first, keeps the frontmatter and shows a diff."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 15,
+          "evidence": "If the workflow needs bundled scripts or reference files, say a skill fits better (out of scope here).",
+          "fix": "Give this branch an outcome: 'say a skill fits better and stop without writing; if the user still wants a command, write one that calls the existing scripts by path and flag each missing script as a manual step.' Also note that the agent cannot see the / menu (line 41), so it should tell the user to check for /name instead of claiming it checked."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/command-creator/references/examples.md",
+          "line": 53,
+          "evidence": "The submit-stack example takes `$ARGUMENTS` as the basis for the commit message, then shows `git commit -m \"[Single sentence summary of what was done]\"`. Double-quoted shell text still expands dollar expressions and command substitutions, contradicting SKILL.md's required single-quoted encoding for argument-derived values.",
+          "fix": "Add an explicit encoding step for the final commit message: encode it as one single-quoted shell word, escaping embedded single quotes, then run `git commit -m <encoded-message>`. Update the example snippet accordingly and preserve its upstream attribution."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 134,
+          "evidence": "The checklist requires an approved update to have 'no other skill or command shares the name (if one does, stop and use the step 2 template)'. When both a same-named skill and command exist, as in the collision fixture, approving either offered update returns to the same collision menu rather than completing the update.",
+          "fix": "Make the initial collision offer distinguish viable resolutions: a renamed command, an explicitly approved resolution of the shadowing collision before updating the command, or routing a requested SKILL.md edit out of scope. Carry the selected resolution into the approved-update checklist instead of returning to the unchanged menu."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 68,
+          "evidence": "'The frontmatter is read only when `---` is on line 1; broken YAML loads the body with no fields and no error' repeats the same loading constraint stated again in Gotchas at line 92.",
+          "fix": "Keep the complete silent-frontmatter warning and its auto-invocation consequence once in Gotchas; replace the repeated explanation in Frontmatter with a short cross-reference."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

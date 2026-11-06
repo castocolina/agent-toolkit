@@ -1,0 +1,35 @@
+$ git status
+On branch fix/token-expiry
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	modified:   config/settings.json
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   src/auth.ts
+
+$ git diff --cached
+diff --git a/config/settings.json b/config/settings.json
+index 4c1e2d0..9a7b3f1 100644
+--- a/config/settings.json
++++ b/config/settings.json
+@@ -1,4 +1,4 @@
+ {
+-  "featureFlags": { "newCheckout": false },
++  "featureFlags": { "newCheckout": true },
+   "sessionTtlSeconds": 3600
+ }
+
+$ git diff
+diff --git a/src/auth.ts b/src/auth.ts
+index 2b8d7e4..c0f19a2 100644
+--- a/src/auth.ts
++++ b/src/auth.ts
+@@ -10,5 +10,5 @@ export function isExpired(token: Token, now: number = Date.now()): boolean {
+   if (!token.expiresAt) {
+     return true;
+   }
+-  return now > token.expiresAt;
++  return now >= token.expiresAt;
+ }

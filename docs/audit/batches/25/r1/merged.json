@@ -1,0 +1,153 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "design-system-starter",
+      "percent": 90.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 90.4,
+        "router-env-my-referee-one": 89.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 34,
+          "evidence": "Never encode state by color alone; pair it with text, an icon, or another perceivable cue.",
+          "fix": "Delete this item, or fold it into the line-29 state-check gotcha. Current models already know WCAG 1.4.1, so this line only activates knowledge they have and costs a Gotchas slot."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 37,
+          "evidence": "Use native interactive elements. A `<button>` needs `onClick`, not a duplicate Enter handler",
+          "fix": "Keep only the non-obvious part, that a <button> holds only phrasing content so Header/Body layouts belong on a container, and drop the generic 'use native elements' advice."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 12,
+          "evidence": "Turn repeated product decisions into stable, adoptable shared contracts, not a redesign of isolated screens.",
+          "fix": "Add a short 'before starting, ask' frame for sizing the work. Example: with one app and no repeated pattern, ship tokens plus 2-3 primitives and defer the component hierarchy and versioning (steps 5 and 8) until a second consumer exists."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 34,
+          "evidence": "Never encode state by color alone; pair it with text, an icon, or another perceivable cue.",
+          "fix": "Give a reason only experience teaches, or replace the item with a design-system-specific landmine. Example: error and success roles that differ only in hue collapse for deuteranopes, so check them as a pair with a CVD simulation and not only against the background."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 21,
+          "evidence": "resolve each foreground/background pair to final values and compute the WCAG 2.x ratio from relative luminance",
+          "fix": "This is a fragile numeric step that the agent must do by mental arithmetic for every theme and state. Pin the procedure: give the exact formula (sRGB linearization threshold 0.04045, L = 0.2126R + 0.7152G + 0.0722B, ratio (L1+0.05)/(L2+0.05)) and tell the agent to run it as a short script rather than estimate it. Better still, bundle scripts/check-contrast with a smoke test."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/design-system-starter/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "\"Create a one-off poster illustration with a retro color palette.\" / \"Pick a font pairing for my personal r\u00e9sum\u00e9 website.\" / \"Build a landing page with a pricing table and hero copy.\"",
+          "fix": "Replace these easy negatives with near-misses that share token or component vocabulary. Examples: 'convert our tokens.json to Android XML with Style Dictionary', 'fix the hover color on this one Button', 'write a Tailwind config for this single landing page'. Also add realistic context such as file paths and team names to the positives."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/design-system-starter/evals/evals.json",
+          "line": null,
+          "evidence": "\"Documents a 4.5:1 pair and a 3:1 pair\"",
+          "fix": "Make the assertion verifiable against the output. For example: 'Lists at least one text/background pair with a computed ratio of 4.5 or more and one UI-boundary pair of 3 or more, each with hex values that reproduce that ratio'."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 18,
+          "evidence": "Greenfield: skip to step 3.",
+          "fix": "The greenfield branch skips step 2, so no pilot is chosen, yet step 7 says 'Integrate into the pilot screen'. That branch reaches an undefined target. Change the line to 'Greenfield: skip the audit; in step 2 pick the first screen being built as the pilot.'"
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/design-system-starter/templates/design-tokens-template.json",
+          "line": 5,
+          "evidence": "\"color\": { \"$type\": \"color\", ... (group-level $type, also on font.size, spacing, radius) while SKILL.md line 36 says 'with group-level `$type`, a passing schema run proves nothing about values'",
+          "fix": "Step 4 tells the agent to copy this template, but the template uses group-level $type, which the Gotcha on line 36 warns makes schema validation meaningless. Put $type on each token in the template, or add a note that the schema check needs per-token $type and that the template's grouped form must be validated by alias and value checks instead."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/design-system-starter/templates/component-template.tsx",
+          "line": 5,
+          "evidence": "\"export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>\" introduces a 26-line stock button wrapper dominated by familiar prop forwarding, ref forwarding and class-name assembly. Unlike the token-format and browser-validation gotchas, this supplies little knowledge beyond ordinary React usage.",
+          "fix": "Replace the routine wrapper boilerplate with a compact example demonstrating design-system-specific state/token contracts and escape-hatch constraints; retain only implementation details needed to illustrate those contracts."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 16,
+          "evidence": "\"A first pass always contains\" both \"a component list by level\" and \"a component documentation guide.\" This expands a token-only request with little repository context into component-system deliverables, although step 5 explicitly recognizes token-only work.",
+          "fix": "Keep the full bundle as the default for complete starter-system requests. For token-only work, require only the token artifact, applicable theme mappings and measured contrast results; make component inventories, documentation and pilot integration conditional on component-system scope."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/design-system-starter/evals/evals.json",
+          "line": 18,
+          "evidence": "The accessible-dark-tokens prompt requests \"a component API convention for Button and FormField,\" but its assertions only check semantic colors, theme mapping and \"States 4.5:1 normal-text and 3:1 large-text/UI contrast targets.\" An answer omitting both requested component APIs can pass this case.",
+          "fix": "Add assertions checking Button and FormField props, defaults and state/accessibility contracts. Also require resolved foreground/background values and computed ratios for both themes rather than accepting threshold statements alone."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/design-system-starter/templates/design-tokens-template.json",
+          "line": 68,
+          "evidence": "The prescribed template defines numeric spacing entries such as \"\\\"1\\\": {\\\"$value\\\": {\\\"value\\\": 4, \\\"unit\\\": \\\"px\\\"}}\" and font-size scales, but no semantic typography or spacing aliases. Following this template alone cannot satisfy the first-pass requirement for named typography and spacing roles while keeping consumers off primitive scales.",
+          "fix": "Add semantic typography roles such as body and label, and semantic spacing roles such as control.inlinePadding and stack.gap, aliasing the existing scale tokens. Show consumers referencing these roles rather than numeric spacing or font-size scale entries."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/design-system-starter/checklists/design-system-checklist.md",
+          "line": 25,
+          "evidence": "\"interactive elements contain only phrasing content\" incorrectly generalizes the button restriction to all interactive elements. Applying this release check to a valid card link containing a heading or other flow content would reject valid HTML: an anchor has a transparent content model.",
+          "fix": "Make the restriction element-specific: buttons require phrasing content and prohibit interactive descendants; anchors follow their transparent content model and prohibit nested interactive content. Validate each native element against its own content model instead of imposing the button rule universally."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

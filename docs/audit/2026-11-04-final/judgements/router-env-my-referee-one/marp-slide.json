@@ -1,0 +1,59 @@
+{
+  "skill": "marp-slide",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 11,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "high",
+      "file": "skills/marp-slide/evals/evals.json",
+      "line": 40,
+      "evidence": "The redesign case supplies only \"evals/files/incident-review.md\", whose image is `![bg right:40%](img/latency-chart.png)`. Reading skills/marp-slide/evals/files/img/latency-chart.png returned ENOENT. The gradient case likewise supplies only a template and reference while requiring photos/hero.jpg, photos/before.png and photos/after.png. These cases cannot complete the prescribed image-resolution and visual-validation checks from the supplied inputs.",
+      "fix": "Bundle the incident chart and three keynote photos under evals/files/, and include them in the respective files lists with staging paths that preserve the Markdown-relative image locations. Alternatively, explicitly make missing-image handling the expected outcome rather than expecting a completed image deck."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/marp-slide/SKILL.md",
+      "line": 59,
+      "evidence": "Fallback validation requires \"theme: default with the template <style> block intact (or gaia/uncover...)\". However, references/theme-css-guide.md:20 instructs custom-theme users to delete that block and set `theme: name`. The built-in-theme branch also conflicts with the unconditional `lead` requirement at line 39: references/marp-syntax.md:36 says only gaia defines lead among the built-ins. Following these supported branches produces decks that the skill's own lint rejects.",
+      "fix": "Branch validation explicitly by deck mode: bundled templates require theme: default and embedded CSS; built-in themes require their actual supported classes; registered custom themes require valid theme metadata and registration but may omit embedded CSS. Apply lead only when the selected theme defines it, or supply a matching rule."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/marp-slide/assets/template-basic.md",
+      "line": 31,
+      "evidence": "`section:last-of-type { border-bottom: none; }` also appears in template-dark.md and template-colorful.md. Because each Marp slide occupies its own SVG, this selector matches every slide's section rather than just the final slide, removing the border from every non-lead slide. This contradicts the skill's own warning about positional section selectors.",
+      "fix": "Replace the positional selector in all three templates with an explicit `section.final` rule and apply `<!-- _class: final -->` only to the intended final slide. Tell the authoring workflow to preserve or relocate that directive when replacing sample slides, combining it with other required classes."
+    }
+  ]
+}

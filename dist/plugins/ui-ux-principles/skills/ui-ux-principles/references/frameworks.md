@@ -1,14 +1,24 @@
 # Framework constructs per rule
 
-Rule ids mapped to constructs; no rule text. Entries marked UNVERIFIED were not confirmed against the framework docs on 2026-10-30.
+Styling-stack facts the rules turn on and that no other file holds; standard constructs (`Button` variants, `:hover`, `aria-label`, utility scales) are left to the model. Stack traps that decide a verdict live in `SKILL.md` (MUI `sx` strings, Tailwind arbitrary values, `hover:` wrapping, `dark:` patches, `Skeleton` ARIA) or in the rule file named. Entries marked UNVERIFIED were not confirmed against the framework docs on 2026-10-30.
 
-| rule | MUI v7 | Tailwind | plain CSS |
-|------|--------|----------|-----------|
-| loading | `Skeleton` (`variant` text/circular/rectangular/rounded, `animation` pulse/wave/false; wrap a component to infer size), `CircularProgress`, `LinearProgress` (only Skeleton was read) | `animate-pulse`; `motion-safe:` / `motion-reduce:` variants exist (pairing UNVERIFIED) | `@keyframes` plus `prefers-reduced-motion`; `aspect-ratio`, `min-height` to reserve space |
-| responsive | `Grid` with `size={{ xs: 12, md: 6 }}`, responsive `sx` values, `useMediaQuery` | unprefixed = base, `sm:` 40rem, `md:` 48rem, `lg:` 64rem, `xl:` 80rem, `2xl:` 96rem (min-width); `max-*` variants for below-width | `@media (min-width)`, `@container` with `container-type: inline-size`, `clamp()`, `cqi` units |
-| hierarchy | `Button` `variant` contained/outlined/text, `Typography` `variant` scale, `Stack` spacing | `font-*`, `text-*`, `space-y-*`, `gap-*` utilities on a defined scale | type scale custom properties; spacing and heading margins |
-| tokens | `createTheme` (`palette`, `spacing`, `shape`, `typography`), `sx` theme keys | theme variables / config; arbitrary values `[...]` are the escape hatch to avoid | `:root { --token: value }` custom properties; optional DTCG `.tokens.json` as source |
-| consistency | one `ThemeProvider`; `components` overrides in the theme; `colorSchemes` for dark mode (`palette` wins if both set); `useColorScheme` | `dark:` maps to `prefers-color-scheme`; shared component classes via `@apply` or a component | variables switched in `@media (prefers-color-scheme: dark)` or on `[data-theme]`; `color-scheme` (UNVERIFIED) |
-| a11y | `IconButton aria-label`, `TextField` `slotProps.htmlInput` for native attributes, visible `label` | `sr-only` for visually hidden text (UNVERIFIED), `aria-*:` variants for state styling | `aria-label`, `aria-labelledby`, `alt`, `min-width/min-height` for targets |
-| states | `Alert`, `Snackbar` (`role` handling UNVERIFIED), `FormHelperText` with `error` | `aria-invalid:` variant (an `aria-*` family exists; this exact one UNVERIFIED), `disabled:` | `[aria-invalid="true"]`, `:invalid` (UNVERIFIED for UX timing); `role="alert"` / `role="status"` |
-| interaction | `Button` has built-in states; custom `sx` needs `'&:focus-visible'`, `'&:hover'`, `'&.Mui-disabled'` (UNVERIFIED class name) | `hover:` (wrapped in `@media (hover: hover)`), `focus-visible:`, `active:`, `disabled:`, `enabled:` | `:hover`, `:focus-visible`, `:active`, `:disabled`, `@media (hover: hover)`, `scroll-margin` for sticky headers |
+## MUI v7
+
+- responsive: `Grid` takes `size={{ xs: 12, md: 6 }}`, not the old `xs`/`md` item props.
+- a11y: native input attributes go through `TextField` `slotProps.htmlInput`.
+- loading: only `Skeleton` was read (wrapping and sizing in `rules/loading.md`); `CircularProgress` and `LinearProgress` were not.
+- states: `Snackbar` `role` handling UNVERIFIED.
+- interaction: `.Mui-disabled` as the disabled class name in `sx` is UNVERIFIED; ripple and focus-visible in `rules/interaction.md`.
+- consistency: `colorSchemes` and `palette` precedence in `rules/consistency.md`.
+
+## Tailwind
+
+- responsive: unprefixed classes are the base (phone) style; `sm:` 40rem, `md:` 48rem, `lg:` 64rem, `xl:` 80rem, `2xl:` 96rem are min-width; `max-*` variants target below a width.
+- a11y, states: `aria-*:` variants exist for state styling; `sr-only` and the exact `aria-invalid:` variant are UNVERIFIED.
+- loading: `animate-pulse`; pairing it with `motion-reduce:` is UNVERIFIED.
+
+## Plain CSS
+
+- responsive: `@container` needs `container-type: inline-size` on the ancestor; `cqi` units size against it.
+- consistency: `color-scheme` on `:root` is UNVERIFIED (route in `rules/consistency.md`).
+- states: `[aria-invalid="true"]` styles a field in error; `:invalid` is UNVERIFIED for error timing.

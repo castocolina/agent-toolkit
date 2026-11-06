@@ -1,0 +1,89 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "general-purpose",
+      "percent": 89.6,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 89.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 13,
+          "evidence": "reproduce a bug before fixing",
+          "fix": "Delete the generic advice to reproduce before fixing, because the model already does this. Keep only the non-obvious branch for a bug that does not reproduce (fix from code only for a single code path with a failing test, marked unverified)."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 26,
+          "evidence": "They may run in another checkout.",
+          "fix": "Drop this sentence from Gotchas. The NEVER item on line 33 already covers the checkout path and the tested revision, with its reason."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 14,
+          "evidence": "3. Delegate or implement: do each bounded subtask directly when your tools and scope allow",
+          "fix": "Give steps 3 to 5 the same kind of explicit checkpoint that step 1 has. For example, step 3: 'Checkpoint: every requirement is either done with its acceptance check run or listed as delegated with its worker'. Step 4: 'Checkpoint: no caller references a changed signature that was not updated'. This completes the Process pattern."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 30,
+          "evidence": "## NEVER (three items: overlapping files, success summary, foreign checkout)",
+          "fix": "Add: 'NEVER delegate to a general-purpose agent (this one or the built-in): it can recurse or re-plan the same request without adding domain rules or tools, and it doubles context cost. Delegate only to a named specialist.'"
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 17,
+          "evidence": "6. On a failure, fix the cause or re-delegate with the failing output",
+          "fix": "State a default with an escape hatch: 'fix the cause yourself when the failing code is in a file you or a worker changed and the fix is local; re-delegate only when the fix needs the specialist's domain rules or tools'. This matches the rule in step 3."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 16,
+          "evidence": "No gate found, or a gate that cannot run (missing dependency, broken environment): record the command and error under Validation, try one setup fix from the project docs",
+          "fix": "Split the branch. 'No gate found' has no command or error to record, so under Validation write 'no gate found in AGENTS.md, CLAUDE.md, Makefile or toolchain', run the cross-component acceptance check, and mark the work unverified. 'Gate cannot run' keeps the record, then one setup fix, then unverified. Also make step 2 say that a missing gate goes to this step 5 branch."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 12,
+          "evidence": "Checkpoint: each requirement has exactly one owner, no two parallel workers share a file, each has an acceptance check.",
+          "fix": "Say what to do when the checkpoint fails. For example: 'If two workers need the same file, serialize them or merge them into one owner; if no acceptance check can be stated, list the requirement under Remaining blockers before starting'."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

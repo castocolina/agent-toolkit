@@ -1,0 +1,77 @@
+{
+  "skill": "ascii-ui-mockup-generator",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 23,
+      "evidence": "6. **Ask which to pick**, numbered. Be ready to modify one or combine elements.",
+      "fix": "Shorten step 6 to the non-obvious part: 'If the user rejects all, ask which ranked task each option got wrong, then redraw.' The model already asks for a choice and offers to modify or combine options without being told."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 30,
+      "evidence": "Each mockup in its own fenced code block under a numbered heading, rationale as short bullets below it.",
+      "fix": "Replace the prose with a short literal template: a numbered heading such as '### 1. Sidebar + table', then an 80-column fenced block with a +---+ border and one sample row, then the four bullets (Approach / Favors / Drawback / Best fit). Agents copy a concrete structure more reliably than a description of one."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 38,
+      "evidence": "Always put mockups in fenced blocks: outside one, Markdown uses a proportional font and collapses repeated spaces.",
+      "fix": "Keep the rule, but add a gotcha the model will actually trip on: a mockup that contains backticks (for example code samples inside the UI) closes a ``` fence early. Use a four-backtick or ~~~ fence for those mockups."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 35,
+      "evidence": "NEVER use emoji or Unicode box-drawing characters; stay with `| - + = * #`.",
+      "fix": "Make ASCII the default and add an escape hatch: 'Default to `| - + = * #`; use Unicode box-drawing only when the user explicitly asks for it (common for TUI mockups), and then check border alignment in a monospace font.' The description invites TUI requests, so a flat NEVER clashes with an explicit user preference."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 26,
+      "evidence": "Done: the initial task ends when the numbered mockups, their rationales and the selection question are delivered. A refinement task ends when the requested changes (and any requested handoff) are delivered.",
+      "fix": "Add the branch that does not resolve: 'A pick task (the user chooses an option and asks for no changes) ends when the step 7 handoff is delivered.' Also state a fallback for step 1: if a clarifying question goes unanswered, draw with stated assumptions and list them above mockup 1."
+    }
+  ]
+}

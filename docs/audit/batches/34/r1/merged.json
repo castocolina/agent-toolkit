@@ -1,0 +1,99 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "mermaid-diagrams",
+      "percent": 88.8,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 88.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-one",
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 12,
+          "evidence": "\"**Ground** - audience and abstraction level; entities and relationships taken from the supplied code, schema, or facts; confirmed versus assumed (state assumptions, never invent edges).\"",
+          "fix": "Cut this step to the one non-obvious rule (state assumptions, never invent edges). The rest is generic advice the model already follows."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 18,
+          "evidence": "\"4. **Draw**.\" is a one-word step. The workflow mixes Process and Navigation patterns without a checkpoint between drawing and validating, such as a pre-render self-check against the authoring-rules section 7 list.",
+          "fix": "Replace step 4 with a short check: before validating, scan every label for unquoted delimiters, `#`/`;` in sequence text, lowercase `end`, and `o`/`x` after a link. This turns the checklist into a thinking step and gives the Process pattern a real gate."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": null,
+          "evidence": "The Gotchas section lists class, C4, gantt and gitGraph traps. The cheapest-to-hit parse traps (lowercase `end`, `A---oB`, unquoted `(` in labels) appear only in references/authoring-rules.md section 7.",
+          "fix": "Add one Gotchas bullet naming lowercase `end`, unquoted parentheses and `---oB` as the most frequent parse failures, with a pointer to authoring-rules.md section 7."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 3,
+          "evidence": "The description spends characters on routing rules (\"Choose the diagram type from the question being answered: sequenceDiagram, classDiagram, ... with flowchart as the last resort.\"). That is body guidance and it crowds the trigger and boundary text.",
+          "fix": "Replace the description with: \"Create, edit, and repair Mermaid diagrams (.mmd files or ```mermaid blocks in Markdown). Use when users ask to diagram, visualize, model, map out or show sequence flows, class models, ER diagrams or database schemas, state machines, flowcharts, software or infrastructure architecture (including terse requests such as 'architecture: mobile client, API, database, email provider'), Gantt schedules, pie proportions or Git branch history, or when a Mermaid diagram fails to render or export (mmdc, GitHub), even without naming Mermaid. Picks the diagram type from the question being answered, with flowchart as the last resort. Not for prose-only explanations, explaining an existing diagram without changing it, PlantUML or draw.io work, matplotlib data charts, or interactive diagram-canvas components.\""
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 13,
+          "evidence": "\"[authoring-rules.md] is mandatory on every path, in the sections listed.\" Sections are cited by number (1-3, 6-7, 4-5), and the Gotchas bullet cites \"sections 4 and 7\" for silent failures. A numbered-section dependency is fragile when the reference is edited.",
+          "fix": "Cite sections by heading name (for example \"Labels that break the parser\") alongside the number. Consider splitting the flowchart-only sections 4-6 into a separate file so the section-subset rule becomes a plain file-level load."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 19,
+          "evidence": "\"npx -y @mermaid-js/mermaid-cli -i in.mmd -o out.svg\" is unpinned. mmdc output and supported syntax change between versions, and the skill gates syntax on specific Mermaid versions.",
+          "fix": "Pin a mermaid-cli version (for example `@mermaid-js/mermaid-cli@11`) or state that the validator's Mermaid version must match the target host."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/evals/evals.json",
+          "line": null,
+          "evidence": "There are 15 evals with verifiable assertions, but none covers the architecture-beta edge-label or version fallback. Several evals list references/*.md in `files`, which are skill files and not eval inputs. The trigger query \"Visualize the deploy pipeline in .github/workflows/ci.yml\" is ambiguous, since the pipeline could be a flowchart or an architecture-beta diagram.",
+          "fix": "Add an eval for an older-host or edge-label architecture-beta request, keep only real fixtures in `files`, and relabel or reword the ambiguous ci.yml trigger query."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 15,
+          "evidence": "Semantic repair reads \"authoring-rules.md section 7 and the type file\". The Gotchas bullet says a flowchart subgraph whose `direction` is ignored has its cause in \"sections 4 and 7\", but section 4 is not read on that path.",
+          "fix": "For semantic repair of a flowchart, also read authoring-rules.md section 4, or move the subgraph-direction cause into flowcharts.md so the repair path actually reaches it."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

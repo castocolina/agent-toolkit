@@ -1,0 +1,68 @@
+{
+  "skill": "openapi-to-typescript",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 72,
+      "evidence": "Worked example input is about 50 lines of YAML (lines 72-122), including the plain `/users/{id}/orders` and `put` operations, which repeat naming and ref rules already given in the Naming and Mapping tables",
+      "fix": "Cut the input down to the parts that show non-obvious results: the path-item parameter inheritance, the getUser/get_user collision, the readOnly/writeOnly split and the ignored `$ref` sibling. Drop the operations whose output follows directly from the tables."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 3,
+      "evidence": "Description and workflow advertise \"FastAPI, springdoc or NestJS output\", but no gotcha warns that generator output is often 3.1, which the preflight then refuses",
+      "fix": "Add a `## Gotchas` section, starting with: \"FastAPI 0.99+ emits `openapi: 3.1.0` (Optional fields become `anyOf: [..., {type: 'null'}]`), so its output hits the 3.1 stop. Read the version line and never assume 3.0 from the generator's name. Editing only the version string does not make the document 3.0.\" Move the TS2411 and ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX facts into the same section so the environment traps sit together."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/evals/evals.json",
+      "line": 8,
+      "evidence": "\"files\": [\"evals/files/pets-min.json\", \"references/guards.md\"]: a skill reference is listed as an eval input, and no eval covers the Swagger 2.0 stop, an `allOf` property conflict, or `properties` + `additionalProperties` with an optional fixed property (TS2411)",
+      "fix": "Remove `references/guards.md` from `files` in the spec-types and shapes-guards evals. Add an eval with a `swagger: \"2.0\"` input that asserts the skill stops and emits no types. Add an eval spec where `allOf` branches conflict on a property and an object has `note?: string` plus `additionalProperties: {type: string}`, with assertions that the conflict is reported and that the index signature includes `| undefined`."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 23,
+      "evidence": "Preflight rows cover only `swagger: \"2.0\"`, `openapi: 3.1.x` and `openapi: 3.0.x`, so `openapi: 3.2.0` matches no row. The suffix rule (line 35) adds a media suffix only \"when one status has several media types\", and nothing says how to name a requestBody with several media types that have different schemas",
+      "fix": "Add a final preflight row: \"any other `openapi` value (3.2.x, 4.x) | Stop: only 3.0.x is supported; report the version found\". Extend the suffix rule: \"likewise `{Base}RequestBody{Media}` when a request body has several media types with different schemas (for example `CreatePetRequestBodyJson`, `CreatePetRequestBodyFormData`)\"."
+    }
+  ]
+}

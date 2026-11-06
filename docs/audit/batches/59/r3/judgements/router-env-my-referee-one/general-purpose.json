@@ -1,0 +1,50 @@
+{
+  "skill": "general-purpose",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 15,
+    "D3": 15,
+    "D4": 5,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 109,
+  "max_total": 125,
+  "percent": 87.2,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "high",
+      "file": "agents/general-purpose.md",
+      "line": 3,
+      "evidence": "\"description: Coordinate multi-file, multi-component programming work end to end: break the request down\" contains an unquoted colon followed by a space inside a plain YAML scalar. This makes the frontmatter invalid. A plugin agent can fall back to its filename, but its routing description and other frontmatter settings are lost.",
+      "fix": "Use the following folded-scalar field to repair YAML parsing and preserve the routing description:\ndescription: >-\n  Coordinate multi-file, multi-component programming work end to end: break the request down, delegate to matching specialists or implement directly, integrate their changes and run the project's verification gates. Use for complex multi-step debugging, implementation or refactoring that spans several files or components, or when specialist results need integrating and verifying, even if coordination is not requested. Not for trivial one-step edits or a focused single-domain task a dedicated specialist owns. Unlike the built-in general-purpose agent, it returns Result, Changes, Validation and Remaining blockers."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 33,
+      "evidence": "Under \"## NEVER\": \"Report a check as passed that you did not run: the caller acts on it. Say it was not run.\" This generic verification reminder overlaps \"Read the output yourself\" in Process and \"Inspect the resulting diff and the observed validation output\" in the preceding NEVER rules. These repeated reminders dilute the more valuable worker-ownership and checkout/revision guidance.",
+      "fix": "Consolidate routine verification reporting into the output contract: \"Validation lists commands actually run, their observed outcomes, and required checks not run.\" Keep the separate orchestration-specific rules about overlapping worker files, unreliable specialist summaries, and checkout/revision provenance."
+    }
+  ]
+}

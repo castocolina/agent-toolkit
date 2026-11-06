@@ -1,0 +1,68 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 41,
+      "evidence": "\"On PostgreSQL and MySQL use fixed-scale `NUMERIC`/`DECIMAL`, never floating point.\" and line 38 \"Unique keys accept many NULLs in PostgreSQL, MySQL and SQLite.\"",
+      "fix": "Shorten the parts the model already knows to one clause each, for example \"Money: exact types (SQLite: INTEGER minor units, because DECIMAL gets NUMERIC affinity and stores REAL)\". Keep the engine-specific traps: SQLite affinity, Decimal128 and `NULLS NOT DISTINCT`."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 24,
+      "evidence": "Workflow step 1 fits four questions, their engine branches and the full MongoDB embed-or-reference rule into one paragraph of about 130 words",
+      "fix": "Split step 1 into four sub-bullets (live data, tenant noun, atomic writes, hot reads), each giving its action. Move the embed-or-reference criteria into the MongoDB 16 MiB gotcha or a sub-bullet so the process pattern reads as discrete checkpoints."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/database-schema-designer/evals/evals.json",
+      "line": 32,
+      "evidence": "\"files\": [ \"references/migrations.md\" ] lists the skill's own reference as an eval input file, and the same happens in the review, MySQL and SQLite evals",
+      "fix": "Limit `files` to user-supplied inputs under `evals/files/`. Drop `references/migrations.md` and `references/schema-design-checklist.md` from `files`, so the with-skill and without-skill runs differ only by the skill. This also tests whether the skill's own load triggers fire."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 32,
+      "evidence": "\"`ON DELETE SET NULL` on a composite tenant FK also nulls the tenant column... On PostgreSQL 15+, write `ON DELETE SET NULL (assignee_id)`\". The MySQL, SQLite and PostgreSQL <15 branch of a tenant model with a nullable assignee has no fallback, and `references/migrations.md` gives the composite-FK retrofit only for PostgreSQL",
+      "fix": "Add the fallback for other engines: \"On MySQL, SQLite or PostgreSQL <15, use `ON DELETE RESTRICT` on the composite FK and clear `assignee_id` in the same transaction before deleting the user (or with a BEFORE DELETE trigger).\" Add a MySQL note to the retrofit section: no `NOT VALID`, so clean bad rows first, then `ADD FOREIGN KEY` with `ALGORITHM=INPLACE, LOCK=NONE` under `foreign_key_checks=0` only after the orphan query returns zero rows."
+    }
+  ]
+}

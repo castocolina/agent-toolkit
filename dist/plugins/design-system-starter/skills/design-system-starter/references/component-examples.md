@@ -8,6 +8,7 @@ Examples focus on semantic-token contracts, accessible composition, theme valida
 :root,
 [data-theme="light"] {
   --color-action: var(--brand-action-light);
+  --color-action-hover: var(--brand-action-hover-light);
   --color-on-action: var(--brand-on-action-light);
   --color-focus: var(--brand-focus-light);
   --color-surface: var(--brand-surface-light);
@@ -17,6 +18,7 @@ Examples focus on semantic-token contracts, accessible composition, theme valida
 
 [data-theme="dark"] {
   --color-action: var(--brand-action-dark);
+  --color-action-hover: var(--brand-action-hover-dark);
   --color-on-action: var(--brand-on-action-dark);
   --color-focus: var(--brand-focus-dark);
   --color-surface: var(--brand-surface-dark);
@@ -25,54 +27,42 @@ Examples focus on semantic-token contracts, accessible composition, theme valida
 }
 ```
 
-Components consume roles for default, hover, focus, and error states; they never select product palette values directly:
+Components consume roles for default, hover, focus, and error states; they never select product palette values directly. Every state gets its own role (no `color-mix()` or opacity derivation in components), so each state pair can be contrast-checked at token level:
 
 ```css
-.button {
+.ds-button[data-intent="primary"] {
   color: var(--color-on-action);
   background: var(--color-action);
 }
-.button:hover { background: color-mix(in srgb, var(--color-action), var(--color-text) 12%); }
-.button:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.ds-button[data-intent="primary"]:hover { background: var(--color-action-hover); }
+.ds-button:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
 .field[aria-invalid="true"] { border-color: var(--color-danger); }
 ```
 
 ## Accessible field composition
 
-`controlId` is required and must be unique per rendered control. The render prop receives all association and validation props; the control must spread them onto the actual input. Hint/error IDs are stable derivatives of `controlId`, and only the displayed message is referenced.
-
 ```tsx
 import type { InputHTMLAttributes, ReactNode } from 'react';
 
-type FieldControlProps = Pick<
-  InputHTMLAttributes<HTMLInputElement>,
-  'id' | 'required' | 'aria-invalid' | 'aria-describedby'
->;
+type FieldControlProps = Pick<InputHTMLAttributes<HTMLInputElement>, 'id' | 'required' | 'aria-invalid' | 'aria-describedby'>;
 
 interface FormFieldProps {
-  controlId: string;
+  controlId: string; // required and unique per rendered control; hint and error ids derive from it
   label: string;
   required?: boolean;
   hint?: string;
-  error?: string;
-  children: (props: FieldControlProps) => ReactNode;
+  error?: string; // when shown, replaces the hint in aria-describedby and sets aria-invalid
+  children: (props: FieldControlProps) => ReactNode; // the control spreads these onto the real input
 }
 
 function FormField({ controlId, label, required = false, hint, error, children }: FormFieldProps) {
-  const hintId = `${controlId}-hint`;
-  const errorId = `${controlId}-error`;
-  const describedBy = error ? errorId : hint ? hintId : undefined;
+  const message = error || hint;
+  const messageId = message ? `${controlId}-${error ? 'error' : 'hint'}` : undefined;
   return (
     <div>
       <label htmlFor={controlId}>{label}{required ? ' (required)' : ''}</label>
-      {children({
-        id: controlId,
-        required,
-        'aria-invalid': error ? true : undefined,
-        'aria-describedby': describedBy,
-      })}
-      {hint && !error && <p id={hintId}>{hint}</p>}
-      {error && <p id={errorId} role="alert">{error}</p>}
+      {children({ id: controlId, required, 'aria-invalid': error ? true : undefined, 'aria-describedby': messageId })}
+      {message && <p id={messageId} role={error ? 'alert' : undefined}>{message}</p>}
     </div>
   );
 }
@@ -82,34 +72,46 @@ function FormField({ controlId, label, required = false, hint, error, children }
 </FormField>
 ```
 
-The label's `htmlFor` matches the input `id`; required status reaches the input; errors set `aria-invalid` and replace hint association with the error association.
-
 ## Theme-state validation
 
-After a theme change, verify computed semantic roles and interaction states rather than checking only the theme attribute. Include light and dark modes, keyboard focus, hover, disabled, and validation error states; confirm contrast against each mapped surface.
+Run this in a real browser: jsdom does not compute rendered colors, so jest-axe turns color contrast off and computed-style assertions there prove nothing. axe's `color-contrast` rule checks text only; check non-text pairs (borders, focus ring) from the resolved token values.
 
 ```ts
+import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+
 for (const theme of ['light', 'dark']) {
-  document.documentElement.dataset.theme = theme;
-  const button = getByRole('button', { name: 'Save' });
-  expect(getComputedStyle(button).backgroundColor).not.toBe('');
-  button.focus();
-  expect(getComputedStyle(button).outlineStyle).not.toBe('none');
+  test(`pilot screen contrast, ${theme}`, async ({ page }) => {
+    await page.goto('/pilot');
+    await page.evaluate((t) => { document.documentElement.dataset.theme = t; }, theme);
+    await page.getByRole('button', { name: 'Save' }).focus(); // repeat with hover() and error states
+    const { violations } = await new AxeBuilder({ page }).withRules(['color-contrast']).analyze();
+    expect(violations).toEqual([]);
+  });
 }
 ```
 
-## Compatibility-preserving evolution
+## Deprecation alias
 
-Add variants as optional props with a default matching existing behavior. Keep established semantic token roles and DOM/accessibility contracts stable; introduce new roles additively and deprecate old ones before removal.
+A renamed token keeps its old path as an alias with `$deprecated` (DTCG 2025.10) through the next major release; a renamed prop maps to the new one with the same default. Both are removed in the major after that.
+
+```json
+{
+  "color": {
+    "action": {
+      "default": { "$type": "color", "$value": "{color.primitive.blue.600}" },
+      "primary": { "$type": "color", "$value": "{color.action.default}", "$deprecated": "Use color.action.default; removed in 3.0.0" }
+    }
+  }
+}
+```
 
 ```ts
-type ButtonProps = {
-  variant?: 'primary' | 'secondary' | 'quiet'; // quiet is additive
-};
-
-const variantToken = {
-  primary: '--color-action',
-  secondary: '--color-surface',
-  quiet: '--color-surface',
-} as const;
+type Intent = 'primary' | 'secondary' | 'danger';
+interface ButtonProps {
+  intent?: Intent;
+  /** @deprecated Use `intent`; removed in 3.0.0. */
+  variant?: Intent;
+}
+const resolveIntent = ({ intent, variant }: ButtonProps): Intent => intent ?? variant ?? 'primary';
 ```

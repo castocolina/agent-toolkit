@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codex-plan",
+      "percent": 94.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8,
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 49,
+          "evidence": "Plan structure: Overview, Prerequisites, Phases with tasks, Testing Strategy, Dependency Graph, Risks, Rollback",
+          "fix": "Shorten this list to the parts the model would not add by default: Dependencies as task IDs for parallel work, Complexity 1-10, and Test-First Approach per task. Drop the generic section names the model already uses in any plan."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 27,
+          "evidence": "The ```bash fences under steps 5 and 6 and the paragraphs after them (\"Add `--skip-git-repo-check`...\", \"Ask the user to send you...\") are not indented, so they break out of the numbered list",
+          "fix": "Indent the code fences and the follow-up paragraphs under steps 5 and 6 by three spaces. That keeps steps 5 to 7 as one ordered phase list with visible checkpoints."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 35,
+          "evidence": "codex exec ... \"$(cat prompt_to_codex.md)\"",
+          "fix": "Add a gotcha: on Linux a single argv string is capped at 128 KiB (MAX_ARG_STRLEN). A large prompt passed through $(cat ...) fails with 'Argument list too long'. For large prompts, show `codex exec ... - < prompt_to_codex.md` so the prompt is read from stdin."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 24,
+          "evidence": "On failure report the exact error, give the prompt inline or ask for a writable directory",
+          "fix": "Pick a default: 'ask for a writable directory and, in the same message, give the prompt inline so the user can save it themselves'. Do not leave two equal options."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 21,
+          "evidence": "Ask the blocking decisions with AskUserQuestion, one batch, only what the request and repo do not already answer.",
+          "fix": "Resolve the branch where the user does not answer or declines a blocking question. Add: 'If a blocking decision stays unanswered, pick the most conservative option, record it as a labelled assumption in the prompt, and tell the user which plan sections depend on it.'"
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 28,
+          "evidence": "{ git status --porcelain=v1 -uall; git diff HEAD | sha256sum; ... } > \"<literal path>\"",
+          "fix": "The group's exit status comes from xargs, and `git diff HEAD | sha256sum` hides a failing git diff (for example an unborn HEAD). So the 'if the command fails' branch never fires. Run `git rev-parse --verify HEAD` first, and say change verification is limited when it fails."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 52,
+          "evidence": "The illustrative excerpt repeats familiar file roles: '`package.json` - framework and dependencies', '`prisma/schema.prisma` - existing models', and '`src/middleware.ts` - current request handling'. The verified-path requirement already appears in step 1 and Prompt contents.",
+          "fix": "Reduce the excerpt to one path-and-reason example, preserving the verified-path requirement; remove the repeated explanations of standard manifest, schema and middleware roles."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 28,
+          "evidence": "The snapshot uses '{ git status --porcelain=v1 -uall; git diff HEAD | sha256sum; git ls-files -o --exclude-standard -z | xargs -0 -r sha256sum; }'. A failed 'git diff HEAD', such as in a repository without a first commit, is masked by sha256sum; the group can still succeed, bypassing 'if the command fails, say change verification is unavailable'.",
+          "fix": "Enable pipeline failure propagation and explicitly check every snapshot component, stopping on any failure. If HEAD is unavailable, either use an explicit empty-tree baseline or mark verification unavailable. Gate step 7's comparison on a successfully recorded baseline."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 43,
+          "evidence": "'Flag any difference other than the chosen plan file' cannot reliably resolve the allowed overwrite branch when codex-plan.md is tracked: step 5 hashes the entire 'git diff HEAD' into one opaque digest. An expected plan edit and an additional edit to an already-dirty source file can change that same digest without changing the source file's status entry.",
+          "fix": "Exclude the chosen plan path from both snapshots before computing status and diff fingerprints, or record per-path content hashes and compare all paths except the chosen plan. Ensure additional edits to already-dirty tracked files remain independently detectable."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

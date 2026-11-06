@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "compose-email",
+      "percent": 92.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 90.4,
+        "router-env-my-referee-one": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 19,
+          "evidence": "Request, approval, status or FYI: lead with the decision or recipient impact plus the context needed to act",
+          "fix": "Cut bottom-line-up-front advice the model already knows, such as leading with the decision. Keep only the parts the model gets wrong, such as \"never invent an ask for an FYI\", and spend the saved lines on more of the expert material in steps 1 and 4: blocking versus non-blocking gaps, and keeping qualifiers."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 25,
+          "evidence": "**Output** a ready-to-paste draft: `**Subject:**` line (specific, names the action or deadline), then the body.",
+          "fix": "Add a short inline output template that shows the What-Why-How body the description promises: a What line (decision or impact), a Why paragraph (context), and a How close (ask, owner, deadline, or 'No response needed'). Agents follow a concrete template more reliably than a prose description."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 32,
+          "evidence": "NEVER put the ask only in the subject line: many clients truncate subjects on mobile and the reader misses it.",
+          "fix": "Replace this widely known rule with a gotcha you learned in practice. For example: reply-all follow-ups inherit the old subject, so rewrite the subject when the ask changes. Or: a relative date such as 'Friday' is ambiguous across time zones and weeks, so write the full date."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 2,
+          "evidence": "Draft or rewrite a professional email ... using What-Why-How.",
+          "fix": "Define What-Why-How once in the body, for example in step 5: What = the decision or impact, Why = the minimum context, How = the ask, owner and deadline. Each purpose strategy in step 2 can then map onto it. Right now the agent has to guess what the structure named in the description means."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 17,
+          "evidence": "Also blocking: the source facts cannot fit a stated word limit (keep every fact, report the overage, ask whether to relax the limit or drop named items, then resume step 4).",
+          "fix": "Move this conflict check to step 4, where the draft exists and its length can be measured. Then state the loop: if the limit is relaxed or items are dropped, redraft with steps 2-3 and re-validate with step 4. As written, the branch runs in step 1, before any draft exists, and resumes at step 4 without saying whether to redraft."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 13,
+          "evidence": "The Arguments section says \"`$ARGUMENTS` - topic, known facts, or an existing draft to rewrite,\" and Example Usage only shows \"/command-compose-email:compose-email <context or pasted draft>\". These sections repeat the argument hint and ordinary invocation mechanics rather than adding domain knowledge.",
+          "fix": "Remove the standalone Arguments section because workflow step 1 already explains argument handling. Replace the invocation-only example with a compact before/after demonstrating a non-obvious decision, such as preserving suspected impact while redacting internal details for an external recipient."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 17,
+          "evidence": "The over-limit branch says to ask whether to \"relax the limit or drop named items, then resume step 4\". Step 4 is validation rather than drafting and still requires \"every source fact kept\". After the user authorizes dropping items, the workflow does not explicitly update the required fact set or direct the agent to produce the revised draft before validating.",
+          "fix": "After the user resolves a word-limit conflict, update the effective limit and retained fact set, explicitly exempt user-authorized omissions from the keep-every-fact check, and return to drafting before running step 4."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

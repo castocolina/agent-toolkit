@@ -1,0 +1,95 @@
+{
+  "skill": "design-system-starter",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 14,
+    "D4": 14,
+    "D5": 15,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 60,
+      "evidence": "An `aria-modal=\"true\"` dialog needs a tested dialog primitive or complete containment, background inertness, initial focus, Escape and focus restoration",
+      "fix": "Delete this gotcha or cut it to one line pointing to a tested dialog primitive. Current models already know the standard modal-dialog requirements, and nothing in the line is specific to design systems."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 44,
+      "evidence": "Levels: primitives, composed patterns (form field, card), product modules only where reuse exists.",
+      "fix": "Add a decision question for promoting a component to the next level, for example: 'Before promoting a pattern to the shared library, ask: do two consumers already use it with the same props? If not, keep it local to the pilot.'"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 55,
+      "evidence": "Never document a component by example alone: consumers copy the example's exact prop set and never discover the other states.",
+      "fix": "Replace this general documentation advice with a concrete design-system failure learned from real use, such as a token-build or theme-switch mistake seen in the evals. Keep the gotcha list for facts that defy reasonable assumptions."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 3,
+      "evidence": "Use when asked to create a design system or token file, convert raw values into semantic tokens, standardize UI across apps or teams...",
+      "fix": "Set up or evolve a shared design system - semantic design tokens (DTCG .tokens.json, CSS custom properties), light/dark token themes, reusable component APIs (atoms, molecules, organisms), contrast-checked token pairs, and versioned migration off scattered styles. Use when asked to create a design system or token file, convert raw values into semantic tokens, standardize UI across apps or teams, define component library conventions, or version and deprecate shared tokens and components, even if the user only says the screens look inconsistent or all over the place and never says 'design system' or 'tokens'. Not for reviewing or fixing one screen or component against UI rules (ui-ux-principles), one-off pages, ARIA how-to questions in an existing form, Storybook stories for existing components, SVG icon optimization, logos, or marketing copy."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 41,
+      "evidence": "convert to sRGB first (culori: `formatHex(toGamut('rgb', 'oklch')(parse(value)))`)",
+      "fix": "Give the gamut conversion as an exact command with a pinned version, as the hex contrast path already does, for example: `npx -y -p culori@4 node --input-type=module -e \"import {parse,toGamut,formatHex} from 'culori'; console.log(formatHex(toGamut('rgb','oklch')(parse(process.argv[1]))))\" 'oklch(0.6 0.2 250)'`. This fragile step currently has less guidance than the easy one."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/design-system-starter/evals/evals.json",
+      "line": 37,
+      "evidence": "\"Includes contrast review and WCAG AA target thresholds\"",
+      "fix": "Make the assertion verifiable: 'Lists at least one button text/background pair from legacy-settings.html with its hex values and computed ratio, marks it below 4.5:1, and names a passing replacement token'. Also add an assertion to casual-brand-kit that a component documentation guide lists props, defaults and states."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 24,
+      "evidence": "Resolve every alias. A cycle or a missing target is an error: name the tokens involved and fix it before any component work.",
+      "fix": "Add a short runnable resolver next to the contrast script, for example a python3 heredoc that loads the token JSON, follows each `{a.b.c}` reference, and prints a JSON list of cycles and missing targets. Then the blocking alias check (the broken-tokens eval branch) is mechanical rather than traced by hand."
+    }
+  ]
+}

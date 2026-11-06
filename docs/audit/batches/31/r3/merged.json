@@ -1,0 +1,126 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "plugin-forge",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 90.4,
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 12,
+          "evidence": "It rejects names `claude plugin validate` treats as Anthropic's own (`claude`, `anthropic`, `claude-code`, `claude-mods`, prefixes `claude-`, `anthropic-`, `anthropics-`, `cc-plugin-`, or `official` beside claude/anthropic).",
+          "fix": "Make the always-loaded contract shorter. Replace the full reserved-name list with 'rejects names reserved for Anthropic (exit 2 explains why)', because the script's error message already lists the rules. Keep the full list in references/plugin-structure.md, where hand-written plugins need it."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 23,
+          "evidence": "2. **Components.** Add `skills/`, `commands/`, `agents/`, `hooks/hooks.json`, or `.mcp.json` at the plugin root. Read `references/plugin-structure.md` for layout, command names, and manifest path rules.",
+          "fix": "Add a short decision rule for choosing a component. Use a skill for new instructions, since `commands/` is legacy. Use a hook only for deterministic event reactions. Use an MCP server only for external tools. Also add one 'before adding, ask' check: will this rename or remove an existing component, which forces a major bump?"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 30,
+          "evidence": "Gotchas cover manifest placement, version precedence, caching, names and source paths, but not that installed plugins run from a per-version cache (`${CLAUDE_PLUGIN_ROOT}` changes each version), which appears only in references/plugin-structure.md",
+          "fix": "Add a gotcha: 'In hooks and .mcp.json, reference bundled files as ${CLAUDE_PLUGIN_ROOT}/...; an installed plugin runs from a per-version cache, so absolute or repo-relative paths break and state written there is lost on update; keep durable data in ${CLAUDE_PLUGIN_DATA}.'"
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 3,
+          "evidence": "Use when packaging Claude Code capabilities, repairing marketplace registration/manifests, or debugging a plugin install or update that does not pick up changes.",
+          "fix": "Create and manage Claude Code marketplace plugins: scaffold plugin directories, edit plugin.json and marketplace.json, add skills, commands, agents, hooks and MCP servers, bump versions, and test or publish packages. Use when the user wants to bundle skills, slash commands, hooks or MCP servers so a team can install them with one command, fix a marketplace entry or manifest, or debug a plugin install or update that does not pick up changes (for example 'already at the latest version'), even if they never say 'plugin' or 'marketplace'. Not for VS Code, JetBrains or browser extensions, npm releases, or writing a standalone skill or command without plugin packaging."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 34,
+          "evidence": "Bump every release, or omit `version` from both files so the commit SHA becomes the version.",
+          "fix": "Choose a default and keep one escape hatch: 'Default: keep version in plugin.json and bump it every release. Use SHA versioning, with no version in either file, only when the user wants every pushed commit to reach users automatically.'"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/plugin-forge/evals/evals.json",
+          "line": 21,
+          "evidence": "\"Mentions both manifests\" (eval `version`, expected_output \"Minor bump expected 1.5.0 in both manifests\")",
+          "fix": "Align this assertion with the skill. bump_version.py changes the marketplace entry only when it already has a version, and the skill says to set version in one place. Replace the assertion with 'States 1.5.0 is written to plugin.json and to the marketplace entry only if the entry already has a version'. Also assert that `--marketplace-root` is passed in evals new-plugin and version."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/plugin-forge/evals/trigger-queries.json",
+          "line": 44,
+          "evidence": "Most negatives are terse and far from the skill, for example \"Create Firefox browser extension.\", \"Add component to IntelliJ plugin.\" and \"Build npm package with CLI binary.\"",
+          "fix": "Replace three far-away negatives with realistic near-misses, for example: 'add a PreToolUse hook to my own ~/.claude/settings.json (no plugin)', 'write a new SKILL.md in ~/.claude/skills/pdf-tools for my own use', 'install the official github plugin from the Anthropic marketplace and configure it'. Give each one a file path and personal context."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/plugin-forge/references/plugin-structure.md",
+          "line": 38,
+          "evidence": "Names starting with `claude-`, `anthropic-` or `cc-plugin-` fail validation as impersonating Anthropic.",
+          "fix": "Make this match SKILL.md line 12, which also rejects `anthropics-`, the exact names `claude`, `anthropic`, `claude-code` and `claude-mods`, and 'official' beside claude or anthropic. In step 1, the other-local and remote branches write files by hand from this reference, so they would accept names that validation rejects. Copy the full list here or link to the script's check_reserved_name."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/plugin-forge/scripts/bump_version.py",
+          "line": 49,
+          "evidence": "`if not plugin_json_path.exists():` immediately raises `Plugin manifest not found`. However, references/plugin-structure.md explicitly identifies plugin.json as optional, and SKILL.md step 3 directs standard-layout plugins to this helper. A valid standard-layout plugin with only a marketplace entry version therefore fails before the helper reads that version.",
+          "fix": "After verifying the plugin directory and marketplace entry, treat an absent optional plugin.json as an empty manifest. Bump an entry-only version without creating plugin.json, or report SHA versioning when neither location contains a version. Add regression tests for both manifestless cases while retaining errors for genuinely missing plugin directories."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 37,
+          "evidence": "The gotcha says a relative source `must start with ./`, and step 1 classifies local sources only by their ./ prefix. Yet references/marketplace-schema.md:33 explicitly supports bare sources such as `\"source\": \"formatter\"` through `metadata.pluginRoot`. That valid input has no workflow branch and contradicts the gotcha.",
+          "fix": "Resolve bare sources through metadata.pluginRoot before classifying their layout. Route the resolved plugins/<name> layout to the scripts and other local layouts to manual editing, and use the resolved directory for validation. Qualify the ./ requirement so it does not reject the documented pluginRoot shorthand."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/plugin-forge/evals/evals.json",
+          "line": 17,
+          "evidence": "The version eval expects `Minor bump expected 1.5.0 in both manifests` without supplying their initial contents, although the contract deliberately never adds an entry version. The stale-update assertion also permits `minor` or `patch` for a newly added skill, contrary to the documented minor-bump rule.",
+          "fix": "Supply initial manifest fixtures for the version eval and assert that only existing version fields are updated, with no new marketplace version field. Tighten the stale-update assertion to require a minor bump to 1.3.0, or the explicitly supported switch to SHA versioning, rather than accepting a patch bump."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

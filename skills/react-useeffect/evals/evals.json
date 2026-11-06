@@ -3,32 +3,80 @@
   "evals": [
     {
       "id": "derived-name",
-      "prompt": "My component stores firstName, lastName, and fullName, then an Effect updates fullName. This feels clunky\u2014what should I do?",
-      "expected_output": "Compute fullName during render instead of redundant state and an Effect.",
+      "prompt": "My component stores firstName, lastName, and fullName, then an Effect updates fullName. This feels clunky—what should I do?",
+      "expected_output": "Compute fullName during render instead of redundant state and an Effect, without useMemo for a cheap concatenation.",
       "assertions": [
         "Computes fullName during render",
         "Removes fullName useState",
-        "Does not add an Effect"
+        "Does not add an Effect",
+        "Does not wrap the string concatenation in useMemo, since memoization is only for a measured cost"
       ]
     },
     {
       "id": "query-race",
       "prompt": "Search results sometimes show the previous query after fast typing. I fetch in useEffect; fix the race.",
-      "expected_output": "Use cleanup to prevent stale responses from updating results.",
+      "expected_output": "Use cleanup with an ignore flag (abort optional) so neither a stale response nor a stale error or loading write can win, and check response.ok.",
       "assertions": [
         "Includes Effect cleanup",
         "Prevents stale response from setting results",
-        "Names ignore flag or AbortController"
+        "Names ignore flag or AbortController",
+        "Guards the error (catch) write with the same stale-request check as the success write, not only the success write",
+        "Derives loading from which request the stored result belongs to, or guards the finally loading write with the same check",
+        "Checks response.ok (or the status) so an HTTP error is not shown as results"
       ]
     },
     {
       "id": "external-widget",
       "prompt": "A React component must keep a third-party map widget synchronized with its zoom prop. Is an Effect appropriate?",
-      "expected_output": "Yes, synchronize this external system in an Effect and clean up created resources/listeners.",
+      "expected_output": "Yes: one Effect creates the widget and its cleanup destroys that instance; a separate Effect depending on zoom calls the widget's zoom setter.",
       "assertions": [
         "Says Effect is appropriate for external synchronization",
         "Synchronizes zoom prop with widget",
-        "Mentions cleanup"
+        "Mentions cleanup",
+        "Cleanup destroys or detaches the same widget instance that its setup created",
+        "Applies zoom changes to the existing instance in an Effect that depends on zoom, without destroying and recreating the widget on every zoom change"
+      ]
+    },
+    {
+      "id": "strict-mode-fetch-errors",
+      "prompt": "evals/files/SearchResults.tsx already has an ignore flag and an AbortController, but in dev (StrictMode is on) the page flashes \"Request failed: signal is aborted without reason\" before the results show up, and when /api/search answers 404 with a JSON error body the user just sees an empty list. What's still wrong and how do I fix it?",
+      "files": [
+        "evals/files/SearchResults.tsx"
+      ],
+      "expected_output": "Explains that the Strict Mode setup-cleanup-setup replay aborts the first request and its unguarded catch and finally then overwrite the current request's error and loading state, and that fetch resolves for a 404 so res.ok is never checked. The fix guards the catch and finally writes with the same ignore flag (or derives loading), throws on !res.ok so HTTP errors get their own state, and keeps Strict Mode on.",
+      "assertions": [
+        "Attributes the aborted-request error to the Strict Mode development replay (setup, cleanup, setup) aborting the first request",
+        "Guards the catch (error) write with the ignore flag, not only the success write",
+        "Guards or removes the unguarded finally setLoading(false) so an obsolete request cannot change the current request's loading state",
+        "Checks response.ok (or the status) and treats a 404 as an HTTP error distinct from a network failure",
+        "Keeps Strict Mode enabled and does not add a ref to stop the second run"
+      ]
+    },
+    {
+      "id": "init-runs-twice",
+      "prompt": "Our App component calls refreshAuthToken() in a useEffect with []. In development it runs twice and the second call invalidates the first token. I want to add a useRef like hasRun.current so it only runs once, or a module variable set to true at the top of the effect. Which one?",
+      "expected_output": "Rejects the ref guard because it hides the missing cleanup the Strict Mode replay exposes and components remount in production too. Accepts a module-level guard only if it is set after the async refresh succeeds (or a cached promise cleared on failure) and scoped to the intended lifetime such as the auth session, so a failed refresh can be retried.",
+      "assertions": [
+        "Rejects the useRef already-ran flag and keeps Strict Mode on",
+        "Says the module-level flag must not be set before the async or fallible refresh succeeds, because a failed attempt would then count as done",
+        "Ties the guard to a named lifetime (page load or auth session) rather than to the component mount",
+        "Requires a shared in-flight Promise (single-flight) held for the chosen lifetime, so the two Strict Mode setups call refreshAuthToken only once while it is pending",
+        "Clears the cached Promise when the refresh fails so a retry can run",
+        "Gives a new auth session its own initialization (cache keyed by session or dropped on sign-out)"
+      ]
+    },
+    {
+      "id": "partial-reset-casual",
+      "prompt": "switching threads in evals/files/InboxPanel.tsx flashes the old selected message for a split second. a coworker said just slap key={threadId} on the panel, good idea?",
+      "files": [
+        "evals/files/InboxPanel.tsx"
+      ],
+      "expected_output": "No: a key on the whole panel would also reset the showArchived preference. Remove the reset Effect, store the selected message ID and derive the message from messages during render (or compare a stored previous threadId during render); the flash comes from the Effect running after the panel already rendered the stale selection.",
+      "assertions": [
+        "Advises against key={threadId} on the whole InboxPanel because it would also reset showArchived",
+        "Removes the Effect that calls setSelected(null)",
+        "Stores the selected message ID and derives the selected message from messages during render, or compares a stored previous threadId during render",
+        "Explains the flash: the Effect runs only after the panel has already rendered with the stale selection"
       ]
     }
   ]

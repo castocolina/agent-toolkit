@@ -30,6 +30,7 @@ Output (JSON format):
 
 import argparse
 import json
+import os
 import re
 import sys
 from dataclasses import dataclass
@@ -47,7 +48,7 @@ class Session:
     branch: Optional[str]
     files: list
     commands_count: int
-    timestamp: str
+    timestamp: datetime
 
 
 def get_claude_projects_dir() -> Path:
@@ -73,20 +74,6 @@ def parse_timestamp(timestamp: str) -> Optional[datetime]:
         return None
 
 
-def extract_text_content(content) -> str:
-    """Extract plain text from message content."""
-    if isinstance(content, str):
-        return content
-    if isinstance(content, list):
-        texts = []
-        for block in content:
-            if isinstance(block, dict):
-                if block.get('type') == 'text':
-                    texts.append(block.get('text', ''))
-        return '\n'.join(texts)
-    return ''
-
-
 def extract_tool_uses(content) -> list:
     """Extract tool_use blocks from message content."""
     if not isinstance(content, list):
@@ -99,15 +86,11 @@ def extract_tool_uses(content) -> list:
 
 
 def parse_session_file(file_path: Path) -> Optional[dict]:
-    """Parse a JSONL session file."""
+    """Parse a JSONL session file; each message keeps its own cwd and branch."""
     messages = []
-    summary = None
     session_id = file_path.stem
-    project_path = decode_project_path(file_path.parent.name)
+    cwd = decode_project_path(file_path.parent.name)
     git_branch = None
-    first_timestamp = None
-    cwd = None
-    first_user_message = None
 
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -119,40 +102,18 @@ def parse_session_file(file_path: Path) -> Optional[dict]:
                 except json.JSONDecodeError:
                     continue
 
-                entry_type = entry.get('type')
-
-                if entry_type == 'summary':
-                    summary = entry.get('summary')
+                if entry.get('type') not in ('user', 'assistant'):
                     continue
 
-                if entry_type not in ('user', 'assistant'):
-                    continue
-
-                if git_branch is None:
-                    git_branch = entry.get('gitBranch')
-                if entry.get('cwd'):
-                    cwd = entry['cwd']
-                    project_path = cwd
-
-                timestamp = entry.get('timestamp', '')
-                if first_timestamp is None:
-                    first_timestamp = timestamp
-
-                msg_data = entry.get('message', {})
-                content = msg_data.get('content', '')
-                text_content = extract_text_content(content)
-                tool_uses = extract_tool_uses(content)
-
-                if entry_type == 'user' and first_user_message is None and text_content:
-                    # Skip tool results
-                    if not text_content.startswith('[') and not text_content.startswith('{'):
-                        first_user_message = text_content
-
+                # Entries missing cwd/gitBranch inherit the last value seen in this session.
+                cwd = entry.get('cwd') or cwd
+                git_branch = entry.get('gitBranch') or git_branch
+                content = entry.get('message', {}).get('content', '')
                 messages.append({
-                    'role': entry_type,
-                    'timestamp': timestamp,
-                    'content': text_content,
-                    'tool_uses': tool_uses
+                    'timestamp': entry.get('timestamp', ''),
+                    'project': cwd,
+                    'branch': git_branch,
+                    'tool_uses': extract_tool_uses(content)
                 })
 
     except Exception as e:
@@ -162,15 +123,7 @@ def parse_session_file(file_path: Path) -> Optional[dict]:
     if not messages:
         return None
 
-    return {
-        'session_id': session_id,
-        'summary': summary,
-        'messages': messages,
-        'project_path': cwd or project_path,
-        'git_branch': git_branch,
-        'timestamp': first_timestamp or '',
-        'first_user_message': first_user_message
-    }
+    return {'session_id': session_id, 'messages': messages}
 
 
 def extract_title(session_data: dict) -> str:
@@ -205,6 +158,11 @@ def count_commands(messages: list) -> int:
     return count
 
 
+def in_scope(cwd: str, scope: Path) -> bool:
+    """The project dir is only a candidate: each message's own recorded cwd must sit inside scope."""
+    return os.path.isabs(cwd) and Path(cwd).resolve().is_relative_to(scope)
+
+
 def get_sessions_for_date(
     target_date: datetime,
     project_path: Optional[str] = None
@@ -217,13 +175,19 @@ def get_sessions_for_date(
         return []
 
     requested_day = target_date.date()
-    local_tz = datetime.now().astimezone().tzinfo
 
     # Get project directories
+    scope = None
     if project_path:
-        project_path = str(Path(project_path).expanduser().resolve())
-        encoded = '-' + project_path[1:].replace('/', '-')
-        project_dirs = [projects_dir / encoded] if (projects_dir / encoded).exists() else []
+        given = Path(project_path).expanduser()
+        scope = given.resolve()
+        # Claude Code names project dirs by replacing every non-alphanumeric character with '-';
+        # try the path as given and resolved, since symlinks (e.g. /home -> /var/home) differ.
+        # A prefix match also finds sessions launched from subdirectories; the encoding is lossy
+        # (/app-old shares the prefix of /app/old), so in_scope() still filters every message.
+        names = {re.sub(r'[^A-Za-z0-9]', '-', str(p)) for p in (given.absolute(), scope)}
+        project_dirs = sorted(d for d in projects_dir.iterdir() if d.is_dir() and any(
+            d.name == n or d.name.startswith(n + '-') for n in names))
     else:
         project_dirs = [d for d in projects_dir.iterdir() if d.is_dir()]
 
@@ -236,35 +200,28 @@ def get_sessions_for_date(
             if session_data is None:
                 continue
 
-            # Keep only activity whose timestamp falls on the requested local calendar day.
-            day_messages = []
+            # Filter to the requested local day first; astimezone() with no argument applies
+            # the local DST rule for each instant, unlike a captured fixed offset.
+            groups = {}
             for message in session_data['messages']:
-                timestamp = parse_timestamp(message.get('timestamp', ''))
-                if timestamp is not None and timestamp.astimezone(local_tz).date() == requested_day:
-                    day_messages.append(message)
-            if not day_messages:
-                continue
+                timestamp = parse_timestamp(message['timestamp'])
+                if timestamp is not None and timestamp.astimezone().date() == requested_day \
+                        and (scope is None or in_scope(message['project'], scope)):
+                    message['parsed'] = timestamp
+                    groups.setdefault((message['project'], message['branch']), []).append(message)
 
-            day_session_data = dict(session_data)
-            day_session_data['summary'] = None
-            day_session_data['first_user_message'] = next(
-                (m['content'] for m in day_messages if m['role'] == 'user' and m['content']), None
-            )
-            session = Session(
-                id=session_data['session_id'][:8],
-                title=extract_title(day_session_data),
-                project=session_data['project_path'],
-                branch=session_data['git_branch'],
-                files=extract_files(day_messages),
-                commands_count=count_commands(day_messages),
-                timestamp=min(
-                    (parse_timestamp(m['timestamp']) for m in day_messages if m.get('timestamp')),
-                    key=lambda value: value,
-                ).isoformat()
-            )
-            sessions.append(session)
+            # A session that switches project or branch during the day yields one entry per pair.
+            for (project, branch), day_messages in groups.items():
+                sessions.append(Session(
+                    id=session_data['session_id'][:8],
+                    title=extract_title(session_data),
+                    project=project,
+                    branch=branch,
+                    files=extract_files(day_messages),
+                    commands_count=count_commands(day_messages),
+                    timestamp=min(m['parsed'] for m in day_messages),
+                ))
 
-    # Sort by timestamp
     sessions.sort(key=lambda s: s.timestamp)
     return sessions
 

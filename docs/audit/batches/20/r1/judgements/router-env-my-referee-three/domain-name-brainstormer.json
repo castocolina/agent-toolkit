@@ -1,0 +1,77 @@
+{
+  "skill": "domain-name-brainstormer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 21,
+      "evidence": "\"Is it close to an established brand in the same category?\" and line 29 \"Recommend trademark screening in the relevant jurisdictions and product classes\"",
+      "fix": "Merge these generic checks into one short line or cut them. The model already screens for brand collisions and recommends trademark searches. Keep the lines on the RDAP 404, HSTS preloading and premium pricing, which the model does not know."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 17,
+      "evidence": "\"Spread candidates across distinct naming directions (compound, affix, evocative real word, coined blend)\": no procedure for the \"replacing a taken first choice\" case that the description promises",
+      "fix": "Add a short sub-step for when the first choice is taken. Say when to keep the name on another TLD, when to add a modifier (get-, -hq, -app) and when to pick a new name. Give the trade-off for each choice in one line."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 38,
+      "evidence": "\"A registered domain grants no trademark right. Do not build a candidate around another company's mark or call a near-match safe.\"",
+      "fix": "Replace this with a non-obvious fact. For example, a registered .com can still lose a UDRP dispute to an earlier mark holder. Or merge it into Procedure step 5 so the gotchas list holds only facts that go against reasonable assumptions."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/domain-name-brainstormer/evals/trigger-queries.json",
+      "line": 34,
+      "evidence": "\"Suggest names for a sustainable clothing store and explain the brand fit.\" is labelled should_trigger, but the description excludes \"naming without domains\". Most queries are terse one-liners with no personal context.",
+      "fix": "Relabel or reword this query so it clearly wants a domain, or move it to the negatives as a near-miss. Rewrite 3-4 positives with realistic context: a backstory, an existing name that is taken, a typo or a budget, as optimizing-descriptions.md recommends."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 28,
+      "evidence": "\"Lookup order when you have a network tool: RDAP at `https://rdap.org/domain/<name>`, which redirects...\" To tell rdap.org's no-service 404 from a registry 404, the agent must see the final URL. The skill gives no command that shows it, and nothing covers a missing `whois` binary.",
+      "fix": "Give an exact command, `curl -sS -L -o /tmp/rdap.json -w '%{http_code} %{url_effective}' https://rdap.org/domain/<name>`, and classify the result by host and status. Add: if `whois` is not installed, or the fetch tool hides redirects, label the name `unverified` and give the user the RDAP URL."
+    }
+  ]
+}

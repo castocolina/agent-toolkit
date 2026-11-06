@@ -1,0 +1,41 @@
+{
+  "skill": "session-handoff",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 123,
+  "max_total": 125,
+  "percent": 98.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 57,
+      "evidence": "The UNKNOWN branch includes \"No baseline, not a git repo\" but then unconditionally instructs: \"run `git cat-file -e '<baseline>^{commit}'`, then `git diff --stat '<baseline>' HEAD`; if the baseline is gone, use `git reflog`.\" Those commands cannot resolve an absent baseline or operate outside a Git repository.",
+      "fix": "Split UNKNOWN recovery by cause. When a recorded baseline exists in a Git repository, check the commit and compare its tree with HEAD; use reflog if it is unavailable. When baseline metadata is absent, ask for a trustworthy baseline or manually verify the relevant files and assumptions without claiming a baseline comparison. Outside Git, skip Git commands and verify files, environment state, blockers and next steps directly. Resume only after the applicable checks pass."
+    }
+  ]
+}

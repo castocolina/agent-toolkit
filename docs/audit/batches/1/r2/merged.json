@@ -1,0 +1,144 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "mermaid-diagrams",
+      "percent": 84.8,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 84.0,
+        "router-env-my-referee-three": 85.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/references/class-diagrams.md",
+          "line": 5,
+          "evidence": "\"## Basic Syntax\", \"## Domain-Driven Design Patterns\", and \"## Common Patterns\" introduce extensive standard UML syntax and repository/factory/strategy examples. By line count, this reference and the similarly expansive C4 and flowchart catalogs substantially dilute the expert renderer constraints and failure modes.",
+          "fix": "Condense familiar syntax, UML definitions, and generic design-pattern examples across the class, C4, and flowchart references. Retain compact templates and Mermaid-specific decisions, compatibility constraints, and failure modes; preserve all attribution and source credits."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "high",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 13,
+          "evidence": "\"New diagram: apply `authoring-rules.md` sections 2-5 in full\" applies flowchart-oriented constraints before classification. Those sections require role-specific shapes and prescribe a palette when there are six or more nodes, although sequence and C4 diagrams do not support the prescribed flowchart shapes and classDef styling. Only the state/Git/Gantt/pie reference explicitly exempts its types.",
+          "fix": "Scope flowchart shape, subgraph, and classDef requirements explicitly to flowcharts. For sequence, C4, class, ER, and architecture-beta diagrams, use supported type-native layout and styling controls while retaining contrast and semantic-labeling principles. Put these exceptions before the instruction to apply the authoring rules."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/references/flowcharts.md",
+          "line": 26,
+          "evidence": "\"### Rounded Rectangle\" demonstrates `B([Rounded process])`, while \"### Stadium/Pill Shape\" demonstrates `C(Start or End)`. The examples render the opposite shapes from their headings and disagree with the stadium syntax in authoring-rules.md.",
+          "fix": "Use `B(Rounded process)` for the rounded rectangle and `C([Start or End])` for the stadium so the shape catalog matches Mermaid syntax and the authoring rules."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/references/class-diagrams.md",
+          "line": 238,
+          "evidence": "`LineItem \"1\" --> \"1\" Product : references` in the e-commerce example models each Product as belonging to exactly one LineItem, preventing the same product from appearing in multiple orders.",
+          "fix": "Change the example to `LineItem \"0..*\" --> \"1\" Product : references`, unless an explicitly documented business constraint requires one-to-one product usage."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/references/c4-diagrams.md",
+          "line": 1,
+          "evidence": "Opens with 'The C4 model provides a hierarchical way to visualize software architecture...' and a 'C4 Model Levels' list. It then carries five long, near-identical example diagrams (comprehensive context, container, component and microservices). This is the standard C4 and Mermaid syntax the model already knows. Only the unique-id rule is expert content, and that lives in SKILL.md.",
+          "fix": "Delete the C4 level explainer and cut the examples to one minimal C4Container sample. Keep only the non-obvious facts: unique ids, GitHub layout quirks, and UpdateRelStyle offsets."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/references/flowcharts.md",
+          "line": 15,
+          "evidence": "The 'Node Shapes' and 'Connections' sections list every shape and link syntax, one code block each (Rectangle, Rounded, Hexagon, Trapezoid, Dotted, Thick...). This is catalog content the model knows. It also repeats the 'not the default' warning twice.",
+          "fix": "Collapse the catalog into one compact table or a single example block. Keep the subgraph/direction trap and the role-shape mapping from authoring-rules.md. State the 'not the default diagram' warning once."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": null,
+          "evidence": "The 'Classify before you draw' table mixes questions and types unevenly. The row 'Branches, schedule, or share of a whole? | Git, Gantt, Pie' packs three questions into one. 'State' has no question tied to its own type, and the 'Not a flowchart' column is partly empty.",
+          "fix": "Split the Git, Gantt and Pie row into one question per type. Give the third column a consistent meaning, such as 'Typical request that is wrongly drawn as a flowchart'."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": null,
+          "evidence": "'Common Pitfalls' mixes expert traps (inner-to-inner subgraph edges, duplicate C4 ids) with generic items. The generic ones are 'Node IDs - Bare identifiers' and 'Keep the .mmd source next to the code'. The first bullet 'Defaulting to a flowchart - Classify first' repeats the classification section.",
+          "fix": "Drop the generic and duplicated bullets. Add the reason for each remaining one, for example why unquoted '#' breaks and which renderer versions are affected."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 3,
+          "evidence": "The description names the syntax tokens (sequenceDiagram, classDiagram, erDiagram) but few plain-language triggers for them: 'class diagram', 'ERD', 'sequence diagram', 'state machine', 'flowchart', 'ER diagram'. A user who writes those words may not match.",
+          "fix": "Replace with: \"Create, edit, and repair Mermaid diagrams (.mmd or fenced ```mermaid blocks in Markdown). Use when users ask to diagram, visualize, model, map out, or show sequence diagrams, class diagrams, ER diagrams/database schemas, state machines, flowcharts, software architecture (including terse requests such as \\\"architecture: mobile client, API, database, email provider\\\"), schedules, proportions, or Git history, or when a Mermaid diagram fails to render or export (mmdc, GitHub), even without naming Mermaid. Picks among sequenceDiagram, classDiagram, erDiagram, C4, stateDiagram-v2, flowchart, architecture-beta, gantt, pie and gitGraph. Not for prose-only explanations, PlantUML or draw.io editing, matplotlib data charts, or interactive diagram-canvas components.\""
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": null,
+          "evidence": "The reference table gates each type file, but it has no 'Do NOT load' guidance for the large c4-diagrams.md. A request for architecture-beta, or a repair job, can still pull in the C4 file ('C4 (also the default for \"the architecture\")').",
+          "fix": "Add a line such as 'Do NOT load c4-diagrams.md for repairs of non-C4 diagrams or for architecture-beta requests', and state when authoring-rules.md is skipped (repair only)."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/references/other-diagrams.md",
+          "line": null,
+          "evidence": "State, Git, Gantt and Pie get only a minimal sample each. The Gantt note says 'A bad dateFormat fails silently' with no exact working date and format rule. The skill otherwise insists on mmdc validation for fragile syntax.",
+          "fix": "Add the dateFormat tokens that must match the task dates, and one exact valid example per fragile construct (gantt dependencies, gitGraph merge/cherry-pick)."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/evals/evals.json",
+          "line": null,
+          "evidence": "There are 9 evals with verifiable assertions, but none covers classDiagram, gantt, pie or gitGraph. Several trigger negatives are easy and far from the skill: 'Write a React component rendering an interactive diagram canvas', 'Make an infographic ... HTML/CSS'. No tests/skills/mermaid-diagrams directory exists, but the skill has no scripts/, so this is not penalised.",
+          "fix": "Add evals for a class diagram, a gantt and a gitGraph. Add near-miss negatives that share Mermaid vocabulary, such as 'convert this Mermaid diagram to PlantUML' and 'what Mermaid version does GitHub bundle?'."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": null,
+          "evidence": "Step 5 runs mmdc via npx and falls back to naming the unverified syntax, but it gives no failure path for common mmdc errors, such as a puppeteer '--no-sandbox' failure. That path appears only in advanced-features.md, which SKILL.md routes to only for 'Theming or export failed'.",
+          "fix": "Add one line to step 5: 'If mmdc fails to launch Chromium, read advanced-features.md (Export with mmdc) before declaring it unverifiable'."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

@@ -1,0 +1,77 @@
+{
+  "skill": "react-dev",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/react-dev/SKILL.md",
+      "line": 63,
+      "evidence": "Activation checklist, no explanation needed: native props via `ComponentPropsWithoutRef<'button'>`, variants as a discriminated union, `children: ReactNode`, an explicit state type when the initializer is `null`...",
+      "fix": "Keep only the item the model often misses (an explicit useState type when the initializer is null, [] or a single literal) and delete ComponentPropsWithoutRef, discriminated-union variants and children: ReactNode, which current models already apply."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/react-dev/examples/server-components.md",
+      "line": 121,
+      "evidence": "Use the keyed storage hook in [hooks.md](../references/hooks.md#external-state-and-ssr)",
+      "fix": "Add references/hooks.md to the Server Components row of the SKILL.md load table (\"plus hooks.md when the component reads browser storage\") and drop the link from the example file, so every file reference stays one level deep from SKILL.md."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/react-dev/evals/evals.json",
+      "line": 30,
+      "evidence": "\"id\": \"submit-handler\" ... assertions: FormEvent<HTMLFormElement>, ChangeEvent<HTMLInputElement>, FormData from e.currentTarget",
+      "fix": "Replace the submit-handler and typed-button evals with prompts that need the skill, since the model passes both without it. For example: a form with two submit buttons that must read which one was clicked (assert (e.nativeEvent as SubmitEvent).submitter is passed to FormData), and a Button request with no package.json and no stated major (assert React 18-compatible forwardRef and that the response states the assumed version)."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/react-dev/references/react-19-patterns.md",
+      "line": 131,
+      "evidence": "Run the codemod exactly as the SKILL.md React 19 gotcha says (pinned version, real source roots, opt-in transforms...)",
+      "fix": "Point to the right place: \"Run the codemods exactly as SKILL.md step 1 lists them\". The React 19 gotcha only refers back to step 1, so an agent following this pointer reaches a bullet that has no commands."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/react-dev/SKILL.md",
+      "line": 83,
+      "evidence": "// columns.type-test.tsx: compile-only, never called or imported by app code.\nexport function columnContract() { ... col('createdAt', ...) }",
+      "fix": "Show the import the type-test file needs, for example `import { col } from './columns';`, or say that the column builder must be exported. As written, the snippet puts the contract in a separate file but uses `col` from the component module, and that file will not compile."
+    }
+  ]
+}

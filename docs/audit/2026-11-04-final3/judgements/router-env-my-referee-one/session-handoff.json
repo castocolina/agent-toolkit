@@ -1,0 +1,50 @@
+{
+  "skill": "session-handoff",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/scripts/check_staleness.py",
+      "line": 359,
+      "evidence": "The SLIGHTLY_STALE branch instructs 'Read the listed commits and changed files, then resume', but the default text report prints only \"Files changed: {result.get('files_changed_count', 0)}\" and never lists changed paths. The JSON result also truncates files_changed to ten paths without an explicit truncation notice.",
+      "fix": "Print changed-file paths in the default report. When the list is truncated, identify that explicitly and provide `git diff --name-only '<baseline>' HEAD` plus `git status --short --untracked-files=all` to inspect the complete committed and working-tree changes. Require that review before the SLIGHTLY_STALE branch resumes."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 59,
+      "evidence": "'UNKNOWN by cause (the report\u2019s Issues line says which)' covers a non-ancestor baseline, an absent baseline and a non-git project. However, check_staleness.py:289-293 also returns UNKNOWN for a missing timestamp or failed git comparison, combining those causes into 'Missing timestamp/baseline commit or git comparison unavailable'. Neither additional cause has a recovery branch.",
+      "fix": "Distinguish UNKNOWN causes in the script report and add recovery entries for missing or invalid Created timestamps and failed Git comparisons. Restore timestamps only from trustworthy evidence; otherwise require manual verification of relevant files, assumptions, blockers and next steps. For failed comparisons, diagnose and retry the read-only Git operation, or explicitly use manual verification before resuming."
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "ui-ux-principles",
+      "percent": 91.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6,
+        "router-env-my-referee-one": 89.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 27,
+          "evidence": "Render spells out Playwright mechanics the model already knows: \"`npx playwright screenshot --viewport-size=360,800 <url> shot-360.png`), press Tab once and capture the focus ring (`page.keyboard.press('Tab')`, then a screenshot)\"",
+          "fix": "Keep only the non-obvious parts: the four test widths, one Tab press to expose the focus ring, computed-style colors, a repeat in the dark theme, and a CLS trace. Delete the literal command and API calls."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 21,
+          "evidence": "The build path ends with \"every check you could not render goes in the hand-over as `unverified: needs <observation>`\", but no hand-over template exists. Review output (lines 85-138) gets a full template.",
+          "fix": "Add a 3-line build hand-over template after step 3: the changed files, one line per rule touched, then an `unverified:` list with one `needs <observation>` per open check. The build path then matches the Process pattern as well as the review path matches the Tool pattern."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 81,
+          "evidence": "\"Custom controls have hover and pressed states; hover carries nothing a touch user needs.\" The line gives no reason, and the Tailwind fact behind it is only in references/sources.md.",
+          "fix": "Add to the interaction Trap: \"Tailwind `hover:` is wrapped in `@media (hover: hover)`, so a tooltip or reveal that exists only on hover never appears on touch devices.\""
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 21,
+          "evidence": "\"4. Render (below)\" is unconditional on every build. Render means a dev server, 4 widths, a Tab capture and a dark-theme repeat, even for a one-button change.",
+          "fix": "Scope the render to the change: \"Render the widths and themes the change can affect (any layout change: all four widths; a color change: every shipped theme); list the rest as unverified.\""
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/evals/evals.json",
+          "line": null,
+          "evidence": "No build eval (build-checkout-actions, build-no-theme-plain-css, fix-dashboard) asserts the `unverified: needs <observation>` hand-over that SKILL.md line 21 requires. The trigger set is also skewed: 15 should-trigger against 11 should-not-trigger.",
+          "fix": "Add an assertion to fix-dashboard: \"The hand-over lists unverified checks, such as `unverified: needs render at 360 px` and `needs CLS measurement`\". Trim or balance trigger-queries.json toward 10 positives and 10 near-miss negatives."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 87,
+          "evidence": "\"No other prose unless the user also asks for an explanation or a fix\". The review-scrolling-table eval asks a direct question (\"is that a responsive problem?\") and expects only the table, but the rule does not say whether a question counts as asking for an explanation.",
+          "fix": "Add: \"A direct question about one rule is answered in that row's evidence cell and the summary line, not in extra prose.\""
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 63,
+          "evidence": "\u201cOne shared component per role; dark mode is a second value set on the same tokens, switched at the root.\u201d Familiar activation also occupies much of the tokens and interaction sections, including \u201cCustom controls have hover and pressed states.\u201d Weighted by section length, these reminders dilute the stronger, task-specific evidence contract and framework gotchas.",
+          "fix": "Compress familiar token, component-reuse and interaction explanations into brief pass predicates. Preserve the source-versus-render decision rules, framework-specific exceptions, live-region timing and other non-obvious failure modes."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 42,
+          "evidence": "The source-only responsive fail branch includes \u201cwhite-space: nowrap on a content row\u201d and \u201can image without max-width: 100%\u201d. Following it with a short nonwrapping row or an explicitly sized 16px image produces fail even when neither can overflow.",
+          "fix": "Treat nowrap and unconstrained intrinsic sizing as investigation cues, not sufficient failures. Fail from source only when resolved dimensions or minimum-content sizing prove overflow beyond the available container; otherwise request a render and mark the unresolved criterion unverified."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 27,
+          "evidence": "\u201cFor CLS, record a Playwright trace or a Lighthouse run.\u201d A standard Playwright trace does not itself report the numeric CLS measurement required by the loading rule, leaving that branch without a usable measurement procedure.",
+          "fix": "Use Lighthouse's reported CLS as the default measurement. For Playwright, explicitly collect layout-shift entries, exclude recent-input shifts and calculate the maximum session-window score; use the trace only as supporting diagnostic evidence."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 149,
+          "evidence": "\u201cload when the changed files use MUI, Tailwind or plain CSS and you need the construct; do not load it for Vue, Svelte or any other framework.\u201d A Vue component using Tailwind, as supplied in ProfileCard.vue, satisfies both the load and do-not-load conditions.",
+          "fix": "Gate this reference by styling stack independently of the host framework: load it for relevant MUI, Tailwind or plain-CSS constructs even inside Vue or Svelte; skip it when only host-framework-specific guidance is needed."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/evals/evals.json",
+          "line": 41,
+          "evidence": "\u201cAfter a successful delete, the order disappears from the list or a confirmation is shown.\u201d This assertion permits silent removal with no announcement, although the states rule requires success to be announced through role=\"status\".",
+          "fix": "Add a separate assertion requiring an initially mounted empty status region to receive the success message after deletion. Also verify that retry clears the previous error before refetching, so the state-management eval checks these explicit rule requirements rather than only visible branch presence."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

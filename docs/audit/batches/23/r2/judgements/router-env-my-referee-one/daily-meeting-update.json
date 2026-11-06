@@ -1,0 +1,59 @@
+{
+  "skill": "daily-meeting-update",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 25,
+      "evidence": "The prescribed JQL is `assignee = currentUser() AND updated >= \"DATE\"`. Although step 2 obtains approval for specific Jira projects, this query has no project restriction and can retrieve tickets from unapproved projects.",
+      "fix": "Include the approved project keys in every MCP and CLI query: `project IN (\"APPROVED_KEY\") AND assignee = currentUser() AND updated >= \"DATE\"`. Require a confirmed project scope before querying, and never fall back to an account-wide query when a scoped request fails."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 32,
+      "evidence": "The gotcha says '`gh search prs` reports `state` as `open`, `merged` or `closed`'. GitHub search results report open/closed, not a separate merged state. The prescribed search fields also omit merge timestamps and head branches, leaving the terminal-outcome and branch-based deduplication gates without the metadata used by the supplied integration eval.",
+      "fix": "Correct the search-state guidance. For relevant results, fetch scoped details with `gh pr view NUMBER --repo OWNER/REPO --json number,title,state,mergedAt,headRefName,url`. Use confirmed merge status and timing to establish yesterday's completed work, and headRefName to associate sessions with PRs. Never equate closed with merged; if details cannot be retrieved, ask the user rather than infer completion."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 55,
+      "evidence": "'Never report an investigation or an open PR as delivered' repeats the Interview provenance gate, which already says files, command counts, commits and open PRs are activity rather than outcomes. The related activity-versus-intent principle is restated again at line 57.",
+      "fix": "Consolidate the provenance rule and its planning consequence into one authoritative gate, and reference that gate elsewhere. Preserve the distinct comment-only-update caveat, session privacy rules and project/branch handling, which add information rather than repeat the principle."
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "skill": "design-system-starter",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 14,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 113,
+  "max_total": 125,
+  "percent": 90.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/design-system-starter/templates/component-template.tsx",
+      "line": 23,
+      "evidence": "`onClick={loading ? (e) => e.preventDefault() : onClick}` suppresses activation only during loading. Following the inherited-props branch with `aria-disabled={true}` and `loading={false}` announces a disabled button but still invokes its click handler and permits default submission.",
+      "fix": "Compute an effective aria-disabled state from loading and the boolean/string aria-disabled prop. When that state is true, prevent default activation and do not invoke onClick; retain focusability for aria-disabled/loading and preserve native disabled behavior."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/design-system-starter/templates/component-template.tsx",
+      "line": 5,
+      "evidence": "The comment claims that appending className and excluding inline style means 'neither bypasses' focus and theme roles. The custom-class branch merely concatenates classes; a consumer class can still override outline, foreground, or background through the CSS cascade.",
+      "fix": "Do not claim class concatenation protects accessibility or token contracts. Prefer arbitrary layout classes on a documented outer wrapper or constrained slot. If root className remains, document its trust boundary and enforce prohibited focus/color overrides with tooling and rendered theme/focus checks."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 24,
+      "evidence": "The Workflow section mixes expert pilot-selection and alias-validation gates with familiar semantic-token, CSS-variable, and documentation guidance. In particular, 'linearize each sRGB channel' and the luminance/ratio derivation repeat standard WCAG mechanics already implemented by the command at line 27; the line-weighted body is not predominantly expert-only knowledge.",
+      "fix": "Remove the duplicated textbook contrast derivation while retaining the runnable command, thresholds, and blocking validation gate. Condense routine semantic-token, theming, and documentation reminders; preserve the pilot-selection rules and DTCG/toolchain/schema gotchas."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 31,
+      "evidence": "Step 5 says 'Do NOT load either ... for ... a non-React stack', including references/component-examples.md. Step 7 nevertheless directs any project with a browser test rig to run the theme-state check in that reference, and Resources also gates it on component-API work without a React restriction.",
+      "fix": "Apply the non-React prohibition only to templates/component-template.tsx. Explicitly allow the framework-independent CSS and browser-validation sections of references/component-examples.md for non-React work, while marking its React FormField example as React-only."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/design-system-starter/evals/evals.json",
+      "line": 10,
+      "evidence": "The small-app starter eval unconditionally asserts 'Outputs a component list with primitive, composed, and product levels'. The workflow instead defers hierarchy for an app without repeated patterns and permits product modules only where reuse exists; this assertion can penalize a correctly scoped starter.",
+      "fix": "Accept tokens plus two or three primitives when reuse is not established, and require composed/product levels only when justified by consumers. Add a separate multi-consumer prompt if the full hierarchy needs an unconditional assertion."
+    }
+  ]
+}

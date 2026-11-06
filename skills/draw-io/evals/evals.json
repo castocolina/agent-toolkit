@@ -4,21 +4,23 @@
     {
       "id": "casual-api-map",
       "prompt": "Can you make a draw.io diagram of our web app: browser to API, API to Postgres, and API to an email service? Keep the page light.",
-      "expected_output": "A plan or XML-ready diagram with labeled components, directional relationships, a light page background, and readable layout.",
+      "expected_output": "A complete, parseable, uncompressed .drawio document with the required root cells, one vertex per component, directed edges written after the vertices, a light page background, and an export command that does not make the page transparent.",
       "assertions": [
-        "Includes browser, API, Postgres, and email service as labeled elements",
-        "Shows directional connections from browser to API and API to both dependencies",
-        "Preserves a light background instead of forcing transparency"
+        "Outputs a complete uncompressed .drawio XML document (`<mxfile>`, `<diagram>`, `<mxGraphModel>`, `<root>`) that contains `<mxCell id=\"0\"/>` and `<mxCell id=\"1\" parent=\"0\"/>`",
+        "Has vertex cells (`vertex=\"1\"`) labeled browser, API, Postgres and email service",
+        "Has edge cells (`edge=\"1\"`) whose `source`/`target` run browser to API, API to Postgres and API to the email service, and the edge cells come after the vertex cells in the file",
+        "Sets a light `background` (for example `#ffffff`) on `<mxGraphModel>` and does not export with `-t` or `DRAWIO_BACKGROUND=transparent`"
       ]
     },
     {
       "id": "quarto-aws-figure",
       "prompt": "Use the supplied `find_aws_icon.py` results fixture to create an AWS architecture .drawio XML for Quarto: CloudFront serves a public S3 site; API Gateway invokes Lambda, which reads DynamoDB. Use official icon names, orthogonal routed arrows, Noto Sans JP, and PNG export guidance for a dark plate. Give XML and the export command; do not claim execution.",
-      "expected_output": "Draw.io XML using service identifiers from the provided search output, correct service flow, font declarations, dark background, and a proposed export command.",
+      "expected_output": "Draw.io XML using the resIcon identifiers from the fixture, the CloudFront to S3 and API Gateway to Lambda to DynamoDB flow with orthogonal edges, fontFamily on every text-bearing cell, a dark background with light text, and a proposed DRAWIO_BACKGROUND=dark export command that is not claimed as run.",
       "assertions": [
         "Uses the fixture `resIcon` identifiers for CloudFront, S3, API Gateway, Lambda, and DynamoDB.",
-        "Sets `defaultFontFamily=\"Noto Sans JP\"` and `fontFamily=Noto Sans JP` on text elements.",
-        "Uses a dark background and proposes export without `-t`; does not claim it ran."
+        "Sets `fontFamily=Noto Sans JP` in the style of every text-bearing cell, edges included, rather than relying on `defaultFontFamily` alone.",
+        "Has orthogonal edges (`edgeStyle=orthogonalEdgeStyle`) from CloudFront to S3, API Gateway to Lambda and Lambda to DynamoDB.",
+        "Uses a dark `background` with light text and proposes `DRAWIO_BACKGROUND=dark` with `convert-drawio-to-png.sh`, without `-t`; does not claim it ran."
       ],
       "files": [
         "evals/files/aws-icon-results.txt"
@@ -26,12 +28,48 @@
     },
     {
       "id": "layout-overlap-fix",
-      "prompt": "My draw.io diagram has a frame around a group, but moving the frame leaves its services behind and the connector label is hidden. Explain the XML layout fix and verification.",
-      "expected_output": "A correction using true parent-child containment with relative coordinates, correctly layered/routed connectors and visual PNG verification.",
+      "prompt": "My draw.io diagram (evals/files/broken-group.drawio) has a frame around a group, but moving the frame leaves its services behind and the connector labels are hidden. Fix the XML and tell me how to verify it.",
+      "expected_output": "Corrected XML where ecs and rds are children of the subnet frame with coordinates converted to frame-relative values, the edges moved after the vertices with e-https parented to the page, and a re-export plus visual PNG check.",
       "assertions": [
-        "Makes contained services actual children of the frame with relative coordinates",
-        "Addresses connector routing/layering so its label is not obscured",
-        "Requires visual verification of the exported PNG"
+        "Sets `parent=\"subnet\"` on `ecs` and `rds` and converts their geometry to coordinates relative to the frame (`ecs` x=40 y=90, `rds` x=240 y=90)",
+        "Moves the edge cells after the vertex cells (out of the back layer) so the frame no longer covers the lines and the HTTPS and SQL labels",
+        "Keeps `e-https` on parent `1`, the common ancestor, because ALB sits outside the frame",
+        "Requires re-exporting and visually checking the PNG"
+      ],
+      "files": [
+        "evals/files/broken-group.drawio"
+      ]
+    },
+    {
+      "id": "compressed-rename",
+      "prompt": "rename the Payments box to Billing in evals/files/compressed-flow.drawio and give me the new png. when i open the file in my editor the <diagram> part is just gibberish",
+      "expected_output": "Recognises a compressed diagram, decodes it with the drawio CLI before editing, renames the Payments cell in the decoded XML, then exports with the converter script and checks the PNG.",
+      "assertions": [
+        "Identifies the `<diagram>` content as compressed (deflated, base64) and does not edit or hand-decode the base64 text",
+        "Decodes it with a `drawio -x -f xml -u` call (for example to a temp file that is checked for `<mxGraphModel>` and then moved over the original) before editing",
+        "Renames by changing `value=\"Payments\"` to `value=\"Billing\"` in the decoded XML, not by a text replace on the compressed file",
+        "Exports with `convert-drawio-to-png.sh` without `--stage` and checks the resulting PNG visually"
+      ],
+      "files": [
+        "evals/files/compressed-flow.drawio"
+      ]
+    },
+    {
+      "id": "refactor-eleven-components",
+      "prompt": "Draw the notification-pipeline refactor in notification-refactor.md as an editable draw.io diagram for our design doc (light page, Noto Sans JP). Give the XML only; do not claim it was exported.",
+      "expected_output": "Uncompressed .drawio XML with one container per group as the parent of its children, the store as a cylinder, orthogonal edges written after all vertices, and per-cell fontFamily.",
+      "assertions": [
+        "Outputs a complete uncompressed .drawio XML document with `<mxCell id=\"0\"/>` and `<mxCell id=\"1\" parent=\"0\"/>`",
+        "Contains all eleven components from the fixture as vertex cells",
+        "Makes the ingest, routing and delivery groups containers and gives each child its container as `parent`, with coordinates relative to that container, not sibling rectangles drawn behind the nodes",
+        "Keeps every child at least 30px inside its container edge (`30 <= y` and `y + height <= container height - 30`)",
+        "Draws Notification Store with a cylinder shape such as `shape=cylinder3`",
+        "Writes every edge cell after all vertex cells, with `edgeStyle=orthogonalEdgeStyle` and no arrow routed through a box it does not connect",
+        "Sets `fontFamily=Noto Sans JP` in the style of every text-bearing cell, edges included, and a light `background` on `<mxGraphModel>`",
+        "Compares the node count with the ~12-node split limit and either stages the diagram (context first, then one diagram per group) or keeps one picture with a stated reason"
+      ],
+      "files": [
+        "evals/files/notification-refactor.md"
       ]
     }
   ]

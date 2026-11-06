@@ -1,0 +1,86 @@
+{
+  "skill": "session-handoff",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 23,
+      "evidence": "1. State that is not in the repository: what was verified, what was only assumed, what failed. ... 4. Decisions with the options rejected (the rationale, not just the outcome).",
+      "fix": "Shorten the five-item priority list to one line, since models already know these handoff basics (for example 'Prioritise unverified state, repro commands with dates, rejected hypotheses'). Keep the weak/strong Important Context example, which is the part that adds expert value."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 21,
+      "evidence": "1. **Scaffold.** `python3 scripts/create_handoff.py implementing-user-auth` ... (the untracked-files step appears only in Gotchas: 'Add relevant new files from `git status` by hand')",
+      "fix": "Add a sub-step to CREATE after Scaffold: 'Run `git status --porcelain` and add untracked files and any modified files past the tenth to Files Modified'. That puts the easy-to-miss step in the sequence where it happens, not only in Gotchas."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 29,
+      "evidence": "The validator requires three sections ... each at least 50 characters with no `[TODO:` left.",
+      "fix": "Add a gotcha: 'The validator only catches `[TODO:` markers. The scaffold's `[TASK_TITLE - replace this]`, `[estimate how long you worked]`, `[describe changes]` and `[why changed]` placeholders still pass as READY, and list_handoffs shows an untitled handoff. Replace them by hand before reporting.'"
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 3,
+      "evidence": "Use when the user asks to pause coding, save session state, transfer work to another agent, load a handoff, or resume a handoff chain.",
+      "fix": "Create, validate and resume project-session handoff documents in .claude/handoffs/, using bundled Python scaffolding, secret checks and staleness reports. Use when the user wants to pause or stop for the day, save where the work stands, write down what was learned so the next session does not redo it, hand work to another agent or engineer, or load, check or resume a handoff or handoff chain, even if they never say 'handoff'. Suggest one at major milestones or near context limits. Not for ordinary status emails, ADRs, commit messages, PR descriptions, or updates to persistent harness memory (CLAUDE.md)."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/session-handoff/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "\"Draft a sprint planning meeting agenda for the engineering team.\" and \"Search for list_handoffs function\" are easy negatives; no output eval covers CREATE with --continues-from",
+      "fix": "Replace the sprint-agenda negative with a near-miss, such as 'write a shift-handover note for the on-call rotation doc'. Add an evals.json case that continues an existing handoff and asserts `--continues-from <exact filename>` with no path."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 59,
+      "evidence": "UNKNOWN by cause (the report's Issues line says which): Baseline recorded ... not an ancestor / No baseline in the handoff / Not a git repo",
+      "fix": "Add a fourth cause matching check_staleness.py's Issues line 'Missing timestamp/baseline commit or git comparison unavailable'. If `Baseline commit:` is present, the commit is unreachable (git diff failed), so run `git cat-file -e`, then `git reflog`, as in the first bullet. If `Created:` is missing or malformed, restore it from the filename timestamp and re-run. Otherwise an agent reading that line takes the 'No baseline' branch even when a baseline exists."
+    }
+  ]
+}

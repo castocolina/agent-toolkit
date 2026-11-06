@@ -1,0 +1,23 @@
+{
+  "findings": [
+    {
+      "severity": "medium",
+      "file": "tests/skills/session-handoff/test_check_staleness.py",
+      "line": 122,
+      "summary": "The unstaged-path regression test places the staged rename before the unstaged modification, so it does not exercise the leading-space stripping bug.",
+      "failure_scenario": "The fixture produces a first porcelain record for new.py beginning with \"R  \", followed by the \" M src.py\" record; applying .strip() to the entire status output therefore leaves src.py intact, allowing the original path-corruption bug to return without failing this test.",
+      "fix": "Check the unstaged modification before staging the rename, or choose filenames that put the unstaged record first. Assert that the raw fixture output starts with the expected leading-space record."
+    },
+    {
+      "severity": "medium",
+      "file": "tests/skills/draw-io/test-convert-drawio-to-png.sh",
+      "line": 210,
+      "summary": "The noidat and zerodim fixtures embed invalid draw.io XML, masking whether their targeted PNG defects are rejected.",
+      "failure_scenario": "Both cases embed <mxfile/> without a diagram, which independently fails the current embedded-document check; removing the IDAT-presence or nonzero-dimension validation would still leave these tests passing, even though corrupted PNGs containing valid diagram XML would then be accepted.",
+      "fix": "Copy the valid flow.drawio source into these fixtures so their embedded XML passes validation. Ensure each fixture would be accepted in ok mode before applying its targeted PNG corruption."
+    }
+  ],
+  "verdict": "approve",
+  "lane": "router-env/my-referee-one",
+  "base": "49e83ff"
+}

@@ -1,0 +1,77 @@
+{
+  "skill": "openapi-to-typescript",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 68,
+      "evidence": "The '## Worked example' section is about 90 lines (YAML input plus TS output), close to half the body. It mostly re-demonstrates rules the mapping table and naming algorithm already state (readOnly/writeOnly views, $ref sibling, collision rename, the no-operationId name).",
+      "fix": "Cut the example to the cases the tables cannot show on their own: the UserWrite projection with its nested manager?: UserWrite, the GetUser2 rename and the GetUsersByIdOrders name. Drop the repeated path-param interfaces, and keep the report line."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 41,
+      "evidence": "\"standard primitives, arrays and enums map the usual way\". The NEVER list says nothing about TypeScript `enum` declarations.",
+      "fix": "Add: \"NEVER emit TypeScript `enum` declarations for spec enums; emit literal unions. A TS `enum` creates runtime code, so it does not match string payloads structurally, and Node's type stripping (used for the guard mutation tests) rejects it.\""
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 3,
+      "evidence": "The description gives WHAT, WHEN, keywords and boundaries. It has no trigger for requests that never say 'OpenAPI', such as typing a FastAPI or springdoc /openapi.json, or 'API response types for the frontend'.",
+      "fix": "Convert OpenAPI 3.0.x JSON/YAML specs into TypeScript types for components/schemas and for each operation's parameters, request body and responses, plus runtime type guards on request. Use when generating frontend or SDK types from openapi.yaml/openapi.json (including FastAPI, springdoc or NestJS /openapi.json output), typing the endpoints under paths, updating types/api.ts after the backend spec changed, or deciding how nullable, readOnly/writeOnly, oneOf/discriminator, allOf, additionalProperties or $ref map to TS, even if the user only says 'API types' or 'typed responses'. Keywords: OpenAPI 3.0, components/schemas, types/api.ts, type guard. Not for Swagger 2.0 or OpenAPI 3.1 input, standalone JSON Schema or Zod conversion, non-TypeScript targets, HTTP clients, mock servers, or validating a spec without emitting types."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/evals/evals.json",
+      "line": null,
+      "evidence": "Eval 'spec-types' lists \"files\": [\"references/guards.md\"], and 'shapes-guards' does the same. That entry is a skill reference, not an eval input. Most trigger queries are also tidy, with no typos or abbreviations.",
+      "fix": "Keep only the real input files under evals/files/ in `files` (for spec-types, save the inline JSON spec as evals/files/pets-min.json). Add an assertion that guards.md was loaded only when guards were requested. Rewrite 2-3 should-trigger queries casually (\"can u make ts types off our swagger-ui json, its 3.0.2\")."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 167,
+      "evidence": "\"otherwise `npx tsc --noEmit --strict --target es2022 types/api.ts`\". When TypeScript is not installed locally, `npx tsc` fetches the unrelated `tsc` npm stub, not the compiler. The `-p tsconfig.json` branch also passes silently when the tsconfig's include does not cover types/api.ts.",
+      "fix": "Use `npx -p typescript tsc --noEmit --strict --target es2022 types/api.ts` when no local typescript exists. With a repository tsconfig, first confirm that types/api.ts is in its include/files (for example with `npx tsc -p tsconfig.json --listFilesOnly | grep api.ts`). If it is not, run the standalone command instead."
+    }
+  ]
+}

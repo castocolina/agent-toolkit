@@ -8,7 +8,11 @@
       "assertions": [
         "Uses `sequenceDiagram`",
         "Shows credential lookup via Database",
-        "Shows distinct success and failure"
+        "Shows distinct success and failure",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ],
+      "files": [
+        "references/authoring-rules.md"
       ]
     },
     {
@@ -18,7 +22,16 @@
       "assertions": [
         "Uses `erDiagram`",
         "Includes CUSTOMER, ORDER, LINE_ITEM, PRODUCT",
-        "Shows order-line and item-product cardinalities"
+        "Shows order-line and item-product cardinalities",
+        "Marks primary and foreign keys on the keyed columns (e.g. `int id PK`, `int order_id FK`)",
+        "Each LINE_ITEM belongs to exactly one ORDER and one PRODUCT: the ORDER and PRODUCT endpoints of those relationships are `||`",
+        "The many side of CUSTOMER-ORDER, ORDER-LINE_ITEM and PRODUCT-LINE_ITEM uses `o{` or `|{` on the child entity",
+        "States as an assumption any minimum child count the prompt does not settle (e.g. whether an order needs at least one line item)",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ],
+      "files": [
+        "references/erd-diagrams.md",
+        "references/authoring-rules.md"
       ]
     },
     {
@@ -28,7 +41,268 @@
       "assertions": [
         "The first diagram line is `C4Container`",
         "Includes case-insensitive entity names Mobile App, Catalog API, PostgreSQL, and Search",
-        "Shows relationships between the requested components without using `flowchart`"
+        "Shows relationships between the requested components without using `flowchart`",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ],
+      "files": [
+        "references/authoring-rules.md"
+      ]
+    },
+    {
+      "id": "repair-labels",
+      "prompt": "my deploy flow in broken-labels.mmd won't render on GitHub, can you fix it? keep the same meaning, it's going in our runbook README.",
+      "files": [
+        "evals/files/broken-labels.mmd",
+        "references/authoring-rules.md"
+      ],
+      "expected_output": "Repaired flowchart with quoted special-character labels, <br/> line breaks, and no lowercase end.",
+      "assertions": [
+        "Quotes the labels containing parentheses and `#`, e.g. `A[\"Deploy (prod)\"]`",
+        "Replaces the `\\n` line break with `<br/>`",
+        "Does not use lowercase `end` as a node id or target (uses `End` or a quoted/renamed node)",
+        "Keeps the same four-step meaning: deploy, health check with yes/no branches, notify, rollback",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ]
+    },
+    {
+      "id": "github-icons",
+      "prompt": "Draw our CI/CD pipeline as an architecture-beta diagram with AWS and Docker logos for the README on GitHub: a git repo, a build runner, a container registry, and a production cluster.",
+      "expected_output": "architecture-beta diagram using only built-in icons, with a warning about aws:/logos: icons.",
+      "assertions": [
+        "Uses `architecture-beta`",
+        "Uses only the built-in icons cloud, database, disk, internet, server (no `aws:` or `logos:` prefix)",
+        "Warns that aws: and logos: icons render as `?` on GitHub",
+        "Connects the four requested elements with edges",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ],
+      "files": [
+        "references/authoring-rules.md"
+      ]
+    },
+    {
+      "id": "arch-edge-labels-github",
+      "prompt": "architecture-beta diagram for our GitHub README: browser -> load balancer -> API -> Postgres. put the protocol on each arrow (HTTPS, HTTP, TCP 5432).",
+      "files": [
+        "references/authoring-rules.md",
+        "references/architecture-diagrams.md"
+      ],
+      "expected_output": "architecture-beta with built-in icons where the protocols appear in service titles or prose instead of edge labels, with a note that edge labels depend on the host's Mermaid version.",
+      "assertions": [
+        "Uses `architecture-beta`",
+        "Uses only the built-in icons cloud, database, disk, internet, server",
+        "Does not rely on edge-label syntax (`-[HTTPS]->`) for GitHub: the protocols appear in service titles or prose, or it offers C4 `Rel` for labeled edges",
+        "Says that architecture-beta edge labels depend on the host's Mermaid version, so GitHub may not render them",
+        "Connects the four requested elements in order with edges",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ]
+    },
+    {
+      "id": "c4-unique-ids",
+      "prompt": "Our C4 container diagram in streaming.mmd renders with the wrong arrows. Please fix it.",
+      "files": [
+        "evals/files/streaming.mmd",
+        "references/authoring-rules.md"
+      ],
+      "expected_output": "C4Container diagram where the Person and the User Service have distinct identifiers and each Rel targets the intended element.",
+      "assertions": [
+        "Keeps `C4Container` as the first line",
+        "Gives the Person and the User Service different identifiers (the duplicated `user` id is resolved)",
+        "Rel from the Person goes to Web App; Web App to User Service; User Service to User DB",
+        "No identifier is declared twice in the result",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ]
+    },
+    {
+      "id": "api-flowchart-request",
+      "prompt": "can you do a flowchart of our API? the checkout service calls payments, payments calls the bank, and the bank answers back.",
+      "expected_output": "A sequence diagram instead of a flowchart, with a brief reason.",
+      "assertions": [
+        "Uses `sequenceDiagram`, not `flowchart`",
+        "Includes Checkout, Payments, and Bank as participants with the reply back",
+        "Says why a sequence fits better than a flowchart"
+      ],
+      "files": [
+        "references/authoring-rules.md"
+      ]
+    },
+    {
+      "id": "class-from-code",
+      "prompt": "can you turn the classes in models.py into a class diagram for the README?",
+      "files": [
+        "evals/files/models.py",
+        "references/class-diagrams.md",
+        "references/authoring-rules.md"
+      ],
+      "expected_output": "classDiagram of Repository, OrderRepository, Order, LineItem and Product with correct arrow direction, tilde generics and domain multiplicities.",
+      "assertions": [
+        "Uses `classDiagram`",
+        "Writes the generic with tildes (`Repository~T~` or `Repository~Order~`), not angle brackets",
+        "The inheritance or realization arrowhead between Repository and OrderRepository points at Repository (e.g. `Repository~T~ <|.. OrderRepository`)",
+        "Order to LineItem is a composition (`*--`) with the diamond on Order",
+        "LineItem to Product is many-to-one with quoted multiplicities (`\"0..*\"` or `\"*\"` on the LineItem side, `\"1\"` on Product), not `\"1\"` to `\"1\"`",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ]
+    },
+    {
+      "id": "roadmap-gantt",
+      "prompt": "make a gantt chart of docs/roadmap.md for the release notes",
+      "files": [
+        "evals/files/roadmap.md",
+        "references/other-diagrams.md",
+        "references/authoring-rules.md"
+      ],
+      "expected_output": "gantt with a declared dateFormat, Design starting 2026-01-05, Build and QA chained with after, and a Launch milestone.",
+      "assertions": [
+        "Uses `gantt`",
+        "Declares a `dateFormat` and writes the Design start date in exactly that format (e.g. `2026-01-05` with `dateFormat YYYY-MM-DD`), not as \"Jan 5\"",
+        "Build starts `after` the Design task id and QA starts `after` the Build task id",
+        "Launch is a `milestone` task with a `0d` duration that starts after QA",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ]
+    },
+    {
+      "id": "hotfix-gitgraph",
+      "prompt": "turn our branch history into a gitGraph for the docs: init commit on main, release/1.2 branched off main and got rc1, hotfix branched off release/1.2 with a login fix, hotfix merged back into release/1.2 and tagged v1.2.1, then the login fix was cherry-picked onto main.",
+      "files": [
+        "references/other-diagrams.md",
+        "references/authoring-rules.md"
+      ],
+      "expected_output": "gitGraph that creates each branch before checking it out, merges hotfix into release/1.2 with tag v1.2.1, and cherry-picks the login fix by id onto main.",
+      "assertions": [
+        "Uses `gitGraph`",
+        "Creates release/1.2 and hotfix with `branch` before any `checkout` of them",
+        "The login-fix commit has an explicit `id:` and the `cherry-pick` on main references that same id",
+        "Merges hotfix into release/1.2 with `merge hotfix` carrying `tag: \"v1.2.1\"`",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ]
+    },
+    {
+      "id": "fulfilment-flowchart",
+      "prompt": "diagram our order fulfilment process for the ops wiki and colour-code it by team. Sales: order received, fraud check (pass/fail), reject order. Warehouse: look up stock in the inventory DB, pick, pack, print label. Shipping: carrier pickup, send tracking, delivered? (yes/no). Support: retry delivery when it isn't delivered, close ticket when it is.",
+      "files": [
+        "references/authoring-rules.md"
+      ],
+      "expected_output": "A top-down flowchart of about 12 nodes grouped into one subgraph per team, colored by team with complete classDefs, decisions as diamonds and the inventory DB as a cylinder.",
+      "assertions": [
+        "Uses `flowchart TD` (or `TB`), not `LR`",
+        "Groups the nodes into subgraphs, e.g. one per team",
+        "Every `classDef` sets `fill`, `stroke`, and `color` together",
+        "Defines one class per team (Sales, Warehouse, Shipping, Support), each with a distinct fill",
+        "Every team-owned node is assigned its own team's class (via `class` or `:::`), and no node carries another team's class",
+        "No subgraph that declares `direction` has an edge between one of its inner nodes and a node outside it (cross-team edges join subgraphs at the boundary, or the `direction` lines are omitted)",
+        "The fraud check and delivered checks are diamonds `{...}` and the inventory DB is a cylinder `[(...)]`",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ]
+    },
+    {
+      "id": "repair-sequence-end",
+      "prompt": "order-sync.mmd is in our API docs and GitHub just shows a parse error. can you fix it without changing what it says?",
+      "files": [
+        "evals/files/order-sync.mmd",
+        "references/authoring-rules.md"
+      ],
+      "expected_output": "The sequence diagram with the `end` participant renamed (label Backend kept), `;` and `#` in message text replaced by entity codes, and both messages unchanged in meaning.",
+      "assertions": [
+        "Keeps `sequenceDiagram` with the same two participants labeled Web and Backend",
+        "Renames the participant id `end` (e.g. `backend` or `End`) and updates both messages to use the new id",
+        "Replaces the `;` in the first message with `#59;` (or rewords it without a semicolon) so the text still reads \"GET /orders; page 2\"",
+        "Replaces the `#` in the second message with `#35;` so \"#orders\" is not silently cut off",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ]
+    },
+    {
+      "id": "repair-class-arrows",
+      "prompt": "payments-classes.mmd renders, but our reviewer says the hierarchy looks upside down. can you fix it? the comment at the top says what's intended.",
+      "files": [
+        "evals/files/payments-classes.mmd",
+        "references/class-diagrams.md",
+        "references/authoring-rules.md"
+      ],
+      "expected_output": "The class diagram with the realization arrowheads on PaymentMethod and the inheritance arrowhead on Receipt, other content unchanged, and a short note on what changed.",
+      "assertions": [
+        "Keeps `classDiagram`, the `<<interface>>` stereotype and the `charge` member",
+        "The realization arrowheads point at PaymentMethod: `PaymentMethod <|.. CardPayment` and `PaymentMethod <|.. WalletPayment` (or the mirrored `CardPayment ..|> PaymentMethod`)",
+        "The inheritance arrowhead points at Receipt: `Receipt <|-- RefundReceipt` (or `RefundReceipt --|> Receipt`)",
+        "Keeps the `PaymentMethod ..> Receipt : issues` dependency",
+        "Says in the reply that the arrowheads were reversed because they belong on the parent or interface",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ]
+    },
+    {
+      "id": "traffic-pie",
+      "prompt": "quick pie of our traffic split for the README: web 61.5%, mobile 30%, api 8.5%",
+      "files": [
+        "references/other-diagrams.md",
+        "references/authoring-rules.md"
+      ],
+      "expected_output": "A Mermaid pie with three quoted slices and the given values.",
+      "assertions": [
+        "Uses `pie`, not a flowchart or another chart type",
+        "Quotes every slice label",
+        "Has exactly three slices with the values 61.5, 30 and 8.5",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ]
+    },
+    {
+      "id": "repair-erd-cardinality",
+      "prompt": "library-erd.mmd renders fine but it reads as if one loan has many members. fix the cardinalities to match the schema in the comment.",
+      "files": [
+        "evals/files/library-erd.mmd",
+        "references/erd-diagrams.md",
+        "references/authoring-rules.md"
+      ],
+      "expected_output": "MEMBER ||..o{ LOAN and BOOK ||..o{ LOAN with the LOAN attributes unchanged.",
+      "assertions": [
+        "Keeps `erDiagram` and the LOAN attributes (id PK, member_id FK, book_id FK, due_on)",
+        "MEMBER and BOOK endpoints are `||` (the FK columns are NOT NULL) and both LOAN endpoints are `o{`",
+        "Uses the non-identifying `..` line for both relationships, since LOAN has its own `id` primary key",
+        "Says in the reply what was inverted",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ]
+    },
+    {
+      "id": "order-states",
+      "prompt": "our orders go draft -> submitted -> approved or rejected, and rejected ones can be resubmitted. diagram it for the wiki",
+      "expected_output": "A stateDiagram-v2 with the four states and the resubmit transition.",
+      "assertions": [
+        "Uses `stateDiagram-v2`",
+        "Starts from `[*]`",
+        "Includes draft, submitted, approved, rejected states",
+        "Has a transition from rejected back to submitted (or draft)",
+        "Does not use `flowchart`",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ],
+      "files": [
+        "references/authoring-rules.md",
+        "references/other-diagrams.md"
+      ]
+    },
+    {
+      "id": "prose-only",
+      "prompt": "explain in a paragraph how our login works: user posts credentials, API checks DB, returns a token. no diagram please, I'm pasting it in an email.",
+      "expected_output": "A prose paragraph with no Mermaid block.",
+      "assertions": [
+        "Contains no mermaid fence",
+        "Describes credentials, database check, and token in prose",
+        "Keeps the order: credentials posted, database check, token returned"
+      ]
+    },
+    {
+      "id": "refactor-eleven-components",
+      "prompt": "Diagram the notification-pipeline refactor described in notification-refactor.md for our design doc on GitHub. Style it so the groups and the store stand out.",
+      "expected_output": "A top-down flowchart of the eleven components in three subgraphs, a cylinder for the store, a classDef palette, and a stated height-to-width plan.",
+      "assertions": [
+        "Uses `flowchart TD` (a different direction or type is accepted only with a stated reason)",
+        "Contains all eleven components from the fixture, none invented",
+        "Groups the components into ingest, routing and delivery, with `subgraph` blocks for a flowchart or the alternative type's native grouping",
+        "Draws Notification Store as a store: a `[(...)]` cylinder in a flowchart, or the alternative type's native database construct",
+        "Emphasizes by role: in a flowchart, at least one `classDef` that sets `fill`, `stroke` and `color` together, applied with `class` or `:::`; in an alternative type, its native styling",
+        "States an expected rendered height-to-width ratio of 0.4 or more, or says the diagram was checked against that ratio, and avoids widening the diagram to fix cramping",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ],
+      "files": [
+        "evals/files/notification-refactor.md",
+        "references/authoring-rules.md"
       ]
     }
   ]

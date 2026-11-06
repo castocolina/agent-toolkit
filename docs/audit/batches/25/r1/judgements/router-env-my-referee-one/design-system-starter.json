@@ -1,0 +1,77 @@
+{
+  "skill": "design-system-starter",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 14,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/design-system-starter/templates/component-template.tsx",
+      "line": 5,
+      "evidence": "\"export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>\" introduces a 26-line stock button wrapper dominated by familiar prop forwarding, ref forwarding and class-name assembly. Unlike the token-format and browser-validation gotchas, this supplies little knowledge beyond ordinary React usage.",
+      "fix": "Replace the routine wrapper boilerplate with a compact example demonstrating design-system-specific state/token contracts and escape-hatch constraints; retain only implementation details needed to illustrate those contracts."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 16,
+      "evidence": "\"A first pass always contains\" both \"a component list by level\" and \"a component documentation guide.\" This expands a token-only request with little repository context into component-system deliverables, although step 5 explicitly recognizes token-only work.",
+      "fix": "Keep the full bundle as the default for complete starter-system requests. For token-only work, require only the token artifact, applicable theme mappings and measured contrast results; make component inventories, documentation and pilot integration conditional on component-system scope."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/design-system-starter/evals/evals.json",
+      "line": 18,
+      "evidence": "The accessible-dark-tokens prompt requests \"a component API convention for Button and FormField,\" but its assertions only check semantic colors, theme mapping and \"States 4.5:1 normal-text and 3:1 large-text/UI contrast targets.\" An answer omitting both requested component APIs can pass this case.",
+      "fix": "Add assertions checking Button and FormField props, defaults and state/accessibility contracts. Also require resolved foreground/background values and computed ratios for both themes rather than accepting threshold statements alone."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/design-system-starter/templates/design-tokens-template.json",
+      "line": 68,
+      "evidence": "The prescribed template defines numeric spacing entries such as \"\\\"1\\\": {\\\"$value\\\": {\\\"value\\\": 4, \\\"unit\\\": \\\"px\\\"}}\" and font-size scales, but no semantic typography or spacing aliases. Following this template alone cannot satisfy the first-pass requirement for named typography and spacing roles while keeping consumers off primitive scales.",
+      "fix": "Add semantic typography roles such as body and label, and semantic spacing roles such as control.inlinePadding and stack.gap, aliasing the existing scale tokens. Show consumers referencing these roles rather than numeric spacing or font-size scale entries."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/design-system-starter/checklists/design-system-checklist.md",
+      "line": 25,
+      "evidence": "\"interactive elements contain only phrasing content\" incorrectly generalizes the button restriction to all interactive elements. Applying this release check to a valid card link containing a heading or other flow content would reject valid HTML: an anchor has a transparent content model.",
+      "fix": "Make the restriction element-specific: buttons require phrasing content and prohibit interactive descendants; anchors follow their transparent content model and prohibit nested interactive content. Validate each native element against its own content model instead of imposing the button rule universally."
+    }
+  ]
+}

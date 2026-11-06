@@ -1,0 +1,86 @@
+{
+  "skill": "meme-factory",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 12,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 13,
+      "evidence": "\"Who will see it: team Slack, a PR, or a public post? Who is the butt of the joke ... Which channel, and does its tone allow it?\" The model already knows this general audience and tone advice. It only reminds the agent and adds no memegen-specific knowledge.",
+      "fix": "Cut step 4 to the parts that are specific to this skill: write the payoff line first, keep lines under about 30 characters (about 20 on 3-line templates), and never target a named teammate or customer. Drop the generic audience questions."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 12,
+      "evidence": "\"Pick the template from the table below. Check that the joke fits the template's line count\". To choose a template, the agent has a flat table of 9 IDs and a keyword heuristic it is told to treat as a hint only. No decision rule maps the shape of the joke (contrast, escalation, hot take, uncertain outcome) to a template.",
+      "fix": "Add a short decision list before the table: a contrast between two options goes to drake; something that is everywhere goes to buzz; calm amid failure goes to fine; an unconfirmed outcome goes to fry; a one-line opinion goes to cmm; three actors go to db (hand-built); the user's own image goes to custom."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 43,
+      "evidence": "\"`background`: an image URL used as the background with template `custom`.\" No gotcha says that memegen.link fetches this URL from the public internet. Image URLs from Slack, an intranet or a login-protected page cannot be fetched, so the meme fails even though the URL is well formed.",
+      "fix": "Add this gotcha: \"Never pass a private background URL (Slack file links, intranet hosts, signed or auth-gated links). memegen.link fetches it publicly, so the meme fails, and the private link is also exposed. Ask for a public image URL instead.\""
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 16,
+      "evidence": "\"No Python, or a template with 3+ lines: build it by hand (see Hand-built URLs)\". Escaping is the most fragile step (double-escaping, ordering against percent-encoding). The helper covers it only for 2 lines, so every db or other 3+ line meme falls back to manual escaping.",
+      "fix": "Make the helper's `generate` accept a variable number of captions (`nargs='*'`) and escape each one. Then change step 5 to send all templates through the helper, and keep the hand-built path only for the case where Python is unavailable."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/meme-factory/evals/evals.json",
+      "line": 19,
+      "evidence": "\"Uses concise captions separated by `/` and ending `.png`.\" and \"Uses a failure-appropriate template such as `fine` and concise text.\" The word \"concise\" cannot be graded. No eval covers the `custom` template with `--background`, or width and height options.",
+      "fix": "Replace \"concise\" with a countable check, for example \"each caption is 30 characters or fewer before escaping\". Add an eval for the user's image URL at 800 px wide, asserting `/images/custom/`, a percent-encoded `background=` value and `width=800`."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 17,
+      "evidence": "\"If you can fetch the URL, expect HTTP 200 ... If you can view the image ...\". Following the branch where the agent cannot fetch or view the URL (for example, no network in a sandbox) leads nowhere. The agent presents a URL it never checked and gets no instruction to say so.",
+      "fix": "Add this to step 6: \"If you cannot fetch the URL, still present it, but say it is unverified and name the likely failure modes (404 = wrong template ID, 422 = bad style, font or size).\""
+    }
+  ]
+}

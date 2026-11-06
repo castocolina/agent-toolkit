@@ -1,0 +1,59 @@
+{
+  "skill": "draw-io",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "line": 123,
+      "evidence": "`if b\"IDAT\" not in kinds` checks chunk presence without decoding image data, and `doc.find(\"diagram\") is not None` checks only the embedded document's outer structure. Following this branch permits a CRC-valid PNG with an empty or corrupt IDAT, or an embedded `<mxfile><diagram>garbage</diagram></mxfile>`, to reach the replacement at line 160 despite being unreadable or uneditable.",
+      "fix": "Before replacing the previous PNG, fully decode its raster data using a declared PNG-decoder dependency and validate each embedded page as an mxGraphModel, decoding compressed page content when necessary. Treat either failure as ok=false and retain the previous PNG. Add regression cases for corrupt IDAT data and invalid embedded diagram content."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 169,
+      "evidence": "The hook uses `entry: bash scripts/convert-drawio-to-png.sh --stage` and `files: \\.drawio$` without `require_serial`. Pre-commit can partition a multi-file run into parallel invocations; one `git add` per invocation does not prevent those processes from contending for index.lock.",
+      "fix": "Add `require_serial: true` to the supplied pre-commit hook so its export-and-stage batches run sequentially. Correct the comment in scripts/convert-drawio-to-png.sh that claims batching alone prevents races between parallel hook runs."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 20,
+      "evidence": "The compressed-input branch runs `timeout 120 drawio --disable-update -x -f xml -u ...` directly. Unlike the converter, it never tries `gtimeout`, so the documented macOS setup with Homebrew coreutils can export ordinary diagrams but cannot follow this decoding workflow.",
+      "fix": "Resolve timeout or gtimeout before the decoding command, as the converter does, and invoke the resolved executable with a kill-after bound. If neither exists, report the missing dependency and installation guidance rather than saying the diagram could not be decoded."
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "skill": "codebase-pattern-finder",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 10,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 109,
+  "max_total": 125,
+  "percent": 87.2,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 20,
+      "evidence": "'Search with Grep/Glob/LS on the behavior and its synonyms' and 'Read each promising file' restate native navigation and ordinary code-search procedures. Much of the procedure is activation rather than expert knowledge; the upstream-copy provenance check is its principal non-obvious insight.",
+      "fix": "Compress the generic navigation in steps 1, 2 and 4 into one instruction: 'Find behavior-equivalent candidates in the requested runtime/layer, inspect their callers/tests and extract minimal source-read sections with usage context.' Preserve the provenance check, factual reporting constraints and explicit no-match fallback."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 22,
+      "evidence": "'Keep every variation you find' requires exhaustive inclusion without a report-size boundary or escape hatch, even when a large repository contains many equivalent variants.",
+      "fix": "Default to one source-verified example per materially distinct approach. Group equivalent variants and list their additional paths without ranking them; expand those groups only when the caller requests exhaustive coverage."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 51,
+      "evidence": "'skip broken or deprecated code unless the code itself marks it as such' reverses the useful evidence condition: explicitly marked broken/deprecated code is exempted from skipping, while excluding unmarked code requires the agent to evaluate it despite the documentary-only role.",
+      "fix": "Replace this with: 'Do not infer that code is broken or deprecated. Skip examples explicitly marked broken or deprecated unless the caller requests historical examples; when included, quote the marking and label their status. If excluding them leaves no eligible examples, report that limitation and the searched scope.'"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 13,
+      "evidence": "'suggest improvements (unless the user explicitly asks)' permits an evaluation branch that conflicts with line 12's unconditional prohibition on recommendations and line 8's 'never evaluate it.' A mixed request for examples and improvements has contradictory outcomes.",
+      "fix": "Remove the evaluation exception and state the handoff explicitly: 'Do not critique, label anti-patterns/code smells, infer rationale or suggest improvements. If the request also asks for evaluation, return the factual examples and identify evaluation as work for the caller or a separate reviewer.'"
+    }
+  ]
+}

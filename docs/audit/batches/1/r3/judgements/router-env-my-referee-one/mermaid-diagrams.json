@@ -1,0 +1,68 @@
+{
+  "skill": "mermaid-diagrams",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 12,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/references/class-diagrams.md",
+      "line": 35,
+      "evidence": "\"The arrowhead sits on the side it is written\" introduces a standard UML relationship table. Alongside the basic shape-role inventory in authoring-rules.md and link inventory in flowcharts.md, these sections spend context on familiar syntax rather than the stronger parser, renderer and silent-failure knowledge elsewhere.",
+      "fix": "Reduce the standard relationship table to a brief orientation reminder, and shorten the basic shape/link inventories and routine example members. Retain the Mermaid-specific generics, multiplicity parsing, identifier and renderer traps."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+      "line": 92,
+      "evidence": "\"Six or more nodes with no `classDef` read as flat default gray: give them a palette\" makes styling mandatory by node count; line 111 further requires \"Otherwise copy one block below; do not invent hex colors.\" These rigid aesthetic constraints also apply when the host theme already communicates the diagram adequately.",
+      "fix": "Make the node-count threshold and bundled palettes defaults rather than requirements. Permit host-themed diagrams and other accessible palettes when they suit the audience; retain strict contrast requirements whenever custom colors are used."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/evals/evals.json",
+      "line": 25,
+      "evidence": "The orders-erd assertion only requires \"Shows order-line and item-product cardinalities\" although the prompt says \"include keys.\" An ERD with missing PK/FK annotations or incorrect cardinalities could satisfy the listed checks.",
+      "fix": "Add assertions for PK/FK annotations, exactly one order and one product per line item, the corresponding many-side endpoints, and explicit assumptions where minimum child counts are unspecified."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 15,
+      "evidence": "The repair branch says \"change only syntax\" and \"read the type file only if the parse error is not covered there.\" A syntactically valid but inverted class relationship never satisfies that loading condition, even though class-diagrams.md explicitly documents this silent failure.",
+      "fix": "Separate parse-only repair from semantic or rendering repair. For incorrect arrows, missing elements or other silent failures, load the matching type reference even when parsing succeeds, and permit corrections that restore the user-intended meaning. Keep syntax-only preservation for requests limited to parse repair."
+    }
+  ]
+}

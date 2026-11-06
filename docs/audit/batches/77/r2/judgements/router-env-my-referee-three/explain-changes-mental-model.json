@@ -1,0 +1,77 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 36,
+      "evidence": "Order so dependencies come first. Configuration or migrations go first when later behavior needs them, not last by category. Independent groups: contracts first, tests and docs last.",
+      "fix": "Keep only the non-obvious part ('migrations or config go first when later behavior needs them, not last by category'). Delete 'Order so dependencies come first' because the model already orders by dependency."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 30,
+      "evidence": "Over about 5000 lines: read `--stat` first, give a high-level overview, and offer to deep-dive an area (for example \"the API changes\").",
+      "fix": "Turn the large-diff branch into a procedure. From the same-source `--stat`, cluster paths into candidate groups. Read the per-file diffs of the contract and schema files first to fix the dependency order. Then output the group list with file counts, mark it as provisional, and offer the deep-dive per group."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 64,
+      "evidence": "## Gotchas \u2014 no item forbids state-changing git or gh commands while gathering the diff",
+      "fix": "Add: 'NEVER run `git checkout`, `git switch`, `gh pr checkout`, `git stash` or `git fetch` to inspect a source. Use `git show <rev>:<path>` and `gh pr diff` instead. Checking out a ref silently rewrites the user's worktree and can hide their uncommitted changes, which are the default thing this command explains.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 66,
+      "evidence": "Never group from a diff you did not see in full: page with `git diff --stat`, then read per-file diffs.",
+      "fix": "Line 66 contradicts line 38 ('never a bare `git diff --stat`'). Change it to: 'page with `--stat` on the same source as step 1 (for example `git diff --stat \"<base>...<arg>\"`, `git show --stat --format= \"<arg>^{commit}\"`, `gh pr diff \"<pr>\" --name-only`), then read per-file diffs with the same source and `-- <path>`.'"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 38,
+      "evidence": "compare the groups with the selected patch's file list (the manifest; if you use `--stat`, give it the same commit, range or branch comparison, never a bare `git diff --stat`)",
+      "fix": "Say how to build the manifest for every source, not only for git ranges. For the no-argument case, use `git diff HEAD --name-only` plus the `git ls-files -z --others --exclude-standard` list, because untracked files are missing from `--stat`. For a PR, use `gh pr diff \"<pr>\" --name-only`. For `custom`, use the `diff --git` headers of the pasted patch."
+    }
+  ]
+}

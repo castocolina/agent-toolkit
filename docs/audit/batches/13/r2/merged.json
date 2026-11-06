@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "writing-clearly-and-concisely",
+      "percent": 90.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8,
+        "router-env-my-referee-one": 88.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/writing-clearly-and-concisely/SKILL.md",
+          "line": 47,
+          "evidence": "Draft branch: \"Before drafting, ask: who reads this, and what should they do next?\" and line 49 \"Error message: what failed, the cause if known, what to do now; no apology or preamble.\"",
+          "fix": "Replace these generic audience and error-message steps with the one non-obvious rule they hide. For example: \"Error message: quote the failing identifier or value verbatim and name the exact command or setting that fixes it. If you do not know the fix, write `Needs: remediation`.\" Leave everything else to the invariant checkpoint."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/writing-clearly-and-concisely/SKILL.md",
+          "line": 54,
+          "evidence": "Flag branch: \"List numbered suggestions as `\"<quoted original fragment>\" \u2192 \"<proposed text>\" (reason)`.\" It gives no order and no limit.",
+          "fix": "Add an ordering rule: \"List invariant risks and factual errors first, then cuts by the number of words they save. Stop at about 10 items and name the section where the rest occur.\" A long document then gets a prioritised review, not an unordered dump."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/writing-clearly-and-concisely/SKILL.md",
+          "line": 39,
+          "evidence": "Edit step 1: \"first cut or merge sections that repeat each other\". No NEVER item or gotcha warns that the copies may differ. The NEVER list (lines 88-90) has only three items.",
+          "fix": "Add this NEVER item: \"NEVER merge two near-duplicate sections without diffing them first. One copy often holds the only `unless`, limit or version note, and the merge silently drops it.\" Also add a gotcha: \"In Markdown, a 'redundant' heading may be a link anchor. Keep its text even when you merge its body.\""
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/writing-clearly-and-concisely/evals/evals.json",
+          "line": null,
+          "evidence": "No eval covers the Draft branch's brand-voice default (\"with no samples write plain copy and add `Needs: a sample of the brand voice`\"). The prompts for `tighten-prose` and `active-docs` are bare one-liners without realistic context.",
+          "fix": "Add an eval such as \"write the empty-state copy for our Saved Searches page in our brand voice\" with no sample supplied. Assert that the copy is plain, ends with `Needs: a sample of the brand voice` and invents no tone. Also give `tighten-prose` a realistic setting, such as a changelog file path and the team asking for the rewrite."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/writing-clearly-and-concisely/SKILL.md",
+          "line": 12,
+          "evidence": "The branch table covers Edit, Draft, Flag and the no-text case. A mixed request such as \"tighten this and tell me what you changed\" matches Edit, but Output (line 58) says \"Return only the requested prose\". The skill has no precedence rule for this case.",
+          "fix": "Add a row to the branch table: \"Rewrite plus an explanation of the changes \u2192 Edit, then a numbered list of up to 5 changes in Flag format after the rewrite\". Also state that the Output line limits apply only when the user did not ask for an explanation."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/writing-clearly-and-concisely/SKILL.md",
+          "line": 47,
+          "evidence": "'Before drafting, ask: who reads this, and what should they do next?' and 'Error message: what failed, the cause if known, what to do now' are familiar writing heuristics. The Edit, Draft and Output sections devote substantial space to activation rather than expert-only knowledge; the no-invented-specifics instruction also recurs at lines 41, 48 and 88.",
+          "fix": "Keep the invariant framework, consequential counterexamples and reference routing. Trim generic audience and error-message reminders, and consolidate the repeated no-invention instruction into one checkpoint referenced by both drafting and editing."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/writing-clearly-and-concisely/SKILL.md",
+          "line": 48,
+          "evidence": "'Use only facts the user gave' applies to every Draft request. For an in-scope request such as drafting a README paragraph explaining idempotency, this prohibits using established domain knowledge unless the user supplies the explanation's facts first. The restriction appropriate for unknown product claims is applied to all explanatory prose.",
+          "fix": "Restrict unsupported task-specific claims rather than all facts: use supplied or verified sources for product behavior, metrics, contacts and operational details; permit established general knowledge for explanatory prose, and use Needs only for genuinely missing task-specific information."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/writing-clearly-and-concisely/SKILL.md",
+          "line": 39,
+          "evidence": "'For a long document, first cut or merge sections that repeat each other' conflicts with the checkpoint's protected 'Markdown structure | heading levels and text ... table columns' at line 35. On a document with redundant headed sections, the Edit branch does not say whether section removal or structural preservation wins.",
+          "fix": "Define a structural-edit branch: preserve existing headings and anchors by default and consolidate only their prose; when the user authorizes restructuring, allow section removal or merging while preserving explicit anchor IDs or flagging changed derived anchors."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/writing-clearly-and-concisely/SKILL.md",
+          "line": 58,
+          "evidence": "'Return only the requested prose. Add one short line after it only when' permits only invariant notes, missing facts and requested counts. However, line 21 directs the agent to list suggestions about protected quotations after the rewrite as Flag items. An Edit result with such suggestions has incompatible output instructions.",
+          "fix": "Make Output explicitly branch-aware: Edit and Draft return prose plus applicable Needs or invariant notes; Edit may additionally append numbered suggestions about protected quotations; Flag returns numbered suggestions without a rewritten document."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

@@ -9,12 +9,11 @@ Checks:
 - Referenced files exist
 - Quality scoring
 
-Usage:
-    python validate_handoff.py <handoff-file>
-    python validate_handoff.py .claude/handoffs/2024-01-15-143022-auth.md
+Run with --help for usage, exit codes and examples.
 """
 
-import os
+import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -26,11 +25,10 @@ SECRET_PATTERNS = [
     (r'["\']?[a-zA-Z_]*secret["\']?\s*[:=]\s*["\'][^"\']{10,}["\']', "Secret"),
     (r'["\']?[a-zA-Z_]*token["\']?\s*[:=]\s*["\'][^"\']{20,}["\']', "Token"),
     (r'["\']?[a-zA-Z_]*private[_-]?key["\']?\s*[:=]', "Private key"),
-    (r'-----BEGIN [A-Z]+ PRIVATE KEY-----', "PEM private key"),
-    (r'mongodb(\+srv)?://[^/\s]+:[^@\s]+@', "MongoDB connection string with password"),
-    (r'postgres://[^/\s]+:[^@\s]+@', "PostgreSQL connection string with password"),
-    (r'mysql://[^/\s]+:[^@\s]+@', "MySQL connection string with password"),
-    (r'Bearer\s+[a-zA-Z0-9_\-\.]+', "Bearer token"),
+    (r'-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----', "PEM private key"),
+    # Any scheme://user:password@ (redis, amqp, mongodb+srv, ...); skips user@ and <pw>/$VAR/*** placeholders.
+    (r'[a-z][a-z0-9+.\-]*://[^/\s:@]*:(?![<$*])[^@\s/]+@', "URL with embedded password"),
+    (r'Bearer\s+[a-zA-Z0-9_\-\.]{20,}', "Bearer token"),  # 20+: prose "Bearer token" is not a credential
     (r'ghp_[a-zA-Z0-9]{36}', "GitHub personal access token"),
     (r'sk-[a-zA-Z0-9]{48}', "OpenAI API key"),
     (r'xox[baprs]-[a-zA-Z0-9-]+', "Slack token"),
@@ -103,39 +101,36 @@ def scan_for_secrets(content: str) -> list[tuple[str, str]]:
     return findings
 
 
-def check_file_references(content: str, base_path: str) -> tuple[list[str], list[str]]:
-    """Check if referenced files exist."""
-    # Extract file paths from content (look for common patterns)
-    # Pattern 1: | path/to/file | in tables
-    # Pattern 2: `path/to/file` in code
-    # Pattern 3: path/to/file:123 with line numbers
+FILE_REF_PATTERNS = [
+    r'\|\s*([a-zA-Z0-9_\-./]+\.[a-zA-Z]+)\s*\|',  # Table cells
+    r'`([a-zA-Z0-9_\-./]+\.[a-zA-Z]+(?::\d+)?)`',  # Inline code
+    r'(?:^|\s)([a-zA-Z0-9_\-./]+\.[a-zA-Z]+:\d+)',  # path:line
+    r'\]\(([a-zA-Z0-9_\-./]+\.[a-zA-Z]+)(?:#[^)]*)?\)',  # Markdown link; the colon-free charset skips URLs
+]
 
-    patterns = [
-        r'\|\s*([a-zA-Z0-9_\-./]+\.[a-zA-Z]+)\s*\|',  # Table cells
-        r'`([a-zA-Z0-9_\-./]+\.[a-zA-Z]+(?::\d+)?)`',  # Inline code
-        r'(?:^|\s)([a-zA-Z0-9_\-./]+\.[a-zA-Z]+:\d+)',  # With line numbers
-    ]
 
-    found_files = set()
-    for pattern in patterns:
-        matches = re.findall(pattern, content)
-        for match in matches:
-            # Remove line numbers
+def extract_file_references(content: str) -> set[str]:
+    """Return file paths cited in tables, inline code, path:line or Markdown links.
+
+    Root-level names (README.md) count too; URLs are skipped.
+    """
+    found = set()
+    for pattern in FILE_REF_PATTERNS:
+        for match in re.findall(pattern, content, re.MULTILINE):
             filepath = match.split(':')[0]
-            # Skip obvious non-files
-            if filepath and not filepath.startswith('http') and '/' in filepath:
-                found_files.add(filepath)
+            if filepath and not filepath.startswith(('http', 'www.')) and '://' not in match:
+                found.add(filepath)
+    return found
 
-    existing = []
-    missing = []
 
-    for filepath in found_files:
-        full_path = Path(base_path) / filepath
-        if full_path.exists():
+def check_file_references(content: str, base_dirs: list[str]) -> tuple[list[str], list[str]]:
+    """Split cited files into existing/missing; a file exists if any base dir holds it."""
+    existing, missing = [], []
+    for filepath in sorted(extract_file_references(content)):
+        if any((Path(base) / filepath).exists() for base in base_dirs):
             existing.append(filepath)
         else:
             missing.append(filepath)
-
     return existing, missing
 
 
@@ -203,14 +198,15 @@ def validate_handoff(filepath: str) -> dict:
         return {"error": f"File not found: {filepath}"}
 
     content = path.read_text()
-    base_path = path.parent.parent.parent  # Go up from .claude/handoffs/
+    # Project root (handoffs live in <root>/.claude/handoffs/) and the handoff's own directory for chain links.
+    base_dirs = [str(path.parent.parent.parent), str(path.parent)]
 
     # Run checks
     todos_clear, remaining_todos = check_todos(content)
     required_complete, missing_required = check_required_sections(content)
     missing_recommended = check_recommended_sections(content)
     secrets_found = scan_for_secrets(content)
-    existing_files, missing_files = check_file_references(content, str(base_path))
+    existing_files, missing_files = check_file_references(content, base_dirs)
 
     # Calculate score
     score, rating = calculate_quality_score(
@@ -218,8 +214,16 @@ def validate_handoff(filepath: str) -> dict:
         missing_recommended, secrets_found, missing_files
     )
 
+    if secrets_found:
+        verdict = "BLOCKED"
+    elif score >= 70 and todos_clear and required_complete:
+        verdict = "READY"
+    else:
+        verdict = "NEEDS_WORK"
+
     return {
         "filepath": str(path),
+        "verdict": verdict,
         "score": score,
         "rating": rating,
         "todos_clear": todos_clear,
@@ -236,10 +240,6 @@ def validate_handoff(filepath: str) -> dict:
 
 def print_report(result: dict):
     """Print a formatted validation report."""
-    if "error" in result:
-        print(f"Error: {result['error']}")
-        return False
-
     print(f"\n{'='*60}")
     print(f"Handoff Validation Report")
     print(f"{'='*60}")
@@ -286,31 +286,40 @@ def print_report(result: dict):
             print(f"       - {section}")
 
     print(f"\n{'='*60}")
-
-    # Final verdict
-    if (result['score'] >= 70 and result['todos_clear'] and
-            result['required_complete'] and not result['secrets_found']):
-        print("Verdict: READY for handoff")
-        return True
-    elif result['secrets_found']:
-        print("Verdict: BLOCKED - Remove secrets before handoff")
-        return False
-    else:
-        print("Verdict: NEEDS WORK - Complete required sections")
-        return False
+    messages = {
+        "READY": "Verdict: READY for handoff",
+        "BLOCKED": "Verdict: BLOCKED - Remove secrets before handoff",
+        "NEEDS_WORK": "Verdict: NEEDS WORK - Complete required sections",
+    }
+    print(messages[result["verdict"]])
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python validate_handoff.py <handoff-file>")
-        print("Example: python validate_handoff.py .claude/handoffs/2024-01-15-auth.md")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description="Validate a handoff document: TODO placeholders, required sections, secrets, file references, score.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""exit codes:
+  0  verdict READY (score >= 70, no TODOs, required sections complete, no secrets)
+  1  verdict NEEDS_WORK or BLOCKED (fix the reported items and re-run)
+  2  usage error or handoff file not found (message on stderr)
 
-    filepath = sys.argv[1]
-    result = validate_handoff(filepath)
-    success = print_report(result)
+examples:
+  python3 scripts/validate_handoff.py .claude/handoffs/2026-01-15-143022-auth.md
+  python3 scripts/validate_handoff.py --json .claude/handoffs/2026-01-15-143022-auth.md""",
+    )
+    parser.add_argument("handoff_file", help="Path to the handoff markdown file")
+    parser.add_argument("--json", action="store_true", help="Print the result as one JSON object on stdout")
+    args = parser.parse_args()
 
-    sys.exit(0 if success else 1)
+    result = validate_handoff(args.handoff_file)
+    if "error" in result:
+        print(f"Error: {result['error']}", file=sys.stderr)
+        sys.exit(2)
+    if args.json:
+        print(json.dumps(result, indent=2))
+    else:
+        print_report(result)
+    sys.exit(0 if result["verdict"] == "READY" else 1)
 
 
 if __name__ == "__main__":

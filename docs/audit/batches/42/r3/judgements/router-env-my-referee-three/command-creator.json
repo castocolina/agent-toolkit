@@ -1,0 +1,77 @@
+{
+  "skill": "command-creator",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 85,
+      "evidence": "NEVER let the body splice arguments into shell unquoted... 2. Encode the value as one single-quoted shell word: wrap it in `'...'` and write each `'` inside it as `'\\''`. So `it's` becomes `'it'\\''s'`...",
+      "fix": "The model already knows POSIX single-quote escaping. Cut the 8-line walkthrough to a 2-line rule: validate fixed shapes, single-quote free text with the '\\'' escape, put operands after `--` and keep option values attached. Keep the `--end-of-options` note for git rev-parse, which is the non-obvious part."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 66,
+      "evidence": "| `model`, `effort` | the user asks | apply to the rest of the turn |",
+      "fix": "Drop this row, or merge it into one clause in the line under the table. It adds no decision the model would get wrong."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 15,
+      "evidence": "2. **Command or skill?** Since commands were merged into skills, both create `/name`... Before writing, look for `<name>` in `.claude/skills/<name>/`... If any exists, write nothing and reply with this template:",
+      "fix": "Split step 2 into two steps: 2a 'Command or skill?', which covers scripts and references and stops or flags manual steps, and 2b 'Name collision check', which holds the template and the approved-update path. Then the process pattern has one decision per checkpoint."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/command-creator/evals/evals.json",
+      "line": 32,
+      "evidence": "\"Asks for the command purpose/workflow steps or other essential missing requirements\"",
+      "fix": "Make the underspecified-workflow assertions verifiable. Examples: 'Writes no file under .claude/commands/ or ~/.claude/commands/', 'Asks for the release steps in order' and 'Asks whether the command is project or global'. Replace the open-ended 'or other essential missing requirements'."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 28,
+      "evidence": "6. **Validate in a loop.** Walk the checklist at the end of this file against the draft, fix every failing item, and walk it again",
+      "fix": "Add a concrete check to step 6, because Gotchas warns that broken YAML silently drops `disable-model-invocation`. Parse the frontmatter, for example `python3 -c 'import sys,yaml; yaml.safe_load(open(sys.argv[1]).read().split(\"---\")[1])' <file>` or an equivalent. Confirm `---` is on line 1, and fix the draft and re-check on failure."
+    }
+  ]
+}

@@ -62,7 +62,7 @@ cmd_related() {
   repo=$(repo_of)
   local fetch_err
   fetch_err=$(mktemp); TMPS+=("$fetch_err")
-  if ! git fetch origin "$base" "$head" >"$fetch_err" 2>&1; then
+  if ! git fetch origin "+refs/heads/$base:refs/remotes/origin/$base" "+refs/heads/$head:refs/remotes/origin/$head" >"$fetch_err" 2>&1; then
     cat "$fetch_err" >&2
     exit 1
   fi

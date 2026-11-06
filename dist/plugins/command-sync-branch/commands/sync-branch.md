@@ -1,16 +1,30 @@
 ---
-description: Sync feature branch with the latest main branch.
+description: Rebase the current feature branch onto the latest origin/main (or a given target) and update its PR with --force-with-lease. Use when a feature branch or PR is behind, out of date or conflicts with its base, or the user asks to update, catch up or sync a branch, even without the word rebase. Not for merge-based sync, updating local main, or rebasing a branch others push to.
 argument-hint: [target]
 ---
 
-1. Fetch latest upstream refs: `git fetch origin --prune`.
-2. Identify target branch (default `main`, or override via argument).
-3. Rebase current branch onto target:
-   ```bash
-   git rebase origin/${target:-main}
-   ```
-4. Resolve any conflicts
-5. Force-with-lease push to update the PR:
-   ```bash
-   git push --force-with-lease origin $(git branch --show-current)
-   ```
+Target = the argument, else `main`; an argument starting with `origin/` or `upstream/` is a remote ref, not a branch: stop and ask for the bare branch name. `base=origin`, except fork PRs: if an `upstream` remote exists (`git remote`) and the PR base lives there (`gh pr view --json baseRepository` when available, else ask once), set `base=upstream` so a stale fork `main` is never the base; pushes still go to `origin`. Run each step in order; stop at the first failed check and report it. Never push after a stop.
+
+1. Preconditions, before any mutation:
+   - `branch=$(git branch --show-current)`; empty means detached HEAD: stop and say so.
+   - `$branch` equals the target: stop, say the current branch is the target and nothing was rebased.
+   - `git status --porcelain --untracked-files=no` not empty (a modified or staged tracked file): stop, name the uncommitted paths, tell the user to commit or stash. Never stash automatically. Untracked files do not stop; mention them as a note, and name one only if the rebase later fails because it would be overwritten.
+   - Any of `rebase-merge`, `rebase-apply`, `MERGE_HEAD`, `CHERRY_PICK_HEAD` exists under `git rev-parse --git-path <name>` (`.git` is a file in linked worktrees): an operation is in progress, stop.
+2. Record state, then fetch:
+   - `old_base=$(git rev-parse --verify --quiet "$base/$target")` (empty if never fetched) and `orig=$(git rev-parse HEAD)`.
+   - `git fetch origin --prune`, and `git fetch "$base" --prune` too when `base` is not `origin`. On failure stop and report the error. `git rev-parse --verify --quiet "$base/$target"` failing: stop, "<base>/<target> does not exist".
+   - `remote=$(git rev-parse --verify --quiet "origin/$branch")` (empty if the branch was never pushed). If `$remote` is set and `git merge-base --is-ancestor "$remote" "$orig"` fails, the remote has commits the local branch lacks: run `git rev-list --merges "$orig..$remote"`: any output means remote-only merges, whose conflict resolutions `git cherry` ignores, so stop, list them and require reconciliation. Otherwise run `git cherry "$orig" "$remote"`; if every line starts with `-` (each has an equivalent patch in `$orig`, an earlier rebase of the same work), continue and push with the lease on `$remote`; any `+` line is a real new commit: stop, list them with `git log --oneline "$orig..$remote"`, rebase nothing.
+   - If `$remote` is set, the rebase rewrites a published branch: unless the user already said it is theirs alone (invocation or conversation), ask once with AskUserQuestion (or plain text) "This force-pushes <branch>; is it yours alone?" and stop on anything but yes. Author emails (`git log --format=%ae "$base/$target..$remote"`) may be shown as a hint, never as proof.
+   - `git log --merges "$base/$target..$branch"` not empty: the branch has merge commits that a plain rebase linearises; ask "Rebase with --rebase-merges to keep the merge commits, or stop?". On keep, add `--rebase-merges` to the step 3 rebase; on anything else stop, changing nothing.
+3. Rebase onto the remote ref, never local `main`; never `git pull` or `git merge`. In order:
+   - (a) `fork=$(git merge-base --fork-point "$base/$target" "$branch")` (reflog based) and `plain=$(git merge-base "$base/$target" "$branch")`.
+   - (b) If `fork` is non-empty and differs from `plain`, `fork` is always the newer commit, so list what fork-point would skip: `git log --oneline "$plain..$fork"` (commits that were on the `$base/$target` reflog and are no longer on it, e.g. pushed then reverted or rewritten). Show that list and ask "fork-point skips these N commits; skip them (fork-point rebase), keep them (plain rebase), or stop?". Keep: run `git rebase "$base/$target"` (add `--rebase-merges` if step 2 chose it) and skip (c); skip: continue to (c); anything else: stop, changing nothing.
+   - (c) Choose the form: `fork` non-empty and differs from `plain` (base rewritten by force-push or squash-merge): `git rebase --onto "$base/$target" "$fork" "$branch"`. Else if `old_base` is set, `git merge-base --is-ancestor "$old_base" "$base/$target"` fails and `git merge-base --is-ancestor "$old_base" "$branch"` succeeds: `git rebase --onto "$base/$target" "$old_base" "$branch"`. Otherwise `git rebase "$base/$target"`. Replaying from the old base keeps only the feature commits.
+4. Rebase exits non-zero: do not resolve and do not push. Read `git diff --name-only --diff-filter=U`. Non-empty: it is a conflict; leave the rebase paused, name those files, and tell the user to resolve them, `git add`, then `git rebase --continue` (or `git rebase --abort` to restore `$orig`), and that nothing was pushed. Empty but `git rev-parse --git-path rebase-merge` or `rebase-apply` exists: the rebase stopped on something else (signing, hook or `exec` failure); never say "conflict", report git's stderr and `git status` rebase state, leave it paused, give the same continue/abort choices, and say nothing was pushed. Neither exists: report the git error as is and say the branch is unchanged at `$orig`.
+5. Push with an explicit lease on the step 2 tip: `git push --force-with-lease="refs/heads/$branch:$remote" origin "$branch"`; when `$remote` is empty, `git push -u origin "$branch"`. If the lease is rejected, someone else pushed: stop, do not retry with `--force`. Any other push failure (auth, network, pre-push hook, protected branch): stop and quote git's stderr. Either way report that the local branch is rebased but not pushed, give `$orig`, and the recovery `git reset --hard "$orig"` (discards the rebase; only on the user's go-ahead). After a lease rejection, to inspect first run `git fetch origin "refs/heads/$branch"` then `git log --oneline "$orig..FETCH_HEAD"`. On success report `git log --oneline "$base/$target..$branch"`, `$orig` and the new tip.
+
+## Gotchas
+
+- Never rebase onto local `main` (often stale, so the branch lands on an old base), never `git pull` (it merges or rebases the feature branch's own remote, the wrong upstream), never `git merge` (the merge commit breaks the PR's linear history).
+- Never use `--force` or `-f`, even after a lease rejection. A background `git fetch` (IDE, cron) moves the remote-tracking ref and silently disarms a bare `--force-with-lease`, so always pass the explicit expected value saved in step 2.
+- During a rebase `--ours` is the target history being replayed onto and `--theirs` is your feature commit, the reverse of a merge. Mention this in the conflict message; picking a side by label discards feature work.

@@ -1,0 +1,59 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/evals/evals.json",
+      "line": 9,
+      "evidence": "The auth-plan assertion requires \"at least one out-of-scope item with its reason\", although its prompt supplies no change or dependency evidence establishing a safe exclusion. SKILL.md line 37 explicitly requires such evidence before excluding an area.",
+      "fix": "Replace the assertion with: \"Excludes an area only with cited evidence that the change cannot reach it; otherwise records impact as Unknown, names the missing-information owner or marks it Unknown, and retains a minimal smoke check or an owned Blocked check.\""
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/evals/evals.json",
+      "line": 88,
+      "evidence": "The assertion says \"Runs scripts/create_bug_report.sh with field flags\", but the prompt says \"The harness already ran the command ... check that run\" and the expected output permits confirming the supplied call. The same contradiction appears for generate_test_cases.sh at line 121. A correct review without duplicate execution can therefore fail these assertions.",
+      "fix": "For both supplied-run evals, require checking the logged command's flags, exit code, manifest and generated file without requiring another execution. Reserve assertions requiring execution for separate evals where no completed run is supplied."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/scripts/create_bug_report.sh",
+      "line": 50,
+      "evidence": "The \"JSON-escape $1\" helper escapes backslash, quote, newline and tab only. For an accepted --id containing a literal carriage return, filename sanitization succeeds, but the success manifest at line 321 emits that control character unescaped in id, producing invalid JSON. generate_test_cases.sh repeats the same serializer and failure branch.",
+      "fix": "Implement complete JSON string escaping in both scripts, including carriage return, backspace, form feed and the remaining supported U+0001\u2013U+001F characters. Add tests that parse success and error manifests containing control characters with a JSON parser."
+    }
+  ]
+}

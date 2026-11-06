@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "command-creator",
+      "percent": 92.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6,
+        "router-env-my-referee-one": 91.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 26,
+          "evidence": "Location rows 'Inside a repository, no scope stated' and 'Inside a repository, user says \"for the team\"...' both resolve to `.claude/commands/<name>.md`; the second row restates the default the model would already infer",
+          "fix": "Merge the two rows into one: 'Inside a repository, unless the user says global or personal | `.claude/commands/<name>.md`'"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 53,
+          "evidence": "Frontmatter and Arguments sections are fact tables ('`arguments: file lines` makes `$file`, `$lines`') with no decision prompt for choosing named arguments, `$0` or whole `$ARGUMENTS`",
+          "fix": "Add one 'Before choosing placeholders, ask:' line: free text that may contain spaces -> `$ARGUMENTS` whole; one or more fixed-shape values -> named `arguments:` so the body can test for empty; never `$1` for the first value"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 13,
+          "evidence": "Two silent-failure facts sit outside Gotchas: 'a skill with the same name wins and the command is silently unused' (line 13) and 'broken YAML loads the body with no fields and no error' (line 59)",
+          "fix": "Add both as Gotchas bullets with their consequence, e.g. 'A same-named skill in .claude/skills/ or ~/.claude/skills/ shadows the command with no warning: check before writing' and 'Frontmatter not starting on line 1 or invalid YAML is silently dropped, including disable-model-invocation'"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/command-creator/evals/trigger-queries.json",
+          "line": 2,
+          "evidence": "Queries are terse and formal ('Create a reusable `/deploy-preview` slash command for this project.'); none has file paths, typos or backstory, and few positives describe the need without saying 'command'",
+          "fix": "Rewrite 3-4 positives as realistic implicit-need prompts (e.g. 'every friday i do git pull, bump package.json, npm publish, post in #releases, can i just type one thing for that?') and add context such as paths and team names to near-miss negatives"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 13,
+          "evidence": "'a skill with the same name wins and the command is silently unused' states the check but not the branch outcome when a same-named skill exists",
+          "fix": "Add the branch: 'If one exists, stop and offer to rename the command (suggest `<name>-cmd` or a namespaced path) or to update the skill instead; never write a shadowed command'"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/command-creator/references/examples.md",
+          "line": 224,
+          "evidence": "The 223-line ensure-ci example repeatedly instructs native task tracking: \"Use TodoWrite to track your progress:\" and \"Track progress: Use TodoWrite for every iteration\", alongside generic guidance such as \"Be systematic\" and \"Don't guess\". This substantially dilutes the command-specific knowledge.",
+          "fix": "Condense ensure-ci to its project-specific check mapping, bounded stopping policy and concise reporting template. Remove repeated TodoWrite instructions and generic run/fix recaps; preserve all erk attribution and source credits."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 99,
+          "evidence": "The release example says: \"If the tag is there, report success\" after a failed or timed-out push. If another publisher creates that tag for a different commit between validation and pushing, the push fails but this branch incorrectly reports success.",
+          "fix": "Record the intended commit before tagging. After a failed or timed-out push, query the exact remote tag and its peeled target, and report success only when the target matches the intended commit. Report a conflict for a different target, stop when the query fails or remains inconclusive, and permit retry only when a successful query proves absence."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/references/patterns.md",
+          "line": 27,
+          "evidence": "\"Repeat at most <N> times\" checks first and fixes afterward, then says \"After <N> attempts without success, report STUCK\". A successful fix on the final iteration is never checked, so the skeleton can report STUCK after actually repairing the failure.",
+          "fix": "Run an initial baseline check, then define each of the N attempts as a fix followed by a fresh check. Update stuck detection from those observed results, return SUCCESS immediately on a passing check, and report exhaustion only after the final verification fails."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/command-creator/evals/evals.json",
+          "line": 3,
+          "evidence": "The five evals are \"project-ci-command\", \"global-argument-command\", \"underspecified-workflow\", \"release-from-transcript\" and \"shell-special-argument\"; none exercises the supported \"Plan, approve, execute\" pattern.",
+          "fix": "Add a multi-turn approval-gate eval asserting that drafting and feedback cause no writes, the approval wait remains in the main conversation, and explicit approval saves the plan before execution begins."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

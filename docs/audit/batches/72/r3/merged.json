@@ -1,0 +1,62 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "general-purpose",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 13,
+          "evidence": "1. Plan: before any edit or delegation, record per requirement its owner, dependency order and acceptance check.",
+          "fix": "Shorten step 1 to its non-obvious checkpoint (one owner per requirement, no two parallel workers share a file, each requirement has an acceptance check). Drop the general planning wording, which the model and the harness's todo and plan features already cover."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 15,
+          "evidence": "delegate only when its domain rules or tools add something you lack, since each delegation costs context and needs its own verification",
+          "fix": "Add a short 'before running workers in parallel, ask:' heuristic. Parallelize only when the file sets are disjoint and each worker has its own acceptance check. Otherwise run workers one after another. This adds a thinking frame for the main serial-or-parallel choice."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 29,
+          "evidence": "Delegated specialists start without your conversation context: pass file paths and acceptance checks explicitly.",
+          "fix": "Replace this widely known point with an environment-specific gotcha learned in practice, for example that a specialist run with isolation: worktree commits on a different branch, so its diff must be merged or cherry-picked before the gates run in your worktree."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 14,
+          "evidence": "2. Baseline and reproduce: list tests already failing in this worktree under Validation as pre-existing",
+          "fix": "Move gate discovery ahead of the baseline. Find the gate commands (AGENTS.md, CLAUDE.md, the Makefile, else the toolchain's standard test runner) in step 2 and run them there to record pre-existing failures. Step 5 only finds the gates, so the step 2 baseline cannot be taken as written. Also say whether 'else stop and report it' stops only that requirement or the whole task."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

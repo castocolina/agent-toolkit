@@ -1,0 +1,68 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 36,
+      "evidence": "Independent groups: public contracts and schemas, then core logic, then callers, then tests and docs.",
+      "fix": "Cut this generic layering order, which the model already applies. Keep only the non-obvious rule that configuration or migrations come first when later behaviour needs them."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 34,
+      "evidence": "Group files by purpose (not by directory), one group per reviewable idea.",
+      "fix": "Add a decision question for drawing group boundaries, for example: 'Before splitting, ask: can a reviewer verify this group without opening the other one? If not, merge. Does one rename touch many files? Make it one mechanical group, whatever the file count.'"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 64,
+      "evidence": "## Gotchas lists git show <rev>:<path>, hunk headers, binary/submodule changes and generated churn, but has no item on large diffs being cut off silently",
+      "fix": "Add this gotcha: 'Harness tool output is truncated beyond roughly 10-30K characters without warning. Never build groups from a diff you did not see in full. Read `--stat`, then read the diff per path (`git diff <src> -- <path>`) so every file in the stat is actually read.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 22,
+      "evidence": "With no commits yet (`git rev-parse --verify --quiet HEAD` fails) there is no `HEAD` diff: collect both `git diff --cached --no-color` and `git diff --no-color` ... Nothing from either: report \"No uncommitted changes to analyze\" and stop.",
+      "fix": "Say whether the no-commit branch also runs the untracked-file step. As written, a fresh repo where every file is untracked reports 'No uncommitted changes'. Add: 'In both cases also include untracked files via `git diff --no-index`; report no changes only when all three sources are empty.'"
+    }
+  ]
+}

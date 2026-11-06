@@ -1,0 +1,104 @@
+{
+  "skill": "reducing-entropy",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 14,
+    "D6": 13,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 108,
+  "max_total": 125,
+  "percent": 86.4,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 32,
+      "evidence": "6. **Verify.** Run the existing tests, any available build or type checks, and a smoke import of every public name from step 1.",
+      "fix": "Keep only the parts the model would skip: the smoke import of every step-1 public name, the re-measure with the step-2 counter, and the label 'unverified' when checks cannot run. Remove 'run the existing tests, any available build or type checks', because the model already does that."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 22,
+      "evidence": "4. **Decide merges** with this table: ... 5. **Check displacement.** ... 6. **Verify.**",
+      "fix": "Add a checkpoint between ranking and editing: 'Before deleting, list each candidate with its lens, its table row and its projected line delta, then execute.' This makes the Process pattern gate the decision phase before the destructive phase."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 39,
+      "evidence": "Gotchas cover dynamic lookups, test/vendored paths and schema data, but nothing on code that persisted state still references",
+      "fix": "Add: 'NEVER delete a class, enum member or function that stored data or deployed config names (pickled objects, ORM polymorphic identities, Celery task names, functions imported by old migrations, feature-flag keys still set in prod config): the code looks unused, but loading existing data or replaying migrations crashes after the delete.'"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/reducing-entropy/references/data-over-abstractions.md",
+      "line": 1,
+      "evidence": "Reference body is two bullets (\"plain data is a default, not an absolute\"...)",
+      "fix": "Inline the two bullets into the step 3b 'Wrappers, custom types, lookalike code' line in SKILL.md and drop the extra file read, or expand the reference with concrete keep/remove examples so loading it is worth a tool call. Keep its External References wherever the content lands."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 14,
+      "evidence": "`git ls-files -z --cached --others --exclude-standard -- src ':(exclude,glob)**/tests/**' ':(exclude,glob)**/vendor/**' ...` while line 13 requires excludes for 'tests, vendored and generated code'",
+      "fix": "Make the counter's exclusions exact rather than illustrative: add pathspecs for colocated tests (':(exclude,glob)**/test_*.py', ':(exclude,glob)**/*_test.*') and for generated paths, and tell the agent to state the final pathspec in the report. The before and after counts then use the same fixed scope."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/evals/evals.json",
+      "line": 11,
+      "evidence": "\"files\": [... \"references/data-over-abstractions.md\"] (also in pagni-data-deletion); no eval covers step 5 displacement or the dynamic-lookup gotcha",
+      "fix": "Remove the skill's own references from eval 'files' so the without-skill baseline is fair. Add an eval whose fixture has a function reached only through getattr or a registry and whose assertion is 'does not delete it'. Add another where the proposed deletion moves logic into YAML config, with the assertion 'counts the config lines or drops the candidate'."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 14,
+      "evidence": "Exclusion ':(exclude,glob)**/tests/**' only; eval fixture test_formatters.py sits beside formatters.py",
+      "fix": "I ran the explicit-minimize branch. A colocated test_formatters.py under src/ is counted by the example command, so the agent's baseline includes tests, which contradicts line 13 and the eval assertion. Add colocated-test patterns to the counter. Also add a fallback: 'if no src/ exists, use the directory the user named as the scope'."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 33,
+      "evidence": "7. **Report.** Baseline, after count, net change, files made obsolete, each retained item with its reason...",
+      "fix": "Replace the prose list with a short report template (Scope/counter command; Baseline; After (measured|projected); Net; Deleted; Retained: item - reason (contract|invariant|PAGNI); Verification; Test/dependency cost). The output then stays consistent and the 'projected' label is never dropped."
+    }
+  ]
+}

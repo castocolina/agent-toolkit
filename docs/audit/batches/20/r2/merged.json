@@ -1,0 +1,99 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "domain-name-brainstormer",
+      "percent": 95.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0,
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 18,
+          "evidence": "Rank the survivors by the user's stated priorities; default order is spelling reliability, then memorability, then descriptiveness, then TLD fit.",
+          "fix": "Shorten step 3 to the part the model would not do unprompted: 'Default ranking: spelling reliability first; when the top pick wins one axis and loses another (for example memorable but needs a premium .com), state the trade-off in one line.' Drop the generic restatement of ranking by user priorities."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/evals/trigger-queries.json",
+          "line": 79,
+          "evidence": "\"Suggest names for a sustainable clothing store and explain the brand fit.\" labeled should_trigger false, while the description says to trigger 'even if the user only describes the business'",
+          "fix": "Make the negative an unambiguous near-miss, for example 'Suggest names for a sustainable clothing line's spring collection; we already own our domain and don't need a new one.', or relabel this query should_trigger true"
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/evals/evals.json",
+          "line": null,
+          "evidence": "No eval covers step 4 (first choice taken: another TLD vs modifier vs new name)",
+          "fix": "Add an eval such as 'rosiescrumb.com is taken by a bakery in Ohio; we're a bakery in Leeds. What should we do?' with assertions: picks exactly one path, recommends a new name or a clearly distinct option because the holder is in the same category, and states that path's cost"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 37,
+          "evidence": "WHOIS fallback ... then `whois -h <server> <name>` (label rule at line 26: 'its WHOIS said \"not found\"')",
+          "fix": "Add a WHOIS classification rule: 'Registry WHOIS phrasing varies (for example .de returns \"Status: free\", others \"No match\" or \"NOT FOUND\"). Map an explicit no-record reply to `not found in registry`, a record with a creation date to `registered`, and anything else, including restricted or rate-limit text, to `unverified`.'"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 8,
+          "evidence": "\u201cIdeation is cheap; the skill's value is screening names hard and never presenting a guess as a lookup.\u201d This introductory declaration repeats the operational rules below rather than adding knowledge.",
+          "fix": "Remove the introductory paragraph and begin with Defaults; retain the concrete screening rules, lookup distinctions and gotchas."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/evals/trigger-queries.json",
+          "line": 79,
+          "evidence": "\u201cSuggest names for a sustainable clothing store and explain the brand fit.\u201d is labeled false, while \u201cGive me brandable names for a secure family photo-sharing product.\u201d at line 27 is labeled true. Both request brand names without mentioning domains, leaving the intended implicit-domain boundary inconsistent.",
+          "fix": "Keep the implicit-business positive and rewrite the clothing-store negative to explicitly exclude domains, for example: \u201cSuggest names for a sustainable clothing store and explain the brand fit; do not suggest domains.\u201d"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 20,
+          "evidence": "\u201cSame name, another TLD: when the audience types the name more than it searches for it on `.com`\u201d. Following this branch for a direct-navigation-heavy audience selects the option most exposed to the acknowledged .com traffic and email leakage.",
+          "fix": "Prefer another TLD when discovery is mainly through search or links, users can reliably retain the full address, and the .com holder is unrelated. Prefer a new name when users habitually type the bare .com or significant email confusion is expected; retain the explicit leakage warning."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 28,
+          "evidence": "The prescribed command is \u201ccurl -sS -L -o rdap.json -w '%{http_code} %{url_effective}' https://rdap.org/domain/<name>\u201d, without a connection or total deadline, although line 35 provides a timeout fallback. A server that accepts a connection and then stalls can prevent that fallback from being reached promptly.",
+          "fix": "Add explicit limits such as --connect-timeout 5 --max-time 20 to curl, and bound WHOIS execution with a tool deadline as well. Route expired lookups to unverified without retrying."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

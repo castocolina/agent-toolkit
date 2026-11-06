@@ -1,0 +1,77 @@
+{
+  "skill": "openapi-to-typescript",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 50,
+      "evidence": "**PascalCase:** split on non-alphanumerics and lower-to-upper boundaries, capitalise each part, keep the rest: `listPets`, `list_pets` \u2192 `ListPets`. and the `format: date`, `date-time` \u2192 `string` row (line 77)",
+      "fix": "Cut the PascalCase rule to its non-obvious part (the `Schema`/`Operation` digit prefixes). Cut the date row to one clause in the int64 row, because the model already maps JSON dates to string."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 33,
+      "evidence": "Compare its exports with the new ones and list the differences in the report.",
+      "fix": "Add a decision prompt for the update path: \"Before overwriting, ask: does any removed or renamed export, or any property that became required or `| null`, break existing callers? If so, list it first in the report as a breaking change.\" This gives the update flow the same expert framing as the exactness question on line 10."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 79,
+      "evidence": "`format: binary` in `application/octet-stream` or `multipart/*` | `Blob` for browser code; ask for other runtimes",
+      "fix": "Give a default with an escape hatch: \"`Blob` for browser code; `Uint8Array` when the output is used only in Node (no DOM lib in tsconfig); report the choice.\" Then generation does not stop in the middle of a file."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/evals/evals.json",
+      "line": null,
+      "evidence": "12 evals cover preflight stops, naming, refs, bodies and guards, but none covers the update flow (header detection, refusing to overwrite a headerless file, listing removed exports) or the springdoc/NestJS `allOf` + base `discriminator` form",
+      "fix": "Add an eval with an existing `types/api.ts` (with and without the generated header) plus a changed spec. Assert that a headerless file is not overwritten and that `Removed/renamed exports:` lists the dropped export. Add another eval with a base-discriminator `allOf` fixture that asserts `BaseVariant = Cat | Dog` is marked Approximate."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 86,
+      "evidence": "any other media type maps to `Blob` per the `format: binary` row",
+      "fix": "Add `*/*` and `application/*` to the JSON branch when their schema is an object, array or `$ref`. springdoc emits `content: {\"*/*\": {schema: {$ref: User}}}` by default, and the rule as written types every springdoc response as `Blob`. Example: \"`*/*` with a non-binary schema maps its schema as JSON; report the assumption.\""
+    }
+  ]
+}

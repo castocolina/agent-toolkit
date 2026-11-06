@@ -1,103 +1,53 @@
 # Plugin Structure Reference
 
-## Directory Hierarchy
+Source: https://code.claude.com/docs/en/plugins/manifest-reference and https://code.claude.com/docs/en/plugins/components (checked 2026-11-04).
+
+## Default layout
+
+Every path is relative to the plugin root. Add only the directories you use.
 
 ```
 plugin-name/
-├── .claude-plugin/
-│   └── plugin.json          # Required: Plugin metadata manifest
-├── commands/                 # Optional: Custom slash commands
-├── agents/                   # Optional: Agent definitions
-├── skills/                   # Optional: Agent Skills
-│   └── skill-name/
-│       ├── SKILL.md         # Required for each skill
-│       ├── scripts/         # Optional: Executable code
-│       ├── references/      # Optional: Documentation
-│       └── assets/          # Optional: Output files
-├── hooks/                    # Optional: Event handlers
-│   └── hooks.json
-└── .mcp.json                # Optional: MCP server integrations
+├── .claude-plugin/plugin.json   # manifest; optional, but create_plugin.py writes one
+├── skills/<skill>/SKILL.md      # preferred for new instructions
+├── commands/<file>.md           # legacy flat command files
+├── agents/<agent>.md
+├── hooks/hooks.json
+├── .mcp.json
+├── .lsp.json
+├── output-styles/
+├── bin/                         # on the Bash tool's PATH while enabled; claude.ai and Cowork refuse plugins that have it
+└── settings.json                # only `agent` and `subagentStatusLine` take effect
 ```
 
-## Plugin Manifest (`plugin.json`)
+A `CLAUDE.md` at the plugin root is not loaded as context (`claude plugin validate` warns); put instructions in a skill.
 
-**Location:** `.claude-plugin/plugin.json` (must be in this directory)
+## Component names
 
-**Required fields:**
+Every component is namespaced under the `plugin.json` `name`:
 
-- `name`: Unique identifier (kebab-case)
+- `skills/deploy/SKILL.md` -> `/plugin-name:deploy`
+- `commands/status.md` -> `/plugin-name:status`
+- `commands/db/migrate.md` -> `/plugin-name:db:migrate` (each subdirectory adds a segment)
+- agent `reviewer` -> `plugin-name:reviewer`
 
-**Standard metadata:**
+Confirm the names after install by typing `/plugin-name:` in a session. `claude plugin details <plugin-name>` lists skills and flat commands but omits commands in subdirectories (checked on Claude Code 2.1.318).
 
-- `version`: Semantic versioning (e.g., "1.0.0")
-- `description`: Plugin purpose
-- `author`: Object with name, email, url
-- `homepage`: URL
-- `repository`: URL
-- `license`: SPDX identifier
-- `keywords`: Array of search terms
+## plugin.json
 
-**Component paths (optional):**
+`name` is the only required key: kebab-case, no spaces, `@`, `:` or path separators. Names starting with `claude-`, `anthropic-` or `cc-plugin-` fail validation as impersonating Anthropic.
 
-- `commands`: Path to commands directory
-- `agents`: Path to agents directory
-- `hooks`: Path to hooks configuration
-- `mcpServers`: Path to MCP configuration
+Common optional keys: `version` (any string, not checked against semver; pins users until changed), `description`, `author` (`name` required, `email` and `url` optional), `homepage` (must parse as a URL or the plugin fails to load), `repository`, `license` (SPDX id), `keywords`, `displayName`, `dependencies`, `userConfig`.
 
-### Example plugin.json
+Unknown top-level keys are stripped with a validate warning; an unknown key inside `userConfig`, `channels`, `lspServers` or `monitors` stops the plugin from loading.
 
-```json
-{
-  "name": "example-plugin",
-  "version": "1.0.0",
-  "description": "Example plugin for demonstration",
-  "author": {
-    "name": "Plugin Creator",
-    "email": "creator@example.com"
-  },
-  "keywords": ["example", "demo"]
-}
-```
+## Component path rules
 
-## Component Types
+Needed only when components live outside the default layout:
 
-### Commands
-
-**Location:** `commands/` directory
-**Format:** Markdown files with frontmatter
-**Naming:** Subdirectories create namespaces via `:`
-
-```
-commands/
-├── simple.md              # Invoked as /plugin-name:simple (verify after installation)
-└── namespace/
-    └── command.md         # Discover the plugin-qualified name after installation
-```
-
-### Agents
-
-**Location:** `agents/` directory
-**Format:** Markdown files describing agent capabilities
-
-### Skills
-
-**Location:** `skills/` directory
-**Format:** Subdirectories with `SKILL.md` file
-**Structure:** See skills documentation
-
-### Hooks
-
-**Location:** `hooks/hooks.json` or path specified in manifest
-**Events:** PreToolUse, PostToolUse, UserPromptSubmit, Notification, Stop, SubagentStop, SessionStart, SessionEnd, PreCompact
-
-### MCP Servers
-
-**Location:** `.mcp.json` at plugin root
-**Purpose:** External tool integrations
-
-## Path Requirements
-
-- All paths relative to plugin root
-- Start with `./` for custom paths
-- Use `${CLAUDE_PLUGIN_ROOT}` for dynamic resolution in hooks/MCP
-- Components must be at plugin root, not inside `.claude-plugin/`
+- Paths start with `./` (`commands/foo.md` fails validation), stay inside the plugin root (no `..`), and must exist.
+- `commands`, `agents` and `outputStyles` replace their default scan. To keep `commands/` and add more, list both: `"commands": ["./commands/", "./extras/"]`.
+- `skills` adds to the default `skills/` scan.
+- `hooks`, `mcpServers` and `lspServers` merge with `hooks/hooks.json`, `.mcp.json` and `.lsp.json`.
+- `agents` takes `.md` files, not directories.
+- In hook commands and MCP configs, reference bundled files as `${CLAUDE_PLUGIN_ROOT}/...`. An installed hosted plugin runs from a per-version cache directory, so that path changes on every version; keep durable files in `${CLAUDE_PLUGIN_DATA}`.

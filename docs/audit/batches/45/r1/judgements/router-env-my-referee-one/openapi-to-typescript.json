@@ -1,0 +1,50 @@
+{
+  "skill": "openapi-to-typescript",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 20,
+      "evidence": "Preflight requires stopping when \"`openapi` missing\" and when \"`paths` missing\", without distinguishing document generation from mapping explanations. The description advertises mapping questions, and the `union-ref` eval expects `Pet = Cat | Dog` from a question supplying neither field. Following the unconditional preflight instead stops that supported scenario.",
+      "fix": "Add an explicit branch for conceptual or fragment-only mapping questions: explain the applicable mapping and its assumptions without writing a file or requiring document-level fields. Apply the complete-document preflight to generation requests, while retaining the stop for explicitly unsupported versions in either mode."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 26,
+      "evidence": "\"`#/components/schemas/X` stays the named type `X`\" and the listed non-schema component substitutions do not cover other valid local references. For example, a request schema referencing `#/components/schemas/Address/properties/postcode` passes preflight when that target exists, but has no naming-table entry or specified resolution branch.",
+      "fix": "Distinguish exact component-schema pointers from other local JSON Pointers. Decode pointer escapes before looking up component names; resolve other existing local pointers to their target in context, inlining a referenced property schema rather than inventing a component name. Preserve cycle handling and add a regression case for a local subschema reference."
+    }
+  ]
+}

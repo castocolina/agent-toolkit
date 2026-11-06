@@ -1,0 +1,135 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "ui-ux-principles",
+      "percent": 90.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 91.2,
+        "router-env-my-referee-one": 88.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 58,
+          "evidence": "Text 4.5:1 (large text, 18 pt or 14 pt bold, 3:1); non-text UI 3:1 (input borders, icons, focus rings) in every theme",
+          "fix": "Cut the WCAG ratios the model already knows down to a short reference ('WCAG AA 1.4.3/1.4.11 ratios'). Spend the saved lines on the non-obvious parts: the 24 px fail line versus the 44 px target, and checking contrast in both themes."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 13,
+          "evidence": "Before placing any action, ask: what is the user here to finish, which control finishes it, and what does a wrong press cost?",
+          "fix": "The only thinking framework covers action placement. Add one 'before X, ask' line for layout ('which content breaks first at 360 px, and does it get its own container scroll or reflow?') and one for states ('which response codes can this request return, and what does each one render?')."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 114,
+          "evidence": "## NEVER lists three process items (second theme, invented line numbers, UNVERIFIED figures); the UI landmines are spread across the per-rule Trap lines",
+          "fix": "Add a short Gotchas list next to the NEVER list with environment facts that break assumptions. Example: a role=\"status\" live region must already be in the DOM before the message text is inserted, or screen readers announce nothing, so render the empty region up front and fill it on success."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 3,
+          "evidence": "description starts \"Use when building, changing, or reviewing any UI screen...\" and never says what the skill produces",
+          "fix": "Apply eight pass/fail UI/UX rules (loading, responsive, hierarchy, tokens, consistency, a11y, states, interaction) while building a screen, and return a rule | pass/fail/na | evidence file:line | fix table on review. Use when building, changing or reviewing any UI screen or component in React, Vue, Svelte, HTML/CSS, MUI or Tailwind: skeleton vs spinner loading, empty and error states, mobile-first responsive layout, visual hierarchy, design tokens, dark mode, WCAG contrast, focus rings, tap targets, aria-label on icon buttons, hover/focus-visible/active/disabled states. Trigger even when the user only says review this page, make this look polished, why does this feel off, or fix the layout, without naming UX. Not for backend or API work, copywriting, brand or logo design, choosing or scaffolding a design-system product, or the MUI theme API and Grid migration (use the mui skill)."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/evals/evals.json",
+          "line": null,
+          "evidence": "No eval covers the tokens no-theme build branch ('create one :root custom-property block... tell the user') or a request that asks for both a review and a fix",
+          "fix": "Add an eval that builds a plain-CSS component in a repo with no theme, asserting one :root block and a note to the user. Add another for 'review and fix X', asserting the table comes first, then the summary line, then the edit."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 92,
+          "evidence": "source row: \"append `not rendered` when the verdict needs a render you did not do\" with \"nothing: decide every row\"",
+          "fix": "Say which verdict an unrendered-only check gets. For example: 'when the only open check needs a render (computed contrast, widths, focus ring), mark the row pass with `not rendered` appended, or fail when the code already shows the break'. Without this, the agent has to guess between pass and na."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 52,
+          "evidence": "'One shared component per role, varied by props. Dark mode is a second value set on the same tokens' restates familiar component and theming practices. The six-line consistency and interaction sections, together with substantial portions of the accessibility, responsive and states sections, are activation-level guidance rather than expert-only knowledge.",
+          "fix": "Compress familiar component reuse, dark-theme, keyboard, hover and basic state reminders into a terse preflight while retaining the eight rule identifiers. Concentrate the detailed rule text on framework-specific failure modes, exceptions and evidence decisions; preserve the output contract and all attribution."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 41,
+          "evidence": "'A filled button repeated on every row or card: the same task N times is not N independent panels' makes repeated card actions an automatic failure. The worked product-grid example applies this restriction regardless of the user's task; the documented-design-system escape hatch does not cover legitimate new designs.",
+          "fix": "Keep one filled primary as the default, but permit repeated equal-priority actions for independent product choices when task context supports them. Require evidence of competing emphasis before failing a product grid, while retaining stricter safeguards for destructive actions."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 92,
+          "evidence": "The source-only Input branch says 'nothing: decide every row' and merely appends 'not rendered' for widths, computed contrast and focus rendering. This conflicts with line 24, 'reading code cannot pass them', and allows an unmeasured responsive or contrast result to receive pass.",
+          "fix": "For source-only reviews, report fail where static evidence establishes a violation, but use na with an explicit unverified explanation for render-dependent checks that have not been measured. Reserve pass for supported conclusions, and align the build checklist and affected eval expectations with this evidence policy."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 53,
+          "evidence": "'A <style> element inside a component: it is not scoped and restyles every matching element in the document' is unconditional, although the description explicitly supports Vue and Svelte. Following this branch incorrectly fails Vue <style scoped> and Svelte's compiler-scoped component styles.",
+          "fix": "Limit this trap to genuinely global styles, such as raw React/DOM style elements and unscoped Vue styles. Explicitly exempt Vue scoped styles, Svelte compiler-scoped styles and shadow-root styles unless their selectors actually escape their scope."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/references/rules/states.md",
+          "line": 27,
+          "evidence": "The fix pattern checks only 'if (orders.length === 0)' after its error branch. With status loading and the usual initial orders = [], following this example renders 'No orders yet', contrary to the successful-response-only rule.",
+          "fix": "Guard the empty branch with status === 'success' && orders.length === 0, or include an explicit preceding loading return and document the required status invariant."
+        },
+        {
+          "id": "D8-4",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 70,
+          "evidence": "'The focus ring sits on :focus-visible, so a mouse click does not show it' treats :focus-visible as keyboard-only. Browser heuristics can intentionally match mouse-focused text inputs, so this rule can incorrectly fail an accessible control.",
+          "fix": "Describe :focus-visible as following browser focus-indication heuristics, not as guaranteeing no mouse-triggered ring. Explicitly allow indicators on pointer-focused text-entry controls and never suppress a required indicator merely because focus came from a mouse."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

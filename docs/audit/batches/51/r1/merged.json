@@ -1,0 +1,81 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "daily-meeting-update",
+      "percent": 94.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.8,
+        "router-env-my-referee-one": 92.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 82,
+          "evidence": "Never let tool activity replace the why, the blockers or the plans: tools show motion, not intent or impediments.",
+          "fix": "Delete this line. Step 3 already makes the same point with a concrete action on line 42 (\"Ask for topics even when tools found plenty\") and in the Provenance gate, so this generic reminder only uses context."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/evals/evals.json",
+          "line": null,
+          "evidence": "Six evals cover the manual, GitHub, digest, contradiction and Monday paths, but none uses Jira input",
+          "fix": "Add an eval with an evals/files/jira-issues.json fixture holding one ticket resolved as Won't Do and one as Done yesterday. Assert that the Won't Do ticket is reported as a triage outcome and not as delivered, and that only the Done ticket whose resolutiondate falls in the window appears under Yesterday."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 19,
+          "evidence": "On Monday or after leave, ask which day counts before querying.",
+          "fix": "Add what to do when the user names a span of days (for example Friday to Sunday): \"If the window covers several days, run `claude_digest.py --date D --format json` once per day and merge the sessions by id. Use the first day as DATE for the gh and Jira queries, and keep only events whose own time falls inside the span.\" The digest accepts only a single --date, so this path is undefined today."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 49,
+          "evidence": "By H2 line count, Fast path (4 lines) and Output (28 lines) are mostly activation; Optional integrations (17), Gotchas (8), Interview (9), and Never (6) carry the expert workflow. The familiar '## Yesterday', '## Today', '## Blockers', and '## Topics for Discussion' template leaves roughly 56% of section lines classified as expert, below the rubric's >70% target.",
+          "fix": "Replace the expanded conventional standup example with a compact section-order specification and one PR/Jira formatting example. Retain the custom meeting-date rule, optional-section conditions, title requirement, and bullet budget."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 24,
+          "evidence": "The window is defined as '00:00-24:00 in the user's local timezone', but GitHub discovery uses '--updated \">=DATE\"', whose date-only boundary is UTC. For a Tokyo-local November 2 window, a PR merged November 1 at 15:30Z belongs to Yesterday but can be excluded from discovery. The later event-time gate cannot recover an undiscovered PR.",
+          "fix": "Compute the selected local day's start and end as timezone-aware instants, convert them to UTC, and use the UTC start timestamp for GitHub discovery. Filter mergedAt and submittedAt against the resulting half-open interval. When the user's zone differs from the machine's, also run the digest with an explicit TZ setting for that zone."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/evals/evals.json",
+          "line": 36,
+          "evidence": "The integration prompt says 'Daily update please' and 'yesterday' without fixing the meeting date or timezone, while its fixtures use date '2026-11-02' and mergedAt '2026-11-02T16:40:00Z'. Assertions require that merge in Yesterday, leaving the expected result dependent on temporal assumptions outside the test.",
+          "fix": "Anchor the integration eval to meeting date 2026-11-03 and timezone UTC, either explicitly in the prompt or through a documented frozen evaluation clock. Add a case containing both an in-window event and a today-only event to verify the event-time gate."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

@@ -4,9 +4,10 @@
     {
       "id": "vague-login",
       "prompt": "We need a login feature. Help me figure out what to build before anyone codes.",
-      "expected_output": "Give initial clarity assessment, identify gaps, and ask 2-3 focused questions; do not draft PRD yet.",
+      "expected_output": "Give an initial advisory score with one line per rubric category, identify the consequential gaps, and ask 2-3 focused questions; do not draft the PRD yet.",
       "assertions": [
         "Provides score out of 100",
+        "Shows per-category points earned against each category maximum (for example Functional x/30)",
         "Identifies missing auth/context decisions",
         "Asks no more than three focused questions",
         "Does not claim final PRD"
@@ -30,6 +31,89 @@
         "Recognizes specific path and expected behavior",
         "Does not start 100-point PRD interview",
         "Mentions test for 401 behavior"
+      ]
+    },
+    {
+      "id": "path-but-ambiguous",
+      "prompt": "support keeps forwarding complaints that people get kicked to the login page mid-form and lose everything they typed. it's in src/auth/session.ts (attached). can you make it less annoying?",
+      "files": [
+        "evals/files/session.ts"
+      ],
+      "expected_output": "Treats the file as context, not a spec: reads the current behavior from session.ts (30-minute TTL, redirect to /login on 401, form state lost) as known facts, does not start coding, and asks 2-3 product questions about what 'less annoying' means.",
+      "assertions": [
+        "Does not write or propose a code change as the answer before clarifying",
+        "States the current behavior from session.ts (redirect to /login on a 401 and/or the 30-minute TTL) as a known fact instead of asking the user about it",
+        "Asks at most three questions, and they are product choices such as silent refresh, a warning before expiry, preserving form data, or changing the session length",
+        "Each question asks for one decision; none joins two decisions with and or nests sub-questions under a number",
+        "Shows an advisory score out of 100",
+        "Does not ask the user for the stack, framework or current behavior; reads them from session.ts or states them as assumptions"
+      ]
+    },
+    {
+      "id": "prd-final",
+      "prompt": "Notes from our three rounds on the weekly CSV export are attached. We're at 92, so write the PRD.",
+      "files": [
+        "evals/files/weekly-csv-export-session.md",
+        "references/prd-template.md"
+      ],
+      "expected_output": "Generates the PRD from the template and shows it with the write to ./docs/prds/weekly-csv-export-v1.0-prd.md, preserving every decision from the notes with its source, with Given/When/Then acceptance criteria, no invented metrics, and the filled footer.",
+      "assertions": [
+        "Targets the path ./docs/prds/weekly-csv-export-v1.0-prd.md (kebab-case feature name, version 1.0)",
+        "Shows the full PRD content with that path and does not claim a save it did not make",
+        "Preserves the decisions: manager exports only their own team, admins any team, members get 403, under 30 seconds for 120 people, header-only file for an empty week, team time zone Monday to Sunday",
+        "Lists scheduled email delivery and Excel format as excluded",
+        "Writes acceptance criteria in Given/When/Then form with observable results, including one for the member 403",
+        "Uses the user-supplied success measure (manual export requests from about 40 a month to under 5) and invents no other metric, deadline or number",
+        "Footer has Document version 1.0, Created 2026-11-03, Clarification rounds 3 and an Advisory clarity score of at least 90/100 from its own rubric rescore; if that score differs from the stated 92, both are shown",
+        "Does not add execution phases, training, deployment plans or architecture the notes do not mention"
+      ]
+    },
+    {
+      "id": "prd-chat-only",
+      "prompt": "Same CSV export notes attached. Don't create any files in the repo, just paste the PRD here so I can drop it into Notion.",
+      "files": [
+        "evals/files/weekly-csv-export-session.md",
+        "references/prd-template.md"
+      ],
+      "expected_output": "Gives the full PRD in chat, names the path it would have used, and states it was not saved; content and footer are the same as a saved PRD.",
+      "assertions": [
+        "Gives the full PRD in the response and does not show a file write",
+        "States that the PRD was not saved to docs/prds",
+        "Names the path it would have used (./docs/prds/weekly-csv-export-v1.0-prd.md)",
+        "Footer has Document version 1.0, Clarification rounds 3 and an Advisory clarity score from its own rubric rescore"
+      ]
+    },
+    {
+      "id": "approved-low-score-draft",
+      "prompt": "Referral program notes attached. Yes I know we only did one round. Draft it anyway, marketing reacts on Friday.",
+      "files": [
+        "evals/files/referral-program-session.md",
+        "references/prd-template.md"
+      ],
+      "expected_output": "Generates the draft instead of refusing, records its own advisory score (below 90; both scores if it differs from the notes' 55) in the footer, keeps the decided behavior in scope and acceptance criteria, and lists reward, eligibility, fraud limits and success measure as open questions with owners, inventing none of them.",
+      "assertions": [
+        "Generates the PRD draft instead of refusing or insisting on more rounds first",
+        "Footer shows an Advisory clarity score below 90/100 from its own rubric rescore and Clarification rounds 1; if that score differs from the 55 in the notes, both are shown",
+        "Lists the reward amount as an open decision owned by marketing and does not invent an amount",
+        "Lists free-plan eligibility, fraud limits and the success measure as open questions or assumptions, not as decisions",
+        "Invents no target metric, conversion rate or deadline",
+        "Acceptance criteria cover only decided behavior (for example the personal referral link on the account page), not the open items"
+      ]
+    },
+    {
+      "id": "round-conflict",
+      "prompt": "Here's where we landed on deleting conversations in the shared inbox (notes attached). Pretty sure we're basically at 90. Write the PRD.",
+      "files": [
+        "evals/files/shared-inbox-delete-session.md",
+        "references/prd-template.md"
+      ],
+      "expected_output": "Surfaces the round 1 versus round 3 contradiction on who can delete and the 90-day purge versus 7-year billing retention disagreement between Marco and Aisha, asks which holds and who decides, and keeps both out of decided acceptance criteria.",
+      "assertions": [
+        "Points out that round 1 (only admins can permanently delete) contradicts round 3 (any agent can delete conversations they own) and asks which holds",
+        "Does not silently adopt the round 3 answer as the decision",
+        "Flags the disagreement between the 90-day purge (Marco) and 7-year retention for billing conversations (Aisha) and asks who decides",
+        "Does not pick one retention rule, and does not narrow, split, carve out or blend the two into a new rule (such as purge after 90 days except billing)",
+        "If it drafts a PRD, both conflicts appear as open decisions with their owners, and no acceptance criterion touches who can delete or how long conversations are kept"
       ]
     }
   ]

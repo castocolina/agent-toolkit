@@ -17,32 +17,25 @@ VersionPart = Literal["major", "minor", "patch"]
 
 
 def parse_version(version: str) -> tuple[int, int, int]:
-    """Parse semantic version string into tuple."""
-    try:
-        parts = version.split(".")
-        return int(parts[0]), int(parts[1]), int(parts[2])
-    except (ValueError, IndexError):
-        print(f"❌ Invalid version format: {version}")
-        sys.exit(1)
+    """Parse a plain MAJOR.MINOR.PATCH version; prerelease/build suffixes are rejected."""
+    if not isinstance(version, str) or not re.fullmatch(r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)", version):
+        raise ValueError(f"Invalid version {version!r}: expected MAJOR.MINOR.PATCH without prerelease or build suffix")
+    major, minor, patch = (int(x) for x in version.split("."))
+    return major, minor, patch
 
 
 def bump_version(version: str, part: VersionPart) -> str:
     """Bump semantic version."""
     major, minor, patch = parse_version(version)
-
     if part == "major":
         return f"{major + 1}.0.0"
-    elif part == "minor":
+    if part == "minor":
         return f"{major}.{minor + 1}.0"
-    elif part == "patch":
-        return f"{major}.{minor}.{patch + 1}"
-    else:
-        print(f"❌ Invalid version part: {part}")
-        sys.exit(1)
+    return f"{major}.{minor}.{patch + 1}"
 
 
 def update_plugin_version(plugin_name: str, marketplace_root: Path, part: VersionPart) -> None:
-    """Update both manifests after validating names, paths, and contents."""
+    """Bump the version where Claude Code reads it (plugin.json, else the marketplace entry) after validating both."""
     if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", plugin_name):
         raise ValueError("plugin_name must be a kebab-case identifier")
     plugins_root = (marketplace_root / "plugins").resolve()
@@ -54,38 +47,46 @@ def update_plugin_version(plugin_name: str, marketplace_root: Path, part: Versio
     plugin_json_path = marketplace_root / "plugins" / plugin_name / ".claude-plugin" / "plugin.json"
 
     if not plugin_json_path.exists():
-        print(f"❌ Plugin manifest not found: {plugin_json_path}")
-        sys.exit(1)
+        raise FileNotFoundError(f"Plugin manifest not found: {plugin_json_path}. bump_version.py requires plugin.json; "
+                                "for a manifest-less plugin edit an existing marketplace-entry version by hand, or leave a SHA-versioned plugin unbumped.")
 
     with open(plugin_json_path, "r") as f:
         plugin_data = json.load(f)
 
-    old_version = plugin_data.get("version", "0.0.0")
-    new_version = bump_version(old_version, part)
-    plugin_data["version"] = new_version
+    if not isinstance(plugin_data, dict):
+        raise ValueError(f"Invalid plugin manifest {plugin_json_path}: top level must be a JSON object")
 
-    # Validate marketplace prerequisites before writing either manifest.
     marketplace_json_path = marketplace_root / ".claude-plugin" / "marketplace.json"
-
     if not marketplace_json_path.exists():
-        print(f"❌ Marketplace manifest not found: {marketplace_json_path}")
-        sys.exit(1)
-
+        raise FileNotFoundError(f"Marketplace manifest not found: {marketplace_json_path}")
     with open(marketplace_json_path, "r") as f:
         marketplace_data = json.load(f)
+    plugins = marketplace_data.get("plugins") if isinstance(marketplace_data, dict) else None
+    if not isinstance(plugins, list):
+        raise ValueError(f"Invalid marketplace manifest {marketplace_json_path}: 'plugins' must be an array")
+    entry = next((p for p in plugins if isinstance(p, dict) and p.get("name") == plugin_name), None)
+    if entry is None:
+        raise ValueError(f"Plugin '{plugin_name}' not found in marketplace manifest")
 
-    plugin_found = False
-    for plugin in marketplace_data.get("plugins", []):
-        if plugin.get("name") == plugin_name:
-            plugin["version"] = new_version
-            plugin_found = True
-            break
+    # Claude Code resolves the version from plugin.json first, then the marketplace entry, then the commit SHA.
+    pinned_in_manifest = "version" in plugin_data
+    if pinned_in_manifest:
+        old_version = plugin_data["version"]
+    elif "version" in entry:
+        old_version = entry["version"]
+    else:
+        raise ValueError(f"Neither {plugin_json_path} nor the '{plugin_name}' marketplace entry has a version: "
+                         "the plugin is versioned by commit SHA, so there is nothing to bump. "
+                         "Push the change, or add a version to plugin.json first to pin releases.")
+    new_version = bump_version(old_version, part)
+    replacements = {}
+    if pinned_in_manifest:
+        plugin_data["version"] = new_version
+        replacements[plugin_json_path] = json.dumps(plugin_data, indent=2) + "\n"
+    if "version" in entry:  # keep an existing entry version equal; never add one (docs: set version in one place)
+        entry["version"] = new_version
+        replacements[marketplace_json_path] = json.dumps(marketplace_data, indent=2) + "\n"
 
-    if not plugin_found:
-        print(f"❌ Plugin '{plugin_name}' not found in marketplace manifest")
-        sys.exit(1)
-
-    replacements = {plugin_json_path: json.dumps(plugin_data, indent=2) + "\n", marketplace_json_path: json.dumps(marketplace_data, indent=2) + "\n"}
     originals = {path: path.read_bytes() for path in replacements}
     staged = {}
     try:
@@ -110,7 +111,11 @@ def update_plugin_version(plugin_name: str, marketplace_root: Path, part: Versio
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Bump plugin version")
+    parser = argparse.ArgumentParser(
+        description="Bump a plugin version in plugin.json and/or its marketplace entry, wherever it is set",
+        epilog="Prints one JSON object on stdout. Exit 0 on success; exit 2 on invalid input or manifest, "
+        "with the message on stderr and both manifests unchanged.",
+    )
     parser.add_argument("plugin_name", help="Plugin name")
     parser.add_argument("part", choices=["major", "minor", "patch"], help="Version part to bump")
     parser.add_argument("--marketplace-root", default=".", help="Path to marketplace root directory")

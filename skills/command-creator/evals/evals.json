@@ -1,1 +1,97 @@
-{"skill_name":"command-creator","evals":[{"id":"project-ci-command","prompt":"I'd like a reusable slash command in this git repo that runs our test suite, fixes failures iteratively, and reports what changed. Call it fix-ci; no arguments.","expected_output":"A focused command draft or requirements-driven creation plan using a project-level command, valid kebab-case name and command frontmatter, autonomous steps, success criteria, and error handling.","assertions":["Selects project-level `.claude/commands/fix-ci.md` because this is a git repository","Uses valid command markdown frontmatter with a concise description","Defines ordered run/parse/fix/repeat steps and a clear passing condition"]},{"id":"global-argument-command","prompt":"Create a global `/summarize-log <file>` command. It should read the supplied log and return the five most frequent error types; avoid delegating to agents.","expected_output":"A global command file design with required argument hint and explicit autonomous workflow/tool constraints.","assertions":["Selects `~/.claude/commands/summarize-log.md` for the explicit global request","Uses `argument-hint: <file>` or an equivalent required-file placeholder","Specifies five frequent error types and honors the no-delegation constraint"]},{"id":"underspecified-workflow","prompt":"Make me a slash command for the way our team handles releases. I have not decided what it should do, where it belongs, or whether it takes arguments.","expected_output":"Gather essential requirements and explain available patterns rather than fabricate a release workflow or write a command with assumed behavior.","assertions":["Asks for the command purpose/workflow steps or other essential missing requirements","Does not invent release actions, arguments, or tool integrations","Mentions project versus global location choice or asks for intended scope"]}]}
+{
+  "skill_name": "command-creator",
+  "evals": [
+    {
+      "id": "project-ci-command",
+      "prompt": "I'd like a reusable slash command in this git repo that runs our test suite, fixes failures iteratively, and reports what changed. Call it fix-ci; no arguments.",
+      "expected_output": "Writes `.claude/commands/fix-ci.md` with a description and no argument-hint, a baseline test run, a maximum of 5 attempts (each a fix plus a fresh run), a stuck rule, SUCCESS as soon as a run passes, and SUCCESS/STUCK reports that say what changed.",
+      "assertions": [
+        "Selects project-level `.claude/commands/fix-ci.md` because this is a git repository",
+        "The file has `---` on line 1, its YAML frontmatter parses, and it has a one-line `description` key and no `argument-hint` (the command takes no arguments)",
+        "Runs a baseline test run before the first fix, makes each attempt a fix followed by a fresh run, and reports SUCCESS as soon as a run exits 0",
+        "Caps the loop at 5 attempts (the default when the user gives no number) and stops with a STUCK report when the same failure survives two fix attempts"
+      ]
+    },
+    {
+      "id": "global-argument-command",
+      "prompt": "Create a global `/summarize-log <file>` command. It should read the supplied log and return the five most frequent error types; avoid delegating to agents.",
+      "expected_output": "Writes `~/.claude/commands/summarize-log.md` with `---` on line 1, a `description`, `argument-hint: <file>`, a body that stops when the file argument is empty or the file does not exist, then reads the log and returns the five most frequent error types with counts, with no delegation.",
+      "assertions": [
+        "Selects `~/.claude/commands/summarize-log.md` for the explicit global request",
+        "Uses `argument-hint: <file>` or an equivalent required-file placeholder",
+        "Stops or asks before reading anything when the file argument is empty or the file does not exist",
+        "Returns the five most frequent error types from the supplied log, with their counts",
+        "Has no `context: fork`, no `agent:` field and no subagent or delegation step, honoring the no-delegation constraint"
+      ]
+    },
+    {
+      "id": "underspecified-workflow",
+      "prompt": "Make me a slash command for the way our team handles releases. I have not decided what it should do, where it belongs, or whether it takes arguments.",
+      "expected_output": "Gather essential requirements and explain available patterns rather than fabricate a release workflow or write a command with assumed behavior.",
+      "assertions": [
+        "Asks for the command purpose/workflow steps or other essential missing requirements",
+        "Does not invent release actions, arguments, or tool integrations",
+        "Mentions project versus global location choice or asks for intended scope"
+      ]
+    },
+    {
+      "id": "release-from-transcript",
+      "prompt": "Here's how I do our releases by hand (pasted chat in the attached file). Turn it into a slash command /release for this repo so I stop fumbling it.",
+      "expected_output": "A project command `.claude/commands/release.md` that keeps the transcript's order (main and up to date, clean tree, npm test, npm version, push with tags, npm publish), takes the bump type as a validated required argument, cannot be started by Claude on its own, checks the registry after a publish timeout before any retry, keeps every state change out of `!` pre-run blocks, and leaves the Slack announcement as a reported manual step.",
+      "assertions": [
+        "Writes to `.claude/commands/release.md` (project level, because the user said \"for this repo\")",
+        "Takes the bump type as a required argument limited to `patch`, `minor` or `major` (for example `argument-hint: <patch|minor|major>`) and stops on any other or missing value before running anything",
+        "Keeps the transcript's order: on `main` and up to date, clean `git status`, and passing `npm test` all checked before `npm version`, which comes before `git push origin main --follow-tags` and `npm publish`",
+        "After an `npm publish` failure or timeout, checks whether the version is already on the registry (for example `npm view @acme/widgets@<version> version`) before any retry, and never re-runs publish blindly",
+        "Sets `disable-model-invocation: true` so only the user can start the release, because it pushes and publishes",
+        "Puts no push, publish, version bump or other state change in a `!` pre-run block",
+        "Reports the #releases Slack post as a manual step (or asks which tool to use) instead of inventing a Slack integration"
+      ],
+      "files": [
+        "evals/files/release-transcript.md"
+      ]
+    },
+    {
+      "id": "shell-special-argument",
+      "prompt": "make a project command /find-usages that takes a search string and lists every file:line where it shows up. people will pass stuff like foo$bar, it's, or literally a; rm -rf ~ (someone tried), so it has to be safe",
+      "expected_output": "A project command whose body takes the whole search text, checks for an empty value, and searches with fixed-string matching, the value single-quoted with embedded quotes escaped and an option terminator, with no placeholder inside a `!` block.",
+      "assertions": [
+        "Searches with fixed-string matching and an option terminator, the text single-quoted (for example `rg -n -F -- '<text>'` or `grep -rnF -- '<text>' .`), never as unquoted shell or as a regex",
+        "Says how to quote a value that contains a single quote (each `'` written as `'\\''`, or an equivalent safe method)",
+        "Reads the search text through `$ARGUMENTS` (or `$0` for a single token), not `$1`, which is the second argument",
+        "Has an `argument-hint` for the search string and stops or asks when the argument is empty, because `argument-hint` does not enforce input",
+        "Does not put `$ARGUMENTS`, `$0` or any placeholder inside a `!` pre-run block"
+      ]
+    },
+    {
+      "id": "name-collision",
+      "prompt": "add a /release command to this repo that runs the tests, bumps the version and publishes. fyi the two attached files are already in the repo.",
+      "expected_output": "Reports that `.claude/skills/release/SKILL.md` exists and would shadow a `/release` command, and that `.claude/commands/release.md` already exists; writes nothing yet, leaves both files untouched, and offers a rename (for example `release-cmd` or a namespaced path) or an update of the existing skill or command once the user approves.",
+      "assertions": [
+        "Reports the collision: the existing `release` skill would shadow a new `/release` command, and `.claude/commands/release.md` already exists",
+        "Does not overwrite, edit or delete `.claude/skills/release/SKILL.md` or `.claude/commands/release.md` in this answer",
+        "Offers a rename (for example `release-cmd` or a namespaced path such as `.claude/commands/<group>/release.md`) or updating the existing skill or command",
+        "Makes any update conditional on the user's explicit approval, and for an update says it would read the existing file first and keep its frontmatter unless the change needs it edited"
+      ],
+      "files": [
+        "evals/files/collision/skill-release-SKILL.md.txt",
+        "evals/files/collision/command-release.md"
+      ]
+    },
+    {
+      "id": "approved-update",
+      "prompt": "Update our existing /deploy-preview command (file attached): it should run npm test and stop on failures before it deploys. Yes, you have my go-ahead to edit that file. There is no deploy-preview skill in .claude/skills/ or ~/.claude/skills/.",
+      "expected_output": "An edit of `.claude/commands/deploy-preview.md` that keeps all frontmatter and the existing steps, inserts an `npm test` check that stops on failure before `npm run deploy:preview`, notes that no same-named skill shadows it, and shows the change as a diff.",
+      "assertions": [
+        "Keeps every frontmatter field and value unchanged: `description`, `argument-hint: <branch>`, `arguments: branch`, `disable-model-invocation: true` and `allowed-tools: Bash(npm run build)`",
+        "Keeps the existing steps' wording (empty-branch check, branch check, `npm run build`, `npm run deploy:preview` with the preview URL); only renumbering changes them",
+        "Adds `npm test` as a step that stops on failure, placed before `npm run deploy:preview`",
+        "Shows the change as a diff (unified diff or before/after of the changed lines)",
+        "Edits only `.claude/commands/deploy-preview.md` (no new command or skill file) and states the shadowing check: no same-named skill, per the user, so the command is not shadowed"
+      ],
+      "files": [
+        "evals/files/update/command-deploy-preview.md"
+      ]
+    }
+  ]
+}

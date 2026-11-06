@@ -1,0 +1,313 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "plugin-forge",
+      "percent": 98.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 98.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/plugin-forge/scripts/create_plugin.py",
+          "line": 42,
+          "evidence": "The check `or \"source\" not in entry` verifies only that the key exists. An existing entry such as {\"name\":\"broken\",\"source\":null} passes validate_marketplace; dry-run reports success, and a normal run creates files and rewrites the marketplace despite the contract requiring a well-formed manifest and promising no writes on bad input.",
+          "fix": "Validate existing entries' source values before any filesystem mutation: require a valid local-source string or a supported source object with its required fields, rejecting null, numeric values and malformed objects. Extend test_create_plugin.py to verify that these inputs return exit 2 with empty stdout and unchanged files in both dry-run and normal modes."
+        }
+      ]
+    },
+    {
+      "name": "skill-updater",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 28,
+          "evidence": "The branch without last_upstream_sha enumerates commits with \"gh api 'repos/<o>/<r>/commits?path=<path>&sha=<ref>&since=<last_reviewed>T00:00:00Z' --jq '.[].sha'\", without pagination. When more than GitHub's default 30 commits match, older changes are omitted, yet line 29 advances --sha to the newest commit read, leaving those omitted changes behind the next review's comparison base.",
+          "fix": "Enumerate all matching commits using gh api --paginate with per_page=100. Require successful retrieval and inspection of every page and relevant patch before advancing last_upstream_sha; if retrieval is incomplete, report the review as unresolved and leave the comparison base unchanged."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/skill-updater/evals/evals.json",
+          "line": 22,
+          "evidence": "registry-current expects \"The upstreams row has stale false and error null, so the status is current.\" kept-new-path repeats that inference at line 118. Neither fixture supplies upstream contents or a comparison result, and their assertions accept current without checking the content inspection required by SKILL.md line 27.",
+          "fix": "Supply upstream-content or comparison-result fixtures for both current cases and assert that content inspection precedes recording current. Add a stale:false case where an unrelated newer local commit masks a substantive upstream change, and require adopt/adapt/ignore classification rather than automatically recording current."
+        }
+      ]
+    },
+    {
+      "name": "naming-analyzer",
+      "percent": 97.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 28,
+          "evidence": "The convention row illustrates ordinary casing with \"class `user_profile`, constant `max`\" and \"`UserProfile`, `MAX_RETRIES`\". These examples repeat naming conventions the model already knows rather than adding the non-obvious compatibility knowledge supplied elsewhere.",
+          "fix": "Remove the elementary casing examples from this row while retaining the instruction to follow the project's conventions, with the language convention as the fallback."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 41,
+          "evidence": "The boolean-polarity branch requires \"every default, read, write and test must flip\" and warns that this \"is not safe as a symbol-only IDE rename\". The six output evals do not exercise this branch; the boolean trigger query only tests activation.",
+          "fix": "Add an output eval with a disableRetry default, reads, writes and an external configuration key. Assert that the report specifies retryEnabled = !disableRetry, flips the default and affected conditions, preserves the external key through a mapping, and rejects a symbol-only rename."
+        }
+      ]
+    },
+    {
+      "name": "pr-diagrams",
+      "percent": 97.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+          "line": 208,
+          "evidence": "`mv -f \"$tmp\" \"$dest\"` follows a destination check that rejects only symlinks. If the expected output path, such as flow.drawio.png, is an existing directory, mv moves the temporary PNG inside that directory and succeeds. The manifest then identifies the directory itself as the PNG to attach.",
+          "fix": "Preflight destination paths before publishing any output and reject existing directories or other non-regular destinations with a clear error and empty stdout. Add a regression test with an existing flow.drawio.png directory that verifies a nonzero exit, no manifest, and no temporary PNG deposited inside it."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+          "line": 222,
+          "evidence": "`*) die \"usage: pr-diagrams.sh repo|related|reviewers|render ...\" ;;` handles --help as an error. The script has substantial runnable tests and structured data output, but no successful --help interface documenting its subcommands and flags.",
+          "fix": "Add -h/--help handling that exits successfully and documents subcommands, flags, prerequisites, output formats, and exit behavior. Extend tests/skills/pr-diagrams/test-pr-diagrams.sh to verify the help exit status and advertised command signatures."
+        }
+      ]
+    },
+    {
+      "name": "react-dev",
+      "percent": 96.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/references/hooks.md",
+          "line": 18,
+          "evidence": "\u201cContext with no meaningful default: createContext<T | null>(null) plus a useX() hook that throws outside the provider\u201d and the following useImperativeHandle bullet repeat standard React guidance rather than adding version-specific or non-obvious knowledge.",
+          "fix": "Remove the routine context-default and imperative-handle bullets; retain the version-sensitive useReducer rule, ref compatibility table and keyed-storage procedure."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 18,
+          "evidence": "The migration branch mandates \u201cUpdate react, react-dom, @types/react and @types/react-dom to 19 together\u201d without first checking framework compatibility. Following it for the supplied ProfileForm.tsx fixture, labeled \u201cReact 18.3, Next.js 14\u201d, reaches a React/framework compatibility blocker that the workflow does not resolve.",
+          "fix": "Before changing dependencies, check the installed framework's supported React peer range. For a stable Next.js 14 app, obtain approval to upgrade to a React-19-compatible Next.js release or report the incompatibility and stop the dependency migration. Only then update the four React packages and run the codemods; do not bypass peer-dependency checks."
+        }
+      ]
+    },
+    {
+      "name": "ui-ux-principles",
+      "percent": 90.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 90.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 75,
+          "evidence": "\u201cPass: no color, type, spacing, radius or shadow literal in a component\u201d and, at line 81, \u201ceach control is the shared component for its role, and dark mode switches token values at the root\u201d repeat familiar design-system advice. The line-weighted H2 assessment also finds substantial activation material in Workflow, loading, a11y and interaction; the strongest knowledge delta is concentrated in the source-versus-render decisions, hierarchy exceptions, live-region timing and framework gotchas.",
+          "fix": "Condense familiar theming, shared-control, loading and accessibility guidance into brief rule checks. Preserve the precise evidence requirements, hierarchy exceptions, live-region sequencing and MUI edge cases rather than giving generic principles comparable instructional weight."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 82,
+          "evidence": "\u201cA raw <style> element in React or the DOM, or a Vue <style> without scoped\u201d is an unconditional consistency trap. This makes the implementation mechanism itself a failure even when selectors are safely namespaced or the stylesheet is intentionally application-wide, with no escape hatch for the repository's established styling architecture.",
+          "fix": "Keep scoped styles and CSS modules as the default, but allow safely namespaced selectors and intentional application-wide styles. Fail consistency when selectors leak beyond their intended scope or controls diverge from shared components, rather than solely because a style element or unscoped Vue block exists."
+        }
+      ]
+    },
+    {
+      "name": "writing-clearly-and-concisely",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 93.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/writing-clearly-and-concisely/SKILL.md",
+          "line": 46,
+          "evidence": "\u201cCut what carries no invariant: puffery\u201d introduces familiar advice about throat-clearing, hedges and repetition. Together with the claims reminders, repeated checkpoint calls and much of the output guidance, activation occupies a substantial share of the body; the stronger knowledge delta is in normative force, unknown actors, anchor preservation and merging exceptions.",
+          "fix": "Condense routine copyediting reminders and repeated checkpoint calls into one shared editing-and-validation instruction. Retain the concrete invariant rules, merge ordering, anchor handling and distinguishing examples."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/writing-clearly-and-concisely/SKILL.md",
+          "line": 59,
+          "evidence": "The Draft branch begins \u201cApply the claims checkpoint to every specific before writing it\u201d and ends \u201cRun the invariant checkpoint on the draft.\u201d Its only intervening procedure is specific to an \u201cError message,\u201d leaving other advertised drafts with safeguards but little guidance on constructing the prose.",
+          "fix": "Add a short default procedure for non-error drafts: inventory sourced claims and their qualifiers, identify what the reader needs to know or do first, organize supporting details around that priority, then draft and run the checkpoints. Keep error-message guidance as a specialization."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/writing-clearly-and-concisely/evals/evals.json",
+          "line": 65,
+          "evidence": "The supplied-brand-voice case asks \u201cMarketing wants to keep the playful brand voice, but can you point out where it's wordy?\u201d Its assertions check suggestion format, commands and unsupported facts, but not preservation of voice. It exercises Flag rather than the Edit and sampled-Draft paths that explicitly promise voice preservation.",
+          "fix": "Add an Edit case using the playful README and a Draft case with a supplied voice sample. Include observable checks for retaining the sample's tone characteristics while preserving facts, identifiers and commands."
+        }
+      ]
+    },
+    {
+      "name": "explain-pr-changes",
+      "percent": 89.6,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 89.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 198,
+          "evidence": "\"Never make a second view, retype, or reconstruct source-body content.\" The single-view, saved-JSON extraction and verbatim-copy requirements are repeatedly restated in sections 2.1, 2.2, 2.5, 2.6 and phase 3, diluting otherwise substantial environment-specific knowledge.",
+          "fix": "State the common source-reading invariants once before sections 2.1\u20132.2. Have each reuse branch and phase 3 refer to that rule, retaining only branch-specific fields, validation and assembly instructions."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 184,
+          "evidence": "\"if head -n 1 \"$AD/source-<n>.md\" | grep -q '^# PR Summary:'; then\" begins an inline assembly implementation. The command is 408 lines: templates and the none-mode filter are split into a bundled skill, but substantial title-normalization and single/consolidated-body assembly details remain inline.",
+          "fix": "Move the title-normalization and body-assembly implementations from sections 2.4\u20132.6 into skills/pr-diagrams/references/pr-body.md. Load those sections explicitly only for single-source or consolidated reuse, leaving mode routing, safety invariants and phase ordering in the command."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/pr-diagrams/references/pr-body.md",
+          "line": 19,
+          "evidence": "The required none-mode filter uses sed with the inline-image pattern '!\\[[^]]*\\]\\([^)]*github\\.com/user-attachments/[^)]*\\)'. On the copied-body branch, a valid reference-style image such as '![Architecture][arch]' with '[arch]: https://github.com/user-attachments/assets/example' survives unchanged and still renders a diagram, contrary to section 2.8.",
+          "fix": "Replace the inline-only image-removal stage with Markdown-aware handling that resolves reference-style image destinations as well as inline destinations. Remove attachment-image usages while preserving surrounding prose, ordinary-host images and attribution text; verify the reference-style example produces no rendered attachment image."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

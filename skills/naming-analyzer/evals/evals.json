@@ -3,32 +3,73 @@
   "evals": [
     {
       "id": "ts-review",
-      "prompt": "Review `const d = new Date(); const usrCfg = loadConfig(); function getUser(id) { const u=fetchUser(id); u.lastLogin=Date.now(); saveUser(u); return u; }`.",
-      "expected_output": "Suggest descriptive names and flag getUser side effect.",
+      "prompt": "quick naming pass on this before I open the PR? `const d = new Date(); const usrCfg = loadConfig(); function getUser(id) { const u = fetchUser(id); u.lastLogin = Date.now(); saveUser(u); return u; }`",
+      "expected_output": "A rename table that puts getUser first as a getter that writes and saves, proposes a name stating the effect or a query/command split, and gives camelCase replacements for d and usrCfg, each with a confidence and a compatibility value.",
       "assertions": [
-        "Replaces `d` and `usrCfg`",
-        "Flags `getUser` as misleading mutator",
-        "Uses JS conventions"
+        "Ranks `getUser` as the highest-priority issue because it sets `lastLogin` and calls `saveUser`, and proposes a name that states the write or a split into a query and a command",
+        "Proposes camelCase replacements for `d` and `usrCfg` that state what they hold",
+        "Every proposed rename has a confidence value and a compatibility value"
       ]
     },
     {
-      "id": "python-names",
-      "prompt": "Python: `class user_profile`, `def calc_ttl(arr)`, `MAX=5`. Correct names.",
-      "expected_output": "PascalCase class, descriptive snake_case function/param, descriptive uppercase constant.",
+      "id": "python-evidence",
+      "prompt": "Can you review the naming in evals/files/retry_client.py and tell me what to rename?",
+      "files": [
+        "evals/files/retry_client.py"
+      ],
+      "expected_output": "Reads the bodies before naming: calc_ttl sums amounts, so it means total, not time-to-live; MAX is the retry attempt limit; DEFAULT_TIMEOUT is in seconds; user_profile becomes UserProfile. Each rename cites the line that establishes it.",
       "assertions": [
-        "PascalCase class",
-        "Descriptive snake_case names",
-        "Descriptive UPPER_SNAKE_CASE constant"
+        "Proposes a snake_case name for `calc_ttl` that says total or sum (for example `calculate_total` or `sum_line_amounts`), citing the loop that adds `x.amount`, and does not read `ttl` as time-to-live",
+        "Renames `MAX` to an UPPER_SNAKE_CASE name that names the retry or attempt limit (for example `MAX_FETCH_ATTEMPTS`), citing its use in `range(MAX)`",
+        "Proposes a seconds unit in the timeout constant's name (for example `DEFAULT_TIMEOUT_S` or `DEFAULT_TIMEOUT_SECONDS`)",
+        "Renames `user_profile` to `UserProfile`"
+      ]
+    },
+    {
+      "id": "conflicting-callers",
+      "prompt": "People keep getting the unit of `timeout` wrong in evals/files/timeout_callers.md. What should we rename it to?",
+      "files": [
+        "evals/files/timeout_callers.md"
+      ],
+      "expected_output": "Reports that the two callers disagree: the JS client passes timeout to setTimeout (milliseconds, so 30 ms) and the Python worker passes it to requests.get (seconds, so 30 s). Calls it a bug, gives one unit-suffixed candidate per meaning marked tentative until the owner confirms the intended unit, and does not rename the key to match either caller.",
+      "assertions": [
+        "Reports that `setTimeout` reads the value as milliseconds and `requests.get` reads it as seconds, and calls the mismatch a bug",
+        "Gives a unit-suffixed candidate for each meaning (for example `timeout_ms` and `timeout_seconds`) marked tentative or conditional on the owner confirming the intended unit",
+        "Does not just rename the key to match one caller; it names the conversion or fix the other caller needs"
+      ]
+    },
+    {
+      "id": "name-only-ambiguity",
+      "prompt": "no code handy, just the names: what should `proc(data)` and `ttl` be called instead?",
+      "expected_output": "Does not settle on one rename. Asks a focused question about what proc does and what ttl measures, or lists candidates marked tentative, each tied to the fact that would settle it.",
+      "assertions": [
+        "Does not present a single rename for `proc` or `ttl` as settled; candidates are marked tentative or replaced by a question",
+        "Names the fact that would settle `ttl`, such as whether it is a duration or a total and what unit it uses",
+        "Asks what `proc` does or what `data` holds, or ties each candidate name to an assumed behavior"
+      ]
+    },
+    {
+      "id": "serialized-contract",
+      "prompt": "We're doing a v2 cleanup of evals/files/orders_api.py and I'd like the abbreviations gone, starting with usr_nm and ord_id. Please review the naming and flag anything risky.",
+      "files": [
+        "evals/files/orders_api.py"
+      ],
+      "expected_output": "Flags usr_nm, ord_id and created as external contract names (partner portal, mobile app and webhook payload), notes that EXPORT_FIELDS and the payload lookups reach the fields by string key so a plain attribute rename breaks at runtime, proposes an internal rename only with an explicit mapping that keeps the wire keys, and keeps created as fixed by the provider schema.",
+      "assertions": [
+        "Rates renaming `usr_nm` and `ord_id` as a contract (or equivalent high-risk) change because the export and webhook payload keys are consumed outside the module",
+        "Points out that `EXPORT_FIELDS` and `data[key]` (or the `payload[...]` lookups) reach the fields by string, so a plain rename of the dataclass attribute breaks at runtime and is missed by symbol search",
+        "Proposes keeping the external keys `usr_nm` and `ord_id` with an explicit mapping or alias if the attributes are renamed, rather than a plain rename",
+        "Keeps `created` unchanged because the provider's webhook schema fixes it, at most suggesting the unit be documented or carried in a local name"
       ]
     },
     {
       "id": "context-edge",
-      "prompt": "Rename loop `i` and `id` in `user.id`? Assess context.",
-      "expected_output": "Loop i and common id are acceptable absent contrary context.",
+      "prompt": "A reviewer on my PR wants me to rename the loop counter `i` in `for (let i = 0; i < rows.length; i++)` and `user.id` to something longer. Is that worth doing?",
+      "expected_output": "Says neither rename is warranted: i is a conventional loop counter in a short loop and id is a standard abbreviation, and states no change explicitly.",
       "assertions": [
-        "Allows loop counter `i`",
-        "Recognizes common `id` abbreviation",
-        "Does not insist on needless renaming"
+        "Keeps the loop counter `i` as conventional in this short loop",
+        "Keeps `id` as a standard, clear abbreviation",
+        "States explicitly that no change is warranted for these names"
       ]
     }
   ]

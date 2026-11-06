@@ -45,16 +45,17 @@ This cycle repeats, with each "rep" building on the previous one.
 
 1. **Read the Content**: Provide your learning material (transcript, article, notes)
 2. **Extract Core Lessons**: Identify actionable principles, not just theory
-3. **Define Your Quest**: Frame a specific 4-8 week goal with concrete success criteria
-4. **Design Rep 1**: Create the smallest shippable version you can complete this week
-5. **Create the Rep Plan**: Structure action steps, success criteria, and reflection questions
-6. **Map Future Reps**: Outline a progression path for reps 2-5
+3. **Define Your Quest**: Use your goal, deadline and available time
+4. **Design Rep 1**: Create the smallest shippable version that fits your time budget
+5. **Create the Rep Plan**: Structure action steps, success criteria you control, and reflection questions
+6. **Map Future Reps**: Outline provisional later reps, each changing one thing
+7. **Review and Choose Next**: Report how a rep went; the skill reads the evidence and picks the next rep
 
 ### What Makes a Good Rep
 
 Each rep should be:
 - **Concrete and specific** - "Ship one landing page by Friday" not "Learn web development"
-- **Completable in 1-7 days** - Small enough to not be intimidating
+- **Fits your available time** - Small enough to finish before your deadline
 - **Produces real evidence** - An artifact you can show
 - **Big enough to learn** - Challenging enough to teach you something meaningful
 
@@ -65,7 +66,7 @@ Each rep should be:
 - **Progressive Difficulty**: Each rep adds ONE new element
 - **Built-in Reflection**: Structured questions after each shipped rep
 - **Action Orientation**: Always ends with "what's next?"
-- **Automatic Plan Saving**: Saves your complete quest plan as a Markdown file
+- **Plan Saving**: Saves your quest plan as a Markdown file by default, or gives it in chat when you ask
 
 ## Usage Examples
 
@@ -111,7 +112,7 @@ Skill: [Extracts the 3-5 core actionable principles]
 
 ## Prerequisites
 
-- **Learning content**: A file containing the transcript, article, tutorial, or notes you want to implement
+- **Learning content**: The transcript, article, tutorial, or notes you want to implement, pasted or as a file. With only a link or title, the skill asks for the text or gives a plan marked provisional
 - **Willingness to ship**: This skill is for doing, not planning forever
 
 No special tools or dependencies required.

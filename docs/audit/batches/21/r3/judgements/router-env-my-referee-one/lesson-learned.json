@@ -1,0 +1,68 @@
+{
+  "skill": "lesson-learned",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/lesson-learned/SKILL.md",
+      "line": 56,
+      "evidence": "'NEVER cite a file, commit or line you did not read' restates baseline evidence hygiene; 'List the candidate causal changes' at line 39 likewise adds generic process rather than the specific scope and false-positive knowledge that distinguishes this skill.",
+      "fix": "Compress selection steps 1\u20133 into one instruction to rank causal changes by demonstrated consequence and defensible counterfactual. Fold source-location recording into verification step 4 instead of keeping the standalone generic citation reminder."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/lesson-learned/SKILL.md",
+      "line": 34,
+      "evidence": "'git show <merge> prints a combined diff that is empty for a clean merge' is too absolute: a conflict-free merge can have a nonempty combined diff when a file changed relative to both parents.",
+      "fix": "Replace the explanation with: 'Combined diffs show only files changed relative to every parent, so they can omit changes introduced by a merge, including clean merges. Use git show --first-parent <sha> to inspect what entered the first-parent branch.' Keep the existing first-parent command."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/lesson-learned/evals/evals.json",
+      "line": 5,
+      "evidence": "The six cases include 'extraction-adds-coupling', 'mechanical-rename', 'precise-range' and 'untracked-only', but no assertions verify base resolution, dirty-base scope selection or first-parent merge evidence. Supplied diffs and logs bypass most of the Git evidence-selection workflow.",
+      "fix": "Add reproducible repository-backed eval cases for feature-branch base selection, a dirty base branch and a merge commit. Assert the selected scope, inclusion or exclusion of working changes, and the changes introduced relative to the merge's first parent."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/lesson-learned/SKILL.md",
+      "line": 21,
+      "evidence": "'git symbolic-ref --short refs/remotes/origin/HEAD; if that fails, local main or master' does not handle a dangling origin/HEAD: symbolic-ref can return a branch name whose target does not exist, after which log and diff fail without reaching the documented fallback.",
+      "fix": "Validate each candidate base with git rev-parse --verify --quiet \"<base>^{commit}\" before using it. If the remote default does not resolve to a commit, try local main, then master, then the existing last-five-commits fallback, and state which scope was selected."
+    }
+  ]
+}
