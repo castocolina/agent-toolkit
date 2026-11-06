@@ -1,0 +1,54 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "explain-pr-changes",
+      "percent": 89.6,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 89.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 198,
+          "evidence": "\"Never make a second view, retype, or reconstruct source-body content.\" The single-view, saved-JSON extraction and verbatim-copy requirements are repeatedly restated in sections 2.1, 2.2, 2.5, 2.6 and phase 3, diluting otherwise substantial environment-specific knowledge.",
+          "fix": "State the common source-reading invariants once before sections 2.1\u20132.2. Have each reuse branch and phase 3 refer to that rule, retaining only branch-specific fields, validation and assembly instructions."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 184,
+          "evidence": "\"if head -n 1 \"$AD/source-<n>.md\" | grep -q '^# PR Summary:'; then\" begins an inline assembly implementation. The command is 408 lines: templates and the none-mode filter are split into a bundled skill, but substantial title-normalization and single/consolidated-body assembly details remain inline.",
+          "fix": "Move the title-normalization and body-assembly implementations from sections 2.4\u20132.6 into skills/pr-diagrams/references/pr-body.md. Load those sections explicitly only for single-source or consolidated reuse, leaving mode routing, safety invariants and phase ordering in the command."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/pr-diagrams/references/pr-body.md",
+          "line": 19,
+          "evidence": "The required none-mode filter uses sed with the inline-image pattern '!\\[[^]]*\\]\\([^)]*github\\.com/user-attachments/[^)]*\\)'. On the copied-body branch, a valid reference-style image such as '![Architecture][arch]' with '[arch]: https://github.com/user-attachments/assets/example' survives unchanged and still renders a diagram, contrary to section 2.8.",
+          "fix": "Replace the inline-only image-removal stage with Markdown-aware handling that resolves reference-style image destinations as well as inline destinations. Remove attachment-image usages while preserving surrounding prose, ordinary-host images and attribution text; verify the reference-style example produces no rendered attachment image."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

@@ -1,0 +1,47 @@
+{
+  "skill_name": "codex-plan",
+  "subject": "commands/codex-plan.md",
+  "context": [],
+  "evals": [
+    {
+      "id": "auth-handoff",
+      "prompt": "Scenario: the user runs `/codex-plan help me implement auth into my webapp` (no --model). Reading the repo shows these files exist: README.md, package.json (Next.js, Prisma), prisma/schema.prisma, src/middleware.ts, .env.example. No docs/ directory, no src/lib/db.ts. Neither prompt_to_codex.md nor codex-plan.md exists. The user answered your questions: email/password plus Google OAuth, Next.js App Router with Prisma and Postgres, admin/user roles, password reset and email verification, no 2FA, no compliance needs. Writing the file succeeds. You cannot run commands or ask new questions. Show the exact full contents of prompt_to_codex.md, then the exact command you present to the user, then the final user-facing message. State the files you verified. Where the scenario leaves a detail open, choose a concrete plausible value and state it.",
+      "assertions": [
+        "The Files to Read section of the prompt lists only paths from the scenario's existing files (README.md, package.json, prisma/schema.prisma, src/middleware.ts, .env.example) and does not list src/lib/db.ts or docs/ files",
+        "The prompt tells Codex not to ask clarifying questions and to write the plan to codex-plan.md",
+        "The prompt records the confirmed requirements (email/password, Google OAuth, Prisma/Postgres, admin/user roles, password reset, email verification) and the exclusions (no 2FA, no compliance)",
+        "The presented command is `codex exec` with `-c model_reasoning_effort=high` and `-s workspace-write`, reads the prompt with `$(cat prompt_to_codex.md)`, and contains no `--full-auto` and no `-m` or `model=` pin",
+        "Codex is not run by the assistant; the final message asks the user to run the command and send back the content of codex-plan.md, then stops",
+        "Tasks and acceptance criteria requested in the prompt cover each confirmed requirement"
+      ]
+    },
+    {
+      "id": "model-argument",
+      "prompt": "Scenario: the user runs `/codex-plan --model gpt-5.1-codex-max add a retry layer to the HTTP client in src/http.ts`. src/http.ts and README.md exist; no other relevant files. The request is specific enough that you need no clarifying questions. No output files exist and writing succeeds. You cannot run commands. Show the contents of prompt_to_codex.md, the exact command you present, and the final message.",
+      "assertions": [
+        "The presented command passes the model with `-m gpt-5.1-codex-max` (or `-c model=gpt-5.1-codex-max`) and keeps `-c model_reasoning_effort=high`",
+        "The words `--model gpt-5.1-codex-max` do not appear in the planning request inside the prompt; the topic is the retry layer for src/http.ts",
+        "No clarifying questions are asked; any assumptions are stated explicitly inside the prompt",
+        "The prompt's Files to Read section lists src/http.ts and README.md"
+      ]
+    },
+    {
+      "id": "write-fails",
+      "prompt": "Scenario: the user runs `/codex-plan plan a migration from REST to GraphQL`. All questions are answered and the prompt is composed. Writing prompt_to_codex.md fails with `EACCES: permission denied, open 'prompt_to_codex.md'` and the current directory is not writable. You cannot run commands or ask questions. Show what you do next and the final user-facing message.",
+      "assertions": [
+        "The final message reports the concrete error (EACCES, permission denied) and does not say prompt_to_codex.md was saved or is ready",
+        "The prompt is provided inline in the message, or the user is asked for a writable destination",
+        "No ready-to-run `codex exec ... $(cat prompt_to_codex.md)` command is presented as working while the file does not exist"
+      ]
+    },
+    {
+      "id": "existing-output",
+      "prompt": "Scenario: the user runs `/codex-plan plan a testing strategy for the payments module`. Both prompt_to_codex.md and codex-plan.md already exist in the current directory from an earlier run. You asked whether to overwrite them; the user answered: keep the old ones, use a new name. Choose the suffix `-2`. You cannot run commands. Show the file you write, the exact command presented, and the final message.",
+      "assertions": [
+        "The existing prompt_to_codex.md and codex-plan.md are not overwritten; the new files are prompt_to_codex-2.md and codex-plan-2.md",
+        "The prompt tells Codex to write to codex-plan-2.md, and the presented command reads prompt_to_codex-2.md",
+        "The final message asks for the content of codex-plan-2.md, not codex-plan.md"
+      ]
+    }
+  ]
+}

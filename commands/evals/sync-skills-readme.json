@@ -1,0 +1,93 @@
+{
+  "skill_name": "sync-skills-readme",
+  "subject": "commands/sync-skills-readme.md",
+  "evals": [
+    {
+      "id": "table-only-rewrite",
+      "prompt": "Scenario: README.md is the file readme-skills-before.md. `skills/` holds `alpha-test` (its SKILL.md is skill-alpha.SKILL.md) and `zeta-docs` (its SKILL.md is skill-zeta.SKILL.md). Show the regenerated README.md section and describe what you edit. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "files": [
+        "readme-skills-before.md",
+        "skill-alpha.SKILL.md",
+        "skill-zeta.SKILL.md"
+      ],
+      "assertions": [
+        "Only the table under `## 📚 Available Skills` is replaced; the intro paragraph, Quick Navigation, both `---` separators and the Installation section are left unchanged",
+        "The stale `old-skill` row is gone and both `alpha-test` and `zeta-docs` rows are present",
+        "The heading `## 📚 Available Skills` is kept and the table header is `| Category | Skill | Description |`"
+      ]
+    },
+    {
+      "id": "sort-order-deterministic",
+      "prompt": "Scenario: `skills/` holds `zeta-docs` (SKILL.md is skill-zeta.SKILL.md, a documentation skill) and `alpha-test` (SKILL.md is skill-alpha.SKILL.md, a testing skill). Show the final table rows in order. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "files": [
+        "skill-alpha.SKILL.md",
+        "skill-zeta.SKILL.md"
+      ],
+      "assertions": [
+        "Rows are grouped by category in the command's stated order, so the Documentation row for `zeta-docs` comes before the Testing row for `alpha-test`",
+        "Within one category rows are alphabetical by skill name",
+        "Each row is `| <emoji> <Category> | [name](skills/<name>/README.md) | <description> |`"
+      ]
+    },
+    {
+      "id": "missing-skill-md-reported",
+      "prompt": "Scenario: `skills/` holds `alpha-test` (SKILL.md is skill-alpha.SKILL.md) and `empty-dir` (a directory with no SKILL.md). Show the commands, the README edit and the final message. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "files": [
+        "skill-alpha.SKILL.md"
+      ],
+      "assertions": [
+        "`empty-dir` is not added to the table",
+        "The report warns `Skipped empty-dir: No SKILL.md found`",
+        "`alpha-test` is still added"
+      ]
+    },
+    {
+      "id": "missing-description-reported",
+      "prompt": "Scenario: `skills/` holds `alpha-test` (skill-alpha.SKILL.md) and `broken-skill` (skill-broken.SKILL.md, whose frontmatter has a name but no description). Show the table and the final message. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "files": [
+        "skill-alpha.SKILL.md",
+        "skill-broken.SKILL.md"
+      ],
+      "assertions": [
+        "`broken-skill` is not in the table",
+        "The report warns `Skipped broken-skill: Missing name or description in frontmatter`",
+        "`alpha-test` is in the table"
+      ]
+    },
+    {
+      "id": "long-description-shortened",
+      "prompt": "Scenario: `skills/` holds `zeta-docs` (SKILL.md is skill-zeta.SKILL.md). Show its table row. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "files": [
+        "skill-zeta.SKILL.md"
+      ],
+      "assertions": [
+        "The description cell is a shortened, action-oriented phrase of roughly 50 characters or fewer, not the full original sentence",
+        "The row still links `[zeta-docs](skills/zeta-docs/README.md)`"
+      ]
+    },
+    {
+      "id": "section-missing-stops",
+      "prompt": "Scenario: README.md contains no `## 📚 Available Skills` heading (only an intro and an Installation section). `skills/` holds `alpha-test` (skill-alpha.SKILL.md). You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "files": [
+        "skill-alpha.SKILL.md"
+      ],
+      "assertions": [
+        "The command stops with the error `Could not find '## 📚 Available Skills' section in README.md`",
+        "README.md is not modified and no section is appended"
+      ]
+    },
+    {
+      "id": "report-summary",
+      "prompt": "Scenario: `skills/` holds `alpha-test` and `zeta-docs` (fixtures skill-alpha.SKILL.md and skill-zeta.SKILL.md), and README.md was updated. Show the final user-facing message. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "files": [
+        "skill-alpha.SKILL.md",
+        "skill-zeta.SKILL.md"
+      ],
+      "assertions": [
+        "The message states the total skills count as 2",
+        "The message lists the categories with counts (Documentation 1, Testing 1)",
+        "The message does not claim files other than README.md changed"
+      ]
+    }
+  ]
+}

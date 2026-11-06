@@ -2,7 +2,8 @@
   "skill_name": "explain-pr-changes",
   "subject": "commands/explain-pr-changes.md",
   "context": [
-    "skills/pr-diagrams/SKILL.md"
+    "skills/pr-diagrams/SKILL.md",
+    "skills/pr-diagrams/references/pr-body.md"
   ],
   "evals": [
     {
@@ -670,6 +671,17 @@
         "The draw.io authoring rules are read from the literal '${CLAUDE_PLUGIN_ROOT}/skills/draw-io/SKILL.md' first",
         "When that text is unsubstituted or missing, '~/.claude/skills/draw-io/SKILL.md' is used instead",
         "Both candidate paths appear in the command's calls"
+      ]
+    },
+    {
+      "id": "mermaid-rules-paths",
+      "prompt": "Scenario: a feature PR in mermaid mode whose diff warrants a diagram. Describe exactly where the command reads the Mermaid authoring rules from before it writes the Mermaid block, in which order, and what happens when the first location is unsubstituted or missing. Show both candidate paths as the command references them, and state the layout the Mermaid block must have for a refactor that touches eleven components (direction, grouping, color classes). You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The Mermaid authoring rules are read from the literal '${CLAUDE_PLUGIN_ROOT}/skills/mermaid-diagrams/references/authoring-rules.md' first, before the Mermaid block is written",
+        "When that text is unsubstituted or missing, '$HOME/.claude/skills/mermaid-diagrams/references/authoring-rules.md' is used instead",
+        "Both candidate paths appear in the command's calls",
+        "The planned diagram is top-down (flowchart TD), not a single wide LR row, and the eleven components are grouped into subgraphs",
+        "Each node role has a classDef that sets fill, stroke and color so the diagram reads on light and dark themes"
       ]
     },
     {

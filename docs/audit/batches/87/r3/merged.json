@@ -1,0 +1,62 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "explain-changes-mental-model",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 75,
+          "evidence": "State only what the patch proves. Mark author intent that you infer as inferred; the diff does not show why.",
+          "fix": "Turn this generic reminder into a specific rule, for example: 'Write inferred intent as \"likely because ...\" and never put it in Key changes; commit messages and PR bodies are the only evidence of why.' Otherwise keep it to one short clause."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 30,
+          "evidence": "Measure size before reading: run `--shortstat` on the same source ... Above roughly 800 changed lines or 30 files ... switch to this procedure:",
+          "fix": "Move the empty-diff check, the size measurement and the large-diff procedure out of section 1 into a separate phase, '## 1b. Size the diff', so the Process pattern reads source \u2192 size \u2192 group \u2192 verify \u2192 output with one checkpoint per phase."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "commands/evals/explain-changes-mental-model.json",
+          "line": 44,
+          "evidence": "\"Scenario: no argument is given and `git diff HEAD` prints nothing.\" with assertion \"The command run is `git diff HEAD`\" and the instruction \"Where the scenario leaves a detail open, choose a concrete plausible value\"",
+          "fix": "Make the scenario say there are no untracked files either, for example '`git diff HEAD` prints nothing and `git ls-files --others --exclude-standard` prints nothing'. Change the assertion to 'Runs `git diff HEAD --no-color` and the untracked-file listing, and both are empty'. As written, an agent that follows the command's untracked-file step may invent untracked files, or it fails the single-command assertion."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 34,
+          "evidence": "1. Run `--stat` on the same source as above ... 3. Per group, read the per-file diffs (same source plus `-- <path>`)",
+          "fix": "Add a fallback for sources that have no `--stat` or pathspec. `gh pr diff` accepts neither, and a pasted `custom` patch has no command at all. For a PR, get per-file stats from `gh pr view \"<pr>\" --json files` and split the `gh pr diff` output on `diff --git` headers into per-file chunks, or read it in pages. For `custom`, split the pasted patch on the same headers. Line 72 forbids checkout and fetch, so these are the only routes for large PRs."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

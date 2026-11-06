@@ -1,0 +1,71 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "general-purpose",
+      "percent": 91.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 91.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 14,
+          "evidence": "\"first find the gates (AGENTS.md, CLAUDE.md, Makefile; else the toolchain's test runner) ... reproduce a bug before fixing.\"",
+          "fix": "Cut the generic parts the model already knows (where gates usually live, reproduce before fixing). Keep only the non-obvious rule: record baseline failures as pre-existing before any edit, and use the unverified-fix condition."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 13,
+          "evidence": "\"Plan: before any edit or delegation, record per requirement its owner, dependency order and acceptance check.\"",
+          "fix": "Add a decomposition heuristic, for example: \"Before splitting, ask: does this requirement change a shared interface? If so, give it to one owner, schedule it first and make its callers depend on it.\" This tells the agent how to split the work, not only what to record."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 29,
+          "evidence": "\"They may run in another checkout.\"",
+          "fix": "Give the consequence and the action in the Gotcha itself: \"They may run in another checkout, so pass the absolute worktree path and confirm the paths of their changed files before integrating.\" The current wording leaves the reason to NEVER line 37."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 16,
+          "evidence": "\"fix the callers yourself if the fix is local, else re-delegate to the owning worker\"",
+          "fix": "Define \"local\". For example: \"local = the caller edits touch no file assigned to another active worker and change no public signature.\" Two runs then make the same choice between fixing directly and re-delegating."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 14,
+          "evidence": "\"fix from the code only when ... marked unverified, else stop and report it.\" and line 17 \"No gate found: report it, mark the work unverified.\"",
+          "fix": "Make two branches resolve. (1) \"stop\" applies only to that requirement: keep working on the other requirements and list it under Remaining blockers. (2) Cover a gate that exists but cannot run (missing dependency, broken environment): record the command and its error under Validation, try one setup fix from the project docs, otherwise handle it like no gate and mark the work unverified."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

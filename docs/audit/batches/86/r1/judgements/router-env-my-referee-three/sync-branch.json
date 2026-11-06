@@ -1,0 +1,68 @@
+{
+  "skill": "sync-branch",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 28,
+      "evidence": "Gotchas: \"Never rebase onto local `main` ..., never `git pull` ..., never `git merge` ...\" repeats step 3 (line 19): \"Rebase onto the remote ref, never local `main`; never `git pull` or `git merge`.\"",
+      "fix": "Keep the reasons only in the Gotchas bullet and cut line 19 to \"Rebase onto `$base/$target` (see Gotchas). In order:\", so the same rule is not loaded twice."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 22,
+      "evidence": "The principle behind the three rebase forms comes only at the end of step 3(c): \"Replaying from the old base keeps only the feature commits.\" Steps (a) to (c) read as bare conditionals until then.",
+      "fix": "Open step 3 with the goal: \"Replay exactly the commits unique to $branch; fork-point, old_base and plain merge-base are three ways to find that lower boundary, so pick the one that drops no feature commit and carries no rewritten base commit.\" Then list (a) to (c)."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 11,
+      "evidence": "\"`git status --porcelain` not empty: stop, name the uncommitted paths\" also matches untracked `??` files. Those files do not block a rebase, so the check stops on harmless scratch files.",
+      "fix": "Use `git status --porcelain --untracked-files=no` for the stop check. List untracked files only as a note, unless the rebase later fails because an untracked file would be overwritten (step 4 then reports git's error)."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 17,
+      "evidence": "No branch covers an already up-to-date branch. When `git merge-base --is-ancestor \"$base/$target\" \"$branch\"` succeeds, the command still asks \"This force-pushes <branch>; is it yours alone?\" and then runs a no-op rebase and push.",
+      "fix": "Add to step 2, after the fetch: \"If `git merge-base --is-ancestor \\\"$base/$target\\\" \\\"$orig\\\"` succeeds, report '<branch> already contains <base>/<target>; nothing to rebase or push' and stop before the ownership question.\""
+    }
+  ]
+}

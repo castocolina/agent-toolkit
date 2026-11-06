@@ -1,0 +1,62 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "mermaid-diagram-specialist",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 15,
+          "evidence": "repair: decide first whether it fails to parse or renders with wrong meaning, then edit; a minimal diff beats a rewrite.",
+          "fix": "Delete the generic 'a minimal diff beats a rewrite' clause, or tie it to its non-obvious reason in Mermaid terms (for example: keep node ids unchanged because callers link to them and style classes reference them)."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 13,
+          "evidence": "1. If asked for a non-Mermaid format, stop (see the output contract). Next check the material can support a diagram: if not, stop (see the output contract); stop only when the core question or entities are unknown, and if just details are missing, proceed and list each as an assumption. Then name the task kind and make its first decision:",
+          "fix": "Split step 1 into ordered gates: '1. Format gate: non-Mermaid -> stop. 2. Material gate: core question or entities unknown -> stop; details missing -> proceed and list assumptions. 3. Classify the task kind (new, repair, extend, restyle, mixed) and make its first decision.' Separate gates are easier to follow than one dense sentence."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 35,
+          "evidence": "Gotchas has only two items: scratch files are invisible to the caller, and a clean validator run does not prove GitHub renders it.",
+          "fix": "Add delegate-specific gotchas learned from real runs, for example: 'The caller's target renderer (GitHub, GitLab, MkDocs) may pin an older Mermaid version; when the caller does not name it, assume GitHub and say so in the assumptions.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 21,
+          "evidence": "extend/update: the diagram works but the caller wants nodes, edges or steps added or changed: keep existing ids and type, apply only the requested changes, validate, and list the changes.",
+          "fix": "Resolve the case where an extend/update target does not parse, as restyle already does: 'If the original fails to parse, treat it as mixed: minimal repair first, listed as a repair change, then apply the requested additions.' Also state the order for mixed kinds that include extend (repair, then extend, then restyle)."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

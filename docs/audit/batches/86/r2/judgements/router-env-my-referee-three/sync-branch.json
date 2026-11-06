@@ -1,0 +1,77 @@
+{
+  "skill": "sync-branch",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 28,
+      "evidence": "Gotcha 'Never rebase onto local `main` ..., never `git pull` ..., never `git merge`' repeats step 3 line 19 'Rebase onto the remote ref, never local `main`; never `git pull` or `git merge`'",
+      "fix": "Keep the reasons in the Gotchas line. In step 3, cut the sentence to 'Rebase onto the remote ref (see Gotchas)' so the same rule is not stated twice."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 6,
+      "evidence": "The preamble packs argument parsing, fork/upstream base selection ('`base=origin`, except fork PRs: if an `upstream` remote exists ...') and the stop rule into one paragraph before the numbered phases",
+      "fix": "Make base selection its own numbered phase 0 ('Resolve target and base'), with the upstream/fork decision as a short if/else. The decision then gets a checkpoint like the other phases."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 26,
+      "evidence": "Gotchas cover lease disarming and ours/theirs, but not stacked branches: other local branches built on `$branch` keep the pre-rebase commits after the rewrite",
+      "fix": "Add a gotcha: 'If other local branches are stacked on this one, a plain rebase strands them on the old commits; mention `git rebase --update-refs` or list the dependent branches (`git branch --contains \"$orig\"`) in the report.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 16,
+      "evidence": "'If `$remote` is set and `git merge-base --is-ancestor \"$remote\" \"$orig\"` fails, the remote has commits the local branch lacks: stop' \u2014 after a run whose push failed in step 5 (network, hook), or after a manual local rebase, the remote holds the pre-rebase copies, so a rerun always stops here with no way forward",
+      "fix": "Before stopping, compare patches with `git range-diff` or `git cherry \"$orig\" \"$remote\"`. If every remote-only commit has an equivalent patch in `$orig` (an earlier rebase that was never pushed), continue to the push with the lease on `$remote`. Stop only when real new remote commits exist."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 17,
+      "evidence": "The force-push confirmation and the merge-commit question are asked even when `$base/$target` is already an ancestor of `$branch`, where the rebase is a no-op and nothing gets force-pushed",
+      "fix": "After the fetch in step 2, add: 'If `git merge-base --is-ancestor \"$base/$target\" \"$branch\"` succeeds, report that the branch is already up to date with <base>/<target> and stop without asking or pushing.'"
+    }
+  ]
+}

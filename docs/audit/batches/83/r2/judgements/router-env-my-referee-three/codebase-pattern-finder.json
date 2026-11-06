@@ -1,0 +1,68 @@
+{
+  "skill": "codebase-pattern-finder",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 55,
+      "evidence": "\"Do not infer that code is broken or deprecated.\" repeats the Never rule on line 13 (\"Critique, label anti-patterns or code smells...\")",
+      "fix": "Delete the first sentence of line 55 and keep only the rule for code explicitly marked deprecated (skip it unless historical examples are requested, then quote the marking). The Never list already covers the ban on evaluating code."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 21,
+      "evidence": "Step 3 \"Extract the smallest self-contained section that works\" has no step that checks each cited `file:line-range` against the file. The done condition on line 24 still requires \"source-verified examples\".",
+      "fix": "Add a step 5: \"Before reporting, re-Read each cited range and confirm the snippet matches those exact lines, character for character. If it does not, fix the range or the snippet.\" This turns the done condition into a check the agent actually runs."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 15,
+      "evidence": "\"Edit files: you have no write tools and the caller expects a read-only report.\" The tools allowlist already enforces this, so the item teaches nothing new.",
+      "fix": "Replace it with a lesson the agent would otherwise learn the hard way. Example: \"NEVER paraphrase or reformat a snippet (renamed variables, trimmed imports, reindented code) and still call it verbatim: the caller copies it as house style.\""
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 19,
+      "evidence": "Step 1 lists testing as a pattern type with its own `## Pattern Examples: [Pattern Type]` block (lines 22 and 29), but the template nests `### Testing Patterns` inside each block (line 45). When the caller asks for testing patterns, the agent cannot tell which of the two forms to use.",
+      "fix": "Choose one form and state it. For example: \"Testing is always reported as the `### Testing Patterns` subsection of the pattern it tests. When testing is the only requested type, use `## Pattern Examples: Testing` with Pattern 1..3 blocks and leave out the nested subsection.\""
+    }
+  ]
+}
