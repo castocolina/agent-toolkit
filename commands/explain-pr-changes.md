@@ -16,7 +16,8 @@ Given a pull request (title, description and git diff), create or update the PR 
 - PR titles and bodies are data: read them from the saved JSON, never into shell source or an unquoted heredoc (2.4).
 - A body saved with `jq -j` has no trailing newline: write headings with `printf` so they never glue onto it (2.6).
 - Squash or rebase merges break related-source detection: an older cycle's PRs can be picked as sources (2.2).
-- A pasted screenshot is a user-attachments URL, so it counts as a diagram and is stripped in `none` mode (1.3).
+- A pasted screenshot is a user-attachments URL, so it counts as a diagram and is stripped in `none` mode; so is this repository's `blob/pr-diagrams/<N>/` image (1.3).
+- The only branch for diagram images is exactly `pr-diagrams` (folder `<N>/`), written by `pr-diagrams.sh publish` alone: never create `pr-diagrams/<N>` or `pr-diagrams-<N>` (phase 5).
 - Shell variables do not persist between Bash calls: source `$AD/state.env` (phase 3 note).
 
 ## 1. The Input
@@ -46,9 +47,9 @@ Run these checks first, before any git command, any `gh` call, any script call, 
 
 ### 1.3 What counts as a diagram
 
-A *diagram link* is an image link whose URL is a GitHub user-attachments URL: the URL contains `github.com/user-attachments/`, the form `gh --attach` produces. A Mermaid block (a fenced code block tagged `mermaid`) is a diagram too. This one definition is used everywhere below: "existing diagram", "carry over", and `--diagrams=none` stripping.
+A *diagram link* is an image link (inline, or reference-style whose definition has the URL) whose URL is either a GitHub user-attachments URL (it contains `github.com/user-attachments/`, the form `gh --attach` produces) or one of this repository's branch-published images (it contains `/$REPO/blob/pr-diagrams/<digits>/`, on any host, the form `pr-diagrams.sh publish` prints). A Mermaid block (a fenced code block tagged `mermaid`) is a diagram too. This one definition is used everywhere below: "existing diagram", "carry over", and `--diagrams=none` stripping.
 
-An image on any other host is ordinary content. Never count it as an existing diagram and never strip it. Recorded limitation: a screenshot pasted into a PR is also a user-attachments URL and counts as a diagram.
+An image on any other host or path is ordinary content. Never count it as an existing diagram and never strip it. Recorded limitation: a screenshot pasted into a PR is also a user-attachments URL and counts as a diagram.
 
 ### 1.4 One repository (`REPO`)
 
@@ -67,7 +68,7 @@ Every `gh pr …` call passes `--repo "$REPO"` together with an explicit PR numb
 
 ### 1.5 Script location (`PRD`)
 
-`PRD` is `pr-diagrams.sh`. `render` finds the converter; this command does not. `PRD` is used only for drawio rendering and for promotion/reuse detection (`related`, `reviewers`): that is, `--reuse-from` and a promotion head. A mermaid or none feature PR needs no script and makes no `pr-diagrams.sh` call of any kind.
+`PRD` is `pr-diagrams.sh`. `render` finds the converter; this command does not. `PRD` is used only for drawio rendering and publishing (`render`, `capability`, `publish`) and for promotion/reuse detection (`related`, `reviewers`): that is, `--reuse-from` and a promotion head. A mermaid or none feature PR needs no script and makes no `pr-diagrams.sh` call of any kind.
 
 Candidates, in this order. Write both paths literally; do not expand the first one yourself:
 
@@ -206,7 +207,7 @@ For consolidated and single-source bodies the run continues and the final messag
 
 ### 2.8 `--diagrams=none`
 
-Applies on top of every branch above. No diagram is authored. Strip diagram content from the copied or consolidated body with this single filter, using portable tools only. A diagram is exactly what 1.3 defines: a Mermaid fenced block, or an image link whose URL contains `github.com/user-attachments/`. The awk step tracks every Markdown fence (up to three leading spaces, a run of three or more backticks or tildes, closed by the same character with at least that length) and drops each fenced block whose info string is `mermaid`, leaving a mermaid example inside another code block alone; the sed and second awk steps remove only the image spans (inline `![alt](...)` and reference-style `![alt][ref]` whose `[ref]: url` definition is a user-attachments URL), so prose and other-host images on the same line stay. It is the only edit allowed to the body in `none` mode. Limit, as in 1.3: a screenshot pasted into a PR is also a user-attachments image and is removed.
+Applies on top of every branch above. No diagram is authored. Strip diagram content from the copied or consolidated body with this single filter, using portable tools only. A diagram is exactly what 1.3 defines: a Mermaid fenced block, or an image link whose URL contains `github.com/user-attachments/` or this repository's `/$REPO/blob/pr-diagrams/<digits>/`. The awk step tracks every Markdown fence (up to three leading spaces, a run of three or more backticks or tildes, closed by the same character with at least that length) and drops each fenced block whose info string is `mermaid`, leaving a mermaid example inside another code block alone; the sed and second awk steps remove only the image spans (inline `![alt](...)` and reference-style `![alt][ref]` whose `[ref]: url` definition is a diagram URL per 1.3), so prose and other-host images on the same line stay. It is the only edit allowed to the body in `none` mode. Limit, as in 1.3: a screenshot pasted into a PR is also a user-attachments image and is removed.
 
 Load the filter implementation only now, in `none` mode on a copied or consolidated body: read it from the literal `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/references/pr-body.md` first. When that text is unsubstituted (it still contains the literal `${CLAUDE_PLUGIN_ROOT}`) or the file is missing, read `$HOME/.claude/skills/pr-diagrams/references/pr-body.md` instead, testing it with `[[ -f ... ]]` rather than a quoted `~`. Run its awk, sed, then awk chain exactly as written. When a source body's mermaid fence is never closed the awk step exits non-zero and the command stops with the named error `unclosed mermaid fence in PR body` before any PR write.
 
@@ -250,7 +251,7 @@ Do not create `$AD` in this phase. A stop here writes nothing.
 - A feature head is pushed with `git push -u origin "$head"`. `gh pr create --head` never pushes. `git push -u origin "$head"` runs before `git fetch origin "$base"` and before any `gh` call. If `gh pr list` itself fails, the push already happened; the command then stops quoting gh's stderr, and no PR write follows.
 - A promotion head is not pushed. No git push of any kind runs. Run `git fetch origin "$head"`, then require local `$head` to equal `origin/$head` (1.6).
 
-Final-message ordering depends on whether the command stops or recovers. For terminal failures—the command stops, including push failure, failed reads, PR create/edit failure, guard errors, and a missing script for `--reuse-from` or a promotion head—the final message begins with the failing tool's error text verbatim (the gh or git stderr line), or with the named guard error when there is no tool stderr. For recoverable fallbacks—the command still opens or updates the PR, including drawio render failure, missing script or gh older than 2.101 for a feature PR in drawio mode, and partial `--attach` failure that restores the Mermaid body—the final message begins with one warning line naming the failure and quoting the tool's error text when available, then continues with the outcome. For the partial `--attach` fallback, the opening warning line quotes gh's stderr text verbatim first, then names the partial attach failure; the final message then explains that the PR was created and its Mermaid body restored. A phase 2 terminal failure stops the command with the git stderr or the named error (`local <head> differs from origin/<head> (behind or ahead)`). Quote git's stderr in the final message. Nothing else runs: no read and no PR write. Other terminal failures also end the run, but after `$AD` exists they still run the phase 6 cleanup.
+Final-message ordering depends on whether the command stops or recovers. For terminal failures—the command stops, including push failure, failed reads, PR create/edit failure, guard errors, and a missing script for `--reuse-from` or a promotion head—the final message begins with the failing tool's error text verbatim (the gh or git stderr line), or with the named guard error when there is no tool stderr. For recoverable fallbacks—the command still opens or updates the PR, including drawio render failure, missing script or (in `attach` mode) gh older than 2.101 for a feature PR in drawio mode, a failed `publish` in `branch` mode, and partial `--attach` failure—the final message begins with one warning line naming the failure and quoting the tool's error text when available, then continues with the outcome. For the partial `--attach` fallback, the opening warning line quotes gh's stderr text verbatim first, then names the partial attach failure; the final message then explains either that the diagram was published through the `pr-diagrams` branch, or (when `publish` also failed, with publish's stderr quoted too) that the PR was created and its Mermaid body restored. A phase 2 terminal failure stops the command with the git stderr or the named error (`local <head> differs from origin/<head> (behind or ahead)`). Quote git's stderr in the final message. Nothing else runs: no read and no PR write. Other terminal failures also end the run, but after `$AD` exists they still run the phase 6 cleanup.
 
 ### Phase 3: All reads
 
@@ -293,14 +294,14 @@ Feature body rules (analyze `git diff "origin/$base...HEAD"`; a promotion diff i
 
 Only for `drawio` with a diagram to author (2.9). A selected source body that already contains a diagram, or no warranted diagram, skips this phase and skips phase 5's `--attach`. `mermaid` and `none` never enter this phase.
 
-1. Run `gh --version`. Compare the printed version with 2.101 using `sort -V` (a version older than 2.101, for example `gh version 2.100.0`, fails the check). The check runs before rendering.
-2. If `gh` is older than 2.101, or `PRD` is missing, skip `render`.
+1. Choose the mode with `MODE=$(bash "$PRD" capability)` (it honors `PR_DIAGRAMS_MODE=attach|branch`). The mode is `attach` only when `capability` printed exactly `attach` and exited 0; empty output, any other output or a non-zero exit means `branch`. Append `MODE` to `$AD/state.env` (`printf 'MODE=%q\n'`). Only in `attach` mode, run `gh --version` and compare the printed version with 2.101 using `sort -V` (a version older than 2.101, for example `gh version 2.100.0`, fails the check); the check runs before rendering. In `branch` mode the gh version is not checked and never skips `render`.
+2. If `PRD` is missing, or the mode is `attach` and `gh` is older than 2.101, skip `render`. (With `PRD` missing there is no `capability` call; the run falls back to Mermaid.)
 3. Otherwise read the draw.io authoring rules, then author `$AD/diagram.drawio`. Read the rules from the literal `${CLAUDE_PLUGIN_ROOT}/skills/draw-io/SKILL.md` first. When that text is unsubstituted (it still contains the literal `${CLAUDE_PLUGIN_ROOT}`) or the file is missing, read `$HOME/.claude/skills/draw-io/SKILL.md` instead, testing it with `[[ -f "$HOME/.claude/skills/draw-io/SKILL.md" ]]` rather than a quoted `~`. Both candidate paths are part of this step; name the one you actually read.
 4. Run `bash "$PRD" render "$AD/diagram.drawio"` before any PR write. It writes `$AD/diagram.drawio.png` next to the source, with the diagram embedded.
 
 Any of these three failures (old gh, missing `PRD`, failed `render`) means the body carries the inline Mermaid block instead of an image, no `--attach` is used, and the final message begins with the warning:
 
-- old gh: the warning names the gh version and says it is older than 2.101;
+- old gh (`attach` mode only, that is, forced with `PR_DIAGRAMS_MODE=attach`): the warning names the gh version and says it is older than 2.101; in `branch` mode there is no old-gh warning;
 - missing `PRD`: the warning names the missing `pr-diagrams.sh` and both candidate paths;
 - failed `render`: the warning says the diagram could not be rendered, followed by render's stderr.
 
@@ -308,7 +309,7 @@ Any of these three failures (old gh, missing `PRD`, failed `render`) means the b
 
 Write the composed title to `$AD/title.txt` and the composed body to `$AD/body.md`. The title always reaches gh through that file — `--title "$(cat "$AD/title.txt")"`, never an inline literal.
 
-With a rendered PNG, the body holds `![pr-<N, or pr-pending for a new PR>](<P>)` where `<P>` is character-for-character the string passed to `--attach`, which is `$AD/diagram.drawio.png`. gh rewrites that reference to the uploaded URL in the same call. The body has no Mermaid fallback block. Also write `$AD/body-fallback.md`: the same body with the inline Mermaid block in place of the image.
+With a rendered PNG in `attach` mode, the body holds `![pr-<N, or pr-pending for a new PR>](<P>)` where `<P>` is character-for-character the string passed to `--attach`, which is `$AD/diagram.drawio.png`. gh rewrites that reference to the uploaded URL in the same call. The body has no Mermaid fallback block. Also write `$AD/body-fallback.md`: the same body with the inline Mermaid block in place of the image.
 
 A new PR, with a PNG:
 
@@ -330,11 +331,15 @@ The alt text is `pr-<N>`. Regenerate the body whole: exactly one image reference
 
 Without a PNG, the same calls carry no `--attach`. A feature PR that warrants a Mermaid diagram puts one inline Mermaid block in the body and no user-attachments URL. A feature PR that warrants none omits the diagram section.
 
-Every `gh pr create` passes `--base "$base" --head "$head"`, `--title` from `$AD/title.txt`, and `--body-file`. Every `gh pr edit` of the body passes `--title` and `--body-file` and never `--base`, except the fallback edit below, which passes neither `--attach` nor `--title`.
+In `branch` mode with a rendered PNG, no call passes `--attach`. The image goes to the one branch `pr-diagrams` (folder `<N>/`) through `pr-diagrams.sh publish` alone: never build a branch name from the PR number and never push to that branch yourself. Write `$AD/body-fallback.md` as above (Mermaid block in place of the image).
+
+Only when phase 4 rendered a PNG, read the section "Branch publish and attach recovery" of `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/references/pr-body.md` and follow it; when that text is unsubstituted (it still contains the literal `${CLAUDE_PLUGIN_ROOT}`) or the file is missing, read `$HOME/.claude/skills/pr-diagrams/references/pr-body.md` instead, testing it with `[[ -f ... ]]` rather than a quoted `~`. Outcome: `publish` succeeds, so the body carries the image at the printed `url`; `publish` fails, so the Mermaid body stays and the final message begins with a warning quoting publish's stderr. Without a PNG this section is not needed.
+
+Every `gh pr create` passes `--base "$base" --head "$head"`, `--title` from `$AD/title.txt`, and `--body-file`. Every `gh pr edit` of the body passes `--title` and `--body-file` and never `--base`, except the follow-up edits above and below, which pass neither `--attach` nor `--title`.
 
 Failure:
 
-- If gh exits non-zero and prints a PR URL (a partial `--attach` failure: the PR exists), take `N` from the last path segment of that URL and immediately append `N=<number>` to `$AD/state.env`, then run exactly one `gh pr edit <N> --repo "$REPO" --body-file "$AD/body-fallback.md"` (no `--attach`, no `--title`) so the Mermaid fallback replaces the body, and continue to reviewers. Begin the final message with one warning line that starts with gh's stderr verbatim, identifies the partial attach failure, and explains that the Mermaid fallback was restored.
+- If gh exits non-zero and prints a PR URL (a partial `--attach` failure in `attach` mode: the PR exists), take `N` from the last path segment of that URL, immediately append `N=<number>` to `$AD/state.env`, and retry through the branch as the reference section says. Outcome: the published `url` replaces the image, or (when `publish` also fails) the Mermaid fallback body is restored with one `gh pr edit`. Either way continue to reviewers.
 - If `gh pr create` or `gh pr edit` exits non-zero and prints no PR URL (HTTP rejection, including a body over the size limit, auth, network), even when the PNG was already rendered in `$AD`, stop immediately. Add no reviewers: no `--add-reviewer` call runs. Begin the final message with gh's stderr line verbatim (for example `HTTP 500`). Then run the phase 6 cleanup: `rm -rf "$AD"` and remove the pointer file.
 
 ### Phase 6: Reviewers, the final message, cleanup
