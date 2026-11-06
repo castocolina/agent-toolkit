@@ -1,0 +1,81 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "viral-tweet",
+      "percent": 92.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.0,
+        "router-env-my-referee-one": 93.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/viral-tweet.md",
+          "line": 35,
+          "evidence": "Add hashtag stacks, \"link in bio\", or unrelated @mentions or links.",
+          "fix": "Shorten the line to its non-obvious part: \"Keep a link only if it substantiates the claim, and prefer it outside the main post text.\" The model already avoids hashtag stacks and \"link in bio\"."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/viral-tweet.md",
+          "line": 20,
+          "evidence": "5. **Recommend one** and say why, plus any hybrid.",
+          "fix": "Step 2 already holds the recommendation logic, and step 5 repeats it. Merge them: move the \"check the candidate against the objective\" gate from step 2 into step 5, so the order is objective first and the validated recommendation last."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/viral-tweet.md",
+          "line": 26,
+          "evidence": "## Gotchas has only two items (compression can falsify; Unicode fancy text)",
+          "fix": "Move the counting traps from step 4 into Gotchas, where they are read before drafting: a bare domain such as example.com counts as a 23-character URL, every line break counts as one character, and the `1/n ` thread prefix uses part of each post's 280."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/viral-tweet.md",
+          "line": 17,
+          "evidence": "choose one primary objective: replies, reposts or dwell ... sensitive posts -> clarity ... dwell needs a concrete observation ... clarity needs the least ambiguity",
+          "fix": "List clarity as a fourth objective: \"replies, reposts, dwell or clarity (sensitive posts)\". Also give a pass check for the other two, for example \"replies needs one specific question the author wants answered; reposts needs a statement that makes sense without the author's context\". As written, the recommendation check does not resolve when the objective is replies or reposts."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/viral-tweet.md",
+          "line": 33,
+          "evidence": "'Invent facts, numbers, customers or drama to make a hook punchier' repeats step 1's factual-grounding constraint. The separate Voice and tone section also revisits the sensitive-post guidance already established in the workflow. These familiar, repeated guardrails dilute the stronger objective-selection, compression and weighted-character guidance.",
+          "fix": "Consolidate the anti-invention warning and its reputational rationale into step 1, and merge the sensitivity paragraph into step 3. Retain the concrete qualifier, causality, Unicode and engagement-objective rules."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/viral-tweet.md",
+          "line": 19,
+          "evidence": "Step 1 requires 'every variant keeps every one of them with its qualifiers', but the overlength fallback says 'if you cannot ask, return three within-limit posts keeping the strongest point, say what was cut and offer a thread'. For essential facts that cannot all fit, this branch cannot satisfy both instructions: disclosure of cuts does not preserve every fact.",
+          "fix": "Make the no-questions overlength fallback return three alternative threads, preserving all supplied facts and qualifiers across each thread's posts and counting numbering prefixes. Update the output template to allow each VERSION to contain a thread; permit strongest-point standalone summaries only when the user explicitly authorizes omissions."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

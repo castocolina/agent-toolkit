@@ -1,0 +1,68 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 8,
+      "evidence": "'A commit is one change that builds and tests on its own' and 'Plan each commit as paths, plus hunks for a mixed file' repeat familiar commit-helper guidance. By section line count, the 11-line intent router is chiefly activation, the 15-line Workflow is mostly expert with some generic reminders, and the six-line Gotchas is expert; activation therefore occupies substantially more than the rubric's preferred share.",
+      "fix": "Remove the generic opening definition and standalone planning reminder, and compress ordinary message/review/stage routing while preserving its safety constraints. Retain the distinctive temporary-index, non-interactive patch, staged-version verification and hook-handling procedures."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 14,
+      "evidence": "The message-only route requires 'step 1' but forbids 'propose or run any git command'. Step 1 requires reading 'git status', 'git diff --cached' and 'git diff'. For a request to draft a message from the current index without supplied command output, these instructions cannot both be followed.",
+      "fix": "Give message-only requests a separate inspection rule: use a supplied staged diff without commands; otherwise permit read-only Git inspection. Keep the final response message-only and forbid index/worktree mutation and commit commands. Adjust the message-only eval assertion to allow read-only inspection when no diff was supplied."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 30,
+      "evidence": "Stage-only requests must use 'the real index; leave the user's entries in it alone', but step 4 requires the exact index to contain 'only the approved change'. Staging an approved auth change while preserving an unrelated, already-staged configuration change cannot satisfy that whole-index invariant.",
+      "fix": "Make the invariant intent-specific: for a commit, the commit index must contain only approved changes; for stage-only work, review the newly staged delta, verify that pre-existing staged entries remain unchanged, and explicitly report those retained entries."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 27,
+      "evidence": "The temporary-index branch always starts with 'GIT_INDEX_FILE=<gitdir>/commit-work.index git read-tree HEAD'. In a repository without its first commit, a request to commit selected work while leaving unrelated staged content untouched reaches this branch, but HEAD does not exist and the prescribed initialization fails.",
+      "fix": "Before initializing the temporary index, check whether HEAD resolves to a commit. Use the prescribed read-tree HEAD initialization when it does; otherwise initialize the temporary index with git read-tree --empty, retaining the same explicit GIT_INDEX_FILE prefix throughout the workflow."
+    }
+  ]
+}

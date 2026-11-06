@@ -1,0 +1,86 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 12,
+    "D3": 12,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 111,
+  "max_total": 125,
+  "percent": 88.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 8,
+      "evidence": "Invoked as `/explain-changes-mental-model` (project install) or `/command-explain-changes-mental-model:explain-changes-mental-model` (this repository's plugin). followed by a 6-line usage block (lines 10-17) that repeats the source table in section 1",
+      "fix": "Cut the invocation sentence, because the harness already shows slash-command names. Shrink the usage block to the two non-obvious cases: `HEAD~3` is one commit, and `custom` waits for a pasted diff. The other cases are already covered by the rules in section 1."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 34,
+      "evidence": "Group files by purpose (not by directory), one group per reviewable idea.",
+      "fix": "Add an expert grouping heuristic: 'Before grouping, split mechanical changes (renames, moves, pure refactors, signature-only updates at call sites) from behavior changes, and give each its own group so the reviewer can skim the mechanical one. When the patch shows no import, caller or contract linking two groups, mark them Independent rather than inventing an order.'"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 66,
+      "evidence": "## Gotchas has three items; there are none for file references or for non-text changes",
+      "fix": "Add gotchas with reasons, for example: 'Line numbers in a hunk header (`@@ -a,b +c,d @@`) refer to the post-image. Cite `+c` lines for new code, not working-tree lines.' 'Binary files, submodule pointer bumps and mode-only changes (`old mode 100644 / new mode 100755`) show almost no diff text but can be the real change. Name them as their own group.' 'NEVER describe a file from its name alone when its hunk was truncated by a large-diff `--stat`. Say it was not read.'"
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 2,
+      "evidence": "Explain a git diff, commit, branch, range, PR or pasted patch ... Not for ... the PR-workflow command explain-pr-changes.",
+      "fix": "description: Explain a git diff, commit, branch, range or pasted patch (including a PR's diff pasted or checked out as a branch) as dependency-ordered logical groups with file references and a review sequence. Use when the user wants to understand, onboard onto or walk through a changeset, asks what changed or what to read first, even without saying 'mental model'. Not for editing code, a defect-focused code review, or fetching and explaining a PR by number (explain-pr-changes)."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 25,
+      "evidence": "3. Contains `..` (covers `...`): `git diff \"<arg>\" --no-color`.",
+      "fix": "Give the range branch the same failure path as rule 4: 'If git diff exits non-zero (for example `main..typo` gives `fatal: ambiguous argument`), report its stderr, suggest `git branch -a`, and stop. Never invent changes.' Otherwise a bad range endpoint leaves the agent with no defined outcome."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 27,
+      "evidence": "base is the first that exists of `main`, `master`, `origin/main`, `origin/master`, else ask the user for a base; then `git diff \"<base>...<arg>\" --no-color`.",
+      "fix": "Handle the case where the argument is the base itself, for example `/explain-changes-mental-model main`: 'If <arg> resolves to the same commit as <base>, say that the branch is the base and ask which branch or range to compare.' Without this, the agent reports the misleading 'No changes found'. Also add a one-line self-check before output: every 'Depends on' must name an earlier group."
+    }
+  ]
+}

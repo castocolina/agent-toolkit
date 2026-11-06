@@ -1,0 +1,104 @@
+{
+  "skill": "mermaid-diagrams",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 8,
+    "D2": 12,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 12,
+    "D7": 13,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 100,
+  "max_total": 125,
+  "percent": 80.0,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/references/erd-diagrams.md",
+      "line": 97,
+      "evidence": "'## Comprehensive Example: E-Commerce Database' starts three stock schemas spanning lines 97\u2013393. Together with elementary syntax and generic database-design advice, these dominate the 509-line reference that every ERD task must load. The useful host and layout gotchas are diluted by material the model already knows.",
+      "fix": "Retain the reference file, but replace the repeated schema catalogs with one compact example. Concentrate the remaining content on Mermaid-specific failure modes, relationship interpretation, and renderer limitations; omit generic database-design advice."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/references/erd-diagrams.md",
+      "line": 399,
+      "evidence": "'Show cardinality accurately - Be precise about one-to-many vs many-to-many' declares the desired result without a procedure for deriving endpoint minimums, maximums, and identifying relationships from supplied schema evidence.",
+      "fix": "Add a schema-to-diagram decision procedure: inspect foreign keys, nullability, uniqueness, and primary-key membership; derive both relationship endpoints; distinguish identifying from non-identifying relationships; and mark unresolved constraints as assumptions rather than copying example cardinalities."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 34,
+      "evidence": "'Do not invent hex colors' makes the bundled palettes mandatory rather than defaults. The rule provides no escape for an existing diagram style or a user-supplied brand palette, although these are flexible presentation choices.",
+      "fix": "Keep the bundled palettes as defaults, with B for status and C for migrations. Permit existing or user-supplied colors when they pass contrast and grayscale checks, while retaining strict requirements for fragile Mermaid syntax."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/evals/evals.json",
+      "line": 9,
+      "evidence": "'Uses `sequenceDiagram`' checks type selection, but none of the six evaluations explicitly asserts that the returned Mermaid parses or renders. A diagram can satisfy the current content assertions while still failing the skill's central usability requirement.",
+      "fix": "Add a parse/render assertion to every diagram-producing evaluation, checked against a pinned Mermaid version or the specified target host. For repair cases, also require preservation of the intended nodes and relationships."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/evals/trigger-queries.json",
+      "line": 3,
+      "evidence": "'Visualize checkout sequence: browser calls API, authorizes payment, returns success or decline.' is representative of the uniformly short, direct queries. The balanced 20-query set has useful near-misses but lacks context-heavy prompts, file paths, and requests where diagramming is embedded in a larger workflow.",
+      "fix": "Preserve the 10-positive/10-negative balance while replacing several entries with realistic repository paths, casual phrasing, and multi-step documentation requests. Include implicit diagram needs and similarly contextual prose-only near-misses."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/mermaid-diagrams/references/erd-diagrams.md",
+      "line": 50,
+      "evidence": "The ERD branch lists '`}{` - One or many'. This is not a valid one-or-many endpoint token; following the symbol catalog literally can produce invalid relationship syntax.",
+      "fix": "Document cardinalities separately for left and right endpoints: exactly one uses `||`; zero-or-one uses `|o` on the left and `o|` on the right; one-or-many uses `}|` and `|{`; zero-or-many uses `}o` and `o{`. Include a complete relationship demonstrating each pair."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/mermaid-diagrams/references/architecture-diagrams.md",
+      "line": 176,
+      "evidence": "'Label edges with protocols (HTTPS, TCP, etc.)' cannot be followed using architecture-beta's edge grammar, which has no edge-label production. The cloud/CI/CD branch therefore asks for unsupported syntax.",
+      "fix": "State that architecture-beta does not support edge labels. Put protocol information in accompanying prose or service titles; when labeled relationships are required, use C4 with the technology argument of `Rel` instead."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/references/advanced-features.md",
+      "line": 397,
+      "evidence": "The troubleshooting reference's complex styling example declares 'direction LR' inside production, then connects internal nodes across boundaries with 'app1 & app2 & app3 --> logs'. This follows the exact branch that the mandatory authoring rules warn silently disables subgraph direction.",
+      "fix": "Rewrite the example to connect subgraph boundaries when demonstrating preserved subgraph direction. If internal cross-boundary connections are essential, remove the ineffective direction setting and explain the layout limitation explicitly."
+    }
+  ]
+}

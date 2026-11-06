@@ -1,0 +1,41 @@
+{
+  "skill": "sync-branch",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 16,
+      "evidence": "The divergent-remote branch says to run `git cherry \"$orig\" \"$remote\"` and, \"if every line starts with `-` ... continue and push with the lease on `$remote`\". Git cherry excludes merge commits. A remote-only merge can contain unique conflict-resolution changes even when every non-merge commit has a patch-equivalent local commit. This branch permits the subsequent force-push to discard those changes; the explicit lease only verifies that the remote tip has not moved.",
+      "fix": "Before accepting the all-minus result, check `git rev-list --merges \"$orig..$remote\"`. If that range contains merges, stop, list them and require reconciliation rather than treating git cherry as proof that all remote changes are preserved. Restrict the patch-equivalence fast path to a remote-only range without merge commits."
+    }
+  ]
+}

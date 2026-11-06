@@ -1,0 +1,77 @@
+{
+  "skill": "sync-skills-readme",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 12,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 47,
+      "evidence": "Gotchas repeat rules the Workflow already states: 'Reading only the first description line truncates a folded or literal summary' (step 1 already says 'Join folded (`>`) or literal (`|`) description lines'), 'Hyphenated keywords ... match only as a contiguous run' (step 2 line 14) and 'A link built from `name:` breaks' (step 3 line 32 'The link uses the directory name')",
+      "fix": "Keep each rule in one place: shorten step 1, step 2 and step 3 to the bare instruction and keep the reason in Gotchas, or delete the three duplicate Gotcha bullets, so the command spends its lines on each rule only once"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 14,
+      "evidence": "Categorization is purely mechanical: 'If still none, use Utilities.' Nothing tells the agent to question a result that looks wrong",
+      "fix": "Add a check after step 2: 'Before building rows, look at each skill that was placed by the description-word pass or that fell back to Utilities. If its category contradicts what the skill obviously does, keep the mechanical result and list it in the report under Warnings with the keyword to pin it (for example: add `skill-judge` to Meta).'"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 45,
+      "evidence": "Gotchas cover parsing and table-splitting traps, but none warns that the description-word fallback misroutes skills on common words such as 'model', 'tool', 'system', 'plan' or 'test' (for example 'what the model already knows' sends a skill to AI Tools)",
+      "fix": "Add a Gotcha: '- The description-word pass matches generic words: `model`, `tool`, `system`, `plan` and `test` show up in many descriptions that are not about those topics, so a skill can land in AI Tools or Planning by accident. Pin such a skill by its name instead of adding broader keywords.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 14,
+      "evidence": "'repeat on the words of the description (single-token keywords only)': the command never says how description words are tokenized. It is not clear whether 'slash-command' or 'frontend,' contains the tokens 'command' or 'frontend', so this branch has no single outcome",
+      "fix": "Define it: 'Description words are the description lowercased and split on any character other than a-z and 0-9 (so `slash-command,` gives `slash` and `command`). Ignore a trailing `s` on each word, as for names.'"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 33,
+      "evidence": "Step 4 stops only on a missing heading or table. A missing `skills/` directory, or zero valid skills, still reaches the replace step and leaves an empty table. Step 5's check 'row count must equal the number of valid skills' then passes with 0 = 0. The missing-README warning on line 32 also has no text, while every other warning has one",
+      "fix": "In step 4, add: 'If `skills/` is missing or no valid skills remain, stop without editing: `\u274c No valid skills found in skills/`.' On line 32, give the warning text: '\u26a0\ufe0f <dir>: skills/<dir>/README.md not found, link will be broken'"
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "qa-test-planner",
+      "percent": 90.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 91.2,
+        "router-env-my-referee-one": 90.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 27,
+          "evidence": "Before writing, list the facts you need: requirements or acceptance criteria, changed behavior, build, environment (OS, browser, device), test data, risk owner",
+          "fix": "Shorten the generic fact list to one clause and keep the expert part: the NEVER on line 29 about guessed environments and a guessed 'Always'."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 35,
+          "evidence": "**Risks.** One line each: failure mode, impact, covering case IDs.",
+          "fix": "Give a way to find risks, not only their format: for each change, ask what money, data, permission, time or external boundary it touches, and record one risk per answer."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 65,
+          "evidence": "NEVER share mutable accounts or orders between cases or testers: concurrent edits produce failures nobody can reproduce",
+          "fix": "Replace this widely known rule with an environment-specific gotcha that defies assumptions, for example: payment-sandbox decline cards and webhooks behave differently from production, so a passing sandbox decline does not prove that no charge was made."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 3,
+          "evidence": "description: Use only when the user explicitly invokes qa-test-planner by name or /qa-test-planner ... metadata:\n  trigger: explicit",
+          "fix": "Add the allowlisted field `disable-model-invocation: true` to the frontmatter so the harness enforces explicit-only loading, and keep the description: 'Create manual QA plans, executable test cases, regression/smoke suites, Figma design-validation checklists and structured bug reports. Use only when the user invokes qa-test-planner by name or /qa-test-planner. Not for Cypress/unit/API automation, fixing implementation code or general testing requests.'"
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/qa-test-planner/references/regression_testing.md",
+          "line": 13,
+          "evidence": "Visual comparisons: match the rendering conditions in `references/figma_validation.md` section 2 before counting a difference.",
+          "fix": "Put a one-line summary of the conditions inline (viewport, DPR, theme, color profile), or route the Figma read from the SKILL.md table, so reference files do not chain to other references."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/qa-test-planner/evals/evals.json",
+          "line": null,
+          "evidence": "\"assertions\": [\"Defines scope\", ... \"Includes all three scenarios\"",
+          "fix": "Make these vague assertions verifiable, for example 'Lists an Out of scope item with a reason' and 'Has one case each for valid card, declined card and empty cart, each with a seeded precondition'."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 93,
+          "evidence": "Every case seeds and cleans its own data. / Every unknown fact is `Unknown` and appears under \"Open questions\".",
+          "fix": "Make the scripts meet the section 8 checklist, or say how to finish their output by hand. generate_test_cases.sh writes placeholder Post-conditions and has no --cleanup flag. create_bug_report.sh writes no Open Questions section and leaves '[Your Name]'. Add --cleanup and an Open Questions section (or tell the agent to edit the file after the run). Also split the exit 1 advice on line 87: when the output directory is missing, create it; use --overwrite only when the file already exists."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 33,
+          "evidence": "'List requirement IDs', 'Partition inputs by behavior, with boundaries and failure paths' and the P0\u2013P3 definitions reactivate familiar QA practices. The line-weighted H2 review finds substantial activation content in the missing-facts, planning, prioritization and final-check sections, alongside stronger expert content in routing, side-effect oracles, gotchas and script interfaces.",
+          "fix": "Compress generic requirement-listing and priority definitions into a compact output convention. Preserve the change-overlap/cost precedence, residual-risk ownership, ledger oracles, clock controls and isolated test-data procedures."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 18,
+          "evidence": "The regression route says 'Do NOT load' references/figma_validation.md, but references/regression_testing.md explicitly requires matching that file's rendering conditions for visual comparisons. A regression suite containing visual cases therefore receives conflicting loading instructions.",
+          "fix": "Change the regression route to load references/figma_validation.md only when selected cases require visual comparison; prohibit it only for nonvisual regression work."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/evals/evals.json",
+          "line": 85,
+          "evidence": "The script-bug-file assertions check 'Runs scripts/create_bug_report.sh with field flags' and argument values, but do not require successful file creation or inspect the generated Markdown. No output eval exercises the test-case generator's complete file-delivery workflow.",
+          "fix": "Assert exit 0, a parseable manifest, existence of manifest.file and the generated report's supplied and Unknown fields. Add a test-case file eval checking requirement/risk traceability, seeded data and completed cleanup rather than only command construction."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/qa-test-planner/evals/trigger-queries.json",
+          "line": 47,
+          "evidence": "'Create Cypress automation code for login scenarios.' is negative, but every negative query omits the skill's explicit invocation. The suite therefore does not test whether named invocations outside the advertised manual-QA scope are rejected.",
+          "fix": "Add negative near-misses such as 'Use qa-test-planner to implement Cypress checkout tests' and '/qa-test-planner fix the failing unit tests', while retaining the existing uninvoked manual-QA negatives."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/scripts/generate_test_cases.sh",
+          "line": 233,
+          "evidence": "The Markdown-file branch writes '${TEST_DATA:-No specific test data required}' and later '- [Any cleanup required]'. Its interface has no requirement, risk or cleanup fields, so the documented successful invocation produces an unfinished case without the traceability and isolation required by SKILL.md.",
+          "fix": "Add requirement, risk and repeatable cleanup inputs; render missing data as Unknown rather than asserting none is required. Update the example to supply seeded preconditions, data and cleanup, and require inspection and completion of the generated file before delivery."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/scripts/create_bug_report.sh",
+          "line": 213,
+          "evidence": "The bug-file branch renders an omitted URL as '${URL:-N/A}' and emits no Open Questions section. Thus a report generated from incomplete support notes does not preserve the body's distinction between unknown and inapplicable facts or collect the missing facts as required.",
+          "fix": "Default an unspecified URL to Unknown and generate an Open Questions section from missing reproduction and environment fields. Ensure the saved Markdown, not only an accompanying reply, satisfies the missing-facts protocol."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

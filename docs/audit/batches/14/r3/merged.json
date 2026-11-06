@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "ui-ux-principles",
+      "percent": 91.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.0,
+        "router-env-my-referee-one": 90.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 64,
+          "evidence": "Contrast in every theme: text 4.5:1 (large text, 18 pt or 14 pt bold: 3:1), non-text UI 3:1 (input borders, icons, focus rings).",
+          "fix": "Cut the WCAG ratio recital, which the model already knows, to 'WCAG AA in every theme, non-text included'. Keep the non-obvious parts: 'in every theme', 'names contain the visible text' and the 24 px fail line versus the 44 px target."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 40,
+          "evidence": "From source: `fail` when it shows an overflow defect ...; `pass` only when it establishes reflow ...; otherwise `na` with `unverified: needs render`.",
+          "fix": "Turn each three-way verdict in a Rule line (responsive, loading) into a short ordered decision list, such as 1. shows overflow cause -> fail, 2. normal flow with nothing over 360 px and the primary action in flow -> pass, 3. else -> na unverified. This keeps the Tool pattern's decision-tree form instead of dense prose."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 46,
+          "evidence": "Default: at most one filled button per view; outlined and text buttons never count. (The fact that a MUI Button with no variant is text, while a custom .btn with a background counts as filled, appears only in references/rules/hierarchy.md Gotchas, which loads only for exceptions.)",
+          "fix": "Add a short '## Gotchas' in SKILL.md for the cross-rule facts every review needs: a MUI Button with no variant is text and never counts as filled, while a custom .btn with a background does; a retry must clear the error before it refetches. The reference files only load on condition, so these facts are missing when the hierarchy or states rows are decided without them."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 3,
+          "evidence": "Description is about 980 of the 1024 allowed characters, and the token-pipeline near-miss (design-system-starter) is not named in the boundary, although the held-out trigger set tests it.",
+          "fix": "Apply eight pass/fail UI/UX rules (loading, responsive, hierarchy, tokens, consistency, a11y, states, interaction) when building or changing a screen, and return a rule | pass/fail/na | evidence | fix table on review. Use when building, changing or reviewing any UI screen or component in React, Vue, Svelte, HTML/CSS, MUI or Tailwind: skeleton vs spinner, empty and error states, mobile layout, button hierarchy, hard-coded colors, dark mode without per-component overrides, WCAG contrast, focus rings, tap targets, icon-button names, hover/focus-visible/disabled states. Trigger even on 'review this page', 'make this look polished', 'why does this feel off' or 'fix the layout'. Not for backend or API work, copywriting, brand or logo design, scaffolding a design system or token pipeline (design-system-starter), or the MUI theme API and Grid migration (mui)."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/ui-ux-principles/evals/trigger-queries.json",
+          "line": 131,
+          "evidence": "\"Rewrite the hero headline and the three feature blurbs on the landing page so they sound friendlier.\" duplicates the earlier copywriting near-miss \"Rewrite the hero copy on my landing page so it sounds friendlier.\"",
+          "fix": "Replace the duplicate with a different near-miss negative, such as 'Add analytics click tracking to every button on the pricing page'. Also add an a11y/interaction assertion to review-tailwind-vue-card so all eight rows of that eval are checked."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 30,
+          "evidence": "6. Render the widths, contrast and focus ring, or list each one as `unverified: needs render` in the hand-over",
+          "fix": "Name a default way to render, with a fallback. For example: 'Default: run the dev server and take a screenshot at 360/768/1280/1920 with Playwright (or the harness browser tool), and tab once to capture the focus ring. With no runnable app, list each as unverified: needs render.' Without it, the agent guesses how to verify, or quietly skips verification."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 25,
+          "evidence": "The 22-line Workflow section and six-line tokens, consistency, a11y and interaction sections are predominantly activation: approximately 46 of 124 H2-section lines. Examples include \"find the theme first\", \"reuse the shared component\" and \"every action is keyboard-operable\". The custom evidence rules and framework-specific traps add substantially more knowledge than these familiar reminders.",
+          "fix": "Condense the familiar theme, request-state and shared-control preflight reminders into one ordered checklist. Preserve the eight pass lines, custom exceptions, evidence routing and non-obvious framework/live-region gotchas rather than repeating general UI advice around them."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 99,
+          "evidence": "The source-and-render branch says \"nothing: decide every row\", and the source-only branch says \"loading, hierarchy, tokens, consistency and states never need a render\". However, loading requires \"CLS stays at 0.1 or less\" at line 34. Source plus one desktop screenshot does not necessarily establish layout shift, missing viewport behavior or unobserved interaction states; source alone cannot establish runtime CLS.",
+          "fix": "Apply evidence-sufficiency checks to every input combination. Fail proven violations, pass only when all applicable criteria are established, and otherwise use na with the missing observation identified. Remove the blanket claim that loading never needs runtime evidence, and explicitly allow unverified CLS or timing checks."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/ui-ux-principles/SKILL.md",
+          "line": 28,
+          "evidence": "Build preflight says \"set no fixed container width\", and the responsive Trap also treats \"Fixed container widths\" as defects without qualification. This rejects safe constrained layouts such as width: 20rem; max-width: 100%, even when they reflow correctly and keep the primary action reachable.",
+          "fix": "Make fluid sizing the default, but permit fixed preferred widths constrained by max-width, wrapping or breakpoint changes. Fail widths when they cause page-level overflow or an unreachable primary action, rather than failing every fixed-width declaration."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

@@ -1,0 +1,104 @@
+{
+  "skill": "general-purpose",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 12,
+    "D2": 10,
+    "D3": 10,
+    "D4": 14,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 102,
+  "max_total": 125,
+  "percent": 81.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 8,
+      "evidence": "Whether an installed agent named `general-purpose` replaces Claude Code's built-in one is unverified; do not rely on either behavior.",
+      "fix": "Move this author-facing note about built-in override to README.md or docs/audit/artifact-specs.md; the running agent cannot act on it, so it costs system-prompt tokens without changing behavior"
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/general-purpose.md",
+      "line": 13,
+      "evidence": "Order the work by dependency. Record baseline behavior (run the relevant tests or reproduce the bug) before changing anything.",
+      "fix": "Cut this to repository-specific content (for example which test command establishes the baseline here); dependency ordering and reproduce-first are generic engineering advice the model already follows"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 15,
+      "evidence": "Run the verification gates that match the components you touched, and read their output yourself.",
+      "fix": "Name the gates per component, for example: skills/ or agents/ or commands/ touched -> run `audit.py check` (and rubric-check when skill-judge references change); code touched -> the package's test command. This turns a generic step into a domain sequence the model would not derive"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 28,
+      "evidence": "Report a check as passed that you did not run; say it was not run.",
+      "fix": "Add the reason for this item, and add a short Gotchas section with environment facts that defy assumptions, for example: `audit.py check --kind agent` requires `name` to equal the file stem even though Claude Code does not, and plugin agents ignore `hooks`, `mcpServers` and `permissionMode`"
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "agents/general-purpose.md",
+      "line": 3,
+      "evidence": "description: Coordinate general programming work across multiple files or components, including debugging, implementation and validation.",
+      "fix": "description: Coordinate multi-step programming work that spans several files or components: implementation, debugging, refactoring, migrations and validation. Use for complex requests that no single specialist owns, or to combine and check results from several specialists, even when the user does not say \"coordinate\". Prefer a dedicated specialist for a focused domain task. Not for trivial one-step edits."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "agents/general-purpose.md",
+      "line": 14,
+      "evidence": "if an available specialist matches it, delegate; otherwise do it directly when your tools and scope allow.",
+      "fix": "Set a default for small subtasks, for example: do subtasks of a few lines or a single file directly; delegate only when a specialist's domain rules or tools add something you lack, because each delegation costs context and needs its own verification"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 22,
+      "evidence": "require authorization that covers that exact operation",
+      "fix": "Resolve the missing branch: when no authorization covers the operation, do not perform it; list it under Remaining blockers with the exact command, target and impact so the caller can approve it (a subagent cannot prompt the user)"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "agents/general-purpose.md",
+      "line": 13,
+      "evidence": "Record baseline behavior (run the relevant tests or reproduce the bug) before changing anything.",
+      "fix": "Add the edge cases: if the bug does not reproduce, or baseline tests already fail, record the pre-existing failures, do not count them against your change, and report them under Validation"
+    }
+  ]
+}

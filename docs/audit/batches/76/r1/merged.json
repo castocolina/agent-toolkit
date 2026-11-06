@@ -1,0 +1,117 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "sync-branch",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.0,
+        "router-env-my-referee-one": 92.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 26,
+          "evidence": "Pass `\"$branch\"` quoted. Single quotes are needed only for a literal name you type containing `$` (`'feature/weird$name'`), which the shell would otherwise expand.",
+          "fix": "Delete this gotcha. Models already know shell quoting and variable expansion, and steps 1-5 already quote \"$branch\" everywhere."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 18,
+          "evidence": "If `fork` is non-empty and differs from `git merge-base \"origin/$target\" \"$branch\"`, the base was rewritten ... Else if `old_base` is set ... Otherwise `git rebase \"origin/$target\"`.",
+          "fix": "Add one sentence of reasoning before the three-way choice, such as: 'Before rebasing, ask which commits are really yours: the replay range must start at the base your commits were made on, not at the current merge-base.' Then the agent can handle cases the three branches do not list."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 22,
+          "evidence": "The Gotchas list covers --force, --ours/--theirs and quoting. It does not say that a plain `git rebase` flattens merge commits on the feature branch.",
+          "fix": "Add a gotcha: 'If `git log --merges origin/$target..$branch` is not empty, the branch has merge commits. A plain rebase drops them and linearises the history. Stop and ask, or use `--rebase-merges` when the user wants to keep them.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 20,
+          "evidence": "If the lease is rejected, someone else pushed: stop ... On success report ...",
+          "fix": "Add a branch for push failures that are not a lease rejection (auth error, network error, pre-push hook, protected branch): 'Any other push error: stop, report git's stderr, say the local branch is rebased but not pushed, and give `$orig` and `git reset --hard \"$orig\"` as the recovery (only on the user's go-ahead).'"
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 18,
+          "evidence": "Else if `old_base` is set and `git merge-base --is-ancestor \"$old_base\" \"origin/$target\"` fails: `git rebase --onto \"origin/$target\" \"$old_base\" \"$branch\"`.",
+          "fix": "Use this branch only when `git merge-base --is-ancestor \"$old_base\" \"$branch\"` also succeeds. Otherwise the range old_base..branch includes rewritten base commits. If old_base is not in the branch history, stop and show `git log --oneline \"origin/$target..$branch\"` so the user can pick the replay range."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 6,
+          "evidence": "Target = the argument, else `main`.",
+          "fix": "Normalise the argument: 'Strip a leading `origin/` from the argument (so `origin/main` becomes `main`). Then `origin/$target` never becomes `origin/origin/main`, and the step 1 check that the branch equals the target still works.'"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "commands/evals/sync-branch.json",
+          "line": null,
+          "evidence": "push-lease-quoted-branch assertion: \"The branch name is passed quoted, as `\\\"$(git branch --show-current)\\\"` or the literal `'feature/weird$name'` in single quotes\". The command itself uses `\"$branch\"`. No scenario covers a lease rejection, a remote that is ahead of the local branch, or a rewritten base.",
+          "fix": "Also accept `\"$branch\"` in that assertion. Add scenarios for: a lease rejection (no --force, recovery given), origin/<branch> having commits the local branch lacks (stops, lists them), and a squash-merged base (uses `git rebase --onto origin/main <fork> <branch>`)."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 26,
+          "evidence": "\u201cPass `\"$branch\"` quoted. Single quotes are needed only for a literal name you type containing `$`\u201d explains familiar shell mechanics; together with the routine branch, status and fetch instructions, this makes a substantial portion of the short workflow activation rather than expert knowledge.",
+          "fix": "Preserve every safety gate, but consolidate routine branch/target/clean-tree prerequisites and shorten the quoting explanation to \u201cAlways use the captured, quoted \"$branch\".\u201d Retain the detailed guidance on rewritten bases, paused rebases and explicit leases."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "high",
+          "file": "commands/sync-branch.md",
+          "line": 17,
+          "evidence": "\u201cIf `$remote` is set and `git log --format=%ae \"origin/$target..$remote\"` lists an email other than `git config user.email`, others push to this branch: stop and ask before any mutation.\u201d Commit authorship does not identify who pushes: collaborators can push commits authored by the current user, allowing this guard to pass before shared history is rewritten.",
+          "fix": "Do not infer pushership from author emails. Before rewriting an already-published branch, require confirmation that it is exclusively owned and safe to rebase; stop if it is shared. Foreign author emails may justify an additional warning, but an explicit lease protects against concurrent updates, not against rewriting known shared history."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 20,
+          "evidence": "After a lease rejection, the command recommends \u201cto inspect first, `git log \"$orig..origin/$branch\"`\u201d. A rejected push does not refresh `origin/$branch`; without another fetch, it still points to the saved remote tip, which step 2 established as an ancestor of `$orig`. This inspection therefore returns no commits instead of showing the competing update.",
+          "fix": "Include a refresh in the suggested inspection procedure, for example `git fetch origin \"refs/heads/$branch\"` followed by `git log --oneline \"$orig..FETCH_HEAD\"`. Keep the originally captured lease value unchanged and never retry the push automatically."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

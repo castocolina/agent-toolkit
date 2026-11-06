@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "qa-test-planner",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 86,
+          "evidence": "**Failure impact:** P0 money, security or irreversible data; P1 blocked core journey; P2 workaround exists; P3 cosmetic.",
+          "fix": "Drop the textbook P0-P3 definitions the model already knows. Keep only the non-obvious part: overlap shown by evidence, never assumed, and the tie-break by cost."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 59,
+          "evidence": "## 3b. Bug report branch: 1. Keep the first failure's evidence ... 4. Write every missing fact as `Unknown`",
+          "fix": "Add one thinking prompt before step 3, such as 'before setting severity, ask what the failure costs (money, data, recovery) and whether it is product or environment'. That makes the branch a decision framework and not only a four-step checklist."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/qa-test-planner/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "10 should-trigger vs 13 should-not-trigger queries; several positives are terse fragments ('Invoke /qa-test-planner for intermittent timeout report.')",
+          "fix": "Trim the negatives to 10 and keep the strongest near-misses (the unnamed plan, smoke, bug and release-decision prompts). Rewrite the terse positives with realistic context: file paths, builds, rates."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 61,
+          "evidence": "3. Set severity by impact, then priority from the rate grid in `references/bug_report_templates.md`.",
+          "fix": "Add the branch for an Unknown rate, which the grid has no row for (the 'sometimes does nothing, can't reliably repro' case): 'If the rate is Unknown, set priority from the intermittent row as a provisional value, or write Untriaged, and list the rate under Open Questions. Security or data-loss bugs stay P0.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 59,
+          "evidence": "The bug-report branch says \"Rerun under the same conditions only to measure the rate (n/10)\" before assessing severity. For a production double-charge or destructive-data defect, this branch provides no safety gate before repeating the harmful operation. The disposable-data restriction appears in the separate cases branch.",
+          "fix": "Assess potential money, data and security harm before reproducing a bug. Require authorized disposable data and a safe environment for potentially harmful reruns; if those prerequisites are unavailable, preserve the existing evidence and observed rate, record an unmeasured rate as Unknown or a single unreproduced occurrence, and request the missing prerequisites. Keep the original environment distinct from any later sandbox reproduction."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 61,
+          "evidence": "\"Write every missing fact as `Unknown` and list it under Open Questions\" repeats the global output rule at line 31 and the delivery check at line 136. This branch-level repetition adds no new QA decision or exception.",
+          "fix": "Remove the duplicate missing-fact instruction from the bug-report branch, retaining the global output convention and the final validation check. Keep branch-specific guidance focused on evidence preservation, safe reproduction and triage."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/evals/evals.json",
+          "line": 89,
+          "evidence": "The script-bug-file assertion checks \"the observed rate 2/10 and the build 2.4.0-rc2\" but not the known environment. Its source notes say \"on staging build 2.4.0-rc2\", while both the logged command's description and the saved report omit staging. All listed assertions can pass despite losing this supplied fact, contrary to the skill's preservation rule.",
+          "fix": "Add an assertion that every supplied reproduction-context fact, including staging, survives in the command and saved report. Update the logged --description and report fixture to retain staging without altering the exact build value, or explicitly make the omission a defect the evaluator must detect and report."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

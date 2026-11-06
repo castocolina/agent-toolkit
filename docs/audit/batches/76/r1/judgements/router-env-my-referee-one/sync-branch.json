@@ -1,0 +1,59 @@
+{
+  "skill": "sync-branch",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 12,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 26,
+      "evidence": "\u201cPass `\"$branch\"` quoted. Single quotes are needed only for a literal name you type containing `$`\u201d explains familiar shell mechanics; together with the routine branch, status and fetch instructions, this makes a substantial portion of the short workflow activation rather than expert knowledge.",
+      "fix": "Preserve every safety gate, but consolidate routine branch/target/clean-tree prerequisites and shorten the quoting explanation to \u201cAlways use the captured, quoted \"$branch\".\u201d Retain the detailed guidance on rewritten bases, paused rebases and explicit leases."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 17,
+      "evidence": "\u201cIf `$remote` is set and `git log --format=%ae \"origin/$target..$remote\"` lists an email other than `git config user.email`, others push to this branch: stop and ask before any mutation.\u201d Commit authorship does not identify who pushes: collaborators can push commits authored by the current user, allowing this guard to pass before shared history is rewritten.",
+      "fix": "Do not infer pushership from author emails. Before rewriting an already-published branch, require confirmation that it is exclusively owned and safe to rebase; stop if it is shared. Foreign author emails may justify an additional warning, but an explicit lease protects against concurrent updates, not against rewriting known shared history."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 20,
+      "evidence": "After a lease rejection, the command recommends \u201cto inspect first, `git log \"$orig..origin/$branch\"`\u201d. A rejected push does not refresh `origin/$branch`; without another fetch, it still points to the saved remote tip, which step 2 established as an ancestor of `$orig`. This inspection therefore returns no commits instead of showing the competing update.",
+      "fix": "Include a refresh in the suggested inspection procedure, for example `git fetch origin \"refs/heads/$branch\"` followed by `git log --oneline \"$orig..FETCH_HEAD\"`. Keep the originally captured lease value unchanged and never retry the push automatically."
+    }
+  ]
+}

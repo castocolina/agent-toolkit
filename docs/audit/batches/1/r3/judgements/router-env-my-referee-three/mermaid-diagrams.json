@@ -1,0 +1,122 @@
+{
+  "skill": "mermaid-diagrams",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 13,
+    "D4": 14,
+    "D5": 14,
+    "D6": 14,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/references/flowcharts.md",
+      "line": 5,
+      "evidence": "Links: `-->`, `---` (no arrow), `-.->` (dotted), `==>` (thick), `-->|label|`; `A --> B & C` fans out.",
+      "fix": "Delete the basic link and shape syntax list, which the model already knows. Keep only the `A(Text)` vs `A([Text])` confusion and the `linkStyle` index-shift trap."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/references/sequence-diagrams.md",
+      "line": 28,
+      "evidence": "| `->>` / `-->>` | Sync call / dashed reply | ... | `->` / `-->` | Plain line, no arrowhead |",
+      "fix": "Trim the arrow table to the non-obvious rows (`-)` async and `-x` lost), since the model knows the standard arrows."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 13,
+      "evidence": "2. **Read [authoring-rules.md] before drawing** (mandatory). ... 3. **Repair or new?**",
+      "fix": "Put the repair-or-new fork before the read step and say which sections each path reads. SKILL.md would then show the routing as a clear decision tree. Most of the thinking framework (choose by question answered) lives only in authoring-rules.md section 1; add one line to SKILL.md naming it."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": null,
+      "evidence": "The only pitfall in SKILL.md is `## C4 pitfall`. The other silent failures sit in the type files (for example `## Silent failures` in erd-diagrams.md).",
+      "fix": "Add a short `## Gotchas` or NEVER list to SKILL.md with the highest-cost silent failures and a pointer to each type file. Candidates: the inverted class arrow, a gantt date that does not match dateFormat, the gitGraph `checkout` before `branch`, and the subgraph `direction` being ignored. The agent often will not recognize the trigger to open the right type file."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 3,
+      "evidence": "Picks among sequenceDiagram, classDiagram, erDiagram, C4, stateDiagram-v2, flowchart, architecture-beta, gantt, pie and gitGraph.",
+      "fix": "Replace the description with: \"Create, edit, and repair Mermaid diagrams (.mmd files or ```mermaid blocks in Markdown). Use this skill when users ask to diagram, visualize, model, map out, or show sequence diagrams, class diagrams, ER diagrams or database schemas, state machines, flowcharts, software architecture (including terse requests such as 'architecture: mobile client, API, database, email provider'), Gantt schedules, pie proportions, or Git branch history, or when a Mermaid diagram fails to render or export (mmdc, GitHub), even without naming Mermaid. Choose the diagram type from the question being answered: sequenceDiagram, classDiagram, erDiagram, C4, stateDiagram-v2, architecture-beta, gantt, pie, gitGraph, with flowchart as the last resort. Not for prose-only explanations, explaining an existing diagram without changing it, PlantUML or draw.io work, matplotlib data charts, or interactive diagram-canvas components.\""
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+      "line": null,
+      "evidence": "Mandatory read for every new diagram, including sections 4-6 (subgraphs, shapes, classDef palettes), which the file itself labels flowchart-only.",
+      "fix": "Move the flowchart-only sections 4-6 into `flowcharts.md`, or tell the agent to read them only for a flowchart. A sequence or ERD diagram would then not load them."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/references/architecture-diagrams.md",
+      "line": null,
+      "evidence": "Usage: `pack:icon-name`, such as `logos:docker` ... Other packs: `@iconify-json/bi` (Bootstrap), `@iconify-json/simple-icons`.",
+      "fix": "Keep one default pack example and cut the list of alternative packs. This section is already gated to renderers known to register the pack, so a menu adds no value."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/evals/evals.json",
+      "line": null,
+      "evidence": "The 12 evals cover type choice, repair, C4 duplicate ids, gantt, gitGraph and prose-only. None asserts the authoring-rules styling or layout rules: classDef contrast, subgraph direction, 900px proportion, or splitting a large diagram.",
+      "fix": "Add an eval for a flowchart of about 12 nodes. Its assertions should check that `classDef` sets fill, stroke and color together, that the diagram is TD, that no cross-boundary edge sits beside a subgraph `direction`, and that the diagram is split if it is oversized. Add a repair eval for a lowercase `end` in a sequence diagram."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 15,
+      "evidence": "Repair: ... Check authoring-rules.md section 7 first and read the type file only if the parse error is not covered there. Skip the layout and styling rules. (vs step 2: \"Read authoring-rules.md before drawing (mandatory)\")",
+      "fix": "Reconcile steps 2 and 3. Say that a repair reads only authoring-rules.md section 7, and that the full read applies to new diagrams only. The mandatory-read line currently contradicts the repair shortcut."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "README.md",
+      "line": null,
+      "evidence": "README tells readers to see \"Classify before you draw\" in SKILL.md and to validate in Mermaid Live. SKILL.md has no such section and requires mmdc validation.",
+      "fix": "Update the README pointers to match the current SKILL.md and mmdc validation step. The README stays as the repo-required file."
+    }
+  ]
+}

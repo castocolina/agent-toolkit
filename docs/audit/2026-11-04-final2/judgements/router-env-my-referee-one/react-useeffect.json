@@ -1,0 +1,68 @@
+{
+  "skill": "react-useeffect",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 10,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 109,
+  "max_total": 125,
+  "percent": 87.2,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/react-useeffect/SKILL.md",
+      "line": 8,
+      "evidence": "\"An Effect synchronizes a component with a system outside React\" and \"List every reactive value the Effect reads\" reiterate familiar React guidance. Line-weighting the sections, the routing table and much of the correctness loop are activation rather than expert knowledge; the referenced fetch and store examples also contain substantial standard API scaffolding. The stronger knowledge delta is concentrated in partial resets, Effect Event boundaries, obsolete async writes and initialization lifetimes.",
+      "fix": "Keep familiar render-versus-handler, dependency and cleanup reminders as a compact activation checklist rather than repeating them across prose and procedures. Concentrate the remaining instructional detail on the non-obvious boundaries and concurrency cases, preserving runnable examples where needed and leaving all attribution intact."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/react-useeffect/references/alternatives.md",
+      "line": 56,
+      "evidence": "\"Use the Effect fallback from the SKILL.md table when the store has no change event to subscribe to\" routes to an Effect that \"subscribes, reads the current value once, and unsubscribes in cleanup.\" Following the no-change-event branch provides neither a subscription mechanism nor another way to observe subsequent changes.",
+      "fix": "Route stores without change notifications to an explicit observable adapter or polling strategy, specifying the initial read, polling interval and timer cleanup. If no observation mechanism is available, state that live synchronization cannot be guaranteed instead of prescribing a subscription-only fallback."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/react-useeffect/references/anti-patterns.md",
+      "line": 75,
+      "evidence": "\"Retry of the same URL: add a reloadCount state to the URL key (or the dependencies)\" permits adding reloadCount only to the dependency array. In that branch, the return check remains \"result.url !== url\", so a retry continues reporting the previous error or success as current instead of exposing the new request's loading state.",
+      "fix": "Use a composite request identity containing both url and reloadCount in the Effect dependencies, stored result and render-time loading comparison. Remove the dependencies-only alternative so retrying the same URL cannot mistake a previous result for the current attempt."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/react-useeffect/evals/evals.json",
+      "line": 58,
+      "evidence": "The initialization eval accepts a module-level guard \"set after the async refresh succeeds\" and asserts that the flag is not set before success, but never checks in-flight deduplication. A boolean set after success can satisfy every assertion while both Strict Mode setups start refreshAuthToken before either call finishes, reproducing the token-invalidation bug.",
+      "fix": "Require a lifetime-scoped shared in-flight Promise or equivalent single-flight mechanism. Add assertions that two Strict Mode setups invoke refreshAuthToken only once while pending, a failed attempt clears the cache for retry, and a new auth session receives its own initialization."
+    }
+  ]
+}

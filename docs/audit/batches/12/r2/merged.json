@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "openapi-to-typescript",
+      "percent": 95.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4,
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 72,
+          "evidence": "Worked example input is about 50 lines of YAML (lines 72-122), including the plain `/users/{id}/orders` and `put` operations, which repeat naming and ref rules already given in the Naming and Mapping tables",
+          "fix": "Cut the input down to the parts that show non-obvious results: the path-item parameter inheritance, the getUser/get_user collision, the readOnly/writeOnly split and the ignored `$ref` sibling. Drop the operations whose output follows directly from the tables."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 3,
+          "evidence": "Description and workflow advertise \"FastAPI, springdoc or NestJS output\", but no gotcha warns that generator output is often 3.1, which the preflight then refuses",
+          "fix": "Add a `## Gotchas` section, starting with: \"FastAPI 0.99+ emits `openapi: 3.1.0` (Optional fields become `anyOf: [..., {type: 'null'}]`), so its output hits the 3.1 stop. Read the version line and never assume 3.0 from the generator's name. Editing only the version string does not make the document 3.0.\" Move the TS2411 and ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX facts into the same section so the environment traps sit together."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/evals/evals.json",
+          "line": 8,
+          "evidence": "\"files\": [\"evals/files/pets-min.json\", \"references/guards.md\"]: a skill reference is listed as an eval input, and no eval covers the Swagger 2.0 stop, an `allOf` property conflict, or `properties` + `additionalProperties` with an optional fixed property (TS2411)",
+          "fix": "Remove `references/guards.md` from `files` in the spec-types and shapes-guards evals. Add an eval with a `swagger: \"2.0\"` input that asserts the skill stops and emits no types. Add an eval spec where `allOf` branches conflict on a property and an object has `note?: string` plus `additionalProperties: {type: string}`, with assertions that the conflict is reported and that the index signature includes `| undefined`."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 23,
+          "evidence": "Preflight rows cover only `swagger: \"2.0\"`, `openapi: 3.1.x` and `openapi: 3.0.x`, so `openapi: 3.2.0` matches no row. The suffix rule (line 35) adds a media suffix only \"when one status has several media types\", and nothing says how to name a requestBody with several media types that have different schemas",
+          "fix": "Add a final preflight row: \"any other `openapi` value (3.2.x, 4.x) | Stop: only 3.0.x is supported; report the version found\". Extend the suffix rule: \"likewise `{Base}RequestBody{Media}` when a request body has several media types with different schemas (for example `CreatePetRequestBodyJson`, `CreatePetRequestBodyFormData`)\"."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/openapi-to-typescript/references/guards.md",
+          "line": 18,
+          "evidence": "The exclusivity check may be skipped \"unless every branch declares the discriminator property required with a single-value enum, which makes the branches disjoint.\" Singleton enums need not have distinct values. If branches A and B both require kind with enum [\"x\"], require a and b respectively, and mapping x selects A, {kind:\"x\",a:1,b:1} matches both branches but passes the stated shortcut.",
+          "fix": "Skip the other-branch checks only when the branches' required discriminator enums contain pairwise distinct singleton values consistent with the discriminator mapping. Otherwise always require exactly one matching branch. Apply the same distinctness requirement to the exactness criterion in SKILL.md's oneOf/discriminator row."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 34,
+          "evidence": "\"Operation base: PascalCased operationId.\" Unlike schema names, operation bases have no empty-name or leading-digit repair. A valid operationId of \"123\" therefore produces an invalid declaration identifier such as 123Response200.",
+          "fix": "Sanitize operation bases before allocating names: prefix Operation when PascalCasing produces an empty result or a leading digit, then perform collision resolution and append the prescribed suffixes. For example, operationId \"123\" should produce Operation123Response200."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/evals/trigger-queries.json",
+          "line": 3,
+          "evidence": "All ten positive queries explicitly mention OpenAPI/openapi; for example, \"We have api/openapi.yaml (openapi: 3.0.3) from the backend team.\" None tests the description's advertised ability to trigger from indirect requests such as \"API types\" or \"typed responses\" without naming OpenAPI.",
+          "fix": "Replace two positive queries with realistic indirect requests that omit the OpenAPI keyword and openapi-named files while retaining clear generation intent and source context, such as: \"The backend handed us docs/service-contract.yaml; update src/types/api.ts for all its endpoints, including request parameters and typed responses. No fetch client.\" Keep the balanced near-miss negatives."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

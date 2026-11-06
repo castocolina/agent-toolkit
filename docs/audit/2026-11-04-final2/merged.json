@@ -1,0 +1,886 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": false,
+  "skills": [
+    {
+      "name": "communication-excellence-coach",
+      "percent": 96.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/communication-excellence-coach.md",
+          "line": 58,
+          "evidence": "\"Put an inferred motive (\\\"you don't care\\\", \\\"you were careless\\\") in SBI Behavior\" and, at line 65, \"A Slack thread reply stays visible to channel members but may not notify them\" repeat guidance already injected through feedback-mastery and professional-communication.",
+          "fix": "Remove these two duplicated rules from the agent body and rely on the preloaded skills' motive and channel checks. Retain the distinct review-risk framework, roleplay branches, notification-preview guidance and Cc handling."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "agents/communication-excellence-coach.md",
+          "line": 67,
+          "evidence": "\"Cc'ing a manager on feedback reads as escalation even when the tone is soft: flag the Cc in Biggest risk and suggest sending 1:1 first.\" This mandates the same recommendation even when the escalation is intentional or policy-required.",
+          "fix": "Flag the Cc as an escalation signal, then check whether it is intentional, policy-required or part of an existing escalation. Recommend private 1:1 delivery first only for informal feedback without those conditions; preserve required recipients and select Biggest risk from the actual context."
+        }
+      ]
+    },
+    {
+      "name": "explain-changes-mental-model",
+      "percent": 97.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 27,
+          "evidence": "Branch detection uses `git show-ref --verify --quiet \"refs/heads/<arg>\"` or `refs/remotes/<arg>`. For a valid fully qualified argument such as `refs/remotes/origin/feature/x`, both probes prepend another refs prefix and fail. The argument consequently falls through to rule 7's single-commit explanation instead of the branch changeset.",
+          "fix": "Handle arguments already starting with refs/heads/ or refs/remotes/ by verifying that exact ref with `git show-ref --verify --quiet \"$arg\"` before attempting the shorthand probes. Route confirmed branch refs through rule 6 and preserve the remote-base preference for refs/remotes/ arguments."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 34,
+          "evidence": "The large-PR branch says to run `gh pr diff \"<pr>\" --color=never > \"$(mktemp)\"` and then read the saved patch in sections. The temporary pathname is neither retained nor printed, so the next read has no known path.",
+          "fix": "Retain and expose the pathname, for example `patch=$(mktemp) && gh pr diff \"<pr>\" --color=never > \"$patch\" && printf '%s\\n' \"$patch\"`. Check the command's status and use the printed absolute path for subsequent section reads."
+        }
+      ]
+    },
+    {
+      "name": "sync-branch",
+      "percent": 97.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "commands/sync-branch.md",
+          "line": 16,
+          "evidence": "`remote=$(git rev-parse --verify --quiet \"origin/$branch\")` is described as \"empty if the branch was never pushed\", and step 5 pushes to `origin \"$branch\"`. This assumes the local branch name equals the remote PR head name. For a local branch `local/login` tracking `origin/feature/login`, the missing `origin/local/login` instead selects the unpublished-branch path: it creates a different remote branch and leaves the existing PR unchanged while reporting success.",
+          "fix": "Resolve the remote destination separately from the local branch before recording its tip. Inspect the configured upstream and, for an existing PR, its headRefName and head repository; stop and ask if the destination is ambiguous or is not on origin. Use the verified remote head name consistently for the remote-tip lookup, divergence checks and explicit lease, and push with an explicit `HEAD:refs/heads/<remote-head>` refspec. Keep `$branch` for local rebase operations."
+        }
+      ]
+    },
+    {
+      "name": "crafting-effective-readmes",
+      "percent": 98.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 98.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/crafting-effective-readmes/SKILL.md",
+          "line": 20,
+          "evidence": "\u201cRun the documented first-use path verbatim in a clean environment\u201d specifies execution, and the next step handles unavailable execution, but neither defines what happens when a documented command actually fails. Reporting a claim as \u201cexecuted\u201d also does not distinguish successful validation from a failed attempt.",
+          "fix": "Add a failed-execution branch: capture the command and error, reconcile the instructions against repository evidence, correct the README or its generating template, and rerun the complete first-use path in a clean environment. If validation remains blocked or fails, report that outcome explicitly with its evidence rather than treating execution alone as validation."
+        }
+      ]
+    },
+    {
+      "name": "difficult-workplace-conversations",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/difficult-workplace-conversations/references/emotional-regulation.md",
+          "line": 15,
+          "evidence": "The 'Trigger inventory' includes familiar mappings such as '| Being left out | Not invited to the decision meeting | Inclusion |'. The following 'Day-of preparation' repeats instructions already supplied in SKILL.md, including 'Bring dated examples; mark which you saw directly and which you inferred or heard.' These sections dilute the expert decision rules with basic psychology and repeated activation material.",
+          "fix": "Remove the generic trigger-to-need inventory and repeated day-of checklist. Retain the readiness cross-reference, short regulation worksheet, and situation-specific one-technique table."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/difficult-workplace-conversations/references/preparation-template.md",
+          "line": 56,
+          "evidence": "The delivering-a-decision add-on specifies 'Approved reason (HR-agreed wording): [...]'. Following the full-worksheet branch for an ordinary cancelled project therefore introduces an HR-approval requirement, contradicting SKILL.md Section 4's explicit instruction that decision-owner verification is sufficient for operational bad news.",
+          "fix": "Replace the field with 'Reason verified with the decision owner: [...]' and add: 'For layoffs or other formal personnel decisions, use only HR\u2019s or the authorized owner\u2019s approved wording; ordinary operational decisions do not require HR approval.'"
+        }
+      ]
+    },
+    {
+      "name": "feedback-mastery",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 92.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": 55,
+          "evidence": "Deliver, Receive and Follow up occupy 39 of the 101 H2-section lines and contain substantial standard coaching guidance and repeated examples: \"Reply to instances; turn labels into a request for an instance\", \"Do not argue the label; ask for one recent example and what it affected\", and the subsequent sample repeat the same familiar technique. The strongest knowledge delta is concentrated in the routing rules, exceptions and gotchas rather than throughout the body.",
+          "fix": "Compress familiar SBI mechanics and the repeated label-to-example guidance into brief activation reminders. Retain the thin-versus-missing-evidence branch, disputed-evidence handling, power-specific rules, actionable recap fields, check-in defaults and silent omission of private details."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": 51,
+          "evidence": "The pre-send gate applies to \"every draft\" and requires it to be \"written for private delivery\"; line 100 reinforces private delivery even when a channel post is requested. This appropriately constrains corrective feedback but unnecessarily applies the same restriction to specific-work recognition and non-personal shared-work updates.",
+          "fix": "Scope mandatory private delivery to individual corrective feedback and sensitive content. Permit requested, recipient-approved public recognition and non-personal norm or ownership updates in appropriate shared channels when the confidentiality test passes; preserve the existing live-versus-written guidance for corrective feedback."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": 24,
+          "evidence": "The routing table sends \"One incident, or recognition\" to \"SBI opener plus one open question\", while line 49 says recognition names the behavior and effect, \"then stops\". Following the table literally adds a question to a recognition message that the dedicated recognition instruction says should end.",
+          "fix": "Give recognition its own routing-table row: name the specific behavior and its verified effect, then stop. Reserve the SBI opener plus open question route for corrective feedback."
+        }
+      ]
+    },
+    {
+      "name": "game-changing-features",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 93.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 53,
+          "evidence": "\"Registered accounts overstate reach; size an opportunity by active users of the affected flow.\" Alongside \"The segment, the metric it should move, and the cheapest test\" and the roadmap-freshness and source-conflict reminders, this is activation of standard product-analysis knowledge rather than new expertise. These reminders occupy a meaningful share of the short skill despite its valuable custom ranking and session protocol.",
+          "fix": "Consolidate the routine segment/metric/test, roadmap-freshness, active-user-denominator and source-conflict reminders into one compact pre-ranking check. Preserve the bespoke tiering, scoring and session-reconciliation rules and the specific production-flag and renamed-event traps."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 40,
+          "evidence": "The single-feature branch requires \"exactly one Do Now\", while the general prioritization rule says \"when capacity is unstated or no test fits, write 'No Do Now yet'\". For a requested-feature comparison with no stated capacity, these instructions require incompatible outcomes.",
+          "fix": "Make the single-feature branch explicitly inherit the general eligibility rule: choose exactly one Do Now only when a scored candidate's cheapest test fits stated capacity; otherwise write \"No Do Now yet\" and identify the missing capacity constraint and resolving question or test."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 21,
+          "evidence": "\"When none is defensible, leave the idea unscored\" permits every candidate to lack a score, but the next step selects \"the highest-scoring idea across all tiers\". With known team capacity and no defensible reach estimates, neither documented fallback necessarily applies, leaving the priority decision undefined.",
+          "fix": "Add an explicit no-scored-candidate fallback: write \"No Do Now yet\", identify the missing reach estimate, and name the cheapest reach-measurement test even when team capacity is known."
+        }
+      ]
+    },
+    {
+      "name": "jira",
+      "percent": 97.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/jira/references/story-anatomy.md",
+          "line": 51,
+          "evidence": "The creator branch says: \"CLI: `jira me` prints the configured login, which `-a` accepts.\" House policy requires the authenticated user, but a configured login is not authenticated identity. With the supported Data Center Bearer authentication, a valid token can belong to someone other than the saved login, causing this branch to assign the card to the wrong person.",
+          "fix": "Resolve the creator through an authenticated GET /rest/api/3/myself on Cloud or /rest/api/2/myself on Data Center, including when using the CLI backend. Use the returned accountId or name for the proposed assignee and subsequent assignment. Treat `jira me` only as a configuration hint, not proof of the token owner's identity."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/jira/evals/evals.json",
+          "line": 47,
+          "evidence": "The assertion accepts \"Says it will re-read the created issue (for example `jira issue view KEY` or the `--raw` output)\". The unqualified `--raw` alternative can credit the create response instead of a separate issue read, leaving the central dropped-field verification requirement insufficiently tested.",
+          "fix": "Require a separate post-write issue read, such as `jira issue view KEY --raw` or GET /rest/api/{v}/issue/{key}; explicitly reject treating the create response as verification. Add an approved-success case with create and read-back fixtures where a requested field was silently dropped, and assert that the final report identifies the mismatch."
+        }
+      ]
+    },
+    {
+      "name": "marp-slide",
+      "percent": 96.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/marp-slide/evals/evals.json",
+          "line": 34,
+          "evidence": "The sparse-input assertion only checks \"Does not claim a file was saved to `/mnt/user-data/outputs/`.\" An answer could ask a question, fabricate slides and claim a save elsewhere while satisfying both assertions.",
+          "fix": "Assert that the response stops after one focused clarification question, produces no deck and makes no successful-save claim to any path."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/marp-slide/assets/template-basic.md",
+          "line": 98,
+          "evidence": "`section.lead { border-bottom: 8px solid var(--color-hr); }` follows the equally specific `section.final { border-bottom: none; }`. Consequently, the `<!-- _class: lead final -->` closing-title example recommended in SKILL.md retains its border. The dark and colorful templates have the same cascade.",
+          "fix": "In the basic, dark and colorful templates, move the final-border override after the lead rule or add a later `section.lead.final { border-bottom: none; }` rule."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/marp-slide/SKILL.md",
+          "line": 12,
+          "evidence": "The only workflow routes are \"New deck\" and \"Existing deck\", although the description explicitly includes \"custom Marp theme CSS\". A request to create a reusable theme stylesheet without creating slides has no matching route; the new-deck route instead requires a concrete topic and audience and proceeds to slide creation.",
+          "fix": "Add a theme-CSS-only route that loads references/theme-css-guide.md, creates or edits the requested stylesheet without demanding a deck topic or generating a presentation, and validates it through a small preview deck when rendering is available."
+        }
+      ]
+    },
+    {
+      "name": "mermaid-diagrams",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 62,
+          "evidence": "\u201cThe most frequent parse failures are lowercase `end` as an id ... an unquoted `(` in a label ... and a target starting with `o` or `x` right after a link\u201d repeats the mandatory scan already specified in workflow step 3 and the detailed explanations in authoring-rules.md section 7.",
+          "fix": "Keep the mandatory scan in step 3 and the detailed fixes in section 7; replace this final repeated explanation with a short pointer, or omit this duplicate bullet."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+          "line": 22,
+          "evidence": "\u201c\u2018Show the flow\u2019, \u2018how does X work\u2019, and \u2018flowchart of our API\u2019 are not evidence for a flowchart: an API is a sequence.\u201d This turns a useful type-selection default into an unconditional override, without an escape hatch for an explicitly required flowchart or an API decision/control-flow question.",
+          "fix": "Default to sequence diagrams when the question is message ordering, but honor explicit diagram-format requirements or ask before substituting. Allow flowcharts for API routing, decisions and control flow when those are the question being answered."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/evals/evals.json",
+          "line": 295,
+          "evidence": "The refactor eval says \u201ca different direction or type is accepted only with a stated reason\u201d, but subsequent assertions unconditionally require `subgraph` blocks, `[(...)]` cylinders and `classDef`. A justified C4 or architecture-beta alternative therefore cannot satisfy the supposedly type-flexible test.",
+          "fix": "Make the subgraph, cylinder-syntax and classDef assertions conditional on choosing flowchart. For an accepted alternative type, check the same grouping, storage-role and visual-emphasis requirements using that type's native constructs."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 26,
+          "evidence": "\u201cScan every label and message: is any `[ ] ( ) { } < > |` unquoted? ... Fix each from section 7.\u201d In the syntax-only sequence-repair branch, ordinary message text such as `API->>DB: find(id)` has legal parentheses; applying section 7's whole-label quoting adds visible quotation marks instead of repairing syntax, conflicting with the requirement to preserve labels.",
+          "fix": "Scope whole-label quoting to the diagram grammars that require it, particularly flowchart node and edge labels. Explicitly exempt ordinary sequence-message punctuation such as `find(id)`; for sequence messages apply the documented `#` and `;` entity rules, with participant and block checks handled separately."
+        }
+      ]
+    },
+    {
+      "name": "naming-analyzer",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 37,
+          "evidence": "The example '`expiresAt = 3600`, later `now + expiresAt`' concludes 'it is a duration, not an instant: `ttlSeconds`'. The arithmetic establishes a duration but does not establish seconds; the same expression could operate on milliseconds.",
+          "fix": "Make the outcome conditional on evidence about the time basis: use `ttlSeconds` only when `now` and the offset are established as seconds, or `ttlMs` when they are milliseconds. Otherwise mark the unit tentative and ask what unit `now` uses rather than asserting a seconds-suffixed name."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 12,
+          "evidence": "'every name you report still gets the full repo and string-literal search of step 1' requires repository-wide searches even for identifiers proven to be lexical locals, such as short-lived loop counters. Common names can produce extensive unrelated matches without improving compatibility evidence.",
+          "fix": "Keep repository-wide symbol and string searches mandatory for members, exported names and potential hidden contracts. Allow scope-local searches for identifiers whose definitions and uses establish that they cannot escape or participate in string-based access; require broader searches when that cannot be established."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 28,
+          "evidence": "The convention row teaches 'class `user_profile`, constant `max`' \u2192 '`UserProfile`, `MAX_RETRIES`'; the later advice to 'flip to positive polarity' likewise supplies familiar naming guidance. These are activation material rather than expert knowledge, unlike the ORM, serialization and queued-task failure cases.",
+          "fix": "Compress routine casing and positive-polarity examples into brief reminders rather than worked naming rules. Preserve the evidence-dependent decisions and hidden-consumer examples, which provide the substantive knowledge delta."
+        }
+      ]
+    },
+    {
+      "name": "openapi-to-typescript",
+      "percent": 98.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 98.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 75,
+          "evidence": "The incompatible-fixed-property branch prescribes \"interface plus `[key: string]: V | <fixed types>`\", but does not carry forward the preceding row's optional-property handling. For an optional numeric `version` property with string-valued additionalProperties, the stated formula gives `version?: number; [key: string]: string | number`, which fails TS2411 under the documented standalone `--strict` check with exactOptionalPropertyTypes off.",
+          "fix": "Explicitly apply optional-property handling to both typed-additionalProperties branches. When an incompatible fixed property is optional, include `undefined` in the widened index signature: `{ version?: number; [key: string]: string | number | undefined }`. Retain the Approximate marking."
+        }
+      ]
+    },
+    {
+      "name": "plugin-forge",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/plugin-forge/evals/evals.json",
+          "line": 17,
+          "evidence": "\"Minor bump expected 1.5.0 in both manifests.\" The prompt does not establish that both manifests contain version fields, while the script contract explicitly says never to add an entry version.",
+          "fix": "Make this expectation conditional: plugin.json wins when it contains version; otherwise bump the existing entry version. Require synchronization only when both already contain version, and explicitly assert that no redundant entry version is added."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/plugin-forge/evals/evals.json",
+          "line": 40,
+          "evidence": "The stale-update assertion accepts \"bump_version.py lint-kit minor` (or `patch`)\" even though the fixture adds a new skill and the skill's version policy requires minor for a new skill.",
+          "fix": "Require a minor bump to 1.3.0 for this fixture, or accept the documented alternative of removing version from both manifests. Do not accept a patch bump for the new-skill release."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/plugin-forge/scripts/bump_version.py",
+          "line": 49,
+          "evidence": "\"if not plugin_json_path.exists():\" immediately raises \"Plugin manifest not found\". However, references/plugin-structure.md documents plugin.json as optional, and the workflow routes standard-layout plugins to this script without a manifest-less fallback.",
+          "fix": "Add a manifest-existence check before selecting the standard bump script. For a manifest-less plugin, route to manually bumping an existing marketplace-entry version, or leave a SHA-versioned plugin unbumped; explicitly state that bump_version.py requires plugin.json."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 37,
+          "evidence": "\"A relative source ... must start with `./`\" contradicts references/marketplace-schema.md, which permits a bare source such as \"formatter\" under metadata.pluginRoot. The source decision tree also lacks a branch for that supported form.",
+          "fix": "Resolve a bare source through metadata.pluginRoot before classifying it as standard or other-local. Qualify the ./ requirement as applying to explicit relative paths, document the pluginRoot exception, and retain traversal restrictions on the resolved path."
+        }
+      ]
+    },
+    {
+      "name": "qa-test-planner",
+      "percent": 96.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/qa-test-planner/references/bug_report_templates.md",
+          "line": 54,
+          "evidence": "\"A good title names the area, the failing behavior and the trigger\" explains standard bug-report writing already demonstrated by the base template. This adds little knowledge compared with the skill's specific reproduction, waiver and environment rules.",
+          "fix": "Remove this explanatory paragraph while retaining the concrete title format in the base template; keep the reference focused on the non-obvious evidence, severity and priority rules."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/scripts/generate_test_cases.sh",
+          "line": 273,
+          "evidence": "The visual section is guarded by `if [ \"$TEST_TYPE\" = \"UI/Visual\" ] && [ -n \"$FIGMA_URL\" ]; then`. Following the flag-mode branch with `--type 'ui' --visual 'Button spacing and focus state'` but no --figma reaches successful creation while silently discarding the supplied visual checks. Supplying --figma or --visual for a regression case also discards those values.",
+          "fix": "Preserve supplied visual checks even when the Figma URL is unavailable, writing the design reference as Unknown and listing it under Open Questions. For non-UI cases, either retain supplied design context in the output or reject unsupported flag combinations with exit 2 instead of silently dropping them."
+        }
+      ]
+    },
+    {
+      "name": "react-dev",
+      "percent": null,
+      "grade": "UNJUDGED",
+      "judges": {},
+      "missing_judges": [
+        "router-env-my-referee-one",
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": []
+    },
+    {
+      "name": "react-useeffect",
+      "percent": 87.2,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 87.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": 8,
+          "evidence": "\"An Effect synchronizes a component with a system outside React\" and \"List every reactive value the Effect reads\" reiterate familiar React guidance. Line-weighting the sections, the routing table and much of the correctness loop are activation rather than expert knowledge; the referenced fetch and store examples also contain substantial standard API scaffolding. The stronger knowledge delta is concentrated in partial resets, Effect Event boundaries, obsolete async writes and initialization lifetimes.",
+          "fix": "Keep familiar render-versus-handler, dependency and cleanup reminders as a compact activation checklist rather than repeating them across prose and procedures. Concentrate the remaining instructional detail on the non-obvious boundaries and concurrency cases, preserving runnable examples where needed and leaving all attribution intact."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/react-useeffect/references/alternatives.md",
+          "line": 56,
+          "evidence": "\"Use the Effect fallback from the SKILL.md table when the store has no change event to subscribe to\" routes to an Effect that \"subscribes, reads the current value once, and unsubscribes in cleanup.\" Following the no-change-event branch provides neither a subscription mechanism nor another way to observe subsequent changes.",
+          "fix": "Route stores without change notifications to an explicit observable adapter or polling strategy, specifying the initial read, polling interval and timer cleanup. If no observation mechanism is available, state that live synchronization cannot be guaranteed instead of prescribing a subscription-only fallback."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-useeffect/references/anti-patterns.md",
+          "line": 75,
+          "evidence": "\"Retry of the same URL: add a reloadCount state to the URL key (or the dependencies)\" permits adding reloadCount only to the dependency array. In that branch, the return check remains \"result.url !== url\", so a retry continues reporting the previous error or success as current instead of exposing the new request's loading state.",
+          "fix": "Use a composite request identity containing both url and reloadCount in the Effect dependencies, stored result and render-time loading comparison. Remove the dependencies-only alternative so retrying the same URL cannot mistake a previous result for the current attempt."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/react-useeffect/evals/evals.json",
+          "line": 58,
+          "evidence": "The initialization eval accepts a module-level guard \"set after the async refresh succeeds\" and asserts that the flag is not set before success, but never checks in-flight deduplication. A boolean set after success can satisfy every assertion while both Strict Mode setups start refreshAuthToken before either call finishes, reproducing the token-invalidation bug.",
+          "fix": "Require a lifetime-scoped shared in-flight Promise or equivalent single-flight mechanism. Add assertions that two Strict Mode setups invoke refreshAuthToken only once while pending, a failed attempt clears the cache for retry, and a new auth session receives its own initialization."
+        }
+      ]
+    },
+    {
+      "name": "reducing-entropy",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/references/design-is-taking-apart.md",
+          "line": 3,
+          "evidence": "\"Name each responsibility and the state it reads/writes\" and \"Split a component when parts change for independent reasons or can be tested/replaced independently\" repeat familiar cohesion principles rather than adding expert-only knowledge. Similar independent-change guidance appears in the merge table and simplicity lens.",
+          "fix": "Consolidate the repeated cohesion guidance into one brief activation reminder. Retain the more actionable exception about separation introducing callbacks, shared mutable state or pass-through abstractions, and preserve all External References credits."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 14,
+          "evidence": "\"for f; do [ ! -e \"$f\" ] || cat -- \"$f\"; done\" feeds \"wc -l\", followed by \"Record it\". On the unreadable-file branch, cat reports an error but the pipeline still produces a partial numeric count without invalidating the measurement. It also follows symlink targets, potentially counting content outside the first-party scope.",
+          "fix": "Make the counter reject incomplete measurements by checking enumeration and every file-read result; report totals as pending if any read fails. Define an explicit policy for symlinks and other non-regular entries rather than following their targets implicitly, and use that same validated counter before and after."
+        }
+      ]
+    },
+    {
+      "name": "requirements-clarity",
+      "percent": 96.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/requirements-clarity/SKILL.md",
+          "line": 21,
+          "evidence": "\"Ask the 2\u20133 questions whose answers could change scope, an irreversible decision, or an acceptance test\"; line 54 also requires \"the next 2\u20133 questions.\" This leaves no allowance for a below-threshold request with exactly one consequential decision still open.",
+          "fix": "Allow 1\u20133 focused questions per round, bounded by the number of consequential unresolved decisions. Explicitly permit a single question rather than requiring another question merely to satisfy the minimum."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/requirements-clarity/evals/evals.json",
+          "line": 67,
+          "evidence": "\"Footer has Document version 1.0, Created 2026-11-03, Clarification rounds 3 and an Advisory clarity score of at least 90/100 from its own rubric rescore; if that score differs from the stated 92, both are shown\" fixes the creation date without fixing the evaluation clock and requires both scores even when the rescore is at least 90, beyond the body's conditional requirement.",
+          "fix": "Supply an explicit document-creation date or fixed test clock, or check the creation date against the evaluation run date. Require both scores only under the condition specified in SKILL.md, or explicitly add the broader reporting requirement to the skill."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/requirements-clarity/evals/evals.json",
+          "line": 62,
+          "evidence": "\"Shows the full PRD content with that path and does not claim a save it did not make\" requires the full document in the response for the saved-file case, whereas workflow step 7 requires reporting the path, version, advisory score, rounds, and open questions.",
+          "fix": "For successful saves, inspect the generated PRD file to grade its content and check the response for the required save summary. Require the full PRD in chat only for chat-only requests or failed writes."
+        }
+      ]
+    },
+    {
+      "name": "session-handoff",
+      "percent": 96.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/session-handoff/scripts/validate_handoff.py",
+          "line": 28,
+          "evidence": "The PEM detector is r'-----BEGIN [A-Z]+ PRIVATE KEY-----'. It requires a prefix such as RSA and therefore misses the common unencrypted PKCS#8 header '-----BEGIN PRIVATE KEY-----'. An otherwise complete handoff containing that private-key block can receive READY despite SKILL.md advertising PEM-header detection.",
+          "fix": "Allow an absent PEM type prefix, for example with r'-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----'. Add regression tests for unprefixed PKCS#8, encrypted PKCS#8, RSA, EC and OpenSSH headers, asserting BLOCKED and exit 1 without printing key material."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/session-handoff/scripts/validate_handoff.py",
+          "line": 104,
+          "evidence": "FILE_REF_PATTERNS covers only 'Table cells', 'Inline code' and 'path:line'. The scaffold instead emits its predecessor as '- **Continues from**: [filename](./filename)'. That Markdown link is not extracted, so a deleted predecessor is absent from both validation's missing-file list and the staleness check's shared reference parser.",
+          "fix": "Extract local Markdown link destinations as file references, ignoring external URLs and resolving relative predecessor links against the handoff directory. Add a regression test using an actual scaffold-style chain link whose predecessor is deleted; require both validation and staleness reports to identify the missing predecessor."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "tests/skills/session-handoff/setup_test_env.py",
+          "line": 162,
+          "evidence": "The fixture labeled '# Fresh handoff (today)' writes Created, Project and Branch metadata but no 'Baseline commit:'; the stale fixture also omits it. The current check_staleness.py explicitly returns UNKNOWN when that baseline is absent, so these documented model-evaluation fixtures no longer exercise their advertised fresh and stale outcomes.",
+          "fix": "Populate fixture baselines from real commits in the generated repository and record the actual branch instead of hard-coding main. Add assertions that the fresh fixture yields FRESH and that the deliberately old fixture yields the intended stale level. The runnable smoke tests, output evals and balanced trigger queries otherwise provide substantial coverage; tests were inspected read-only, not executed."
+        }
+      ]
+    },
+    {
+      "name": "ship-learn-next",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/ship-learn-next/evals/evals.json",
+          "line": 72,
+          "evidence": "The existing-plan-review case expects the response to say \"the file was not saved because it cannot write,\" but its prompt asks to update the file and specifies no read-only restriction. The skill allows Read and Write. The tutorial-to-action case likewise prohibits reporting a save without establishing that writing is unavailable.",
+          "fix": "Make the read-only restriction explicit in these test prompts or their runner configuration. Add a writable-path case that verifies a successful append preserves the existing plan, and permit truthful save reports when writing succeeds."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/ship-learn-next/SKILL.md",
+          "line": 32,
+          "evidence": "\"Shipped consistently, usable evidence | Raise difficulty or test the next lesson\" does not distinguish evidence supporting the approach from evidence disproving it. Following this branch for a consistently executed checkout experiment that clearly worsened conversion provides no instruction to reject or revise the failed approach before progressing.",
+          "fix": "Split usable evidence into supported and disproven outcomes. For disproven outcomes, record the rejected hypothesis, consider reverting a harmful intervention where applicable, and choose one corrective variant or another lesson. Reserve raising difficulty for evidence that supports progression."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/ship-learn-next/SKILL.md",
+          "line": 61,
+          "evidence": "\"Never report a plan file as saved before the write succeeded; a tool-less or chat-only run must say the plan was not saved\" is generic file-writing guidance, and its second clause repeats step 5's instruction to \"say it was not saved.\"",
+          "fix": "Consolidate the save-success and unsaved-output requirements into step 5, removing the duplicate Gotchas bullet while preserving both safeguards. Keep Gotchas focused on rep-design and evidence-interpretation failure modes."
+        }
+      ]
+    },
+    {
+      "name": "skill-updater",
+      "percent": null,
+      "grade": "UNJUDGED",
+      "judges": {},
+      "missing_judges": [
+        "router-env-my-referee-one",
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": []
+    },
+    {
+      "name": "ui-ux-principles",
+      "percent": null,
+      "grade": "UNJUDGED",
+      "judges": {},
+      "missing_judges": [
+        "router-env-my-referee-one",
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": []
+    },
+    {
+      "name": "writing-clearly-and-concisely",
+      "percent": null,
+      "grade": "UNJUDGED",
+      "judges": {},
+      "missing_judges": [
+        "router-env-my-referee-one",
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": []
+    },
+    {
+      "name": "pr-diagrams",
+      "percent": null,
+      "grade": "UNJUDGED",
+      "judges": {},
+      "missing_judges": [
+        "router-env-my-referee-one",
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": []
+    }
+  ],
+  "needs_update": true
+}

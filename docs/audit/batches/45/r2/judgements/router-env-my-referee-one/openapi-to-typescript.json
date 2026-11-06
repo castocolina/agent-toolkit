@@ -1,0 +1,59 @@
+{
+  "skill": "openapi-to-typescript",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 76,
+      "evidence": "The section beginning \"Input (condensed):\" occupies 75 of the 162 H2-section lines. Its projection, ignored-ref-sibling and collision examples add value, but much of the surrounding document and interface scaffolding is familiar activation material rather than additional expertise.",
+      "fix": "Condense the inline example to the schema and output deltas demonstrating readOnly/writeOnly projections, ignored nullable siblings and operation-name collisions. Keep the complete document in an eval fixture or a conditionally loaded worked-example reference."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 30,
+      "evidence": "\"Any other local pointer whose target exists ... inline the target's type at the use site\" classifies references by their target path rather than their use-site object kind. A Response Object reference to #/paths/~1pets/get/responses/200 falls into this schema-inlining branch, although its target must be substituted as a Response Object and its content inspected. A Path Item reference to #/paths/~1pets has the same problem.",
+      "fix": "Resolve references according to the expected object kind at the use site. Substitute Path Item, Parameter, Request Body, Response and Header objects regardless of where their targets reside; apply named-type versus inline-schema rules only at Schema Object positions. Add examples covering a response reference outside components.responses and a referenced Path Item."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/openapi-to-typescript/references/guards.md",
+      "line": 14,
+      "evidence": "The guard rule \"nullable: true | null, or the non-null schema\" is unconditional, unlike SKILL.md's mapping rules. Following it for {type: string, nullable: true, enum: [\"x\"]} accepts null even though the emitted type is \"x\". It also permits null when nullable appears without an explicit same-schema type, where the main mapping correctly says nullable has no effect.",
+      "fix": "Define guard nullability from the effective OpenAPI 3.0 schema: nullable adds null only with an explicit type in the same Schema Object, enum constraints must still admit null, and nullable beside a Reference Object is ignored. Accept null only after these conditions hold. Add mutation tests for a nullable enum excluding null and nullable without a same-schema type."
+    }
+  ]
+}

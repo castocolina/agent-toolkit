@@ -1,0 +1,50 @@
+{
+  "skill": "meme-factory",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/meme-factory/references/markdown-memes-guide.md",
+      "line": 17,
+      "evidence": "\"Use repeated phrasing and escalation; preserve the rhythm and line breaks\" and \"Use a fenced block for spacing-sensitive ASCII\" repeat familiar genre and Markdown conventions rather than adding expert knowledge. The main workflow is substantially more information-dense.",
+      "fix": "Remove the stock copypasta-composition sentence and generic ASCII-formatting explanation. Retain the sensitive-details guard and the concrete rule for preserving literal greentext prefixes."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/meme-factory/scripts/meme_generator.py",
+      "line": 162,
+      "evidence": "`tokens = re.findall(r\"[a-z]+(?:'[a-z]+)?\", context.lower())` recognizes only straight apostrophes. Following the branch for \"tests haven\u2019t passed yet\" produces tokens [\"tests\", \"haven\", \"t\", \"passed\", \"yet\"], misses the negation, and returns \"success\". This contradicts the documented neutral handling of negated outcomes, although the workflow separately cautions that suggestions are only hints.",
+      "fix": "Normalize typographic apostrophes to ASCII before tokenization so contractions match NEGATIONS. Add regression tests asserting `fry` for \"tests haven\u2019t passed yet\", \"the build didn\u2019t fail\", and \"the deploy isn\u2019t working\"; retain the explicit user-confirmation requirement for success memes."
+    }
+  ]
+}

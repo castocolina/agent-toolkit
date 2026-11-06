@@ -1,0 +1,77 @@
+{
+  "skill": "codex-plan",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 19,
+      "evidence": "Start with the manifest (`package.json`, `pyproject.toml`), the schema or models, the entry points and middleware the topic touches, and `.env.example`",
+      "fix": "Remove the generic list of files to read, since the model already explores a repo this way. Keep only the non-obvious rules: stop at about 10 files, prefer files a task would edit, and list only paths verified to exist."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 41,
+      "evidence": "When the plan arrives, first re-run `snap > \"$B/after\"; diff ...` ... then check that every confirmed requirement maps to a task with acceptance criteria, list gaps, and do not implement unless asked.",
+      "fix": "Move the review after the handoff into its own numbered step 7, 'Review the returned plan': (a) diff the snapshots, (b) map each requirement to a task, (c) list the gaps. Right now it sits in one prose paragraph under step 6, so the Process pattern has no visible checkpoint for it."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 34,
+      "evidence": "codex exec -s workspace-write -c model_reasoning_effort=high [-m <id>] \"$(cat prompt_to_codex.md)\"; the eval asserts \"contains no `--full-auto`\" but the body never warns against it",
+      "fix": "Add a gotcha: 'Never add `--full-auto` or `-s danger-full-access`. They widen the sandbox or skip approvals, and the planning-only instruction is the only guard against source edits.'"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 15,
+      "evidence": "if no id follows, or the next token reads like part of the topic, ask for the id with AskUserQuestion or drop the flag",
+      "fix": "Pick one default: 'ask for the id with AskUserQuestion; drop the flag only if the user declines to give one'. This replaces two equal options with a default and an escape hatch."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 25,
+      "evidence": "saving to a file outside the workspace (`B=$(mktemp -d)`; keep `$B` for the comparison) ... later: re-run `snap > \"$B/after\"`",
+      "fix": "Shell variables and functions do not survive between separate Bash tool calls, so the later `snap > \"$B/after\"` fails. Tell the agent to print and record the literal mktemp path, and to define `snap` again in the same command as the comparison (or include the full one-liner in step 6), so the diff branch actually runs."
+    }
+  ]
+}

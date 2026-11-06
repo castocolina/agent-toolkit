@@ -1,0 +1,59 @@
+{
+  "skill": "explain-pr-changes",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 10,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 307,
+      "evidence": "The command remains 381 lines despite splitting out templates, assembly code and the diagram filter. Under \"### Phase 5: PR write\", it still embeds the full attachment-writing and recovery procedure.",
+      "fix": "Move the detailed attachment commands and partial-failure recovery procedure into an explicitly gated reference bundled with skills/pr-diagrams. Keep the phase order, selection conditions and stop invariants in the command, reducing the command toward the repository's 200-line convention."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/references/pr-body.md",
+      "line": 19,
+      "evidence": "The inline-image filter uses `[^)]*github\\.com/user-attachments/[^)]*`, stopping at the first closing parenthesis. A valid image such as `![d](https://github.com/user-attachments/assets/x \"Flow (v2)\")` leaves `\")` behind. The image-removal passes also process preserved non-Mermaid code fences, deleting literal image examples rather than only rendered diagrams.",
+      "fix": "Make image removal fence-aware and parse complete Markdown image spans, including optional titles and balanced parentheses. Preserve image examples inside non-Mermaid code fences and remove the entire actual diagram-image span without leaving fragments."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 375,
+      "evidence": "\"Once the body is written, create or update the PR as phase 5 specifies, passing the title from `$AD/title.txt` in the same call\" repeats Phase 5's title/body-file invariant. The final paragraph repeats the subsection-separator rule already established in 2.6.",
+      "fix": "Remove these duplicate operational restatements from section 5. Keep its conditional template-loading instruction and point to the existing Phase 5 and section 2.6 rules instead; retain the expert invariants at their authoritative definitions."
+    }
+  ]
+}

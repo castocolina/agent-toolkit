@@ -1,0 +1,77 @@
+{
+  "skill": "command-creator",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 26,
+      "evidence": "Location rows 'Inside a repository, no scope stated' and 'Inside a repository, user says \"for the team\"...' both resolve to `.claude/commands/<name>.md`; the second row restates the default the model would already infer",
+      "fix": "Merge the two rows into one: 'Inside a repository, unless the user says global or personal | `.claude/commands/<name>.md`'"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 53,
+      "evidence": "Frontmatter and Arguments sections are fact tables ('`arguments: file lines` makes `$file`, `$lines`') with no decision prompt for choosing named arguments, `$0` or whole `$ARGUMENTS`",
+      "fix": "Add one 'Before choosing placeholders, ask:' line: free text that may contain spaces -> `$ARGUMENTS` whole; one or more fixed-shape values -> named `arguments:` so the body can test for empty; never `$1` for the first value"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 13,
+      "evidence": "Two silent-failure facts sit outside Gotchas: 'a skill with the same name wins and the command is silently unused' (line 13) and 'broken YAML loads the body with no fields and no error' (line 59)",
+      "fix": "Add both as Gotchas bullets with their consequence, e.g. 'A same-named skill in .claude/skills/ or ~/.claude/skills/ shadows the command with no warning: check before writing' and 'Frontmatter not starting on line 1 or invalid YAML is silently dropped, including disable-model-invocation'"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/command-creator/evals/trigger-queries.json",
+      "line": 2,
+      "evidence": "Queries are terse and formal ('Create a reusable `/deploy-preview` slash command for this project.'); none has file paths, typos or backstory, and few positives describe the need without saying 'command'",
+      "fix": "Rewrite 3-4 positives as realistic implicit-need prompts (e.g. 'every friday i do git pull, bump package.json, npm publish, post in #releases, can i just type one thing for that?') and add context such as paths and team names to near-miss negatives"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 13,
+      "evidence": "'a skill with the same name wins and the command is silently unused' states the check but not the branch outcome when a same-named skill exists",
+      "fix": "Add the branch: 'If one exists, stop and offer to rename the command (suggest `<name>-cmd` or a namespaced path) or to update the skill instead; never write a shadowed command'"
+    }
+  ]
+}

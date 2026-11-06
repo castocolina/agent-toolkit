@@ -1,0 +1,59 @@
+{
+  "skill": "codex-plan",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 15,
+    "D8": 15
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 38,
+      "evidence": "The generated instructions say \"write the full plan to the chosen plan file in the current directory\" and \"begin immediately\", but do not explicitly prohibit implementation or edits to other files, despite the workspace-write sandbox.",
+      "fix": "Require the generated prompt to state: \"This is planning only. Do not implement changes or modify source, configuration, dependencies or data. Write only the chosen plan file; describe implementation and validation steps without executing them.\""
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 37,
+      "evidence": "\"Tasks must be small and independently testable (\\\"Add Google OAuth config to env\\\", not \\\"Implement Google OAuth\\\").\" This restates standard task-decomposition advice rather than adding Codex-handoff knowledge.",
+      "fix": "Remove the generic task-granularity explanation and auth example; retain the required task-field schema and confirmed-requirement-to-acceptance-criteria check."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 55,
+      "evidence": "\"Never tell Codex to run tests or install packages: under `-s workspace-write` the network is off and the run stalls or fails.\" The rationale incorrectly treats running tests as inherently network-dependent; offline tests need no network.",
+      "fix": "Replace the rationale with: \"Do not execute tests or install packages during this planning-only pass; describe those commands in the plan. Network-dependent operations may fail in the default workspace-write sandbox.\""
+    }
+  ]
+}

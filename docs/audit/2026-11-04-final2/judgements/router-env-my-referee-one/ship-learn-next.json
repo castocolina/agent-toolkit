@@ -1,0 +1,59 @@
+{
+  "skill": "ship-learn-next",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/ship-learn-next/evals/evals.json",
+      "line": 72,
+      "evidence": "The existing-plan-review case expects the response to say \"the file was not saved because it cannot write,\" but its prompt asks to update the file and specifies no read-only restriction. The skill allows Read and Write. The tutorial-to-action case likewise prohibits reporting a save without establishing that writing is unavailable.",
+      "fix": "Make the read-only restriction explicit in these test prompts or their runner configuration. Add a writable-path case that verifies a successful append preserves the existing plan, and permit truthful save reports when writing succeeds."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/ship-learn-next/SKILL.md",
+      "line": 32,
+      "evidence": "\"Shipped consistently, usable evidence | Raise difficulty or test the next lesson\" does not distinguish evidence supporting the approach from evidence disproving it. Following this branch for a consistently executed checkout experiment that clearly worsened conversion provides no instruction to reject or revise the failed approach before progressing.",
+      "fix": "Split usable evidence into supported and disproven outcomes. For disproven outcomes, record the rejected hypothesis, consider reverting a harmful intervention where applicable, and choose one corrective variant or another lesson. Reserve raising difficulty for evidence that supports progression."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/ship-learn-next/SKILL.md",
+      "line": 61,
+      "evidence": "\"Never report a plan file as saved before the write succeeded; a tool-less or chat-only run must say the plan was not saved\" is generic file-writing guidance, and its second clause repeats step 5's instruction to \"say it was not saved.\"",
+      "fix": "Consolidate the save-success and unsaved-output requirements into step 5, removing the duplicate Gotchas bullet while preserving both safeguards. Keep Gotchas focused on rep-design and evidence-interpretation failure modes."
+    }
+  ]
+}

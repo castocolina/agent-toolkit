@@ -1,0 +1,41 @@
+{
+  "skill": "codex-plan",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 33,
+      "evidence": "\"Before handoff, record a baseline: `git status --short`\" is followed by \"re-run the baseline command ... and compare\" on line 35. In an already-dirty worktree, Codex can change an already-modified or untracked source file without changing its status entry, so this branch can miss prohibited source edits.",
+      "fix": "Record a content-aware baseline before handoff: file paths and content hashes, including already-modified and untracked files. Compare file presence and hashes after Codex returns, excluding only the chosen plan file. Keep `git status --short` as a summary rather than the change-verification mechanism."
+    }
+  ]
+}

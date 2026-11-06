@@ -1,0 +1,99 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "command-creator",
+      "percent": 94.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4,
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 98,
+          "evidence": "## Worked example (about 35 lines, roughly a fifth of the body) repeats the 'Workflow with side effects' skeleton in references/patterns.md and the timeout-retry gotcha",
+          "fix": "Move the full release-tag example into references/examples.md as a 'Workflow with side effects' section. In SKILL.md, keep only the expert parts in two or three lines: check the remote tag with ls-remote and the peeled ^{} line, compare it to the recorded TARGET, and never overwrite a conflicting tag."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 15,
+          "evidence": "\"Write a command for a single prompt the user starts. If the workflow needs bundled scripts or reference files, say a skill fits better\"",
+          "fix": "Add the decisive question: 'Should Claude ever start this on its own from context? If yes, and it has no side effects, a skill with a trigger description fits better; if only the user should start it, write a command.' This gives the command-or-skill choice a real expert framework instead of a single file-count rule."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/command-creator/evals/evals.json",
+          "line": null,
+          "evidence": "No eval covers the Location table's conflict row (\"for my team\" with no repository open, so the skill should ask) or a user-supplied attempt cap overriding the default of 5",
+          "fix": "Add an eval whose prompt is \"make a /lint-fix command for my team, max 3 tries\" run outside a git repository. Assert that the skill asks which location to use before writing and caps the loop at 3 attempts."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/references/patterns.md",
+          "line": 19,
+          "evidence": "\"3. Run `<tool> <encoded value>` (same encoding) and show its output unchanged.\" has no `--` option terminator, which contradicts SKILL.md Gotcha step 3. The codex-review example in references/examples.md copies the gap: `scripts/codex-review.py <encoded branch>`",
+          "fix": "Change the step to \"3. Run `<tool> -- <encoded value>` (same encoding; use the tool's own end-of-options form if it has one) and show its output unchanged.\" Apply the same change to the codex-review script call in examples.md."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 120,
+          "evidence": "Worked example step 5: \"It succeeds with no output: the tag is not on the remote. Show the push error and ask before one retry.\" No branch says what to do if that one approved retry also fails or times out",
+          "fix": "Add a sub-bullet to step 5: \"If the approved retry fails or times out, run the same ls-remote check once more and follow its outcome. Never retry a second time; report the state and the local-tag options.\""
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 23,
+          "evidence": "'On an approved update, do what option 2 says, then run steps 6-7.' Step 6 requires every checklist item to pass, but line 134 requires that 'the name is free of a same-named skill or command.' An approved update necessarily retains an existing same-named command, so this branch cannot literally pass validation.",
+          "fix": "Make the collision checklist distinguish creation from updating: new commands need a free name; an approved update may reuse its existing target, but must still stop if another skill shadows that command. Retain the approval, existing-file read and diff requirements."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/references/examples.md",
+          "line": 150,
+          "evidence": "The iterative-fixing example specifies 'At most 10 iterations' and, at line 151, 'STUCK when the same error survives 3 fix attempts.' SKILL.md:48 instead requires a default of 5 attempts and stopping after the same failure survives two fix attempts. The example-loading branch for check mappings or fixed reports therefore introduces conflicting stopping policies.",
+          "fix": "Label 10 iterations and 3 unchanged failures as erk-specific example settings, and explicitly require generated commands to retain SKILL.md's 5-attempt and 2-unchanged-failure defaults unless the user requests different limits. Preserve the upstream example attribution."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "high",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 138,
+          "evidence": "'Every argument reaches the shell as one single-quoted word ... after `--` or `--end-of-options`, unless a strict pattern already validated it.' This blanket placement rule breaks free-text option values: inserting `--` between `git commit -m` and its message makes `--` the message rather than terminating options.",
+          "fix": "Require shell encoding for arbitrary text, but distinguish positional operands from option values. Put positional operands after the tool's supported option terminator; place an encoded option value directly after its option, for example `git commit -m <encoded-message>`. When a tool lacks an option terminator, require its documented safe input mechanism or reject unsupported input. Apply this distinction to both the Gotchas rule and the checklist."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

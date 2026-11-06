@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codex-plan",
+      "percent": 93.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 90.4,
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 39,
+          "evidence": "Plan structure: Overview, Prerequisites, Phases with tasks, Testing Strategy, Dependency Graph, Risks, Rollback",
+          "fix": "Keep only the task fields the model would not add by itself (Dependencies by task ID, Complexity 1-10, Test-First Approach). Cut the generic section list down to a single clause, because the model already knows the standard plan headings."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 33,
+          "evidence": "When the plan arrives, first ask for `git status --short` (or check it yourself) and flag any changed file other than the chosen plan file, then check that every confirmed requirement maps to a task",
+          "fix": "Make the post-run review its own numbered step 6 (Review the returned plan: changed-file check, requirement-to-task mapping, gap list) so the Process pattern has an explicit final checkpoint and the review is not buried in prose after 'then stop'."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 57,
+          "evidence": "Write the prompt and plan in English unless the user asks otherwise, so they can pass them on.",
+          "fix": "This line is a preference, not a landmine. Move it to the Prompt contents Instructions bullet. In its place add an environment fact that defies assumptions, for example: 'The command uses relative paths: the user must run it from the directory where prompt_to_codex.md was written, or $(cat ...) fails and Codex writes codex-plan.md somewhere else. State that directory next to the command.'"
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 2,
+          "evidence": "Use when planning a feature, API, auth change, migration, refactor or test strategy, or a plan handed off to Codex or another agent",
+          "fix": "Prepare prompt_to_codex.md so the user can run Codex themselves and get an implementation plan in codex-plan.md. Use when the user wants a plan written by Codex or handed off to another agent for a feature, API, auth change, migration, refactor or test strategy, including underspecified requests. Gathers repo context, asks only blocking questions, shows the manual codex exec command. Not for in-session planning or plan mode without a Codex handoff, not for implementing changes; never runs Codex."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 15,
+          "evidence": "if no id follows, or the next token reads like part of the topic, ask for the id with AskUserQuestion or drop the flag",
+          "fix": "Set one default with an escape hatch: 'ask for the id with AskUserQuestion; drop the flag only if the user declines', rather than two equal options."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 33,
+          "evidence": "first ask for `git status --short` (or check it yourself) and flag any changed file other than the chosen plan file",
+          "fix": "Resolve the non-git branch that line 31 already detects (`git rev-parse --is-inside-work-tree` fails): 'Outside a git repo, record file modification times (e.g. `find . -newer prompt_to_codex.md -type f`) and flag any file other than the plan file.' Without this, the source-edit guard has no check in that case."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 42,
+          "evidence": "The illustrative excerpt repeats the context-list contract with generic examples: \"`package.json` - framework and dependencies\", \"`prisma/schema.prisma` - existing models\" and \"`src/middleware.ts` - current request handling\". These add no decision knowledge beyond the verified-path and one-line-reason instructions already given.",
+          "fix": "Remove the generic auth file-list excerpt; retain the verified-path requirement in step 1 and the one-line-reason contract under Prompt contents."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 33,
+          "evidence": "\"flag any changed file other than the chosen plan file\" also flags the workflow's own newly created prompt_to_codex.md when it is untracked. No pre-handoff baseline distinguishes existing user edits from changes made during the Codex run.",
+          "fix": "Record the workspace's baseline status and relevant diffs or file hashes after writing the prompt and before handing off. On return, compare against that baseline, allow the chosen plan output, and distinguish pre-existing changes and the expected prompt artifact from unexpected changes."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 31,
+          "evidence": "\"Add `--skip-git-repo-check` only when `git rev-parse --is-inside-work-tree` fails\" explicitly supports execution outside a Git worktree, but the return phase unconditionally requests \"`git status --short`\". That branch has no working source-change check or stated fallback.",
+          "fix": "Carry the Git-worktree check result into the return phase. Outside Git, compare a pre-handoff file snapshot or explicitly report that source-change verification is unavailable and request a file-change report instead of git status."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

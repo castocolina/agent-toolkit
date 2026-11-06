@@ -1,0 +1,50 @@
+{
+  "skill": "react-dev",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/react-dev/references/react-router.md",
+      "line": 53,
+      "evidence": "The heading promises \"Typed context (v8, or v7 with middleware on)\", but the example imports \"createContext\" and uses \"Route.MiddlewareFunction\" without a minor-version gate. The earlier version table explicitly includes pre-7.9 middleware. Following that branch on those releases fails because the middleware APIs still have unstable-prefixed names.",
+      "fix": "Split the middleware instructions at v7.9: use the unprefixed APIs for v7.9+ and v8; for earlier middleware-capable v7 releases, show unstable_createContext, unstable_RouterContextProvider and the corresponding unstable middleware exports/types with future.unstable_middleware. Alternatively, explicitly require upgrading to v7.9+ before applying this example."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/react-dev/references/react-19-patterns.md",
+      "line": 128,
+      "evidence": "The eight-line \"Migration checklist (React 18 to 19)\" repeats the main file's migration protocol, including \"Pin react, react-dom, @types/react, @types/react-dom to 19 together\", running the codemod, replacing useFormState, preserving forwardRef for React 18 peers, and rerunning validation. Migration tasks load both files, so this adds little knowledge.",
+      "fix": "Replace the repeated checklist with a short pointer to SKILL.md steps 1 and 5; retain the reference's worked examples and any migration details not already covered there."
+    }
+  ]
+}

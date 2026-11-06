@@ -1,0 +1,113 @@
+{
+  "skill": "mermaid-diagrams",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 14,
+    "D5": 14,
+    "D6": 14,
+    "D7": 12,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/references/flowcharts.md",
+      "line": 3,
+      "evidence": "flowcharts.md is two short paragraphs, and `A(Text)` versus `A([Text])` is basic syntax. Routing step 3 still sends the agent to read the file for flowcharts.",
+      "fix": "Fold the `linkStyle` index trap and the `A(Text)` / `A([Text])` note into authoring-rules.md section 5 and drop the separate file. Alternatively, add expert flowchart traps such as `-->|text|` versus `-- text -->`, `click` quoting, and the node-count limit for dagre."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 21,
+      "evidence": "\"Draw only when the user asked for a diagram or it clearly explains more than prose. A prose-only request stays prose...\" The model already follows explicit user instructions about format.",
+      "fix": "Shorten this to one clause, or keep only the non-obvious part: architecture, schema or refactor requests do not by themselves mean the user wants a diagram."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 13,
+      "evidence": "Step 2 is a three-way fork with a long per-path reading list, followed by steps 3-5. Step 3 repeats the type-selection thinking that authoring-rules.md section 1 already contains. The mix of Process and Tool patterns is clear but wordy.",
+      "fix": "Present the fork as a short table (job, files to read, what to change). Leave the 'which question does the diagram answer' reasoning only in authoring-rules.md section 1."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 42,
+      "evidence": "The Gotchas section covers class, C4, gantt, gitGraph, flowchart-subgraph and sequence `#`. It has no silent-failure item for erDiagram or stateDiagram-v2, although the semantic-repair path says to read the type file's silent failures.",
+      "fix": "Add one-line NEVER items for ER cardinality direction and for `classDef` on `[*]`, each with the reason it fails silently or at parse time, linking to the type file."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 3,
+      "evidence": "The description does not name C4 or `architecture-beta`, the `.mmd` extension is only mentioned in passing, and a user who asks for cloud or vendor logos is not covered. Boundaries are otherwise good.",
+      "fix": "Create, edit, and repair Mermaid diagrams (.mmd files or ```mermaid blocks in Markdown). Use when users ask to diagram, visualize, model, map out or show sequence flows, class models, ER diagrams or database schemas, state machines, flowcharts, C4 or architecture-beta software and infrastructure architecture (including terse requests such as 'architecture: mobile client, API, database, email provider'), Gantt schedules, pie proportions or Git branch history, or when a Mermaid diagram fails to render or export (mmdc, GitHub), even without naming Mermaid. Picks the diagram type from the question being answered, with flowchart as the last resort. Not for prose-only explanations, explaining an existing diagram without changing it, PlantUML or draw.io work, matplotlib data charts, or interactive diagram-canvas components."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 16,
+      "evidence": "The new-diagram path requires authoring-rules sections 1-3 and 6-7 (plus 4-5 for flowcharts) and then a type file. That is 2-3 reads on every run, and the section-number routing is long.",
+      "fix": "Keep the section routing, but state a minimal read for simple one-type requests, for example 'sections 1 and 7 only when the type is already obvious and unstyled'."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 19,
+      "evidence": "Step 5 gives an unpinned `npx -y @mermaid-js/mermaid-cli` default and then adds pinning, a sandbox workaround and a fallback. The default is clear, but the version-pin guidance does not say how to find the host's Mermaid version.",
+      "fix": "Add one sentence: if the host is GitHub or an unknown version, validate unpinned and state the unverified version-gated constructs. Pin only when the user names the host version."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/evals/evals.json",
+      "line": null,
+      "evidence": "There are 16 evals and 20 trigger queries (10 positive, 10 negative). No eval covers pie, an ERD or state semantic repair, or a class-arrow inversion repair. Evals 'order-states' and 'prose-only' have no `files` input or only thin assertions. Several negatives, such as the matplotlib and PlantUML ones, are still easy.",
+      "fix": "Add evals for a reversed `Child <|-- Parent` repair, a pie request, and an ER cardinality repair. Add near-miss negatives such as 'edit this existing mermaid file to change a label colour', which should trigger, and 'convert this mermaid to draw.io', which should not."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 19,
+      "evidence": "Step 5 says 'on an error, fix the reported line and rerun', but step 4 notes that mmdc reports only the first parse error and `#` fails silently. No loop bound or stopping rule is given, and no check for semantic correctness (rendered output) is stated.",
+      "fix": "Add 'repeat until exit 0, then open the SVG or compare against the Gotchas for silent failures before replying', and say what to report if more than three rounds are needed."
+    }
+  ]
+}

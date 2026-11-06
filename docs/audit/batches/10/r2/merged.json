@@ -1,0 +1,117 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "qa-test-planner",
+      "percent": 93.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6,
+        "router-env-my-referee-one": 92.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 39,
+          "evidence": "Entry: build deployed, data seeded, blocking defects listed.",
+          "fix": "Remove the generic entry criteria, which the model already knows. Keep only the non-obvious exit rules: every critical requirement passes, no open P0, blocked cases have owners and residual risk is accepted in writing."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 34,
+          "evidence": "## 3. Test plan branch: five steps but no output skeleton or worked example, unlike section 4's coupon example",
+          "fix": "Add a short plan skeleton after step 5: Scope (in/out with reason), Risks K1.. (failure mode, impact, cases, owner), Gates, Residual risk, Open Questions. Or add a two-line worked risk entry, so plans have the same shape on every run."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 65,
+          "evidence": "Gotchas has no item for retry-until-green; that rule appears only in references/regression_testing.md: \"Never turn a failure into a pass by retrying until green\"",
+          "fix": "Add to section 6: \"NEVER rerun a failed case until it passes and report the pass: the first failure is the evidence; rerun under the same conditions only to measure the rate (3/10).\""
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 3,
+          "evidence": "Use only when the user invokes qa-test-planner by name or /qa-test-planner. (explicit-only gating relies on the model obeying prose; metadata.trigger: explicit is not read by harnesses)",
+          "fix": "---\nname: qa-test-planner\ndescription: Create manual QA plans, executable test cases, regression/smoke suites, Figma design-validation checklists, release-gate decisions and structured bug reports. Use only when the user invokes qa-test-planner by name or /qa-test-planner. Not for Cypress/unit/API automation, fixing implementation code or general testing requests.\ndisable-model-invocation: true\nmetadata:\n  trigger: explicit\n---\n(the allowlisted disable-model-invocation field enforces the explicit-only trigger in Claude Code, so the prose is not the only control)"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/qa-test-planner/evals/evals.json",
+          "line": null,
+          "evidence": "checkout-cases assertion \"Preconditions/data for each\" repeats the first assertion's \"each with a seeded precondition\" and is too vague to grade",
+          "fix": "Replace it with a checkable assertion, for example \"Each case has a Cleanup step that resets the data it seeded\" or \"The empty-cart case asserts the Pay control is disabled or refused and no order exists\"."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 14,
+          "evidence": "Routing table has no row for a release decision or a run report after a failed case (the p0-waiver-pressure eval prompt matches no row's \"Request says\" column)",
+          "fix": "Add a row: \"release decision, ship/no-ship, waiver, run report | Release decision with the P0 gate | references/regression_testing.md (Release decision, Run report) | test and bug templates\"."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 44,
+          "evidence": "\u201cPartition inputs by behavior, with boundaries and failure paths.\u201d The plan, cases and final-check sections occupy 30 of the 99 lines across the eight H2 sections and primarily activate familiar QA techniques. The remaining sections predominantly supply skill-specific routing, conventions, tool contracts and concrete gotchas; the activation share exceeds the rubric's under-20% target.",
+          "fix": "Compress the standard planning and case-writing reminders while retaining the useful validation checklist. Preserve the local conventions, concrete oracle examples and gotchas; concentrate additional detail on non-obvious decisions such as observation windows for asynchronous side effects and handling inaccessible order or ledger evidence."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/qa-test-planner/evals/trigger-queries.json",
+          "line": 3,
+          "evidence": "\u201c/qa-test-planner create test plan for signup with email verification and rate limits\u201d exemplifies the positive set: all ten positives are short, clean invocations. The set has useful negative near-misses, but does not exercise context-heavy or noisy requests where the invocation is embedded in a larger task.",
+          "fix": "Add or substitute context-rich positive queries containing artifact paths, release constraints and casual phrasing, including a mixed request for both a plan and cases. Retain explicit invocation and the automation boundary so the labels remain consistent with the description."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/scripts/create_bug_report.sh",
+          "line": 203,
+          "evidence": "The Open Questions collector enumerates OS, browser, device, build, URL, steps, rate, console errors, impact and workaround, but the report also renders omitted Type and Reporter as \u201cUnknown\u201d without listing them. Consequently it can print \u201cNone: every listed fact was supplied.\u201d while unknown fields remain. The case generator similarly writes an omitted estimated time as \u201cTBD\u201d without an Open Questions entry, contrary to SKILL.md's promised Unknown handling.",
+          "fix": "Align both generators with the documented contract: collect every displayed unknown fact, including bug type and reporter, and render an unspecified case duration as Unknown with a corresponding question. Extend the existing omission tests to cover these fields and reject a 'None' questions section when displayed unknowns remain."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 53,
+          "evidence": "The enumeration oracle requires known and unknown inputs to have \u201cno measurable timing difference,\u201d but supplies no sampling method, noise tolerance or blocked fallback. Following this manual-testing branch cannot produce a reproducible timing verdict: ordinary network jitter can satisfy the literal failure condition.",
+          "fix": "Keep the identical-message/status checks, but require a stated timing sampling plan and an agreed statistical criterion or tolerance. When the necessary tooling or criterion is unavailable, mark timing coverage Blocked or Unknown and record the missing prerequisite rather than asserting a pass or defect."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

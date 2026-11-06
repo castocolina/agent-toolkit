@@ -1,0 +1,68 @@
+{
+  "skill": "command-creator",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 52,
+      "evidence": "Before delegating any step, ask: what does a subagent give here that the main thread lacks: isolation from a large search, a specialized registered agent, or parallel work? If none, run it directly.",
+      "fix": "Shorten this to the parts specific to commands: 'Delegate only with an agent type that exists (built-ins: Explore, Plan, general-purpose) or with context: fork plus agent:, and honor \"no agents\".' Drop the generic when-to-delegate reasoning, which the model and harness already handle."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 43,
+      "evidence": "The Process workflow (## Workflow) is followed by Tool-style reference tables (## Location, ## Patterns, ## Frontmatter, ## Arguments and pre-run context), so the phased checkpoints and the lookup material are interleaved",
+      "fix": "Mark each table as the lookup for its workflow step (for example 'Step 3 lookup' over ## Location and 'Step 5 lookup' over ## Frontmatter), so the Process pattern stays the spine and the tables read as its reference."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/command-creator/evals/evals.json",
+      "line": null,
+      "evidence": "Six evals cover iterative fixing, simple execution, a side-effect workflow, arguments that are special to the shell and a name collision, but none covers the Plan, approve, execute pattern or the approved-update path (step 2 option 2)",
+      "fix": "Add an eval that asks for a plan-then-implement command, with assertions that it writes nothing before an explicit approval signal and that it names where the plan is saved. Add a second eval in which the user approves updating an existing command, with assertions that it reads the file first, keeps the frontmatter and shows a diff."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 15,
+      "evidence": "If the workflow needs bundled scripts or reference files, say a skill fits better (out of scope here).",
+      "fix": "Give this branch an outcome: 'say a skill fits better and stop without writing; if the user still wants a command, write one that calls the existing scripts by path and flag each missing script as a manual step.' Also note that the agent cannot see the / menu (line 41), so it should tell the user to check for /name instead of claiming it checked."
+    }
+  ]
+}

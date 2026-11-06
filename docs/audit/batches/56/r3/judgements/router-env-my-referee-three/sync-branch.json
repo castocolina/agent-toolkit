@@ -1,0 +1,68 @@
+{
+  "skill": "sync-branch",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 25,
+      "evidence": "Pass `\"$branch\"` quoted. Single quotes are needed only for a literal name you type containing `$` (`'feature/weird$name'`), which the shell would otherwise expand.",
+      "fix": "Cut this to one clause or delete it. The model already knows how shell quoting works, and step 5 already quotes \"$branch\"."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 16,
+      "evidence": "If `$remote` is set and `git merge-base --is-ancestor \"$remote\" \"$orig\"` fails, the remote has commits the local branch lacks: stop",
+      "fix": "Add one decision check before any mutation: 'Before rebasing, ask whether anyone else pushes to this branch. If `git log --format=%ae \"origin/$target..$remote\"` shows authors other than the user, stop.' The description excludes shared branches, but the body never tells the agent how to spot one. Right now it only notices a shared branch when the remote has diverged."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 21,
+      "evidence": "## Gotchas lists three items, one of which (line 25) is generic shell quoting",
+      "fix": "Replace the quoting item with a gotcha from real use, for example: 'Stacked branches: rebasing a branch that other local branches build on leaves them on the old SHAs. Pass `--update-refs` (git 2.38+) or tell the user which dependent branches need rebasing.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 19,
+      "evidence": "If the lease is rejected, someone else pushed: stop, do not retry with `--force`.",
+      "fix": "Finish the lease-rejected branch: 'Report that the local branch is already rebased and was not pushed. Give the pre-rebase tip `$orig` and the recovery command `git reset --hard $orig`. Then list the new remote commits with `git fetch origin && git log --oneline \"$branch..origin/$branch\"`.' The agent should not leave the user with no next step."
+    }
+  ]
+}

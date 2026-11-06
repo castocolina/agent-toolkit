@@ -1,0 +1,59 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 12,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 34,
+      "evidence": "\u201cAfterwards delete `<gitdir>/commit-work*`\u201d deletes every matching file, not just artifacts created by this run. Combined with fixed scratch filenames, this can overwrite or remove another session's artifacts or pre-existing files.",
+      "fix": "Create a uniquely named scratch directory under the Git directory for each run, place its temporary index, patches and message there, and clean up only that run-owned directory. Remove the wildcard cleanup instruction."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 10,
+      "evidence": "The 11-line \u201cRoute by intent first\u201d section is predominantly activation: \u201cdraft a message\u201d means \u201creply with the message text only,\u201d and \u201cstage changes\u201d means \u201cstop after the review.\u201d By line count, this occupies roughly a third of the H2 sections, while Workflow and Gotchas supply the mostly expert index-isolation, snapshot-verification and hook-recovery knowledge.",
+      "fix": "Condense the familiar intent table into a short guard preserving its safety boundaries: drafting and review are read-only, drafting returns only message text, staging stops after step 4, and committing requires approval. Retain the detailed non-obvious index and hook procedures."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 29,
+      "evidence": "The partial-file branch starts with \u201c`git diff -U1 -- <file> > <gitdir>/commit-work-all.diff`\u201d without distinguishing tracked from untracked files. For an untracked file containing both approved content and local-only content, this produces an empty diff; the subsequent `git apply --cached --check` fails, and the branch supplies no fallback.",
+      "fix": "Gate the partial-file patch method on the path being tracked. For an untracked path, explicitly stop and ask whether the whole file is approved or request the exact approved new-file content; explain that ordinary git diff omits untracked files rather than proceeding with an empty patch."
+    }
+  ]
+}

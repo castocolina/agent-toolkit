@@ -1,0 +1,54 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "explain-pr-changes",
+      "percent": 89.6,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 89.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 192,
+          "evidence": "The assembly block beginning \"if head -n 1\" repeats the implementation already given at line 144; the saved-JSON extraction and no-reconstruction instructions recur in sections 2.1, 2.2, 2.5 and phase 3. These repeated lines add no further knowledge.",
+          "fix": "Keep the single-source assembly implementation only in section 2.5. Have section 2.1 and phase 3 refer to that implementation, retaining their distinct source-selection and validation rules rather than repeating extraction and assembly instructions."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 237,
+          "evidence": "The command exceeds 200 lines, with its last substantive line at 489. Diagram authoring is conditionally delegated to bundled skills, but \"### 2.8 `--diagrams=none`\" still embeds a complete Markdown filter and section 5 embeds a lengthy output template.",
+          "fix": "Move the diagram-stripping implementation and detailed body templates into references under the bundled pr-diagrams skill. Add explicit plugin-root and personal-install read paths: load the filter reference only for none-mode copied or consolidated bodies, and load the fresh-body template only for feature or consolidated composition. Keep mode routing, invariants and the ordered phases in the command."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 169,
+          "evidence": "\"With squash or rebase merges an older cycle's commits stay in the range and the detection may pick wrong sources. This command does not handle that case.\" Following this automatic-promotion branch still permits those sources to be copied into the PR; no stop or safe fallback is defined for the acknowledged failure.",
+          "fix": "Before automatic promotion-body reuse, require confirmation that the merge-commit assumption holds. If it does not hold or cannot be established, stop before any PR write and request an explicit merged source through --reuse-from, rather than publishing potentially stale source bodies."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

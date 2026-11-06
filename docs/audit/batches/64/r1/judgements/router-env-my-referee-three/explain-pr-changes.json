@@ -1,0 +1,104 @@
+{
+  "skill": "explain-pr-changes",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 11,
+    "D3": 11,
+    "D4": 14,
+    "D5": 10,
+    "D6": 14,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 101,
+  "max_total": 125,
+  "percent": 80.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 179,
+      "evidence": "\"The drop-first-line step applies only when the first line of the saved source file starts with `# PR Summary:`; otherwise append the whole saved body unchanged\" appears almost word for word at lines 124, 179, 199 and 304. The ban on awk, sed and perl is also repeated at lines 193, 213 and 304.",
+      "fix": "State the drop-first-line rule and the no-transform rule once, in 4.5. Replace the other copies with \"apply the 4.5 assembly rule\". This keeps the expert content and removes roughly 40 lines of duplicates."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 370,
+      "evidence": "\"Understand the intent behind the changes, not just the code modifications. Identify the core problem being solved or the feature being added.\"",
+      "fix": "Delete the generic advice in 5.1, which the model already follows. Keep only the scope rule (feature path, and judging whether a promotion diagram is warranted, on origin/$base...HEAD)."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 11,
+      "evidence": "Numbering starts at \"## 3. The Input\". Sections 5.1-5.4, which compose the feature body, come after \"### Phase 6: Reviewers, the final message, cleanup\" (line 357). The content order does not match the phase order.",
+      "fix": "Renumber from 1. Move 5.1-5.4 into a \"Compose the body\" step between Phase 3 and Phase 5, so the Process pattern reads in execution order."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": null,
+      "evidence": "There is no Gotchas or NEVER section. Hard-won facts are scattered through the prose: \"gh pr view --repo with no argument fails with `argument required when using the --repo flag`\" (3.4), \"`${CLAUDE_PLUGIN_ROOT}` ... is not exported to Bash tool calls\" (3.5), \"`--head` filters by branch name only\" (3.7), and the squash-merge limitation (4.2).",
+      "fix": "Add a short \"## Gotchas\" section near the top that collects these items, each with its reason. Leave a one-line pointer where each item applies."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 5,
+      "evidence": "argument-hint: [--diagrams=none|mermaid|drawio] [--reuse-from=<PR>] [--base=<branch>] [Close-args]. It leaves out the accepted aliases --drawio, --mermaid and --no-diagrams.",
+      "fix": "argument-hint: [--diagrams=none|mermaid|drawio | --drawio | --mermaid | --no-diagrams] [--reuse-from=<PR>] [--base=<branch>] [Close-args]. The hint the user sees at invocation then shows every accepted option."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 226,
+      "evidence": "The command file is 521 lines. The Mermaid and draw.io authoring rules are loaded by explicit path from bundled skills, but the 4.8 awk/sed diagram filter, the 4.7 size-bound rules, the reuse and consolidation assembly code (4.1, 4.5, 4.6) and the section 8 template are all still inline.",
+      "fix": "Move the none-mode filter and the reuse and consolidated body-assembly snippets into a script or reference in the bundled pr-diagrams skill (for example a `pr-diagrams.sh assemble`/`strip` subcommand or references/body-assembly.md). Load that file only on reuse or none paths, and keep the command under about 200 lines of routing and phase order."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 79,
+      "evidence": "\"Create the branch with one of: git checkout -b \\\"pr/<short-slug>\\\" / git switch -c \\\"pr/<short-slug>\\\"\" offers a menu of two equivalent commands at a step the command otherwise pins down exactly.",
+      "fix": "Give one default, `git switch -c \"pr/<short-slug>\"`, and mention `git checkout -b` only as the fallback for git versions older than 2.23."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 326,
+      "evidence": "Phase 5 says \"Write the composed title to `$AD/title.txt` and the composed body to `$AD/body.md`\". No phase owns composing the feature body (5.1-5.4), applying the 4.7 size-bound check, or authoring the 4.9 diagram. Phases 1-3 end in one Bash call, so where these steps run is never stated.",
+      "fix": "Add an explicit \"Phase 3b: Compose\" step: (1) write the feature body per 5.1-5.4 or assemble the reuse body per 4.5/4.6; (2) apply the 4.8 filter in none mode; (3) apply the 4.7 size bound; (4) decide and author the diagram per 4.9. Add a checklist line for each step."
+    }
+  ]
+}

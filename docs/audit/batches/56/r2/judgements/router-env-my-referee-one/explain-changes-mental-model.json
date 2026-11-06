@@ -1,0 +1,68 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 57,
+      "evidence": "The template requests both \"### Change Groups (in review order)\" and \"### Review Sequence\", repeating the dependency-ordered list rather than adding another expert decision.",
+      "fix": "Put the reason for each group's review position in its numbered group entry and remove the duplicate Review Sequence section; retain the summary, dependency evidence and gotchas."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 23,
+      "evidence": "\"With no commits yet ... use `git diff --cached --no-color` instead of the `HEAD` diff.\" A newly staged file that is subsequently edited is tracked, so neither this cached diff nor the untracked-file scan includes its unstaged edits.",
+      "fix": "For an unborn HEAD, collect both `git diff --cached --no-color` and `git diff --no-color`, reconcile their staged and unstaged changes before explaining the final worktree state, and retain the untracked-file scan."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 26,
+      "evidence": "The description promises \"commit, branch, range, PR or pasted patch\", but the ordered source selector sends a PR URL or `#123` to \"Otherwise verify first: `git rev-parse --verify \"<arg>^{commit}\"`\", which fails and stops instead of obtaining the PR patch.",
+      "fix": "Recognize explicit PR numbers and URLs before generic revision verification. Obtain their patch with `gh pr diff \"<pr>\" --color=never`; if GitHub tooling or access is unavailable, request a pasted patch and resume analysis from it."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 25,
+      "evidence": "\"Contains `..` (covers `...`): `git diff \"<arg>\" --no-color`.\" Unlike the single-ref branch, this branch specifies no failure outcome for an invalid range; the later \"Empty diff\" rule does not distinguish an unsuccessful command from a successful empty patch.",
+      "fix": "Check the exit status of ordinary diff commands before applying the empty-diff rule. On failure, report stderr and stop or request a valid range/base; apply this to branch comparisons with no merge base as well, while preserving the documented `--no-index` exit-1 exception."
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "skill": "general-purpose",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 11,
+    "D3": 12,
+    "D4": 13,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 107,
+  "max_total": 125,
+  "percent": 85.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 15,
+      "evidence": "4. Integrate: compare producer and consumer interfaces across workers' changes and reconcile assumptions.",
+      "fix": "Replace the generic integration advice with a concrete check the model would skip, for example: diff each worker's changed signatures, schemas and config keys against their callers before you run the gates."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 12,
+      "evidence": "1. Map each requirement to an observable acceptance check and the file or component that owns it, in dependency order.",
+      "fix": "Add a decision frame for decomposition, for example 'before splitting, ask: which subtasks share files (keep them in one worker), and which acceptance check proves each one'. Also add a checkpoint after step 1 that records the plan before any edit."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/general-purpose.md",
+      "line": 25,
+      "evidence": "## NEVER list has reasons but no Gotchas of environment-specific facts",
+      "fix": "Add a short Gotchas list of host facts that defy assumptions, for example: delegated specialists start without your conversation context, so pass file paths and acceptance checks explicitly; a specialist may run in another checkout."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 3,
+      "evidence": "description: Coordinate general programming work across multiple files or components, including debugging, implementation and validation. ... (no distinction from Claude Code's built-in general-purpose agent of the same name; keywords thin)",
+      "fix": "Coordinate multi-file, multi-component programming work end to end: break the request down, delegate to matching specialists or implement directly, integrate their changes and run the project's verification gates. Use for complex, multi-step debugging, implementation or refactoring requests that span several files or components, or when specialist results need integrating and verifying, even if the user does not ask for coordination. Not for trivial one-step edits or a focused single-domain task a dedicated specialist owns. Unlike the built-in general-purpose agent, it returns Result, Changes, Validation and Remaining blockers."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 13,
+      "evidence": "If the bug does not reproduce or baseline tests already fail, note those pre-existing failures under Validation",
+      "fix": "Resolve the branch where the bug does not reproduce: say whether to stop and report it under Remaining blockers with the reproduction attempted, or to continue with a fix based on reading the code, and how to mark it (for example as unverified)."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "agents/general-purpose.md",
+      "line": 16,
+      "evidence": "the project's own check, lint and test commands named in its AGENTS.md, CLAUDE.md or Makefile",
+      "fix": "Add a fallback for when none of these files names a command: look for the standard runner of the detected toolchain (package.json scripts, pyproject, go test) and run it, or report that no verification gate was found and mark the work as unverified."
+    }
+  ]
+}

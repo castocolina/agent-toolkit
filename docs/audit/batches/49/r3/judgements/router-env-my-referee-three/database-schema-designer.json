@@ -1,0 +1,77 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 41,
+      "evidence": "**Money.** On PostgreSQL and MySQL use fixed-scale `NUMERIC`/`DECIMAL`, never floating point.",
+      "fix": "Delete the PostgreSQL/MySQL 'never floating point' clause, because the model already knows it. Keep the expert parts: SQLite DECIMAL affinity storing 0.1 as REAL, INTEGER minor units with a CHECK, Decimal128 on MongoDB and the currency column."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 42,
+      "evidence": "Shape changes happen in place, in this order: (1) deploy readers that accept both shapes everywhere; (2) deploy writers ... (5) only then tighten the validator with `collMod`.",
+      "fix": "Move the five-step MongoDB shape-change procedure into a '## MongoDB shape change' section of references/migrations.md. Keep only the one-line gotcha (no FKs, tenantId in every filter and reference, collMod does not re-check existing docs) in SKILL.md. Then the Gotchas list stays facts, and the procedures stay in the Process layer."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/database-schema-designer/evals/evals.json",
+      "line": null,
+      "evidence": "\"files\": [\"references/migrations.md\"] (also in review-legacy-tenant-schema, mysql-soft-delete-and-not-null, sqlite-price-to-cents-rebuild)",
+      "fix": "Remove the skill's own reference files from each eval's `files` list and keep only user inputs under evals/files/. Add an assertion that the run read references/migrations.md, or references/schema-design-checklist.md for the review eval. That tests whether the skill's loading triggers fire rather than handing the reference to the agent."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 12,
+      "evidence": "Contract: stop writing the old column, and only in a later deploy drop the old column in a later deploy, after checking views, triggers, replicas and reports that still read it.",
+      "fix": "Rewrite as: 'Contract: stop writing the old column; in a later deploy, after checking views, triggers, replicas and reports that still read it, drop the old column.'"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 31,
+      "evidence": "Rolling back is another rebuild, `ALTER TABLE orders MODIFY total DECIMAL(12,2) NULL, ALGORITHM=INPLACE, LOCK=NONE;`",
+      "fix": "Use the section's running example so that the forward and recovery steps match: give the MySQL forward statement `ALTER TABLE users MODIFY phone VARCHAR(32) NOT NULL, ALGORITHM=INPLACE, LOCK=NONE;` and the rollback `ALTER TABLE users MODIFY phone VARCHAR(32) NULL, ALGORITHM=INPLACE, LOCK=NONE;`. Note that the column's full type and attributes must be restated."
+    }
+  ]
+}

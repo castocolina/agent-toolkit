@@ -1,0 +1,271 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "sync-branch",
+      "percent": 80.4,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 83.2,
+        "router-env-my-referee-one": 77.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 19,
+          "evidence": "Plain `--force` overwrites commits pushed by others since your fetch; `--force-with-lease` refuses.",
+          "fix": "Cut this to the non-obvious part. The model already knows what --force-with-lease does. Keep only 'Never use --force or -f, even after a lease rejection' and add the expert caveat: a background `git fetch` (IDE or cron) updates the remote-tracking ref and silently disarms the lease. Use `--force-with-lease=\"$branch\":<sha recorded before the rebase>` or `--force-if-includes` to keep it armed."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 21,
+          "evidence": "check `git log --left-right --cherry-pick --oneline \"origin/$target\"...HEAD` first so only feature-only patches are replayed",
+          "fix": "Say what plain rebase does not handle. It already skips commits whose patch-id matches upstream. The real case is squash-merged or rewritten feature commits, whose patch-ids differ. Then use `git rebase --onto \"origin/$target\" <last-landed-commit> \"$branch\"`."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 14,
+          "evidence": "Inspect each conflicted file's intent, fix it, ... If a choice is uncertain, run `git rebase --abort`",
+          "fix": "Give a test for 'uncertain' the agent can apply. For example: resolve only when both sides change disjoint hunks, or when one side is a pure rename or format change. Abort when both sides edit the same logic, when a lockfile or generated file conflicts (regenerate it instead), or when tests fail after `--continue`."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 20,
+          "evidence": "Unquoted branch names break on `$` or spaces in the name.",
+          "fix": "Fix the factual error. `git check-ref-format` rejects spaces in ref names, so the hazard is `$`, glob characters and a leading `-`. Write: 'Quote \"$branch\" and pass it after the remote. A branch with `$` or `*` is expanded by the shell when unquoted.'"
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 2,
+          "evidence": "Use when a feature branch or PR is behind its base.",
+          "fix": "Rebase the current feature branch onto the latest origin/main (or a given target branch) and update its PR with git push --force-with-lease. Use when a branch or PR is behind, out of date, has merge conflicts with main, or the user asks to update, catch up, refresh or sync their branch, even without the word rebase. Not for merge-based sync, updating local main, or rebasing a shared branch others push to."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 21,
+          "evidence": "If the base was rewritten or feature commits already landed upstream, check `git log ...` first",
+          "fix": "Give a default action after the check, not only a diagnostic. If the log shows `=` (equivalent) or already-landed commits on the right side, run `git rebase --onto \"origin/$target\" <fork-point> \"$branch\"`. If unsure, stop and report the commit list without pushing."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 14,
+          "evidence": "If a choice is uncertain, run `git rebase --abort` and report ... tells the user to resolve then `git rebase --continue` (or `--abort`)",
+          "fix": "Split the conflict branch into two final messages. After `--abort`: 'Rebase aborted, branch unchanged at <sha>, nothing pushed; conflicting files: ...; rerun /sync-branch after resolving manually.' When leaving the rebase paused: name the files and say to resolve, then `git rebase --continue` or `--abort`. Telling the user to `--continue` after an abort points at a rebase that no longer exists."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 12,
+          "evidence": "A rebase, merge or cherry-pick already in progress (`.git/rebase-merge`, `MERGE_HEAD`): stop.",
+          "fix": "Resolve the paths through git so the check works in linked worktrees, where `.git` is a file. Check `git rev-parse --git-path rebase-merge`, `rebase-apply`, `MERGE_HEAD` and `CHERRY_PICK_HEAD`, and stop if any exists. The current list also omits `CHERRY_PICK_HEAD` even though the bullet names cherry-pick."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 13,
+          "evidence": "`git fetch origin --prune`, then `git rebase \"origin/$target\"`.",
+          "fix": "Add failure branches before step 3. If `git fetch` fails (network or auth), stop and report it. If `git rev-parse --verify --quiet \"origin/$target\"` fails, stop with 'origin/<target> does not exist'. Otherwise a non-zero rebase exit from an invalid upstream falls into the conflict-resolution step."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 13,
+          "evidence": "The workflow largely activates familiar Git operations: \"git fetch origin --prune\", \"git rebase\" and the standard conflict-resolution loop. The Gotchas section mixes valuable history hazards with familiar explanations such as \"Plain --force overwrites commits\"; weighted by lines, expert-only knowledge is a minority.",
+          "fix": "Keep the exact execution commands, but remove explanations of common CLI behavior already enforced by the procedure, such as the repeated definition of --force. Concentrate explanatory prose on non-obvious history decisions and environment-specific failure modes."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "high",
+          "file": "commands/sync-branch.md",
+          "line": 22,
+          "evidence": "\"If the base was rewritten ... check git log --left-right --cherry-pick ... first so only feature-only patches are replayed.\" Inspecting this log does not constrain the unconditional rebase in step 2; dropped old-base commits can appear on the HEAD side alongside feature commits.",
+          "fix": "Add a rewritten-base procedure before rebasing: establish and verify the original base and feature-only range, then use git rebase --onto \"origin/$target\" \"$old_base\" \"$branch\" for that case. If the original base cannot be established reliably, stop and report rather than replaying an unverified range."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 21,
+          "evidence": "\"Unquoted branch names break on $ or spaces in the name.\" Git branch names cannot contain spaces, and a dollar sign produced by expanding $branch is not recursively expanded by the shell; literal names and variable expansions have different hazards.",
+          "fix": "Replace this gotcha with: Quote saved variables as \"$branch\" to prevent word splitting and glob expansion. Single-quote literal names such as 'feature/weird$name' so the shell does not expand $name. Git refnames cannot contain spaces."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "high",
+          "file": "commands/sync-branch.md",
+          "line": 15,
+          "evidence": "\"git push --force-with-lease origin \\\"$branch\\\"\" follows a fetch without checking whether the remote feature branch contains commits absent locally. The fetch can update origin/$branch to another contributor's existing tip, allowing the subsequent lease-protected push to overwrite those commits.",
+          "fix": "After fetching and before rebasing, save the local HEAD and remote feature tip, and verify that the remote tip is an ancestor of the saved local HEAD; stop on remote-only commits. Push using an explicit expected-tip lease, --force-with-lease=\"refs/heads/$branch:$expected_oid\". If the remote branch does not exist, use an explicit expected-absence lease instead."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "commands/sync-branch.md",
+          "line": 14,
+          "evidence": "Step 3 instructs the agent to resolve conflicts and continue, or to \"git rebase --abort\", but then mandates a final message saying the rebase stopped and directing the user to resolve and continue. That message is false after successful resolution and unusable after aborting. It also treats every nonzero rebase exit as a conflict.",
+          "fix": "Make step 3 a consistent fail-closed branch matching the conflict eval: when conflicts occur, leave the rebase paused, name unresolved paths, state that nothing was pushed, and give manual --continue/--abort guidance. For non-conflict failures, report the actual error without claiming conflicts or suggesting continuation of a nonexistent rebase."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 12,
+          "evidence": "The in-progress-operation check names only \".git/rebase-merge\" and \"MERGE_HEAD\". It omits cherry-pick and apply-backend rebase markers, and a literal .git/rebase-merge path does not work in linked worktrees where .git is a file.",
+          "fix": "Resolve operation-state paths with git rev-parse --git-path rather than assuming .git is a directory. Stop when rebase-merge, rebase-apply, MERGE_HEAD, CHERRY_PICK_HEAD or sequencer state exists."
+        }
+      ]
+    },
+    {
+      "name": "explain-changes-mental-model",
+      "percent": 88.4,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 86.4,
+        "router-env-my-referee-one": 90.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 68,
+          "evidence": "Use the codebase's own terms. Say so when something is genuinely complex and split it further; name the one insight that makes the rest click.",
+          "fix": "Delete this generic explanation advice, which the model already follows. Use the line for a diff-specific fact, for example that renames appear as delete plus add unless `-M` is passed."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 36,
+          "evidence": "Order so dependencies come first. Configuration or migrations go first when later behavior needs them, not last by category.",
+          "fix": "Add a tie-break rule for groups with no dependency between them. For example: 'When groups are independent, order by blast radius: public contracts and schemas, then core logic, then callers, then tests and docs.' This gives a deterministic order where the patch shows no dependency."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 64,
+          "evidence": "## Gotchas lists four items. None covers merge commits, renames or binary files, which are the common traps when reading a git patch.",
+          "fix": "Add: '- A merge commit under `git show` prints a combined diff that is often empty; use `git show --first-parent <rev>` or `git diff <rev>^1 <rev>` instead of reporting no changes.' Also add: '- Pass `-M` so renamed files are not shown as a delete plus an unrelated add.'"
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 2,
+          "evidence": "Use when the user wants to understand a changeset or asks what to read first. Not for editing code or a defect-focused code review.",
+          "fix": "description: Explain a git diff, commit, branch, range, PR or pasted patch as dependency-ordered logical groups with file references and a review sequence. Use when the user wants to understand, onboard onto or walk through a changeset, asks what changed or what to read first, even without saying 'mental model'. Not for editing code, a defect-focused code review, or the PR-workflow command explain-pr-changes."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 40,
+          "evidence": "The full template (Key Concepts, Change Groups, Review Sequence, Gotchas) is required for every diff, with no rule for a one-file or one-idea change.",
+          "fix": "Add under ## 3: 'For a single-group change, keep only the summary, the one group and its gotchas; skip Review Sequence and Key Concepts when they would repeat the summary.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 23,
+          "evidence": "No argument: `git diff HEAD --no-color`. Empty output: report \"No uncommitted changes to analyze\" and stop.",
+          "fix": "Also run `git status --porcelain` and include untracked files, for example with `git add -N` or by reading them directly. Otherwise a working tree with only new files hits the 'No uncommitted changes' stop by mistake. In a repository with no commits, where HEAD does not exist, fall back to `git diff --cached` plus the untracked files."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 28,
+          "evidence": "Verified, not a branch (hash, `HEAD~3`, tag): `git show \"<arg>\" --no-color`, a single-commit patch.",
+          "fix": "Add a branch for merge commits: check `git rev-list --parents -n1 \"<arg>\"`, and when it lists more than one parent run `git diff \"<arg>^1\" \"<arg>\" --no-color`. Otherwise the combined diff is empty and the 'No changes found' stop on line 30 fires wrongly. Separately, when local `main`/`master` are missing, try `origin/main` and then `origin/master` before asking for a base."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 43,
+          "evidence": "The substantial output scaffold includes \"High-Level Summary\", \"[2-3 sentences: goal and approach]\", \"Key Concepts to Understand\" and \"[brief explanation]\", then repeats the grouping and review-order requirements. Much of this section is activation and formatting rather than additional expert knowledge.",
+          "fix": "Condense the scaffold to a compact group contract covering purpose, files, evidenced prerequisites, enables and review reason. Make concept explanations conditional on a prerequisite the reader actually needs, and collapse the generic summary placeholders while preserving the non-obvious source-routing and historical-revision guidance."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 68,
+          "evidence": "\"Skip pure import reordering.\" A textual import-only reorder can still change side-effect execution or module initialization order; the warning does not distinguish this from a behavior-preserving reorder.",
+          "fix": "Skip import reordering only after checking that it preserves side-effect and initialization order. Explain any reorder that changes execution behavior, even when no imported names or paths change."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 26,
+          "evidence": "The invalid-reference branch runs `git rev-parse --verify --quiet \"<arg>^{commit}\"` and then says \"On failure report the git error\". For an unresolved reference, --quiet suppresses the diagnostic that this outcome requires reporting.",
+          "fix": "Use `git rev-parse --verify \"<arg>^{commit}\"` without --quiet and report its captured stderr on failure, or explicitly prescribe an invalid-reference message based on the nonzero status. Retain the stop-before-diff/show behavior and the suggestion to run `git branch -a`."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

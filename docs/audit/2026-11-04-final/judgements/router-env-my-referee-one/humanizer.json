@@ -1,0 +1,59 @@
+{
+  "skill": "humanizer",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/humanizer/references/pattern-catalog.md",
+      "line": 31,
+      "evidence": "The 42-line 'Correspondence and disclaimers' section and 18-line 'Conclusions and hedging' section devote substantial space to familiar editing activation: 'Delete the frame and keep the fact', removing empty positive conclusions, and collapsing 'could potentially possibly' to one qualifier. These routine examples dilute the more distinctive evidence-scope and model-era guidance.",
+      "fix": "Condense routine disclaimer, empty-conclusion and stacked-hedge examples into a short checklist. Retain the evidence-scope distinctions, source-preservation safeguards, era-specific diagnostics, and all attribution and license content unchanged."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/humanizer/evals/evals.json",
+      "line": 67,
+      "evidence": "The wrapper-and-identifier and bio-unsupported-attribution cases list 'references/pattern-catalog.md' as an input file even though their drafts are supplied inline. This is the skill's instructional reference, not a draft fixture; supplying it to a without-skill baseline would expose part of the treatment. No output eval exercises the documented in-place file-editing branch.",
+      "fix": "Remove the instructional catalog from both cases' files arrays and let SKILL.md control its loading. Add a draft fixture under evals/files/ and an explicit file-input case asserting that only the requested passage changes, protected strings remain character-identical, and the response includes the required change note and sentence-level diff summary."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/humanizer/SKILL.md",
+      "line": 17,
+      "evidence": "'Gate: count distinct cues per paragraph; with fewer than three, fix only the evidence and inflation cues and skip the style pass.' For a draft containing only 'Certainly!' followed by a factual sentence, this branch skips the sole stylistic defect, while references/pattern-catalog.md:11 explicitly requires deleting that wrapper. An explicit request to fix em-dash overuse alone can reach the same dead end because repeated dashes remain one distinct cue.",
+      "fix": "Apply the density gate only to unsolicited changes based on weak cues. Explicitly requested edits and unambiguous defects such as chatbot wrappers should proceed independently of cue count; isolated weak vocabulary or punctuation cues should still be left alone."
+    }
+  ]
+}

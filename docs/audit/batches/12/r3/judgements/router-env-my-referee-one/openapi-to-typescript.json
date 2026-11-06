@@ -1,0 +1,50 @@
+{
+  "skill": "openapi-to-typescript",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 22,
+      "evidence": "Preflight says \"Stop at the first row that matches\", but the \"components.schemas absent or empty | Continue\" row precedes the catch-all unsupported-version rejection. An input with openapi: 3.2.0, paths: {}, and no components therefore reaches Continue instead of the required version stop.",
+      "fix": "Validate that the version is 3.0.x before any Continue branch. Then check references and schema availability separately, so absent components cannot bypass rejection of unsupported versions."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 150,
+      "evidence": "Validation hardcodes \"grep types/api.ts\" and \"npx tsc --noEmit --strict --target es2022 types/api.ts\", although the workflow first selects the repository's existing API-types location. For an existing destination such as src/generated/api-types.ts, these commands inspect the wrong path; the excluded-file fallback is also unspecified.",
+      "fix": "Use the destination selected during emission in every validation command and check its resolved path against --listFilesOnly output. If the repository tsconfig excludes that file, validate it with a temporary config extending the repository config and explicitly including the destination; retain the documented standalone fallback when no repository config exists."
+    }
+  ]
+}
