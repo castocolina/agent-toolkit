@@ -569,6 +569,196 @@ test_stdout_clean_on_http_errors() {
   check reviewers_stdout "$OUT" ""
 }
 
+# Stub gh for capability/publish: output and failure are env-driven.
+# CAP_VERSION / CAP_URL are printed; CAP_MODE_V / CAP_MODE_U = fail|hang|"".
+write_cap_stub() {
+  local root=$1
+  mkdir -p "$root/bin"
+  cp "$HERE/fixtures/gh-cap-stub.sh" "$root/bin/gh"
+  chmod +x "$root/bin/gh"
+}
+
+cap() { # cap VERSION URL [env...]; sets OUT CODE ERR
+  local v=$1 u=$2; shift 2
+  local s; s=$(mktemp -d); TMPS+=("$s"); write_cap_stub "$s"
+  run_in "$s" GH="$s/bin/gh" CAP_VERSION="$v" CAP_URL="$u" PR_DIAGRAMS_PROBE_TIMEOUT=1 "$@" -- capability
+}
+
+test_capability_rule() {
+  cap 'gh version 2.101.0 (2026-09-15)' https://github.com/o/r; check v2101 "$OUT/$CODE" attach/0
+  cap 'gh version 2.100.0' https://github.com/o/r; check v2100 "$OUT/$CODE" branch/0
+  cap 'gh version 3.0.0' https://github.com/o/r; check v3 "$OUT/$CODE" attach/0
+  cap 'gh version 2.101.0' https://GitHub.com/o/r/; check upper "$OUT/$CODE" attach/0
+  local u
+  for u in https://github.company.com/o/r https://ghe.example.com/o/r https://github.com.evil.example/o/r https://www.github.com/o/r https://github.com:8443/o/r; do
+    cap 'gh version 2.101.0' "$u"; check "host $u" "$OUT/$CODE" branch/0
+  done
+  cap 'gh version 2.100.0' https://ghe.example.com/o/r PR_DIAGRAMS_MODE=attach; check force_attach "$OUT/$CODE" attach/0
+  cap 'gh version 2.101.0' https://github.com/o/r PR_DIAGRAMS_MODE=branch; check force_branch "$OUT/$CODE" branch/0
+}
+
+test_capability_probe_failures_print_branch() {
+  cap 'gh version 2.101.0' https://github.com/o/r CAP_MODE_V=fail
+  check vfail "$OUT/$CODE" branch/0; check vfail_why "$([ -n "$ERR" ] && echo y)" y
+  cap 'gh version 2.101.0' https://github.com/o/r CAP_MODE_U=fail
+  check ufail "$OUT/$CODE" branch/0; check ufail_why "$([ -n "$ERR" ] && echo y)" y
+  cap 'gh version 2.101.0' https://github.com/o/r CAP_MODE_V=hang
+  check vhang "$OUT/$CODE" branch/0; check vhang_why "$(printf '%s' "$ERR" | grep -c -i 'timed out')" 1
+  cap 'gh version 2.101.0' https://github.com/o/r CAP_MODE_U=hang
+  check uhang "$OUT/$CODE" branch/0
+  cap 'gh version banana' https://github.com/o/r
+  check banana "$OUT/$CODE" branch/0; check banana_why "$(printf '%s' "$ERR" | grep -c 'banana')" 1
+  local u
+  for u in '' github.com/o/r https:///o/r; do
+    cap 'gh version 2.101.0' "$u"; check "nohost [$u]" "$OUT/$CODE" branch/0
+    check "nohost_why [$u]" "$([ -n "$ERR" ] && echo y)" y
+  done
+  cap 'gh version 2.101.0' https://github.com/o/r PR_DIAGRAMS_MODE=bogus
+  check bogus "[$OUT]/$CODE" "[]/2"
+}
+
+test_capability_without_timeout_still_attaches() {
+  # Break: with no timeout(1) on PATH (stock macOS) the probe fails and github.com silently gets branch.
+  local b f; b=$(mktemp -d); TMPS+=("$b")
+  for f in /usr/bin/*; do
+    case "${f##*/}" in timeout|gtimeout) ;; *) ln -s "$f" "$b/${f##*/}" 2>/dev/null || true ;; esac
+  done
+  cap 'gh version 2.101.0' https://github.com/o/r PATH="$b"
+  check notimeout "$OUT/$CODE" attach/0
+  check notimeout_why "$(printf '%s' "$ERR" | grep -c 'timeout(1) not found')" 1
+}
+
+# Work clone with identity, a stub gh for the URL and PNG fixtures.
+pub_setup() {
+  init_repo
+  write_cap_stub "$STUB"
+  printf '\211PNG\r\n\032\nx' > "$STUB/a.png"
+  printf '\211PNG\r\n\032\ny' > "$STUB/b.png"
+  printf '\211PNG\r\n\032\nz' > "$STUB/c.png"
+}
+pub() { # pub [env...] -- args
+  local e=()
+  while [ "$1" != -- ]; do e+=("$1"); shift; done
+  shift
+  run_in "$REPO" GH="$STUB/bin/gh" PR_DIAGRAMS_REPO=acme/widgets CAP_URL=https://ghe.example.com/acme/widgets "${e[@]}" -- publish "$@"
+}
+remote_tree() { "$REAL_GIT" -C "$BARE" ls-tree -r --name-only pr-diagrams | tr '\n' ' '; }
+
+test_publish_creates_orphan_then_fast_forwards() {
+  pub_setup
+  local head0 br0; head0=$("$REAL_GIT" -C "$REPO" rev-parse HEAD); br0=$("$REAL_GIT" -C "$REPO" branch --show-current)
+  pub -- 12 "$STUB/a.png"
+  check exit "$CODE" 0; check tree "$(remote_tree)" '12/a.png '
+  check url "$OUT" "{\"png\":\"$STUB/a.png\",\"url\":\"https://ghe.example.com/acme/widgets/blob/pr-diagrams/12/a.png?raw=true\"}"
+  check orphan "$("$REAL_GIT" -C "$BARE" rev-list --max-parents=0 pr-diagrams | wc -l | tr -d ' ')" 1
+  check subject "$("$REAL_GIT" -C "$BARE" log -1 --format=%s pr-diagrams)" 'docs: diagrams for PR 12'
+  local first; first=$("$REAL_GIT" -C "$BARE" rev-parse pr-diagrams)
+  pub -- 13 "$STUB/b.png" "$STUB/c.png"
+  check exit2 "$CODE" 0; check tree2 "$(remote_tree)" '12/a.png 13/b.png 13/c.png '
+  check ff "$("$REAL_GIT" -C "$BARE" merge-base --is-ancestor "$first" pr-diagrams && echo yes)" yes
+  check lines "$(printf '%s\n' "$OUT" | wc -l | tr -d ' ')" 2
+  # the user's checkout is untouched
+  check head "$("$REAL_GIT" -C "$REPO" rev-parse HEAD)" "$head0"
+  check branch "$("$REAL_GIT" -C "$REPO" branch --show-current)" "$br0"
+  check clean "$("$REAL_GIT" -C "$REPO" status --porcelain | grep -v '^?? err$' || true)" ""
+  check worktrees "$("$REAL_GIT" -C "$REPO" worktree list | wc -l | tr -d ' ')" 1
+  check no_local "$("$REAL_GIT" -C "$REPO" for-each-ref 'refs/heads/pr-diagrams*' | wc -l | tr -d ' ')" 0
+}
+
+test_publish_keeps_earlier_images_of_the_same_pr() {
+  pub_setup
+  pub -- 41 "$STUB/a.png"; check exit1 "$CODE" 0
+  pub -- 41 "$STUB/b.png"; check exit2 "$CODE" 0
+  check tree "$(remote_tree)" '41/a.png 41/b.png '
+}
+
+test_publish_rejects_gh_repo_other_than_origin() {
+  pub_setup
+  pub CAP_URL=https://ghe.example.com/other/thing -- 12 "$STUB/a.png"
+  check exit "$CODE" 2; check out "$OUT" ""
+  check both "$(printf '%s' "$ERR" | grep -c -F acme/widgets)/$(printf '%s' "$ERR" | grep -c -F other/thing)" 1/1
+  check pushed "$("$REAL_GIT" -C "$BARE" for-each-ref refs/heads/pr-diagrams | wc -l | tr -d ' ')" 0
+}
+
+test_publish_rejects_same_path_on_another_host() {
+  pub_setup
+  pub PR_DIAGRAMS_REPO=ghe.example.com/acme/widgets CAP_URL=https://github.com/acme/widgets -- 12 "$STUB/a.png"
+  check exit "$CODE" 2; check out "$OUT" ""
+  check both "$(printf '%s' "$ERR" | grep -c -F github.com/acme/widgets)/$(printf '%s' "$ERR" | grep -c -F ghe.example.com/acme/widgets)" 1/1
+  check pushed "$("$REAL_GIT" -C "$BARE" for-each-ref refs/heads/pr-diagrams | wc -l | tr -d ' ')" 0
+  pub PR_DIAGRAMS_REPO=GHE.example.com/acme/widgets CAP_URL=https://ghe.example.com/acme/widgets -- 12 "$STUB/a.png"
+  check same_host_exit "$CODE" 0
+}
+
+test_publish_basenames_compared_exactly() {
+  pub_setup
+  cp "$STUB/a.png" "$STUB/a.png b.png"
+  mkdir "$STUB/sub"; cp "$STUB/b.png" "$STUB/sub/a.png"
+  pub -- 12 "$STUB/a.png b.png" "$STUB/sub/a.png"
+  check spaced_exit "$CODE" 0; check tree "$(remote_tree)" '12/a.png 12/a.png b.png '
+  pub -- 13 "$STUB/a.png" "$STUB/sub/a.png"
+  check same_exit "$CODE" 2
+}
+
+test_publish_rejects_bad_arguments() {
+  pub_setup
+  pub -- abc "$STUB/a.png"; check n_exit "$CODE" 2; check n_out "$OUT" ""
+  pub -- 12/../x "$STUB/a.png"; check n2_exit "$CODE" 2
+  pub -- 12; check nopng_exit "$CODE" 2
+  pub -- 12 "$STUB/a.png/../.."; check trick_exit "$CODE" 2
+  pub -- 12 "$STUB"; check dir_exit "$CODE" 2
+  pub -- 12 "$STUB/missing.png"; check missing_exit "$CODE" 2
+  printf 'nope' > "$STUB/bad.png"
+  pub -- 12 "$STUB/bad.png"; check notpng_exit "$CODE" 2
+  pub -- 12 "$STUB/a.png" "$STUB/a.png"; check dup_exit "$CODE" 2
+  check pushed "$("$REAL_GIT" -C "$BARE" for-each-ref refs/heads/pr-diagrams | wc -l | tr -d ' ')" 0
+}
+
+test_publish_refuses_stray_refs() {
+  local ref where
+  for where in remote local; do
+    for ref in pr-diagrams-5 pr-diagrams/5; do
+      pub_setup
+      if [ $where = remote ]; then "$REAL_GIT" -C "$REPO" push -q origin "HEAD:refs/heads/$ref"
+      else "$REAL_GIT" -C "$REPO" branch "$ref"; fi
+      pub -- 12 "$STUB/a.png"
+      check "$where $ref exit" "$CODE" 2
+      check "$where $ref names" "$(printf '%s' "$ERR" | grep -c -F -- "$ref")" 1
+      check "$where $ref nopush" "$("$REAL_GIT" -C "$BARE" rev-parse -q --verify refs/heads/pr-diagrams || true)" ""
+    done
+  done
+}
+
+test_publish_retries_once_on_non_fast_forward() {
+  pub_setup
+  pub -- 12 "$STUB/a.png"
+  mkdir -p "$STUB/gitbin"
+  cp "$HERE/fixtures/git-race-wrapper.sh" "$STUB/gitbin/git"
+  chmod +x "$STUB/gitbin/git"
+  pub PATH="$STUB/gitbin:$PATH" REAL_GIT="$REAL_GIT" RACE_BARE="$BARE" RACE_MARK="$STUB/raced" -- 14 "$STUB/c.png"
+  check exit "$CODE" 0
+  check raced "$([ -e "$STUB/raced" ] && echo y)" y
+  check tree "$(remote_tree)" '12/a.png 14/c.png 99/z.png '
+  check linear "$("$REAL_GIT" -C "$BARE" rev-list --merges pr-diagrams | wc -l | tr -d ' ')" 0
+}
+
+test_help_lists_subcommands_and_exit_codes() {
+  local root; root=$(mktemp -d); TMPS+=("$root")
+  local arg sub
+  for arg in help --help -h; do
+    run_in "$root" -- "$arg"
+    check "$arg exit" "$CODE" 0
+    check "$arg stderr" "$ERR" ""
+    for sub in capability render publish related reviewers repo; do
+      check "$arg lists $sub" "$(grep -c "^  $sub " <<<"$OUT")" 1
+    done
+    check "$arg exit codes" "$(grep -c -E '^exit: 0 ok; 1 failure|^ +2 usage error' <<<"$OUT")" 2
+  done
+  run_in "$root" -- bogus
+  check unknown_exit "$CODE" 1
+  check unknown_names_help "$(grep -c 'publish|help' <<<"$ERR")" 1
+}
+
 for f in $(declare -F | awk '{print $3}' | grep '^test_'); do t "$f"; done
 [ $FAILS = 0 ] || { echo "$FAILS assertion(s) failed"; exit 1; }
 echo "all passed"
