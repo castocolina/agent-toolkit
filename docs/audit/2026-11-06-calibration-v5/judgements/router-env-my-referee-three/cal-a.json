@@ -1,0 +1,86 @@
+{
+  "skill": "cal-a",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": 37,
+      "evidence": "`--first-parent` yields one line per merged PR in both merge-commit and squash workflows; `--no-merges` lists every feature-branch commit.",
+      "fix": "This says the same thing as the NEVER item 'NEVER combine `--no-merges` with `--first-parent`...'. Keep it in one place: put the workflow reason into the NEVER item, then delete line 37 and record the merge as a move, not a drop"
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": 65,
+      "evidence": "Rewrite each subject for the person who upgrades: what changed for them, not the internal wording.",
+      "fix": "The model already writes user-facing changelog lines like this without being told. Keep the sentence but tie it to the command's own rule: when a subject has no user-visible effect, it goes under Internal (the NEVER item about thin subjects)"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": 65,
+      "evidence": "Step 5 gives output rules (one line per PR, at most 100 characters, merge same (#123)) but no way to judge user impact",
+      "fix": "Add one check before writing each line, for example 'Before writing a line, ask: would someone upgrading see or need to act on this? If not, move it to Internal'. This gives step 5 a way of thinking and not only formatting rules"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-a.md",
+      "line": 25,
+      "evidence": "the log command in step 2 runs as `git log --first-parent --format='%h%x09%s' <to>` (no `<from>..`)",
+      "fix": "In the first-release branch, keep `%x09%b` (`git log --first-parent --format='%h%x09%s%x09%b' <to>`). Without it, the rule at line 35 that reads the PR title from a generic `Merge pull request` body cannot run. Also give the first-release form of the BREAKING CHANGE grep (`git log --first-parent --grep='^BREAKING[ -]CHANGE' --format='%h' <to>`), because line 42 assumes `<from>..<to>`"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-a.md",
+      "line": 22,
+      "evidence": "If the tag resolves to the same commit as `HEAD`, rerun from `HEAD^` and use the older tag as the start.",
+      "fix": "Follow this branch to its header: `$1` was not given, so line 67 prints `Unreleased` even though HEAD carries a version tag. Add: 'In this case `<to>` is the HEAD tag and the header names it'"
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-a.md",
+      "line": 30,
+      "evidence": "git log --first-parent --format='%h%x09%s%x09%b' <from>..<to>",
+      "fix": "`%b` spans several lines, so the output is not one record per line, and the 'first non-empty body line' rule (line 35) cannot tell where one commit ends and the next begins. End each record with a delimiter, for example `--format='%h%x09%s%x09%b%x00'`, and split on NUL"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "skill": "cal-a",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 13,
+    "D6": 15,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "high",
+      "file": "commands/cal-a.md",
+      "line": 2,
+      "evidence": "\"Not for describing a single pull request (use explain-pr-changes).\" \u2014 no commands/explain-pr-changes.md exists anywhere under this root (commands/ holds only cal-a.md, cal-b.md, evals/; the mention in docs/audit/artifact-specs.md \u00a73 is an observation dated 2026-10-31, 'not re-counted'), so the boundary pointer names a command that does not resolve",
+      "fix": "Restore commands/explain-pr-changes.md under this root, or keep the boundary without the dead name (\"Not for describing a single pull request\")"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-a.md",
+      "line": 25,
+      "evidence": "\"the log command in step 2 runs as `git log --first-parent --format='%h%x09%s' <to>` (no `<from>..`)\" \u2014 dropping %b leaves no body, so the merge-subject rule (\"carries the PR title on the first non-empty body line\", line 35) and the BREAKING CHANGE footer list (\"Breaking-change footers live in the body\", line 39) cannot run in a first release; the first-release eval supplies %h%x09%s%x09%b output and expects the PR-title rule to apply, and the grep variant with no <from> is also unstated",
+      "fix": "Make the first-release variant `git log --first-parent --format='%h%x09%s%x09%b' <to>` and state that the footer grep runs as `git log --first-parent --grep='^BREAKING[ -]CHANGE' --format='%h' <to>`"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/cal-a.md",
+      "line": 4,
+      "evidence": "\"allowed-tools: Bash(git log:*), Bash(git describe:*), Bash(git rev-parse:*), Bash(git show:*)\" \u2014 no step ever instructs `git show`; every body and footer datum is already collected by the two log commands",
+      "fix": "Drop `Bash(git show:*)` from allowed-tools, or add the step that needs it (for example inspecting a commit whose subject is too thin to classify)"
+    }
+  ]
+}
