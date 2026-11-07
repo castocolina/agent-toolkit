@@ -1,0 +1,131 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 14,
+    "D4": 14,
+    "D5": 14,
+    "D6": 14,
+    "D7": 12,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 113,
+  "max_total": 125,
+  "percent": 90.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 1,
+      "evidence": "The previous-version digest at dbff837f lists 306 removed units and shows 40 (showing 40 of 306).",
+      "fix": "Record the unlisted para units in docs/audit/recovery/database-schema-designer/record.md, or restore any a user would miss into references/ (or SKILL.md when a procedure depends on it)."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/references/schema-fundamentals.md",
+      "line": 1,
+      "evidence": "Background the user may ask for by name: normal forms, denormalization, key choice, foreign-key actions, junction tables, MongoDB index syntax, reading a MySQL EXPLAIN and a basic do and avoid list. It restates textbook rules in this skill's terms.",
+      "fix": "Keep this file behind its load trigger. Do not copy the 1NF/2NF/3NF table, CHAR/VARCHAR sizing, or the integer-range table back into SKILL.md; delete a textbook block only when the model reliably produces it unprompted, and add a record row."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 35,
+      "evidence": "For another named engine (SQL Server, Oracle, DynamoDB), apply the workflow questions and the engine-neutral gotchas (tenant references, soft-delete uniqueness, money, column meaning). State in an `Assumption:` line that its lock and online-DDL behavior is unverified by this skill.",
+      "fix": "Add a short Gotchas line that SQL Server, Oracle and DynamoDB have no engine-specific procedure here, so the agent must not invent their lock or online-DDL syntax and must say so in the Assumption line."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 3,
+      "evidence": "Design and review SQL and MongoDB schemas - tables or collections, keys, foreign keys, constraints, multi-tenant isolation, soft deletes, timestamp and money types, query-aligned indexes, and staged live migrations (expand-contract, NOT NULL, online DDL) for PostgreSQL, MySQL and SQLite.",
+      "fix": "Design and review SQL and MongoDB schemas: tables or collections, keys, foreign keys, constraints, multi-tenant isolation, soft deletes, timestamp and money types, query-aligned indexes, and staged live migrations (expand-contract, NOT NULL, online DDL) for PostgreSQL, MySQL and SQLite. Use when someone needs a data model, DDL, an ERD-ready table list, an embed-or-reference decision, a schema review, or a safe migration plan, even if they only describe entities and queries or a symptom such as re-signup failing after a soft delete, cross-tenant data leaking, or a migration that locked production. Not for REST or GraphQL API models, ORM classes for an existing schema, data-warehouse dashboards, database deployment, backups or connection pooling, or tuning a query without changing the schema."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 70,
+      "evidence": "`references/schema-fundamentals.md` | The user asks for normalization, denormalization, key choice, foreign-key actions, a junction table, MongoDB index syntax, reading a MySQL EXPLAIN, or a basic-design do and avoid checklist | Tenant isolation, live changes and engine gotchas (those are above)",
+      "fix": "In workflow step 4, say to read references/schema-fundamentals.md only for those named asks, and add: do not load it for a tenant-isolation, live-migration or engine-gotcha answer."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 49,
+      "evidence": "In MongoDB, embed a child only when it is read with its parent, bounded in size, owned by that parent alone, and updated atomically with it. Reference it when it is shared across parents, grows without bound (see the 16 MiB gotcha), is queried on its own, or is updated independently at a high rate.",
+      "fix": "Add one sentence: when the criteria conflict (read with the parent, but shared or unbounded), reference it and keep at most the bounded slice from the 16 MiB gotcha."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/evals/evals.json",
+      "line": 1,
+      "evidence": "evals.json has 12 cases with verifiable assertions, but no recorded with-skill versus without-skill grading, so the file does not show that the skill changes the output.",
+      "fix": "Run the 12 prompts with and without the skill, grade each assertion with quoted evidence, and keep the failing cases next to the instruction they test."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/database-schema-designer/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "20 queries, 10 should-trigger and 10 should-not, with near-misses such as REST design, Prisma models and query tuning, but no recorded trigger-rate runs.",
+      "fix": "Run each query about three times, record the trigger rate, and replace any query that passes for the wrong reason."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 46,
+      "evidence": "Live data? If any table already holds production data, on a relational engine read `references/migrations.md` before writing DDL; on MongoDB follow the MongoDB gotcha.",
+      "fix": "Name the gotcha in that step: on MongoDB follow the 'MongoDB has no foreign keys' gotcha and its five-step in-place shape change, and do not write SQL DDL."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 79,
+      "evidence": "SQLite `ALTER TABLE` is limited (see the SQLite gotcha in SKILL.md). For any other change, follow the 12-step procedure at https://www.sqlite.org/lang_altertable.html in this order:",
+      "fix": "Retitle the section 'SQLite table rebuild (9 steps)' and point step 2's 'steps 5 and 8' at the row-count check and the foreign-key check by name."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 82,
+      "evidence": "Start the script with `.bail on` (sqlite3 CLI) so the first error stops it. Then run `PRAGMA foreign_keys = OFF;` outside any transaction, because inside one it is silently ignored.",
+      "fix": "Say the same nine steps apply in an application driver, with the driver's transaction and rollback replacing `.bail on`, and that `.bail on` is only for the sqlite3 CLI."
+    }
+  ]
+}

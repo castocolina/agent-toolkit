@@ -18,7 +18,7 @@ Never copy once and then switch reads while writers still update only the old co
 1. Keep the column nullable. Deploy code that always writes it.
 2. Backfill existing NULLs in idempotent batches (step 3 above).
 3. Enforce without a long blocking scan, one phase per migration file (each its own committed transaction, each starting with `SET lock_timeout`):
-   - PostgreSQL 12+:
+   - PostgreSQL (the current ALTER TABLE page, https://www.postgresql.org/docs/current/sql-altertable.html, gives the scan skip but no version; check the release notes at https://www.postgresql.org/docs/release/ for the oldest version you must support, checked 2026-11-07):
      1. `ALTER TABLE users ADD CONSTRAINT users_phone_nn CHECK (phone IS NOT NULL) NOT VALID;` takes a brief ACCESS EXCLUSIVE lock.
      2. `ALTER TABLE users VALIDATE CONSTRAINT users_phone_nn;` scans under SHARE UPDATE EXCLUSIVE, so reads and writes continue.
      3. `ALTER TABLE users ALTER COLUMN phone SET NOT NULL;` skips the table scan because the valid CHECK proves no NULLs.
@@ -40,27 +40,27 @@ Example: make `tasks (organization_id, project_id)` reference `projects (organiz
 4. `ALTER TABLE tasks VALIDATE CONSTRAINT tasks_org_project_fk;` If it fails, step 2 missed a row; the error names the key.
 5. `ALTER TABLE tasks DROP CONSTRAINT tasks_project_id_fkey;` drops the old single-column FK.
 
-MySQL has no `NOT VALID`. Add the parent's `UNIQUE KEY (organization_id, id)` and fix the bad rows, then add the FK with `ALGORITHM=COPY`. COPY checks existing rows and fails on an orphan, but it blocks writes for the whole copy, so schedule a write window. INPLACE works only with `foreign_key_checks = 0`, which skips validation, so never use it on live data.
+MySQL has no `NOT VALID`. Add the parent's `UNIQUE KEY (organization_id, id)` and fix the bad rows, then add the FK with `ALGORITHM=COPY`. COPY checks existing rows and fails on an orphan, but it blocks writes for the whole copy, so schedule a write window. INPLACE works only with `foreign_key_checks = 0`, which skips validation, so never use it on live data (https://dev.mysql.com/doc/refman/8.4/en/innodb-online-ddl-operations.html, foreign key operations, checked 2026-11-07).
 
 ## PostgreSQL lock rules
 
 - Run `SET lock_timeout = '5s';` before DDL and retry on timeout. An `ALTER TABLE` waiting for its ACCESS EXCLUSIVE lock behind one long transaction blocks every later read and write queued behind it, so a stuck migration becomes an outage.
 - Most `ALTER TABLE` forms take ACCESS EXCLUSIVE. `ADD FOREIGN KEY` takes SHARE ROW EXCLUSIVE on both tables, which blocks writes. On a big table, add the FK `NOT VALID`, then run `VALIDATE CONSTRAINT`, which takes SHARE UPDATE EXCLUSIVE (plus ROW SHARE on the referenced table). Use the same two steps for a `CHECK`. Commit the `NOT VALID` step before `VALIDATE`, for the reason given under NOT NULL above.
-- `ADD COLUMN` with a non-volatile default is metadata-only from PostgreSQL 11 on. A volatile default such as `clock_timestamp()` rewrites the table. `ALTER COLUMN TYPE` usually rewrites the table and its indexes, except for binary-coercible changes such as raising a `varchar` limit or `varchar` to `text`.
+- `ADD COLUMN` with a non-volatile default is metadata-only from PostgreSQL 11 on (https://www.postgresql.org/docs/release/11.0/, checked 2026-11-07). A volatile default such as `clock_timestamp()` rewrites the table (https://www.postgresql.org/docs/current/sql-altertable.html). `ALTER COLUMN TYPE` usually rewrites the table and its indexes, except for binary-coercible changes such as raising a `varchar` limit or `varchar` to `text`.
 - `CREATE INDEX` blocks writes but not reads. `CREATE INDEX CONCURRENTLY` blocks neither, but it cannot run inside a transaction block, so mark the migration non-transactional in your migration tool. It also waits for existing transactions that touched the table. If it fails, it leaves an INVALID index that queries ignore but every write still maintains: find it with `SELECT indexrelid::regclass FROM pg_index WHERE NOT indisvalid;`, run `DROP INDEX CONCURRENTLY`, and retry.
 
 ## MySQL rules
 
-- DDL commits implicitly: `ALTER TABLE`, `CREATE INDEX` and `CREATE TABLE` end the open transaction. A `BEGIN ... ROLLBACK` around a migration does not undo earlier statements, so a failure halfway leaves partial schema. Keep each migration file to one DDL statement, or make each statement idempotent.
+- DDL commits implicitly: `ALTER TABLE`, `CREATE INDEX` and `CREATE TABLE` end the open transaction. A `BEGIN ... ROLLBACK` around a migration does not undo earlier statements, so a failure halfway leaves partial schema. Keep each migration file to one DDL statement, or make each statement idempotent. Confirm the list of statements that commit implicitly for your version in the manual's "Statements That Cause an Implicit Commit" page.
 - Always write `ALGORITHM` and `LOCK` explicitly (`ALGORITHM=INSTANT`, or `ALGORITHM=INPLACE, LOCK=NONE`). The explicit clause makes the statement fail when the operation cannot honor it, instead of silently falling back to `COPY`, which blocks writes for the whole rebuild. Say this in the answer, since it is the reason for the clause.
-- Even INSTANT and INPLACE take a brief exclusive metadata lock. Behind a long transaction, that wait blocks the table like the PostgreSQL case above, so set `lock_wait_timeout` low for the session.
+- Even INSTANT and INPLACE take a brief exclusive metadata lock. Behind a long transaction, that wait blocks the table like the PostgreSQL case above, so set `lock_wait_timeout` low for the session. Read https://dev.mysql.com/doc/refman/8.4/en/innodb-online-ddl-performance.html for the lock behavior of your version.
 
 ## SQLite table rebuild
 
-SQLite `ALTER TABLE` is limited (see the SQLite gotcha in SKILL.md). For any other change, follow the 12-step procedure at https://www.sqlite.org/lang_altertable.html in this order:
+SQLite `ALTER TABLE` is limited (see the SQLite gotcha in SKILL.md). For any other change, follow the 12-step procedure at https://www.sqlite.org/lang_altertable.html, condensed here into nine steps, in this order:
 
 1. Start the script with `.bail on` (sqlite3 CLI) so the first error stops it. Then run `PRAGMA foreign_keys = OFF;` outside any transaction, because inside one it is silently ignored.
-2. `BEGIN;`, then `CREATE TEMP TABLE gate (ok INTEGER NOT NULL CHECK (ok = 1));`. Every check below inserts into `gate`, so a failed check raises an error.
+2. `BEGIN;`, then `CREATE TEMP TABLE gate (ok INTEGER NOT NULL CHECK (ok = 1));`. Every check below (the row-count check in step 5 and the foreign-key check in step 8) inserts its result into `gate`; a failed check inserts 0, which violates the CHECK and raises an error.
 3. Save the `sql` of the table's indexes and triggers, and separately of every view that reads it, from `sqlite_schema`.
 4. `DROP VIEW` each of those views. `DROP TABLE` removes the table's indexes and triggers but leaves its views, and the rename in step 6 then fails with `error in view ...: no such table`.
 5. `CREATE TABLE new_x (...)` in the target shape, then `INSERT INTO new_x (...) SELECT ... FROM x;`, then `INSERT INTO gate SELECT (SELECT count(*) FROM x) = (SELECT count(*) FROM new_x);`
