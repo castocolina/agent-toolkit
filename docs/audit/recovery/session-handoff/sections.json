@@ -1,0 +1,871 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Overview",
+      "text": "The Session Handoff skill creates comprehensive handoff documents that enable fresh AI agents to seamlessly continue work with zero ambiguity. It solves the long-running agent context exhaustion problem by preserving complete context, decisions, and state across sessions.",
+      "chars": 272,
+      "units": [
+        "para:dda0efb7"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Purpose",
+      "text": "When working on complex, multi-session projects with AI agents, context gets lost between sessions. This skill provides a structured approach to:\n\n- **Preserve context** - Capture all critical information before context window fills\n- **Enable continuity** - Allow new agents to pick up exactly where you left off\n- **Document decisions** - Record architectural choices and their rationale\n- **Track progress** - Maintain clear status of completed and pending work\n- **Chain sessions** - Link related handoffs for long-running projects",
+      "chars": 535,
+      "units": [
+        "para:1c265f31",
+        "para:075778f5",
+        "para:8fcfc8e8",
+        "para:36a5629f",
+        "para:d04f64f5",
+        "para:0ef2c4d6"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/session-handoff/README.md",
+      "heading": "User-Triggered",
+      "text": "- User says \"save state\", \"create handoff\", \"I need to pause\"\n- User requests \"load handoff\", \"resume from\", \"continue where we left off\"\n- User mentions \"context is getting full\" or \"save this for later\"",
+      "chars": 204,
+      "units": [
+        "para:81c7fe4f",
+        "para:c79463df",
+        "para:815d910b"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Agent-Triggered (Proactive)",
+      "text": "- Context window approaching capacity (>80% full)\n- Major task milestone completed\n- Work session ending with significant progress\n- After substantial work (5+ file edits, complex debugging, architecture decisions)\n- Before switching to a different task",
+      "chars": 253,
+      "units": [
+        "para:6e740238",
+        "para:18e8e17c",
+        "para:82708b63",
+        "para:41a4ac9e",
+        "para:8fb8af59"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Resumption Scenarios",
+      "text": "- Starting a new session on an existing project\n- Different agent needs to continue the work\n- Need to recall decisions made in previous sessions\n- Picking up after a long break",
+      "chars": 177,
+      "units": [
+        "para:cca13084",
+        "para:c2eec909",
+        "para:d7b98ce9",
+        "para:1e4342d7"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/session-handoff/README.md",
+      "heading": "CREATE Mode",
+      "text": "Generates a comprehensive handoff document capturing current state:\n\n1. **Generate Scaffold** - Smart script pre-fills metadata (timestamp, git status, modified files)\n2. **Complete Document** - Fill in critical sections (state, context, decisions, next steps)\n3. **Validate** - Automated checks for completeness, quality, and security\n4. **Confirm** - Present location and summary to user",
+      "chars": 389,
+      "units": [
+        "para:77bd5085",
+        "para:5fab69cf",
+        "para:76c5bfd4",
+        "para:5a19a653",
+        "para:c091ebd8"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/session-handoff/README.md",
+      "heading": "RESUME Mode",
+      "text": "Loads and validates existing handoff documents:\n\n1. **Find Handoffs** - List available handoffs in project\n2. **Check Staleness** - Assess if context is still current\n3. **Load Document** - Read handoff (and chain if linked)\n4. **Verify Context** - Validate assumptions and environment\n5. **Begin Work** - Start from \"Immediate Next Steps\"",
+      "chars": 339,
+      "units": [
+        "para:ddaf48bd",
+        "para:90d81bb3",
+        "para:2fa17744",
+        "para:6c9b6fa2",
+        "para:1e1994b2",
+        "para:7badfa8c"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Smart Scaffolding",
+      "text": "The `create_handoff.py` script automatically captures:\n- Timestamp and project path\n- Current git branch and recent commits\n- Modified and unstaged files\n- Handoff chain links (if continuing from previous)",
+      "chars": 205,
+      "units": [
+        "para:d2009aeb",
+        "para:93c50756",
+        "para:b9ddbc9e",
+        "para:d293c3c6",
+        "para:3cac40ff"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Validation & Quality Assurance",
+      "text": "The `validate_handoff.py` script checks:\n- No incomplete `[TODO: ...]` placeholders\n- All required sections populated\n- No potential secrets (API keys, passwords, tokens)\n- Referenced files exist\n- Quality score (0-100)",
+      "chars": 219,
+      "units": [
+        "para:8a27ec9d",
+        "para:2c253b6c",
+        "para:49c177c6",
+        "para:dbee7f73",
+        "para:de99f239",
+        "para:8d10684e"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Staleness Detection",
+      "text": "The `check_staleness.py` script assesses:\n- Time elapsed since handoff creation\n- Git commits made since handoff\n- Files changed since handoff\n- Branch divergence\n- Missing referenced files",
+      "chars": 189,
+      "units": [
+        "para:6712e0b0",
+        "para:885f95f1",
+        "para:c84ad196",
+        "para:dc9d3ba1",
+        "para:1a199131"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Handoff Chaining",
+      "text": "For long-running projects, chain handoffs together:\n```\nhandoff-1.md (initial work)\n    \u2193\nhandoff-2.md --continues-from handoff-1.md\n    \u2193\nhandoff-3.md --continues-from handoff-2.md\n```\n\nEach handoff links to its predecessor, providing context breadcrumbs for new agents.",
+      "chars": 271,
+      "units": [
+        "para:80c5da99",
+        "para:5b024994",
+        "para:4201c0fb"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Creating a Handoff",
+      "text": "**Basic handoff creation:**\n```bash\npython scripts/create_handoff.py implementing-user-auth\n```\n\n**Continuation handoff (linked to previous):**\n```bash\npython scripts/create_handoff.py \"auth-part-2\" --continues-from 2024-01-15-auth.md\n```\n\n**Validate before finalizing:**\n```bash\npython scripts/validate_handoff.py .claude/handoffs/2024-01-15-143022-implementing-auth.md\n```",
+      "chars": 374,
+      "units": [
+        "para:67f68a3b",
+        "para:ac9f6c53",
+        "para:bc8f96e2",
+        "para:9c884927",
+        "para:e23552f3",
+        "para:27e55b1c"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Resuming from a Handoff",
+      "text": "**List available handoffs:**\n```bash\npython scripts/list_handoffs.py\n```\n\n**Check if handoff is current:**\n```bash\npython scripts/check_staleness.py .claude/handoffs/2024-01-15-143022-implementing-auth.md\n```\n\n**Load and continue work:**\n1. Read the handoff document completely\n2. Verify context using resume checklist\n3. Start with first item in \"Immediate Next Steps\"",
+      "chars": 369,
+      "units": [
+        "para:93f7f589",
+        "para:1d778555",
+        "para:47681a26",
+        "para:9f56e624",
+        "para:6127396b",
+        "para:5a73f048",
+        "para:6cd0dfb7",
+        "para:b11f9690"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Handoff Document Structure",
+      "text": "A complete handoff includes:\n\n1. **Metadata** - Timestamp, project path, git branch, commits\n2. **Current State Summary** - What's happening right now\n3. **Important Context** - Critical information for next agent\n4. **Decisions Made** - Architectural choices with rationale\n5. **Immediate Next Steps** - Clear, actionable first steps\n6. **Pending Work** - Remaining tasks and priorities\n7. **Critical Files** - Important locations and their purpose\n8. **Key Patterns Discovered** - Conventions and approaches\n9. **Potential Gotchas** - Known issues and workarounds\n10. **Handoff Chain** - Links to previous/next handoffs\n\nSee [references/handoff-template.md](references/handoff-template.md) for the complete template.",
+      "chars": 718,
+      "units": [
+        "para:cf011ec5",
+        "para:4467ea0f",
+        "para:23993037",
+        "para:88fec07c",
+        "para:77c8f659",
+        "para:c60e6ca9",
+        "para:ad065e71",
+        "para:e3a87aa9",
+        "para:d5a9c1c5",
+        "para:757259bd",
+        "para:c8c3e58a",
+        "para:9ee8e307"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Storage Location",
+      "text": "Handoffs are stored in: `.claude/handoffs/`\n\nNaming convention: `YYYY-MM-DD-HHMMSS-[slug].md`\n\nExample: `2024-01-15-143022-implementing-auth.md`",
+      "chars": 144,
+      "units": [
+        "para:774d843b",
+        "para:28bb66e2",
+        "para:72dd6879"
+      ]
+    },
+    {
+      "id": "s016",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Scripts Reference",
+      "text": "| Script | Purpose | Usage |\n|--------|---------|-------|\n| `create_handoff.py` | Generate new handoff with smart scaffolding | `python scripts/create_handoff.py [slug] [--continues-from <file>]` |\n| `list_handoffs.py` | List available handoffs in a project | `python scripts/list_handoffs.py [path]` |\n| `validate_handoff.py` | Check completeness, quality, and security | `python scripts/validate_handoff.py <file>` |\n| `check_staleness.py` | Assess if handoff context is still current | `python scripts/check_staleness.py <file>` |",
+      "chars": 533,
+      "units": [
+        "para:0b612608",
+        "para:657f4a23",
+        "para:78b3dfe0",
+        "para:4abd8cad",
+        "para:59ca0c93"
+      ]
+    },
+    {
+      "id": "s017",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Quality Standards",
+      "text": "**Do not finalize a handoff if:**\n- Validation score is below 70\n- Secrets are detected\n- `[TODO: ...]` placeholders remain\n- Required sections are empty\n\n**Best practices:**\n- Write clear, specific next steps (not vague goals)\n- Document the \"why\" behind decisions, not just the \"what\"\n- Include code snippets for critical patterns\n- Reference specific file paths and line numbers\n- Update handoffs as work progresses",
+      "chars": 418,
+      "units": [
+        "para:e8520ceb",
+        "para:649cf456",
+        "para:ce50a3b3",
+        "para:9235c882",
+        "para:701ba72a",
+        "para:ad8ebac2",
+        "para:891762db",
+        "para:e4af366e",
+        "para:06a965b7",
+        "para:e60cd3d8"
+      ]
+    },
+    {
+      "id": "s018",
+      "file": "skills/session-handoff/README.md",
+      "heading": "References",
+      "text": "- [handoff-template.md](references/handoff-template.md) - Complete template structure with guidance\n- [resume-checklist.md](references/resume-checklist.md) - Verification checklist for resuming agents\n- [evals/model-expectations.md](evals/model-expectations.md) - Model behavior expectations\n- [evals/test-scenarios.md](evals/test-scenarios.md) - Test cases for handoff creation and resumption",
+      "chars": 393,
+      "units": [
+        "para:d94d27b1",
+        "para:cf3de253",
+        "para:03c60e9c",
+        "para:823feac8"
+      ]
+    },
+    {
+      "id": "s019",
+      "file": "skills/session-handoff/README.md",
+      "heading": "Benefits",
+      "text": "- **Zero ambiguity** - New agents know exactly what to do\n- **Context preservation** - No loss of critical information\n- **Decision history** - Understand why choices were made\n- **Reduced onboarding** - Faster agent startup on existing work\n- **Quality assurance** - Automated validation prevents incomplete handoffs\n- **Security** - Secret detection prevents credential leaks\n- **Long-term memory** - Handoff chains maintain project history",
+      "chars": 442,
+      "units": [
+        "para:e2cbde18",
+        "para:5b03fc87",
+        "para:fdf188dc",
+        "para:2c7f1a32",
+        "para:48795cd1",
+        "para:73ea1e1a",
+        "para:28754613"
+      ]
+    },
+    {
+      "id": "s020",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: session-handoff\ndescription: \"Creates comprehensive handoff documents for seamless AI agent session transfers. Triggered when: (1) user requests handoff/memory/context save, (2) context window approaches capacity, (3) major task milestone completed, (4) work session ending, (5) user says 'save state', 'create handoff', 'I need to pause', 'context is getting full', (6) resuming work with 'load handoff', 'resume from', 'continue where we left off'. Proactively suggests handoffs after substantial work (multiple file edits, complex debugging, architecture decisions). Solves long-running agent context exhaustion by enabling fresh agents to continue with zero ambiguity.\"\n---",
+      "chars": 687,
+      "units": [
+        "para:973eab7e"
+      ]
+    },
+    {
+      "id": "s021",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "Handoff",
+      "text": "Creates comprehensive handoff documents that enable fresh AI agents to seamlessly continue work with zero ambiguity. Solves the long-running agent context exhaustion problem.",
+      "chars": 174,
+      "units": [
+        "para:4bb8b8b8"
+      ]
+    },
+    {
+      "id": "s022",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "Mode Selection",
+      "text": "Determine which mode applies:\n\n**Creating a handoff?** User wants to save current state, pause work, or context is getting full.\n- Follow: CREATE Workflow below\n\n**Resuming from a handoff?** User wants to continue previous work, load context, or mentions an existing handoff.\n- Follow: RESUME Workflow below\n\n**Proactive suggestion?** After substantial work (5+ file edits, complex debugging, major decisions), suggest:\n> \"We've made significant progress. Consider creating a handoff document to preserve this context for future sessions. Say 'create handoff' when ready.\"",
+      "chars": 572,
+      "units": [
+        "para:437c1574",
+        "para:77552952",
+        "para:76e8a9a1",
+        "para:83e0212c",
+        "para:e4a5a4c3",
+        "para:75c64ea8"
+      ]
+    },
+    {
+      "id": "s023",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "Step 1: Generate Scaffold",
+      "text": "Run the smart scaffold script to create a pre-filled handoff document:\n\n```bash\npython scripts/create_handoff.py [task-slug]\n```\n\nExample: `python scripts/create_handoff.py implementing-user-auth`\n\n**For continuation handoffs** (linking to previous work):\n```bash\npython scripts/create_handoff.py \"auth-part-2\" --continues-from 2024-01-15-auth.md\n```\n\nThe script will:\n- Create `.claude/handoffs/` directory if needed\n- Generate timestamped filename\n- Pre-fill: timestamp, project path, git branch, recent commits, modified files\n- Add handoff chain links if continuing from previous\n- Output file path for editing",
+      "chars": 614,
+      "units": [
+        "para:99639647",
+        "para:e2738aed",
+        "para:96c5615d",
+        "para:eb117ae5",
+        "para:9c884927",
+        "para:a06fa36e",
+        "para:8335f880",
+        "para:4e713797",
+        "para:008b731f",
+        "para:baaa0e68",
+        "para:39c9e242"
+      ]
+    },
+    {
+      "id": "s024",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "Step 2: Complete the Handoff Document",
+      "text": "Open the generated file and fill in all `[TODO: ...]` sections. Prioritize these sections:\n\n1. **Current State Summary** - What's happening right now\n2. **Important Context** - Critical info the next agent MUST know\n3. **Immediate Next Steps** - Clear, actionable first steps\n4. **Decisions Made** - Choices with rationale (not just outcomes)\n\nUse the template structure in [references/handoff-template.md](references/handoff-template.md) for guidance.",
+      "chars": 452,
+      "units": [
+        "para:d71c052e",
+        "para:1e0746e2",
+        "para:406ac553",
+        "para:a880a619",
+        "para:08622143",
+        "para:95df5b59"
+      ]
+    },
+    {
+      "id": "s025",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "Step 3: Validate the Handoff",
+      "text": "Run the validation script to check completeness and security:\n\n```bash\npython scripts/validate_handoff.py <handoff-file>\n```\n\nThe validator checks:\n- [ ] No `[TODO: ...]` placeholders remaining\n- [ ] Required sections present and populated\n- [ ] No potential secrets detected (API keys, passwords, tokens)\n- [ ] Referenced files exist\n- [ ] Quality score (0-100)\n\n**Do not finalize a handoff with secrets detected or score below 70.**",
+      "chars": 434,
+      "units": [
+        "para:db3d7f55",
+        "para:3ab0b761",
+        "para:b6312eb6",
+        "para:5c38fc96",
+        "para:a6355737",
+        "para:112bbdad",
+        "para:de99f239",
+        "para:8d10684e",
+        "para:85cbdc2c"
+      ]
+    },
+    {
+      "id": "s026",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "Step 4: Confirm Handoff",
+      "text": "Report to user:\n- Handoff file location\n- Validation score and any warnings\n- Summary of captured context\n- First action item for next session",
+      "chars": 142,
+      "units": [
+        "para:8fb375e8",
+        "para:6e07a689",
+        "para:c06fc0b7",
+        "para:273c7a46",
+        "para:ded67c86"
+      ]
+    },
+    {
+      "id": "s027",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "Step 1: Find Available Handoffs",
+      "text": "List handoffs in the current project:\n\n```bash\npython scripts/list_handoffs.py\n```\n\nThis shows all handoffs with dates, titles, and completion status.",
+      "chars": 150,
+      "units": [
+        "para:6f864038",
+        "para:1d778555",
+        "para:9e754340"
+      ]
+    },
+    {
+      "id": "s028",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "Step 2: Check Staleness",
+      "text": "Before loading, check how current the handoff is:\n\n```bash\npython scripts/check_staleness.py <handoff-file>\n```\n\nStaleness levels:\n- **FRESH**: Safe to resume - minimal changes since handoff\n- **SLIGHTLY_STALE**: Review changes, then resume\n- **STALE**: Verify context carefully before resuming\n- **VERY_STALE**: Consider creating a fresh handoff\n\nThe script checks:\n- Time since handoff was created\n- Git commits since handoff\n- Files changed since handoff\n- Branch divergence\n- Missing referenced files",
+      "chars": 504,
+      "units": [
+        "para:d9846bd2",
+        "para:edb86d67",
+        "para:58170b21",
+        "para:ef9ac2fe",
+        "para:8388fd43",
+        "para:858aad38",
+        "para:b828e941",
+        "para:6a04c6a5",
+        "para:04efa583",
+        "para:dc9d3ba1",
+        "para:1a199131"
+      ]
+    },
+    {
+      "id": "s029",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "Step 3: Load the Handoff",
+      "text": "Read the relevant handoff document completely before taking any action.\n\nIf handoff is part of a chain (has \"Continues from\" link), also read the linked previous handoff for full context.",
+      "chars": 187,
+      "units": [
+        "para:7665fc84",
+        "para:792c53d5"
+      ]
+    },
+    {
+      "id": "s030",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "Step 4: Verify Context",
+      "text": "Follow the checklist in [references/resume-checklist.md](references/resume-checklist.md):\n\n1. Verify project directory and git branch match\n2. Check if blockers have been resolved\n3. Validate assumptions still hold\n4. Review modified files for conflicts\n5. Check environment state",
+      "chars": 280,
+      "units": [
+        "para:27c6f3b1",
+        "para:a89db29d",
+        "para:e3090189",
+        "para:ab9c095d",
+        "para:b0ef5554",
+        "para:85c01d15"
+      ]
+    },
+    {
+      "id": "s031",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "Step 5: Begin Work",
+      "text": "Start with \"Immediate Next Steps\" item #1 from the handoff document.\n\nReference these sections as you work:\n- \"Critical Files\" for important locations\n- \"Key Patterns Discovered\" for conventions to follow\n- \"Potential Gotchas\" to avoid known issues",
+      "chars": 248,
+      "units": [
+        "para:49003ded",
+        "para:47112208",
+        "para:a31cbf1d",
+        "para:774b1dcd",
+        "para:dba03f6a"
+      ]
+    },
+    {
+      "id": "s032",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "Step 6: Update or Chain Handoffs",
+      "text": "As you work:\n- Mark completed items in \"Pending Work\"\n- Add new discoveries to relevant sections\n- For long sessions: create a new handoff with `--continues-from` to chain them",
+      "chars": 176,
+      "units": [
+        "para:1bfce5b1",
+        "para:60ca1447",
+        "para:1674fbee",
+        "para:1b85a804"
+      ]
+    },
+    {
+      "id": "s033",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "Handoff Chaining",
+      "text": "For long-running projects, chain handoffs together to maintain context lineage:\n\n```\nhandoff-1.md (initial work)\n    \u2193\nhandoff-2.md --continues-from handoff-1.md\n    \u2193\nhandoff-3.md --continues-from handoff-2.md\n```\n\nEach handoff in the chain:\n- Links to its predecessor\n- Can mark older handoffs as superseded\n- Provides context breadcrumbs for new agents\n\nWhen resuming from a chain, read the most recent handoff first, then reference predecessors as needed.",
+      "chars": 459,
+      "units": [
+        "para:d100f2f8",
+        "para:5b024994",
+        "para:fe2228cb",
+        "para:d9bb8cd9",
+        "para:eb8f1346",
+        "para:4f28f7de",
+        "para:3e19ccff"
+      ]
+    },
+    {
+      "id": "s034",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "Storage Location",
+      "text": "Handoffs are stored in: `.claude/handoffs/`\n\nNaming convention: `YYYY-MM-DD-HHMMSS-[slug].md`\n\nExample: `2024-01-15-143022-implementing-auth.md`",
+      "chars": 144,
+      "units": [
+        "para:774d843b",
+        "para:28bb66e2",
+        "para:72dd6879"
+      ]
+    },
+    {
+      "id": "s035",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "scripts/",
+      "text": "| Script | Purpose |\n|--------|---------|\n| `create_handoff.py [slug] [--continues-from <file>]` | Generate new handoff with smart scaffolding |\n| `list_handoffs.py [path]` | List available handoffs in a project |\n| `validate_handoff.py <file>` | Check completeness, quality, and security |\n| `check_staleness.py <file>` | Assess if handoff context is still current |",
+      "chars": 367,
+      "units": [
+        "para:ac04b484",
+        "para:29e16258",
+        "para:22fb355f",
+        "para:f9493e62"
+      ]
+    },
+    {
+      "id": "s036",
+      "file": "skills/session-handoff/SKILL.md",
+      "heading": "references/",
+      "text": "- [handoff-template.md](references/handoff-template.md) - Complete template structure with guidance\n- [resume-checklist.md](references/resume-checklist.md) - Verification checklist for resuming agents",
+      "chars": 200,
+      "units": [
+        "para:d94d27b1",
+        "para:cf3de253"
+      ]
+    },
+    {
+      "id": "s037",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Handoff Template",
+      "text": "Use this template structure when creating handoff documents. The smart scaffold script will pre-fill metadata sections; complete the remaining sections based on session context.",
+      "chars": 177,
+      "units": [
+        "para:76782ca8"
+      ]
+    },
+    {
+      "id": "s038",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Table of Contents",
+      "text": "- [Session Metadata](#session-metadata)\n- [Current State Summary](#current-state-summary)\n- [Codebase Understanding](#codebase-understanding)\n  - [Architecture Overview](#architecture-overview)\n  - [Critical Files](#critical-files)\n  - [Key Patterns Discovered](#key-patterns-discovered)\n- [Work Completed](#work-completed)\n  - [Tasks Finished](#tasks-finished)\n  - [Files Modified](#files-modified)\n  - [Decisions Made](#decisions-made)\n- [Pending Work](#pending-work)\n  - [Immediate Next Steps](#immediate-next-steps)\n  - [Blockers/Open Questions](#blockersopen-questions)\n  - [Deferred Items](#deferred-items)\n- [Context for Resuming Agent](#context-for-resuming-agent)\n  - [Important Context](#important-context)\n  - [Assumptions Made](#assumptions-made)\n  - [Potential Gotchas](#potential-gotchas)\n- [Environment State](#environment-state)\n- [Related Resources](#related-resources)\n- [Template Usage Notes](#template-usage-notes)\n\n---",
+      "chars": 939,
+      "units": [
+        "para:51a7ae99",
+        "para:6521b7e5",
+        "para:0753d8d1",
+        "para:390c7c01",
+        "para:2fc2faab",
+        "para:69c048cc",
+        "para:8972647a",
+        "para:c641c811",
+        "para:9540305c",
+        "para:1ccfb50a",
+        "para:1ffb4356",
+        "para:6db6a8a3",
+        "para:ecf1b5c2",
+        "para:36a1a295",
+        "para:65b8b56b",
+        "para:1118cded",
+        "para:a2b1bf6d",
+        "para:679d6927",
+        "para:ccfaa6d2",
+        "para:2c59c4c5",
+        "para:160aff59"
+      ]
+    },
+    {
+      "id": "s039",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Current State Summary",
+      "text": "[One paragraph: What was being worked on, current status, and where things left off]",
+      "chars": 84,
+      "units": [
+        "para:25ee2b58"
+      ]
+    },
+    {
+      "id": "s040",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Architecture Overview",
+      "text": "[Key architectural insights discovered during this session - how the system is structured, main components, data flow]",
+      "chars": 118,
+      "units": [
+        "para:8f837074"
+      ]
+    },
+    {
+      "id": "s041",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Critical Files",
+      "text": "| File | Purpose | Relevance |\n|------|---------|-----------|\n| path/to/file | What this file does | Why it matters for this task |",
+      "chars": 131,
+      "units": [
+        "para:c23feff8",
+        "para:07215387"
+      ]
+    },
+    {
+      "id": "s042",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Key Patterns Discovered",
+      "text": "[Important patterns, conventions, or idioms found in this codebase that the next agent should follow]",
+      "chars": 101,
+      "units": [
+        "para:d7a747e6"
+      ]
+    },
+    {
+      "id": "s043",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Tasks Finished",
+      "text": "- [x] Task 1 - brief description of what was done\n- [x] Task 2 - brief description",
+      "chars": 82,
+      "units": [
+        "para:7c5d6f93",
+        "para:9e78b0ba"
+      ]
+    },
+    {
+      "id": "s044",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Files Modified",
+      "text": "| File | Changes | Rationale |\n|------|---------|-----------|\n| path/to/file | Description of changes | Why this change was made |",
+      "chars": 130,
+      "units": [
+        "para:0435d6c0",
+        "para:8c5a032c"
+      ]
+    },
+    {
+      "id": "s045",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Decisions Made",
+      "text": "| Decision | Options Considered | Rationale |\n|----------|-------------------|-----------|\n| Chose X over Y | X, Y, Z | Why X was chosen |",
+      "chars": 138,
+      "units": [
+        "para:a603aea4",
+        "para:90072ca4"
+      ]
+    },
+    {
+      "id": "s046",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Immediate Next Steps",
+      "text": "1. [Most critical next action - what to do first]\n2. [Second priority]\n3. [Third priority]",
+      "chars": 90,
+      "units": [
+        "para:5ab1486e",
+        "para:95fcb250",
+        "para:e99eb67f"
+      ]
+    },
+    {
+      "id": "s047",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Blockers/Open Questions",
+      "text": "- [ ] Blocker: [description] - Needs: [what's required to unblock]\n- [ ] Question: [unclear aspect] - Suggested: [potential resolution]",
+      "chars": 135,
+      "units": [
+        "para:4db8c7e0",
+        "para:98ac7080"
+      ]
+    },
+    {
+      "id": "s048",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Deferred Items",
+      "text": "- Item 1 (deferred because: [reason, e.g., out of scope, needs user input])",
+      "chars": 75,
+      "units": [
+        "para:de12a69b"
+      ]
+    },
+    {
+      "id": "s049",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Important Context",
+      "text": "[Critical information the next agent MUST know to continue effectively - this is the most important section for handoff]",
+      "chars": 120,
+      "units": [
+        "para:e0908375"
+      ]
+    },
+    {
+      "id": "s050",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Assumptions Made",
+      "text": "- Assumption 1: [what was assumed to be true]\n- Assumption 2: [another assumption]",
+      "chars": 82,
+      "units": [
+        "para:eb2bb260",
+        "para:6a6f8bdd"
+      ]
+    },
+    {
+      "id": "s051",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Potential Gotchas",
+      "text": "- [Things that might trip up a new agent - edge cases, quirks, non-obvious behavior]",
+      "chars": 84,
+      "units": [
+        "para:4bd10c31"
+      ]
+    },
+    {
+      "id": "s052",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Environment Variables",
+      "text": "- [Key env vars that matter for this work - DO NOT include secrets/values, just names]",
+      "chars": 86,
+      "units": [
+        "para:b9b78438"
+      ]
+    },
+    {
+      "id": "s053",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "heading": "Template Usage Notes",
+      "text": "When filling this template:\n1. Be specific and concrete - vague descriptions don't help the next agent\n2. Include file paths with line numbers where relevant (e.g., `src/auth.ts:142`)\n3. Prioritize the \"Important Context\" and \"Immediate Next Steps\" sections\n4. Don't include sensitive data (API keys, passwords, tokens)\n5. Focus on WHAT and WHY, not just WHAT - rationale is crucial for handoffs",
+      "chars": 395,
+      "units": [
+        "para:7e876851",
+        "para:6ec618a0",
+        "para:fec4490d",
+        "para:fbd95aaa",
+        "para:dc2eeda6",
+        "para:a7b248af"
+      ]
+    },
+    {
+      "id": "s054",
+      "file": "skills/session-handoff/references/resume-checklist.md",
+      "heading": "Resume Checklist",
+      "text": "Follow this checklist when resuming work from a handoff document to ensure zero-ambiguity continuation.",
+      "chars": 103,
+      "units": [
+        "para:4650e3d9"
+      ]
+    },
+    {
+      "id": "s055",
+      "file": "skills/session-handoff/references/resume-checklist.md",
+      "heading": "Pre-Resume Verification",
+      "text": "- [ ] Read the entire handoff document before taking any action\n- [ ] Verify you are in the correct project directory\n- [ ] Confirm the git branch matches (or understand why it might differ)\n- [ ] Check the handoff timestamp - how stale is this context?",
+      "chars": 253,
+      "units": [
+        "para:e0cdc662",
+        "para:0b3d2bc8",
+        "para:92570205",
+        "para:e426c9fe"
+      ]
+    },
+    {
+      "id": "s056",
+      "file": "skills/session-handoff/references/resume-checklist.md",
+      "heading": "Context Validation",
+      "text": "- [ ] Review \"Important Context\" section thoroughly\n- [ ] Understand all assumptions listed - are they still valid?\n- [ ] Check if any blockers have been resolved since handoff\n- [ ] Review \"Potential Gotchas\" to avoid known pitfalls",
+      "chars": 233,
+      "units": [
+        "para:d18a34b6",
+        "para:304f683a",
+        "para:acd2d87c",
+        "para:9bc80b04"
+      ]
+    },
+    {
+      "id": "s057",
+      "file": "skills/session-handoff/references/resume-checklist.md",
+      "heading": "State Verification",
+      "text": "- [ ] Run `git status` to see current file state\n- [ ] Compare modified files list in handoff vs current state\n- [ ] Check if any environment variables need to be set\n- [ ] Verify any required services/processes are running",
+      "chars": 223,
+      "units": [
+        "para:701da1f6",
+        "para:4fc483e7",
+        "para:e9d960c8",
+        "para:000fb83e"
+      ]
+    },
+    {
+      "id": "s058",
+      "file": "skills/session-handoff/references/resume-checklist.md",
+      "heading": "Resume Execution",
+      "text": "- [ ] Start with \"Immediate Next Steps\" item #1\n- [ ] Reference \"Files Modified\" table for context on recent changes\n- [ ] Apply patterns documented in \"Key Patterns Discovered\"\n- [ ] Follow architectural insights from \"Architecture Overview\"",
+      "chars": 242,
+      "units": [
+        "para:69f3151a",
+        "para:a50eefef",
+        "para:21dc86c1",
+        "para:5a0894be"
+      ]
+    },
+    {
+      "id": "s059",
+      "file": "skills/session-handoff/references/resume-checklist.md",
+      "heading": "During Work",
+      "text": "- [ ] Update handoff document if major new context is discovered\n- [ ] Mark completed items in \"Pending Work\" as you finish them\n- [ ] Add new blockers/questions as they arise\n- [ ] Consider creating a new handoff if session becomes long",
+      "chars": 237,
+      "units": [
+        "para:e174473c",
+        "para:4d1a65ae",
+        "para:f3ff142a",
+        "para:805b6a5c"
+      ]
+    },
+    {
+      "id": "s060",
+      "file": "skills/session-handoff/references/resume-checklist.md",
+      "heading": "Red Flags - Stop and Verify",
+      "text": "If you encounter any of these, pause and verify context before proceeding:\n\n1. **Files mentioned in handoff don't exist** - codebase may have changed significantly\n2. **Branch has diverged substantially** - check git log for recent commits\n3. **Assumptions are clearly invalid** - reassess the approach\n4. **Blockers marked as unresolved are now blocking you** - escalate to user\n5. **Architecture has changed** - re-explore before continuing",
+      "chars": 442,
+      "units": [
+        "para:80d0361f",
+        "para:7be4b4cf",
+        "para:b49ee478",
+        "para:c230b847",
+        "para:de365556",
+        "para:da469b27"
+      ]
+    },
+    {
+      "id": "s061",
+      "file": "skills/session-handoff/references/resume-checklist.md",
+      "heading": "Quick Start Commands",
+      "text": "After reading the handoff, these commands help verify state:\n\n```bash\n# Check current branch and status\ngit branch --show-current\ngit status\n\n# See recent commits (compare with handoff)\ngit log --oneline -10\n\n# Check for any running processes mentioned\nps aux | grep [process-name]\n\n# Verify environment\nenv | grep [relevant-var]\n```",
+      "chars": 333,
+      "units": [
+        "para:3c886e93",
+        "para:4c02abe9"
+      ]
+    },
+    {
+      "id": "s062",
+      "file": "skills/session-handoff/references/resume-checklist.md",
+      "heading": "Handoff Quality Assessment",
+      "text": "Rate the handoff quality to identify if more exploration is needed:\n\n| Aspect | Good | Needs Exploration |\n|--------|------|-------------------|\n| Next steps | Clear, actionable | Vague or missing |\n| File references | Specific paths/lines | General descriptions |\n| Decisions | Rationale included | Just outcomes |\n| Context | Complete picture | Gaps or assumptions |\n\nIf multiple aspects \"Need Exploration\", spend time re-exploring the codebase before continuing implementation.",
+      "chars": 480,
+      "units": [
+        "para:4e149d82",
+        "para:bfaaeda9",
+        "para:844c6f06",
+        "para:126a6edb",
+        "para:606ab686",
+        "para:d4ae102e",
+        "para:605226fb"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "skills/session-handoff/scripts/check_staleness.py",
+      "status": "changed",
+      "lines": 316,
+      "kept": 283
+    },
+    {
+      "path": "skills/session-handoff/scripts/create_handoff.py",
+      "status": "changed",
+      "lines": 285,
+      "kept": 240
+    },
+    {
+      "path": "skills/session-handoff/scripts/list_handoffs.py",
+      "status": "changed",
+      "lines": 99,
+      "kept": 92
+    },
+    {
+      "path": "skills/session-handoff/scripts/validate_handoff.py",
+      "status": "changed",
+      "lines": 262,
+      "kept": 208
+    }
+  ],
+  "phrase_fate": {
+    "kept": 15.24,
+    "moved": 1.97,
+    "gone": 82.79,
+    "new": 93.73
+  }
+}

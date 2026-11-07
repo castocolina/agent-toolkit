@@ -1,0 +1,1087 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/jira/README.md",
+      "heading": "Jira Skill",
+      "text": "Natural language interaction with Jira for managing issues, sprints, and workflows. This skill enables Claude to view, create, update, and transition Jira tickets using conversational commands.",
+      "chars": 193,
+      "units": [
+        "para:5ae5325a"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/jira/README.md",
+      "heading": "Purpose",
+      "text": "The Jira skill bridges the gap between natural language requests and Jira operations. Instead of remembering specific CLI commands or API calls, you can simply tell Claude what you want to do with your Jira tickets, and the skill handles the technical details.\n\nKey benefits:\n- **Conversational interface**: Ask questions like \"What are my open tickets?\" or \"Move PROJ-123 to Done\"\n- **Dual backend support**: Works with either the jira CLI or Atlassian MCP\n- **Safety-first approach**: Always fetches current state before modifications and requires approval for changes\n- **Context-aware**: Detects issue keys (e.g., PROJ-123) in conversation and offers relevant actions",
+      "chars": 671,
+      "units": [
+        "para:b7f0ca3d",
+        "para:6e8c9a89",
+        "para:505a8848",
+        "para:8a8bc36b",
+        "para:cc18de2a"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/jira/README.md",
+      "heading": "When to Use",
+      "text": "This skill activates when you:\n\n- Mention Jira issue keys (e.g., \"Show me PROJ-123\", \"What's the status of ABC-456?\")\n- Ask about tickets (\"List my open tickets\", \"What's assigned to me?\")\n- Want to create issues (\"Create a bug ticket for the login issue\")\n- Need to update tickets (\"Move this to In Progress\", \"Assign PROJ-123 to me\")\n- Check sprint status (\"What's in the current sprint?\", \"Show sprint backlog\")\n- Manage workflow (\"Close this ticket\", \"Add a comment to PROJ-123\")\n\n**Trigger phrases include:**\n- \"create a jira ticket\"\n- \"show me PROJ-123\"\n- \"list my tickets\"\n- \"move ticket to done\"\n- \"what's in the current sprint\"\n- Any mention of \"jira\", \"issue\", \"ticket\", \"sprint\", or \"backlog\"",
+      "chars": 703,
+      "units": [
+        "para:6f6b2f2a",
+        "para:4d91b974",
+        "para:c77ab3d3",
+        "para:ed75838e",
+        "para:88db4a22",
+        "para:3ee52e9e",
+        "para:8e9e6895",
+        "para:a9a950d1",
+        "para:052d0187",
+        "para:6dc767ad",
+        "para:dd21e0fc",
+        "para:e2e8922d",
+        "para:74572488",
+        "para:0e418de3"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/jira/README.md",
+      "heading": "1. Backend Detection",
+      "text": "When activated, the skill first determines which backend is available:\n\n1. **CLI backend**: Checks if the `jira` command is installed\n2. **MCP backend**: Looks for Atlassian MCP tools (`mcp__atlassian__*`)\n3. **No backend**: Guides you to install one of the above",
+      "chars": 263,
+      "units": [
+        "para:fb8bbbff",
+        "para:aeafb1ef",
+        "para:adfe1001",
+        "para:642e83b8"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/jira/README.md",
+      "heading": "2. Operation Execution",
+      "text": "Once a backend is detected:\n\n1. **Read operations** (viewing, listing): Execute immediately and display results\n2. **Write operations** (create, update, transition):\n   - Fetch current issue state first\n   - Show proposed changes\n   - Request user approval\n   - Execute the operation\n   - Verify the result",
+      "chars": 306,
+      "units": [
+        "para:72554aac",
+        "para:ef94acc5",
+        "para:22e574a7",
+        "para:74b71540",
+        "para:8fc23484",
+        "para:734950d2",
+        "para:d03ec5d3",
+        "para:74f9f230"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/jira/README.md",
+      "heading": "3. Safety Checks",
+      "text": "Before any modification, the skill:\n\n- Fetches current issue state (never assumes status or assignee)\n- Checks who else might be affected (watchers, linked issues)\n- Verifies the operation is reversible or warns if not\n- Confirms correct identifiers (transition IDs, account IDs)",
+      "chars": 279,
+      "units": [
+        "para:20581717",
+        "para:8869fd41",
+        "para:ab914c29",
+        "para:1c858905",
+        "para:500d0ae9"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/jira/README.md",
+      "heading": "Issue Management",
+      "text": "- **View issues**: See full details including description, status, assignee, and comments\n- **List issues**: Filter by assignee, status, type, priority, labels, or custom JQL\n- **Create issues**: Create tickets with full field support including multi-line descriptions\n- **Update issues**: Modify summary, description, priority, labels, and custom fields\n- **Assign issues**: Assign to yourself, others, or unassign",
+      "chars": 415,
+      "units": [
+        "para:bbba50b3",
+        "para:2d0e2d93",
+        "para:85afd124",
+        "para:c352d6c3",
+        "para:d892e23c"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/jira/README.md",
+      "heading": "Workflow Operations",
+      "text": "- **Transition issues**: Move tickets through workflow states (To Do, In Progress, Done)\n- **Add comments**: Document progress or decisions on tickets\n- **Link issues**: Create relationships between tickets (blocks, relates to, duplicates)",
+      "chars": 239,
+      "units": [
+        "para:145652e8",
+        "para:9a6a623b",
+        "para:af6cf852"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/jira/README.md",
+      "heading": "Sprint Management",
+      "text": "- **List sprints**: View active, future, or closed sprints\n- **Sprint issues**: See what's in the current sprint\n- **Add to sprint**: Move issues into a sprint",
+      "chars": 159,
+      "units": [
+        "para:95f90cad",
+        "para:0631939e",
+        "para:829d7f12"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/jira/README.md",
+      "heading": "Search and Query",
+      "text": "- **Natural language search**: Find issues matching text queries\n- **JQL support**: Use full Jira Query Language for complex searches\n- **Filter combinations**: Combine assignee, status, type, and date filters",
+      "chars": 209,
+      "units": [
+        "para:a2d3655d",
+        "para:16ec3bcb",
+        "para:2936ae68"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/jira/README.md",
+      "heading": "Viewing Issues",
+      "text": "```\n\"Show me PROJ-123\"\n\"What's the status of ABC-456?\"\n\"Display the details of that bug ticket\"\n```",
+      "chars": 99,
+      "units": [
+        "para:c2c05f0a"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/jira/README.md",
+      "heading": "Listing Issues",
+      "text": "```\n\"List my open tickets\"\n\"What issues are in progress?\"\n\"Show me high priority bugs\"\n\"Find all tickets updated this week\"\n\"What's assigned to john@example.com?\"\n```",
+      "chars": 166,
+      "units": [
+        "para:b3291373"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/jira/README.md",
+      "heading": "Creating Issues",
+      "text": "```\n\"Create a bug ticket for the login timeout issue\"\n\"Make a new task for updating the documentation\"\n\"Create a story for implementing the export feature with acceptance criteria\"\n```",
+      "chars": 184,
+      "units": [
+        "para:78119591"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/jira/README.md",
+      "heading": "Updating Issues",
+      "text": "```\n\"Move PROJ-123 to In Progress\"\n\"Assign this ticket to me\"\n\"Mark the bug as done\"\n\"Add a comment saying the fix is deployed\"\n\"Change the priority to high\"\n```",
+      "chars": 161,
+      "units": [
+        "para:2179c261"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/jira/README.md",
+      "heading": "Sprint Operations",
+      "text": "```\n\"What's in the current sprint?\"\n\"Show me the active sprint\"\n\"List sprint backlog items\"\n```",
+      "chars": 95,
+      "units": [
+        "para:1370dea4"
+      ]
+    },
+    {
+      "id": "s016",
+      "file": "skills/jira/README.md",
+      "heading": "Advanced JQL Queries",
+      "text": "```\n\"Find all bugs created this week\"\n\"Show unassigned high-priority issues\"\n\"List tickets I updated recently\"\n\"Find issues blocked by PROJ-100\"\n```",
+      "chars": 148,
+      "units": [
+        "para:09925289"
+      ]
+    },
+    {
+      "id": "s017",
+      "file": "skills/jira/README.md",
+      "heading": "Option 1: jira CLI (Recommended)",
+      "text": "The jira CLI provides fast, local access to Jira.\n\n**Installation:**\n```bash\n# macOS\nbrew install ankitpokhrel/jira-cli/jira-cli\n\n# Linux\n# Download from https://github.com/ankitpokhrel/jira-cli/releases\n```\n\n**Setup:**\n```bash\njira init\n```\n\nFollow the prompts to configure your Jira server URL and authentication.",
+      "chars": 315,
+      "units": [
+        "para:53aed7ea",
+        "para:6ee08c2c",
+        "para:23540b2e",
+        "para:bb9dbc99"
+      ]
+    },
+    {
+      "id": "s018",
+      "file": "skills/jira/README.md",
+      "heading": "Option 2: Atlassian MCP",
+      "text": "The Atlassian MCP provides Jira access through Model Context Protocol.\n\nConfigure the Atlassian MCP in your Claude settings with your Atlassian credentials. This enables access to `mcp__atlassian__*` tools.",
+      "chars": 206,
+      "units": [
+        "para:71577e61",
+        "para:79f52678"
+      ]
+    },
+    {
+      "id": "s019",
+      "file": "skills/jira/README.md",
+      "heading": "Issue View",
+      "text": "When viewing an issue, you'll see:\n- Issue key and summary\n- Status, priority, and type\n- Assignee and reporter\n- Description\n- Recent comments\n- Linked issues",
+      "chars": 159,
+      "units": [
+        "para:bbac3452",
+        "para:728ec2f6",
+        "para:db120eec",
+        "para:44fa1908"
+      ]
+    },
+    {
+      "id": "s020",
+      "file": "skills/jira/README.md",
+      "heading": "Issue Lists",
+      "text": "Lists display in a table format showing:\n- Issue key\n- Summary\n- Status\n- Assignee\n- Priority",
+      "chars": 93,
+      "units": [
+        "para:d4270f87"
+      ]
+    },
+    {
+      "id": "s021",
+      "file": "skills/jira/README.md",
+      "heading": "Operation Results",
+      "text": "After modifications, the skill:\n- Confirms the action was successful\n- Shows the updated state\n- Reports any errors with resolution guidance",
+      "chars": 140,
+      "units": [
+        "para:872b51ba",
+        "para:d717022d",
+        "para:77c1ec37",
+        "para:578f43d5"
+      ]
+    },
+    {
+      "id": "s022",
+      "file": "skills/jira/README.md",
+      "heading": "Before Creating Issues",
+      "text": "1. Check if a similar issue already exists\n2. Understand the project's required fields\n3. Use clear, descriptive summaries\n4. Include acceptance criteria for stories",
+      "chars": 165,
+      "units": [
+        "para:55a2595c",
+        "para:7124b4c8",
+        "para:7d075bb2",
+        "para:ccec550b"
+      ]
+    },
+    {
+      "id": "s023",
+      "file": "skills/jira/README.md",
+      "heading": "Before Transitioning",
+      "text": "1. Let the skill fetch available transitions (they vary by project)\n2. Some workflows require intermediate states\n3. Add comments explaining why you're making the transition",
+      "chars": 173,
+      "units": [
+        "para:9facd5e9",
+        "para:20d44f8a",
+        "para:7d4ee53f"
+      ]
+    },
+    {
+      "id": "s024",
+      "file": "skills/jira/README.md",
+      "heading": "For Assignments",
+      "text": "1. With MCP, always use account IDs (not display names)\n2. Verify the user exists in the project\n3. Consider notifying the assignee separately",
+      "chars": 142,
+      "units": [
+        "para:637a502a",
+        "para:37253ab7",
+        "para:0c2e6c89"
+      ]
+    },
+    {
+      "id": "s025",
+      "file": "skills/jira/README.md",
+      "heading": "For Bulk Operations",
+      "text": "1. Request explicit approval before bulk changes\n2. Each change notifies watchers\n3. Consider timing to avoid notification storms",
+      "chars": 129,
+      "units": [
+        "para:6a55a289",
+        "para:b5b05c81",
+        "para:96f1b686"
+      ]
+    },
+    {
+      "id": "s026",
+      "file": "skills/jira/README.md",
+      "heading": "General Tips",
+      "text": "- Always let the skill fetch current state before modifications\n- Preserve original information when editing descriptions\n- Use the \"open in browser\" feature for complex editing\n- Check linked issues before making major changes",
+      "chars": 227,
+      "units": [
+        "para:e1de501c",
+        "para:3ef749e9",
+        "para:4cdc6500",
+        "para:c0cf61e4"
+      ]
+    },
+    {
+      "id": "s027",
+      "file": "skills/jira/README.md",
+      "heading": "Safety Guidelines",
+      "text": "The skill follows strict safety protocols:\n\n**Always:**\n- Shows commands/tool calls before executing\n- Requests approval before modifications\n- Preserves original content when editing\n- Verifies updates after applying\n- Surfaces authentication issues clearly\n\n**Never:**\n- Transitions without fetching current status first\n- Assigns using display names with MCP (only account IDs work)\n- Edits descriptions without showing the original\n- Uses `--no-input` without all required fields\n- Assumes transition names are universal across projects\n- Bulk-modifies without explicit approval",
+      "chars": 582,
+      "units": [
+        "para:abbee675",
+        "para:5517589b",
+        "para:03ce2de3",
+        "para:fbc24667",
+        "para:d352c190",
+        "para:5828e87e",
+        "para:cf8d517c",
+        "para:74780a96",
+        "para:82920d10",
+        "para:459afbdb",
+        "para:29906845",
+        "para:55c03e6e"
+      ]
+    },
+    {
+      "id": "s028",
+      "file": "skills/jira/README.md",
+      "heading": "Authentication Issues",
+      "text": "**CLI:**\n```bash\n# Reinitialize\njira init\n\n# Verify connection\njira me\n```\n\n**MCP:**\n- Check MCP connection status\n- Reconnect the Atlassian service\n- Verify API token permissions",
+      "chars": 179,
+      "units": [
+        "para:b765bca8",
+        "para:bc5274ee",
+        "para:0e238bff",
+        "para:04b19e8a"
+      ]
+    },
+    {
+      "id": "s029",
+      "file": "skills/jira/README.md",
+      "heading": "Common Errors",
+      "text": "| Error | Cause | Solution |\n|-------|-------|----------|\n| \"Issue not found\" | Invalid key | Verify the issue key is correct |\n| \"Transition not available\" | Workflow constraint | Check available transitions first |\n| \"Permission denied\" | Project access | Verify your Jira permissions |\n| \"Invalid assignee\" | Wrong ID format | Use account ID, not display name |\n| \"Required field missing\" | Project config | Check project's required fields |",
+      "chars": 444,
+      "units": [
+        "para:96b32861",
+        "para:854be6b1",
+        "para:55b39dbb",
+        "para:e2afc910",
+        "para:674ac4ad",
+        "para:130fb4f1"
+      ]
+    },
+    {
+      "id": "s030",
+      "file": "skills/jira/README.md",
+      "heading": "Backend Not Available",
+      "text": "If neither CLI nor MCP is available:\n\n1. **Install jira CLI** (recommended):\n   ```bash\n   brew install ankitpokhrel/jira-cli/jira-cli\n   jira init\n   ```\n\n2. **Or configure Atlassian MCP** in your Claude settings",
+      "chars": 213,
+      "units": [
+        "para:40890433",
+        "para:09435ee4",
+        "para:e45c0186",
+        "para:937ebfc3"
+      ]
+    },
+    {
+      "id": "s031",
+      "file": "skills/jira/README.md",
+      "heading": "Reference Files",
+      "text": "For advanced usage, the skill includes detailed reference documentation:\n\n- `references/commands.md`: Complete CLI command reference with examples\n- `references/mcp.md`: Full MCP tool reference with JQL query guide\n\nThese are loaded on-demand when handling complex operations like:\n- Multi-line descriptions\n- Complex JQL queries\n- Transition workflows\n- Issue linking",
+      "chars": 368,
+      "units": [
+        "para:f4bec245",
+        "para:2e933fda",
+        "para:50bd55c9",
+        "para:abece7b7",
+        "para:bb110d24",
+        "para:bfadac25"
+      ]
+    },
+    {
+      "id": "s032",
+      "file": "skills/jira/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: jira\ndescription: Use when the user mentions Jira issues (e.g., \"PROJ-123\"), asks about tickets, wants to create/view/update issues, check sprint status, or manage their Jira workflow. Triggers on keywords like \"jira\", \"issue\", \"ticket\", \"sprint\", \"backlog\", or issue key patterns.\n---",
+      "chars": 295,
+      "units": [
+        "para:55a03c76"
+      ]
+    },
+    {
+      "id": "s033",
+      "file": "skills/jira/SKILL.md",
+      "heading": "Backend Detection",
+      "text": "**Run this check first** to determine which backend to use:\n\n```\n1. Check if jira CLI is available:\n   \u2192 Run: which jira\n   \u2192 If found: USE CLI BACKEND\n\n2. If no CLI, check for Atlassian MCP:\n   \u2192 Look for mcp__atlassian__* tools\n   \u2192 If available: USE MCP BACKEND\n\n3. If neither available:\n   \u2192 GUIDE USER TO SETUP\n```\n\n| Backend | When to Use | Reference |\n|---------|-------------|-----------|\n| **CLI** | `jira` command available | `references/commands.md` |\n| **MCP** | Atlassian MCP tools available | `references/mcp.md` |\n| **None** | Neither available | Guide to install CLI |\n\n---",
+      "chars": 589,
+      "units": [
+        "para:6033f765",
+        "para:73cc7256",
+        "para:36d36601",
+        "para:30be80cf",
+        "para:55fe3422",
+        "para:4cb2bc53"
+      ]
+    },
+    {
+      "id": "s034",
+      "file": "skills/jira/SKILL.md",
+      "heading": "Quick Reference (CLI)",
+      "text": "> Skip this section if using MCP backend.\n\n| Intent | Command |\n|--------|---------|\n| View issue | `jira issue view ISSUE-KEY` |\n| List my issues | `jira issue list -a$(jira me)` |\n| My in-progress | `jira issue list -a$(jira me) -s\"In Progress\"` |\n| Create issue | `jira issue create -tType -s\"Summary\" -b\"Description\"` |\n| Move/transition | `jira issue move ISSUE-KEY \"State\"` |\n| Assign to me | `jira issue assign ISSUE-KEY $(jira me)` |\n| Unassign | `jira issue assign ISSUE-KEY x` |\n| Add comment | `jira issue comment add ISSUE-KEY -b\"Comment text\"` |\n| Open in browser | `jira open ISSUE-KEY` |\n| Current sprint | `jira sprint list --state active` |\n| Who am I | `jira me` |\n\n---",
+      "chars": 687,
+      "units": [
+        "para:f7c96bb0",
+        "para:8581336b",
+        "para:c0555945",
+        "para:28f302a2",
+        "para:dd656258",
+        "para:82baed54",
+        "para:7e3caac6",
+        "para:1dd2c399",
+        "para:e6407e65",
+        "para:dc538d77",
+        "para:f68bc330",
+        "para:9e709b43"
+      ]
+    },
+    {
+      "id": "s035",
+      "file": "skills/jira/SKILL.md",
+      "heading": "Quick Reference (MCP)",
+      "text": "> Skip this section if using CLI backend.\n\n| Intent | MCP Tool |\n|--------|----------|\n| Search issues | `mcp__atlassian__searchJiraIssuesUsingJql` |\n| View issue | `mcp__atlassian__getJiraIssue` |\n| Create issue | `mcp__atlassian__createJiraIssue` |\n| Update issue | `mcp__atlassian__editJiraIssue` |\n| Get transitions | `mcp__atlassian__getTransitionsForJiraIssue` |\n| Transition | `mcp__atlassian__transitionJiraIssue` |\n| Add comment | `mcp__atlassian__addCommentToJiraIssue` |\n| User lookup | `mcp__atlassian__lookupJiraAccountId` |\n| List projects | `mcp__atlassian__getVisibleJiraProjects` |\n\nSee `references/mcp.md` for full MCP patterns.\n\n---",
+      "chars": 651,
+      "units": [
+        "para:094d5eb9",
+        "para:ae4a97f4",
+        "para:fe0ac331",
+        "para:96fe8f3d",
+        "para:886a718e",
+        "para:e101576a",
+        "para:1cdc4a1f",
+        "para:1146637f",
+        "para:c0b9fbbc",
+        "para:0e2000c2",
+        "para:3eed0eb4"
+      ]
+    },
+    {
+      "id": "s036",
+      "file": "skills/jira/SKILL.md",
+      "heading": "Triggers",
+      "text": "- \"create a jira ticket\"\n- \"show me PROJ-123\"\n- \"list my tickets\"\n- \"move ticket to done\"\n- \"what's in the current sprint\"\n\n---",
+      "chars": 127,
+      "units": [
+        "para:052d0187",
+        "para:6dc767ad",
+        "para:dd21e0fc",
+        "para:e2e8922d",
+        "para:74572488"
+      ]
+    },
+    {
+      "id": "s037",
+      "file": "skills/jira/SKILL.md",
+      "heading": "Issue Key Detection",
+      "text": "Issue keys follow the pattern: `[A-Z]+-[0-9]+` (e.g., PROJ-123, ABC-1).\n\nWhen a user mentions an issue key in conversation:\n- **CLI:** `jira issue view KEY` or `jira open KEY`\n- **MCP:** `mcp__atlassian__jira_get_issue` with the key\n\n---",
+      "chars": 237,
+      "units": [
+        "para:a0c710ea",
+        "para:76ebbf88",
+        "para:d5383536",
+        "para:50fe262f"
+      ]
+    },
+    {
+      "id": "s038",
+      "file": "skills/jira/SKILL.md",
+      "heading": "Workflow",
+      "text": "**Creating tickets:**\n1. Research context if user references code/tickets/PRs\n2. Draft ticket content\n3. Review with user\n4. Create using appropriate backend\n\n**Updating tickets:**\n1. Fetch issue details first\n2. Check status (careful with in-progress tickets)\n3. Show current vs proposed changes\n4. Get approval before updating\n5. Add comment explaining changes\n\n---",
+      "chars": 367,
+      "units": [
+        "para:534c2a77",
+        "para:f5fc6250",
+        "para:41474ba8",
+        "para:713077fd",
+        "para:ae8405e9",
+        "para:a94e051d",
+        "para:4586472f",
+        "para:f9394ace",
+        "para:24f23375"
+      ]
+    },
+    {
+      "id": "s039",
+      "file": "skills/jira/SKILL.md",
+      "heading": "Before Any Operation",
+      "text": "Ask yourself:\n\n1. **What's the current state?** \u2014 Always fetch the issue first. Don't assume status, assignee, or fields are what user thinks they are.\n\n2. **Who else is affected?** \u2014 Check watchers, linked issues, parent epics. A \"simple edit\" might notify 10 people.\n\n3. **Is this reversible?** \u2014 Transitions may have one-way gates. Some workflows require intermediate states. Description edits have no undo.\n\n4. **Do I have the right identifiers?** \u2014 Issue keys, transition IDs, account IDs. Display names don't work for assignment (MCP).\n\n---",
+      "chars": 546,
+      "units": [
+        "para:c32607bd",
+        "para:0c77ca34",
+        "para:7b44324d",
+        "para:03313eb1"
+      ]
+    },
+    {
+      "id": "s040",
+      "file": "skills/jira/SKILL.md",
+      "heading": "NEVER",
+      "text": "- **NEVER transition without fetching current status** \u2014 Workflows may require intermediate states. \"To Do\" \u2192 \"Done\" might fail silently if \"In Progress\" is required first.\n\n- **NEVER assign using display name (MCP)** \u2014 Only account IDs work. Always call `lookupJiraAccountId` first, or assignment silently fails.\n\n- **NEVER edit description without showing original** \u2014 Jira has no undo. User must see what they're replacing.\n\n- **NEVER use `--no-input` without all required fields (CLI)** \u2014 Fails silently with cryptic errors. Check project's required fields first.\n\n- **NEVER assume transition names are universal** \u2014 \"Done\", \"Closed\", \"Complete\" vary by project. Always get available transitions first.\n\n- **NEVER bulk-modify without explicit approval** \u2014 Each ticket change notifies watchers. 10 edits = 10 notification storms.\n\n---",
+      "chars": 837,
+      "units": [
+        "para:9c72922c",
+        "para:3c1b5323",
+        "para:2edb8df2",
+        "para:8396b8a2",
+        "para:705dcacd",
+        "para:3bd0737b"
+      ]
+    },
+    {
+      "id": "s041",
+      "file": "skills/jira/SKILL.md",
+      "heading": "Safety",
+      "text": "- Always show the command/tool call before running it\n- Always get approval before modifying tickets\n- Preserve original information when editing\n- Verify updates after applying\n- Always surface authentication issues clearly so the user can resolve them\n\n---",
+      "chars": 258,
+      "units": [
+        "para:692e2074",
+        "para:e3ad7a8d",
+        "para:766e08bd",
+        "para:e46ccc44",
+        "para:3506009c"
+      ]
+    },
+    {
+      "id": "s042",
+      "file": "skills/jira/SKILL.md",
+      "heading": "No Backend Available",
+      "text": "If neither CLI nor MCP is available, guide the user:\n\n```\nTo use Jira, you need one of:\n\n1. **jira CLI** (recommended):\n   https://github.com/ankitpokhrel/jira-cli\n\n   Install: brew install ankitpokhrel/jira-cli/jira-cli\n   Setup:   jira init\n\n2. **Atlassian MCP**:\n   Configure in your MCP settings with Atlassian credentials.\n```\n\n---",
+      "chars": 336,
+      "units": [
+        "para:eb24f213",
+        "para:18bbc04f"
+      ]
+    },
+    {
+      "id": "s043",
+      "file": "skills/jira/SKILL.md",
+      "heading": "Deep Dive",
+      "text": "**LOAD reference when:**\n- Creating issues with complex fields or multi-line content\n- Building JQL queries beyond simple filters\n- Troubleshooting errors or authentication issues\n- Working with transitions, linking, or sprints\n\n**Do NOT load reference for:**\n- Simple view/list operations (Quick Reference above is sufficient)\n- Basic status checks (`jira issue view KEY`)\n- Opening issues in browser\n\n| Task | Load Reference? |\n|------|-----------------|\n| View single issue | No |\n| List my tickets | No |\n| Create with description | **Yes** \u2014 CLI needs `/tmp` pattern |\n| Transition issue | **Yes** \u2014 need transition ID workflow |\n| JQL search | **Yes** \u2014 for complex queries |\n| Link issues | **Yes** \u2014 MCP limitation, need script |\n\nReferences:\n- CLI patterns: `references/commands.md`\n- MCP patterns: `references/mcp.md`",
+      "chars": 827,
+      "units": [
+        "para:312a2e71",
+        "para:c6ef979c",
+        "para:b85bd3f4",
+        "para:c94c1bff",
+        "para:bc42158c",
+        "para:cbc37552",
+        "para:d228eed4",
+        "para:6169fef5",
+        "para:20cc8fb4",
+        "para:f3d36242",
+        "para:afd91707",
+        "para:a8c2d1c9",
+        "para:b362de89",
+        "para:5c37a674",
+        "para:d349a0f7",
+        "para:6bb7e792",
+        "para:a717c790",
+        "para:275a7d51"
+      ]
+    },
+    {
+      "id": "s044",
+      "file": "skills/jira/references/commands.md",
+      "heading": "Viewing Issues",
+      "text": "```bash\n# View single issue\njira issue view ISSUE-KEY\n\n# View with more comments\njira issue view ISSUE-KEY --comments 5\n\n# Get raw JSON\njira issue view ISSUE-KEY --raw\n```\n\n---",
+      "chars": 176,
+      "units": [
+        "para:7a667e2d"
+      ]
+    },
+    {
+      "id": "s045",
+      "file": "skills/jira/references/commands.md",
+      "heading": "Listing Issues",
+      "text": "```bash\n# List all issues in project\njira issue list\n\n# List my issues\njira issue list -a$(jira me)\n\n# Filter by status (use quotes for multi-word statuses)\njira issue list -s\"In Progress\"\njira issue list -s\"To Do\"\njira issue list -sDone\n\n# Filter by type\njira issue list -tBug\njira issue list -tStory\njira issue list -tTask\njira issue list -tEpic\n\n# Filter by priority\njira issue list -yHigh\njira issue list -yCritical\n\n# Filter by label\njira issue list -lurgent -lbug\n\n# Combine filters\njira issue list -a$(jira me) -s\"In Progress\" -yHigh\n\n# Search with text\njira issue list \"login error\"\n\n# Recently accessed\njira issue list --history\n\n# Issues I'm watching\njira issue list -w\n\n# Created/updated filters\njira issue list --created today\njira issue list --created week\njira issue list --updated -2d\n\n# Plain output for scripting\njira issue list --plain --no-headers\n\n# Specific columns\njira issue list --plain --columns key,summary,status,assignee\n\n# Raw JQL query\njira issue list -q\"status = 'In Progress' AND assignee = currentUser()\"\n\n# Paginate results\njira issue list --paginate 20\njira issue list --paginate 10:50 # start:limit\n```\n\n---",
+      "chars": 1143,
+      "units": [
+        "para:2d2fbd31"
+      ]
+    },
+    {
+      "id": "s046",
+      "file": "skills/jira/references/commands.md",
+      "heading": "Creating Issues",
+      "text": "```bash\n# Interactive creation\njira issue create\n\n# Non-interactive with all fields\njira issue create \\\n    -tBug \\\n    -s\"Login button not working\" \\\n    -b\"Users cannot click the login button on Safari\" \\\n    -yHigh \\\n    -lbug -lurgent\n\n# Create and assign to self\njira issue create -tTask -s\"Summary\" -a$(jira me)\n\n# Create subtask (requires parent)\njira issue create -tSub-task -P\"PROJ-123\" -s\"Subtask summary\"\n\n# Create with custom fields\njira issue create -tStory -s\"Summary\" --custom story-points=3\n\n# Skip prompts for optional fields\njira issue create -tTask -s\"Quick task\" --no-input\n\n# Open in browser after creation\njira issue create -tBug -s\"Bug title\" --web\n\n# Read description from file\njira issue create -tStory -s\"Summary\" --template /path/to/template.md\n\n# Read description from stdin\necho \"Description here\" | jira issue create -tTask -s\"Summary\"\n```\n\n**Multi-line content:** The CLI chokes on multi-line strings. Write to `/tmp` first:\n\n```bash\ncat > /tmp/jira_body.md <<'EOF'\n## Description\nUser needs ability to export data...\n\n## Acceptance Criteria\n- Export works for CSV\n- Export works for JSON\nEOF\n\njira issue create --no-input \\\n  -tStory \\\n  -pPROJ \\\n  -s\"Add export functionality\" \\\n  -b\"$(cat /tmp/jira_body.md)\"\n```\n\n---",
+      "chars": 1251,
+      "units": [
+        "para:60c1a123",
+        "para:ba1aec36",
+        "para:2fe5042c"
+      ]
+    },
+    {
+      "id": "s047",
+      "file": "skills/jira/references/commands.md",
+      "heading": "Transitioning Issues",
+      "text": "```bash\n# Move to a state\njira issue move ISSUE-KEY \"In Progress\"\njira issue move ISSUE-KEY \"Done\"\njira issue move ISSUE-KEY \"To Do\"\n\n# Move with comment\njira issue move ISSUE-KEY \"Done\" --comment \"Completed the implementation\"\n\n# Move and set resolution\njira issue move ISSUE-KEY \"Done\" -R\"Fixed\"\n\n# Move and reassign\njira issue move ISSUE-KEY \"In Review\" -a\"reviewer@example.com\"\n\n# Open in browser after transition\njira issue move ISSUE-KEY \"Done\" --web\n```\n\n---",
+      "chars": 465,
+      "units": [
+        "para:f5f1e35a"
+      ]
+    },
+    {
+      "id": "s048",
+      "file": "skills/jira/references/commands.md",
+      "heading": "Assigning Issues",
+      "text": "```bash\n# Assign to specific user\njira issue assign ISSUE-KEY \"user@example.com\"\njira issue assign ISSUE-KEY \"John Doe\"\n\n# Assign to self\njira issue assign ISSUE-KEY $(jira me)\n\n# Assign to default assignee\njira issue assign ISSUE-KEY default\n\n# Unassign\njira issue assign ISSUE-KEY x\n```\n\n---",
+      "chars": 293,
+      "units": [
+        "para:c2e6baf1"
+      ]
+    },
+    {
+      "id": "s049",
+      "file": "skills/jira/references/commands.md",
+      "heading": "Comments",
+      "text": "```bash\n# Add comment\njira issue comment add ISSUE-KEY -b\"This is my comment\"\n\n# Add comment from file\njira issue comment add ISSUE-KEY --template /path/to/comment.md\n```\n\n---",
+      "chars": 175,
+      "units": [
+        "para:8fa43e65"
+      ]
+    },
+    {
+      "id": "s050",
+      "file": "skills/jira/references/commands.md",
+      "heading": "Sprints",
+      "text": "```bash\n# List sprints\njira sprint list\n\n# Active sprint only\njira sprint list --state active\n\n# Add issue to sprint\njira sprint add SPRINT-ID ISSUE-KEY\n\n# Close sprint\njira sprint close SPRINT-ID\n```\n\n---",
+      "chars": 205,
+      "units": [
+        "para:9454620d"
+      ]
+    },
+    {
+      "id": "s051",
+      "file": "skills/jira/references/commands.md",
+      "heading": "Linking Issues",
+      "text": "| Relationship | Meaning |\n|--------------|---------|\n| `Blocks` | First ticket blocks second |\n| `Relates` | General relationship |\n| `Duplicate` | Same work |\n| `Epic-Story` | Story belongs to Epic |\n\n```bash\n# Basic link\njira issue link PROJ-123 PROJ-456 \"Relates\"\n\n# Blocker (blocker comes first)\njira issue link PROJ-100 PROJ-200 \"Blocks\"\n# Meaning: PROJ-100 blocks PROJ-200\n\n# Link to epic\njira issue link PROJ-EPIC PROJ-STORY \"Epic-Story\"\n```\n\n---",
+      "chars": 454,
+      "units": [
+        "para:c4f7fbab",
+        "para:983b6ca6",
+        "para:e482d58a",
+        "para:3b9e1652",
+        "para:c08b0f7d"
+      ]
+    },
+    {
+      "id": "s052",
+      "file": "skills/jira/references/commands.md",
+      "heading": "Other Commands",
+      "text": "```bash\n# Open issue in browser\njira open ISSUE-KEY\n\n# Show current user\njira me\n\n# Server info\njira serverinfo\n\n# List projects\njira project list\n\n# List boards\njira board list\n```",
+      "chars": 181,
+      "units": [
+        "para:55a81a8f"
+      ]
+    },
+    {
+      "id": "s053",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "`mcp__atlassian__searchJiraIssuesUsingJql`",
+      "text": "Search Jira using JQL (Jira Query Language).\n\n**Parameters:**\n- `jql` (required): JQL query string\n- `maxResults`: Maximum results (default: 50)\n- `startAt`: Pagination offset\n- `fields`: Comma-separated fields to return\n\n**Example:**\n```\nmcp__atlassian__searchJiraIssuesUsingJql(jql: \"project = PROJ AND status = 'In Progress'\")\n```",
+      "chars": 333,
+      "units": [
+        "para:0bc9b945",
+        "para:820814cb",
+        "para:c4dbca12",
+        "para:cd917204",
+        "para:bd86715b",
+        "para:ddd4680e"
+      ]
+    },
+    {
+      "id": "s054",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "`mcp__atlassian__getJiraIssue`",
+      "text": "Retrieve full issue details by key.\n\n**Parameters:**\n- `issueKey` (required): Issue key (e.g., \"PROJ-123\")\n- `expand`: Additional data (changelog, transitions, renderedFields)\n\n**Example:**\n```\nmcp__atlassian__getJiraIssue(issueKey: \"PROJ-123\")\n```",
+      "chars": 248,
+      "units": [
+        "para:9d3d9c8d",
+        "para:bca36532",
+        "para:b498031c",
+        "para:60ce8dd2"
+      ]
+    },
+    {
+      "id": "s055",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "`mcp__atlassian__createJiraIssue`",
+      "text": "Create a new issue.\n\n**Parameters:**\n- `projectKey` (required): Target project\n- `issueType` (required): Issue type (Story, Bug, Task, Epic, etc.)\n- `summary` (required): Issue title\n- `description`: Detailed description\n- `assignee`: Account ID (use lookupJiraAccountId first)\n- `priority`: Priority name (Highest, High, Medium, Low, Lowest)\n- `labels`: Array of labels\n- `components`: Array of component names\n- Custom fields as needed\n\n**Example:**\n```\nmcp__atlassian__createJiraIssue(\n  projectKey: \"PROJ\",\n  issueType: \"Story\",\n  summary: \"Implement user authentication\",\n  description: \"Add OAuth2 authentication flow...\",\n  labels: [\"backend\", \"security\"]\n)\n```",
+      "chars": 668,
+      "units": [
+        "para:86c3d0c7",
+        "para:d85c8d18",
+        "para:afc705be",
+        "para:b212ff6d",
+        "para:723fed00",
+        "para:69a6bdf5",
+        "para:4ad67021",
+        "para:0a2cee5a",
+        "para:12355ab1",
+        "para:206c582d",
+        "para:2aaeb3d7"
+      ]
+    },
+    {
+      "id": "s056",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "`mcp__atlassian__editJiraIssue`",
+      "text": "Update an existing issue.\n\n**Parameters:**\n- `issueKey` (required): Issue to update\n- Any field to update (summary, description, assignee, etc.)\n\n**Example:**\n```\nmcp__atlassian__editJiraIssue(\n  issueKey: \"PROJ-123\",\n  description: \"Updated description with more details...\"\n)\n```",
+      "chars": 281,
+      "units": [
+        "para:3a384d38",
+        "para:36bc5baa",
+        "para:5e6de419",
+        "para:edb1340a"
+      ]
+    },
+    {
+      "id": "s057",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "`mcp__atlassian__getTransitionsForJiraIssue`",
+      "text": "Get available status transitions for an issue.\n\n**Parameters:**\n- `issueKey` (required): Issue key\n\n**Returns:** List of available transitions with IDs and names.",
+      "chars": 162,
+      "units": [
+        "para:9ba79f43",
+        "para:64e59748",
+        "para:032e77e4"
+      ]
+    },
+    {
+      "id": "s058",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "`mcp__atlassian__transitionJiraIssue`",
+      "text": "Change issue status.\n\n**Parameters:**\n- `issueKey` (required): Issue key\n- `transitionId` (required): Transition ID from getTransitions\n- `comment`: Optional comment for the transition\n\n**Workflow:**\n1. Get transitions: `getTransitionsForJiraIssue(\"PROJ-123\")`\n2. Find desired transition ID from results\n3. Execute: `transitionJiraIssue(issueKey: \"PROJ-123\", transitionId: \"31\")`",
+      "chars": 379,
+      "units": [
+        "para:23489b3a",
+        "para:64e59748",
+        "para:635c92fc",
+        "para:8fbd82b8",
+        "para:e86bb18d",
+        "para:74d19169",
+        "para:ef18b733"
+      ]
+    },
+    {
+      "id": "s059",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "`mcp__atlassian__addCommentToJiraIssue`",
+      "text": "Add a comment to an issue.\n\n**Parameters:**\n- `issueKey` (required): Issue key\n- `body` (required): Comment text (supports Jira markdown)",
+      "chars": 137,
+      "units": [
+        "para:f699076a",
+        "para:64e59748",
+        "para:2d3ba316"
+      ]
+    },
+    {
+      "id": "s060",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "`mcp__atlassian__lookupJiraAccountId`",
+      "text": "Find user account ID for assignments.\n\n**Parameters:**\n- `query` (required): Search by display name, email, or username\n\n**Example:**\n```\nmcp__atlassian__lookupJiraAccountId(query: \"user@example.com\")\n```\n\n**Usage:** Always look up account IDs before assigning issues.",
+      "chars": 268,
+      "units": [
+        "para:78183995",
+        "para:27939d4d",
+        "para:8e7ff916",
+        "para:94dcf75c"
+      ]
+    },
+    {
+      "id": "s061",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "`mcp__atlassian__getJiraProjectIssueTypesMetadata`",
+      "text": "Get issue types and required fields for a project.\n\n**Parameters:**\n- `projectKey` (required): Project key\n\n**Usage:** Call before creating issues to understand required fields.",
+      "chars": 177,
+      "units": [
+        "para:5ec57b17",
+        "para:6db596fc",
+        "para:ce7cf2c0"
+      ]
+    },
+    {
+      "id": "s062",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "`mcp__atlassian__getJiraIssueTypeMetaWithFields`",
+      "text": "Get detailed field metadata for an issue type.\n\n**Parameters:**\n- `projectKey` (required): Project key\n- `issueTypeId` (required): Issue type ID\n\n---",
+      "chars": 149,
+      "units": [
+        "para:b427cbcc",
+        "para:6db596fc",
+        "para:8d5d7478"
+      ]
+    },
+    {
+      "id": "s063",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Common Fields",
+      "text": "| Field | Description | Example |\n|-------|-------------|---------|\n| `project` | Project key | `project = \"PROJ\"` |\n| `issuetype` | Issue type | `issuetype = Bug` |\n| `status` | Issue status | `status = \"In Progress\"` |\n| `assignee` | Assigned user | `assignee = currentUser()` |\n| `reporter` | Issue creator | `reporter = \"jobarksdale\"` |\n| `priority` | Priority level | `priority = High` |\n| `labels` | Issue labels | `labels = \"backend\"` |\n| `component` | Components | `component = \"API\"` |\n| `created` | Creation date | `created >= -30d` |\n| `updated` | Last update | `updated >= -7d` |\n| `resolved` | Resolution date | `resolved >= startOfMonth()` |\n| `sprint` | Sprint name/ID | `sprint in openSprints()` |\n| `epic` | Parent epic | `\"Epic Link\" = PROJ-100` |\n| `parent` | Parent issue | `parent = PROJ-50` |\n| `text` | Full-text search | `text ~ \"authentication\"` |\n| `summary` | Title search | `summary ~ \"login\"` |\n| `description` | Description search | `description ~ \"OAuth\"` |",
+      "chars": 988,
+      "units": [
+        "para:df34add7",
+        "para:f56a6292",
+        "para:23717a38",
+        "para:0e458eb6",
+        "para:082d9d40",
+        "para:72e76d15",
+        "para:f3d391b0",
+        "para:1fc3e128",
+        "para:569774aa",
+        "para:f5eab619",
+        "para:bb4902d2",
+        "para:8869a009",
+        "para:4f003d49",
+        "para:0e1e2099",
+        "para:c26755c2",
+        "para:ee4ea04d",
+        "para:dbb089c1",
+        "para:55b2953a"
+      ]
+    },
+    {
+      "id": "s064",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Operators",
+      "text": "| Operator | Meaning | Example |\n|----------|---------|---------|\n| `=` | Exact match | `status = Done` |\n| `!=` | Not equal | `status != Closed` |\n| `~` | Contains (text) | `summary ~ \"auth*\"` |\n| `!~` | Does not contain | `summary !~ \"test\"` |\n| `>` `>=` `<` `<=` | Comparisons | `priority >= High` |\n| `IN` | Multiple values | `status IN (Open, \"In Progress\")` |\n| `NOT IN` | Exclude values | `status NOT IN (Done, Closed)` |\n| `IS` | Null check | `assignee IS EMPTY` |\n| `IS NOT` | Not null | `assignee IS NOT EMPTY` |\n| `WAS` | Historical value | `status WAS \"In Progress\"` |\n| `CHANGED` | Field changed | `status CHANGED` |",
+      "chars": 629,
+      "units": [
+        "para:6db71bbf",
+        "para:048490b6",
+        "para:b9a484b7",
+        "para:9d8c58e1",
+        "para:07bc15bf",
+        "para:9b9b5027",
+        "para:7a30b0d2",
+        "para:9c5c9de2",
+        "para:42f99571",
+        "para:cad425fa",
+        "para:a38ac870",
+        "para:a36ef64d"
+      ]
+    },
+    {
+      "id": "s065",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Functions",
+      "text": "| Function | Description | Example |\n|----------|-------------|---------|\n| `currentUser()` | Logged-in user | `assignee = currentUser()` |\n| `now()` | Current timestamp | `created <= now()` |\n| `startOfDay()` | Midnight today | `updated >= startOfDay()` |\n| `startOfWeek()` | Start of week | `created >= startOfWeek()` |\n| `startOfMonth()` | Start of month | `created >= startOfMonth()` |\n| `endOfDay()` | End of today | `due <= endOfDay()` |\n| `openSprints()` | Active sprints | `sprint in openSprints()` |\n| `closedSprints()` | Completed sprints | `sprint in closedSprints()` |\n| `linkedIssues()` | Linked issues | `issue in linkedIssues(\"PROJ-123\")` |",
+      "chars": 655,
+      "units": [
+        "para:7b8d9bf5",
+        "para:9311e171",
+        "para:ab57989a",
+        "para:6ee556e6",
+        "para:0e767466",
+        "para:589a6cfb",
+        "para:3f6b8942",
+        "para:7d8913f0",
+        "para:33f506d5",
+        "para:ffe3ec6a"
+      ]
+    },
+    {
+      "id": "s066",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Relative Dates",
+      "text": "```jql\n# Days\ncreated >= -7d    # Last 7 days\nupdated >= -30d   # Last 30 days\n\n# Weeks\ncreated >= -2w    # Last 2 weeks\n\n# Months\ncreated >= -1M    # Last month\n\n# Specific date\ncreated >= \"2024-01-01\"\n```",
+      "chars": 206,
+      "units": [
+        "para:5aeae394"
+      ]
+    },
+    {
+      "id": "s067",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Ordering",
+      "text": "```jql\n# Order by priority, highest first\nproject = PROJ ORDER BY priority DESC\n\n# Multiple sort fields\nproject = PROJ ORDER BY status ASC, created DESC\n```",
+      "chars": 156,
+      "units": [
+        "para:a5f5b867"
+      ]
+    },
+    {
+      "id": "s068",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Complex Query Examples",
+      "text": "```jql\n# My open issues, high priority\nassignee = currentUser() AND status NOT IN (Done, Closed) AND priority >= High\n\n# Bugs created this week\nissuetype = Bug AND created >= startOfWeek() ORDER BY priority DESC\n\n# Epics in progress with stories\nissuetype = Epic AND status = \"In Progress\" AND issueFunction in hasLinks(\"is parent of\")\n\n# Issues updated by me recently\nupdatedBy = currentUser() AND updated >= -7d ORDER BY updated DESC\n\n# Blocked issues\nstatus = Blocked OR \"Flagged\" = \"Impediment\"\n\n# Issues linked to specific epic\n\"Epic Link\" = PROJ-100 AND status != Done\n\n# Sprint backlog items\nsprint in openSprints() AND status = \"To Do\" ORDER BY rank ASC\n\n# Unassigned high-priority bugs\nissuetype = Bug AND assignee IS EMPTY AND priority >= High\n\n# Issues I'm watching\nwatcher = currentUser()\n\n# Recently resolved by team\nresolved >= -7d AND project = PROJ ORDER BY resolved DESC\n```\n\n---",
+      "chars": 896,
+      "units": [
+        "para:27cc291d"
+      ]
+    },
+    {
+      "id": "s069",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Limitation",
+      "text": "The Atlassian MCP does not currently support creating issue links. Use the bundled `jira-link-issues` script instead.",
+      "chars": 117,
+      "units": [
+        "para:480d14c1"
+      ]
+    },
+    {
+      "id": "s070",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Link Types",
+      "text": "| Link Type | Inward | Outward | Use Case |\n|-----------|--------|---------|----------|\n| Depends On | is dependency of | depends on | Task dependencies |\n| Blocks | is blocked by | blocks | Blocking relationships |\n| Relates To | relates to | relates to | General relationships |\n| Clones | is cloned by | clones | Cloned issues |\n| Duplicates | is duplicated by | duplicates | Duplicate issues |",
+      "chars": 397,
+      "units": [
+        "para:fae1ed16",
+        "para:c849bade",
+        "para:ae01b11d",
+        "para:1750b426",
+        "para:a4da68a8",
+        "para:a097060d"
+      ]
+    },
+    {
+      "id": "s071",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Script Usage",
+      "text": "```bash\n# Link PROJ-123 depends on PROJ-456\n~/.claude/skills/jira/jira-link-issues PROJ-123 PROJ-456 \"Depends On\"\n\n# PROJ-100 blocks PROJ-200\n~/.claude/skills/jira/jira-link-issues PROJ-100 PROJ-200 \"Blocks\"\n\n# General relationship\n~/.claude/skills/jira/jira-link-issues PROJ-50 PROJ-75 \"Relates To\"\n```",
+      "chars": 303,
+      "units": [
+        "para:a796d4f1"
+      ]
+    },
+    {
+      "id": "s072",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Finding Link Types",
+      "text": "Query the Jira API to get available link types:\n```bash\ncurl -s -u \"$JIRA_USER:$JIRA_API_TOKEN\" \\\n  \"$JIRA_BASE_URL/rest/api/3/issueLinkType\" | jq '.issueLinkTypes[].name'\n```\n\nRequired environment variables:\n- `JIRA_BASE_URL`: Your Atlassian instance (e.g., `https://yourcompany.atlassian.net`)\n- `JIRA_USER`: Your email address\n- `JIRA_API_TOKEN`: API token from Atlassian account settings\n\n---",
+      "chars": 396,
+      "units": [
+        "para:624cd7ec",
+        "para:7637524e",
+        "para:37b1c2ba",
+        "para:99d512b6",
+        "para:64cf4791",
+        "para:9a63ef52"
+      ]
+    },
+    {
+      "id": "s073",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Jira Markup (Wiki Style)",
+      "text": "```\nh1. Heading 1\nh2. Heading 2\nh3. Heading 3\n\n*bold text*\n_italic text_\n-strikethrough-\n+underline+\n\n{code:java}\npublic class Example {\n    // code here\n}\n{code}\n\n{quote}\nQuoted text here\n{quote}\n\n* Bullet list\n** Nested bullet\n# Numbered list\n## Nested number\n\n[Link text|https://example.com]\n[Issue link|PROJ-123]\n\n||Header 1||Header 2||\n|Cell 1|Cell 2|\n\n{panel:title=Panel Title}\nPanel content here\n{panel}\n```",
+      "chars": 414,
+      "units": [
+        "para:7c2e497a"
+      ]
+    },
+    {
+      "id": "s074",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Atlassian Document Format (ADF)",
+      "text": "For createJiraIssue, descriptions may use ADF format:\n```json\n{\n  \"type\": \"doc\",\n  \"version\": 1,\n  \"content\": [\n    {\n      \"type\": \"paragraph\",\n      \"content\": [\n        {\"type\": \"text\", \"text\": \"Description text\"}\n      ]\n    }\n  ]\n}\n```\n\n---",
+      "chars": 245,
+      "units": [
+        "para:8d15ea17",
+        "para:e9b1a5e3"
+      ]
+    },
+    {
+      "id": "s075",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Common Errors",
+      "text": "| HTTP Code | Error | Cause | Resolution |\n|-----------|-------|-------|------------|\n| 400 | Bad Request | Invalid field values | Check required fields for issue type |\n| 401 | Unauthorized | Invalid credentials | Run `/mcp` to reconnect |\n| 403 | Forbidden | Insufficient permissions | Check project permissions |\n| 404 | Not Found | Issue/project doesn't exist | Verify key is correct |\n| 422 | Unprocessable | Validation failed | Check field constraints |",
+      "chars": 459,
+      "units": [
+        "para:98d59a57",
+        "para:5e6fc6b3",
+        "para:b6bbc3d3",
+        "para:be618a25",
+        "para:e25e3b3e",
+        "para:79ecba2d"
+      ]
+    },
+    {
+      "id": "s076",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Authentication Issues",
+      "text": "If MCP tools return authentication errors:\n1. Run `/mcp` to check connection status\n2. Reconnect the Atlassian MCP service if disconnected\n3. Verify API token permissions in Atlassian settings",
+      "chars": 192,
+      "units": [
+        "para:cd772bec",
+        "para:73000347",
+        "para:4ba9e7f8",
+        "para:fccdfbbf"
+      ]
+    },
+    {
+      "id": "s077",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Field Validation",
+      "text": "Before creating issues:\n1. Get project metadata: `getJiraProjectIssueTypesMetadata`\n2. Check required fields for the issue type\n3. Look up user account IDs for assignee fields\n4. Verify custom field IDs and valid values\n\n---",
+      "chars": 224,
+      "units": [
+        "para:e27e7715",
+        "para:8e16347c",
+        "para:e04e10f2",
+        "para:6b69206a",
+        "para:924ea0fd"
+      ]
+    },
+    {
+      "id": "s078",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Move Ticket to Done",
+      "text": "```\n1. Get available transitions:\n   mcp__atlassian__getTransitionsForJiraIssue(issueKey: \"PROJ-123\")\n   \u2192 Returns list with transition IDs\n\n2. Find \"Done\" transition ID from response\n\n3. Execute transition:\n   mcp__atlassian__transitionJiraIssue(\n     issueKey: \"PROJ-123\",\n     transitionId: \"done_id\"\n   )\n\n4. Add comment:\n   mcp__atlassian__addCommentToJiraIssue(\n     issueKey: \"PROJ-123\",\n     body: \"Completed and deployed\"\n   )\n```",
+      "chars": 439,
+      "units": [
+        "para:ab4e93b4"
+      ]
+    },
+    {
+      "id": "s079",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Create and Assign Issue",
+      "text": "```\n1. Look up user account ID:\n   mcp__atlassian__lookupJiraAccountId(query: \"john@example.com\")\n   \u2192 Returns account ID\n\n2. Create issue with assignment:\n   mcp__atlassian__createJiraIssue(\n     projectKey: \"PROJ\",\n     issueType: \"Task\",\n     summary: \"Implement feature X\",\n     description: \"Details here...\",\n     assignee: \"account_id_from_step_1\"\n   )\n```",
+      "chars": 363,
+      "units": [
+        "para:2bcc966f"
+      ]
+    },
+    {
+      "id": "s080",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "List My In-Progress Issues",
+      "text": "```\nmcp__atlassian__searchJiraIssuesUsingJql(\n  jql: \"assignee = currentUser() AND status = 'In Progress' ORDER BY updated DESC\"\n)\n```",
+      "chars": 134,
+      "units": [
+        "para:d516628d"
+      ]
+    },
+    {
+      "id": "s081",
+      "file": "skills/jira/references/mcp.md",
+      "heading": "Get Project Info Before Creating",
+      "text": "```\n1. List available projects:\n   mcp__atlassian__getVisibleJiraProjects()\n\n2. Get issue types for project:\n   mcp__atlassian__getJiraProjectIssueTypesMetadata(projectKey: \"PROJ\")\n\n3. Create issue with correct type:\n   mcp__atlassian__createJiraIssue(\n     projectKey: \"PROJ\",\n     issueType: \"Story\",\n     summary: \"...\",\n     description: \"...\"\n   )\n```",
+      "chars": 356,
+      "units": [
+        "para:23084af7"
+      ]
+    }
+  ],
+  "files": [],
+  "phrase_fate": {
+    "kept": 0.54,
+    "moved": 0.46,
+    "gone": 99.0,
+    "new": 99.39
+  }
+}

@@ -1,0 +1,390 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/perplexity/README.md",
+      "heading": "Perplexity Skill",
+      "text": "A comprehensive guide for using Perplexity AI tools effectively within Claude Code. This skill helps you choose the right search and research tool for your needs while avoiding context bloat and unnecessary API calls.",
+      "chars": 217,
+      "units": [
+        "para:914baf12"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/perplexity/README.md",
+      "heading": "Purpose",
+      "text": "This skill provides clear guidelines for when and how to use Perplexity's search and conversational AI capabilities, ensuring you select the most appropriate tool for each task while respecting token budgets and avoiding overlaps with other specialized tools.",
+      "chars": 259,
+      "units": [
+        "para:adf442c7"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/perplexity/README.md",
+      "heading": "When to Use This Skill",
+      "text": "Use Perplexity tools ONLY when users explicitly request:\n- **Search queries**: \"search\", \"find\", \"look up\", \"research\"\n- **Current information**: \"what's the latest\", \"recent trends\"\n- **Generic questions**: Broad topics not covered by specialized tools",
+      "chars": 253,
+      "units": [
+        "para:09b4bc5f",
+        "para:5dd9f0ea",
+        "para:213f5802",
+        "para:47edd125"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/perplexity/README.md",
+      "heading": "When NOT to Use This Skill",
+      "text": "Do NOT use Perplexity for:\n- **Library/framework documentation** \u2192 Use Context7 MCP instead\n- **Graphite `gt` CLI commands** \u2192 Use Graphite MCP instead\n- **Workspace-specific questions** \u2192 Use Nx MCP instead\n- **Specific URLs** \u2192 Use URL Crawler instead\n- **Deep research** \u2192 Use Researcher agent (`/research`) instead",
+      "chars": 318,
+      "units": [
+        "para:9190eca9",
+        "para:335a8c8f",
+        "para:cbdf810e",
+        "para:47756776",
+        "para:bba7812f",
+        "para:3edf6133"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/perplexity/README.md",
+      "heading": "1. Perplexity Search",
+      "text": "**Best for**: Finding resources, URLs, and current best practices\n\n**When to use**:\n- Discovering tutorials, blog posts, or articles\n- Finding recent information about technologies\n- User says \"search for...\", \"find...\", \"look up...\"\n\n**Default usage** (always start with these limits):\n```typescript\nmcp__perplexity__perplexity_search({\n  query: \"your search query\",\n  max_results: 3,           // Default is 10 - too many!\n  max_tokens_per_page: 512  // Reduce per-result content\n})\n```\n\n**When to increase limits**:\nOnly increase limits if:\n- User explicitly needs comprehensive results\n- Initial search found nothing useful\n- Complex topic requires multiple sources\n\n```typescript\n// Increased limits (use sparingly)\nmcp__perplexity__perplexity_search({\n  query: \"complex topic\",\n  max_results: 5,\n  max_tokens_per_page: 1024\n})\n```",
+      "chars": 836,
+      "units": [
+        "para:82cf9f27",
+        "para:fd784493",
+        "para:fdd28160",
+        "para:775ce180",
+        "para:75edcc30",
+        "para:b7d084e5",
+        "para:67c7fc6b",
+        "para:19da4e79",
+        "para:eb506f86",
+        "para:fab9c56a",
+        "para:353ccab5",
+        "para:51b0cbdf"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/perplexity/README.md",
+      "heading": "2. Perplexity Ask",
+      "text": "**Best for**: Getting conversational explanations synthesized from web sources\n\n**When to use**:\n- Need explanation, not just search results\n- Synthesize information from multiple web sources\n- Explain concepts with current context\n\n**Usage**:\n```typescript\nmcp__perplexity__perplexity_ask({\n  messages: [\n    {\n      role: \"user\",\n      content: \"Explain how postgres advisory locks work\"\n    }\n  ]\n})\n```\n\n**NOT for**:\n- Library documentation (use Context7)\n- Deep multi-source research (use researcher agent)",
+      "chars": 511,
+      "units": [
+        "para:5c024a1e",
+        "para:fd784493",
+        "para:fcaad304",
+        "para:162b5254",
+        "para:bf5ab7a7",
+        "para:8584f60a",
+        "para:7f2c7264",
+        "para:812b77d3"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/perplexity/README.md",
+      "heading": "3. Perplexity Research (PROHIBITED)",
+      "text": "**NEVER use**: `mcp__perplexity__perplexity_research`\n\n**Why**: Extremely high token cost (30-50k tokens)\n\n**Use instead**: Researcher agent (`/research <topic>`)\n- Provides multi-source synthesis with citations\n- Use sparingly for complex questions only",
+      "chars": 254,
+      "units": [
+        "para:8c3ecbcc",
+        "para:43f1fe12",
+        "para:9fb07454",
+        "para:7392e71a",
+        "para:31bb12e6"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/perplexity/README.md",
+      "heading": "Tool Selection Chain",
+      "text": "When a user asks a question, follow this priority order:\n\n1. **Context7 MCP** - Library/framework documentation\n2. **Graphite MCP** - Any `gt` CLI mention\n3. **Nx MCP** - Questions about THIS workspace\n4. **Perplexity Search** - Generic searches\n5. **Perplexity Ask** - Conversational answers\n6. **Researcher agent** - Deep multi-source research\n7. **WebSearch** - Last resort (after Perplexity exhausted)",
+      "chars": 405,
+      "units": [
+        "para:2efaad0c",
+        "para:5d3f024f",
+        "para:94cbadad",
+        "para:e6a19971",
+        "para:5ec8da36",
+        "para:1471854e",
+        "para:c692c4ed",
+        "para:ceb44b41"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/perplexity/README.md",
+      "heading": "Correct Usage",
+      "text": "**Use Perplexity Search:**\n```\nUser: \"Find postgres migration best practices\"\nUser: \"Search for React testing tutorials\"\nUser: \"Look up latest trends in microservices\"\n```\n\n**Use Perplexity Ask:**\n```\nUser: \"Explain how postgres advisory locks work\"\nUser: \"What are the trade-offs of microservices?\"\n```",
+      "chars": 303,
+      "units": [
+        "para:71bb0a27",
+        "para:a8e35306",
+        "para:680829a4",
+        "para:a0031429"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/perplexity/README.md",
+      "heading": "Incorrect Usage (Use Other Tools)",
+      "text": "**Use Context7 instead:**\n```\n\u274c \"Search for React hooks documentation\"\n\u274c \"Find Next.js routing docs\"\n\u274c \"Look up Temporal workflow API\"\n```\n\n**Use Graphite MCP instead:**\n```\n\u274c \"Search for gt stack commands\"\n\u274c \"Find gt branch workflow\"\n```\n\n**Use Nx MCP instead:**\n```\n\u274c \"Search for build config\" (in THIS workspace)\n\u274c \"Find project dependencies\" (in THIS workspace)\n```",
+      "chars": 369,
+      "units": [
+        "para:3272424b",
+        "para:a28738df",
+        "para:0f5a4fad",
+        "para:3b2038fa",
+        "para:080424b0",
+        "para:a7da57ce"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/perplexity/README.md",
+      "heading": "Key Features",
+      "text": "- **Token budget awareness**: Default to limited results to avoid context bloat\n- **Clear tool boundaries**: Know when to use Perplexity vs. specialized tools\n- **Fallback chain**: Search \u2192 Ask \u2192 WebSearch (last resort)\n- **Research delegation**: Use researcher agent for deep dives, not raw Perplexity API",
+      "chars": 306,
+      "units": [
+        "para:ed9c694c",
+        "para:4bd90f33",
+        "para:80b07367",
+        "para:0b24d881"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/perplexity/README.md",
+      "heading": "Best Practices",
+      "text": "1. **Start conservative**: Always use `max_results: 3` and `max_tokens_per_page: 512`\n2. **Check alternatives first**: Try Context7, Graphite MCP, or Nx MCP before Perplexity\n3. **Know your trigger words**: \"search\", \"find\", \"look up\", \"research\", \"latest\"\n4. **Avoid research tool**: Never use `perplexity_research` - use researcher agent instead\n5. **Respect the chain**: Follow the tool selection priority order",
+      "chars": 414,
+      "units": [
+        "para:4a95502f",
+        "para:b0d842e3",
+        "para:9adcbb8f",
+        "para:293d5e69",
+        "para:0936806f"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/perplexity/README.md",
+      "heading": "Common Pitfalls",
+      "text": "- Using Perplexity for library docs (use Context7)\n- Using high limits by default (causes context bloat)\n- Using `perplexity_research` directly (use researcher agent)\n- Skipping the tool selection chain\n- Not checking if specialized tools apply first",
+      "chars": 250,
+      "units": [
+        "para:2cd95ecc",
+        "para:9547b76c",
+        "para:0052240a",
+        "para:c572f57e",
+        "para:1aac6424"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/perplexity/README.md",
+      "heading": "Integration with Other Skills",
+      "text": "- **Context7**: For library/framework documentation\n- **Graphite MCP**: For `gt` CLI operations\n- **Nx MCP**: For workspace-specific queries\n- **Researcher agent**: For deep research tasks\n- **WebSearch**: As absolute last resort fallback",
+      "chars": 238,
+      "units": [
+        "para:709cf809",
+        "para:6b5905a9",
+        "para:2218fe76",
+        "para:0560c4b4",
+        "para:66880edb"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/perplexity/README.md",
+      "heading": "Quick Decision Matrix",
+      "text": "| User Request | Tool to Use |\n|--------------|-------------|\n| React hooks docs | Context7 MCP |\n| gt stack command | Graphite MCP |\n| Build config here | Nx MCP |\n| Find migration guide | Perplexity Search |\n| Explain advisory locks | Perplexity Ask |\n| Deep research report | Researcher agent |\n| Generic web search | WebSearch (last resort) |",
+      "chars": 346,
+      "units": [
+        "para:b8e11b2d",
+        "para:c9a5a559",
+        "para:15e7f96e",
+        "para:06949c09",
+        "para:fa6e09f0",
+        "para:4b92fae3",
+        "para:35076d4c",
+        "para:24ab358d"
+      ]
+    },
+    {
+      "id": "s016",
+      "file": "skills/perplexity/README.md",
+      "heading": "Summary",
+      "text": "The Perplexity skill ensures you use Perplexity AI tools effectively and appropriately:\n- Choose the right tool (Search vs. Ask)\n- Respect token budgets with conservative limits\n- Defer to specialized tools when appropriate\n- Avoid the expensive research tool\n- Follow the tool selection chain\n\nBy following these guidelines, you'll provide better, faster, and more cost-effective responses to users.",
+      "chars": 400,
+      "units": [
+        "para:f734766b",
+        "para:8de3fc77",
+        "para:de1c8fad",
+        "para:9f0167d7",
+        "para:9fe34873",
+        "para:e90505ab",
+        "para:ff9422e5"
+      ]
+    },
+    {
+      "id": "s017",
+      "file": "skills/perplexity/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: perplexity\ndescription: Web search and research using Perplexity AI. Use when user says \"search\", \"find\", \"look up\", \"ask\", \"research\", or \"what's the latest\" for generic queries. NOT for library/framework docs (use Context7) or workspace questions.\n---",
+      "chars": 263,
+      "units": [
+        "para:55e673b5"
+      ]
+    },
+    {
+      "id": "s018",
+      "file": "skills/perplexity/SKILL.md",
+      "heading": "Perplexity Tools",
+      "text": "Use ONLY when user says \"search\", \"find\", \"look up\", \"ask\", \"research\", or \"what's the latest\" for generic queries. NOT for library/framework docs (use Context7), gt CLI (use Graphite MCP), or workspace questions (use Nx MCP).",
+      "chars": 226,
+      "units": [
+        "para:a6bb86de"
+      ]
+    },
+    {
+      "id": "s019",
+      "file": "skills/perplexity/SKILL.md",
+      "heading": "Quick Reference",
+      "text": "**Which Perplexity tool?**\n- Need search results/URLs? \u2192 **Perplexity Search**\n- Need conversational answer? \u2192 **Perplexity Ask**\n- Need deep research? \u2192 **Researcher agent** (`/research <topic>`)\n\n**NOT Perplexity - use these instead:**\n- Library/framework docs \u2192 **Context7 MCP**\n- Graphite `gt` CLI \u2192 **Graphite MCP**\n- THIS workspace \u2192 **Nx MCP**\n- Specific URL \u2192 **URL Crawler**",
+      "chars": 383,
+      "units": [
+        "para:2c08db2b",
+        "para:d7ee35b6",
+        "para:d9f590d1",
+        "para:cb805f87",
+        "para:9caa27c7",
+        "para:6f76cdbb",
+        "para:67133026",
+        "para:4fd9d67b",
+        "para:25fee75d"
+      ]
+    },
+    {
+      "id": "s020",
+      "file": "skills/perplexity/SKILL.md",
+      "heading": "Perplexity Search",
+      "text": "**When to use:**\n- Generic searches, finding resources\n- Current best practices, recent information\n- Tutorial/blog post discovery\n- User says \"search for...\", \"find...\", \"look up...\"\n\n**Default parameters (ALWAYS USE):**\n```typescript\nmcp__perplexity__perplexity_search({\n  query: \"your search query\",\n  max_results: 3,           // Default is 10 - too many!\n  max_tokens_per_page: 512  // Reduce per-result content\n})\n```\n\n**When to increase limits:**\nOnly if:\n- User explicitly needs comprehensive results\n- Initial search found nothing useful\n- Complex topic needs multiple sources\n\n```typescript\n// Increased limits (use sparingly)\nmcp__perplexity__perplexity_search({\n  query: \"complex topic\",\n  max_results: 5,\n  max_tokens_per_page: 1024\n})\n```",
+      "chars": 752,
+      "units": [
+        "para:fd784493",
+        "para:dd89bb94",
+        "para:a7b97aea",
+        "para:d1a94a93",
+        "para:75edcc30",
+        "para:17f83201",
+        "para:67c7fc6b",
+        "para:8564abd8",
+        "para:eb506f86",
+        "para:fab9c56a",
+        "para:07f4368c",
+        "para:51b0cbdf"
+      ]
+    },
+    {
+      "id": "s021",
+      "file": "skills/perplexity/SKILL.md",
+      "heading": "Perplexity Ask",
+      "text": "**When to use:**\n- Need conversational explanation, not search results\n- Synthesize information from web\n- Explain concepts with current context\n\n**Usage:**\n```typescript\nmcp__perplexity__perplexity_ask({\n  messages: [\n    {\n      role: \"user\",\n      content: \"Explain how postgres advisory locks work\"\n    }\n  ]\n})\n```\n\n**NOT for:**\n- Library documentation (use Context7)\n- Deep multi-source research (use researcher agent)",
+      "chars": 424,
+      "units": [
+        "para:fd784493",
+        "para:72d757bc",
+        "para:3f8080e6",
+        "para:bf5ab7a7",
+        "para:8584f60a",
+        "para:7f2c7264",
+        "para:812b77d3"
+      ]
+    },
+    {
+      "id": "s022",
+      "file": "skills/perplexity/SKILL.md",
+      "heading": "Prohibited Tool",
+      "text": "**NEVER use:** `mcp__perplexity__perplexity_research`\n\n**Use instead:** Researcher agent (`/research <topic>`)\n- Token cost: 30-50k tokens\n- Provides multi-source synthesis with citations\n- Use sparingly for complex questions only",
+      "chars": 230,
+      "units": [
+        "para:8c3ecbcc",
+        "para:9fb07454",
+        "para:7361d069",
+        "para:7392e71a",
+        "para:31bb12e6"
+      ]
+    },
+    {
+      "id": "s023",
+      "file": "skills/perplexity/SKILL.md",
+      "heading": "Tool Selection Chain",
+      "text": "**Priority order:**\n1. **Context7 MCP** - Library/framework docs\n2. **Graphite MCP** - Any `gt` CLI mention\n3. **Nx MCP** - THIS workspace questions\n4. **Perplexity Search** - Generic searches\n5. **Perplexity Ask** - Conversational answers\n6. **Researcher agent** - Deep multi-source research\n7. **WebSearch** - Last resort (after Perplexity exhausted)",
+      "chars": 352,
+      "units": [
+        "para:813877a0",
+        "para:94cbadad",
+        "para:ef97b6fb",
+        "para:5ec8da36",
+        "para:1471854e",
+        "para:c692c4ed",
+        "para:ceb44b41"
+      ]
+    },
+    {
+      "id": "s024",
+      "file": "skills/perplexity/SKILL.md",
+      "heading": "Examples",
+      "text": "**\u2705 CORRECT - Use Perplexity Search:**\n- \"Find postgres migration best practices\"\n- \"Search for React testing tutorials\"\n- \"Look up latest trends in microservices\"\n\n**\u2705 CORRECT - Use Perplexity Ask:**\n- \"Explain how postgres advisory locks work\"\n- \"What are the trade-offs of microservices?\"\n\n**\u274c WRONG - Use Context7 instead:**\n- \"Search for React hooks documentation\" \u2192 Context7 MCP\n- \"Find Next.js routing docs\" \u2192 Context7 MCP\n- \"Look up Temporal workflow API\" \u2192 Context7 MCP\n\n**\u274c WRONG - Use Graphite MCP instead:**\n- \"Search for gt stack commands\" \u2192 Graphite MCP\n- \"Find gt branch workflow\" \u2192 Graphite MCP\n\n**\u274c WRONG - Use Nx MCP instead:**\n- \"Search for build config\" (in THIS workspace) \u2192 Nx MCP\n- \"Find project dependencies\" (in THIS workspace) \u2192 Nx MCP",
+      "chars": 761,
+      "units": [
+        "para:61bad031",
+        "para:c6da3ab4",
+        "para:59176a6c",
+        "para:448a09a4",
+        "para:3502446c",
+        "para:1adeab4e",
+        "para:785f32fe",
+        "para:3ba09b39",
+        "para:b1340f4d",
+        "para:7589577e",
+        "para:da31c01a",
+        "para:956352e2",
+        "para:fa998af7",
+        "para:4a5492bf",
+        "para:9bbdd9d5",
+        "para:94106dd0",
+        "para:6c1f522c"
+      ]
+    },
+    {
+      "id": "s025",
+      "file": "skills/perplexity/SKILL.md",
+      "heading": "Key Points",
+      "text": "- **Default to limited results** - avoid context bloat\n- **Library docs = Context7** - ALWAYS try Context7 first\n- **\"gt\" = Graphite MCP** - ANY \"gt\" mention uses Graphite\n- **Deep research = /research** - NOT perplexity_research tool\n- **Fallback chain** - Search \u2192 Ask \u2192 WebSearch (last resort)",
+      "chars": 296,
+      "units": [
+        "para:741cd170",
+        "para:7014141d",
+        "para:f685c7e8",
+        "para:86ab8856",
+        "para:80b07367"
+      ]
+    }
+  ],
+  "files": [],
+  "phrase_fate": {
+    "kept": 63.54,
+    "moved": 12.04,
+    "gone": 24.42,
+    "new": 31.82
+  }
+}

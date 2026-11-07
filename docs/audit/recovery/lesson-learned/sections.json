@@ -1,0 +1,409 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/lesson-learned/README.md",
+      "heading": "Purpose",
+      "text": "Most developers ship code and move on. But the fastest way to grow is to pause and reflect: what principle did I just apply? What trade-off did I make? What would I do differently?\n\nThis skill analyzes recent git history and surfaces the engineering lesson embedded in the work you just did.",
+      "chars": 291,
+      "units": [
+        "para:19c880b2",
+        "para:d17f0528"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/lesson-learned/README.md",
+      "heading": "When to Use",
+      "text": "- After finishing a feature or PR\n- After a debugging session\n- After a refactor\n- When you want to reflect on recent work\n- Trigger phrases: \"what is the lesson here?\", \"what can I learn from this?\", \"engineering takeaway\"",
+      "chars": 223,
+      "units": [
+        "para:e15d2499",
+        "para:75e5059f",
+        "para:d8d05ce5",
+        "para:4811c568",
+        "para:f21f3a8f"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/lesson-learned/README.md",
+      "heading": "How It Works",
+      "text": "1. **Determine scope** -- Detects whether you're on a feature branch (analyzes branch vs main) or main (analyzes last 5 commits). You can also specify a commit range or specific SHA.\n2. **Gather changes** -- Reads git log, diffs, and commit messages. For large diffs, selectively reads the most-changed files.\n3. **Analyze patterns** -- Identifies structural decisions, trade-offs, and problems solved. Maps observations to named SE principles.\n4. **Present the lesson** -- Delivers 1-3 specific, code-grounded takeaways with the principle name, how it manifested, why it matters, and an actionable next step.",
+      "chars": 609,
+      "units": [
+        "para:66d92f7b",
+        "para:2beaa2a6",
+        "para:04d90adf",
+        "para:d9ad2d83"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/lesson-learned/README.md",
+      "heading": "Key Features",
+      "text": "- **Git-history-driven** -- Works from actual code changes, not hypotheticals\n- **Principle-grounded** -- Maps observations to named SE principles (SOLID, DRY, KISS, YAGNI, etc.)\n- **Specific, not generic** -- Every insight references actual files and lines from your diff\n- **Balanced** -- Recognizes good patterns, not just areas for improvement\n- **Configurable scope** -- Feature branch, last N commits, specific SHA, or working changes",
+      "chars": 440,
+      "units": [
+        "para:0e922d3d",
+        "para:1fa796d7",
+        "para:3fd98f18",
+        "para:ad91d553",
+        "para:27e326ac"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/lesson-learned/README.md",
+      "heading": "Output Format",
+      "text": "```markdown\n## Lesson: Separation of Concerns\n\n**What happened in the code:**\nThe `AuthController` was split into `AuthController` and `UserService` across\ncommits abc123 and def456. Authentication logic stayed in the controller while\nuser CRUD operations moved to a dedicated service.\n\n**The principle at work:**\nSeparation of Concerns -- different responsibilities should live in different\nmodules so each can change independently.\n\n**Why it matters:**\nBefore the split, any change to user management risked breaking authentication.\nNow each module can evolve independently with a clear interface between them.\n\n**Takeaway for next time:**\nWhen a file handles two distinct responsibilities, split early -- it's cheaper\nthan untangling them later.\n```",
+      "chars": 752,
+      "units": [
+        "para:4bcfb08b"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/lesson-learned/README.md",
+      "heading": "Prerequisites",
+      "text": "- Must be in a git repository with commit history\n- Works best with descriptive commit messages",
+      "chars": 95,
+      "units": [
+        "para:e6563d1f",
+        "para:f8bb69f2"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/lesson-learned/README.md",
+      "heading": "Related Files",
+      "text": "- `references/se-principles.md` -- Curated SE principles catalog\n- `references/anti-patterns.md` -- Common anti-patterns to detect in diffs",
+      "chars": 139,
+      "units": [
+        "para:0f5a6499",
+        "para:07b364e2"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/lesson-learned/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: lesson-learned\ndescription: \"Analyze recent code changes via git history and extract software engineering lessons. Use when the user asks 'what is the lesson here?', 'what can I learn from this?', 'engineering takeaway', 'what did I just learn?', 'reflect on this code', or wants to extract principles from recent work.\"\n---",
+      "chars": 334,
+      "units": [
+        "para:cd2f9de3"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/lesson-learned/SKILL.md",
+      "heading": "Lesson Learned",
+      "text": "Extract specific, grounded software engineering lessons from actual code changes. Not a lecture -- a mirror. Show the user what their code already demonstrates.",
+      "chars": 160,
+      "units": [
+        "para:66ed373d"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/lesson-learned/SKILL.md",
+      "heading": "Before You Begin",
+      "text": "**Load the principles reference first.**\n\n1. Read `references/se-principles.md` to have the principle catalog available\n2. Optionally read `references/anti-patterns.md` if you suspect the changes include areas for improvement\n3. Determine the scope of analysis (see Phase 1)\n\n**Do not proceed until you've loaded at least `se-principles.md`.**",
+      "chars": 343,
+      "units": [
+        "para:eef175cb",
+        "para:9ed9131c",
+        "para:5d7fc5d2",
+        "para:0f1a0302",
+        "para:c58a68ea"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/lesson-learned/SKILL.md",
+      "heading": "Phase 1: Determine Scope",
+      "text": "Ask the user or infer from context what to analyze.\n\n| Scope | Git Commands | When to Use |\n|-------|-------------|-------------|\n| Feature branch | `git log main..HEAD --oneline` + `git diff main...HEAD` | User is on a non-main branch (default) |\n| Last N commits | `git log --oneline -N` + `git diff HEAD~N..HEAD` | User specifies a range, or on main (default N=5) |\n| Specific commit | `git show <sha>` | User references a specific commit |\n| Working changes | `git diff` + `git diff --cached` | User says \"what about these changes?\" before committing |\n\n**Default behavior:**\n- If on a feature branch: analyze branch commits vs main\n- If on main: analyze the last 5 commits\n- If the user provides a different scope, use that",
+      "chars": 728,
+      "units": [
+        "para:7c241877",
+        "para:2cdcd1f0",
+        "para:9f7f92c9",
+        "para:cc065360",
+        "para:0c6ac8c4",
+        "para:903a2ec5",
+        "para:9d7a0109",
+        "para:45289408",
+        "para:a4b7c5aa"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/lesson-learned/SKILL.md",
+      "heading": "Phase 2: Gather Changes",
+      "text": "1. Run `git log` with the determined scope to get the commit list and messages\n2. Run `git diff` for the full diff of the scope\n3. If the diff is large (>500 lines), use `git diff --stat` first, then selectively read the top 3-5 most-changed files\n4. **Read commit messages carefully** -- they contain intent that raw diffs miss\n5. Only read changed files. Do not read the entire repo.",
+      "chars": 385,
+      "units": [
+        "para:37755b0a",
+        "para:7e258c75",
+        "para:209c9b02",
+        "para:a35c9b8f",
+        "para:ec3e3e90"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/lesson-learned/SKILL.md",
+      "heading": "Phase 3: Analyze",
+      "text": "Identify the **dominant pattern** -- the single most instructive thing about these changes.\n\nLook for:\n- **Structural decisions** -- How was the code organized? Why those boundaries?\n- **Trade-offs made** -- What was gained vs. sacrificed? (readability vs. performance, DRY vs. clarity, speed vs. correctness)\n- **Problems solved** -- What was the before/after? What made the \"after\" better?\n- **Missed opportunities** -- Where could the code improve? (present gently as \"next time, consider...\")\n\nMap findings to specific principles from `references/se-principles.md`. Be specific -- quote actual code, reference actual file names and line changes.",
+      "chars": 649,
+      "units": [
+        "para:b21b801d",
+        "para:03787c64",
+        "para:ba050788",
+        "para:5ab76e18",
+        "para:35a6fb7a",
+        "para:004665c1"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/lesson-learned/SKILL.md",
+      "heading": "Phase 4: Present the Lesson",
+      "text": "Use this template:\n\n```markdown\n## Lesson: [Principle Name]\n\n**What happened in the code:**\n[2-3 sentences describing the specific change, referencing files and commits]\n\n**The principle at work:**\n[1-2 sentences explaining the SE principle]\n\n**Why it matters:**\n[1-2 sentences on the practical consequence -- what would go wrong without this, or what goes right because of it]\n\n**Takeaway for next time:**\n[One concrete, actionable sentence the user can apply to future work]\n```\n\nIf there is a second lesson worth noting (maximum 2 additional):\n\n```markdown\n---\n\n### Also worth noting: [Principle Name]\n\n**In the code:** [1 sentence]\n**The principle:** [1 sentence]\n**Takeaway:** [1 sentence]\n```",
+      "chars": 698,
+      "units": [
+        "para:bcea0057",
+        "para:22893d2e",
+        "para:4d7eba77",
+        "para:be29d2e2"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/lesson-learned/SKILL.md",
+      "heading": "What NOT to Do",
+      "text": "| Avoid | Why | Instead |\n|-------|-----|---------|\n| Listing every principle that vaguely applies | Overwhelming and generic | Pick the 1-2 most relevant |\n| Analyzing files that were not changed | Scope creep | Stick to the diff |\n| Ignoring commit messages | They contain intent that diffs miss | Read them as primary context |\n| Abstract advice disconnected from the code | Not actionable | Always reference specific files/lines |\n| Negative-only feedback | Demoralizing | Lead with what works, then suggest improvements |\n| More than 3 lessons | Dilutes the insight | One well-grounded lesson beats seven vague ones |",
+      "chars": 622,
+      "units": [
+        "para:9b731c69",
+        "para:d92a09d7",
+        "para:82500a7b",
+        "para:7126a594",
+        "para:0baecd72",
+        "para:8de4f139",
+        "para:91f812e5"
+      ]
+    },
+    {
+      "id": "s016",
+      "file": "skills/lesson-learned/SKILL.md",
+      "heading": "Conversation Style",
+      "text": "- **Reflective, not prescriptive.** Use the user's own code as primary evidence.\n- **Never say \"you should have...\"** -- instead use \"the approach here shows...\" or \"next time you face this, consider...\"\n- **If the code is good, say so.** Not every lesson is about what went wrong. Recognizing good patterns reinforces them.\n- **If the changes are trivial** (a single config tweak, a typo fix), say so honestly rather than forcing a lesson. \"These changes are straightforward -- no deep lesson here, just good housekeeping.\"\n- **Be specific.** Generic advice is worthless. Every claim must point to a concrete code change.",
+      "chars": 622,
+      "units": [
+        "para:7a1d7542",
+        "para:e00e7452",
+        "para:17da0d08",
+        "para:cde69b3a",
+        "para:725acb99"
+      ]
+    },
+    {
+      "id": "s017",
+      "file": "skills/lesson-learned/references/anti-patterns.md",
+      "heading": "(preamble)",
+      "text": "---\ndescription: Common anti-patterns to detect in code diffs. Use alongside se-principles.md for balanced analysis -- principles show what's good, anti-patterns show what to watch for.\n---",
+      "chars": 189,
+      "units": [
+        "para:a73e13ff"
+      ]
+    },
+    {
+      "id": "s018",
+      "file": "skills/lesson-learned/references/anti-patterns.md",
+      "heading": "Anti-Patterns",
+      "text": "When analyzing a diff, check for these signals. Present findings gently -- as opportunities, not failures.",
+      "chars": 106,
+      "units": [
+        "para:b1ab837c"
+      ]
+    },
+    {
+      "id": "s019",
+      "file": "skills/lesson-learned/references/anti-patterns.md",
+      "heading": "God Object / God Class",
+      "text": "One module doing too much.\n**Diff signals:** A single file with many unrelated changes. One class/module imported everywhere. A file over 500 lines that keeps growing.\n**Suggest:** Extract responsibilities into focused modules (SRP).",
+      "chars": 233,
+      "units": [
+        "para:e71129b9"
+      ]
+    },
+    {
+      "id": "s020",
+      "file": "skills/lesson-learned/references/anti-patterns.md",
+      "heading": "Shotgun Surgery",
+      "text": "One logical change scattered across many files.\n**Diff signals:** 10+ files changed for a single feature or fix. The same type of edit repeated in many places. A rename or config change touching dozens of files.\n**Suggest:** Consolidate the scattered logic. If one change requires editing many files, the abstraction boundaries may be wrong.",
+      "chars": 341,
+      "units": [
+        "para:09224d1b"
+      ]
+    },
+    {
+      "id": "s021",
+      "file": "skills/lesson-learned/references/anti-patterns.md",
+      "heading": "Feature Envy",
+      "text": "A function that uses another module's data more than its own.\n**Diff signals:** Heavy cross-module imports. A function reaching deep into another object's properties. Utility functions that only serve one caller in a different module.\n**Suggest:** Move the function closer to the data it uses.",
+      "chars": 293,
+      "units": [
+        "para:688ddf85"
+      ]
+    },
+    {
+      "id": "s022",
+      "file": "skills/lesson-learned/references/anti-patterns.md",
+      "heading": "Premature Abstraction",
+      "text": "Abstracting before there are multiple concrete cases.\n**Diff signals:** An interface with exactly one implementation. A factory that creates only one type. A generic solution for a problem that exists only once.\n**Suggest:** Wait for the second or third use case before abstracting (Rule of Three).",
+      "chars": 298,
+      "units": [
+        "para:04033e33"
+      ]
+    },
+    {
+      "id": "s023",
+      "file": "skills/lesson-learned/references/anti-patterns.md",
+      "heading": "Copy-Paste Programming",
+      "text": "Duplicated code blocks with minor variations.\n**Diff signals:** Similar code appearing in multiple places in the diff. Functions that differ by only a parameter or two. Repeated patterns that could be parameterized.\n**Suggest:** Extract shared logic, parameterize the differences.",
+      "chars": 280,
+      "units": [
+        "para:2121cc4f"
+      ]
+    },
+    {
+      "id": "s024",
+      "file": "skills/lesson-learned/references/anti-patterns.md",
+      "heading": "Magic Numbers / Strings",
+      "text": "Literal values without explanation.\n**Diff signals:** Hardcoded numbers in conditions (`if (retries > 3)`). String literals used as keys or identifiers. Timeouts, limits, or thresholds without named constants.\n**Suggest:** Extract to named constants that explain the \"why.\"",
+      "chars": 273,
+      "units": [
+        "para:92804390"
+      ]
+    },
+    {
+      "id": "s025",
+      "file": "skills/lesson-learned/references/anti-patterns.md",
+      "heading": "Long Method",
+      "text": "Functions that do too much.\n**Diff signals:** New functions over 40-50 lines. Functions with multiple levels of nesting. Functions that require scrolling to read.\n**Suggest:** Extract sub-steps into named functions. Each function should do one thing.",
+      "chars": 250,
+      "units": [
+        "para:01954aaa"
+      ]
+    },
+    {
+      "id": "s026",
+      "file": "skills/lesson-learned/references/anti-patterns.md",
+      "heading": "Excessive Comments",
+      "text": "Comments explaining \"what\" instead of \"why.\"\n**Diff signals:** Comments restating the code (`// increment counter`). Large comment blocks before straightforward code. Commented-out code left in place.\n**Suggest:** Make the code self-documenting through better naming. Use comments only for \"why\" -- intent, trade-offs, non-obvious constraints.",
+      "chars": 343,
+      "units": [
+        "para:c7ff0743"
+      ]
+    },
+    {
+      "id": "s027",
+      "file": "skills/lesson-learned/references/se-principles.md",
+      "heading": "(preamble)",
+      "text": "---\ndescription: Curated catalog of software engineering principles. Load this before analyzing code changes so you can map observations to named principles.\n---",
+      "chars": 161,
+      "units": [
+        "para:bdf8f1a3"
+      ]
+    },
+    {
+      "id": "s028",
+      "file": "skills/lesson-learned/references/se-principles.md",
+      "heading": "Software Engineering Principles",
+      "text": "Use this as a lookup table. When you spot a pattern in a diff, find the matching principle here. Each entry includes **code signals** -- what to look for in actual changes.",
+      "chars": 172,
+      "units": [
+        "para:3735d38e"
+      ]
+    },
+    {
+      "id": "s029",
+      "file": "skills/lesson-learned/references/se-principles.md",
+      "heading": "Design Principles (SOLID)",
+      "text": "**Single Responsibility Principle (SRP)**\nA module should have one reason to change.\nCode signals: A class/file was split into two. A function was extracted. A component stopped handling both UI and data fetching.\n\n**Open/Closed Principle (OCP)**\nOpen for extension, closed for modification.\nCode signals: New behavior added without changing existing code. A plugin/hook/callback system introduced. Strategy pattern or configuration used instead of conditionals.\n\n**Liskov Substitution Principle (LSP)**\nSubtypes must be substitutable for their base types.\nCode signals: An interface was introduced to unify implementations. A subclass override changed behavior in a way that broke callers (violation). Type narrowing or guards added.\n\n**Interface Segregation Principle (ISP)**\nNo client should depend on methods it doesn't use.\nCode signals: A large interface was split into smaller ones. Optional methods removed from an interface. A \"fat\" props object was broken into focused ones.\n\n**Dependency Inversion Principle (DIP)**\nDepend on abstractions, not concretions.\nCode signals: A concrete dependency replaced with an interface/injection. A factory or provider pattern introduced. Import paths changed from specific implementations to abstract layers.\n\n**Composition over Inheritance**\nFavor object composition over class inheritance.\nCode signals: Inheritance hierarchy replaced with delegation. Mixins or HOCs replaced with hooks or composition. A \"base class\" was removed.",
+      "chars": 1478,
+      "units": [
+        "para:f9c72327",
+        "para:3ac005dd",
+        "para:19c6ddd8",
+        "para:48a5a689",
+        "para:24e72068",
+        "para:6aa12052"
+      ]
+    },
+    {
+      "id": "s030",
+      "file": "skills/lesson-learned/references/se-principles.md",
+      "heading": "Simplicity Principles",
+      "text": "**DRY (Don't Repeat Yourself)**\nEvery piece of knowledge should have a single representation.\nCode signals: Duplicate code extracted into a shared function. A constant replaced repeated literals. A template/generator replaced copy-pasted boilerplate.\n\n**KISS (Keep It Simple, Stupid)**\nThe simplest solution that works is the best.\nCode signals: A complex abstraction replaced with a straightforward implementation. Unnecessary indirection removed. A clever one-liner replaced with readable code.\n\n**YAGNI (You Aren't Gonna Need It)**\nDon't build it until you actually need it.\nCode signals: Speculative features removed. Unused configuration options deleted. An over-engineered solution simplified to match actual requirements.\n\n**Rule of Three**\nWait until the third duplication before abstracting.\nCode signals: Similar code exists in 2 places and was left alone (good). A premature abstraction was introduced after only one use (violation). Third occurrence triggered extraction (textbook application).\n\n**Principle of Least Surprise**\nCode should behave the way most users would expect.\nCode signals: A function renamed to better describe what it does. Return types made consistent. Side effects made explicit or removed.",
+      "chars": 1226,
+      "units": [
+        "para:cdbad270",
+        "para:b3c1bac3",
+        "para:24c92698",
+        "para:f92fb873",
+        "para:8461fcc0"
+      ]
+    },
+    {
+      "id": "s031",
+      "file": "skills/lesson-learned/references/se-principles.md",
+      "heading": "Structural Principles",
+      "text": "**Separation of Concerns**\nDifferent responsibilities should live in different modules.\nCode signals: Business logic extracted from UI components. Data access separated from domain logic. Configuration separated from behavior. A \"god file\" split into focused modules.\n\n**High Cohesion**\nRelated functionality should live together.\nCode signals: Scattered related functions gathered into one module. A utility file broken up so each piece lives near its consumers. A feature folder created.\n\n**Loose Coupling**\nModules should depend on each other as little as possible.\nCode signals: Direct imports replaced with events/callbacks. A shared dependency removed. Modules communicate through well-defined interfaces instead of reaching into internals.\n\n**Encapsulation**\nHide internal details, expose only what's necessary.\nCode signals: Public methods reduced. Internal helpers made private. A module's API surface shrunk. Implementation details hidden behind a facade.\n\n**Information Hiding**\nModules should not expose their internal data structures.\nCode signals: Raw data structures wrapped in accessor methods. Internal state made private. A data transformation moved inside the module that owns the data.",
+      "chars": 1205,
+      "units": [
+        "para:acf1d823",
+        "para:3494d7be",
+        "para:11a0fd90",
+        "para:bf7568b1",
+        "para:bf7e5153"
+      ]
+    },
+    {
+      "id": "s032",
+      "file": "skills/lesson-learned/references/se-principles.md",
+      "heading": "Pragmatic Principles",
+      "text": "**Boy Scout Rule**\nLeave the code better than you found it.\nCode signals: Small cleanups alongside a feature change. A renamed variable for clarity. A dead code path removed. An outdated comment updated.\n\n**Fail Fast**\nDetect and report errors as early as possible.\nCode signals: Input validation added at entry points. Assertions added for invariants. Early returns replacing deep nesting. Error handling moved closer to the source.\n\n**Defensive Programming**\nAnticipate and handle unexpected inputs gracefully.\nCode signals: Null checks added. Default values provided. Edge cases handled. Error boundaries introduced.\n\n**Premature Optimization (avoiding it)**\nDon't optimize until you've measured.\nCode signals: A simple implementation chosen over a \"faster\" complex one. Readability prioritized over micro-performance. A profiling step added before optimization work.",
+      "chars": 870,
+      "units": [
+        "para:6377529d",
+        "para:a185a217",
+        "para:18f56a87",
+        "para:5a9c5a9b"
+      ]
+    },
+    {
+      "id": "s033",
+      "file": "skills/lesson-learned/references/se-principles.md",
+      "heading": "Refactoring Patterns",
+      "text": "**Extract Method/Function**\nCode signals: A long function split into named sub-functions. Inline logic replaced with a well-named call.\n\n**Extract Class/Module**\nCode signals: A file split into multiple files. A class split into two with distinct responsibilities.\n\n**Replace Conditional with Polymorphism**\nCode signals: A switch/if-else chain replaced with a strategy pattern or subclass dispatch. A type map introduced.\n\n**Introduce Parameter Object**\nCode signals: Multiple related parameters grouped into a single options/config object. Function signatures simplified.",
+      "chars": 573,
+      "units": [
+        "para:ce2c3de1",
+        "para:50710a9b",
+        "para:deec2ec8",
+        "para:e5604ac6"
+      ]
+    }
+  ],
+  "files": [],
+  "phrase_fate": {
+    "kept": 5.18,
+    "moved": 0.43,
+    "gone": 94.39,
+    "new": 92.85
+  }
+}

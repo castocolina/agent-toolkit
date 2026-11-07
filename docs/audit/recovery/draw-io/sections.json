@@ -1,0 +1,1513 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/draw-io/README.md",
+      "heading": "draw-io Diagram Skill",
+      "text": "A Claude Code skill for creating, editing, and managing draw.io diagrams with professional quality standards.",
+      "chars": 109,
+      "units": [
+        "para:c95f0b8b"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/draw-io/README.md",
+      "heading": "Purpose",
+      "text": "This skill enables AI-assisted creation and maintenance of draw.io architecture diagrams, flowcharts, and technical documentation visuals. It ensures consistent styling, proper layout, and automated PNG conversion for presentations and documentation.",
+      "chars": 250,
+      "units": [
+        "para:41b2c745"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/draw-io/README.md",
+      "heading": "When to Use This Skill",
+      "text": "Use this skill when you need to:\n\n- Create or edit `.drawio` XML diagram files\n- Convert diagrams to PNG. Transparent only if the user asks; otherwise keep the page background they chose.\n- Adjust element positions and layouts programmatically\n- Ensure consistent font families (especially for Quarto slides)\n- Work with AWS architecture diagrams using official icons\n- Maintain professional diagram quality with accessibility standards\n- Debug layout issues or element overlaps",
+      "chars": 478,
+      "units": [
+        "para:c6dc12c9",
+        "para:7b16a1f1",
+        "para:693f6166",
+        "para:c8f435a1",
+        "para:5b410bc0",
+        "para:d3a3d940",
+        "para:408b372f",
+        "para:f0a5a9fa"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/draw-io/README.md",
+      "heading": "How It Works",
+      "text": "The skill provides:\n\n1. **Direct XML Editing**: Manipulates `.drawio` files as structured XML\n2. **Automated Conversion**: Converts diagrams to high-resolution PNG via pre-commit hooks or scripts\n3. **Layout Calculations**: Computes proper spacing, alignment, and margins\n4. **Icon Integration**: Searches and integrates official AWS icons\n5. **Quality Assurance**: Applies design principles and accessibility guidelines",
+      "chars": 420,
+      "units": [
+        "para:37757e2f",
+        "para:183dc410",
+        "para:aa3a2b48",
+        "para:6ccc8cce",
+        "para:dd01c7ad",
+        "para:f536fde1"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/draw-io/README.md",
+      "heading": "1. Font Management",
+      "text": "Ensures consistent typography across diagrams:\n\n- Sets `defaultFontFamily` in mxGraphModel\n- Applies `fontFamily` to individual text elements\n- Recommended: \"Noto Sans JP\" for Japanese text support",
+      "chars": 197,
+      "units": [
+        "para:d2add1b8",
+        "para:4bf8478a",
+        "para:65497196",
+        "para:f2bc25e9"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/draw-io/README.md",
+      "heading": "2. PNG Conversion",
+      "text": "Multiple conversion methods:\n\n```bash\n# Via pre-commit hook (all files)\nmise exec -- pre-commit run --all-files\n\n# Specific file via pre-commit\nmise exec -- pre-commit run convert-drawio-to-png --files assets/my-diagram.drawio\n\n# Direct script execution\nbash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram.drawio\n```\n\nConversion produces:\n- 2x scale (high resolution)\n- Transparent background\n- PNG format suitable for presentations",
+      "chars": 458,
+      "units": [
+        "para:b4b86eeb",
+        "para:7cceb470",
+        "para:77b940e7",
+        "para:5c2a7b85"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/draw-io/README.md",
+      "heading": "3. Layout Adjustment",
+      "text": "Programmatic element positioning:\n\n- Calculate element centers: `y + (height / 2)`\n- Align multiple elements by matching center coordinates\n- Maintain minimum 30px margins from container boundaries\n- Position arrows to avoid label overlaps (20px+ clearance)",
+      "chars": 257,
+      "units": [
+        "para:e49fe477",
+        "para:9a5488c3",
+        "para:e783f34a",
+        "para:ea9decfe",
+        "para:213edd42"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/draw-io/README.md",
+      "heading": "4. AWS Icon Integration",
+      "text": "Search and integrate official AWS service icons:\n\n```bash\npython ~/.claude/skills/draw-io/scripts/find_aws_icon.py ec2\npython ~/.claude/skills/draw-io/scripts/find_aws_icon.py lambda\n```\n\nUses latest `mxgraph.aws4.*` icon set.",
+      "chars": 226,
+      "units": [
+        "para:38e8c29e",
+        "para:f15e2d6e",
+        "para:075a4630"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/draw-io/README.md",
+      "heading": "5. Design Principles",
+      "text": "Enforces professional standards:\n\n- **Clarity**: Simple, visually clean diagrams\n- **Consistency**: Unified colors, fonts, icon sizes, line thickness\n- **Accuracy**: Precise technical representation\n- **Accessibility**: Sufficient color contrast, pattern usage\n- **Progressive Disclosure**: Staged diagrams for complex systems",
+      "chars": 326,
+      "units": [
+        "para:cf8e6e75",
+        "para:547bdc30",
+        "para:2cd585c8",
+        "para:6ed50bb2",
+        "para:9259a384",
+        "para:747e1c73"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/draw-io/README.md",
+      "heading": "6. Quality Checklist",
+      "text": "Automated validation ensures:\n\n- Page background matches the user's choice (transparent, light, dark, or other)\n- Appropriate font sizes (1.5x standard for readability)\n- Curved orthogonal arrows unless the span is empty and aligned\n- 30px+ margins from container boundaries\n- Official AWS service names and latest icons\n- Visual verification of PNG output",
+      "chars": 356,
+      "units": [
+        "para:22382e51",
+        "para:4136b5c3",
+        "para:f31086ac",
+        "para:8c4234a8",
+        "para:acf4e351",
+        "para:178026fb",
+        "para:26b41a16"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/draw-io/README.md",
+      "heading": "Example 1: Create AWS Architecture Diagram",
+      "text": "```xml\n<!-- Set font family -->\n<mxGraphModel defaultFontFamily=\"Noto Sans JP\" ...>\n\n  <!-- Container is the parent. Child coordinates are relative to it. -->\n  <mxCell id=\"vpc\" value=\"VPC\" style=\"rounded=1;strokeWidth=3;fillColor=#E6F2F8;fontColor=#111111;strokeColor=#1565c0;\" vertex=\"1\" parent=\"1\">\n    <mxGeometry x=\"40\" y=\"40\" width=\"560\" height=\"430\" as=\"geometry\"/>\n  </mxCell>\n\n  <mxCell id=\"title\" value=\"VPC\" style=\"text;fontSize=18;fontFamily=Noto Sans JP;fontColor=#111111;\" vertex=\"1\" parent=\"vpc\">\n    <mxGeometry x=\"30\" y=\"30\" width=\"500\" height=\"35\" as=\"geometry\"/>\n  </mxCell>\n\n  <!-- Arrow with explicit coordinates -->\n  <mxCell id=\"arrow1\" style=\"edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;\" edge=\"1\" parent=\"1\">\n    <mxGeometry relative=\"1\" as=\"geometry\">\n      <mxPoint x=\"100\" y=\"200\" as=\"sourcePoint\"/>\n      <mxPoint x=\"500\" y=\"200\" as=\"targetPoint\"/>\n    </mxGeometry>\n  </mxCell>\n\n  <!-- Arrow label with offset -->\n  <mxCell id=\"label1\" value=\"API Request\" style=\"edgeLabel;fontSize=14;fontFamily=Noto Sans JP;\">\n    <mxGeometry relative=\"1\" as=\"geometry\">\n      <mxPoint x=\"0\" y=\"-20\" as=\"offset\"/>\n    </mxGeometry>\n  </mxCell>\n</mxGraphModel>\n```",
+      "chars": 1247,
+      "units": [
+        "para:cdc669c0"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/draw-io/README.md",
+      "heading": "Example 2: Convert Diagram to PNG",
+      "text": "```bash\n# Edit the diagram\nvim architecture.drawio\n\n# Convert to PNG (via pre-commit hook)\nmise exec -- pre-commit run convert-drawio-to-png --files architecture.drawio\n\n# Result: architecture.drawio.png (2x resolution, transparent)\n```",
+      "chars": 236,
+      "units": [
+        "para:ca76175a"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/draw-io/README.md",
+      "heading": "Example 3: Find AWS Icon",
+      "text": "```bash\n# Search for EC2 icon\npython ~/.claude/skills/draw-io/scripts/find_aws_icon.py ec2\n\n# Output: mxgraph.aws4.compute.ec2_instance\n```",
+      "chars": 139,
+      "units": [
+        "para:0837c41c"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/draw-io/README.md",
+      "heading": "Example 4: Progressive Disclosure Diagram Set",
+      "text": "For complex systems, create staged diagrams:\n\n1. **Context Diagram**: External perspective (users, external systems)\n2. **System Diagram**: Main components (services, databases)\n3. **Component Diagram**: Technical details (APIs, queues, caches)\n4. **Deployment Diagram**: Infrastructure (VPCs, regions, availability zones)\n5. **Data Flow Diagram**: Data transformations and flows\n6. **Sequence Diagram**: Time-series interactions",
+      "chars": 429,
+      "units": [
+        "para:0b66e187",
+        "para:11b2ec37",
+        "para:538bd5bb",
+        "para:e7f38b9c",
+        "para:b10d32d5",
+        "para:8f099d7b",
+        "para:c8493130"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/draw-io/README.md",
+      "heading": "Text Width Calculation",
+      "text": "Japanese text requires 30-40px per character:\n\n```xml\n<!-- For 10-character text: 300-400px width -->\n<mxGeometry x=\"140\" y=\"60\" width=\"400\" height=\"40\" />\n```",
+      "chars": 159,
+      "units": [
+        "para:4ec5c41a",
+        "para:c371fadc"
+      ]
+    },
+    {
+      "id": "s016",
+      "file": "skills/draw-io/README.md",
+      "heading": "Arrow Layering",
+      "text": "Do not force arrows to the back layer. This XML is the pattern that hides the label under the box:\n\n```xml\n<mxCell id=\"title\" value=\"...\" .../>\n<mxCell id=\"arrow1\" style=\"edgeStyle=orthogonalEdgeStyle;curved=1;...\" .../> <!-- Don't: back layer -->\n<mxCell id=\"box1\" .../> <!-- Front layer covers the arrow and its label -->\n```",
+      "chars": 327,
+      "units": [
+        "para:0b7eac73",
+        "para:d5edf262"
+      ]
+    },
+    {
+      "id": "s017",
+      "file": "skills/draw-io/README.md",
+      "heading": "Container Margins",
+      "text": "Measure the 30px margin inside the parent, not on the page:\n\n```text\nContainer origin y=0, height=400\nElement top: y \u2265 30\nElement bottom: y \u2264 370\n```\n\nThe old page math (frame y=20, element y\u226550) is the sibling pattern. It insets correctly and still does not group.",
+      "chars": 265,
+      "units": [
+        "para:06fe4a69",
+        "para:4e742fb9",
+        "para:1af906a8"
+      ]
+    },
+    {
+      "id": "s018",
+      "file": "skills/draw-io/README.md",
+      "heading": "Page Background",
+      "text": "Do not force a transparent page. Ask: transparent, light, dark, or another color. `#ffffff` and `#1e1e1e` are suggestions. Contrast is harmony of text, component, container, arrow, and page \u2014 not a fixed ink color.\n\nTransparent is still a valid choice when the user asks for it:\n\n```xml\n<!-- One option, not the only option -->\n<mxGraphModel page=\"0\" ...>\n\n<!-- Also valid when the user wants a light or dark plate -->\n<mxGraphModel background=\"#ffffff\" ...>\n<mxGraphModel background=\"#1e1e1e\" ...>\n```",
+      "chars": 502,
+      "units": [
+        "para:4ea6b50b",
+        "para:59edfaf1",
+        "para:bda945d7"
+      ]
+    },
+    {
+      "id": "s019",
+      "file": "skills/draw-io/README.md",
+      "heading": "File Structure",
+      "text": "```\n~/.claude/skills/draw-io/\n\u251c\u2500\u2500 SKILL.md                          # This documentation\n\u251c\u2500\u2500 README.md                         # User-facing guide\n\u251c\u2500\u2500 scripts/\n\u2502   \u251c\u2500\u2500 convert-drawio-to-png.sh     # PNG conversion script\n\u2502   \u2514\u2500\u2500 find_aws_icon.py             # AWS icon search utility\n\u2514\u2500\u2500 references/\n    \u251c\u2500\u2500 layout-guidelines.md         # Detailed layout rules\n    \u2514\u2500\u2500 aws-icons.md                 # AWS icon catalog\n```",
+      "chars": 420,
+      "units": [
+        "para:dbc79e16"
+      ]
+    },
+    {
+      "id": "s020",
+      "file": "skills/draw-io/README.md",
+      "heading": "Integration with Presentations",
+      "text": "For reveal.js slides (Quarto), add to YAML header:\n\n```yaml\n---\ntitle: \"Your Presentation\"\nformat:\n  revealjs:\n    auto-stretch: false\n---\n```\n\nThis ensures correct image sizing on mobile devices.",
+      "chars": 196,
+      "units": [
+        "para:af7c8132",
+        "para:0b38ca2b",
+        "para:8e574875"
+      ]
+    },
+    {
+      "id": "s021",
+      "file": "skills/draw-io/README.md",
+      "heading": "Quality Assurance Checklist",
+      "text": "Before finalizing any diagram:\n\n- [ ] Page background matches the user's choice\n- [ ] Font size appropriate (18px+ for readability)\n- [ ] Arrows are curved orthogonal unless A and B share an axis and the span is empty\n- [ ] Arrows not overlapping labels (verified in PNG)\n- [ ] Arrow endpoints 20px+ from labels\n- [ ] Internal elements not overflowing the container\n- [ ] Arrows not penetrating boxes/icons\n- [ ] Internal elements have 30px+ margins from frames\n- [ ] AWS service names are official/correct\n- [ ] AWS icons use latest version (`mxgraph.aws4.*`)\n- [ ] No unnecessary decorative elements\n- [ ] PNG conversion visually verified",
+      "chars": 640,
+      "units": [
+        "para:c23b1f8c",
+        "para:571f2ccf",
+        "para:fd535d30",
+        "para:f5843f82",
+        "para:f6f9d9a2",
+        "para:015f9720",
+        "para:6674476d",
+        "para:3998827b",
+        "para:4c60e56c",
+        "para:0b452845",
+        "para:270a276d",
+        "para:37c4fce2",
+        "para:18ef4772"
+      ]
+    },
+    {
+      "id": "s022",
+      "file": "skills/draw-io/README.md",
+      "heading": "References",
+      "text": "- [Layout Guidelines](references/layout-guidelines.md) - Detailed spacing and alignment rules\n- [AWS Icons](references/aws-icons.md) - Complete AWS icon catalog\n- [draw.io Documentation](https://www.drawio.com/doc/) - Official draw.io reference",
+      "chars": 244,
+      "units": [
+        "para:e6a1ec3c",
+        "para:b88e3985",
+        "para:64d1a249"
+      ]
+    },
+    {
+      "id": "s023",
+      "file": "skills/draw-io/README.md",
+      "heading": "Skill Metadata",
+      "text": "- **Name**: draw-io\n- **Type**: Diagram creation and editing\n- **Input**: `.drawio` XML files\n- **Output**: `.drawio.png` high-resolution images\n- **Dependencies**: drawio CLI, Python 3.x, pre-commit hooks",
+      "chars": 205,
+      "units": [
+        "para:ed47285d",
+        "para:f701d084",
+        "para:f5a558ed",
+        "para:6f2408d1",
+        "para:691fad67"
+      ]
+    },
+    {
+      "id": "s024",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: draw-io\ndescription: Create and edit uncompressed .drawio diagrams and export PNG. Use when the user asks for a draw.io file, an architecture diagram, an AWS icon diagram, a Quarto or reveal.js slide figure, or a layout fix in mxGraph XML. Keywords include .drawio, mxCell, mxgraph.aws4, and diagram export.\n---",
+      "chars": 321,
+      "units": [
+        "para:d28a6615"
+      ]
+    },
+    {
+      "id": "s025",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "1. Basic Rules",
+      "text": "- Edit only `.drawio` files\n- Do not directly edit `.drawio.png` files\n- Use auto-generated `.drawio.png` by pre-commit hook in slides",
+      "chars": 134,
+      "units": [
+        "para:673a3ab3",
+        "para:49007867",
+        "para:bac2bb36"
+      ]
+    },
+    {
+      "id": "s026",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "2. Font Settings",
+      "text": "For diagrams used in Quarto slides,\nspecify `defaultFontFamily` in mxGraphModel tag:\n\n```xml\n<mxGraphModel defaultFontFamily=\"Noto Sans JP\" ...>\n```\n\nAlso explicitly specify `fontFamily` in each text element's style attribute:\n\n```xml\nstyle=\"text;html=1;fontSize=27;fontFamily=Noto Sans JP;\"\n```",
+      "chars": 295,
+      "units": [
+        "para:fadfe1bc",
+        "para:e05725b3",
+        "para:ab0d8268",
+        "para:65fdd9d4"
+      ]
+    },
+    {
+      "id": "s027",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "3. Conversion Commands",
+      "text": "See conversion script at [scripts/convert-drawio-to-png.sh](scripts/convert-drawio-to-png.sh).\n\n```sh\n# Convert all .drawio files\nmise exec -- pre-commit run --all-files\n\n# Convert specific .drawio file\nmise exec -- pre-commit run convert-drawio-to-png --files assets/my-diagram.drawio\n\n# Run script directly (using skill's script)\nbash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram1.drawio\n```\n\nExport matches the page background the user chose. Pass `-t` only for a transparent page. Do not add `-t` for a light, dark, or custom plate.\n\n```sh\n# Transparent, only if the user asked for it\nDRAWIO_BACKGROUND=transparent bash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram1.drawio\n\n# Light or dark plate: the script rewrites background on a temp copy, then exports without -t\nDRAWIO_BACKGROUND=light bash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram1.drawio\nDRAWIO_BACKGROUND=dark bash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram1.drawio\n\n# File as stored, no -t\nbash ~/.claude/skills/draw-io/scripts/convert-drawio-to-png.sh assets/diagram1.drawio\n```\n\n| Option | Description |\n|--------|-------------|\n| `-x` | Export mode |\n| `-f png` | PNG format output |\n| `-s 2` | 2x scale (high resolution) |\n| `-t` | Transparent background |\n| `-o` | Output file path |",
+      "chars": 1370,
+      "units": [
+        "para:8bcd895a",
+        "para:8f22603b",
+        "para:157ab742",
+        "para:98444eaa",
+        "para:ef2b2c58",
+        "para:5918b145",
+        "para:a022faee",
+        "para:20dbe41e",
+        "para:40d8b453"
+      ]
+    },
+    {
+      "id": "s028",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "4.1. Coordinate Adjustment Steps",
+      "text": "1. Open `.drawio` file in text editor (plain XML format)\n2. Find `mxCell` for element to adjust (search by `value` attribute for text)\n3. Adjust coordinates in `mxGeometry` tag\n   - `x`: Position from left\n   - `y`: Position from top\n   - `width`: Width\n   - `height`: Height\n4. Run conversion and verify",
+      "chars": 304,
+      "units": [
+        "para:cba71912",
+        "para:5858eb9e",
+        "para:c257bd10",
+        "para:4021b290",
+        "para:87d9710c",
+        "para:48c3095f"
+      ]
+    },
+    {
+      "id": "s029",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "4.2. Coordinate Calculation",
+      "text": "- Element center coordinate = `y + (height / 2)`\n- To align multiple elements, calculate and match center coordinates",
+      "chars": 117,
+      "units": [
+        "para:4ff44804",
+        "para:7b86cc47"
+      ]
+    },
+    {
+      "id": "s030",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "5.1. Basic Principles",
+      "text": "- Clarity: Create simple, visually clean diagrams\n- Consistency: Unify colors, fonts, icon sizes, line thickness\n- Accuracy: Do not sacrifice accuracy for simplification",
+      "chars": 169,
+      "units": [
+        "para:b1846474",
+        "para:a87df408",
+        "para:768787ea"
+      ]
+    },
+    {
+      "id": "s031",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "5.2. Element Rules",
+      "text": "- Label all elements\n- Use arrows to indicate direction\n  Prefer two unidirectional arrows over one bidirectional arrow. A single double-headed arrow hides which call is which. `references/layout-guidelines.md` uses the same rule.\n- Use latest official icons\n- Add legend to explain custom symbols",
+      "chars": 297,
+      "units": [
+        "para:55004fda",
+        "para:c7fe1543",
+        "para:b0a2954f",
+        "para:807dd8fe"
+      ]
+    },
+    {
+      "id": "s032",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "5.3. Accessibility",
+      "text": "- Ensure sufficient color contrast. Contrast is harmony of the whole diagram, not a fixed ink color. Text must separate from its component fill. The component must separate from its container. The container and the arrows must separate from the page. Black, gray, or white can all be correct.\n- Use patterns in addition to colors",
+      "chars": 329,
+      "units": [
+        "para:a1f95a32",
+        "para:22f17935"
+      ]
+    },
+    {
+      "id": "s033",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "5.4. Progressive Disclosure",
+      "text": "Separate complex systems into staged diagrams:\n\n| Diagram Type | Purpose |\n|--------------|---------|\n| Context Diagram | System overview from external perspective |\n| System Diagram | Main components and relationships |\n| Component Diagram | Technical details and integration points |\n| Deployment Diagram | Infrastructure configuration |\n| Data Flow Diagram | Data flow and transformation |\n| Sequence Diagram | Time-series interactions |",
+      "chars": 440,
+      "units": [
+        "para:2ced3926",
+        "para:8a62d18f",
+        "para:721dc271",
+        "para:6d9e6e1f",
+        "para:6e4ee960",
+        "para:3f995980",
+        "para:ca6d4a21",
+        "para:d6c673db"
+      ]
+    },
+    {
+      "id": "s034",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "6.1. Background Color",
+      "text": "Ask which page background the user wants: transparent, light, dark, or another color. `#ffffff` and `#1e1e1e` are suggestions, not a closed default. Do not strip `background` just to force transparency.\n\n- Transparent: every stroke, icon, and fill must still read on both a light slide and a dark slide. If it will not, ask for the theme before export.\n- Light plate: `background=\"#ffffff\"` with dark ink on light fills.\n- Dark plate: `background=\"#1e1e1e\"` with light ink on dark fills.\n- Other: use the user's color, then retune component fill, `fontColor`, and arrow `strokeColor` so the set stays harmonious.\n\n`-t` on the PNG export keeps the page transparent. Use it only when the user asked for a transparent background.",
+      "chars": 726,
+      "units": [
+        "para:3160629f",
+        "para:b1bfbe9e",
+        "para:bb82f486",
+        "para:815e1b02",
+        "para:e87d602c",
+        "para:a292136c"
+      ]
+    },
+    {
+      "id": "s035",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "6.3. Japanese Text Width",
+      "text": "- Allow 30-40px per character\n- Insufficient width causes unintended line breaks\n\n```xml\n<!-- For 10-character text, allow 300-400px -->\n<mxGeometry x=\"140\" y=\"60\" width=\"400\" height=\"40\" />\n```",
+      "chars": 194,
+      "units": [
+        "para:2de72e5d",
+        "para:a8c25cef",
+        "para:8e2bd5c7"
+      ]
+    },
+    {
+      "id": "s036",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "6.4. Arrow Placement",
+      "text": "Do not draw a straight line from A to B unless they share an axis and the span is empty. If they are not aligned, or a box sits between them, a straight line cuts the diagram.\n\n```xml\nstyle=\"edgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;\"\n```\n\nDecide the target per arrow. This is not the Mermaid subgraph rule.\n\n- The message is \"this block talks to that block\": end on the parent container.\n\n- The message is \"this call enters this service\": end on that node.\n\n- Leave and enter from the side that faces the other end (`exitX`/`exitY`, `entryX`/`entryY`). The elbow runs through the gutter between groups, not through a container.\n\n- The edge `parent` is the common ancestor (usually the page, `1`), not a buried child.\n\n- Do not put every arrow on the back layer. A back-layer arrow hides its label under a container. Route it in the gap. If it must cross, divert it. Do not bury it.\n\nKeep the label in that gutter, more than 20px from the line and from any box or text. Never under a container. Position arrows so they do not overlap labels. Keep the arrow start and end at least 20px from a label edge.\n\nDo not bury arrows behind boxes. This layering hides the label under the container:",
+      "chars": 1259,
+      "units": [
+        "para:d289ef5d",
+        "para:56943c47",
+        "para:dbf3bf63",
+        "para:228226fa",
+        "para:e3cbeba1",
+        "para:9538dd8d",
+        "para:d2aa7680",
+        "para:fd1dfd08",
+        "para:8506c40b",
+        "para:5b35bb93"
+      ]
+    },
+    {
+      "id": "s037",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "6.4. Arrow Placement",
+      "text": "```xml\n<!-- Title -->\n<mxCell id=\"title\" value=\"...\" .../>\n\n<!-- Don't: arrows forced to the back layer -->\n<mxCell id=\"arrow1\" style=\"edgeStyle=orthogonalEdgeStyle;curved=1;...\" edge=\"1\"/>\n\n<!-- Other elements (front layer) cover the arrow and its label -->\n<mxCell id=\"box1\" .../>\n```",
+      "chars": 286,
+      "units": [
+        "para:bdf0fb15"
+      ]
+    },
+    {
+      "id": "s038",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "6.5. Arrow Connection to Text Labels",
+      "text": "For text elements, exitX/exitY don't work, so use explicit coordinates:\n\n```xml\n<!-- Good: Explicit coordinates with sourcePoint/targetPoint -->\n<mxCell id=\"arrow\" style=\"...\" edge=\"1\" parent=\"1\">\n  <mxGeometry relative=\"1\" as=\"geometry\">\n    <mxPoint x=\"1279\" y=\"500\" as=\"sourcePoint\"/>\n    <mxPoint x=\"119\" y=\"500\" as=\"targetPoint\"/>\n    <Array as=\"points\">\n      <mxPoint x=\"1279\" y=\"560\"/>\n      <mxPoint x=\"119\" y=\"560\"/>\n    </Array>\n  </mxGeometry>\n</mxCell>\n```",
+      "chars": 469,
+      "units": [
+        "para:13fd76de",
+        "para:e2c74a86"
+      ]
+    },
+    {
+      "id": "s039",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "6.6. edgeLabel Offset Adjustment",
+      "text": "Adjust offset attribute to distance arrow labels from arrows:\n\n```xml\n<!-- Place above arrow (negative value to distance) -->\n<mxPoint x=\"0\" y=\"-40\" as=\"offset\"/>\n\n<!-- Place below arrow (positive value to distance) -->\n<mxPoint x=\"0\" y=\"40\" as=\"offset\"/>\n```",
+      "chars": 259,
+      "units": [
+        "para:64afd421",
+        "para:31d50b49"
+      ]
+    },
+    {
+      "id": "s040",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "6.7. Remove Unnecessary Elements",
+      "text": "- Remove decorative icons irrelevant to context\n- Example: If ECR exists, separate Docker icon is unnecessary",
+      "chars": 109,
+      "units": [
+        "para:629b143a",
+        "para:c844095a"
+      ]
+    },
+    {
+      "id": "s041",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "6.8. Labels and Headings",
+      "text": "- Service name only: 1 line\n- Service name + supplementary info: 2 lines with line break\n- Redundant notation (e.g., ECR Container Registry): shorten to 1 line\n- Use `&lt;br&gt;` tag for line breaks",
+      "chars": 198,
+      "units": [
+        "para:82f2a56a",
+        "para:bfcc7a04",
+        "para:45a98b01",
+        "para:384b74d6"
+      ]
+    },
+    {
+      "id": "s042",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "6.9. Containers Are Parents",
+      "text": "A container is the `parent` of its components, not a rectangle drawn behind siblings. Children use coordinates relative to the container. The user can then drag the block and redistribute it.\n\n- YOU MUST: At least 30px margin inside the parent, measured from the container origin\n\n- YOU MUST: Account for rounded corners (`rounded=1`) and stroke width\n\n- YOU MUST: The container stroke must read against the page background\n\n- YOU MUST: Visually verify the PNG\n\nProportion is the slide canvas (16:9), not a GitHub column. One idea per diagram. Do not stretch horizontally so that text has to shrink.\n\nCoordinate check, measured inside the parent:\n\n```text\nContainer origin y=0, height=400 -> inner range is y=0-400\nInternal element top: 30 or more\nInternal element bottom: height - 30 or less (e.g., up to y=370)\n```\n\nBad example (overflow: the label starts 10px inside a frame whose top is y=20, and it is not a child, so the block cannot be dragged together):\n\n```xml\n<mxCell id=\"bg\" value=\"VPC\" style=\"rounded=1;strokeWidth=3;\" vertex=\"1\" parent=\"1\">\n  <mxGeometry x=\"500\" y=\"20\" width=\"560\" height=\"400\" as=\"geometry\"/>\n</mxCell>\n<mxCell id=\"label\" value=\"Title\" style=\"text;\" vertex=\"1\" parent=\"1\">\n  <mxGeometry x=\"510\" y=\"30\" width=\"540\" height=\"35\" as=\"geometry\"/>\n</mxCell>\n```\n\nMargin alone is not enough if the title is still a sibling on the page. This keeps the 30px inset but does not group:",
+      "chars": 1405,
+      "units": [
+        "para:6571f596",
+        "para:92d2eac5",
+        "para:00bf74c3",
+        "para:1167ecd7",
+        "para:0bd57c61",
+        "para:e2840bda",
+        "para:6a88a1e3",
+        "para:6c397f70",
+        "para:fb73ec5e",
+        "para:6ad28be8",
+        "para:14a27011"
+      ]
+    },
+    {
+      "id": "s043",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "6.9. Containers Are Parents",
+      "text": "```xml\n<!-- Background frame -->\n<mxCell id=\"bg\" style=\"rounded=1;strokeWidth=3;...\" vertex=\"1\" parent=\"1\">\n  <mxGeometry x=\"500\" y=\"20\" width=\"560\" height=\"430\" as=\"geometry\"/>\n</mxCell>\n<!-- y=50 is 30px from frame top (y=20), but parent is still the page -->\n<mxCell id=\"label\" value=\"Title\" style=\"text;...\" vertex=\"1\" parent=\"1\">\n  <mxGeometry x=\"510\" y=\"50\" width=\"540\" height=\"35\" as=\"geometry\"/>\n</mxCell>\n```\n\nGood example (child of the container, 30px inside it, moves with the block):\n\n```xml\n<mxCell id=\"vpc\" value=\"VPC\" style=\"rounded=1;strokeWidth=3;fillColor=#E6F2F8;fontColor=#111111;strokeColor=#1565c0;\" vertex=\"1\" parent=\"1\">\n  <mxGeometry x=\"40\" y=\"40\" width=\"560\" height=\"400\" as=\"geometry\"/>\n</mxCell>\n<mxCell id=\"alb\" value=\"ALB\" style=\"rounded=1;fillColor=#ffffff;fontColor=#111111;\" vertex=\"1\" parent=\"vpc\">\n  <mxGeometry x=\"30\" y=\"40\" width=\"120\" height=\"60\" as=\"geometry\"/>\n</mxCell>\n```\n\n`fontColor=#111111` here is dark ink on a light fill, not the only legal text color. On a dark fill, use a light `fontColor`. For an AWS group, use `shape=mxgraph.aws4.group` and still parent the services to that cell.",
+      "chars": 1134,
+      "units": [
+        "para:1c4cf640",
+        "para:6d2c59a3",
+        "para:764c760c",
+        "para:e3f759b4"
+      ]
+    },
+    {
+      "id": "s044",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "7. Reference",
+      "text": "Load only what the task needs.\n\n- **MANDATORY** before placing groups or arrows: [references/layout-guidelines.md](references/layout-guidelines.md)\n- **MANDATORY** for an AWS icon: run [scripts/find_aws_icon.py](scripts/find_aws_icon.py). **Do NOT load** [references/aws-icons.md](references/aws-icons.md) unless that script misses the service.\n- **Do NOT load** `aws-icons.md` for a non-AWS diagram.\n\nAWS icon search examples:\n\n```sh\npython ~/.claude/skills/draw-io/scripts/find_aws_icon.py ec2\npython ~/.claude/skills/draw-io/scripts/find_aws_icon.py lambda\n```",
+      "chars": 563,
+      "units": [
+        "para:bef196be",
+        "para:1530582b",
+        "para:31880466",
+        "para:afc66edc",
+        "para:105425aa",
+        "para:9dce809e"
+      ]
+    },
+    {
+      "id": "s045",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "8. Checklist",
+      "text": "- [ ] Page background matches the user's choice. Transparent is `page=\"0\"` plus `-t`. Light or dark sets `background` and does not pass `-t`\n- [ ] Arrows do not penetrate boxes or icons (verify in PNG)\n- [ ] Text contrasts with its component fill; components, arrows, and containers contrast with the page\n- [ ] Font size appropriate (larger recommended)\n- [ ] Arrows are curved orthogonal unless A and B share an axis and the span is empty\n- [ ] Each arrow ends on the container or the node, chosen per message\n- [ ] Arrow labels sit in the gutter, 20px+ from the line and from any box or text\n- [ ] Arrows not overlapping labels (verify in PNG)\n- [ ] Arrow start/end at least 20px from label edges\n- [ ] Arrows do not cut through containers (verify in PNG)\n- [ ] Container children use `parent` of that container, coordinates relative to it\n- [ ] Internal elements not overflowing the container (verify in PNG)\n- [ ] 30px+ margin inside the container\n- [ ] AWS service names are official names/correct abbreviations\n- [ ] AWS icons are latest version (mxgraph.aws4.*)\n- [ ] No unnecessary elements remaining\n- [ ] Visually verified PNG conversion",
+      "chars": 1148,
+      "units": [
+        "para:0c3c72e3",
+        "para:44cfd033",
+        "para:7ea6f6bb",
+        "para:2d2e2945",
+        "para:f5843f82",
+        "para:c2966fba",
+        "para:22936544",
+        "para:67854753",
+        "para:f09a22cb",
+        "para:600a317a",
+        "para:b571ad2c",
+        "para:28344ccd",
+        "para:1154ee6b",
+        "para:59c52188",
+        "para:fa3e7b89",
+        "para:6f7b1f81",
+        "para:bc7d94ff"
+      ]
+    },
+    {
+      "id": "s046",
+      "file": "skills/draw-io/SKILL.md",
+      "heading": "9. Image Display in reveal.js Slides",
+      "text": "Add `auto-stretch: false` to YAML header:\n\n```yaml\n---\ntitle: \"Your Presentation\"\nformat:\n  revealjs:\n    auto-stretch: false\n---\n```\n\nThis ensures correct image display on mobile devices.",
+      "chars": 188,
+      "units": [
+        "para:b695783d",
+        "para:0b38ca2b",
+        "para:f48e4774"
+      ]
+    },
+    {
+      "id": "s047",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "1. \u6b63\u3057\u3044\u30b5\u30fc\u30d3\u30b9\u540d\u306e\u898f\u5247",
+      "text": "| \u63a5\u982d\u8f9e | \u4f8b |\n|--------|-----|\n| Amazon | Amazon ECS, Amazon ECR, Amazon S3, Amazon RDS, Amazon CloudWatch |\n| AWS | AWS Lambda, AWS IAM, AWS CloudFormation, AWS Step Functions |\n| Elastic | Elastic Load Balancing |\n\n- \u7565\u79f0\u306e\u307f\u306e\u4f7f\u7528\u306f\u907f\u3051\u308b (ECS \u2192 Amazon ECS)\n- \u6b63\u5f0f\u540d\u79f0\u3092\u4f7f\u7528\u3059\u308b",
+      "chars": 259,
+      "units": [
+        "para:551683aa",
+        "para:c2d1821c",
+        "para:0f8228e9",
+        "para:e16e1d8c"
+      ]
+    },
+    {
+      "id": "s048",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.1. Compute (\u30b3\u30f3\u30d4\u30e5\u30fc\u30c6\u30a3\u30f3\u30b0)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| Amazon EC2 | mxgraph.aws4.ec2 |\n| EC2 Instance | mxgraph.aws4.instance2 |\n| EC2 Instances | mxgraph.aws4.instances |\n| Instance with CloudWatch | mxgraph.aws4.instance_with_cloudwatch2 |\n| Spot Instance | mxgraph.aws4.spot_instance |\n| Optimized Instance | mxgraph.aws4.optimized_instance |\n| DB on Instance | mxgraph.aws4.db_on_instance |\n| Elastic IP Address | mxgraph.aws4.elastic_ip_address |\n| Rescue | mxgraph.aws4.rescue |\n| Auto Scaling | mxgraph.aws4.auto_scaling2 |\n| AWS Lambda | mxgraph.aws4.lambda |\n| Lambda Function | mxgraph.aws4.lambda_function |\n| Amazon Lightsail | mxgraph.aws4.lightsail |\n| AWS Batch | mxgraph.aws4.batch |\n| AWS Elastic Beanstalk | mxgraph.aws4.elastic_beanstalk |\n| Elastic Beanstalk Application | mxgraph.aws4.application |\n| Elastic Beanstalk Deployment | mxgraph.aws4.deployment |\n| AWS Outposts | mxgraph.aws4.outposts |\n| AWS App Runner | mxgraph.aws4.app_runner |\n| AWS ParallelCluster | mxgraph.aws4.parallel_cluster |\n| AWS Wavelength | mxgraph.aws4.wavelength |\n| AWS Local Zones | mxgraph.aws4.local_zones |\n| VMware Cloud on AWS | mxgraph.aws4.vmware_cloud_on_aws |\n| Bottlerocket | mxgraph.aws4.bottlerocket |\n| EC2 Image Builder | mxgraph.aws4.ec2_image_builder |\n| Elastic Fabric Adapter | mxgraph.aws4.elastic_fabric_adapter |\n| NICE DCV | mxgraph.aws4.nice_dcv |",
+      "chars": 1362,
+      "units": [
+        "para:395bb64c",
+        "para:592313ff",
+        "para:32f24e6f",
+        "para:6502e671",
+        "para:13b2919e",
+        "para:510d53cf",
+        "para:738125a4",
+        "para:b413f09e",
+        "para:f144b483",
+        "para:5b555712",
+        "para:8db78261",
+        "para:c27e0416",
+        "para:debd8748",
+        "para:99f3b482",
+        "para:55c95b8b",
+        "para:27a128e8",
+        "para:05945336",
+        "para:f23d0140",
+        "para:ad16b627",
+        "para:753f2971",
+        "para:dd8fcf68",
+        "para:87934090",
+        "para:55e988ce",
+        "para:36cb927c",
+        "para:1661714f",
+        "para:c58b8760",
+        "para:4540a502"
+      ]
+    },
+    {
+      "id": "s049",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.2. Containers (\u30b3\u30f3\u30c6\u30ca)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| Amazon ECS | mxgraph.aws4.ecs |\n| ECS Task | mxgraph.aws4.ecs_task |\n| Amazon EKS | mxgraph.aws4.eks |\n| EKS Cloud | mxgraph.aws4.eks_cloud |\n| EKS Anywhere | mxgraph.aws4.eks_anywhere |\n| Amazon ECR | mxgraph.aws4.ecr |\n| AWS Fargate | mxgraph.aws4.fargate |\n| Container 1 | mxgraph.aws4.container_1 |\n| Container 2 | mxgraph.aws4.container_2 |\n| Container 3 | mxgraph.aws4.container_3 |\n| AWS App2Container | mxgraph.aws4.app2container |\n| Red Hat OpenShift on AWS | mxgraph.aws4.red_hat_openshift |",
+      "chars": 545,
+      "units": [
+        "para:69a1b94c",
+        "para:024ada6d",
+        "para:d53397a6",
+        "para:6260cabf",
+        "para:ff1cdbb5",
+        "para:59bb6fbc",
+        "para:41bba6b5",
+        "para:1e919619",
+        "para:1e2c9232",
+        "para:046a13eb",
+        "para:20d7a6cb",
+        "para:8424e2f7"
+      ]
+    },
+    {
+      "id": "s050",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.3. Storage (\u30b9\u30c8\u30ec\u30fc\u30b8)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| Amazon S3 | mxgraph.aws4.s3 |\n| S3 Bucket | mxgraph.aws4.bucket |\n| S3 Bucket with Objects | mxgraph.aws4.bucket_with_objects |\n| S3 Object | mxgraph.aws4.object |\n| S3 Glacier | mxgraph.aws4.glacier |\n| S3 Glacier Archive | mxgraph.aws4.archive |\n| S3 Glacier Vault | mxgraph.aws4.vault |\n| Amazon EBS | mxgraph.aws4.ebs |\n| EBS Volume | mxgraph.aws4.volume |\n| EBS Snapshot | mxgraph.aws4.snapshot |\n| Amazon EFS | mxgraph.aws4.efs |\n| EFS File System | mxgraph.aws4.file_system |\n| Amazon FSx | mxgraph.aws4.fsx |\n| FSx for Lustre | mxgraph.aws4.fsx_for_lustre |\n| FSx for Windows File Server | mxgraph.aws4.fsx_for_windows_file_server |\n| FSx for NetApp ONTAP | mxgraph.aws4.fsx_for_netapp_ontap |\n| FSx for OpenZFS | mxgraph.aws4.fsx_for_openzfs |\n| AWS Storage Gateway | mxgraph.aws4.storage_gateway |\n| File Gateway | mxgraph.aws4.file_gateway |\n| Volume Gateway | mxgraph.aws4.volume_gateway |\n| Tape Gateway | mxgraph.aws4.tape_gateway |\n| AWS Backup | mxgraph.aws4.backup |\n| AWS Elastic Disaster Recovery | mxgraph.aws4.elastic_disaster_recovery |\n| AWS Snow Family | mxgraph.aws4.snow_family |",
+      "chars": 1149,
+      "units": [
+        "para:422e591e",
+        "para:0954b490",
+        "para:defd3259",
+        "para:a4c93d80",
+        "para:a9f17496",
+        "para:d4848cfd",
+        "para:8be71221",
+        "para:60b1c824",
+        "para:104c4e0c",
+        "para:85d3e08f",
+        "para:449c6887",
+        "para:00cd8f32",
+        "para:4cdea39f",
+        "para:1eed5029",
+        "para:f965b6f8",
+        "para:a255911e",
+        "para:be2260b4",
+        "para:98903858",
+        "para:db69b056",
+        "para:a11e9c77",
+        "para:f41ff4c1",
+        "para:02a3c72e",
+        "para:891e798b",
+        "para:0eb02d99"
+      ]
+    },
+    {
+      "id": "s051",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.4. Database (\u30c7\u30fc\u30bf\u30d9\u30fc\u30b9)",
+      "text": "| Amazon RDS | mxgraph.aws4.rds |\n\n| RDS DB Instance | mxgraph.aws4.db_instance |\n\n| RDS Read Replica | mxgraph.aws4.db_instance_read_replica |\n\n| RDS Standby | mxgraph.aws4.db_instance_standby |\n\n| RDS MySQL | mxgraph.aws4.mysql_db_instance |\n\n| RDS MySQL (Alt) | mxgraph.aws4.mysql_db_instance_alternate |\n\n| RDS PostgreSQL | mxgraph.aws4.postgresql_instance |\n\n| RDS Oracle | mxgraph.aws4.oracle_db_instance |\n\n| RDS Oracle (Alt) | mxgraph.aws4.oracle_db_instance_alternate |\n\n| RDS SQL Server | mxgraph.aws4.ms_sql_instance |\n\n| RDS SQL Server (Alt) | mxgraph.aws4.ms_sql_instance_alternate |\n\n| RDS MariaDB | mxgraph.aws4.mariadb_instance |\n\n| RDS SQL Primary | mxgraph.aws4.sql_primary |\n\n| RDS SQL Replica | mxgraph.aws4.sql_replica |\n\n| RDS PIOP | mxgraph.aws4.piop |\n\n| Amazon Aurora | mxgraph.aws4.aurora |\n\n| Aurora MySQL | mxgraph.aws4.aurora_mysql_instance |\n\n| Aurora PostgreSQL | mxgraph.aws4.aurora_postgresql_instance |\n\n| Amazon DynamoDB | mxgraph.aws4.dynamodb |\n\n| DynamoDB Table | mxgraph.aws4.table |\n\n| DynamoDB Item | mxgraph.aws4.item |\n\n| DynamoDB Items | mxgraph.aws4.items |\n\n| DynamoDB Attribute | mxgraph.aws4.attribute |\n\n| DynamoDB Attributes | mxgraph.aws4.attributes |\n\n| DynamoDB Global Secondary Index | mxgraph.aws4.global_secondary_index |\n\n| Amazon ElastiCache | mxgraph.aws4.elasticache |\n\n| ElastiCache for Redis | mxgraph.aws4.elasticache_for_redis |\n\n| ElastiCache for Memcached | mxgraph.aws4.elasticache_for_memcached |",
+      "chars": 1464,
+      "units": [
+        "para:d5c4416f",
+        "para:50e3d79a",
+        "para:872af28d",
+        "para:5c482e48",
+        "para:f0f2394b",
+        "para:d6b9d99f",
+        "para:881b536b",
+        "para:fe057c3b",
+        "para:1135e7e8",
+        "para:521964b3",
+        "para:7ef4f98b",
+        "para:3dbe348b",
+        "para:cef4c307",
+        "para:fa64652c",
+        "para:f5077552",
+        "para:6963d268",
+        "para:1f08c28f",
+        "para:89d6ada1",
+        "para:09980e0a",
+        "para:9b8dcb04",
+        "para:1c90eafa",
+        "para:d1d69e2d",
+        "para:b177dfd2",
+        "para:d470e182",
+        "para:9f28e326",
+        "para:9ad5388a",
+        "para:c2b9b1f2",
+        "para:6ea31cd9"
+      ]
+    },
+    {
+      "id": "s052",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.4. Database (\u30c7\u30fc\u30bf\u30d9\u30fc\u30b9)",
+      "text": "| ElastiCache Cache Node | mxgraph.aws4.cache_node |\n\n| Amazon Redshift | mxgraph.aws4.redshift |\n\n| Redshift Dense Compute Node | mxgraph.aws4.dense_compute_node |\n\n| Redshift Dense Storage Node | mxgraph.aws4.dense_storage_node |\n\n| Amazon Neptune | mxgraph.aws4.neptune |\n\n| Amazon DocumentDB | mxgraph.aws4.documentdb |\n\n| Amazon Timestream | mxgraph.aws4.timestream |\n\n| Amazon MemoryDB | mxgraph.aws4.memorydb |\n\n| Amazon Keyspaces | mxgraph.aws4.keyspaces |\n\n| Amazon QLDB | mxgraph.aws4.qldb |\n\n| Generic Database | mxgraph.aws4.database |",
+      "chars": 547,
+      "units": [
+        "para:34180986",
+        "para:54b032a2",
+        "para:852cd5cb",
+        "para:7561e0f6",
+        "para:202008c7",
+        "para:202ba5ab",
+        "para:fc062434",
+        "para:632005b0",
+        "para:6d69e9a5",
+        "para:8efe1d2e",
+        "para:45b50d8d"
+      ]
+    },
+    {
+      "id": "s053",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.5. Networking (\u30cd\u30c3\u30c8\u30ef\u30fc\u30af)",
+      "text": "| Amazon VPC | mxgraph.aws4.vpc |\n\n| Internet Gateway | mxgraph.aws4.internet_gateway |\n\n| NAT Gateway | mxgraph.aws4.nat_gateway |\n\n| VPN Gateway | mxgraph.aws4.vpn_gateway |\n\n| Customer Gateway | mxgraph.aws4.customer_gateway |\n\n| VPN Connection | mxgraph.aws4.vpn_connection |\n\n| VPC Peering | mxgraph.aws4.peering |\n\n| VPC Endpoints | mxgraph.aws4.endpoints |\n\n| VPC Flow Logs | mxgraph.aws4.flow_logs |\n\n| Network ACL | mxgraph.aws4.network_access_control_list |\n\n| Router | mxgraph.aws4.router |\n\n| Elastic Network Interface | mxgraph.aws4.elastic_network_interface |\n\n| Elastic Network Adapter | mxgraph.aws4.elastic_network_adapter |\n\n| Amazon CloudFront | mxgraph.aws4.cloudfront |\n\n| CloudFront Edge Location | mxgraph.aws4.edge_location |\n\n| CloudFront Download Distribution | mxgraph.aws4.download_distribution |\n\n| CloudFront Streaming Distribution | mxgraph.aws4.streaming_distribution |\n\n| Amazon Route 53 | mxgraph.aws4.route_53 |\n\n| Route 53 Hosted Zone | mxgraph.aws4.hosted_zone |\n\n| Route 53 Route Table | mxgraph.aws4.route_table |\n\n| Elastic Load Balancing | mxgraph.aws4.elastic_load_balancing |\n\n| Application Load Balancer | mxgraph.aws4.application_load_balancer |\n\n| Network Load Balancer | mxgraph.aws4.network_load_balancer |\n\n| Gateway Load Balancer | mxgraph.aws4.gateway_load_balancer |\n\n| Classic Load Balancer | mxgraph.aws4.classic_load_balancer |\n\n| ELB (\u65e7) | mxgraph.aws4.elb |\n\n| Amazon API Gateway | mxgraph.aws4.api_gateway |",
+      "chars": 1465,
+      "units": [
+        "para:cfa0b7d9",
+        "para:ed8f21db",
+        "para:629f8a2a",
+        "para:4727e52f",
+        "para:2226698c",
+        "para:498e9cdd",
+        "para:028acda3",
+        "para:b80f14d2",
+        "para:c1c0eb5a",
+        "para:a2c6f4c5",
+        "para:55c3c245",
+        "para:7e6e284b",
+        "para:a8e6bbf4",
+        "para:d81f0c69",
+        "para:6a0e234a",
+        "para:c2277fec",
+        "para:cfe512b0",
+        "para:e3dc0175",
+        "para:f307424f",
+        "para:d7f4bf09",
+        "para:15775b31",
+        "para:824e57ca",
+        "para:efa46da8",
+        "para:568b370b",
+        "para:5475f8f9",
+        "para:efbde00a",
+        "para:2c143cdd"
+      ]
+    },
+    {
+      "id": "s054",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.5. Networking (\u30cd\u30c3\u30c8\u30ef\u30fc\u30af)",
+      "text": "| API Gateway Endpoint | mxgraph.aws4.endpoint |\n\n| AWS Direct Connect | mxgraph.aws4.direct_connect |\n\n| AWS Transit Gateway | mxgraph.aws4.transit_gateway |\n\n| Transit Gateway Attachment | mxgraph.aws4.transit_gateway_attachment |\n\n| AWS PrivateLink | mxgraph.aws4.privatelink |\n\n| AWS Global Accelerator | mxgraph.aws4.global_accelerator |\n\n| AWS App Mesh | mxgraph.aws4.app_mesh |\n\n| AWS Cloud Map | mxgraph.aws4.cloud_map |\n\n| AWS Client VPN | mxgraph.aws4.client_vpn |\n\n| AWS Site-to-Site VPN | mxgraph.aws4.site_to_site_vpn |\n\n| AWS Network Firewall | mxgraph.aws4.network_firewall |\n\n| Amazon VPC Lattice | mxgraph.aws4.vpc_lattice |\n\n| Verified Access | mxgraph.aws4.verified_access |",
+      "chars": 693,
+      "units": [
+        "para:aed72591",
+        "para:31152a64",
+        "para:e85f3a96",
+        "para:df13c073",
+        "para:f058ffed",
+        "para:76ba8590",
+        "para:2cd75eae",
+        "para:e026735c",
+        "para:312601a4",
+        "para:cc06f498",
+        "para:f70e2ece",
+        "para:ca6903f1",
+        "para:3c97762c"
+      ]
+    },
+    {
+      "id": "s055",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.6. Security, Identity & Compliance (\u30bb\u30ad\u30e5\u30ea\u30c6\u30a3)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| AWS IAM | mxgraph.aws4.identity_and_access_management |\n| IAM (\u77ed\u7e2e) | mxgraph.aws4.iam |\n| IAM Role | mxgraph.aws4.role |\n| IAM Permissions | mxgraph.aws4.permissions |\n| IAM Identity Center | mxgraph.aws4.iam_identity_center |\n| Amazon Cognito | mxgraph.aws4.cognito |\n| AWS WAF | mxgraph.aws4.waf |\n| AWS Shield | mxgraph.aws4.shield |\n| AWS KMS | mxgraph.aws4.key_management_service |\n| AWS Secrets Manager | mxgraph.aws4.secrets_manager |\n| AWS Certificate Manager | mxgraph.aws4.certificate_manager |\n| Amazon GuardDuty | mxgraph.aws4.guardduty |\n| Amazon Inspector | mxgraph.aws4.inspector |\n| Amazon Macie | mxgraph.aws4.macie |\n| AWS Security Hub | mxgraph.aws4.security_hub |\n| AWS Directory Service | mxgraph.aws4.directory_service |\n| AWS Firewall Manager | mxgraph.aws4.firewall_manager |\n| AWS Organizations | mxgraph.aws4.organizations |\n| AWS Resource Access Manager | mxgraph.aws4.resource_access_manager |\n| AWS Artifact | mxgraph.aws4.artifact |\n| AWS Audit Manager | mxgraph.aws4.audit_manager |\n| AWS CloudHSM | mxgraph.aws4.cloudhsm |\n| Amazon Detective | mxgraph.aws4.detective |\n| AWS Network Firewall | mxgraph.aws4.network_firewall |\n| AWS Private CA | mxgraph.aws4.private_ca |\n| AWS Security Lake | mxgraph.aws4.security_lake |\n| AWS Signer | mxgraph.aws4.signer |\n| Amazon Verified Permissions | mxgraph.aws4.verified_permissions |\n| SAML Token | mxgraph.aws4.saml_token |",
+      "chars": 1443,
+      "units": [
+        "para:e262582c",
+        "para:59216f99",
+        "para:67367d9f",
+        "para:ec8c961c",
+        "para:ccaffdf1",
+        "para:e6fb78f4",
+        "para:15fb0357",
+        "para:837b0cc9",
+        "para:19be2abb",
+        "para:7457df41",
+        "para:7519fbac",
+        "para:43d6fc25",
+        "para:cacccb70",
+        "para:94926ec1",
+        "para:e49ef67e",
+        "para:c26baccc",
+        "para:38ceaf84",
+        "para:5a00a037",
+        "para:e158f9cb",
+        "para:966fce25",
+        "para:962e64b2",
+        "para:ff785167",
+        "para:0ce0a12b",
+        "para:f70e2ece",
+        "para:14d16412",
+        "para:e97c3a26",
+        "para:cb4a9efe",
+        "para:2f20f904",
+        "para:b7a9ea67"
+      ]
+    },
+    {
+      "id": "s056",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.7. Analytics (\u5206\u6790)",
+      "text": "| Amazon Athena | mxgraph.aws4.athena |\n\n| Amazon CloudSearch | mxgraph.aws4.cloudsearch |\n\n| CloudSearch Search Documents | mxgraph.aws4.search_documents |\n\n| AWS Glue | mxgraph.aws4.glue |\n\n| AWS Glue DataBrew | mxgraph.aws4.glue_databrew |\n\n| AWS Glue Elastic Views | mxgraph.aws4.glue_elastic_views |\n\n| AWS Glue Data Catalog | mxgraph.aws4.data_catalog |\n\n| AWS Glue Crawler | mxgraph.aws4.crawler |\n\n| Amazon Kinesis | mxgraph.aws4.kinesis |\n\n| Kinesis Data Streams | mxgraph.aws4.kinesis_data_streams |\n\n| Kinesis Data Firehose | mxgraph.aws4.kinesis_data_firehose |\n\n| Kinesis Data Analytics | mxgraph.aws4.kinesis_data_analytics |\n\n| Kinesis Video Streams | mxgraph.aws4.kinesis_video_streams |\n\n| Amazon EMR | mxgraph.aws4.emr |\n\n| EMR Engine | mxgraph.aws4.emr_engine |\n\n| EMR Engine MapR M3 | mxgraph.aws4.emr_engine_mapr_m3 |\n\n| EMR Engine MapR M5 | mxgraph.aws4.emr_engine_mapr_m5 |\n\n| EMR Engine MapR M7 | mxgraph.aws4.emr_engine_mapr_m7 |\n\n| EMR HDFS Cluster | mxgraph.aws4.hdfs_cluster |\n\n| EMR Cluster | mxgraph.aws4.cluster |\n\n| Amazon OpenSearch | mxgraph.aws4.opensearch |\n\n| Elasticsearch (\u65e7) | mxgraph.aws4.elasticsearch_service |\n\n| Amazon QuickSight | mxgraph.aws4.quicksight |\n\n| AWS Data Pipeline | mxgraph.aws4.data_pipeline |\n\n| Amazon MSK | mxgraph.aws4.msk |\n\n| AWS Lake Formation | mxgraph.aws4.lake_formation |\n\n| AWS Data Exchange | mxgraph.aws4.data_exchange |\n\n| Amazon DataZone | mxgraph.aws4.datazone |\n\n| AWS Clean Rooms | mxgraph.aws4.clean_rooms |",
+      "chars": 1488,
+      "units": [
+        "para:db38701c",
+        "para:0279159c",
+        "para:792f0fa5",
+        "para:697c8a1d",
+        "para:d5ddfe1d",
+        "para:6354d1ea",
+        "para:ddb1f7af",
+        "para:91077070",
+        "para:4bef605a",
+        "para:fe929248",
+        "para:11602b73",
+        "para:9dfb562b",
+        "para:2fbf697d",
+        "para:93959a0d",
+        "para:d50279b6",
+        "para:790092be",
+        "para:036d4c55",
+        "para:387b72a3",
+        "para:7a25a5fb",
+        "para:b47af32f",
+        "para:755ee925",
+        "para:2981212c",
+        "para:61a6d735",
+        "para:df9b62de",
+        "para:7deff665",
+        "para:29c9937a",
+        "para:023d006a",
+        "para:556ae76e",
+        "para:80724969"
+      ]
+    },
+    {
+      "id": "s057",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.7. Analytics (\u5206\u6790)",
+      "text": "| AWS Entity Resolution | mxgraph.aws4.entity_resolution |\n\n| Amazon FinSpace | mxgraph.aws4.finspace |\n\n| Amazon Managed Grafana | mxgraph.aws4.managed_grafana |\n\n| Amazon Managed Prometheus | mxgraph.aws4.managed_prometheus |",
+      "chars": 227,
+      "units": [
+        "para:24b9e15b",
+        "para:ea1ad612",
+        "para:a401c9fe",
+        "para:370ddfaf"
+      ]
+    },
+    {
+      "id": "s058",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.8. Machine Learning & AI (\u6a5f\u68b0\u5b66\u7fd2\u30fbAI)",
+      "text": "| Amazon SageMaker | mxgraph.aws4.sagemaker |\n\n| SageMaker Notebook | mxgraph.aws4.sagemaker_notebook |\n\n| SageMaker Model | mxgraph.aws4.sagemaker_model |\n\n| SageMaker Ground Truth | mxgraph.aws4.sagemaker_ground_truth |\n\n| Amazon Bedrock | mxgraph.aws4.bedrock |\n\n| Amazon Q | mxgraph.aws4.amazon_q |\n\n| Amazon Q Business | mxgraph.aws4.q_business |\n\n| Amazon Q Developer | mxgraph.aws4.q_developer |\n\n| Amazon Lex | mxgraph.aws4.lex |\n\n| Amazon Polly | mxgraph.aws4.polly |\n\n| Amazon Rekognition | mxgraph.aws4.rekognition |\n\n| Amazon Transcribe | mxgraph.aws4.transcribe |\n\n| Amazon Comprehend | mxgraph.aws4.comprehend |\n\n| Amazon Textract | mxgraph.aws4.textract |\n\n| Amazon Translate | mxgraph.aws4.translate |\n\n| Amazon Personalize | mxgraph.aws4.personalize |\n\n| Amazon Forecast | mxgraph.aws4.forecast |\n\n| Amazon Kendra | mxgraph.aws4.kendra |\n\n| Amazon CodeWhisperer | mxgraph.aws4.codewhisperer |\n\n| Amazon CodeGuru | mxgraph.aws4.codeguru |\n\n| CodeGuru Reviewer | mxgraph.aws4.codeguru_reviewer |\n\n| CodeGuru Profiler | mxgraph.aws4.codeguru_profiler |\n\n| Amazon Lookout | mxgraph.aws4.lookout |\n\n| Lookout for Vision | mxgraph.aws4.lookout_for_vision |\n\n| Lookout for Equipment | mxgraph.aws4.lookout_for_equipment |\n\n| Lookout for Metrics | mxgraph.aws4.lookout_for_metrics |\n\n| Amazon Fraud Detector | mxgraph.aws4.fraud_detector |\n\n| AWS DeepRacer | mxgraph.aws4.deepracer |\n\n| AWS DeepLens | mxgraph.aws4.deeplens |\n\n| AWS DeepComposer | mxgraph.aws4.deepcomposer |",
+      "chars": 1484,
+      "units": [
+        "para:6db4f811",
+        "para:ac60b24c",
+        "para:fa9e25a0",
+        "para:1c8d7b2a",
+        "para:ae3d4cfe",
+        "para:6495194c",
+        "para:f47bd55c",
+        "para:8c9cf4d2",
+        "para:fc30ff4b",
+        "para:abe89520",
+        "para:c6433446",
+        "para:2754c2bb",
+        "para:f8375786",
+        "para:ca104361",
+        "para:bfe555c6",
+        "para:9ba04518",
+        "para:4c49464e",
+        "para:a983bfae",
+        "para:63e3268c",
+        "para:4d35b2c3",
+        "para:f518ba43",
+        "para:9587c0ed",
+        "para:fdc6d8bd",
+        "para:3594c0c8",
+        "para:1dec1419",
+        "para:5e052e7a",
+        "para:8c198d0c",
+        "para:4e4e0527",
+        "para:da2bae77",
+        "para:e13b77c4"
+      ]
+    },
+    {
+      "id": "s059",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.8. Machine Learning & AI (\u6a5f\u68b0\u5b66\u7fd2\u30fbAI)",
+      "text": "| AWS Panorama | mxgraph.aws4.panorama |\n\n| Amazon Augmented AI | mxgraph.aws4.augmented_ai |\n\n| Amazon HealthLake | mxgraph.aws4.healthlake |\n\n| Amazon Monitron | mxgraph.aws4.monitron |\n\n| Amazon Omics | mxgraph.aws4.omics |\n\n| Apache MXNet on AWS | mxgraph.aws4.apache_mxnet |\n\n| TensorFlow on AWS | mxgraph.aws4.tensorflow |\n\n| PyTorch on AWS | mxgraph.aws4.pytorch |\n\n| Deep Learning AMIs | mxgraph.aws4.deep_learning_amis |\n\n| Deep Learning Containers | mxgraph.aws4.deep_learning_containers |\n\n| Machine Learning (\u6c4e\u7528) | mxgraph.aws4.machine_learning |",
+      "chars": 558,
+      "units": [
+        "para:0d4b0470",
+        "para:6141ca4b",
+        "para:9862ab1d",
+        "para:96c6e370",
+        "para:f6b64f3d",
+        "para:6472a0db",
+        "para:d13a3ab3",
+        "para:5ba17ced",
+        "para:519a309f",
+        "para:bdb0f7bc",
+        "para:83ab8666"
+      ]
+    },
+    {
+      "id": "s060",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.9. Application Integration (\u30a2\u30d7\u30ea\u30b1\u30fc\u30b7\u30e7\u30f3\u7d71\u5408)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| Amazon SNS | mxgraph.aws4.sns |\n| SNS Topic | mxgraph.aws4.topic |\n| SNS Email Notification | mxgraph.aws4.email_notification |\n| SNS HTTP Notification | mxgraph.aws4.http_notification |\n| Amazon SQS | mxgraph.aws4.sqs |\n| SQS Queue | mxgraph.aws4.queue |\n| SQS Message | mxgraph.aws4.message |\n| Amazon EventBridge | mxgraph.aws4.eventbridge |\n| EventBridge Event Bus | mxgraph.aws4.event_bus |\n| EventBridge Rule | mxgraph.aws4.rule |\n| EventBridge Schema Registry | mxgraph.aws4.schema_registry |\n| EventBridge Pipes | mxgraph.aws4.eventbridge_pipes |\n| EventBridge Scheduler | mxgraph.aws4.eventbridge_scheduler |\n| AWS Step Functions | mxgraph.aws4.step_functions |\n| Step Functions Workflow | mxgraph.aws4.workflow |\n| Amazon AppFlow | mxgraph.aws4.appflow |\n| Amazon MQ | mxgraph.aws4.mq |\n| AWS AppSync | mxgraph.aws4.appsync |\n| AWS Express Workflows | mxgraph.aws4.express_workflows |\n| Amazon Managed Workflows for Apache Airflow | mxgraph.aws4.managed_workflows_apache_airflow |",
+      "chars": 1034,
+      "units": [
+        "para:75000ec2",
+        "para:5e816684",
+        "para:a7da5374",
+        "para:74723e71",
+        "para:57d8482c",
+        "para:0de8012d",
+        "para:33d7b18b",
+        "para:af24c33a",
+        "para:018a063b",
+        "para:593ef271",
+        "para:bf063b0f",
+        "para:cb894768",
+        "para:325911c2",
+        "para:73c01d33",
+        "para:24ee0358",
+        "para:44eeb28a",
+        "para:d040103b",
+        "para:1926c49a",
+        "para:306eac20",
+        "para:d3873ffc"
+      ]
+    },
+    {
+      "id": "s061",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.10. Management & Governance (\u7ba1\u7406\u30fb\u30ac\u30d0\u30ca\u30f3\u30b9)",
+      "text": "| Amazon CloudWatch | mxgraph.aws4.cloudwatch |\n\n| CloudWatch (v2) | mxgraph.aws4.cloudwatch_2 |\n\n| CloudWatch Alarm | mxgraph.aws4.alarm |\n\n| CloudWatch Rule | mxgraph.aws4.event |\n\n| CloudWatch Logs | mxgraph.aws4.logs |\n\n| CloudWatch Metrics | mxgraph.aws4.metrics |\n\n| AWS CloudFormation | mxgraph.aws4.cloudformation |\n\n| CloudFormation Template | mxgraph.aws4.template |\n\n| CloudFormation Stack | mxgraph.aws4.stack |\n\n| CloudFormation Change Set | mxgraph.aws4.change_set |\n\n| AWS CloudTrail | mxgraph.aws4.cloudtrail |\n\n| AWS Systems Manager | mxgraph.aws4.systems_manager |\n\n| Systems Manager Automation | mxgraph.aws4.automation |\n\n| Systems Manager Inventory | mxgraph.aws4.inventory |\n\n| Systems Manager Patch Manager | mxgraph.aws4.patch_manager |\n\n| Systems Manager Run Command | mxgraph.aws4.run_command |\n\n| Systems Manager State Manager | mxgraph.aws4.state_manager |\n\n| Systems Manager Parameter Store | mxgraph.aws4.parameter_store |\n\n| Systems Manager OpsCenter | mxgraph.aws4.opscenter |\n\n| AWS Config | mxgraph.aws4.config |\n\n| AWS Service Catalog | mxgraph.aws4.service_catalog |\n\n| AWS Trusted Advisor | mxgraph.aws4.trusted_advisor |\n\n| AWS Control Tower | mxgraph.aws4.control_tower |\n\n| AWS License Manager | mxgraph.aws4.license_manager |\n\n| AWS Resource Explorer | mxgraph.aws4.resource_explorer |\n\n| AWS Well-Architected | mxgraph.aws4.well_architected |\n\n| AWS OpsWorks | mxgraph.aws4.opsworks |\n\n| AWS Launch Wizard | mxgraph.aws4.launch_wizard |",
+      "chars": 1478,
+      "units": [
+        "para:e6ade874",
+        "para:6c911360",
+        "para:1c8b7a3d",
+        "para:fc04ace7",
+        "para:634ee5a7",
+        "para:7d01a6de",
+        "para:a1787fde",
+        "para:5279c26b",
+        "para:8cf92c36",
+        "para:b7d61f4d",
+        "para:b8251072",
+        "para:d0318bb4",
+        "para:cbc0f735",
+        "para:ad7e1856",
+        "para:09defc59",
+        "para:34071f92",
+        "para:57a4a370",
+        "para:bfc092f9",
+        "para:bfc4514c",
+        "para:9ba963b7",
+        "para:e27bf140",
+        "para:80c7a084",
+        "para:f456a100",
+        "para:cab34d3b",
+        "para:6746efed",
+        "para:1d62972b",
+        "para:7e8cf969",
+        "para:b355cfa8"
+      ]
+    },
+    {
+      "id": "s062",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.10. Management & Governance (\u7ba1\u7406\u30fb\u30ac\u30d0\u30ca\u30f3\u30b9)",
+      "text": "| AWS Management Console | mxgraph.aws4.management_console |\n\n| AWS Personal Health Dashboard | mxgraph.aws4.personal_health_dashboard |\n\n| AWS Proton | mxgraph.aws4.proton |\n\n| AWS Resilience Hub | mxgraph.aws4.resilience_hub |\n\n| AWS Service Management Connector | mxgraph.aws4.service_management_connector |\n\n| AWS Chatbot | mxgraph.aws4.chatbot |\n\n| AWS Application Auto Scaling | mxgraph.aws4.application_auto_scaling |",
+      "chars": 424,
+      "units": [
+        "para:995461a8",
+        "para:c1c84aa6",
+        "para:28bcdd71",
+        "para:dc7b85d8",
+        "para:f30d239f",
+        "para:68e20b9c",
+        "para:17fa576b"
+      ]
+    },
+    {
+      "id": "s063",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.11. Developer Tools (\u958b\u767a\u8005\u30c4\u30fc\u30eb)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| AWS CodeBuild | mxgraph.aws4.codebuild |\n| AWS CodePipeline | mxgraph.aws4.codepipeline |\n| AWS CodeCommit | mxgraph.aws4.codecommit |\n| AWS CodeDeploy | mxgraph.aws4.codedeploy |\n| AWS CodeArtifact | mxgraph.aws4.codeartifact |\n| AWS CodeStar | mxgraph.aws4.codestar |\n| AWS CodeCatalyst | mxgraph.aws4.codecatalyst |\n| AWS Cloud9 | mxgraph.aws4.cloud9 |\n| AWS X-Ray | mxgraph.aws4.xray |\n| AWS CLI | mxgraph.aws4.command_line_interface |\n| AWS SDK | mxgraph.aws4.sdk |\n| AWS CloudShell | mxgraph.aws4.cloudshell |\n| AWS CDK | mxgraph.aws4.cloud_development_kit |\n| AWS Application Composer | mxgraph.aws4.application_composer |\n| AWS Fault Injection Service | mxgraph.aws4.fault_injection_service |\n| AWS Tools and SDKs | mxgraph.aws4.tools_and_sdks |\n| AWS SAM | mxgraph.aws4.serverless_application_model |",
+      "chars": 853,
+      "units": [
+        "para:3424e6df",
+        "para:c3cbfccc",
+        "para:77e92b29",
+        "para:799a8e83",
+        "para:c08d8331",
+        "para:1bd88818",
+        "para:e820c7a0",
+        "para:c72419fd",
+        "para:9be2d4f3",
+        "para:31e6b528",
+        "para:479d5424",
+        "para:adfda592",
+        "para:13348a7c",
+        "para:ae0c95af",
+        "para:9e31a95d",
+        "para:b161b41c",
+        "para:d6250ddf"
+      ]
+    },
+    {
+      "id": "s064",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.12. Front-end Web & Mobile (\u30d5\u30ed\u30f3\u30c8\u30a8\u30f3\u30c9)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| AWS Amplify | mxgraph.aws4.amplify |\n| AWS AppSync | mxgraph.aws4.appsync |\n| Amazon API Gateway | mxgraph.aws4.api_gateway |\n| Amazon Location Service | mxgraph.aws4.location_service |\n| AWS Device Farm | mxgraph.aws4.device_farm |\n| Amazon Pinpoint | mxgraph.aws4.pinpoint |",
+      "chars": 320,
+      "units": [
+        "para:2fdbc5d7",
+        "para:1926c49a",
+        "para:2c143cdd",
+        "para:f4a6f330",
+        "para:c7b51ee6",
+        "para:721733a3"
+      ]
+    },
+    {
+      "id": "s065",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.13. Customer Engagement (\u30ab\u30b9\u30bf\u30de\u30fc\u30a8\u30f3\u30b2\u30fc\u30b8\u30e1\u30f3\u30c8)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| Amazon Pinpoint | mxgraph.aws4.pinpoint |\n| Amazon SES | mxgraph.aws4.simple_email_service |\n| Amazon Connect | mxgraph.aws4.connect |\n| Amazon Connect Customer Profiles | mxgraph.aws4.connect_customer_profiles |\n| Amazon Connect Wisdom | mxgraph.aws4.connect_wisdom |\n| Amazon Connect Voice ID | mxgraph.aws4.connect_voice_id |",
+      "chars": 372,
+      "units": [
+        "para:721733a3",
+        "para:aaba4a0e",
+        "para:0eaa29bc",
+        "para:0c2b7120",
+        "para:1b52b87d",
+        "para:9259440b"
+      ]
+    },
+    {
+      "id": "s066",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.14. Business Applications (\u30d3\u30b8\u30cd\u30b9\u30a2\u30d7\u30ea\u30b1\u30fc\u30b7\u30e7\u30f3)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| Amazon Chime | mxgraph.aws4.chime |\n| Amazon Chime SDK | mxgraph.aws4.chime_sdk |\n| Amazon WorkMail | mxgraph.aws4.workmail |\n| Amazon Honeycode | mxgraph.aws4.honeycode |\n| AWS Supply Chain | mxgraph.aws4.supply_chain |\n| AWS Wickr | mxgraph.aws4.wickr |",
+      "chars": 299,
+      "units": [
+        "para:32006a62",
+        "para:3079c66b",
+        "para:e8126445",
+        "para:e9cd8a5f",
+        "para:0627dfdd",
+        "para:8a946ddc"
+      ]
+    },
+    {
+      "id": "s067",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.15. End User Computing (\u30a8\u30f3\u30c9\u30e6\u30fc\u30b6\u30fc\u30b3\u30f3\u30d4\u30e5\u30fc\u30c6\u30a3\u30f3\u30b0)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| Amazon WorkSpaces | mxgraph.aws4.workspaces |\n| Amazon WorkSpaces Web | mxgraph.aws4.workspaces_web |\n| Amazon AppStream 2.0 | mxgraph.aws4.appstream |\n| AppStream 2.0 (v2) | mxgraph.aws4.appstream_20 |\n| Amazon WorkDocs | mxgraph.aws4.workdocs |\n| Amazon WorkLink | mxgraph.aws4.worklink |\n| NICE DCV | mxgraph.aws4.nice_dcv |",
+      "chars": 371,
+      "units": [
+        "para:305fcf4a",
+        "para:e33d2902",
+        "para:e4a3c111",
+        "para:c858a244",
+        "para:10a59198",
+        "para:dabe5262",
+        "para:4540a502"
+      ]
+    },
+    {
+      "id": "s068",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.16. Internet of Things (IoT)",
+      "text": "| AWS IoT Core | mxgraph.aws4.iot_core |\n\n| IoT MQTT Protocol | mxgraph.aws4.mqtt_protocol |\n\n| IoT HTTP Protocol | mxgraph.aws4.http_protocol |\n\n| IoT HTTP2 Protocol | mxgraph.aws4.http2_protocol |\n\n| IoT Rule | mxgraph.aws4.iot_rule |\n\n| IoT Action | mxgraph.aws4.iot_action |\n\n| IoT Topic | mxgraph.aws4.iot_topic |\n\n| IoT Shadow | mxgraph.aws4.iot_shadow |\n\n| IoT Certificate | mxgraph.aws4.iot_certificate |\n\n| IoT Policy | mxgraph.aws4.iot_policy |\n\n| IoT Hardware Board | mxgraph.aws4.iot_hardware_board |\n\n| IoT Sensor | mxgraph.aws4.sensor |\n\n| IoT Servo | mxgraph.aws4.servo |\n\n| IoT Actuator | mxgraph.aws4.actuator |\n\n| IoT Reported State | mxgraph.aws4.reported_state |\n\n| IoT Desired State | mxgraph.aws4.desired_state |\n\n| AWS IoT Greengrass | mxgraph.aws4.iot_greengrass |\n\n| IoT Greengrass Connector | mxgraph.aws4.greengrass_connector |\n\n| AWS IoT Analytics | mxgraph.aws4.iot_analytics |\n\n| IoT Analytics Channel | mxgraph.aws4.iot_analytics_channel |\n\n| IoT Analytics Pipeline | mxgraph.aws4.iot_analytics_pipeline |\n\n| IoT Analytics Data Store | mxgraph.aws4.iot_analytics_data_store |\n\n| IoT Analytics Data Set | mxgraph.aws4.iot_analytics_data_set |\n\n| IoT Analytics Notebook | mxgraph.aws4.iot_analytics_notebook |\n\n| AWS IoT Device Defender | mxgraph.aws4.iot_device_defender |\n\n| AWS IoT Device Management | mxgraph.aws4.iot_device_management |\n\n| AWS IoT Events | mxgraph.aws4.iot_events |\n\n| AWS IoT SiteWise | mxgraph.aws4.iot_sitewise |",
+      "chars": 1466,
+      "units": [
+        "para:ddee6d60",
+        "para:24971098",
+        "para:98855f86",
+        "para:ca2c4822",
+        "para:a1459e6f",
+        "para:9c08c96a",
+        "para:05a81974",
+        "para:f909a46b",
+        "para:548b5eed",
+        "para:479df7c6",
+        "para:e0be76e3",
+        "para:d782a096",
+        "para:32db9afc",
+        "para:b007d0db",
+        "para:8c049e3f",
+        "para:20ba50e2",
+        "para:c646c0db",
+        "para:3ffa50d1",
+        "para:6f1434dd",
+        "para:57098dc7",
+        "para:afffea70",
+        "para:b3ab5f0a",
+        "para:5951b3de",
+        "para:4514769b",
+        "para:79cf615e",
+        "para:c3e10d0f",
+        "para:c1748b92",
+        "para:c5b5e5d4"
+      ]
+    },
+    {
+      "id": "s069",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.16. Internet of Things (IoT)",
+      "text": "| AWS IoT Things Graph | mxgraph.aws4.iot_things_graph |\n\n| AWS IoT 1-Click | mxgraph.aws4.iot_1click |\n\n| AWS IoT Button | mxgraph.aws4.iot_button |\n\n| AWS IoT FleetWise | mxgraph.aws4.iot_fleetwise |\n\n| AWS IoT RoboRunner | mxgraph.aws4.iot_roborunner |\n\n| AWS IoT TwinMaker | mxgraph.aws4.iot_twinmaker |\n\n| FreeRTOS | mxgraph.aws4.freertos |",
+      "chars": 345,
+      "units": [
+        "para:dc6feeb3",
+        "para:4e9f43de",
+        "para:281928d1",
+        "para:419420ef",
+        "para:49bf6c46",
+        "para:7be3f1d7",
+        "para:a3e2c10c"
+      ]
+    },
+    {
+      "id": "s070",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.17. Migration & Transfer (\u79fb\u884c\u30fb\u8ee2\u9001)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| AWS DMS | mxgraph.aws4.database_migration_service |\n| DMS Database Migration Workflow | mxgraph.aws4.database_migration_workflow_job |\n| AWS Snowball | mxgraph.aws4.snowball |\n| Snowball Import Export | mxgraph.aws4.snowball_import_export |\n| AWS Snowcone | mxgraph.aws4.snowcone |\n| AWS Snowmobile | mxgraph.aws4.snowmobile |\n| AWS Transfer Family | mxgraph.aws4.transfer_family |\n| AWS Migration Hub | mxgraph.aws4.migration_hub |\n| Migration Hub Orchestrator | mxgraph.aws4.migration_hub_orchestrator |\n| Migration Hub Refactor Spaces | mxgraph.aws4.migration_hub_refactor_spaces |\n| AWS Application Migration | mxgraph.aws4.application_migration_service |\n| AWS Application Discovery Service | mxgraph.aws4.application_discovery_service |\n| AWS DataSync | mxgraph.aws4.datasync |\n| DataSync Agent | mxgraph.aws4.datasync_agent |\n| AWS Mainframe Modernization | mxgraph.aws4.mainframe_modernization |",
+      "chars": 947,
+      "units": [
+        "para:5fb808c3",
+        "para:eb3ceaa9",
+        "para:d9d31809",
+        "para:a2c1bfb1",
+        "para:ad7ed06d",
+        "para:53783d03",
+        "para:3779e34b",
+        "para:f8d28841",
+        "para:6f984028",
+        "para:8cf5edb0",
+        "para:7c0e41ce",
+        "para:04ef198b",
+        "para:9f02f8ce",
+        "para:9d9436ce",
+        "para:60ae3caf"
+      ]
+    },
+    {
+      "id": "s071",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.18. Media Services (\u30e1\u30c7\u30a3\u30a2\u30b5\u30fc\u30d3\u30b9)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| AWS Elemental MediaConvert | mxgraph.aws4.mediaconvert |\n| AWS Elemental MediaLive | mxgraph.aws4.medialive |\n| AWS Elemental MediaPackage | mxgraph.aws4.mediapackage |\n| AWS Elemental MediaStore | mxgraph.aws4.mediastore |\n| AWS Elemental MediaTailor | mxgraph.aws4.mediatailor |\n| AWS Elemental MediaConnect | mxgraph.aws4.mediaconnect |\n| AWS Elemental Appliances | mxgraph.aws4.elemental_appliances |\n| AWS Elemental Link | mxgraph.aws4.elemental_link |\n| AWS Elemental Server | mxgraph.aws4.elemental_server |\n| AWS Elemental Conductor | mxgraph.aws4.elemental_conductor |\n| AWS Elemental Delta | mxgraph.aws4.elemental_delta |\n| AWS Elemental Live | mxgraph.aws4.elemental_live |\n| Amazon Elastic Transcoder | mxgraph.aws4.elastic_transcoder |\n| Amazon Interactive Video Service | mxgraph.aws4.ivs |\n| Amazon Nimble Studio | mxgraph.aws4.nimble_studio |\n| AWS Deadline Cloud | mxgraph.aws4.deadline_cloud |",
+      "chars": 956,
+      "units": [
+        "para:58b61011",
+        "para:b6c1f88a",
+        "para:61c7610f",
+        "para:d98daa7c",
+        "para:1c7003eb",
+        "para:3acb83aa",
+        "para:e3e785f8",
+        "para:6a9daff6",
+        "para:858bfe32",
+        "para:23ecc15e",
+        "para:568a8423",
+        "para:64824015",
+        "para:8a52f43a",
+        "para:b4f12416",
+        "para:9c669dfc",
+        "para:edb835d3"
+      ]
+    },
+    {
+      "id": "s072",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.19. Game Tech (\u30b2\u30fc\u30e0\u958b\u767a)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| Amazon GameLift | mxgraph.aws4.gamelift |\n| Amazon GameSparks | mxgraph.aws4.gamesparks |\n| Open 3D Engine | mxgraph.aws4.open_3d_engine |\n| Amazon Lumberyard | mxgraph.aws4.lumberyard |",
+      "chars": 230,
+      "units": [
+        "para:d086f460",
+        "para:6541222f",
+        "para:1eee1a7d",
+        "para:e6d56370"
+      ]
+    },
+    {
+      "id": "s073",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.20. Cost Management (\u30b3\u30b9\u30c8\u7ba1\u7406)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| AWS Cost Explorer | mxgraph.aws4.cost_explorer |\n| AWS Budgets | mxgraph.aws4.budgets |\n| AWS Cost and Usage Report | mxgraph.aws4.cost_and_usage_report |\n| Reserved Instance Reporting | mxgraph.aws4.reserved_instance_reporting |\n| Savings Plans | mxgraph.aws4.savings_plans |\n| AWS Billing Conductor | mxgraph.aws4.billing_conductor |\n| AWS Application Cost Profiler | mxgraph.aws4.application_cost_profiler |",
+      "chars": 454,
+      "units": [
+        "para:46344fb0",
+        "para:fbf7e731",
+        "para:08126596",
+        "para:cea363db",
+        "para:33a1d58c",
+        "para:64dbe0ef",
+        "para:97e03df4"
+      ]
+    },
+    {
+      "id": "s074",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.21. Blockchain (\u30d6\u30ed\u30c3\u30af\u30c1\u30a7\u30fc\u30f3)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| Amazon Managed Blockchain | mxgraph.aws4.managed_blockchain |\n| Amazon QLDB | mxgraph.aws4.qldb |",
+      "chars": 141,
+      "units": [
+        "para:366de955",
+        "para:8efe1d2e"
+      ]
+    },
+    {
+      "id": "s075",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.24. Robotics (\u30ed\u30dc\u30c6\u30a3\u30af\u30b9)",
+      "text": "| \u30b5\u30fc\u30d3\u30b9 | resIcon |\n|----------|---------|\n| AWS RoboMaker | mxgraph.aws4.robomaker |\n| RoboMaker Simulation | mxgraph.aws4.robomaker_simulation |\n| RoboMaker Development Environment | mxgraph.aws4.robomaker_development_environment |\n| RoboMaker Fleet Management | mxgraph.aws4.robomaker_fleet_management |\n| RoboMaker Cloud Extension | mxgraph.aws4.robomaker_cloud_extension |",
+      "chars": 376,
+      "units": [
+        "para:1717eebd",
+        "para:5c7d3a05",
+        "para:7ba431d8",
+        "para:92ca1f39",
+        "para:0e8baf73"
+      ]
+    },
+    {
+      "id": "s076",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "3.25. General/Generic Icons (\u6c4e\u7528\u30a2\u30a4\u30b3\u30f3)",
+      "text": "| \u8aac\u660e | resIcon |\n|------|---------|\n| Users | mxgraph.aws4.users |\n| User | mxgraph.aws4.user |\n| Client | mxgraph.aws4.client |\n| Internet | mxgraph.aws4.internet |\n| Internet (v2) | mxgraph.aws4.internet_2 |\n| Mobile Client | mxgraph.aws4.mobile_client |\n| Mobile | mxgraph.aws4.mobile |\n| Desktop | mxgraph.aws4.illustration_desktop |\n| Laptop | mxgraph.aws4.laptop |\n| Tablet | mxgraph.aws4.tablet |\n| Browser | mxgraph.aws4.browser |\n| Traditional Server | mxgraph.aws4.traditional_server |\n| Generic Database | mxgraph.aws4.generic_database |\n| Generic Firewall | mxgraph.aws4.generic_firewall |\n| General | mxgraph.aws4.general |\n| AWS Cloud | mxgraph.aws4.aws_cloud |\n| Data Center | mxgraph.aws4.data_center |\n| Corporate Data Center | mxgraph.aws4.corporate_data_center |\n| On-Premises | mxgraph.aws4.on_premises |\n| Folder | mxgraph.aws4.folder |\n| Forums | mxgraph.aws4.forums |\n| Office Building | mxgraph.aws4.office_building |\n| SAML Token | mxgraph.aws4.saml_token |\n| SSL Padlock | mxgraph.aws4.ssl_padlock |\n| Tape Storage | mxgraph.aws4.tape_storage |\n| Toolkit | mxgraph.aws4.toolkit |\n| Generic SDK | mxgraph.aws4.generic_sdk |\n| Disk | mxgraph.aws4.disk |\n| External SDK | mxgraph.aws4.external_sdk |",
+      "chars": 1222,
+      "units": [
+        "para:a3b60936",
+        "para:aab7594f",
+        "para:29ffeee5",
+        "para:4bbe6427",
+        "para:80f86aff",
+        "para:d074b2e8",
+        "para:c603c52f",
+        "para:4e5dd4dd",
+        "para:10989121",
+        "para:62f1fcd2",
+        "para:6b8d743a",
+        "para:c7a3cddb",
+        "para:ae2c5745",
+        "para:ce5416c9",
+        "para:230047b7",
+        "para:243d72d0",
+        "para:245a5145",
+        "para:6dc8a374",
+        "para:3e229daa",
+        "para:37f7ef20",
+        "para:eaf9dc21",
+        "para:965c4440",
+        "para:b7a9ea67",
+        "para:ed7e866d",
+        "para:33d43b6a",
+        "para:2f3341e6",
+        "para:72e896b0",
+        "para:b98201fa",
+        "para:e61abdb8"
+      ]
+    },
+    {
+      "id": "s077",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "4.2. \u30b0\u30eb\u30fc\u30d7\u30a2\u30a4\u30b3\u30f3\u4e00\u89a7",
+      "text": "| \u8aac\u660e | grIcon |\n|------|--------|\n| AWS Cloud | mxgraph.aws4.group_aws_cloud |\n| AWS Cloud (Alt) | mxgraph.aws4.group_aws_cloud_alt |\n| Region | mxgraph.aws4.group_region |\n| VPC | mxgraph.aws4.group_vpc |\n| Availability Zone | mxgraph.aws4.group_availability_zone |\n| Security Group | mxgraph.aws4.group_security_group |\n| Public Subnet | mxgraph.aws4.group_public_subnet |\n| Private Subnet | mxgraph.aws4.group_private_subnet |\n| AWS Account | mxgraph.aws4.group_aws_account |\n| Corporate Data Center | mxgraph.aws4.group_corporate_data_center |\n| EC2 Instance Contents | mxgraph.aws4.group_ec2_instance_contents |\n| Elastic Beanstalk Container | mxgraph.aws4.group_elastic_beanstalk_container |\n| Auto Scaling | mxgraph.aws4.group_auto_scaling |\n| Spot Fleet | mxgraph.aws4.group_spot_fleet |\n| AWS Step Functions Workflow | mxgraph.aws4.group_step_functions_workflow |\n| Generic Group | mxgraph.aws4.group_generic |\n| AWS IoT Greengrass Deployment | mxgraph.aws4.group_iot_greengrass_deployment |\n| Server Contents | mxgraph.aws4.group_server_contents |",
+      "chars": 1057,
+      "units": [
+        "para:5d3a774a",
+        "para:d7c1feee",
+        "para:92d7077c",
+        "para:3299f5f3",
+        "para:d6ff5722",
+        "para:16660ecd",
+        "para:6e2c9340",
+        "para:d5caeb1a",
+        "para:fb4f6409",
+        "para:18c18f03",
+        "para:cb69f2f3",
+        "para:0ce622bd",
+        "para:1e574582",
+        "para:7450901c",
+        "para:06c10e61",
+        "para:de82bb71",
+        "para:57ad1750",
+        "para:4c02cabd"
+      ]
+    },
+    {
+      "id": "s078",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "4.3. \u4f7f\u7528\u4f8b",
+      "text": "```xml\n<!-- AWS Cloud -->\n<mxCell style=\"shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_cloud;...\" />\n\n<!-- VPC -->\n<mxCell style=\"shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc;...\" />\n\n<!-- Availability Zone -->\n<mxCell style=\"shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_availability_zone;...\" />\n\n<!-- Public Subnet -->\n<mxCell style=\"shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_public_subnet;fillColor=#E9F3E6;...\" />\n\n<!-- Private Subnet -->\n<mxCell style=\"shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_private_subnet;fillColor=#E6F2F8;...\" />\n```",
+      "chars": 587,
+      "units": [
+        "para:197aad62"
+      ]
+    },
+    {
+      "id": "s079",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "heading": "6. \u53c2\u8003\u30ea\u30f3\u30af",
+      "text": "- [draw.io AWS Diagrams Blog](https://www.drawio.com/blog/aws-diagrams)\n- [AWS Architecture Icons](https://aws.amazon.com/architecture/icons/)\n- [jgraph/drawio GitHub](https://github.com/jgraph/drawio)\n- [awsicons.dev](https://awsicons.dev/)\n- [diagrams-aws-icons](https://github.com/m-radzikowski/diagrams-aws-icons)",
+      "chars": 317,
+      "units": [
+        "para:926c69d5",
+        "para:70cb7407",
+        "para:9ccadcfc",
+        "para:9494ab06",
+        "para:d15a33e5"
+      ]
+    },
+    {
+      "id": "s080",
+      "file": "skills/draw-io/references/layout-guidelines.md",
+      "heading": "1. Grouping",
+      "text": "- AWS Cloud is the outermost group\n- Create subgroups by function\n- Place groups side by side, following the data flow",
+      "chars": 118,
+      "units": [
+        "para:81e42c3c",
+        "para:cc2123e2",
+        "para:e3616742"
+      ]
+    },
+    {
+      "id": "s081",
+      "file": "skills/draw-io/references/layout-guidelines.md",
+      "heading": "1.1. Group hierarchy",
+      "text": "```text\nAWS Cloud (outermost)\n\u251c\u2500\u2500 VPC\n\u2502   \u251c\u2500\u2500 Public Subnet\n\u2502   \u2502   \u2514\u2500\u2500 ALB, NAT Gateway, and similar\n\u2502   \u2514\u2500\u2500 Private Subnet\n\u2502       \u2514\u2500\u2500 ECS, RDS, and similar\n\u251c\u2500\u2500 S3\n\u251c\u2500\u2500 CloudWatch\n\u2514\u2500\u2500 other services\n```",
+      "chars": 203,
+      "units": [
+        "para:9f49b8af"
+      ]
+    },
+    {
+      "id": "s082",
+      "file": "skills/draw-io/references/layout-guidelines.md",
+      "heading": "2.1. Line meaning",
+      "text": "| Flow | Line | Use |\n|------|------|-----|\n| Ingestion Flow | dashed | data intake |\n| Query Flow | solid | query, read |\n| Control Flow | dotted | control, management |\n\nDashed, solid, and dotted distinguish meaning. The path is separate. A straight `A -> B` is allowed only when both ends share an axis and the span is empty. Otherwise use a curved orthogonal connector:\n\n```text\nedgeStyle=orthogonalEdgeStyle;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;\n```",
+      "chars": 500,
+      "units": [
+        "para:6af59e3e",
+        "para:3480a048",
+        "para:d31b3999",
+        "para:555d9917",
+        "para:a1368398",
+        "para:f3add755"
+      ]
+    },
+    {
+      "id": "s083",
+      "file": "skills/draw-io/references/layout-guidelines.md",
+      "heading": "2.2. Direction and target",
+      "text": "- The arrow follows the direction of the data\n- Prefer two unidirectional arrows over one bidirectional arrow. A double-headed arrow hides which call is which.\n- Choose the target per case. Block-to-block talk ends on the parent container. A call into a specific service ends on that node. Not always the container, and not always the node\n- The elbow runs through the gutter between groups. Do not cut through a container\n- Put the label in the gutter. Never under a container or under text. Keep it at least 20px from the line and from any box\n- Do not put every arrow on the back layer. A back-layer arrow hides its label under a container",
+      "chars": 642,
+      "units": [
+        "para:c9fc91bc",
+        "para:0f97885f",
+        "para:0855dc2c",
+        "para:7525a66d",
+        "para:de1cd9f7",
+        "para:bcb9d2d7"
+      ]
+    },
+    {
+      "id": "s084",
+      "file": "skills/draw-io/references/layout-guidelines.md",
+      "heading": "2.3. A group is a parent",
+      "text": "A container is not a rectangle drawn behind siblings. Set each child's `parent` to the container. Coordinates are relative to the container origin. Keep at least 30px of inner margin. Dragging the container moves its contents.",
+      "chars": 226,
+      "units": [
+        "para:60a5c5ef"
+      ]
+    },
+    {
+      "id": "s085",
+      "file": "skills/draw-io/references/layout-guidelines.md",
+      "heading": "4. Readability",
+      "text": "- Place labels near their elements\n- Adjust placement so arrows do not cross\n- Group related elements and keep them close\n- Keep enough whitespace to stay readable\n- Judge proportion against a 16:9 slide. Do not stretch horizontally and shrink the text. One idea per diagram",
+      "chars": 274,
+      "units": [
+        "para:3acd6f9b",
+        "para:c6f71503",
+        "para:722d8e7e",
+        "para:7291278c",
+        "para:435e1feb"
+      ]
+    },
+    {
+      "id": "s086",
+      "file": "skills/draw-io/references/layout-guidelines.md",
+      "heading": "5. Background and contrast",
+      "text": "The user chooses the background: transparent, light (`#ffffff`), dark (`#1e1e1e`), or another color. Those values are suggestions, not a closed default. Do not strip `background` to force transparency.\n\nContrast is not a fixed color. It is harmony of the whole diagram.\n\n- Text separates from its component fill\n- The component separates from its container\n- The container and the arrows separate from the page\n- A transparent background must still read on both a light slide and a dark slide. If it will not, ask for the theme before export",
+      "chars": 541,
+      "units": [
+        "para:7bf6d737",
+        "para:8e1ffc93",
+        "para:b5139eb2",
+        "para:be2d276e",
+        "para:68f82893",
+        "para:4a68eaf0"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "status": "changed",
+      "lines": 54,
+      "kept": 17
+    },
+    {
+      "path": "skills/draw-io/scripts/find_aws_icon.py",
+      "status": "changed",
+      "lines": 59,
+      "kept": 10
+    }
+  ],
+  "phrase_fate": {
+    "kept": 45.29,
+    "moved": 1.46,
+    "gone": 53.25,
+    "new": 60.49
+  }
+}

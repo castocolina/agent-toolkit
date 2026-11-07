@@ -1,0 +1,547 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Excalidraw Skill",
+      "text": "A Claude Code skill for efficiently working with Excalidraw diagram files through intelligent subagent delegation.",
+      "chars": 114,
+      "units": [
+        "para:4bcc0574"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Purpose",
+      "text": "This skill provides a pattern for working with Excalidraw files (*.excalidraw, *.excalidraw.json) without exhausting the main agent's context budget. Excalidraw JSON files are extremely verbose (4k-22k tokens per file) but have low information density, making them perfect candidates for subagent delegation.",
+      "chars": 308,
+      "units": [
+        "para:ee6f1142"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/excalidraw/README.md",
+      "heading": "When to Use",
+      "text": "Use this skill when:\n\n- Working with files ending in `.excalidraw` or `.excalidraw.json`\n- User requests diagram operations: \"explain diagram\", \"update flowchart\", \"create architecture visualization\"\n- User mentions: \"flowchart\", \"architecture diagram\", \"Excalidraw file\"\n- Performing architecture/design documentation tasks involving visual artifacts\n\n**Important:** Use delegation even for:\n- \"Small\" files (smallest is still 4k tokens)\n- \"Quick checks\" (loading full JSON even just to check component names)\n- Single file operations (isolation prevents context pollution)\n- Modifications (don't need full format understanding in main context)",
+      "chars": 645,
+      "units": [
+        "para:dbba4837",
+        "para:910f3647",
+        "para:0c6f1900",
+        "para:35d4decd",
+        "para:0c468975",
+        "para:e5acd3c3",
+        "para:63712533",
+        "para:e627ace4",
+        "para:798fa86e",
+        "para:c28f88d8"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/excalidraw/README.md",
+      "heading": "The Problem This Solves",
+      "text": "Excalidraw files have an extremely low signal-to-noise ratio:\n\n- Each shape has 20+ properties (x, y, width, height, strokeColor, seed, version, etc.)\n- Most properties are visual metadata (positioning, styling, roughness)\n- Actual useful content: text labels and element relationships (<10% of file)\n- **Token cost**: Single files range from 4k-22k tokens\n- **Context exhaustion**: Reading 7 diagrams = 67k tokens (33% of 200k budget)",
+      "chars": 435,
+      "units": [
+        "para:2094e2bb",
+        "para:eb830a2b",
+        "para:2675fbde",
+        "para:24c333ba",
+        "para:b1801f9a",
+        "para:5e51805f"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Real Examples",
+      "text": "- 14-element diagram: 596 lines, 16K, ~4k tokens\n- 79-element diagram: 2,916 lines, 88K, ~22k tokens (exceeds read limits)",
+      "chars": 122,
+      "units": [
+        "para:5767211d",
+        "para:66e51261"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/excalidraw/README.md",
+      "heading": "The Delegation Pattern",
+      "text": "1. Main agent receives request involving Excalidraw file\n2. Main agent creates a task description for subagent\n3. Subagent reads/modifies the Excalidraw JSON in isolation\n4. Subagent returns text-only summary (not raw JSON)\n5. Main agent context remains clean",
+      "chars": 259,
+      "units": [
+        "para:9e28c903",
+        "para:62b7763a",
+        "para:02ab0a98",
+        "para:3b41e861",
+        "para:2ff6c8e1"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/excalidraw/README.md",
+      "heading": "What Main Agents Should NEVER Do",
+      "text": "- Use Read tool on *.excalidraw files\n- Parse Excalidraw JSON in main context\n- Load multiple diagrams for comparison\n- Inspect file to \"understand the format\"",
+      "chars": 159,
+      "units": [
+        "para:fe9e3f25",
+        "para:db9923e2",
+        "para:97a8ad64",
+        "para:7d584575"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/excalidraw/README.md",
+      "heading": "What Main Agents Should ALWAYS Do",
+      "text": "- Delegate ALL Excalidraw operations to subagents\n- Provide clear task description to subagent\n- Request text-only summaries (not raw JSON)\n- Keep diagram analysis isolated from main work",
+      "chars": 187,
+      "units": [
+        "para:8f46ba28",
+        "para:a31d3ab6",
+        "para:d66ddc19",
+        "para:2c1d2a58"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Token Efficiency",
+      "text": "| Scenario | Without Delegation | With Delegation | Savings |\n|----------|-------------------|-----------------|---------|\n| Single large file | 22k tokens (45% budget) | ~500 tokens | 98% |\n| Two-file comparison | 18k tokens (9% budget) | ~800 tokens | 96% |\n| Modification task | 14k tokens (7% budget) | ~300 tokens | 98% |",
+      "chars": 326,
+      "units": [
+        "para:2d883621",
+        "para:729674dd",
+        "para:545508ba",
+        "para:58af4ee9"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Context Preservation",
+      "text": "- Reading all 7 project diagrams directly: 67k tokens (33% of budget)\n- With delegation: ~2k tokens (isolated in subagents)\n- **Overall savings: 97% context budget preserved**",
+      "chars": 175,
+      "units": [
+        "para:dde5480c",
+        "para:5aa8cf10",
+        "para:7ae44ee9"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Example 1: Understanding a Diagram",
+      "text": "**User Request:** \"What architecture is shown in detailed-architecture.excalidraw.json?\"\n\n**Correct Approach:**\n```\nAgent: I'll use a subagent to extract the architecture details.\n\nTask: Extract and explain the components in detailed-architecture.excalidraw.json\n\nApproach:\n1. Read the Excalidraw JSON\n2. Extract only text elements (ignore positioning/styling)\n3. Identify relationships between components\n4. Summarize architecture/flow\n\nReturn:\n- List of components/services with descriptions\n- Connection/dependency relationships\n- Key insights about the architecture\n- DO NOT return raw JSON or verbose element details\n```\n\n**Result:** ~500 token summary with component list and relationships, main context preserved.",
+      "chars": 720,
+      "units": [
+        "para:3dc92c84",
+        "para:dfb7dd67",
+        "para:e9cc2a8d"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Example 2: Modifying a Diagram",
+      "text": "**User Request:** \"Add a Redis cache component to the architecture diagram, connected to the API service\"\n\n**Correct Approach:**\n```\nTask: Add Redis cache to architecture.excalidraw.json, connected to API service\n\nApproach:\n1. Read file to identify existing elements\n2. Find API service element and its position\n3. Create new element JSON for Redis cache\n4. Add arrow elements for connections\n5. Write updated file\n\nReturn:\n- Confirmation of changes made\n- Position of new element\n- IDs of created elements\n```",
+      "chars": 510,
+      "units": [
+        "para:94844c72",
+        "para:5c10bdac"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Example 3: Creating a New Diagram",
+      "text": "**User Request:** \"Create a flowchart showing the user authentication flow\"\n\n**Correct Approach:**\n```\nTask: Create new Excalidraw diagram showing user authentication flow\n\nApproach:\n1. Design layout for authentication steps (login, validate, token, response)\n2. Create rectangle elements with text labels\n3. Add arrows showing relationships\n4. Use consistent styling (colors, fonts)\n5. Write to auth-flow.excalidraw.json\n\nReturn:\n- Confirmation of file created\n- Summary of components included\n- File location\n```",
+      "chars": 514,
+      "units": [
+        "para:fc7fcf33",
+        "para:9265c1d8"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Example 4: Comparing Diagrams",
+      "text": "**User Request:** \"Compare the monolith vs microservices architecture diagrams\"\n\n**Correct Approach:**\n```\nTask: Compare architecture approaches in monolith.excalidraw.json vs microservices.excalidraw.json\n\nApproach:\n1. Read both files\n2. Extract text labels from each\n3. Identify structural differences\n4. Compare component relationships\n\nReturn:\n- Key differences in architecture\n- Components unique to each approach\n- Relationship/flow differences\n- DO NOT return full element details from both files\n```",
+      "chars": 507,
+      "units": [
+        "para:894ad8ed",
+        "para:6307e0d9"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Common Rationalizations to Avoid",
+      "text": "Agents often try to justify reading Excalidraw files directly. Here are common excuses and why they're wrong:\n\n| Excuse | Reality | What to Do |\n|--------|---------|------------|\n| \"Direct reading is most efficient\" | Consumes 4k-22k tokens unnecessarily | Delegate to subagent |\n| \"It's token-efficient to read directly\" | Baseline tests showed 9-45% budget used | Always delegate |\n| \"This is optimal for one-time analysis\" | \"One-time\" still pollutes main context | Subagent isolation |\n| \"The JSON is straightforward\" | Simplicity \u2260 token efficiency | Delegate anyway |\n| \"I need to understand the format\" | Format understanding not needed in main agent | Subagent handles format |\n| \"Within reasonable bounds\" (18k tokens) | \"Reasonable\" is subjective rationalization | Hard rule: delegate |\n| \"Just a quick check of components\" | \"Quick check\" still loads full JSON | Extract text via subagent |\n| \"File is small (16K)\" | 4k tokens is NOT small | Size threshold doesn't matter |",
+      "chars": 984,
+      "units": [
+        "para:c0dfc58c",
+        "para:02b2a5a5",
+        "para:fa44dd78",
+        "para:fe0aeaa1",
+        "para:6fccfc00",
+        "para:42c33f82",
+        "para:e50ac25f",
+        "para:7e8f9074",
+        "para:26ff7d1d",
+        "para:21b4f221"
+      ]
+    },
+    {
+      "id": "s016",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Red Flags - Stop and Delegate",
+      "text": "If you find yourself about to:\n\n- Use Read tool on .excalidraw file\n- \"Quickly check\" what components exist\n- \"Understand the structure\" before modifying\n- Load file to \"see what's there\"\n- Compare multiple diagrams side-by-side\n- Parse JSON to \"extract just the text\"\n\n**STOP. Use the Task tool with a subagent instead.**",
+      "chars": 322,
+      "units": [
+        "para:5341d79b",
+        "para:4a513ca8",
+        "para:ee843b22",
+        "para:2fd61919",
+        "para:8f5b32b7",
+        "para:9a81c978",
+        "para:d63d50b7",
+        "para:4d60b8df"
+      ]
+    },
+    {
+      "id": "s017",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Quick Reference",
+      "text": "| Operation | Main Agent Action | Subagent Returns |\n|-----------|-------------------|------------------|\n| **Understand diagram** | Delegate with \"Extract and explain\" template | Component list + relationships |\n| **Modify diagram** | Delegate with \"Add [X] connected to [Y]\" template | Confirmation + changes made |\n| **Create diagram** | Delegate with \"Create showing [description]\" template | File location + summary |\n| **Compare diagrams** | Delegate with \"Compare [A] vs [B]\" template | Key differences (not raw JSON) |",
+      "chars": 526,
+      "units": [
+        "para:8f912f49",
+        "para:95c029e5",
+        "para:ddcfc395",
+        "para:3846ef81",
+        "para:1020916d"
+      ]
+    },
+    {
+      "id": "s018",
+      "file": "skills/excalidraw/README.md",
+      "heading": "The Iron Law",
+      "text": "**Main agents NEVER read Excalidraw files. No exceptions.**\n\nNot for:\n- \"Quick checks\"\n- \"Small files\"\n- \"Understanding format\"\n- \"One-time analysis\"\n- \"Optimal efficiency\"\n\n**Always delegate. Isolation is free via subagents.**",
+      "chars": 227,
+      "units": [
+        "para:730db7c1",
+        "para:a8c24289",
+        "para:6bdcdb83"
+      ]
+    },
+    {
+      "id": "s019",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Why \"Straightforward JSON\" Doesn't Matter",
+      "text": "Agents often rationalize: \"The format is simple, I can just read it.\"\n\nThe problem isn't complexity - it's verbosity:\n- Simple structure with 20+ properties per element\n- Repetitive metadata (seed, version, nonce, roughness)\n- Positioning data (x, y, width, height) not semantically useful\n- Visual styling (strokeColor, opacity, fillStyle) irrelevant to content\n\nToken cost comes from volume, not complexity:\n- 79 elements \u00d7 ~280 tokens/element = 22k tokens\n- Most tokens are metadata noise\n- Only text labels and relationships matter (~10% of content)",
+      "chars": 553,
+      "units": [
+        "para:c922d328",
+        "para:fe8cfbf9",
+        "para:e3612c7f",
+        "para:14990ada",
+        "para:cd6b2c79",
+        "para:4a4f594a",
+        "para:765aa457",
+        "para:46998a88",
+        "para:a3bad442",
+        "para:900b5e68"
+      ]
+    },
+    {
+      "id": "s020",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Read/Understand Operation",
+      "text": "```\nTask: Extract and explain the components in [file.excalidraw.json]\n\nApproach:\n1. Read the Excalidraw JSON\n2. Extract only text elements (ignore positioning/styling)\n3. Identify relationships between components\n4. Summarize architecture/flow\n\nReturn:\n- List of components/services with descriptions\n- Connection/dependency relationships\n- Key insights about the architecture\n- DO NOT return raw JSON or verbose element details\n```",
+      "chars": 433,
+      "units": [
+        "para:26b59c37"
+      ]
+    },
+    {
+      "id": "s021",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Modify Operation",
+      "text": "```\nTask: Add [component] to [file.excalidraw.json], connected to [existing-component]\n\nApproach:\n1. Read file to identify existing elements\n2. Find [existing-component] and its position\n3. Create new element JSON for [component]\n4. Add arrow elements for connections\n5. Write updated file\n\nReturn:\n- Confirmation of changes made\n- Position of new element\n- IDs of created elements\n```",
+      "chars": 385,
+      "units": [
+        "para:f7a31857"
+      ]
+    },
+    {
+      "id": "s022",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Create Operation",
+      "text": "```\nTask: Create new Excalidraw diagram showing [description]\n\nApproach:\n1. Design layout for [number] components\n2. Create rectangle elements with text labels\n3. Add arrows showing relationships\n4. Use consistent styling (colors, fonts)\n5. Write to [file.excalidraw.json]\n\nReturn:\n- Confirmation of file created\n- Summary of components included\n- File location\n```",
+      "chars": 365,
+      "units": [
+        "para:5dc22b05"
+      ]
+    },
+    {
+      "id": "s023",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Compare Operation",
+      "text": "```\nTask: Compare architecture approaches in [file1] vs [file2]\n\nApproach:\n1. Read both files\n2. Extract text labels from each\n3. Identify structural differences\n4. Compare component relationships\n\nReturn:\n- Key differences in architecture\n- Components unique to each approach\n- Relationship/flow differences\n- DO NOT return full element details from both files\n```",
+      "chars": 365,
+      "units": [
+        "para:bc848e1d"
+      ]
+    },
+    {
+      "id": "s024",
+      "file": "skills/excalidraw/README.md",
+      "heading": "Contributing",
+      "text": "When improving this skill:\n\n1. Never weaken the delegation requirement\n2. Add new task templates as patterns emerge\n3. Document token costs of new operations\n4. Update examples with real-world scenarios\n5. Keep the \"Iron Law\" absolute",
+      "chars": 234,
+      "units": [
+        "para:3163360f",
+        "para:655c9baa",
+        "para:9f3b3242",
+        "para:de0695eb",
+        "para:51d1eac9",
+        "para:d28dd50e"
+      ]
+    },
+    {
+      "id": "s025",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: excalidraw\ndescription: \"Use when working with *.excalidraw or *.excalidraw.json files, user mentions diagrams/flowcharts, or requests architecture visualization - delegates all Excalidraw operations to subagents to prevent context exhaustion from verbose JSON (single files: 4k-22k tokens, can exceed read limits)\"\n---",
+      "chars": 329,
+      "units": [
+        "para:f98b9402"
+      ]
+    },
+    {
+      "id": "s026",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "Overview",
+      "text": "**Core principle:** Main agents NEVER read Excalidraw files directly. Always delegate to subagents to isolate context consumption.\n\nExcalidraw files are JSON with high token cost but low information density. Single files range from 4k-22k tokens (largest can exceed read tool limits). Reading multiple diagrams quickly exhausts context budget (7 files = 67k tokens = 33% of budget).",
+      "chars": 382,
+      "units": [
+        "para:712a29be",
+        "para:9539e8df"
+      ]
+    },
+    {
+      "id": "s027",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "The Problem",
+      "text": "Excalidraw JSON structure:\n- Each shape has 20+ properties (x, y, width, height, strokeColor, seed, version, etc.)\n- Most properties are visual metadata (positioning, styling, roughness)\n- Actual content: text labels and element relationships (<10% of file)\n- **Signal-to-noise ratio is extremely low**\n\nExample: 14-element diagram = 596 lines, 16K, ~4k tokens. 79-element diagram = 2,916 lines, 88K, ~22k tokens (exceeds read limit).",
+      "chars": 434,
+      "units": [
+        "para:c3e5f7db",
+        "para:eb830a2b",
+        "para:2675fbde",
+        "para:65bfc6bf",
+        "para:afea7b5b",
+        "para:35a90a68"
+      ]
+    },
+    {
+      "id": "s028",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "When to Use",
+      "text": "**Trigger on ANY of these:**\n- File path contains `.excalidraw` or `.excalidraw.json`\n- User requests: \"explain/update/create diagram\", \"show architecture\", \"visualize flow\"\n- User mentions: \"flowchart\", \"architecture diagram\", \"Excalidraw file\"\n- Architecture/design documentation tasks involving visual artifacts\n\n**Use delegation even for:**\n- \"Small\" files (smallest is 4k tokens - still significant)\n- \"Quick checks\" (checking component names still loads full JSON)\n- Single file operations (isolation prevents context pollution)\n- Modifications (don't need full format understanding in main context)",
+      "chars": 605,
+      "units": [
+        "para:349416f0",
+        "para:ca2732c4",
+        "para:066280b8",
+        "para:35d4decd",
+        "para:0bf27869",
+        "para:bc7f845f",
+        "para:2faff36b",
+        "para:be3508be",
+        "para:798fa86e",
+        "para:c28f88d8"
+      ]
+    },
+    {
+      "id": "s029",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "Main Agent Responsibilities",
+      "text": "**NEVER:**\n- \u274c Use Read tool on *.excalidraw files\n- \u274c Parse Excalidraw JSON in main context\n- \u274c Load multiple diagrams for comparison\n- \u274c Inspect file to \"understand the format\"\n\n**ALWAYS:**\n- \u2705 Delegate ALL Excalidraw operations to subagents\n- \u2705 Provide clear task description to subagent\n- \u2705 Request text-only summaries (not raw JSON)\n- \u2705 Keep diagram analysis isolated from main work",
+      "chars": 387,
+      "units": [
+        "para:fe9e3f25",
+        "para:db9923e2",
+        "para:97a8ad64",
+        "para:7d584575",
+        "para:8f46ba28",
+        "para:a31d3ab6",
+        "para:d66ddc19",
+        "para:2c1d2a58"
+      ]
+    },
+    {
+      "id": "s030",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "Read/Understand Operation",
+      "text": "```\nTask: Extract and explain the components in [file.excalidraw.json]\n\nApproach:\n1. Read the Excalidraw JSON\n2. Extract only text elements (ignore positioning/styling)\n3. Identify relationships between components\n4. Summarize architecture/flow\n\nReturn:\n- List of components/services with descriptions\n- Connection/dependency relationships\n- Key insights about the architecture\n- DO NOT return raw JSON or verbose element details\n```",
+      "chars": 433,
+      "units": [
+        "para:26b59c37"
+      ]
+    },
+    {
+      "id": "s031",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "Modify Operation",
+      "text": "```\nTask: Add [component] to [file.excalidraw.json], connected to [existing-component]\n\nApproach:\n1. Read file to identify existing elements\n2. Find [existing-component] and its position\n3. Create new element JSON for [component]\n4. Add arrow elements for connections\n5. Write updated file\n\nReturn:\n- Confirmation of changes made\n- Position of new element\n- IDs of created elements\n```",
+      "chars": 385,
+      "units": [
+        "para:f7a31857"
+      ]
+    },
+    {
+      "id": "s032",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "Create Operation",
+      "text": "```\nTask: Create new Excalidraw diagram showing [description]\n\nApproach:\n1. Design layout for [number] components\n2. Create rectangle elements with text labels\n3. Add arrows showing relationships\n4. Use consistent styling (colors, fonts)\n5. Write to [file.excalidraw.json]\n\nReturn:\n- Confirmation of file created\n- Summary of components included\n- File location\n```",
+      "chars": 365,
+      "units": [
+        "para:5dc22b05"
+      ]
+    },
+    {
+      "id": "s033",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "Compare Operation",
+      "text": "```\nTask: Compare architecture approaches in [file1] vs [file2]\n\nApproach:\n1. Read both files\n2. Extract text labels from each\n3. Identify structural differences\n4. Compare component relationships\n\nReturn:\n- Key differences in architecture\n- Components unique to each approach\n- Relationship/flow differences\n- DO NOT return full element details from both files\n```",
+      "chars": 365,
+      "units": [
+        "para:bc848e1d"
+      ]
+    },
+    {
+      "id": "s034",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "Common Rationalizations (STOP and Delegate Instead)",
+      "text": "| Excuse | Reality | What to Do |\n|--------|---------|------------|\n| \"Direct reading is most efficient\" | Consumes 4k-22k tokens unnecessarily | Delegate to subagent |\n| \"It's token-efficient to read directly\" | Baseline tests showed 9-45% budget used | Always delegate |\n| \"This is optimal for one-time analysis\" | \"One-time\" still pollutes main context | Subagent isolation |\n| \"The JSON is straightforward\" | Simplicity \u2260 token efficiency | Delegate anyway |\n| \"I need to understand the format\" | Format understanding not needed in main agent | Subagent handles format |\n| \"Within reasonable bounds\" (18k tokens) | \"Reasonable\" is subjective rationalization | Hard rule: delegate |\n| \"Just a quick check of components\" | \"Quick check\" still loads full JSON | Extract text via subagent |\n| \"File is small (16K)\" | 4k tokens is NOT small | Size threshold doesn't matter |",
+      "chars": 873,
+      "units": [
+        "para:02b2a5a5",
+        "para:fa44dd78",
+        "para:fe0aeaa1",
+        "para:6fccfc00",
+        "para:42c33f82",
+        "para:e50ac25f",
+        "para:7e8f9074",
+        "para:26ff7d1d",
+        "para:21b4f221"
+      ]
+    },
+    {
+      "id": "s035",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "Red Flags - STOP and Delegate",
+      "text": "Catch yourself about to:\n- Use Read tool on .excalidraw file\n- \"Quickly check\" what components exist\n- \"Understand the structure\" before modifying\n- Load file to \"see what's there\"\n- Compare multiple diagrams side-by-side\n- Parse JSON to \"extract just the text\"\n\n**All of these mean: Use Task tool with subagent instead.**",
+      "chars": 322,
+      "units": [
+        "para:71a10bbf",
+        "para:4a513ca8",
+        "para:ee843b22",
+        "para:2fd61919",
+        "para:8f5b32b7",
+        "para:9a81c978",
+        "para:d63d50b7",
+        "para:ce9ca2d1"
+      ]
+    },
+    {
+      "id": "s036",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "Quick Reference",
+      "text": "| Operation | Main Agent Action | Subagent Returns |\n|-----------|-------------------|------------------|\n| **Understand diagram** | Delegate with \"Extract and explain\" template | Component list + relationships |\n| **Modify diagram** | Delegate with \"Add [X] connected to [Y]\" template | Confirmation + changes made |\n| **Create diagram** | Delegate with \"Create showing [description]\" template | File location + summary |\n| **Compare diagrams** | Delegate with \"Compare [A] vs [B]\" template | Key differences (not raw JSON) |",
+      "chars": 526,
+      "units": [
+        "para:8f912f49",
+        "para:95c029e5",
+        "para:ddcfc395",
+        "para:3846ef81",
+        "para:1020916d"
+      ]
+    },
+    {
+      "id": "s037",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "Token Analysis (Why This Matters)",
+      "text": "Real data from baseline testing:\n\n| Scenario | Without Delegation | With Delegation | Savings |\n|----------|-------------------|-----------------|---------|\n| Single large file | 22k tokens (45% budget) | ~500 tokens (subagent summary) | 98% |\n| Two-file comparison | 18k tokens (9% budget) | ~800 tokens (diff summary) | 96% |\n| Modification task | 14k tokens (7% budget) | ~300 tokens (confirmation) | 98% |\n\n**Context pollution impact:**\n- Reading all 7 project diagrams: 67k tokens (33% of 200k budget)\n- With delegation: ~2k tokens (isolated in subagents)\n- **Savings: 97% context budget preserved**",
+      "chars": 604,
+      "units": [
+        "para:e80526d5",
+        "para:2d883621",
+        "para:007ae358",
+        "para:0a074ee0",
+        "para:b89c57a3",
+        "para:2a251c11",
+        "para:d106276e",
+        "para:5aa8cf10",
+        "para:ec2d482f"
+      ]
+    },
+    {
+      "id": "s038",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "Implementation Example",
+      "text": "**\u274c BAD (Direct Read):**\n```\nUser: \"What architecture is shown in detailed-architecture.excalidraw.json?\"\nAgent: Let me read that file... [reads 22k tokens into main context]\n```\n\n**\u2705 GOOD (Subagent Delegation):**\n```\nUser: \"What architecture is shown in detailed-architecture.excalidraw.json?\"\nAgent: I'll use a subagent to extract the architecture details.\n\n[Dispatches Task tool with general-purpose subagent]\nTask: Extract and explain components in .ryanquinn3/ticketing/detailed-architecture.excalidraw.json\n\n[Receives ~500 token summary with component list and relationships]\n[Responds to user with architecture explanation, main context preserved]\n```",
+      "chars": 658,
+      "units": [
+        "para:333729e2",
+        "para:954e50cf",
+        "para:f4489411",
+        "para:9ec775fa"
+      ]
+    },
+    {
+      "id": "s039",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "Why \"Straightforward JSON\" Doesn't Matter",
+      "text": "Agents often rationalize: \"The format is simple, I can just read it.\"\n\n**The problem isn't complexity - it's verbosity:**\n- Simple structure with 20+ properties per element\n- Repetitive metadata (seed, version, nonce, roughness)\n- Positioning data (x, y, width, height) not semantically useful\n- Visual styling (strokeColor, opacity, fillStyle) irrelevant to content\n\n**Token cost comes from volume, not complexity.**\n\nEven \"straightforward\" JSON consumes 4k-22k tokens because:\n- 79 elements \u00d7 ~280 tokens/element = 22k tokens\n- Most tokens are metadata noise\n- Only text labels and relationships matter (~10% of content)",
+      "chars": 622,
+      "units": [
+        "para:c922d328",
+        "para:fe8cfbf9",
+        "para:e3612c7f",
+        "para:14990ada",
+        "para:cd6b2c79",
+        "para:4a4f594a",
+        "para:765aa457",
+        "para:56bd5efe",
+        "para:46998a88",
+        "para:a3bad442",
+        "para:900b5e68"
+      ]
+    },
+    {
+      "id": "s040",
+      "file": "skills/excalidraw/SKILL.md",
+      "heading": "The Iron Law",
+      "text": "**Main agents NEVER read Excalidraw files. No exceptions.**\n\nNot for:\n- \"Quick checks\"\n- \"Small files\"\n- \"Understanding format\"\n- \"One-time analysis\"\n- \"Optimal efficiency\"\n\n**Always delegate. Isolation is free via subagents.**",
+      "chars": 227,
+      "units": [
+        "para:730db7c1",
+        "para:a8c24289",
+        "para:6bdcdb83"
+      ]
+    }
+  ],
+  "files": [],
+  "phrase_fate": {
+    "kept": 0.62,
+    "moved": 0.49,
+    "gone": 98.89,
+    "new": 99.71
+  }
+}

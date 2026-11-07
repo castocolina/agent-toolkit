@@ -1,0 +1,176 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "commands/sync-skills-readme.md",
+      "heading": "(preamble)",
+      "text": "---\ndescription: Sync root README.md with current skills inventory from skills/ directory\n---",
+      "chars": 93,
+      "units": [
+        "para:276c2f04"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "commands/sync-skills-readme.md",
+      "heading": "Sync Skills README",
+      "text": "Update the root README.md \"Available Skills\" table with all skills currently in the `skills/` directory. This command scans skills, reads their metadata, categorizes them, and regenerates the table.",
+      "chars": 198,
+      "units": [
+        "para:6ebe3520"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "commands/sync-skills-readme.md",
+      "heading": "1. Scan Skills Directory",
+      "text": "Use Bash to list all skill directories:\n\n```bash\nls -1 skills/\n```\n\nFor each skill directory found, proceed to step 2.",
+      "chars": 118,
+      "units": [
+        "para:87215431",
+        "para:aa7d91fe",
+        "para:a34a8d2b"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "commands/sync-skills-readme.md",
+      "heading": "2. Extract Skill Metadata",
+      "text": "For each skill, read the SKILL.md frontmatter to extract:\n- `name:` field (skill identifier)\n- `description:` field (what the skill does)\n\nUse the Read tool to read `skills/[skill-name]/SKILL.md` and extract the YAML frontmatter between the `---` markers.\n\n**Example:**\n```yaml\n---\nname: codex\ndescription: Use when the user asks to run Codex CLI for code analysis...\n---\n```\n\nExtract both fields for table generation.",
+      "chars": 418,
+      "units": [
+        "para:5844105a",
+        "para:4a4507a8",
+        "para:1f0f4723",
+        "para:a49ae496",
+        "para:5c777439",
+        "para:694f2ad6"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "commands/sync-skills-readme.md",
+      "heading": "3. Categorize Skills",
+      "text": "Assign each skill to a category based on its purpose. Use this mapping:\n\n| Category | Emoji | Keywords in name/description |\n|----------|-------|------------------------------|\n| AI Tools | \ud83e\udd16 | codex, gemini, perplexity, ai, llm, model |\n| Meta | \ud83d\udd2e | command-creator, plugin-forge, plugin, command |\n| Documentation | \ud83d\udcdd | docs, documentation, handoff, requirements, diagram, mermaid, draw, excalidraw, marp, slide, c4-architecture |\n| Development | \ud83d\udee0\ufe0f | session, handoff, entropy, development, workflow, database, dependency |\n| Design & Frontend | \ud83c\udfa8 | design, frontend, ui, openapi, typescript, system |\n| Utilities | \ud83d\udd27 | domain, meme, web-to-markdown, utility, tool, datadog |\n| Planning | \ud83c\udfaf | plan, planning, spec, forge, gepetto, requirements, clarity, game-changing, features |\n| Professional | \ud83d\udc54 | professional, communication, career, soft-skill, feedback, conversation |\n| Testing | \ud83e\uddea | test, testing, qa, quality |\n| Git | \ud83d\udce6 | commit, git, branch, pr, pull-request |\n\n**Categorization logic:**\n1. Check the skill name and description (case-insensitive)\n2. Match against keywords in the table above\n3. Assign to the first matching category\n4. If no match, default to \"Utilities\" (\ud83d\udd27)",
+      "chars": 1189,
+      "units": [
+        "para:b4946c0e",
+        "para:3654905f",
+        "para:4f15eae1",
+        "para:ec80d237",
+        "para:552bd726",
+        "para:408d4f0c",
+        "para:bf7faa22",
+        "para:1d42c1e2",
+        "para:61d94c07",
+        "para:4852eea6",
+        "para:ddac2b02",
+        "para:baf0662b",
+        "para:3147ea06",
+        "para:86186a87",
+        "para:087f426d",
+        "para:49c63621"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "commands/sync-skills-readme.md",
+      "heading": "4. Generate Compact Table",
+      "text": "Create a markdown table with this exact format:\n\n```markdown\n## \ud83d\udcda Available Skills\n\n| Category | Skill | Description |\n|----------|-------|-------------|\n| \ud83e\udd16 AI Tools | [codex](skills/codex/README.md) | Advanced code analysis with GPT-5.2 |\n| \ud83e\udd16 AI Tools | [gemini](skills/gemini/README.md) | Large-scale review (200k+ context) |\n...\n```\n\n**Table structure:**\n- Column 1: Category emoji + name (e.g., \"\ud83e\udd16 AI Tools\")\n- Column 2: Skill name as markdown link to its README\n- Column 3: Short description (max ~50 chars, extracted from SKILL.md description field)\n\n**Sorting:**\n- Group by category (AI Tools first, then Meta, Documentation, Design & Frontend, Development, Planning, Professional, Testing, Git, Utilities last)\n- Within each category, sort skills alphabetically by name\n\n**Description shortening:**\n- If description is longer than 50 characters, create a shortened version\n- Keep it concise and action-oriented\n- Examples:\n  - \"Use when the user asks to run Codex CLI for code analysis, refactoring, or automated editing\" \u2192 \"Advanced code analysis with GPT-5.2\"\n  - \"Create comprehensive API handoff documentation for frontend developers after backend implementation\" \u2192 \"API handoff docs for frontend\"",
+      "chars": 1210,
+      "units": [
+        "para:2ebbc7c5",
+        "para:a4ee07b7",
+        "para:3e2e4995",
+        "para:c0c9af4f",
+        "para:38c2d008",
+        "para:a80045ba",
+        "para:893a0f5a",
+        "para:624a1852",
+        "para:31f821d4",
+        "para:97cfc8cb",
+        "para:4bafdcd0"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "commands/sync-skills-readme.md",
+      "heading": "5. Update README.md",
+      "text": "Use the Edit tool to replace the \"Available Skills\" section in the root README.md.\n\n**Find and replace:**\n1. Locate the section starting with `## \ud83d\udcda Available Skills`\n2. Find the end of the table (marked by the next `---` separator or next `##` heading)\n3. Replace everything between those markers with the newly generated table\n\n**Important:**\n- Preserve the `---` separator after the table\n- Do NOT modify other sections (Quick Navigation, Installation, etc.)\n- Only replace the table content, keep the section heading",
+      "chars": 519,
+      "units": [
+        "para:bd40a137",
+        "para:ccfd3de8",
+        "para:aed7282d",
+        "para:8a36abe1",
+        "para:fdaf3b0a",
+        "para:7f7e82a5",
+        "para:30b2dfe1",
+        "para:51b09156"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "commands/sync-skills-readme.md",
+      "heading": "6. Report Results",
+      "text": "After updating README.md, report to the user:\n\n```\n\u2705 README.md updated successfully\n\n\ud83d\udcca Summary:\n- Total skills: [count]\n- Categories: [list of categories with counts]\n- Skills added/updated: [list if any changes detected]\n\nThe Available Skills table in README.md now reflects all skills in the skills/ directory.\n```",
+      "chars": 316,
+      "units": [
+        "para:5ad87a83",
+        "para:cc61edab"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "commands/sync-skills-readme.md",
+      "heading": "Error Handling",
+      "text": "**If a skill directory doesn't have SKILL.md:**\n- Skip that skill\n- Warn the user: \"\u26a0\ufe0f Skipped [skill-name]: No SKILL.md found\"\n\n**If SKILL.md doesn't have required frontmatter:**\n- Skip that skill\n- Warn: \"\u26a0\ufe0f Skipped [skill-name]: Missing name or description in frontmatter\"\n\n**If README.md section not found:**\n- Error and stop: \"\u274c Could not find '## \ud83d\udcda Available Skills' section in README.md\"",
+      "chars": 394,
+      "units": [
+        "para:6fee67db",
+        "para:faf3dc07",
+        "para:e6b85cf3",
+        "para:5205e180",
+        "para:faf3dc07",
+        "para:21acead8",
+        "para:fc487ab9",
+        "para:f90b4ed5"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "commands/sync-skills-readme.md",
+      "heading": "Tools to Use",
+      "text": "- **Bash** - List skills directory\n- **Read** - Read SKILL.md files for metadata extraction\n- **Edit** - Update README.md with new table\n- **DO NOT use Grep** - Read files directly for accurate frontmatter parsing",
+      "chars": 213,
+      "units": [
+        "para:5c4ca5b0",
+        "para:00c1e067",
+        "para:68d2a103",
+        "para:c300ca43"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "commands/sync-skills-readme.md",
+      "heading": "Success Criteria",
+      "text": "- All valid skills from skills/ directory appear in the table\n- Skills are correctly categorized with appropriate emojis\n- Table maintains compact format (3 columns)\n- Descriptions are concise and readable\n- README.md is updated without breaking other sections",
+      "chars": 260,
+      "units": [
+        "para:1abbd3d0",
+        "para:0ef39b7c",
+        "para:561987f9",
+        "para:2c3d5f29",
+        "para:1a537ef3"
+      ]
+    }
+  ],
+  "files": [],
+  "phrase_fate": {
+    "kept": 9.62,
+    "moved": 1.17,
+    "gone": 89.21,
+    "new": 93.41
+  }
+}

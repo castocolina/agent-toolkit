@@ -1,0 +1,1664 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/command-creator/README.md",
+      "heading": "Command Creator",
+      "text": "A comprehensive skill for creating optimized, agent-executable slash commands in Claude Code. This skill guides you through the entire process of designing, implementing, and testing reusable workflow automation commands.",
+      "chars": 221,
+      "units": [
+        "para:b0d40a10"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/command-creator/README.md",
+      "heading": "Table of Contents",
+      "text": "- [Overview](#overview)\n- [When to Use This Skill](#when-to-use-this-skill)\n- [What Are Slash Commands?](#what-are-slash-commands)\n- [Key Features](#key-features)\n- [How It Works](#how-it-works)\n- [Command Patterns](#command-patterns)\n- [Location Strategy](#location-strategy)\n- [Bundled Resources](#bundled-resources)\n- [Usage Examples](#usage-examples)\n- [Best Practices](#best-practices)\n- [Common Use Cases](#common-use-cases)\n\n---",
+      "chars": 435,
+      "units": [
+        "para:1893eb9d",
+        "para:8302c9e4",
+        "para:cefae23f",
+        "para:6b9c4ddf",
+        "para:e4a39e93",
+        "para:d02800cf",
+        "para:6739b0ad",
+        "para:dc96641a",
+        "para:78b9e4d7",
+        "para:4c7ac542"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/command-creator/README.md",
+      "heading": "Overview",
+      "text": "The Command Creator skill helps you transform repetitive workflows into reusable slash commands that can be invoked with `/command-name` in Claude Code conversations. It provides expert guidance on command structure, agent optimization, and best practices to ensure your commands execute reliably and autonomously.\n\n**Purpose**: Create high-quality, agent-executable slash commands with proper structure, clear instructions, and optimal tool usage patterns.\n\n**Target Users**: Developers who want to:\n- Automate repetitive workflows\n- Document consistent processes for reuse\n- Create project-specific or global automation\n- Delegate complex tasks to specialized agents\n\n---",
+      "chars": 673,
+      "units": [
+        "para:eeb5afd8",
+        "para:a0e94dc8",
+        "para:7135ab37",
+        "para:a4940467",
+        "para:76be26f2",
+        "para:3610bfe8",
+        "para:65774f0c"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/command-creator/README.md",
+      "heading": "When to Use This Skill",
+      "text": "Invoke this skill when you need to:\n\n- Create a new slash command from scratch\n- Automate a workflow you find yourself repeating\n- Document a multi-step process for consistent execution\n- Convert manual procedures into automated commands\n- Create project-specific commands for team workflows\n- Build global commands for personal productivity\n\n**Trigger Phrases**:\n- \"create a command\"\n- \"make a slash command\"\n- \"add a command\"\n- \"I keep doing X, can we make a command for it?\"\n- \"automate this workflow\"\n- \"create a reusable command\"\n\n---",
+      "chars": 539,
+      "units": [
+        "para:3764dcef",
+        "para:07f19982",
+        "para:a3e8c8e8",
+        "para:12ac509c",
+        "para:97e56373",
+        "para:dc0f14f0",
+        "para:5b171d0d",
+        "para:6f5b630d",
+        "para:c29c7b1d",
+        "para:76163db2",
+        "para:17f3cfac",
+        "para:2bf95f92",
+        "para:c274ec70"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/command-creator/README.md",
+      "heading": "What Are Slash Commands?",
+      "text": "Slash commands are markdown files stored in `.claude/commands/` (project-level) or `~/.claude/commands/` (global/user-level) that get expanded into prompts when invoked.\n\n**Structure**:\n```markdown\n---\ndescription: Brief description shown in /help (required)\nargument-hint: <placeholder> (optional, if command takes arguments)\n---\n\n# Command Title\n\n[Detailed instructions for the agent to execute autonomously]\n```\n\n**Invocation**:\n```\n/command-name [arguments]\n```\n\n**Storage Locations**:\n- **Project-level**: `.claude/commands/my-command.md` (only available in this project)\n- **Global/User-level**: `~/.claude/commands/my-command.md` (available everywhere)\n\n---",
+      "chars": 664,
+      "units": [
+        "para:a70eac22",
+        "para:69a17c59",
+        "para:af438769",
+        "para:6cb1b115",
+        "para:f46e77c8"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/command-creator/README.md",
+      "heading": "1. Intelligent Location Detection",
+      "text": "Automatically determines whether commands should be project-level or global based on:\n- Current directory git repository status\n- User explicit preferences\n- Command scope and purpose",
+      "chars": 183,
+      "units": [
+        "para:97d02a4c",
+        "para:e2b38e99",
+        "para:4ac92817",
+        "para:d895e748"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/command-creator/README.md",
+      "heading": "2. Pattern-Based Design",
+      "text": "Guides you through proven command patterns:\n- **Workflow Automation**: Multi-step processes with analysis, action, and reporting\n- **Iterative Fixing**: Continuous improvement loops (run \u2192 parse \u2192 fix \u2192 repeat)\n- **Agent Delegation**: Complex tasks broken into specialized agent work\n- **Simple Execution**: Direct tool or script execution with arguments",
+      "chars": 354,
+      "units": [
+        "para:0191c1c0",
+        "para:2a6b9207",
+        "para:1b554c52",
+        "para:84835660",
+        "para:f777479d"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/command-creator/README.md",
+      "heading": "3. Agent-Optimized Instructions",
+      "text": "Creates commands that agents can execute autonomously with:\n- Imperative/infinitive verb-first instructions\n- Explicit tool usage specifications\n- Clear success criteria\n- Concrete error handling\n- Expected outcomes defined",
+      "chars": 223,
+      "units": [
+        "para:de13c975",
+        "para:055fa933",
+        "para:6d53b413",
+        "para:8e867258",
+        "para:06209ef4",
+        "para:82f00b2f"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/command-creator/README.md",
+      "heading": "4. Quality Assurance",
+      "text": "Includes comprehensive best practices for:\n- Proper naming conventions (kebab-case enforced)\n- Argument handling and hints\n- Tool restriction guidelines\n- Error recovery strategies\n- Progress reporting patterns",
+      "chars": 210,
+      "units": [
+        "para:58c00df5",
+        "para:b17c40b3",
+        "para:d64bbcf7",
+        "para:ebe7c5f5",
+        "para:ad0ca7e4",
+        "para:c0cd30d2"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/command-creator/README.md",
+      "heading": "5. Bundled Reference Documentation",
+      "text": "Provides three comprehensive reference files:\n- **patterns.md**: Command design patterns with detailed examples\n- **examples.md**: Real-world command implementations\n- **best-practices.md**: Quality checklist and writing guidelines\n\n---",
+      "chars": 236,
+      "units": [
+        "para:6f7b21af",
+        "para:7cd4fbcd",
+        "para:7881231a",
+        "para:5d9175ae"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/command-creator/README.md",
+      "heading": "Step 1: Determine Location",
+      "text": "**Auto-detection Logic**:\n1. Check if current directory is inside a git repository\n2. Default to project-level (`.claude/commands/`) if in git repo\n3. Default to global (`~/.claude/commands/`) if not in git repo\n4. Allow user override for explicit location preference\n\n**User is informed** of the chosen location before proceeding.",
+      "chars": 331,
+      "units": [
+        "para:1be374c8",
+        "para:64234f75",
+        "para:e0c36df9",
+        "para:460fe8c8",
+        "para:6b1d368d",
+        "para:c1879b44"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/command-creator/README.md",
+      "heading": "Step 2: Show Command Patterns",
+      "text": "Present available command patterns to help frame the conversation:\n\n- **Workflow Automation**: Analyze \u2192 Act \u2192 Report (e.g., submit PR stack)\n- **Iterative Fixing**: Run \u2192 Parse \u2192 Fix \u2192 Repeat (e.g., ensure CI passes)\n- **Agent Delegation**: Context \u2192 Delegate \u2192 Iterate (e.g., create implementation plan)\n- **Simple Execution**: Run command with args (e.g., code review)\n\nUser selects the closest pattern to their needs.",
+      "chars": 421,
+      "units": [
+        "para:bb39417a",
+        "para:e983f6b2",
+        "para:7a4d0605",
+        "para:e5992187",
+        "para:ccba00e7",
+        "para:bef4e1a9"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/command-creator/README.md",
+      "heading": "Step 3: Gather Command Information",
+      "text": "Interactive Q&A to collect:\n\n**A. Command Name and Purpose**\n- Command name (must be kebab-case: `my-command`, not `my_command`)\n- Description for `/help` output\n- Purpose and scope\n\n**B. Arguments**\n- Does it take arguments? (yes/no)\n- Required or optional?\n- Argument hint format (`<required>` or `[optional]`)\n\n**C. Workflow Steps**\n- Specific steps in execution order\n- Tools/commands to use\n- Success criteria\n- Error handling approach\n\n**D. Tool Restrictions**\n- Specific agents or tools to use\n- Operations to avoid\n- Context files to read",
+      "chars": 546,
+      "units": [
+        "para:27f32bc7",
+        "para:648a151d",
+        "para:3c0a707a",
+        "para:05c8d980",
+        "para:ea625f9e",
+        "para:572fd475",
+        "para:5c1b13af",
+        "para:03151e41",
+        "para:5a665aae",
+        "para:a0cefe07",
+        "para:95a5a6ad",
+        "para:ddbb7d2e",
+        "para:4c7872a9",
+        "para:47cf92a7",
+        "para:2d43ea45",
+        "para:fd9f0647"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/command-creator/README.md",
+      "heading": "Step 4: Generate Optimized Command",
+      "text": "Create agent-executable instructions using:\n- Template structure from best-practices.md\n- Imperative verb-first language\n- Explicit tool specifications\n- Clear expected outcomes\n- Concrete examples where needed",
+      "chars": 210,
+      "units": [
+        "para:cb6c7819",
+        "para:77ae27c1",
+        "para:94cb8733",
+        "para:39167a78",
+        "para:45a74541",
+        "para:3ad261a9"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/command-creator/README.md",
+      "heading": "Step 5: Create the Command File",
+      "text": "1. Construct full file path (project or global)\n2. Ensure directory exists (`mkdir -p`)\n3. Write command file using Write tool\n4. Confirm with user:\n   - Report file location\n   - Summarize command function\n   - Explain invocation syntax",
+      "chars": 237,
+      "units": [
+        "para:95ea8f73",
+        "para:0efe1edd",
+        "para:57943c24",
+        "para:430b50e3",
+        "para:a19d9725",
+        "para:077c5b5c",
+        "para:cfb89821"
+      ]
+    },
+    {
+      "id": "s016",
+      "file": "skills/command-creator/README.md",
+      "heading": "Step 6: Test and Iterate",
+      "text": "1. Suggest testing the command\n2. Wait for user feedback\n3. Iterate and improve based on results\n4. Update file with refinements\n\n---",
+      "chars": 133,
+      "units": [
+        "para:409154dc",
+        "para:30c8a995",
+        "para:4fb3a1c6",
+        "para:dd6f83e9"
+      ]
+    },
+    {
+      "id": "s017",
+      "file": "skills/command-creator/README.md",
+      "heading": "1. Workflow Automation",
+      "text": "**Use Case**: Multi-step processes requiring analysis, action, and reporting\n\n**Example**: Submit PR stack\n```markdown\n1. Analyze git history to identify commit stack\n2. Create PRs for each commit with proper dependencies\n3. Report created PRs with links and status\n```\n\n**Key Characteristics**:\n- Sequential steps with dependencies\n- Clear analysis phase before action\n- Comprehensive final report",
+      "chars": 398,
+      "units": [
+        "para:c273fc37",
+        "para:b9889376",
+        "para:1b0b9b72",
+        "para:5b180d33",
+        "para:606c70d8",
+        "para:9070d728"
+      ]
+    },
+    {
+      "id": "s018",
+      "file": "skills/command-creator/README.md",
+      "heading": "2. Iterative Fixing",
+      "text": "**Use Case**: Continuous improvement until success criteria met\n\n**Example**: Ensure CI passes\n```markdown\n1. Run tests and capture output\n2. Parse failures and errors\n3. Fix identified issues\n4. Repeat until all tests pass\n```\n\n**Key Characteristics**:\n- Loop until success condition\n- Parse errors to guide fixes\n- Progress tracking across iterations",
+      "chars": 352,
+      "units": [
+        "para:666d24ba",
+        "para:c7e1b2dc",
+        "para:cb24267f",
+        "para:773a5bfa",
+        "para:36fb0512",
+        "para:997886f4"
+      ]
+    },
+    {
+      "id": "s019",
+      "file": "skills/command-creator/README.md",
+      "heading": "3. Agent Delegation",
+      "text": "**Use Case**: Complex tasks requiring specialized agent expertise\n\n**Example**: Create implementation plan\n```markdown\n1. Gather context (requirements, codebase)\n2. Delegate to subagent agent\n3. Iterate on plan with user feedback\n4. Save final plan to .PLAN.md\n```\n\n**Key Characteristics**:\n- Use Task tool for specialized agents\n- Pass relevant context to delegated agent\n- Iterate on specialized agent output",
+      "chars": 410,
+      "units": [
+        "para:984b18fe",
+        "para:4e8b9425",
+        "para:2184b108",
+        "para:942c1083",
+        "para:b7681041",
+        "para:3d06afe3"
+      ]
+    },
+    {
+      "id": "s020",
+      "file": "skills/command-creator/README.md",
+      "heading": "4. Simple Execution",
+      "text": "**Use Case**: Direct tool/script execution with arguments\n\n**Example**: Code review\n```markdown\n1. Run codex review on specified files\n2. Present results to user\n```\n\n**Key Characteristics**:\n- Minimal logic, direct execution\n- Pass through arguments to underlying tool\n- Quick feedback loop\n\n---",
+      "chars": 296,
+      "units": [
+        "para:a5b1b899",
+        "para:70754054",
+        "para:44f4c004",
+        "para:696b50fe",
+        "para:40112f00",
+        "para:8c00ab40"
+      ]
+    },
+    {
+      "id": "s021",
+      "file": "skills/command-creator/README.md",
+      "heading": "Project-Level Commands (`.claude/commands/`)",
+      "text": "**When to Use**:\n- Command is specific to this project's workflow\n- Requires project-specific context or files\n- Team members should share this command\n- Automation tied to project structure\n\n**Examples**:\n- `/submit-stack` (project's PR submission workflow)\n- `/ensure-ci` (project's test suite)\n- `/deploy-staging` (project's deployment process)\n\n**Advantages**:\n- Version controlled with project\n- Shared across team\n- Project-specific customization",
+      "chars": 452,
+      "units": [
+        "para:fd784493",
+        "para:7abf8d64",
+        "para:957528a0",
+        "para:e0dc7c87",
+        "para:8f403ecf",
+        "para:1c242b51",
+        "para:4d44c3d4",
+        "para:ab34eba2",
+        "para:4bd123fa",
+        "para:fdd7cd72",
+        "para:50f9adf2"
+      ]
+    },
+    {
+      "id": "s022",
+      "file": "skills/command-creator/README.md",
+      "heading": "Global Commands (`~/.claude/commands/`)",
+      "text": "**When to Use**:\n- Command works across any project\n- Personal productivity tool\n- Generic workflow automation\n- No project-specific dependencies\n\n**Examples**:\n- `/codex-review` (code review any files)\n- `/create-implementation-plan` (generic planning)\n- `/git-cleanup` (git maintenance anywhere)\n\n**Advantages**:\n- Available everywhere\n- Personal customization\n- Independent of project\n\n---",
+      "chars": 392,
+      "units": [
+        "para:fd784493",
+        "para:5aa43559",
+        "para:3a7836e1",
+        "para:ad6f845f",
+        "para:dddb3c63",
+        "para:de9b7e08",
+        "para:67d1e5f0",
+        "para:b0f9ccde",
+        "para:1d7b6c2b"
+      ]
+    },
+    {
+      "id": "s023",
+      "file": "skills/command-creator/README.md",
+      "heading": "references/patterns.md",
+      "text": "**Purpose**: Detailed command design patterns with implementation guidance\n\n**Contents**:\n- Pattern 1: Workflow Automation (Analyze \u2192 Act \u2192 Report)\n- Pattern 2: Iterative Fixing (Run \u2192 Parse \u2192 Fix \u2192 Repeat)\n- Pattern 3: Agent Delegation (Context \u2192 Delegate \u2192 Iterate)\n- Pattern 4: Simple Execution (Run command with args)\n- When to use each pattern\n- Tool usage recommendations\n- Real examples for each pattern\n\n**Load When**: Designing the command workflow and choosing the right pattern",
+      "chars": 488,
+      "units": [
+        "para:ee7bb776",
+        "para:f90088bb",
+        "para:ae8e00e2",
+        "para:5146256c",
+        "para:739a0d94",
+        "para:f862ba74",
+        "para:91029ef8",
+        "para:51bde4ed",
+        "para:54eab2a5"
+      ]
+    },
+    {
+      "id": "s024",
+      "file": "skills/command-creator/README.md",
+      "heading": "references/examples.md",
+      "text": "**Purpose**: Real-world command implementations with full source code\n\n**Contents**:\n- `/submit-stack`: Submit PR stack from git history\n- `/ensure-ci`: Iteratively fix CI failures\n- `/create-implementation-plan`: Delegate to planner agent\n- Full markdown source for each example\n- Annotations explaining key decisions\n- Best practices demonstrated in context\n\n**Load When**: Need concrete examples of how to structure specific command types",
+      "chars": 441,
+      "units": [
+        "para:5c08da02",
+        "para:604c3eec",
+        "para:46ef0362",
+        "para:49d1a41b",
+        "para:b6080292",
+        "para:333e6d04",
+        "para:c683c6e6",
+        "para:3d72bf00"
+      ]
+    },
+    {
+      "id": "s025",
+      "file": "skills/command-creator/README.md",
+      "heading": "references/best-practices.md",
+      "text": "**Purpose**: Quality checklist and writing guidelines\n\n**Contents**:\n- Command template structure\n- Agent-optimized writing style\n- Common pitfalls to avoid\n- Quality checklist before finalizing\n- Tool restriction patterns\n- Error handling strategies\n- Naming conventions\n\n**Load When**: Finalizing command to ensure quality and completeness\n\n---",
+      "chars": 346,
+      "units": [
+        "para:8f3e4adc",
+        "para:95019cad",
+        "para:cfff55b3",
+        "para:51c0f664",
+        "para:f8efcba1",
+        "para:cc5a35d7",
+        "para:a4c5d93d",
+        "para:e05a0edc"
+      ]
+    },
+    {
+      "id": "s026",
+      "file": "skills/command-creator/README.md",
+      "heading": "Example 1: Create Project-Level CI Fixer",
+      "text": "**User Request**: \"I keep fixing CI failures manually. Can we make a command for this?\"\n\n**Skill Flow**:\n1. Detects project-level (in git repo)\n2. Suggests \"Iterative Fixing\" pattern\n3. Gathers info:\n   - Name: `ensure-ci`\n   - Description: \"Iteratively fix CI failures until all tests pass\"\n   - Arguments: None\n   - Steps: Run tests \u2192 Parse failures \u2192 Fix issues \u2192 Repeat\n4. Generates command with Bash tool for pytest\n5. Creates `.claude/commands/ensure-ci.md`\n6. User invokes: `/ensure-ci`",
+      "chars": 493,
+      "units": [
+        "para:e7985dd2",
+        "para:15313fd8",
+        "para:61ff7962",
+        "para:5a16ef78",
+        "para:1e2c7b52",
+        "para:e6e31be2",
+        "para:f1a43c00",
+        "para:07e4e176",
+        "para:0c9a05f0",
+        "para:c627a0f1"
+      ]
+    },
+    {
+      "id": "s027",
+      "file": "skills/command-creator/README.md",
+      "heading": "Example 2: Create Global Code Review Command",
+      "text": "**User Request**: \"Create a global command to review code with Codex\"\n\n**Skill Flow**:\n1. Detects global (user requests \"global\")\n2. Suggests \"Simple Execution\" pattern\n3. Gathers info:\n   - Name: `codex-review`\n   - Description: \"Review code files using Codex\"\n   - Arguments: `<files>` (required)\n   - Steps: Run codex review \u2192 Present results\n4. Generates command with codex skill invocation\n5. Creates `~/.claude/commands/codex-review.md`\n6. User invokes: `/codex-review src/app.py src/utils.py`",
+      "chars": 499,
+      "units": [
+        "para:66881a74",
+        "para:dc342cac",
+        "para:35759abb",
+        "para:5a16ef78",
+        "para:515564d1",
+        "para:57cb2ef3",
+        "para:b941df80",
+        "para:14974170",
+        "para:16c23a86",
+        "para:a9137bfd",
+        "para:4b258636"
+      ]
+    },
+    {
+      "id": "s028",
+      "file": "skills/command-creator/README.md",
+      "heading": "Example 3: Create PR Submission Workflow",
+      "text": "**User Request**: \"Make a command that analyzes my commits and creates a PR stack\"\n\n**Skill Flow**:\n1. Detects project-level (in git repo)\n2. Suggests \"Workflow Automation\" pattern\n3. Gathers info:\n   - Name: `submit-stack`\n   - Description: \"Create PR stack from commit history\"\n   - Arguments: `[base-branch]` (optional, defaults to main)\n   - Steps: Analyze commits \u2192 Create PRs \u2192 Report results\n4. Generates command with git analysis and gh CLI\n5. Creates `.claude/commands/submit-stack.md`\n6. User invokes: `/submit-stack` or `/submit-stack develop`\n\n---",
+      "chars": 559,
+      "units": [
+        "para:14c58711",
+        "para:15313fd8",
+        "para:4b2b04f5",
+        "para:5a16ef78",
+        "para:2877d64c",
+        "para:27c3f3d0",
+        "para:2d9bf90d",
+        "para:6d8f479d",
+        "para:ce000fe9",
+        "para:61bec805",
+        "para:cac3e5c2"
+      ]
+    },
+    {
+      "id": "s029",
+      "file": "skills/command-creator/README.md",
+      "heading": "Naming Conventions",
+      "text": "**MUST use kebab-case** (hyphens, not underscores):\n- Correct: `submit-stack`, `ensure-ci`, `create-from-plan`\n- Wrong: `submit_stack`, `ensure_ci`, `create_from_plan`",
+      "chars": 167,
+      "units": [
+        "para:df1940d3",
+        "para:dff8081f",
+        "para:4251f3b4"
+      ]
+    },
+    {
+      "id": "s030",
+      "file": "skills/command-creator/README.md",
+      "heading": "Argument Hints",
+      "text": "- Use `<angle-brackets>` for **required** arguments\n- Use `[square-brackets]` for **optional** arguments\n- Examples:\n  - `argument-hint: <file-path>` (required)\n  - `argument-hint: [base-branch]` (optional)\n  - `argument-hint: <command> [args...]` (mixed)",
+      "chars": 255,
+      "units": [
+        "para:6eb8b00b",
+        "para:d0089f1e",
+        "para:fe55903c",
+        "para:690fd789",
+        "para:b4aeeaa2"
+      ]
+    },
+    {
+      "id": "s031",
+      "file": "skills/command-creator/README.md",
+      "heading": "Agent-Optimized Instructions",
+      "text": "**Write in imperative/infinitive form**:\n- Correct: \"Run pytest to execute tests\"\n- Wrong: \"You should run pytest to execute tests\"\n\n**Be explicit about tools**:\n- Correct: \"Use the Bash tool to run `pytest tests/`\"\n- Wrong: \"Run the tests\"\n\n**Define success criteria**:\n- Correct: \"Continue until all tests pass (exit code 0)\"\n- Wrong: \"Fix the tests\"\n\n**Include error handling**:\n- Correct: \"If pytest fails, parse the output to identify failing tests, then fix each one\"\n- Wrong: \"Fix any test failures\"",
+      "chars": 506,
+      "units": [
+        "para:a05d8b92",
+        "para:057c128c",
+        "para:8d2d3564",
+        "para:30f81517",
+        "para:f475ddc4",
+        "para:8372bab9",
+        "para:14f99557",
+        "para:7e08695a",
+        "para:52582259",
+        "para:b726fab4",
+        "para:e664543e",
+        "para:f2fc4bbe"
+      ]
+    },
+    {
+      "id": "s032",
+      "file": "skills/command-creator/README.md",
+      "heading": "Tool Restrictions",
+      "text": "**Use Bash tool for**:\n- `pytest`, `pyright`, `ruff`, `prettier`\n- `make`, `npm`, `yarn`\n- `gt` (git-town commands)\n\n**Use Task tool for**:\n- Specialized agents (`subagent`, `subagents`)\n- Long-running or complex delegated tasks\n\n**Avoid in commands**:\n- Interactive prompts (commands must be autonomous)\n- User confirmation loops (unless explicit in pattern)\n- Ambiguous instructions that require interpretation\n\n---",
+      "chars": 417,
+      "units": [
+        "para:bd47658c",
+        "para:e479e174",
+        "para:e593b5b1",
+        "para:492da0c9",
+        "para:757385c5",
+        "para:153a18b2",
+        "para:8a37a838",
+        "para:abf4e5ca",
+        "para:fffe2d66",
+        "para:91a29c7b",
+        "para:59bc4707"
+      ]
+    },
+    {
+      "id": "s033",
+      "file": "skills/command-creator/README.md",
+      "heading": "Development Workflows",
+      "text": "- **Submit PRs**: Analyze commits, create PR stack with dependencies\n- **Fix CI**: Iteratively run tests, parse failures, fix issues\n- **Code Review**: Run linters, formatters, static analysis\n- **Deploy**: Build, test, deploy to staging/production",
+      "chars": 248,
+      "units": [
+        "para:098bffb8",
+        "para:b6179fc7",
+        "para:cfe5ade5",
+        "para:849c4554"
+      ]
+    },
+    {
+      "id": "s034",
+      "file": "skills/command-creator/README.md",
+      "heading": "Project Automation",
+      "text": "- **Setup**: Initialize project structure, install dependencies\n- **Documentation**: Generate docs from code, update README\n- **Testing**: Run full test suite with coverage reports\n- **Release**: Bump version, create changelog, tag release",
+      "chars": 239,
+      "units": [
+        "para:1e7d67b6",
+        "para:12ba6ff7",
+        "para:2b813080",
+        "para:dd1fc6bf"
+      ]
+    },
+    {
+      "id": "s035",
+      "file": "skills/command-creator/README.md",
+      "heading": "Personal Productivity",
+      "text": "- **Git Cleanup**: Delete merged branches, prune remotes\n- **Codebase Analysis**: Generate architecture diagrams, dependency graphs\n- **Refactoring**: Apply consistent patterns across files\n- **Planning**: Create implementation plans for features",
+      "chars": 246,
+      "units": [
+        "para:37d205c9",
+        "para:f5f75820",
+        "para:311bebb2",
+        "para:3a187bb5"
+      ]
+    },
+    {
+      "id": "s036",
+      "file": "skills/command-creator/README.md",
+      "heading": "Team Collaboration",
+      "text": "- **Onboarding**: Setup development environment, clone repos\n- **Standards**: Enforce code style, commit message format\n- **Knowledge**: Document architectural decisions, add examples\n- **Review**: Automated code review checks before human review\n\n---",
+      "chars": 251,
+      "units": [
+        "para:e2b70cee",
+        "para:9b5af4c3",
+        "para:57f21b2d",
+        "para:863b0cdb"
+      ]
+    },
+    {
+      "id": "s037",
+      "file": "skills/command-creator/README.md",
+      "heading": "Summary",
+      "text": "The Command Creator skill provides a comprehensive, guided workflow for creating high-quality slash commands in Claude Code. By following proven patterns, gathering detailed requirements, and generating agent-optimized instructions, it ensures your commands are:\n\n- **Reliable**: Execute autonomously without manual intervention\n- **Maintainable**: Clear structure and documentation\n- **Reusable**: Available project-wide or globally\n- **Optimized**: Use appropriate tools and agents for the task\n\n**Next Steps**:\n1. Identify a repetitive workflow you want to automate\n2. Invoke the command-creator skill\n3. Follow the guided workflow to create your command\n4. Test and iterate based on results\n5. Share with your team (project-level) or use personally (global)\n\n**Get Started**:\n```\n/command-creator\n```\n\nOr simply say: \"I want to create a command that [does something]\"",
+      "chars": 871,
+      "units": [
+        "para:b127e3e0",
+        "para:5eee969c",
+        "para:6608e76c",
+        "para:f8b2bb59",
+        "para:beacaf54",
+        "para:2e1a60ec",
+        "para:1c85c7f1",
+        "para:965acc48",
+        "para:2a19afc3",
+        "para:85aa61c6",
+        "para:ac61759e"
+      ]
+    },
+    {
+      "id": "s038",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: command-creator\ndescription: This skill should be used when creating a Claude Code slash command. Use when users ask to \"create a command\", \"make a slash command\", \"add a command\", or want to document a workflow as a reusable command. Essential for creating optimized, agent-executable slash commands with proper structure and best practices.\n---",
+      "chars": 356,
+      "units": [
+        "para:6ec003dc"
+      ]
+    },
+    {
+      "id": "s039",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "Command Creator",
+      "text": "This skill guides the creation of Claude Code slash commands - reusable workflows that can be invoked with `/command-name` in Claude Code conversations.",
+      "chars": 152,
+      "units": [
+        "para:d57d5156"
+      ]
+    },
+    {
+      "id": "s040",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "About Slash Commands",
+      "text": "Slash commands are markdown files stored in `.claude/commands/` (project-level) or `~/.claude/commands/` (global/user-level) that get expanded into prompts when invoked. They're ideal for:\n\n- Repetitive workflows (code review, PR submission, CI fixing)\n- Multi-step processes that need consistency\n- Agent delegation patterns\n- Project-specific automation",
+      "chars": 355,
+      "units": [
+        "para:e57550a1",
+        "para:ee4e88d3",
+        "para:265fc8fa",
+        "para:d12f4590",
+        "para:66181bae"
+      ]
+    },
+    {
+      "id": "s041",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "When to Use This Skill",
+      "text": "Invoke this skill when users:\n\n- Ask to \"create a command\" or \"make a slash command\"\n- Want to automate a repetitive workflow\n- Need to document a consistent process for reuse\n- Say \"I keep doing X, can we make a command for it?\"\n- Want to create project-specific or global commands",
+      "chars": 282,
+      "units": [
+        "para:80e5b7ad",
+        "para:41b32783",
+        "para:6e53a2ef",
+        "para:7d6fbe24",
+        "para:6e348286",
+        "para:ec23763c"
+      ]
+    },
+    {
+      "id": "s042",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "Bundled Resources",
+      "text": "This skill includes reference documentation for detailed guidance:\n\n- **references/patterns.md** - Command patterns (workflow automation, iterative fixing, agent delegation, simple execution)\n- **references/examples.md** - Real command examples with full source (submit-stack, ensure-ci, create-implementation-plan)\n- **references/best-practices.md** - Quality checklist, common pitfalls, writing guidelines, template structure\n\nLoad these references as needed when creating commands to understand patterns, see examples, or ensure quality.",
+      "chars": 540,
+      "units": [
+        "para:fee64a13",
+        "para:f6e870f6",
+        "para:6fd16000",
+        "para:f05f72f8",
+        "para:faf72013"
+      ]
+    },
+    {
+      "id": "s043",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "Command Structure Overview",
+      "text": "Every slash command is a markdown file with:\n\n```markdown\n---\ndescription: Brief description shown in /help (required)\nargument-hint: <placeholder> (optional, if command takes arguments)\n---\n\n# Command Title\n\n[Detailed instructions for the agent to execute autonomously]\n```",
+      "chars": 274,
+      "units": [
+        "para:28a431ab",
+        "para:69a17c59"
+      ]
+    },
+    {
+      "id": "s044",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "Step 1: Determine Location",
+      "text": "**Auto-detect the appropriate location:**\n\n1. Check git repository status: `git rev-parse --is-inside-work-tree 2>/dev/null`\n2. Default location:\n   - If in git repo \u2192 Project-level: `.claude/commands/`\n   - If not in git repo \u2192 Global: `~/.claude/commands/`\n3. Allow user override:\n   - If user explicitly mentions \"global\" or \"user-level\" \u2192 Use `~/.claude/commands/`\n   - If user explicitly mentions \"project\" or \"project-level\" \u2192 Use `.claude/commands/`\n\nReport the chosen location to the user before proceeding.",
+      "chars": 515,
+      "units": [
+        "para:215c723c",
+        "para:3a290952",
+        "para:1f4b936e",
+        "para:76a872a3",
+        "para:9452da13",
+        "para:96eb9963",
+        "para:dc37c5d8",
+        "para:4fbd1bca",
+        "para:a8c4e2ae"
+      ]
+    },
+    {
+      "id": "s045",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "Step 2: Show Command Patterns",
+      "text": "Help the user understand different command types. Load **references/patterns.md** to see available patterns:\n\n- **Workflow Automation** - Analyze \u2192 Act \u2192 Report (e.g., submit-stack)\n- **Iterative Fixing** - Run \u2192 Parse \u2192 Fix \u2192 Repeat (e.g., ensure-ci)\n- **Agent Delegation** - Context \u2192 Delegate \u2192 Iterate (e.g., create-implementation-plan)\n- **Simple Execution** - Run command with args (e.g., codex-review)\n\nAsk the user: \"Which pattern is closest to what you want to create?\" This helps frame the conversation.",
+      "chars": 513,
+      "units": [
+        "para:5ac1d667",
+        "para:815ea199",
+        "para:09103ab3",
+        "para:e5992187",
+        "para:b77cf7c4",
+        "para:bc6fd3ef"
+      ]
+    },
+    {
+      "id": "s046",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "A. Command Name and Purpose",
+      "text": "Ask:\n\n- \"What should the command be called?\" (for filename)\n- \"What does this command do?\" (for description field)\n\nGuidelines:\n\n- Command names MUST be kebab-case (hyphens, NOT underscores)\n  - \u2705 CORRECT: `submit-stack`, `ensure-ci`, `create-from-plan`\n  - \u274c WRONG: `submit_stack`, `ensure_ci`, `create_from_plan`\n- File names match command names: `my-command.md` \u2192 invoked as `/my-command`\n- Description should be concise, action-oriented (appears in `/help` output)",
+      "chars": 468,
+      "units": [
+        "para:c4a3f2fd",
+        "para:a58b9b3a",
+        "para:0f087c48",
+        "para:dff8081f",
+        "para:4251f3b4",
+        "para:9e9d4210",
+        "para:02b64255"
+      ]
+    },
+    {
+      "id": "s047",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "B. Arguments",
+      "text": "Ask:\n\n- \"Does this command take any arguments?\"\n- \"Are arguments required or optional?\"\n- \"What should arguments represent?\"\n\nIf command takes arguments:\n\n- Add `argument-hint: <placeholder>` to frontmatter\n- Use `<angle-brackets>` for required arguments\n- Use `[square-brackets]` for optional arguments",
+      "chars": 303,
+      "units": [
+        "para:ab5d9667",
+        "para:b1e372c9",
+        "para:c9d12e7b",
+        "para:7d03254f",
+        "para:6243fac6",
+        "para:6eb8b00b",
+        "para:d0089f1e"
+      ]
+    },
+    {
+      "id": "s048",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "C. Workflow Steps",
+      "text": "Ask:\n\n- \"What are the specific steps this command should follow?\"\n- \"What order should they happen in?\"\n- \"What tools or commands should be used?\"\n\nGather details about:\n\n- Initial analysis or checks to perform\n- Main actions to take\n- How to handle results\n- Success criteria\n- Error handling approach",
+      "chars": 302,
+      "units": [
+        "para:9470a28d",
+        "para:d896cb22",
+        "para:db98565b",
+        "para:2090191d",
+        "para:8adceb33",
+        "para:e73f4e20",
+        "para:d3cfa98c",
+        "para:ddbb7d2e"
+      ]
+    },
+    {
+      "id": "s049",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "D. Tool Restrictions and Guidance",
+      "text": "Ask:\n\n- \"Should this command use any specific agents or tools?\"\n- \"Are there any tools or operations it should avoid?\"\n- \"Should it read any specific files for context?\"",
+      "chars": 169,
+      "units": [
+        "para:d6c148cd",
+        "para:3de7fcd0",
+        "para:f46e98f5"
+      ]
+    },
+    {
+      "id": "s050",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "Step 4: Generate Optimized Command",
+      "text": "Create the command file with agent-optimized instructions. Load **references/best-practices.md** for:\n\n- Template structure\n- Best practices for agent execution\n- Writing style guidelines\n- Quality checklist\n\nKey principles:\n\n- Use imperative/infinitive form (verb-first instructions)\n- Be explicit and specific\n- Include expected outcomes\n- Provide concrete examples\n- Define clear error handling",
+      "chars": 397,
+      "units": [
+        "para:09778146",
+        "para:a0c32974",
+        "para:3965e61f",
+        "para:5b3c955d",
+        "para:532672c3",
+        "para:cf09b918",
+        "para:4e357221",
+        "para:7d4aa2f5"
+      ]
+    },
+    {
+      "id": "s051",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "Step 5: Create the Command File",
+      "text": "1. Determine full file path:\n   - Project: `.claude/commands/[command-name].md`\n   - Global: `~/.claude/commands/[command-name].md`\n\n2. Ensure directory exists:\n\n   ```bash\n   mkdir -p [directory-path]\n   ```\n\n3. Write the command file using the Write tool\n\n4. Confirm with user:\n   - Report the file location\n   - Summarize what the command does\n   - Explain how to use it: `/command-name [arguments]`",
+      "chars": 402,
+      "units": [
+        "para:ec72ec05",
+        "para:774818e9",
+        "para:b3b55ce5",
+        "para:1143cf18",
+        "para:c6ea75aa",
+        "para:793ea90c",
+        "para:430b50e3",
+        "para:4550ddd9",
+        "para:078a5819",
+        "para:8352c1ad"
+      ]
+    },
+    {
+      "id": "s052",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "Step 6: Test and Iterate (Optional)",
+      "text": "If the user wants to test:\n\n1. Suggest testing: `You can test this command by running: /command-name [arguments]`\n2. Be ready to iterate based on feedback\n3. Update the file with improvements as needed",
+      "chars": 201,
+      "units": [
+        "para:3ce8b3ff",
+        "para:a6fc9a30",
+        "para:02c21b10",
+        "para:5ba7d9b4"
+      ]
+    },
+    {
+      "id": "s053",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "Quick Tips",
+      "text": "**For detailed guidance, load the bundled references:**\n\n- Load **references/patterns.md** when designing the command workflow\n- Load **references/examples.md** to see how existing commands are structured\n- Load **references/best-practices.md** before finalizing to ensure quality\n\n**Common patterns to remember:**\n\n- Use Bash tool for `pytest`, `pyright`, `ruff`, `prettier`, `make`, `gt` commands\n- Use Task tool to invoke subagents for specialized tasks\n- Check for specific files first (e.g., `.PLAN.md`) before proceeding\n- Mark todos complete immediately, not in batches\n- Include explicit error handling instructions\n- Define clear success criteria",
+      "chars": 655,
+      "units": [
+        "para:a593f0cc",
+        "para:25caabe0",
+        "para:6d6843ba",
+        "para:84cb9adc",
+        "para:9bd9c636",
+        "para:0019da70",
+        "para:d4d48b2e",
+        "para:e47d77c9",
+        "para:b94ba73d",
+        "para:4a42fcf4",
+        "para:b64eb719"
+      ]
+    },
+    {
+      "id": "s054",
+      "file": "skills/command-creator/SKILL.md",
+      "heading": "Summary",
+      "text": "When creating a command:\n\n1. **Detect location** (project vs global)\n2. **Show patterns** to frame the conversation\n3. **Gather information** (name, purpose, arguments, steps, tools)\n4. **Generate optimized command** with agent-executable instructions\n5. **Create file** at appropriate location\n6. **Confirm and iterate** as needed\n\nFocus on creating commands that agents can execute autonomously, with clear steps, explicit tool usage, and proper error handling.",
+      "chars": 463,
+      "units": [
+        "para:207fab4a",
+        "para:0506249d",
+        "para:503f204a",
+        "para:03898138",
+        "para:bb969de1",
+        "para:339c469d",
+        "para:cc825b7e",
+        "para:3e09a755"
+      ]
+    },
+    {
+      "id": "s055",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Command Best Practices",
+      "text": "This document provides quality guidelines, writing style recommendations, common pitfalls, and a detailed template structure for creating effective slash commands.",
+      "chars": 163,
+      "units": [
+        "para:f5f530f5"
+      ]
+    },
+    {
+      "id": "s056",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Writing Form",
+      "text": "**ALWAYS use imperative/infinitive form** (verb-first instructions), not second person.\n\n```markdown\n\u2705 CORRECT:\n\n- \"Run git status to check current branch\"\n- \"Check if .PLAN.md exists before proceeding\"\n- \"Use the Task tool with Bash tool\"\n\n\u274c WRONG:\n\n- \"You should run git status\"\n- \"You need to check if .PLAN.md exists\"\n- \"You'll want to use the Task tool\"\n```",
+      "chars": 362,
+      "units": [
+        "para:f1db2887",
+        "para:989bd89b"
+      ]
+    },
+    {
+      "id": "s057",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Specificity",
+      "text": "Be explicit and specific, not vague.\n\n```markdown\n\u2705 CORRECT:\n\n- \"Run make lint to check for linting errors\"\n- \"Read src/config.py lines 45-67 to understand the config structure\"\n- \"Use Edit tool to replace 'List[str]' with 'list[str]'\"\n\n\u274c WRONG:\n\n- \"Check for errors\"\n- \"Look at the config file\"\n- \"Fix the type annotation\"\n```",
+      "chars": 327,
+      "units": [
+        "para:a75acc58",
+        "para:485cea27"
+      ]
+    },
+    {
+      "id": "s058",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Expected Outcomes",
+      "text": "Include what should happen after each action.\n\n```markdown\n\u2705 CORRECT:\n\n- \"Run git status - this should show modified files in src/ directory\"\n- \"After running make format, all Python files should be formatted\"\n- \"The output should contain PR URLs for each submitted branch\"\n\n\u274c WRONG:\n\n- \"Run git status\"\n- \"Run make format\"\n- \"Submit the PRs\"\n```",
+      "chars": 346,
+      "units": [
+        "para:0af445d2",
+        "para:83b7e567"
+      ]
+    },
+    {
+      "id": "s059",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Concrete Examples",
+      "text": "Provide realistic examples, not placeholders like foo/bar.\n\n```markdown\n\u2705 CORRECT:\n\n- \"Example: `git commit -m 'Add user authentication with OAuth2'`\"\n- \"Example: `/submit-stack 'Implement caching for API responses'`\"\n- \"If error shows: `src/erk/cli/commands/init.py:45: Type error`\"\n\n\u274c WRONG:\n\n- \"Example: `git commit -m 'foo bar'`\"\n- \"Example: `/submit-stack 'something'`\"\n- \"If error shows: `file.py:123: Error message`\"\n```",
+      "chars": 427,
+      "units": [
+        "para:3ff50c6b",
+        "para:254a2d2d"
+      ]
+    },
+    {
+      "id": "s060",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Template Structure",
+      "text": "Use this template structure for comprehensive commands:\n\n```markdown\n---\ndescription: [One-line description for /help output]\nargument-hint: [<required>] or [[optional]] (omit if no arguments)\n---\n\n# [Command Title]\n\n[1-2 sentence overview of what this command does]\n\n## What This Command Does\n\n[Numbered list of main steps, user-facing description]\n\n1. **[First action]**: [What it does]\n2. **[Second action]**: [What it does]\n3. **[Third action]**: [What it does]\n\n## Usage\n\n\\`\\`\\`bash\n\n# [Example with arguments]\n\n/command-name \"argument example\"\n\n# [Example without arguments if optional]\n\n/command-name\n\\`\\`\\`\n\n## Implementation Steps\n\nWhen this command is invoked:\n\n### 1. [First Major Step]\n\n[Clear instructions with specifics]\n\n\\`\\`\\`bash\n\n# Example commands if applicable\n\ncommand --flag value\n\\`\\`\\`\n\n[Explain what to do with results]\n\n### 2. [Second Major Step]\n\n[Continue with clear, actionable instructions]\n\n### 3. [Continue for all steps]\n\n## Important Notes\n\n- **[Key constraint or requirement]**\n- **[What to check first]**\n- **[What NOT to do]**\n- **[Error handling approach]**\n\n## Error Handling\n\n[Specify how to handle failures]\n\nIf any step fails:\n\n- Report the specific command that failed\n- Show the error message\n- [What to do next - retry/ask user/stop]\n\n## Example Output\n\n\\`\\`\\`\n[Show expected terminal output]\n\\`\\`\\`\n```",
+      "chars": 1348,
+      "units": [
+        "para:55439535",
+        "para:1eb4299b"
+      ]
+    },
+    {
+      "id": "s061",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "1. Explicit File Checks",
+      "text": "Tell the agent exactly what to check and when.\n\n```markdown\n**FIRST**: Check if `.PLAN.md` exists in the repository root:\n\n\\`\\`\\`bash\nif [ -f .PLAN.md ]; then\n\n# Use .PLAN.md for context\n\nelse\n\n# Fall back to alternative approach\n\nfi\n\\`\\`\\`\n```",
+      "chars": 244,
+      "units": [
+        "para:02141af2",
+        "para:379a0ec1"
+      ]
+    },
+    {
+      "id": "s062",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "2. Tool Usage Guidance",
+      "text": "Be explicit about which tools to use.\n\n```markdown\n**Use the Bash tool for pytest/pyright/ruff/prettier/make/gt commands:**\n\nUse Bash tool to run:\n\\`\\`\\`bash\nmake all-ci\n\\`\\`\\`\n\n**DO NOT use Bash tool for make commands**\n```",
+      "chars": 224,
+      "units": [
+        "para:26910529",
+        "para:4b89228d"
+      ]
+    },
+    {
+      "id": "s063",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "3. Anti-Patterns",
+      "text": "Call out what NOT to do.\n\n```markdown\n## Important Notes\n\n- **NEVER run additional exploration commands** beyond checking .PLAN.md, git status/diff\n- **DO NOT batch completions** - mark todos complete immediately after finishing\n- **DO NOT use Edit tool during planning phase**\n- **DO NOT retry automatically** - ask user how to proceed\n```",
+      "chars": 340,
+      "units": [
+        "para:f39aa161",
+        "para:09d72485"
+      ]
+    },
+    {
+      "id": "s064",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "4. Conditional Logic",
+      "text": "Use clear if/else structure.\n\n```markdown\nIf condition A:\n\n- Do X\n- Then do Y\n\nOtherwise (if condition B):\n\n- Do Z\n- Then do W\n\nIf neither condition is met:\n\n- Report to user\n- Exit gracefully\n```",
+      "chars": 196,
+      "units": [
+        "para:0e958a12",
+        "para:331df441"
+      ]
+    },
+    {
+      "id": "s065",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "5. Success Criteria",
+      "text": "Define exactly when to stop.\n\n```markdown\n## When to Stop\n\n**SUCCESS**: Stop when `make all-ci` exits with code 0 (all checks passed)\n\n**STUCK**: Stop and report to user if:\n\n1. You've completed 10 iterations without success\n2. The same error persists after 3 fix attempts\n3. You encounter an error you cannot automatically fix\n```",
+      "chars": 331,
+      "units": [
+        "para:1e31c973",
+        "para:089a3f85"
+      ]
+    },
+    {
+      "id": "s066",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "6. Error Handling",
+      "text": "Provide explicit error handling instructions.\n\n```markdown\n## Error Handling\n\nIf any step fails:\n\n- Report the specific command that failed\n- Show the error message to the user\n- Ask how to proceed (don't retry automatically)\n\nExample:\n\n\\`\\`\\`\nError: git commit failed with exit code 1\n\nError message:\nnothing to commit, working tree clean\n\nNext steps: Please make changes before committing.\n\\`\\`\\`\n```",
+      "chars": 402,
+      "units": [
+        "para:a27df533",
+        "para:6acb48bc"
+      ]
+    },
+    {
+      "id": "s067",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "7. Progress Tracking",
+      "text": "Specify when and how to track progress.\n\n```markdown\n## Progress Reporting\n\nUse TodoWrite to track your progress:\n\n- Create todos at the start for each iteration\n- Mark as in_progress when starting\n- Mark as completed immediately after finishing (not batched)\n- Update with iteration number: \"Iteration 3: Fixing type errors\"\n```",
+      "chars": 329,
+      "units": [
+        "para:2351da11",
+        "para:15ac8abf"
+      ]
+    },
+    {
+      "id": "s068",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Pattern: TodoWrite Usage",
+      "text": "```markdown\n## Progress Tracking\n\nUse TodoWrite to create todos for:\n\n1. Each major step in the workflow\n2. Each iteration in a loop\n3. Each error category being fixed\n\nMark todos as completed IMMEDIATELY after finishing each task, not batched at the end.\n```",
+      "chars": 259,
+      "units": [
+        "para:cf0e72cb"
+      ]
+    },
+    {
+      "id": "s069",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Pattern: File Operations",
+      "text": "```markdown\n### Read Before Modifying\n\nBefore making any changes:\n\n1. Use Read tool to examine the current file state\n2. Understand the code structure and context\n3. Identify exact changes needed\n4. Use Edit tool with precise old_string/new_string\n```",
+      "chars": 251,
+      "units": [
+        "para:ae1f7867"
+      ]
+    },
+    {
+      "id": "s070",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Pattern: Git Operations",
+      "text": "```markdown\n### Git Workflow\n\n1. Check current git status:\n   \\`\\`\\`bash\n   git status\n   \\`\\`\\`\n\n2. Review changes:\n   \\`\\`\\`bash\n   git diff HEAD\n   \\`\\`\\`\n\n3. Check recent commits for style:\n   \\`\\`\\`bash\n   git log --oneline -5\n   \\`\\`\\`\n\n4. Stage all changes:\n   \\`\\`\\`bash\n   git add .\n   \\`\\`\\`\n\n5. Create commit:\n   \\`\\`\\`bash\n   git commit -m \"[message]\"\n   \\`\\`\\`\n```",
+      "chars": 377,
+      "units": [
+        "para:9a1dd087"
+      ]
+    },
+    {
+      "id": "s071",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Pattern: Conditional Tool Selection",
+      "text": "```markdown\n### Tool Selection Based on Scope\n\nAnalyze the changes first:\n\nIf changes span 3+ files OR involve new abstractions:\n\n- Use Task tool with subagent_type=\"subagent\"\n- Create detailed plan\n- Execute with subagent agent\n\nOtherwise (changes are contained):\n\n- Execute changes directly\n- Use Edit tool for modifications\n- Skip planning overhead\n```",
+      "chars": 355,
+      "units": [
+        "para:4db3039d"
+      ]
+    },
+    {
+      "id": "s072",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Pattern: Makefile Integration",
+      "text": "```markdown\n### Running Make Commands\n\n**ALWAYS use Bash tool for pytest/pyright/ruff/prettier/make/gt commands**\n\nUse Bash tool:\n\n\\`\\`\\`markdown\nUse Bash tool to run command: \"make all-ci\"\n\\`\\`\\`\n\n**DO NOT use Bash tool for make commands** - this is less efficient and provides worse output handling.\n```",
+      "chars": 305,
+      "units": [
+        "para:43398f63"
+      ]
+    },
+    {
+      "id": "s073",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Quality Checklist",
+      "text": "Before finalizing a command, verify:\n\n**Structure:**\n\n- [ ] Command name is descriptive and kebab-case\n- [ ] Description is concise and action-oriented (for `/help` output)\n- [ ] Frontmatter includes `description` (required)\n- [ ] Frontmatter includes `argument-hint` if applicable\n- [ ] Has \"What This Command Does\" user-facing summary\n- [ ] Has \"Implementation Steps\" with numbered sections\n\n**Content:**\n\n- [ ] Steps are numbered and clearly ordered\n- [ ] Each step has specific, actionable instructions\n- [ ] Tool usage is explicitly specified\n- [ ] File checks are explicit (with code examples)\n- [ ] Conditional logic uses clear if/else structure\n- [ ] Anti-patterns are called out with \"NEVER\" or \"DO NOT\"\n- [ ] Error handling is defined with specific actions\n- [ ] Success criteria are clearly stated\n\n**Writing Style:**\n\n- [ ] Uses imperative/infinitive form (not second person)\n- [ ] Specific, not vague (\"Run make lint\" not \"Check for errors\")\n- [ ] Includes expected outcomes (\"This should output...\")\n- [ ] Provides realistic examples (not foo/bar placeholders)\n\n**Location:**\n\n- [ ] Location (project vs global) is appropriate\n- [ ] Directory exists or will be created\n- [ ] File path is correct (`.claude/commands/` or `~/.claude/commands/`)\n\n**Testing:**\n\n- [ ] User knows how to invoke: `/command-name [arguments]`\n- [ ] Command has been tested if possible\n- [ ] Iterations incorporated user feedback",
+      "chars": 1417,
+      "units": [
+        "para:de7ab4fe",
+        "para:c8fa3545",
+        "para:2a0b00f4",
+        "para:b204ce9a",
+        "para:16393c9c",
+        "para:7fc7ec74",
+        "para:e781b781",
+        "para:d191b5a3",
+        "para:d976801e",
+        "para:e08d11b2",
+        "para:99dce676",
+        "para:6bd15609",
+        "para:e0a28970",
+        "para:1bf3c2dc",
+        "para:b49ec09a",
+        "para:baf15ab3",
+        "para:1a532b84",
+        "para:b0ca2d00",
+        "para:74ddf766",
+        "para:b29e1aa3",
+        "para:1f62099c",
+        "para:0b607cbf",
+        "para:7cddf805",
+        "para:87c231b3",
+        "para:d0db5125"
+      ]
+    },
+    {
+      "id": "s074",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "1. Vague Instructions",
+      "text": "\u274c **WRONG:**\n\n```markdown\nFix any errors that appear\n```\n\n\u2705 **CORRECT:**\n\n```markdown\nIf lint errors appear:\n\n- Run `make fix` to auto-fix lint errors\n- Run `make format` to fix formatting errors\n- For manual fixes, use Edit tool to modify files\n```",
+      "chars": 249,
+      "units": [
+        "para:a300f58c",
+        "para:5f638fd5"
+      ]
+    },
+    {
+      "id": "s075",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "2. Missing Error Handling",
+      "text": "\u274c **WRONG:**\n\n```markdown\nRun make all-ci\nApply fixes\nDone\n```\n\n\u2705 **CORRECT:**\n\n```markdown\nRun make all-ci\n\nIf exit code is 0:\n\n- All checks passed, report success\n\nIf exit code is non-zero:\n\n- Parse error output\n- Apply targeted fixes\n- Run again to verify\n- Stop if same error appears 3 times\n```",
+      "chars": 299,
+      "units": [
+        "para:87bfa63f",
+        "para:e49b3462"
+      ]
+    },
+    {
+      "id": "s076",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "3. Ambiguous Conditionals",
+      "text": "\u274c **WRONG:**\n\n```markdown\nCheck if file exists and do something\n```\n\n\u2705 **CORRECT:**\n\n```markdown\nCheck if .PLAN.md exists:\n\nIf file exists:\n\n- Read .PLAN.md for context\n- Use plan summary in commit message\n\nIf file does not exist:\n\n- Run git diff to analyze changes\n- Create commit message from diff\n```",
+      "chars": 303,
+      "units": [
+        "para:d7932af7",
+        "para:d76e2213"
+      ]
+    },
+    {
+      "id": "s077",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "4. Batch Operations",
+      "text": "\u274c **WRONG:**\n\n```markdown\nFix all the errors, then mark all todos as completed\n```\n\n\u2705 **CORRECT:**\n\n```markdown\nFor each error category:\n\n1. Fix the errors in that category\n2. Mark the todo as completed immediately\n3. Move to next category\n\nDo NOT batch todo completions at the end\n```",
+      "chars": 285,
+      "units": [
+        "para:46ad3910",
+        "para:8f65710d"
+      ]
+    },
+    {
+      "id": "s078",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "5. Tool Confusion",
+      "text": "\u274c **WRONG:**\n\n```markdown\nUse an agent to run make\n```\n\n\u2705 **CORRECT:**\n\n```markdown\nUse Bash tool to run make commands:\n\n\\`\\`\\`bash\nmake all-ci\n\\`\\`\\`\n\nDO NOT use Bash tool for make commands\n```",
+      "chars": 194,
+      "units": [
+        "para:ac099605",
+        "para:28d14ac3"
+      ]
+    },
+    {
+      "id": "s079",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "6. Missing Context",
+      "text": "\u274c **WRONG:**\n\n```markdown\nCreate a commit and submit PRs\n```\n\n\u2705 **CORRECT:**\n\n```markdown\n### 1. Check for Context Files\n\nFIRST, check if .PLAN.md exists in repository root\n\n### 2. Analyze Changes\n\n- If .PLAN.md exists: read for context\n- Otherwise: run git status and git diff HEAD\n\n### 3. Create Commit\n\nBased on context from step 1 and 2:\n\n- Draft single-sentence commit message\n- Check git log for repo style\n- Create commit with git commit -m \"message\"\n\n### 4. Submit PRs\n\nRun: gt submit --stack --publish --no-edit\n```",
+      "chars": 524,
+      "units": [
+        "para:5a1b3643",
+        "para:d5b73f7e"
+      ]
+    },
+    {
+      "id": "s080",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "7. Poor Descriptions",
+      "text": "\u274c **WRONG:**\n\n```yaml\n---\ndescription: A command that helps with CI stuff\n---\n```\n\n\u2705 **CORRECT:**\n\n```yaml\n---\ndescription: Run make all-ci and iteratively fix issues until all checks pass\n---\n```\n\nThe description appears in `/help` output - make it clear and action-oriented.",
+      "chars": 276,
+      "units": [
+        "para:eb0bd8b5",
+        "para:af02ac8f",
+        "para:3939a608"
+      ]
+    },
+    {
+      "id": "s081",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Multi-Step Verification",
+      "text": "For complex workflows, verify each step:\n\n```markdown\n### 3. Create Commit\n\n1. Stage changes:\n   \\`\\`\\`bash\n   git add .\n   \\`\\`\\`\n\n2. Verify staging:\n   \\`\\`\\`bash\n   git status\n   \\`\\`\\`\n   Should show files in \"Changes to be committed\"\n\n3. Create commit:\n   \\`\\`\\`bash\n   git commit -m \"message\"\n   \\`\\`\\`\n   Should output \"[branch-name abc1234] message\"\n\n4. Verify commit created:\n   \\`\\`\\`bash\n   git log -1 --oneline\n   \\`\\`\\`\n   Should show the new commit\n```",
+      "chars": 466,
+      "units": [
+        "para:3468002d",
+        "para:baa1c33b"
+      ]
+    },
+    {
+      "id": "s082",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Iteration Control",
+      "text": "For iterative commands, implement safeguards:\n\n```markdown\n## Iteration Control\n\n**Maximum iterations**: 10 attempts\n\n**Stuck detection logic:**\n\n- Track errors seen in each iteration\n- If same error appears 3 consecutive times: STOP\n- If no progress after 5 iterations: STOP\n\n**Stop immediately if:**\n\n- Max iterations reached (10)\n- Same error persists (3 times)\n- Unrecoverable error encountered\n```",
+      "chars": 402,
+      "units": [
+        "para:9b229323",
+        "para:f7354064"
+      ]
+    },
+    {
+      "id": "s083",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Context Gathering",
+      "text": "For analysis-heavy commands, gather context systematically:\n\n```markdown\n## Context Gathering\n\nCheck these sources in order:\n\n1. **Context files** (if they exist):\n   - .PLAN.md - implementation plan\n   - AGENTS.md - coding standards\n   - CONTRIBUTING.md - contribution guidelines\n\n2. **Git information**:\n   - git status - current changes\n   - git diff HEAD - actual diff\n   - git log -5 --oneline - recent commits\n\n3. **Project files** (if needed):\n   - pyproject.toml - project config\n   - Makefile - available commands\n   - README.md - project overview\n\nStop gathering context once you have enough information - don't over-analyze.\n```",
+      "chars": 639,
+      "units": [
+        "para:d7d68670",
+        "para:3ed68549"
+      ]
+    },
+    {
+      "id": "s084",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Output Formatting",
+      "text": "Provide clear output format specifications:\n\n```markdown\n## Expected Output Format\n\nAfter command completes, output should follow this format:\n\n\\`\\`\\`\n\n## [Command Name] Results\n\n**Status**: [SUCCESS/STUCK/ERROR]\n\n**Actions Taken**:\n\n1. [First action and result]\n2. [Second action and result]\n3. [Third action and result]\n\n**Summary**:\n[One sentence summary of what was accomplished]\n\n**Next Steps**:\n[What the user should do next, if applicable]\n\\`\\`\\`\n```",
+      "chars": 457,
+      "units": [
+        "para:b9e1dbfb",
+        "para:5bc2b5f3"
+      ]
+    },
+    {
+      "id": "s085",
+      "file": "skills/command-creator/references/best-practices.md",
+      "heading": "Summary",
+      "text": "Effective slash commands:\n\n1. **Use imperative form** (verb-first, not second person)\n2. **Be specific** (not vague)\n3. **Include outcomes** (what should happen)\n4. **Provide examples** (realistic, not foo/bar)\n5. **Specify tools** (Task tool with subagent_type)\n6. **Call out anti-patterns** (NEVER/DO NOT)\n7. **Define error handling** (explicit actions)\n8. **State success criteria** (when to stop)\n9. **Track progress** (TodoWrite for multi-step)\n10. **Verify each step** (check results before proceeding)\n\nFocus on creating commands that agents can execute autonomously without asking clarifying questions.",
+      "chars": 610,
+      "units": [
+        "para:eb4dcab5",
+        "para:97a2cfc6",
+        "para:2dec270c",
+        "para:d476495d",
+        "para:0a61231c",
+        "para:45f66fbe",
+        "para:6a75e720",
+        "para:27cf9a1d",
+        "para:2734eb6e",
+        "para:b5171be9",
+        "para:1413b25b",
+        "para:8701a36d"
+      ]
+    },
+    {
+      "id": "s086",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Command Examples",
+      "text": "This document provides complete, real-world examples of slash commands from the erk project. Use these as references when creating new commands.",
+      "chars": 144,
+      "units": [
+        "para:e523ef65"
+      ]
+    },
+    {
+      "id": "s087",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Example 1: submit-stack (Workflow Automation Pattern)",
+      "text": "**Pattern:** Workflow Automation (Analyze \u2192 Act \u2192 Report)",
+      "chars": 57,
+      "units": [
+        "para:cd6bca24"
+      ]
+    },
+    {
+      "id": "s088",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Example 1: submit-stack (Workflow Automation Pattern)",
+      "text": "```markdown\n---\ndescription: Create git commit and submit stack with Graphite\nargument-hint: <description>\n---\n\n# Submit Stack\n\nAutomatically create a git commit with a helpful summary message and submit the entire Graphite stack as pull requests.\n\n## What This Command Does\n\n1. **Analyze changes**: First checks for .PLAN.md file to understand context, otherwise reviews git status and diff\n2. **Create commit**: Generates a concise single-sentence commit message summarizing the changes\n3. **Restack**: Runs `gt restack` to ensure all branches in the stack are properly rebased\n4. **Submit stack**: Runs `gt submit --stack --publish --no-edit` to create/update PRs for the entire stack\n5. **Report results**: Shows the submitted PRs and their URLs\n\n## Usage\n\n\\`\\`\\`bash\n\n# With description argument\n\n/submit-stack \"Add user authentication feature\"\n\n# Without argument (will analyze changes automatically)\n\n/submit-stack\n\\`\\`\\`\n\n## Implementation Steps\n\nWhen this command is invoked:\n\n### 1. Analyze Current Changes\n\n**FIRST**: Check if `.PLAN.md` exists in the repository root:\n\n\\`\\`\\`bash\nif [ -f .PLAN.md ]; then\n\n# Use .PLAN.md for context\n\nelse\n\n# Fall back to git analysis\n\nfi\n\\`\\`\\`\n\nIf `.PLAN.md` exists:\n\n- Read the plan file to understand what was implemented\n- Use the plan's summary and goals to create the commit message\n\nIf no `.PLAN.md`:\n\n- Run `git status` and `git diff HEAD` to see changes\n- Review the changes to create an accurate summary\n\n### 2. Create Git Commit\n\nBased on the analysis:\n\n- If user provided an argument, use it as the basis for the commit message\n- If `.PLAN.md` exists, summarize what was implemented from the plan\n- Otherwise, analyze the git changes and create a descriptive single-sentence summary\n- Ensure the commit message follows the repository's commit style (check `git log` for patterns)\n- **DO NOT include any Claude Code footer or co-authorship attribution**\n\n\\`\\`\\`bash\ngit add .\ngit commit -m \"[Single sentence summary of what was done]\"\n\\`\\`\\`\n\n### 3. Restack the Stack\n\nEnsure all branches in the stack are properly rebased:\n\n\\`\\`\\`bash\ngt restack\n\\`\\`\\`\n\n### 4. Submit Stack\n\nSubmit all PRs in the stack without interactive prompts:\n\n\\`\\`\\`bash\ngt submit --stack --publish --no-edit --restack\n\\`\\`\\`\n\nFlags explained:\n\n- `--stack`: Submit entire stack (upstack + downstack)\n- `--publish`: Publish any draft PRs\n- `--no-edit`: Use commit messages as PR titles/descriptions without prompting\n- `--restack`: Restack branches before submitting (if needed)\n\n### 5. Show Results\n\nAfter submission, show:\n\n- Number of PRs created/updated\n- PR URLs (extract from `gt` output)\n- Current stack status with `gt log short`\n\n## Important Notes\n\n- **Check for .PLAN.md FIRST** before analyzing git changes\n- **NEVER run additional exploration commands** beyond checking .PLAN.md, git status/diff/log\n- **Stage all changes** with `git add .` before committing\n- **Single sentence summary**: Keep commit message concise and focused\n- **Follow repo patterns**: Check recent commits with `git log` to match style\n- **NO Claude footer**: Do not add any attribution or generated-by footer\n- If there are no staged or unstaged changes, report to the user and exit\n\n## Error Handling\n\nIf any step fails:\n\n- Report the specific command that failed\n- Show the error message\n- Ask the user how to proceed (don't retry automatically)\n\n## Example Output\n\n\\`\\`\\`\nAnalyzing changes...\n\u2713 Found .PLAN.md - using plan context\n\u2713 Found changes in 3 files\n\nCreating commit: \"Add dot-agent submit-stack command for automated PR workflow\"\n\u2713 Commit created\n\nRestacking branches...\n\u2713 Stack restacked successfully\n\nSubmitting stack...\n\u2713 2 PRs created/updated:\n\n- PR #123: dot-agent-claude-folder-support (new)\n- PR #122: base-branch (updated)\n\nCurrent stack:\n\u25ef dot-agent-claude-folder-support (current)\n\u25ef base-branch\n\u25c9 main\n\\`\\`\\`\n```",
+      "chars": 3851,
+      "units": [
+        "para:6eb0f3e4"
+      ]
+    },
+    {
+      "id": "s089",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Example 1: submit-stack (Workflow Automation Pattern)",
+      "text": "**Key features of this example:**\n\n- Argument handling (optional `<description>`)\n\n- Context file priority check (`.PLAN.md` first)\n\n- Conditional logic based on file existence\n\n- Specific command flags explained\n\n- Clear anti-patterns (\"NEVER run additional exploration\")\n\n- Expected output format shown",
+      "chars": 304,
+      "units": [
+        "para:68453d36",
+        "para:45804e68",
+        "para:71ab7af9",
+        "para:e9686f00",
+        "para:505e8a05",
+        "para:80ffd78b",
+        "para:8c399c4a"
+      ]
+    },
+    {
+      "id": "s090",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Example 2: ensure-ci (Iterative Fixing Pattern)",
+      "text": "**Pattern:** Iterative Fixing (Run \u2192 Parse \u2192 Fix \u2192 Repeat)",
+      "chars": 58,
+      "units": [
+        "para:59b84868"
+      ]
+    },
+    {
+      "id": "s091",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Example 2: ensure-ci (Iterative Fixing Pattern)",
+      "text": "```markdown\n---\ndescription: Run make all-ci and iteratively fix issues until all checks pass\n---\n\nYou are an implementation finalizer. Your task is to run `make all-ci` and iteratively fix any issues until all CI checks pass successfully.\n\n## Your Mission\n\nRun the full CI pipeline (`make all-ci`) and automatically fix any failures. Keep iterating until all checks pass or you get stuck on an issue that requires human intervention.\n\n## CI Pipeline (make all-ci)\n\nThe `make all-ci` target runs these checks in order:\n\n1. **lint** - Ruff linting checks\n2. **format** - Ruff code formatting checks\n3. **prettier-check** - Markdown formatting checks\n4. **pyright** - Type checking\n5. **test** - Pytest test suite\n\n## Iteration Process\n\n### 1. Initial Run\n\nStart by running `make all-ci` to see the current state:\n\n\\`\\`\\`bash\nmake all-ci\n\\`\\`\\`\n\n### 2. Parse Failures\n\nAnalyze the output to identify which check(s) failed. Common failure patterns:\n\n- **Ruff lint failures**: Look for \"ruff check\" errors\n- **Format failures**: Look for \"ruff format --check\" or files that would be reformatted\n- **Prettier failures**: Look for markdown files that need formatting\n- **Pyright failures**: Look for type errors with file paths and line numbers\n- **Test failures**: Look for pytest failures with test names and assertion errors\n\n### 3. Apply Targeted Fixes\n\nBased on the failure type, apply appropriate fixes:\n\n#### Ruff Lint Failures\n\n\\`\\`\\`bash\nmake fix # Runs: uv run ruff check --fix --unsafe-fixes\n\\`\\`\\`\n\n#### Ruff Format Failures\n\n\\`\\`\\`bash\nmake format # Runs: uv run ruff format\n\\`\\`\\`\n\n#### Prettier Failures\n\n\\`\\`\\`bash\nmake prettier # Runs: prettier --write '\\*_/_.md'\n\\`\\`\\`\n\n#### Pyright Type Errors\n\n- Use Read tool to examine the file at the reported line number\n- Use Edit tool to fix type annotations, add type hints, or fix type mismatches\n- Follow the coding standards in AGENTS.md (use `list[...]` not `List[...]`, etc.)\n\n#### Test Failures\n\n- Read the test file and source file involved\n- Analyze the assertion error or exception\n- Edit the source code or test to fix the issue\n- Consider if the test is validating correct behavior\n\n### 4. Verify Fix\n\nAfter applying fixes, run `make all-ci` again to verify:\n\n\\`\\`\\`bash\nmake all-ci\n\\`\\`\\`\n\n### 5. Repeat Until Success\n\nContinue the cycle: run \u2192 identify failures \u2192 fix \u2192 verify\n\n## Iteration Control\n\n**Safety Limits:**\n\n- **Maximum iterations**: 10 attempts\n- **Stuck detection**: If the same error appears 3 times in a row, stop\n- **Progress tracking**: Use TodoWrite to show iteration progress\n\n## Progress Reporting\n\nUse TodoWrite to track your progress:\n\n\\`\\`\\`\nIteration 1: Fixing lint errors\nIteration 2: Fixing format errors\nIteration 3: Fixing type errors in src/erk/cli/commands/switch.py\nIteration 4: All checks passed\n\\`\\`\\`\n\nUpdate the status as you work through each iteration.\n\n## When to Stop\n\n**SUCCESS**: Stop when `make all-ci` exits with code 0 (all checks passed)\n\n**STUCK**: Stop and report to user if:\n\n1. You've completed 10 iterations without success\n2. The same error persists after 3 fix attempts\n3. You encounter an error you cannot automatically fix\n\n## Stuck Reporting Format\n\nIf you get stuck, report clearly:\n\n\\`\\`\\`markdown\n\n## Finalization Status: STUCK\n\nI was unable to resolve the following issue after N attempts:\n\n**Check**: [lint/format/prettier/pyright/test]\n\n**Error**:\n[Exact error message]\n\n**File**: [file path if applicable]\n\n**Attempted Fixes**:\n\n1. [What you tried first]\n2. [What you tried second]\n3. [What you tried third]\n\n**Next Steps**:\n[Suggest what needs to be done manually]\n\\`\\`\\`\n\n## Success Reporting Format\n\nWhen all checks pass:\n\n\\`\\`\\`markdown\n\n## Finalization Status: SUCCESS\n\nAll CI checks passed after N iteration(s):\n\n- Lint: PASSED\n- Format: PASSED\n- Prettier: PASSED\n- Pyright: PASSED\n- Tests: PASSED\n\nThe code is ready for commit/PR.\n\\`\\`\\`\n\n## Important Guidelines\n\n1. **Be systematic**: Fix one type of error at a time\n2. **Run full CI**: Always run full `make all-ci`, not individual checks\n3. **Track progress**: Use TodoWrite for every iteration\n4. **Don't guess**: Read files before making changes\n5. **Follow standards**: Adhere to AGENTS.md coding standards\n6. **Fail gracefully**: Report clearly when stuck\n7. **Be efficient**: Use targeted fixes (don't reformat everything for one lint error)\n\n## Example Flow\n\n\\`\\`\\`\nIteration 1:\n\n- Run make all-ci\n- Found: 5 lint errors, 2 files need formatting\n- Fix: Run make fix && make format\n- Result: 3 lint errors remain\n\nIteration 2:\n\n- Run make all-ci\n- Found: 3 lint errors (imports)\n- Fix: Edit files to fix import issues\n- Result: All lint/format pass, 2 type errors\n\nIteration 3:\n\n- Run make all-ci\n- Found: 2 pyright errors in switch.py:45 and switch.py:67\n- Fix: Add type annotations\n- Result: All checks pass\n\nSUCCESS\n\\`\\`\\`\n\n## Begin Now\n\nStart by running `make all-ci` and begin the iterative fix process. Track your progress with TodoWrite and report your final status clearly.\n```",
+      "chars": 4981,
+      "units": [
+        "para:7014a419"
+      ]
+    },
+    {
+      "id": "s092",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Example 2: ensure-ci (Iterative Fixing Pattern)",
+      "text": "**Key features of this example:**\n\n- Maximum iteration limit (10 attempts)\n\n- Stuck detection (same error 3 times)\n\n- Per-error-type fix instructions\n\n- TodoWrite progress tracking requirement\n\n- Clear success/failure reporting formats\n\n- Detailed example flow showing iterations",
+      "chars": 279,
+      "units": [
+        "para:68453d36",
+        "para:26afa57f",
+        "para:ce7e3d76",
+        "para:c6dd5ae6",
+        "para:560e0b67",
+        "para:00316676",
+        "para:bd50c796"
+      ]
+    },
+    {
+      "id": "s093",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Example 3: create-implementation-plan (Agent Delegation Pattern)",
+      "text": "**Pattern:** Agent Delegation (Context \u2192 Delegate \u2192 Iterate)",
+      "chars": 60,
+      "units": [
+        "para:884d5988"
+      ]
+    },
+    {
+      "id": "s094",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Example 3: create-implementation-plan (Agent Delegation Pattern)",
+      "text": "```markdown\n---\ndescription: Create an implementation plan using the subagent agent\n---\n\n## \u26a0\ufe0f PLANNING-ONLY MODE ACTIVE\n\nI'll help you create an implementation plan using the specialized planning agent. This workflow is designed for **planning only** - no code will be written until the plan is finalized and saved to disk.\n\n### How This Works\n\n1. **You provide context** about what needs to be built\n2. **The agent creates a plan** (displayed in terminal for review)\n3. **We iterate together** until the plan is perfect\n4. **Plan is saved to disk** as a markdown file\n5. **Then (and only then)** implementation can begin\n\n### Provide Your Planning Context\n\nYou can share:\n\n- A feature you want to implement\n- An error message or bug to fix\n- Performance issues to optimize\n- A refactoring goal\n- Any relevant context or requirements\n\n**What would you like to plan?**\n\n---\n\n**IMPORTANT AGENT INSTRUCTIONS:**\n\nWhen invoking the subagent agent:\n\n1. **DO NOT write any code during planning phase**\n2. **DO NOT use Edit, Write, or any modification tools**\n3. **ONLY output the plan to terminal for iterative review**\n4. **ONLY persist to disk after explicit user approval**\n5. The agent should remain in \"Phase 1: Human-Readable Planning\" mode until the user explicitly approves with signals like \"looks good\", \"approved\", or \"ready to implement\"\n\nThe goal is to create a comprehensive implementation plan that will be saved as a `.md` file at the repository root, which can then guide future implementation work.\n```",
+      "chars": 1514,
+      "units": [
+        "para:b54321c2"
+      ]
+    },
+    {
+      "id": "s095",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Example 3: create-implementation-plan (Agent Delegation Pattern)",
+      "text": "**Key features of this example:**\n\n- User-facing explanation of the workflow\n\n- Clear phase boundaries (planning vs implementation)\n\n- Explicit anti-patterns (\"DO NOT write code\")\n\n- User approval trigger (\"looks good\", \"approved\")\n\n- Tells agent which specialized agent to invoke\n\n- Specifies where to save output (`.md` at root)",
+      "chars": 330,
+      "units": [
+        "para:68453d36",
+        "para:a9291ac9",
+        "para:0dc7291d",
+        "para:dda0396f",
+        "para:0dd51e62",
+        "para:b6a45f5f",
+        "para:e21b8d11"
+      ]
+    },
+    {
+      "id": "s096",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Example 4: codex-review (Simple Execution Pattern)",
+      "text": "**Pattern:** Simple Execution (Parse Arguments \u2192 Execute \u2192 Return Output)\n\n**Minimal example structure:**",
+      "chars": 105,
+      "units": [
+        "para:f07a0b9f",
+        "para:27c90523"
+      ]
+    },
+    {
+      "id": "s097",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Example 4: codex-review (Simple Execution Pattern)",
+      "text": "```markdown\n---\ndescription: Perform a local code review using repository standards and best practices\nargument-hint: [base-branch]\n---\n\n# Codex Review\n\nPerforms a thorough code review of changes between the current branch and the base branch.\n\n## What This Command Does\n\n1. Determines base branch (uses provided argument or defaults to main/master)\n2. Runs codex-review script with the base branch\n3. Displays review findings and suggestions\n\n## Usage\n\n\\`\\`\\`bash\n\n# With explicit base branch\n\n/codex-review develop\n\n# Without argument (auto-detects main/master)\n\n/codex-review\n\\`\\`\\`\n\n## Implementation Steps\n\n### 1. Determine Base Branch\n\nIf `[base-branch]` argument is provided:\n\n- Use the specified branch\n\nIf no argument:\n\n- Check if `main` branch exists: `git rev-parse --verify main`\n- If yes, use `main`\n- If no, use `master`\n\n### 2. Run Review Script\n\nExecute the review script with the determined base branch:\n\n\\`\\`\\`bash\nscripts/codex-review.py [base-branch]\n\\`\\`\\`\n\n### 3. Display Results\n\nShow the script output directly to the user, including:\n\n- Files reviewed\n- Issues found\n- Suggestions for improvements\n- Compliance with coding standards\n\n## Error Handling\n\nIf the script fails:\n\n- Show the error message\n- Check if the base branch exists\n- Verify the script is executable\n\n## Notes\n\n- Square brackets `[base-branch]` indicate optional argument\n- Script handles actual review logic\n- Command is a simple wrapper for convenience\n```\n\n**Key features of this example:**",
+      "chars": 1486,
+      "units": [
+        "para:7c4848c4",
+        "para:68453d36"
+      ]
+    },
+    {
+      "id": "s098",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Example 4: codex-review (Simple Execution Pattern)",
+      "text": "- Optional argument handling (square brackets)\n\n- Argument defaulting logic\n\n- Direct script invocation\n\n- Minimal additional logic\n\n- Clear output pass-through",
+      "chars": 160,
+      "units": [
+        "para:9ab01cab",
+        "para:a0fcc10f",
+        "para:e24dde91",
+        "para:c16b870a",
+        "para:06e64d48"
+      ]
+    },
+    {
+      "id": "s099",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Pattern Comparison",
+      "text": "| Feature               | submit-stack             | ensure-ci          | create-implementation-plan | codex-review             |\n| --------------------- | ------------------------ | ------------------ | -------------------------- | ------------------------ |\n| **Pattern**           | Workflow Automation      | Iterative Fixing   | Agent Delegation           | Simple Execution         |\n| **Arguments**         | Optional `<description>` | None               | None                       | Optional `[base-branch]` |\n| **Context Files**     | Checks `.PLAN.md`        | Checks `AGENTS.md` | None                       | None                     |\n| **Iterations**        | Single pass              | Up to 10           | Iterative (user-driven)    | Single pass              |\n| **Tool Usage**        | Git, Graphite            | Make, Edit tools   | Task tool (agent)          | Script execution         |\n| **Progress Tracking** | Inline reporting         | TodoWrite required | None (user reviews)        | None                     |\n| **Error Handling**    | Ask user                 | Stop if stuck      | None specified             | Show error message       |\n| **Success Criteria**  | PRs submitted            | Exit code 0        | User approves plan         | Script completes         |",
+      "chars": 1299,
+      "units": [
+        "para:7c32839d",
+        "para:e616340b",
+        "para:0a718f22",
+        "para:411c8187",
+        "para:bd01a82a",
+        "para:866cb272",
+        "para:2eaa4b1d",
+        "para:b4d4d5c4",
+        "para:43258d03"
+      ]
+    },
+    {
+      "id": "s100",
+      "file": "skills/command-creator/references/examples.md",
+      "heading": "Usage Guidance",
+      "text": "**Use submit-stack as a reference when:**\n\n- Command needs to check context files first\n- Workflow has clear sequential steps\n- Git operations are involved\n- Results need clear reporting\n\n**Use ensure-ci as a reference when:**\n\n- Command needs to iterate until success\n- Multiple error types need different fixes\n- Progress tracking is important\n- Stuck detection is needed\n\n**Use create-implementation-plan as a reference when:**\n\n- Command delegates to specialized agent\n- User review/approval is required\n- No direct code modification should happen\n- Output is saved to specific location\n\n**Use codex-review as a reference when:**\n\n- Command is a simple wrapper\n- Main logic is in external script\n- Argument handling is straightforward\n- Output is passed through directly",
+      "chars": 774,
+      "units": [
+        "para:d104ba66",
+        "para:346879d9",
+        "para:cce49881",
+        "para:6afed447",
+        "para:6da62010",
+        "para:b8264af1",
+        "para:67fe2c2d",
+        "para:a44abd69",
+        "para:ce894273",
+        "para:145b36ec",
+        "para:dd1090a5",
+        "para:7dbaf45f",
+        "para:9cf494c0",
+        "para:d728604d",
+        "para:84a52d35",
+        "para:27c67bb0",
+        "para:b2f160b3",
+        "para:0e7fe1b0",
+        "para:f4c70305",
+        "para:c943a2b1"
+      ]
+    },
+    {
+      "id": "s101",
+      "file": "skills/command-creator/references/patterns.md",
+      "heading": "Command Patterns",
+      "text": "This document describes the common patterns for slash commands, helping you choose the right structure for your workflow.",
+      "chars": 121,
+      "units": [
+        "para:efc260ff"
+      ]
+    },
+    {
+      "id": "s102",
+      "file": "skills/command-creator/references/patterns.md",
+      "heading": "1. Workflow Automation Pattern",
+      "text": "**Structure:** Analyze \u2192 Act \u2192 Report\n\n**When to use:**\n\n- Multi-step workflows with clear sequence\n- Commands that need to analyze before acting\n- Workflows that produce specific outputs (commits, PRs, reports)\n\n**Example workflow:**\n\n1. Check for context files (e.g., `.PLAN.md`)\n2. Analyze current state (git status, file changes)\n3. Perform actions (create commit, submit PR)\n4. Report results to user\n\n**Key features:**\n\n- Explicit file check order\n- Conditional logic based on file existence\n- Clear success output format\n- Context-aware decision making\n\n**Pattern example:**\n\n```markdown\n1. Check for .PLAN.md in repository root\n   - If exists: use plan context for commit message\n   - If not: analyze git changes and draft message\n\n2. Review git status and diff\n   - Identify staged and unstaged changes\n   - Determine scope of changes\n\n3. Create commit with descriptive message\n   - Follow repository's commit message style\n   - Include co-author attribution\n\n4. Submit PRs with Graphite\n   - Use gt stack submit\n   - Report PR URLs to user\n```",
+      "chars": 1053,
+      "units": [
+        "para:bbd56415",
+        "para:fd784493",
+        "para:63e5a089",
+        "para:1414e87f",
+        "para:c6846414",
+        "para:fd86b8c9",
+        "para:276647cc",
+        "para:ac72391d",
+        "para:0109ffe7",
+        "para:8de2dc14",
+        "para:e9686f00",
+        "para:989e3722",
+        "para:79b5832c",
+        "para:14d7c733"
+      ]
+    },
+    {
+      "id": "s103",
+      "file": "skills/command-creator/references/patterns.md",
+      "heading": "2. Iterative Fixing Pattern",
+      "text": "**Structure:** Run \u2192 Parse \u2192 Fix \u2192 Repeat\n\n**When to use:**\n\n- Commands that fix issues iteratively (linting, tests, CI)\n- Workflows that need multiple attempts to succeed\n- Tasks with clear pass/fail criteria\n\n**Example workflow:**\n\n1. Run check command (e.g., `make all-ci`)\n2. Parse failures by type\n3. Apply targeted fixes\n4. Run check again to verify\n5. Repeat until success or max iterations reached\n\n**Key features:**\n\n- Iteration control (max attempts, stuck detection)\n- Progress tracking with TodoWrite\n- Clear stopping conditions\n- Categorization of failure types\n- Incremental fix application\n\n**Pattern example:**\n\n```markdown\n1. Run make all-ci (max 10 iterations)\n\n2. If check fails:\n   - Parse error output by category (pyright, ruff, tests)\n   - Create todos for each error category\n   - Apply fixes for each category sequentially\n   - Mark todo complete after fixing each category\n\n3. After each fix iteration:\n   - Run make all-ci again\n   - Check if new errors appeared\n   - If stuck (same errors 2+ times): stop and report\n\n4. Stop when:\n   - All checks pass (exit code 0)\n   - Max iterations reached\n   - Detected stuck state\n```",
+      "chars": 1151,
+      "units": [
+        "para:b0ff2dba",
+        "para:fd784493",
+        "para:1718a280",
+        "para:422c4172",
+        "para:fa94869c",
+        "para:0a0dcaca",
+        "para:495b957d",
+        "para:bd5bd7df",
+        "para:44da5e14",
+        "para:7375af31",
+        "para:9e5d5a2b",
+        "para:76c8565b",
+        "para:1add03f4",
+        "para:76a12ab3",
+        "para:333f74a8",
+        "para:de791b97"
+      ]
+    },
+    {
+      "id": "s104",
+      "file": "skills/command-creator/references/patterns.md",
+      "heading": "3. Agent Delegation Pattern",
+      "text": "**Structure:** Context \u2192 Delegate \u2192 Iterate\n\n**When to use:**\n\n- Complex tasks requiring specialized agents\n- Multi-phase workflows with human review\n- Tasks that benefit from agent specialization\n\n**Example workflow:**\n\n1. Present planning context to user\n2. Invoke specialized agent (via Task tool)\n3. Agent creates plan/output iteratively\n4. Plan is reviewed and refined by user\n5. Save results to disk after approval\n\n**Key features:**\n\n- Clear agent invocation instructions\n- Phase-based workflow (planning \u2192 review \u2192 execution)\n- Explicit save-to-disk trigger\n- User review checkpoints\n- Context gathering before delegation\n\n**Pattern example:**\n\n```markdown\n1. Present planning context\n   - Explain what the agent will do\n   - Set expectations for iterative process\n   - Mention that user can refine the output\n\n2. Invoke subagent agent\n   - Use Task tool with subagent_type=\"subagent\"\n   - Pass task description and context\n   - Do NOT attempt to write plan yourself\n\n3. Agent works autonomously\n   - Creates initial plan\n   - Iterates with user feedback\n   - Refines based on questions/concerns\n\n4. After user approves plan\n   - Save to .PLAN.md\n   - Confirm location with user\n   - Explain next steps (execution)\n```",
+      "chars": 1226,
+      "units": [
+        "para:57bcfd39",
+        "para:fd784493",
+        "para:f9673690",
+        "para:be9ba4d5",
+        "para:c1c1ea10",
+        "para:710444e3",
+        "para:95c4cec0",
+        "para:15ec15bf",
+        "para:76bff333",
+        "para:1808225b",
+        "para:8516b0f9",
+        "para:a12cb7d6",
+        "para:c30cddd2",
+        "para:c8aafa1c",
+        "para:cff9b915",
+        "para:90fbe5a2"
+      ]
+    },
+    {
+      "id": "s105",
+      "file": "skills/command-creator/references/patterns.md",
+      "heading": "4. Simple Execution Pattern",
+      "text": "**Structure:** Parse Arguments \u2192 Execute \u2192 Return Output\n\n**When to use:**\n\n- Single-step commands with arguments\n- Wrapper commands for existing tools\n- Commands that simply run and report\n\n**Example workflow:**\n\n1. Parse command arguments\n2. Run specific command or script with arguments\n3. Handle and display output\n4. Report success or failure\n\n**Key features:**\n\n- Argument handling (required vs optional)\n- Direct tool invocation\n- Minimal logic\n- Output formatting\n\n**Pattern example:**\n\n```markdown\n1. Parse [base-branch] argument\n   - If provided: use specified branch\n   - If not provided: use main/master\n\n2. Run codex-review script\n   - Pass base-branch to script\n   - Capture output\n\n3. Display results\n   - Show review findings\n   - Report issues found\n   - Suggest fixes if applicable\n```",
+      "chars": 803,
+      "units": [
+        "para:12a0869d",
+        "para:fd784493",
+        "para:816fca37",
+        "para:d8c9ba48",
+        "para:78eb1a54",
+        "para:e267bcae",
+        "para:b51dd288",
+        "para:34167f30",
+        "para:7226a627",
+        "para:e12e1900",
+        "para:f40da65d",
+        "para:4190db8d"
+      ]
+    },
+    {
+      "id": "s106",
+      "file": "skills/command-creator/references/patterns.md",
+      "heading": "Multi-Agent Orchestration",
+      "text": "**When to use:** Complex workflows requiring multiple specialized agents in sequence\n\n**Pattern:**\n\n```markdown\n1. Use Task tool with subagent_type=\"Explore\" to find relevant files\n   - Search for specific patterns\n   - Identify key components\n\n2. Use Task tool with subagent_type=\"subagent\" to create plan\n   - Pass context from exploration\n   - Generate detailed implementation plan\n   - Review with user\n\n3. Execute the plan directly in the main conversation\n   - Load plan from .PLAN.md\n   - Use TodoWrite to track phases\n   - Execute steps systematically\n   - Report completion\n```",
+      "chars": 586,
+      "units": [
+        "para:99ca2c89",
+        "para:1634c8a4"
+      ]
+    },
+    {
+      "id": "s107",
+      "file": "skills/command-creator/references/patterns.md",
+      "heading": "Context File Priority Checks",
+      "text": "**When to use:** Commands that can operate in different modes based on available context\n\n**Pattern:**\n\n```markdown\nCheck these files in order for context:\n\n1. .PLAN.md - implementation plan (highest priority)\n2. .github/CONTRIBUTING.md - contribution guidelines\n3. AGENTS.md - coding standards\n4. README.md - project overview\n\nUse the first file found to inform the workflow. Different files trigger different behaviors.\n```",
+      "chars": 425,
+      "units": [
+        "para:79b02256",
+        "para:7312baae"
+      ]
+    },
+    {
+      "id": "s108",
+      "file": "skills/command-creator/references/patterns.md",
+      "heading": "Conditional Tool Selection",
+      "text": "**When to use:** Commands that choose tools/approach based on task complexity\n\n**Pattern:**\n\n```markdown\nAnalyze scope of changes:\n\nIf changes span 3+ files OR involve new abstractions:\n\n- Use subagent agent\n- Create detailed plan\n- Execute with subagent\n\nOtherwise:\n\n- Execute changes directly\n- Use simpler workflow\n- Skip planning overhead\n```",
+      "chars": 346,
+      "units": [
+        "para:b55ea0f4",
+        "para:97d501e8"
+      ]
+    },
+    {
+      "id": "s109",
+      "file": "skills/command-creator/references/patterns.md",
+      "heading": "Makefile Integration Pattern",
+      "text": "**When to use:** Commands that need to run make targets\n\n**Pattern:**\n\n```markdown\n**IMPORTANT:** Always use Bash tool for pytest/pyright/ruff/prettier/make/gt commands\n\n1. Use Bash tool directly\n   - Run commands like: \"make all-ci\", \"pytest tests/\", \"pyright\", etc.\n   - Bash tool will execute and return output\n\n2. Process command results\n   - Check exit code\n   - Parse any errors\n   - Apply fixes if needed\n```",
+      "chars": 415,
+      "units": [
+        "para:a1fbe3b4",
+        "para:0889bbd2"
+      ]
+    },
+    {
+      "id": "s110",
+      "file": "skills/command-creator/references/patterns.md",
+      "heading": "Progressive Disclosure Pattern",
+      "text": "**When to use:** Commands that start simple but can get more complex based on results\n\n**Pattern:**\n\n```markdown\n1. Start with minimal check\n   - Run basic validation\n   - Identify if deeper work needed\n\n2. If issues found:\n   - Expand scope progressively\n   - Add todos for each issue category\n   - Handle incrementally\n\n3. Only go deeper if necessary\n   - Don't over-analyze upfront\n   - Let results guide next steps\n   - Stop when criteria met\n```",
+      "chars": 450,
+      "units": [
+        "para:8e3ad314",
+        "para:41f49dcd"
+      ]
+    },
+    {
+      "id": "s111",
+      "file": "skills/command-creator/references/patterns.md",
+      "heading": "Pattern Selection Guide",
+      "text": "| If the command needs to...              | Use this pattern           |\n| --------------------------------------- | -------------------------- |\n| Create commits/PRs based on analysis    | Workflow Automation        |\n| Fix issues iteratively until passing    | Iterative Fixing           |\n| Create plans or delegate to specialists | Agent Delegation           |\n| Run a tool and display results          | Simple Execution           |\n| Coordinate multiple agents              | Multi-Agent Orchestration  |\n| Check multiple context files            | Context File Priority      |\n| Choose approach based on complexity     | Conditional Tool Selection |\n| Run make targets                        | Makefile Integration       |\n| Start simple and expand as needed       | Progressive Disclosure     |",
+      "chars": 802,
+      "units": [
+        "para:5ff9c1cf",
+        "para:08c4c3a5",
+        "para:23f9341a",
+        "para:0cb5547f",
+        "para:66651685",
+        "para:62c2cab3",
+        "para:fa6a7503",
+        "para:d8f21eae",
+        "para:a705f16f",
+        "para:31aebd27"
+      ]
+    },
+    {
+      "id": "s112",
+      "file": "skills/command-creator/references/patterns.md",
+      "heading": "Combining Patterns",
+      "text": "Commands often combine multiple patterns. For example:\n\n**submit-stack combines:**\n\n- Context File Priority (check .PLAN.md)\n- Workflow Automation (analyze \u2192 commit \u2192 submit)\n- Conditional Tool Selection (use plan if exists)\n\n**ensure-ci combines:**\n\n- Iterative Fixing (run \u2192 fix \u2192 repeat)\n- Makefile Integration (use makefile-runner)\n- Progressive Disclosure (expand todos as issues found)",
+      "chars": 391,
+      "units": [
+        "para:b9912c18",
+        "para:dd8e9d96",
+        "para:2a71c711",
+        "para:ec361552",
+        "para:fdb2c354",
+        "para:c92ef39b",
+        "para:74e385a5",
+        "para:eac01a2e",
+        "para:6d980766"
+      ]
+    },
+    {
+      "id": "s113",
+      "file": "skills/command-creator/references/patterns.md",
+      "heading": "For All Patterns",
+      "text": "- Clear sequence of steps (numbered)\n- Expected outcomes at each step\n- Error handling approach\n- Success criteria",
+      "chars": 114,
+      "units": [
+        "para:82a82fef",
+        "para:9bf74750",
+        "para:ddbb7d2e"
+      ]
+    },
+    {
+      "id": "s114",
+      "file": "skills/command-creator/references/patterns.md",
+      "heading": "Pattern-Specific Elements",
+      "text": "**Workflow Automation:**\n\n- File checks before analysis\n- Conditional branches\n- Output format specifications\n\n**Iterative Fixing:**\n\n- Max iteration count\n- Stuck detection logic\n- Progress tracking requirements\n- Per-category fix instructions\n\n**Agent Delegation:**\n\n- Exact Task tool invocation syntax\n- Context to pass to agent\n- User review checkpoints\n- Save-to-disk instructions\n\n**Simple Execution:**\n\n- Argument parsing logic\n- Command invocation syntax\n- Output formatting requirements",
+      "chars": 495,
+      "units": [
+        "para:3b3c6089",
+        "para:e91cae81",
+        "para:68702189",
+        "para:7e2421dd",
+        "para:b170cbc1",
+        "para:db1791f3",
+        "para:7b912897",
+        "para:ee0a982f",
+        "para:c8aafa1c",
+        "para:f4491bf5",
+        "para:428b1b39",
+        "para:e0592f4f",
+        "para:12b58d24"
+      ]
+    }
+  ],
+  "files": [],
+  "phrase_fate": {
+    "kept": 3.91,
+    "moved": 0.37,
+    "gone": 95.72,
+    "new": 93.99
+  }
+}

@@ -4203,6 +4203,538 @@ class BatchTests(Base):
         self.assertEqual(self.gen(str(p)), 2)
         self.assertFalse((self.out / "batches.json").exists())
 
+    def test_check_skips_report_only_entries(self):
+        # Break: a report-only artifact (never judged, plan 14) fails the closed-batch check for having no verdict.
+        entry = lambda n, mode: {"kind": "skill", "name": n, "percent": None, "findings": audit.batch_counts({}), "mode": mode}
+        self.out.mkdir(parents=True)
+        audit.save_queue(self.out, [{"id": 1, "artifacts": [entry("rep", "report-only"), entry("jud", "full")],
+                                     "brief": "b.md", "status": "closed", "rounds": 0, "requeues": 0, "waived": []}])
+        self.assertEqual(self.chk(self.merged([("jud", 90.0, [])]))[0], 0)
+        self.assertEqual(self.chk(self.merged([("other", 99.0, [])], "n.json"))[0], 1)
 
-if __name__ == "__main__":
-    unittest.main()
+
+FRONT = "---\nname: {n}\ndescription: d\n---\n\n"
+R_INTRO = "Intro words that are long enough to count as a section with at least twelve words in total here."
+R_INTRO_NEW = "A wholly different opening paragraph that says other things entirely, nothing shared."
+R_A1 = "First alpha rule: always archive every build output before cleaning anything."
+R_A2 = "Second alpha rule: never publish a release without reading the changelog twice."
+R_A3 = "Third alpha rule: keep the rollback notes next to the deploy script permanently."
+R_A1_NEW = "Wholly new sentence number one with unrelated vocabulary xylophone quartz."
+R_A2_NEW = "Wholly new sentence number two with unrelated vocabulary marmalade zenith."
+R_BETA = "Beta rule alpha bravo charlie delta echo foxtrot golf hotel india juliet kilo lima mike."
+R_SHORT = "Short note that has only seven words."
+R_GAMMA = "Gamma guidance added after the baseline and later removed by mistake."
+THEME, DATA_OLD, DATA_NEW = "a{}\nb{}\nc{}\n", '{\n"a": 1,\n"b": 2\n}\n', '{\n"a": 1\n}\n'
+MOVED = "skills/y/references/beta.md"
+
+
+def rrow(item, fate, value, decision, cls, reason="because"):
+    return f"| {item} | {fate} | {value} | {decision} | {cls} | {reason} |"
+
+
+class RecoveryTests(EvalBase):
+    """plan 14 recovery tooling: inventory, presence, grep, queue, record-check, check."""
+
+    def setUp(self):
+        super().setUp()
+        self.n = 0
+
+    def git(self, *args):
+        r = subprocess.run(["git", "-C", str(self.root), "-c", "user.name=t", "-c", "user.email=t@example.com", *args],
+                           capture_output=True, text=True, env=GIT_ENV)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return r.stdout.strip()
+
+    def commit(self):
+        self.git("add", "-A")
+        self.git("commit", "-q", "-m", "c")
+        return self.git("rev-parse", "HEAD")
+
+    def rc(self, *argv):
+        o, e = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(o), contextlib.redirect_stderr(e):
+            try:
+                code = audit.main(["--root", str(self.root), "recovery", *argv])
+            except SystemExit as exc:
+                code = exc.code
+        return code, o.getvalue(), e.getvalue()
+
+    def rdir(self, name="x"):
+        return self.root / "docs" / "audit" / "recovery" / name
+
+    def skill_md(self, intro, alpha, beta=None, short=None, gamma=None):
+        parts = [FRONT.format(n="x"), "# X\n\n" + intro + "\n\n", "## Alpha\n\n" + "\n\n".join(alpha) + "\n"]
+        parts += [f"\n## Beta\n\n{beta}\n"] if beta else []
+        parts += [f"\n## Short\n\n{short}\n"] if short else []
+        parts += [f"\n## Gamma\n\n{gamma}\n"] if gamma else []
+        return "".join(parts)
+
+    def world(self):
+        """Baseline commit (self.base), then the current state (self.c2) with every kind of loss."""
+        self.git("init", "-q", "-b", "main")
+        self.write("skills/x/SKILL.md", self.skill_md(R_INTRO, [R_A1, R_A2, R_A3], R_BETA, R_SHORT))
+        self.write("skills/x/assets/theme.css", THEME)
+        self.write("skills/x/data.json", DATA_OLD)
+        self.write("skills/x/scripts/run.sh", "#!/bin/bash\necho hi\n")
+        self.write("skills/x/evals/evals.json", "{}")
+        self.base = self.commit()
+        self.write("skills/x/SKILL.md", self.skill_md(R_INTRO_NEW, [R_A1_NEW, R_A2_NEW, R_A3], gamma=R_GAMMA))
+        (self.root / "skills/x/assets/theme.css").unlink()
+        self.write("skills/x/data.json", DATA_NEW)
+        self.write("skills/x/evals/evals.json", "EVAL-MARKER")
+        self.write(MOVED, R_BETA + "\n")
+        self.write("skills/y/SKILL.md", FRONT.format(n="y") + "# Y\n")
+        self.c2 = self.commit()
+
+    def inventory(self, *extra, name="x"):
+        return self.rc("inventory", "--base", self.base, "--artifact", name, *extra)
+
+    def sections(self, name="x"):
+        return json.loads((self.rdir(name) / "sections.json").read_text())
+
+    def presence(self, verdicts, name="x"):
+        ids = [s["id"] for s in self.sections(name)["sections"]]
+        (self.rdir(name) / "presence.json").write_text(json.dumps(
+            [{"id": i, "verdict": v, "substantive": True} for i, v in zip(ids, verdicts)]))
+
+    def ready(self):
+        self.world()
+        self.assertEqual(self.inventory()[0], 0)
+        self.presence(["partial", "present", "absent"])
+
+    def record(self, *rows, name="x"):
+        head = ["| item | fate | value | decision | reason class | reason |", "| --- | --- | --- | --- | --- | --- |"]
+        (self.rdir(name) / "record.md").write_text("\n".join(head + list(rows)) + "\n")
+
+    def full_rows(self):
+        return [
+            rrow("s001 X", "removed-to-fit", "real", "restore-references", "reusable-template"),
+            rrow("s002 Alpha", "not-lost", "real", "none", "text-present"),
+            rrow("s003 Beta", f"redistributed {MOVED}", "real", "none", f"moved-to {MOVED}"),
+            rrow(audit.unit_id(R_SHORT), "removed-on-merit", "low", "drop", "generic-model-knowledge"),
+            rrow("file:skills/x/assets/theme.css", "removed-on-merit", "low", "drop", "stale"),
+            rrow("file:skills/x/data.json", "removed-on-merit", "low", "intended-change", "fact-update"),
+        ]
+
+    def rcheck(self, *previous):
+        argv = ["record-check", "--artifact", "x"]
+        for p in previous:
+            argv += ["--previous", p]
+        return self.rc(*argv)
+
+    # ---- inventory ----
+
+    def test_inventory_sections_units_files_and_fate(self):
+        self.world()
+        code, out, err = self.inventory()
+        self.assertEqual((code, out, err), (0, "", ""))
+        data = self.sections()
+        self.assertEqual(data["base"], self.base)
+        self.assertEqual([(s["id"], s["file"], s["heading"]) for s in data["sections"]],
+                         [("s001", "skills/x/SKILL.md", "X"), ("s002", "skills/x/SKILL.md", "Alpha"),
+                          ("s003", "skills/x/SKILL.md", "Beta")])  # preamble and the 7-word Short section are skipped
+        s = data["sections"]
+        self.assertEqual(s[0]["units"], [audit.unit_id(R_INTRO)])
+        self.assertEqual(s[1]["units"], [audit.unit_id(u) for u in (R_A1, R_A2, R_A3)])
+        self.assertEqual(s[0]["chars"], len(s[0]["text"]))
+        self.assertEqual(sorted((f["path"], f["status"]) for f in data["files"]),
+                         [("skills/x/assets/theme.css", "deleted"), ("skills/x/data.json", "changed")])  # run.sh unchanged, evals out
+        fate = data["phrase_fate"]
+        self.assertAlmostEqual(fate["kept"] + fate["moved"] + fate["gone"], 100, places=1)
+        self.assertTrue(fate["kept"] > 0 and fate["moved"] > 0 and fate["gone"] > 0 and fate["new"] > 0)
+
+    def test_inventory_preamble_heading(self):
+        self.git("init", "-q", "-b", "main")
+        self.write("skills/p/SKILL.md", "Opening words before any heading that run to at least twelve words overall.\n\n# H\n")
+        self.base = self.commit()
+        self.assertEqual(self.inventory(name="p")[0], 0)
+        self.assertEqual(self.sections("p")["sections"][0]["heading"], "(preamble)")
+
+    def test_inventory_long_section_is_chunked_at_unit_boundaries(self):
+        self.git("init", "-q", "-b", "main")
+        paras = [f"Paragraph {i} " + "word " * 40 for i in range(12)]
+        self.write("skills/big/SKILL.md", "# Big\n\n" + "\n\n".join(paras) + "\n")
+        self.base = self.commit()
+        self.assertEqual(self.inventory(name="big")[0], 0)
+        secs = self.sections("big")["sections"]
+        self.assertGreater(len(secs), 1)
+        self.assertEqual([s["id"] for s in secs], [f"s{i:03d}" for i in range(1, len(secs) + 1)])
+        self.assertTrue(all(s["chars"] <= 1500 and s["heading"] == "Big" for s in secs))
+        self.assertEqual([u for s in secs for u in s["units"]], [audit.unit_id(p) for p in paras])
+
+    def test_inventory_kind_inference_and_unknown_name(self):
+        self.git("init", "-q", "-b", "main")
+        self.write("commands/cmd.md", "---\ndescription: d\n---\n# Cmd\n\nCommand body that has well over twelve words so it forms a section.\n")
+        self.write("skills/k/SKILL.md", "# K\n")
+        self.base = self.commit()
+        self.assertEqual(self.inventory(name="cmd")[0], 0)
+        self.assertEqual(self.sections("cmd")["sections"][0]["file"], "commands/cmd.md")
+        self.assertEqual(self.inventory(name="nope")[0], 2)
+        self.assertEqual(self.inventory("--kind", "agent", name="cmd")[0], 2)
+        self.write("agents/cmd.md", "---\nname: cmd\ndescription: d\n---\n")
+        self.assertEqual(self.inventory(name="cmd")[0], 2)  # two kinds share the name
+
+    def test_inventory_deletes_partial_and_fate_only_writes_nothing(self):
+        self.world()
+        self.rdir().mkdir(parents=True)
+        partial = self.rdir() / "presence.partial.json"
+        partial.write_text("[]")
+        sec = self.rdir() / "sections.json"
+        sec.write_text("TRIAGE-STATE")
+        code, out, _ = self.inventory("--fate-only")
+        self.assertEqual(code, 0)
+        self.assertEqual(set(json.loads(out)), {"kept", "moved", "gone", "new"})
+        self.assertEqual((sec.read_text(), partial.exists()), ("TRIAGE-STATE", True))
+        self.assertEqual(self.inventory()[0], 0)
+        self.assertFalse(partial.exists())
+        self.assertEqual(json.loads(out), self.sections()["phrase_fate"])
+
+    # ---- grep ----
+
+    def test_grep_finds_moves_above_min_share(self):
+        self.ready()
+        intro = R_INTRO.split()
+        self.write("skills/z/SKILL.md", FRONT.format(n="z") + "# Z\n")
+        self.write("skills/z/references/half.md", " ".join(intro[:7]) + "\n")
+        code, out, _ = self.rc("grep", "--artifact", "x")
+        self.assertEqual(code, 0)
+        got = {g["id"]: g for g in json.loads(out)}
+        self.assertEqual(sorted(got), ["s001", "s003"])  # s002 is present
+        self.assertEqual(got["s003"]["matches"], [{"path": MOVED, "share": 1.0}])
+        self.assertEqual((got["s001"]["verdict"], got["s001"]["matches"]), ("partial", []))  # 3 of 13 shingles
+        low = {g["id"]: g for g in json.loads(self.rc("grep", "--artifact", "x", "--min-share", "0.2")[1])}
+        self.assertEqual([m["path"] for m in low["s001"]["matches"]], ["skills/z/references/half.md"])
+        self.assertNotIn("skills/x/SKILL.md", [m["path"] for g in low.values() for m in g["matches"]])
+
+    # ---- presence ----
+
+    def answers_for(self, **verdicts):
+        for sid, line in verdicts.items():
+            self.answer("presence", f"x/{sid}", line)
+
+    def presence_run(self, *extra, runner=None):
+        return self.rc("presence", "--artifact", "x", "--runner", runner or shlex.quote(str(STUB)), *extra)
+
+    def test_presence_writes_verdicts_one_call_per_section(self):
+        self.world()
+        self.inventory()
+        self.answers_for(s001="partial yes", s002="PRESENT No", s003="absent yes")
+        self.assertEqual(self.presence_run()[0], 0)
+        self.assertEqual(json.loads((self.rdir() / "presence.json").read_text()), [
+            {"id": "s001", "verdict": "partial", "substantive": True},
+            {"id": "s002", "verdict": "present", "substantive": False},
+            {"id": "s003", "verdict": "absent", "substantive": True}])
+        self.assertFalse((self.rdir() / "presence.partial.json").exists())
+        calls = self.calls()
+        self.assertEqual(len(calls), 3)
+        for sid, text in zip(("s001", "s002", "s003"), calls):
+            lines = text.split("\n")
+            self.assertEqual(lines[:3], ["MODE: presence", f"KEY: x/{sid}", ""])
+            self.assertIn("=== skills/x/SKILL.md ===", text)
+            self.assertIn(R_A3, text)  # current text
+            self.assertNotIn("EVAL-MARKER", text)
+            self.assertIn(f"=== previous section {sid}: ", text)
+            self.assertIn("present, partial, absent or contradicted", text)
+        self.assertEqual(self.calls("argv"), ["\n"] * 3)  # nothing appended to the runner command
+        self.assertEqual(self.presence_run()[0], 0)  # no partial file: every section judged afresh
+        self.assertEqual(len(self.calls()), 6)
+
+    def test_presence_failures_keep_partial_and_resume(self):
+        self.world()
+        self.inventory()
+        old = self.rdir() / "presence.json"
+        old.write_text("OLD")
+        self.answers_for(s001="partial yes", s003="absent no")  # s002 has no answer: the stub exits 1
+        code, _, err = self.presence_run()
+        self.assertEqual(code, 1)
+        self.assertIn("s002", err)
+        self.assertNotIn("s001:", err)
+        self.assertEqual(old.read_text(), "OLD")
+        partial = json.loads((self.rdir() / "presence.partial.json").read_text())
+        self.assertEqual([e["id"] for e in partial], ["s001", "s003"])
+        self.answers_for(s002="present yes")
+        self.assertEqual(self.presence_run()[0], 0)
+        self.assertEqual(len(self.calls()), 4)  # only the failed section was called again
+        self.assertTrue(self.calls()[3].startswith("MODE: presence\nKEY: x/s002\n"))
+        self.assertEqual([e["verdict"] for e in json.loads(old.read_text())], ["partial", "present", "absent"])
+        self.assertFalse((self.rdir() / "presence.partial.json").exists())
+
+    def test_presence_malformed_answers_fail_the_section(self):
+        self.world()
+        self.inventory()
+        for bad in ("present", "perhaps yes", "present yes extra", "present maybe", ""):
+            with self.subTest(bad=bad):
+                self.answers_for(s001="partial yes", s002=bad, s003="absent yes")
+                (self.rdir() / "presence.partial.json").unlink(missing_ok=True)
+                code, _, err = self.presence_run()
+                self.assertEqual(code, 1)
+                self.assertIn("s002", err)
+                self.assertFalse((self.rdir() / "presence.json").exists())
+
+    def test_presence_timeout_fails_one_section_and_resumes(self):
+        self.world()
+        self.inventory()
+        self.answers_for(s001="partial yes", s002="present yes", s003="absent yes")
+        slow = self.write("slow.sh", f'#!/bin/bash\nin=$(cat)\ncase "$in" in *"KEY: x/s002"*) sleep 4;; esac\necho "present no"\n')
+        slow.chmod(0o755)
+        code, _, err = self.presence_run("--timeout", "1", runner=str(slow))
+        self.assertEqual(code, 1)
+        self.assertIn("s002", err)
+        self.assertIn("timed out", err)
+        self.assertEqual([e["id"] for e in json.loads((self.rdir() / "presence.partial.json").read_text())], ["s001", "s003"])
+        self.assertEqual(self.presence_run()[0], 0)
+        self.assertEqual(len(self.calls()), 1)  # the resume called the stub for s002 alone
+        self.assertEqual(len(json.loads((self.rdir() / "presence.json").read_text())), 3)
+
+    # ---- queue ----
+
+    def qworld(self):
+        self.git("init", "-q", "-b", "main")
+        sec = lambda n, k: f"## S{k}\n\nSection {k} of {n} has words one two three four five six seven eight nine ten.\n"
+        for n in ("f1", "f2", "f3", "f4"):
+            self.write(f"skills/{n}/SKILL.md", FRONT.format(n=n) + sec(n, 1) + "\n" + sec(n, 2))
+        for n in ("u", "gepetto", "datadog-cli"):
+            self.write(f"skills/{n}/SKILL.md", FRONT.format(n=n) + "# T\n")
+        self.base = self.commit()
+        for n in ("f1", "f2", "f3", "f4"):
+            self.write(f"skills/{n}/SKILL.md", (self.root / f"skills/{n}/SKILL.md").read_text() + "\nchanged\n")
+        self.write("skills/new/SKILL.md", FRONT.format(n="new") + "# T\n")
+        self.commit()
+        for n, verdicts in {"f1": ["absent", "present"], "f2": ["absent", "absent"],
+                            "f3": ["contradicted", "contradicted"], "f4": ["present", "present"]}.items():
+            self.assertEqual(self.inventory(name=n)[0], 0)
+            self.presence(verdicts, name=n)
+
+    def queue_run(self, *extra):
+        return self.rc("queue", "--base", self.base, "--out", str(self.root / "docs" / "audit" / "recovery"), *extra)
+
+    def qfile(self):
+        return self.root / "docs" / "audit" / "recovery" / "batches.json"
+
+    def test_queue_order_modes_chunks_and_entries(self):
+        self.qworld()
+        sentinel = self.write("docs/audit/batches.json", "SENTINEL")
+        code, _, err = self.queue_run()
+        self.assertEqual((code, err), (0, ""))
+        q = json.loads(self.qfile().read_text())
+        self.assertEqual([[a["name"] for a in b["artifacts"]] for b in q],
+                         [["f2", "f3", "f1"], ["f4"], ["new", "skill-judge", "u"], ["datadog-cli", "gepetto"]])
+        # contradicted counts (f3 ties f2 at 100%, ahead of f1 at 50%); a lone full remainder is its own batch
+        self.assertEqual([{a["mode"] for a in b["artifacts"]} for b in q],
+                         [{"full"}, {"full"}, {"facts-only"}, {"report-only"}])
+        self.assertEqual([b["id"] for b in q], [1, 2, 3, 4])
+        self.assertTrue(all(len(b["artifacts"]) <= 3 for b in q))
+        self.assertEqual(q[0]["artifacts"][0], {"kind": "skill", "name": "f2", "percent": None, "mode": "full",
+                                                "findings": {"critical": 0, "high": 0, "medium": 0, "low": 0}})
+        self.assertEqual((q[0]["status"], q[0]["rounds"], q[0]["requeues"], q[0]["waived"]), ("queued", 0, 0, []))
+        self.assertEqual(q[0]["brief"], "docs/audit/recovery/batches/01-f2-f3-f1.md")
+        brief = (self.root / q[0]["brief"]).read_text()
+        for needle in ("## f2 (skill)", "- mode: full", "docs/audit/recovery/f2/sections.json", "docs/audit/recovery/f2/presence.json",
+                       "- s001 S1 | absent |", "- s001 S1 | contradicted |", "- s002 S2 | present |"):
+            self.assertEqual(needle in brief, needle != "- s002 S2 | present |", needle)
+        self.assertIn("- mode: facts-only", (self.root / q[2]["brief"]).read_text())
+        self.assertEqual(sentinel.read_text(), "SENTINEL")
+
+    def test_queue_needs_complete_presence_and_builds_once(self):
+        self.qworld()
+        (self.rdir("f4") / "presence.json").write_text(json.dumps([{"id": "s001", "verdict": "present", "substantive": False}]))
+        code, _, err = self.queue_run()
+        self.assertEqual(code, 1)
+        self.assertIn("f4", err)
+        self.assertFalse(self.qfile().exists())
+        (self.rdir("f4") / "presence.json").unlink()
+        self.assertEqual(self.queue_run()[0], 1)
+        self.assertFalse(self.qfile().exists())
+        self.presence(["present", "present"], name="f4")
+        self.assertEqual(self.queue_run()[0], 0)
+        before = self.qfile().read_bytes()
+        self.assertEqual(self.queue_run()[0], 1)
+        self.assertEqual(self.qfile().read_bytes(), before)
+
+    def test_queue_append(self):
+        self.qworld()
+        self.assertEqual(self.queue_run("--append", "f4")[0], 1)  # no queue yet
+        self.assertEqual(self.queue_run()[0], 0)
+        old = json.loads(self.qfile().read_text())
+        briefs = {b["brief"]: (self.root / b["brief"]).read_bytes() for b in old}
+        self.record(rrow("s001 S1", "removed-on-merit", "real", "purpose-change-pending", "scope-change", "restores a baseline purpose"),
+                    rrow("s002 S2", "not-lost", "real", "none", "text-present"), name="f4")
+        self.assertEqual(self.queue_run("--append", "f4")[0], 0)
+        new = json.loads(self.qfile().read_text())
+        self.assertEqual(new[:4], old)
+        self.assertEqual((new[4]["id"], new[4]["status"], new[4]["rounds"], new[4]["requeues"], new[4]["waived"]), (5, "queued", 0, 0, []))
+        self.assertEqual([(a["name"], a["mode"]) for a in new[4]["artifacts"]], [("f4", "full")])
+        self.assertEqual(briefs, {k: (self.root / k).read_bytes() for k in briefs})
+        brief = (self.root / new[4]["brief"]).read_text()
+        self.assertIn("s001 S1 | removed-on-merit | real | purpose-change-pending", brief)
+        self.assertNotIn("s002 S2 | not-lost", brief)
+        self.assertEqual(self.queue_run("--append", "nope")[0], 2)
+
+    # ---- record-check ----
+
+    def test_record_check_complete_record_is_clean(self):
+        self.ready()
+        self.record(*self.full_rows())
+        code, out, _ = self.rcheck(self.base[:8])  # an abbreviated ref still matches the inventory's base
+        self.assertEqual((code, out), (0, ""))
+
+    def test_record_check_reports_each_gap(self):
+        self.ready()
+        rows = self.full_rows()
+        cases = {
+            "s003 Beta": [r for r in rows if "s003" not in r],
+            "file:skills/x/data.json": [r for r in rows if "data.json" not in r],  # lost one line only: still a files entry
+            audit.unit_id(R_SHORT): [r for r in rows if audit.unit_id(R_SHORT) not in r],
+            "s002": [r for r in rows if "s002" not in r],  # a present section with removed units
+        }
+        for needle, kept in cases.items():
+            with self.subTest(needle=needle):
+                self.record(*kept)
+                code, out, _ = self.rcheck(self.base)
+                self.assertEqual(code, 1)
+                self.assertIn(needle.split()[0], out)
+        self.record(*rows)
+        pres = self.rdir() / "presence.json"
+        pres.write_text(json.dumps([{"id": "s001", "verdict": "partial", "substantive": True}]))
+        code, out, _ = self.rcheck(self.base)
+        self.assertEqual(code, 1)
+        self.assertIn("presence.json has no verdict for s002", out)
+        self.assertIn("presence.json has no verdict for s003", out)
+
+    def test_record_check_present_section_reported_once_by_section(self):
+        self.ready()
+        self.record(*[r for r in self.full_rows() if "s002" not in r])  # A1 and A2 are both gone from the present section
+        out = self.rcheck(self.base)[1]
+        self.assertEqual(len([line for line in out.splitlines() if line.startswith("s002")]), 1)
+        self.assertNotIn(audit.unit_id(R_A1), out)
+        self.assertNotIn(audit.unit_id(R_A2), out)
+
+    def test_record_check_non_present_section_row_covers_its_units(self):
+        self.ready()
+        self.record(*self.full_rows())
+        self.assertEqual(self.rcheck(self.base)[0], 0)  # INTRO (s001) and BETA (s003) are removed units, covered by the section rows
+
+    def test_record_check_field_rules(self):
+        self.ready()
+        keep = [r for r in self.full_rows() if "s003" not in r]
+        bad = {
+            "no decision": rrow("s003 Beta", "removed-to-fit", "real", "", "text-present"),
+            "bad class": rrow("s003 Beta", "removed-to-fit", "real", "restore-references", "because-i-say"),
+            "class of another decision": rrow("s003 Beta", "removed-on-merit", "low", "drop", "users-ask-by-name"),
+            "empty reason": rrow("s003 Beta", "removed-to-fit", "real", "restore-references", "reusable-template", ""),
+            "bad value": rrow("s003 Beta", "removed-to-fit", "high", "restore-references", "reusable-template"),
+            "bad fate": rrow("s003 Beta", "gone", "real", "restore-references", "reusable-template"),
+            "bare redistributed": rrow("s003 Beta", "redistributed", "real", "none", "text-present"),
+            "bare moved-to": rrow("s003 Beta", f"redistributed {MOVED}", "real", "none", "moved-to"),
+        }
+        for label, row in bad.items():
+            with self.subTest(label):
+                self.record(*keep, row)
+                self.assertEqual(self.rcheck(self.base)[0], 1)
+        self.record(*keep, rrow("s003 Beta", "removed-to-fit", "real", "restore-references", "reusable-template"))
+        self.assertEqual(self.rcheck(self.base)[0], 0)
+
+    def test_record_check_allowed_and_refused_combinations(self):
+        self.ready()
+        keep = [r for r in self.full_rows() if "s003" not in r]
+        rest, ok, mv = "restore-references", "removed-to-fit", f"redistributed {MOVED}"
+        allowed = [
+            (ok, "real", rest, "users-ask-by-name"), (ok, "real", "restore-main", "procedure-depends"),
+            ("removed-on-merit", "low", "drop", "stale"), ("removed-on-merit", "real", "drop", "wrong"),
+            (ok, "low", "drop-pending", "out-of-scope"), ("removed-on-merit", "real", "drop-pending", "superseded-by rule 3"),
+            ("removed-on-merit", "low", "intended-change", "fact-update"),
+            (ok, "real", "purpose-change-pending", "scope-change"), ("removed-on-merit", "real", "purpose-change-pending", "safety-fix"),
+            ("not-lost", "real", "none", "text-present"), (mv, "low", "none", f"moved-to {MOVED}"),
+            (ok, "real", rest, "tested-example"),  # the rewritten rejected-drop row
+        ]
+        refused = [
+            (ok, "low", rest, "users-ask-by-name"), ("removed-on-merit", "real", "restore-main", "procedure-depends"),
+            (ok, "real", "drop", "stale"), ("not-lost", "real", "drop", "stale"), (ok, "real", "drop-pending", "wrong"),
+            (ok, "real", "intended-change", "safety-fix"), ("not-lost", "real", "intended-change", "safety-fix"),
+            ("not-lost", "real", "purpose-change-pending", "scope-change"), (mv, "real", "purpose-change-pending", "scope-change"),
+            (ok, "real", "none", "text-present"), ("removed-on-merit", "real", "none", "text-present"),
+        ]
+        for fate, value, decision, cls in allowed:
+            with self.subTest(allowed=(fate, value, decision)):
+                self.record(*keep, rrow("s003 Beta", fate, value, decision, cls))
+                self.assertEqual(self.rcheck(self.base), (0, "", ""))
+        for fate, value, decision, cls in refused:
+            with self.subTest(refused=(fate, value, decision)):
+                self.record(*keep, rrow("s003 Beta", fate, value, decision, cls))
+                code, out, _ = self.rcheck(self.base)
+                self.assertEqual(code, 1)
+                self.assertIn("not an allowed combination", out)
+
+    def test_record_check_units_removed_since_a_later_ref(self):
+        self.ready()
+        self.record(*self.full_rows())
+        self.assertEqual(self.rcheck(self.base, self.c2)[0], 0)
+        # A3 is a baseline unit of the Alpha section (which has a row); GAMMA was added after the baseline.
+        self.write("skills/x/SKILL.md", self.skill_md(R_INTRO_NEW, [R_A1_NEW, R_A2_NEW]))
+        self.assertEqual(self.rcheck(self.base)[0], 0)  # section rows cover every baseline unit, whatever the verdict
+        code, out, _ = self.rcheck(self.base, self.c2)
+        self.assertEqual(code, 1)
+        self.assertIn(audit.unit_id(R_A3), out)  # collateral deletion inside a section that has a row
+        self.assertIn(audit.unit_id(R_GAMMA), out)  # text added after the baseline
+        self.record(*self.full_rows(), rrow(audit.unit_id(R_A3), "removed-on-merit", "low", "drop", "stale"))
+        self.assertIn(audit.unit_id(R_GAMMA), self.rcheck(self.base, self.c2)[1])
+        self.assertNotIn(audit.unit_id(R_A3), self.rcheck(self.base, self.c2)[1])
+        self.record(*self.full_rows(), rrow(audit.unit_id(R_A3), "removed-on-merit", "low", "drop", "stale"),
+                    rrow(audit.unit_id(R_GAMMA), "removed-on-merit", "low", "drop", "stale"))
+        self.assertEqual(self.rcheck(self.base, self.c2)[0], 0)
+
+    def test_record_check_not_lost_section_row_does_not_cover_later_removal(self):
+        self.ready()
+        self.record(*self.full_rows())  # s002 is a not-lost row
+        self.write("skills/x/SKILL.md", self.skill_md(R_INTRO_NEW, [R_A1_NEW, R_A2_NEW]))
+        self.assertIn(audit.unit_id(R_A3), self.rcheck(self.base, self.c2)[1])
+
+    def test_record_check_removed_file_since_a_later_ref_needs_its_row(self):
+        self.ready()
+        self.write("skills/x/assets/late.css", "x{}\ny{}\n")
+        late = self.commit()
+        (self.root / "skills/x/assets/late.css").unlink()
+        self.record(*self.full_rows())
+        code, out, _ = self.rcheck(self.base, late)
+        self.assertEqual(code, 1)
+        self.assertIn("file:skills/x/assets/late.css", out)
+
+    # ---- check ----
+
+    def closed(self, batches):
+        out = self.root / "docs" / "audit" / "recovery"
+        out.mkdir(parents=True, exist_ok=True)
+        entry = lambda n, mode: {"kind": "skill", "name": n, "percent": None, "findings": audit.batch_counts({}), "mode": mode}
+        audit.save_queue(out, [{"id": i, "artifacts": [entry(n, m) for n, m in arts], "brief": "b.md", "status": "closed",
+                                "rounds": 1, "requeues": 0, "waived": []} for i, arts in batches])
+        return out
+
+    def merged_at(self, out, batch, rnd, name, percent):
+        d = out / "batches" / str(batch) / f"r{rnd}"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "merged.json").write_text(json.dumps({"skills": [{"name": name, "percent": percent, "synced": False, "findings": []}]}))
+
+    def test_check_reads_every_batch_and_round(self):
+        out = self.closed([(1, [("p", "full")]), (2, [("q", "full")])])
+        self.merged_at(out, 1, 1, "p", 95.0)
+        self.merged_at(out, 2, 1, "q", 95.0)
+        self.assertEqual(self.rc("check", "--out", str(out))[0], 0)
+        (out / "batches/1/r1/merged.json").unlink()  # batch 2 closed, batch 1's round file gone
+        code, o, _ = self.rc("check", "--out", str(out))
+        self.assertEqual(code, 1)
+        self.assertIn("batch 1: p", o)
+
+    def test_check_orders_rounds_numerically(self):
+        out = self.closed([(1, [("p", "full")])])
+        self.merged_at(out, 1, 2, "p", 95.0)
+        self.merged_at(out, 1, 10, "p", 50.0)  # r10 wins over r2
+        self.assertEqual(self.rc("check", "--out", str(out))[0], 1)
+        self.merged_at(out, 1, 11, "p", 96.0)
+        self.assertEqual(self.rc("check", "--out", str(out))[0], 0)
+
+    def test_check_report_only_batch_needs_no_round_files(self):
+        out = self.closed([(1, [("gepetto", "report-only"), ("datadog-cli", "report-only")])])
+        self.assertEqual(self.rc("check", "--out", str(out))[0], 0)
+
+
+if __name__ == "__main__":    unittest.main()

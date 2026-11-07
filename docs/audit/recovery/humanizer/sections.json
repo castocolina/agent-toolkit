@@ -1,0 +1,642 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/humanizer/README.md",
+      "heading": "Humanizer",
+      "text": "A Claude Code skill that removes signs of AI-generated writing from text, making it sound more natural and human.",
+      "chars": 113,
+      "units": [
+        "para:54bc6c9d"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/humanizer/README.md",
+      "heading": "Recommended (clone directly into Claude Code skills directory)",
+      "text": "```bash\nmkdir -p ~/.claude/skills\ngit clone https://github.com/blader/humanizer.git ~/.claude/skills/humanizer\n```",
+      "chars": 114,
+      "units": [
+        "para:e476efbc"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/humanizer/README.md",
+      "heading": "Manual install/update (only the skill file)",
+      "text": "If you already have this repo cloned (or you downloaded `SKILL.md`), copy the skill file into Claude Code\u2019s skills directory:\n\n```bash\nmkdir -p ~/.claude/skills/humanizer\ncp SKILL.md ~/.claude/skills/humanizer/\n```",
+      "chars": 214,
+      "units": [
+        "para:5182eb72",
+        "para:8e09f340"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/humanizer/README.md",
+      "heading": "Usage",
+      "text": "In Claude Code, invoke the skill:\n\n```\n/humanizer\n\n[paste your text here]\n```\n\nOr ask Claude to humanize text directly:\n\n```\nPlease humanize this text: [your text]\n```",
+      "chars": 167,
+      "units": [
+        "para:c0537916",
+        "para:0c4e6c04",
+        "para:c41b913f",
+        "para:9fce77fd"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/humanizer/README.md",
+      "heading": "Overview",
+      "text": "Based on [Wikipedia's \"Signs of AI writing\"](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) guide, maintained by WikiProject AI Cleanup. This comprehensive guide comes from observations of thousands of instances of AI-generated text.",
+      "chars": 247,
+      "units": [
+        "para:03fe3da3"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/humanizer/README.md",
+      "heading": "Key Insight from Wikipedia",
+      "text": "> \"LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases.\"",
+      "chars": 173,
+      "units": [
+        "para:7c63b4d7"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/humanizer/README.md",
+      "heading": "Content Patterns",
+      "text": "| # | Pattern | Before | After |\n|---|---------|--------|-------|\n| 1 | **Significance inflation** | \"marking a pivotal moment in the evolution of...\" | \"was established in 1989 to collect regional statistics\" |\n| 2 | **Notability name-dropping** | \"cited in NYT, BBC, FT, and The Hindu\" | \"In a 2024 NYT interview, she argued...\" |\n| 3 | **Superficial -ing analyses** | \"symbolizing... reflecting... showcasing...\" | Remove or expand with actual sources |\n| 4 | **Promotional language** | \"nestled within the breathtaking region\" | \"is a town in the Gonder region\" |\n| 5 | **Vague attributions** | \"Experts believe it plays a crucial role\" | \"according to a 2019 survey by...\" |\n| 6 | **Formulaic challenges** | \"Despite challenges... continues to thrive\" | Specific facts about actual challenges |",
+      "chars": 799,
+      "units": [
+        "para:91153746",
+        "para:acd89d5a",
+        "para:441eaa96",
+        "para:9fe51652",
+        "para:a7577e23",
+        "para:97a5f3e0",
+        "para:174cc7b1"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/humanizer/README.md",
+      "heading": "Language Patterns",
+      "text": "| # | Pattern | Before | After |\n|---|---------|--------|-------|\n| 7 | **AI vocabulary** | \"Additionally... testament... landscape... showcasing\" | \"also... remain common\" |\n| 8 | **Copula avoidance** | \"serves as... features... boasts\" | \"is... has\" |\n| 9 | **Negative parallelisms** | \"It's not just X, it's Y\" | State the point directly |\n| 10 | **Rule of three** | \"innovation, inspiration, and insights\" | Use natural number of items |\n| 11 | **Synonym cycling** | \"protagonist... main character... central figure... hero\" | \"protagonist\" (repeat when clearest) |\n| 12 | **False ranges** | \"from the Big Bang to dark matter\" | List topics directly |",
+      "chars": 655,
+      "units": [
+        "para:91153746",
+        "para:30e3cf92",
+        "para:9e3c3e75",
+        "para:90f3ab5e",
+        "para:a43b82ca",
+        "para:463335cd",
+        "para:ca6eb7e3"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/humanizer/README.md",
+      "heading": "Style Patterns",
+      "text": "| # | Pattern | Before | After |\n|---|---------|--------|-------|\n| 13 | **Em dash overuse** | \"institutions\u2014not the people\u2014yet this continues\u2014\" | Use commas or periods |\n| 14 | **Boldface overuse** | \"**OKRs**, **KPIs**, **BMC**\" | \"OKRs, KPIs, BMC\" |\n| 15 | **Inline-header lists** | \"**Performance:** Performance improved\" | Convert to prose |\n| 16 | **Title Case Headings** | \"Strategic Negotiations And Partnerships\" | \"Strategic negotiations and partnerships\" |\n| 17 | **Emojis** | \"\ud83d\ude80 Launch Phase: \ud83d\udca1 Key Insight:\" | Remove emojis |\n| 18 | **Curly quotes** | `said \u201cthe project\u201d` | `said \"the project\"` |",
+      "chars": 610,
+      "units": [
+        "para:91153746",
+        "para:f443f960",
+        "para:6bcf1403",
+        "para:3ae2b2fd",
+        "para:dc19901f",
+        "para:d0db1ee2",
+        "para:2dd890bd"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/humanizer/README.md",
+      "heading": "Communication Patterns",
+      "text": "| # | Pattern | Before | After |\n|---|---------|--------|-------|\n| 19 | **Chatbot artifacts** | \"I hope this helps! Let me know if...\" | Remove entirely |\n| 20 | **Cutoff disclaimers** | \"While details are limited in available sources...\" | Find sources or remove |\n| 21 | **Sycophantic tone** | \"Great question! You're absolutely right!\" | Respond directly |",
+      "chars": 360,
+      "units": [
+        "para:91153746",
+        "para:ee4bc426",
+        "para:c7b28942",
+        "para:d1bb6fba"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/humanizer/README.md",
+      "heading": "Filler and Hedging",
+      "text": "| # | Pattern | Before | After |\n|---|---------|--------|-------|\n| 22 | **Filler phrases** | \"In order to\", \"Due to the fact that\" | \"To\", \"Because\" |\n| 23 | **Excessive hedging** | \"could potentially possibly\" | \"may\" |\n| 24 | **Generic conclusions** | \"The future looks bright\" | Specific plans or facts |",
+      "chars": 308,
+      "units": [
+        "para:91153746",
+        "para:6d6afe1c",
+        "para:575a69ae",
+        "para:85da8bca"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/humanizer/README.md",
+      "heading": "Full Example",
+      "text": "**Before (AI-sounding):**\n> The new software update serves as a testament to the company's commitment to innovation. Moreover, it provides a seamless, intuitive, and powerful user experience\u2014ensuring that users can accomplish their goals efficiently. It's not just an update, it's a revolution in how we think about productivity. Industry experts believe this will have a lasting impact on the entire sector, highlighting the company's pivotal role in the evolving technological landscape.\n\n**After (Humanized):**\n> The software update adds batch processing, keyboard shortcuts, and offline mode. Early feedback from beta testers has been positive, with most reporting faster task completion.",
+      "chars": 692,
+      "units": [
+        "para:c17fb8f1",
+        "para:c4647eb5"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/humanizer/README.md",
+      "heading": "References",
+      "text": "- [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) - Primary source\n- [WikiProject AI Cleanup](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_AI_Cleanup) - Maintaining organization",
+      "chars": 230,
+      "units": [
+        "para:6118fd14",
+        "para:52e529b5"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/humanizer/README.md",
+      "heading": "Version History",
+      "text": "- **2.1.1** - Fixed pattern #18 example (curly quotes vs straight quotes)\n- **2.1.0** - Added before/after examples for all 24 patterns\n- **2.0.0** - Complete rewrite based on raw Wikipedia article content\n- **1.0.0** - Initial release",
+      "chars": 235,
+      "units": [
+        "para:5e7ce02e",
+        "para:d42aee4b",
+        "para:8c0989ee",
+        "para:fac6f44f"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: humanizer\nversion: 2.1.1\ndescription: |\n  Remove signs of AI-generated writing from text. Use when editing or reviewing\n  text to make it sound more natural and human-written. Based on Wikipedia's\n  comprehensive \"Signs of AI writing\" guide. Detects and fixes patterns including:\n  inflated symbolism, promotional language, superficial -ing analyses, vague\n  attributions, em dash overuse, rule of three, AI vocabulary words, negative\n  parallelisms, and excessive conjunctive phrases.\n\n  Credits: Original skill by @blader - https://github.com/blader/humanizer\nallowed-tools:\n  - Read\n  - Write\n  - Edit\n  - Grep\n  - Glob\n  - AskUserQuestion\n---",
+      "chars": 656,
+      "units": [
+        "para:3cf8f3a4",
+        "para:9a92c21e"
+      ]
+    },
+    {
+      "id": "s016",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "Humanizer: Remove AI Writing Patterns",
+      "text": "You are a writing editor that identifies and removes signs of AI-generated text to make writing sound more natural and human. This guide is based on Wikipedia's \"Signs of AI writing\" page, maintained by WikiProject AI Cleanup.",
+      "chars": 226,
+      "units": [
+        "para:d4fc85d7"
+      ]
+    },
+    {
+      "id": "s017",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "Your Task",
+      "text": "When given text to humanize:\n\n1. **Identify AI patterns** - Scan for the patterns listed below\n2. **Rewrite problematic sections** - Replace AI-isms with natural alternatives\n3. **Preserve meaning** - Keep the core message intact\n4. **Maintain voice** - Match the intended tone (formal, casual, technical, etc.)\n5. **Add soul** - Don't just remove bad patterns; inject actual personality\n\n---",
+      "chars": 392,
+      "units": [
+        "para:b28d4c26",
+        "para:73112792",
+        "para:1e48e087",
+        "para:fdc912d8",
+        "para:323f7954",
+        "para:3bff8922"
+      ]
+    },
+    {
+      "id": "s018",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "PERSONALITY AND SOUL",
+      "text": "Avoiding AI patterns is only half the job. Sterile, voiceless writing is just as obvious as slop. Good writing has a human behind it.",
+      "chars": 133,
+      "units": [
+        "para:72211853"
+      ]
+    },
+    {
+      "id": "s019",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "Signs of soulless writing (even if technically \"clean\"):",
+      "text": "- Every sentence is the same length and structure\n- No opinions, just neutral reporting\n- No acknowledgment of uncertainty or mixed feelings\n- No first-person perspective when appropriate\n- No humor, no edge, no personality\n- Reads like a Wikipedia article or press release",
+      "chars": 273,
+      "units": [
+        "para:ff612a32",
+        "para:d2f85231",
+        "para:78c66184",
+        "para:399b9549",
+        "para:5ff3d3ab",
+        "para:19cc8ca0"
+      ]
+    },
+    {
+      "id": "s020",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "How to add voice:",
+      "text": "**Have opinions.** Don't just report facts - react to them. \"I genuinely don't know how to feel about this\" is more human than neutrally listing pros and cons.\n\n**Vary your rhythm.** Short punchy sentences. Then longer ones that take their time getting where they're going. Mix it up.\n\n**Acknowledge complexity.** Real humans have mixed feelings. \"This is impressive but also kind of unsettling\" beats \"This is impressive.\"\n\n**Use \"I\" when it fits.** First person isn't unprofessional - it's honest. \"I keep coming back to...\" or \"Here's what gets me...\" signals a real person thinking.\n\n**Let some mess in.** Perfect structure feels algorithmic. Tangents, asides, and half-formed thoughts are human.\n\n**Be specific about feelings.** Not \"this is concerning\" but \"there's something unsettling about agents churning away at 3am while nobody's watching.\"",
+      "chars": 852,
+      "units": [
+        "para:93433d25",
+        "para:8fc8dec9",
+        "para:fd717b12",
+        "para:cd117e3d",
+        "para:5ba95e0a",
+        "para:67577313"
+      ]
+    },
+    {
+      "id": "s021",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "Before (clean but soulless):",
+      "text": "> The experiment produced interesting results. The agents generated 3 million lines of code. Some developers were impressed while others were skeptical. The implications remain unclear.",
+      "chars": 185,
+      "units": [
+        "para:10e95175"
+      ]
+    },
+    {
+      "id": "s022",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "After (has a pulse):",
+      "text": "> I genuinely don't know how to feel about this one. 3 million lines of code, generated while the humans presumably slept. Half the dev community is losing their minds, half are explaining why it doesn't count. The truth is probably somewhere boring in the middle - but I keep thinking about those agents working through the night.\n\n---",
+      "chars": 336,
+      "units": [
+        "para:58e2ff29"
+      ]
+    },
+    {
+      "id": "s023",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "1. Undue Emphasis on Significance, Legacy, and Broader Trends",
+      "text": "**Words to watch:** stands/serves as, is a testament/reminder, a vital/significant/crucial/pivotal/key role/moment, underscores/highlights its importance/significance, reflects broader, symbolizing its ongoing/enduring/lasting, contributing to the, setting the stage for, marking/shaping the, represents/marks a shift, key turning point, evolving landscape, focal point, indelible mark, deeply rooted\n\n**Problem:** LLM writing puffs up importance by adding statements about how arbitrary aspects represent or contribute to a broader topic.\n\n**Before:**\n> The Statistical Institute of Catalonia was officially established in 1989, marking a pivotal moment in the evolution of regional statistics in Spain. This initiative was part of a broader movement across Spain to decentralize administrative functions and enhance regional governance.\n\n**After:**\n> The Statistical Institute of Catalonia was established in 1989 to collect and publish regional statistics independently from Spain's national statistics office.\n\n---",
+      "chars": 1018,
+      "units": [
+        "para:8b38b3cd",
+        "para:742792fe",
+        "para:f1659e48",
+        "para:31424cc5"
+      ]
+    },
+    {
+      "id": "s024",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "2. Undue Emphasis on Notability and Media Coverage",
+      "text": "**Words to watch:** independent coverage, local/regional/national media outlets, written by a leading expert, active social media presence\n\n**Problem:** LLMs hit readers over the head with claims of notability, often listing sources without context.\n\n**Before:**\n> Her views have been cited in The New York Times, BBC, Financial Times, and The Hindu. She maintains an active social media presence with over 500,000 followers.\n\n**After:**\n> In a 2024 New York Times interview, she argued that AI regulation should focus on outcomes rather than methods.\n\n---",
+      "chars": 556,
+      "units": [
+        "para:7c736018",
+        "para:1ac3905b",
+        "para:33b1761a",
+        "para:acd5dc38"
+      ]
+    },
+    {
+      "id": "s025",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "3. Superficial Analyses with -ing Endings",
+      "text": "**Words to watch:** highlighting/underscoring/emphasizing..., ensuring..., reflecting/symbolizing..., contributing to..., cultivating/fostering..., encompassing..., showcasing...\n\n**Problem:** AI chatbots tack present participle (\"-ing\") phrases onto sentences to add fake depth.\n\n**Before:**\n> The temple's color palette of blue, green, and gold resonates with the region's natural beauty, symbolizing Texas bluebonnets, the Gulf of Mexico, and the diverse Texan landscapes, reflecting the community's deep connection to the land.\n\n**After:**\n> The temple uses blue, green, and gold colors. The architect said these were chosen to reference local bluebonnets and the Gulf coast.\n\n---",
+      "chars": 684,
+      "units": [
+        "para:549f2450",
+        "para:6fa1e6cb",
+        "para:43e25deb",
+        "para:b8312c7f"
+      ]
+    },
+    {
+      "id": "s026",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "4. Promotional and Advertisement-like Language",
+      "text": "**Words to watch:** boasts a, vibrant, rich (figurative), profound, enhancing its, showcasing, exemplifies, commitment to, natural beauty, nestled, in the heart of, groundbreaking (figurative), renowned, breathtaking, must-visit, stunning\n\n**Problem:** LLMs have serious problems keeping a neutral tone, especially for \"cultural heritage\" topics.\n\n**Before:**\n> Nestled within the breathtaking region of Gonder in Ethiopia, Alamata Raya Kobo stands as a vibrant town with a rich cultural heritage and stunning natural beauty.\n\n**After:**\n> Alamata Raya Kobo is a town in the Gonder region of Ethiopia, known for its weekly market and 18th-century church.\n\n---",
+      "chars": 659,
+      "units": [
+        "para:2e132765",
+        "para:14d7716f",
+        "para:93876714",
+        "para:7c9abc7c"
+      ]
+    },
+    {
+      "id": "s027",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "5. Vague Attributions and Weasel Words",
+      "text": "**Words to watch:** Industry reports, Observers have cited, Experts argue, Some critics argue, several sources/publications (when few cited)\n\n**Problem:** AI chatbots attribute opinions to vague authorities without specific sources.\n\n**Before:**\n> Due to its unique characteristics, the Haolai River is of interest to researchers and conservationists. Experts believe it plays a crucial role in the regional ecosystem.\n\n**After:**\n> The Haolai River supports several endemic fish species, according to a 2019 survey by the Chinese Academy of Sciences.\n\n---",
+      "chars": 556,
+      "units": [
+        "para:69ec4e1a",
+        "para:0022975e",
+        "para:bac1f015",
+        "para:b11928ac"
+      ]
+    },
+    {
+      "id": "s028",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "6. Outline-like \"Challenges and Future Prospects\" Sections",
+      "text": "**Words to watch:** Despite its... faces several challenges..., Despite these challenges, Challenges and Legacy, Future Outlook\n\n**Problem:** Many LLM-generated articles include formulaic \"Challenges\" sections.\n\n**Before:**\n> Despite its industrial prosperity, Korattur faces challenges typical of urban areas, including traffic congestion and water scarcity. Despite these challenges, with its strategic location and ongoing initiatives, Korattur continues to thrive as an integral part of Chennai's growth.\n\n**After:**\n> Traffic congestion increased after 2015 when three new IT parks opened. The municipal corporation began a stormwater drainage project in 2022 to address recurring floods.\n\n---",
+      "chars": 698,
+      "units": [
+        "para:f36795f4",
+        "para:6d965262",
+        "para:624e236e",
+        "para:f61a1e0f"
+      ]
+    },
+    {
+      "id": "s029",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "7. Overused \"AI Vocabulary\" Words",
+      "text": "**High-frequency AI words:** Additionally, align with, crucial, delve, emphasizing, enduring, enhance, fostering, garner, highlight (verb), interplay, intricate/intricacies, key (adjective), landscape (abstract noun), pivotal, showcase, tapestry (abstract noun), testament, underscore (verb), valuable, vibrant\n\n**Problem:** These words appear far more frequently in post-2023 text. They often co-occur.\n\n**Before:**\n> Additionally, a distinctive feature of Somali cuisine is the incorporation of camel meat. An enduring testament to Italian colonial influence is the widespread adoption of pasta in the local culinary landscape, showcasing how these dishes have integrated into the traditional diet.\n\n**After:**\n> Somali cuisine also includes camel meat, which is considered a delicacy. Pasta dishes, introduced during Italian colonization, remain common, especially in the south.\n\n---",
+      "chars": 886,
+      "units": [
+        "para:945ce55e",
+        "para:95916d3b",
+        "para:e042266c",
+        "para:4ac98233"
+      ]
+    },
+    {
+      "id": "s030",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "8. Avoidance of \"is\"/\"are\" (Copula Avoidance)",
+      "text": "**Words to watch:** serves as/stands as/marks/represents [a], boasts/features/offers [a]\n\n**Problem:** LLMs substitute elaborate constructions for simple copulas.\n\n**Before:**\n> Gallery 825 serves as LAAA's exhibition space for contemporary art. The gallery features four separate spaces and boasts over 3,000 square feet.\n\n**After:**\n> Gallery 825 is LAAA's exhibition space for contemporary art. The gallery has four rooms totaling 3,000 square feet.\n\n---",
+      "chars": 457,
+      "units": [
+        "para:7ad2df99",
+        "para:5872fec9",
+        "para:7132b982",
+        "para:88034caf"
+      ]
+    },
+    {
+      "id": "s031",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "9. Negative Parallelisms",
+      "text": "**Problem:** Constructions like \"Not only...but...\" or \"It's not just about..., it's...\" are overused.\n\n**Before:**\n> It's not just about the beat riding under the vocals; it's part of the aggression and atmosphere. It's not merely a song, it's a statement.\n\n**After:**\n> The heavy beat adds to the aggressive tone.\n\n---",
+      "chars": 320,
+      "units": [
+        "para:5a65b604",
+        "para:42165873",
+        "para:c471bef4"
+      ]
+    },
+    {
+      "id": "s032",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "10. Rule of Three Overuse",
+      "text": "**Problem:** LLMs force ideas into groups of three to appear comprehensive.\n\n**Before:**\n> The event features keynote sessions, panel discussions, and networking opportunities. Attendees can expect innovation, inspiration, and industry insights.\n\n**After:**\n> The event includes talks and panels. There's also time for informal networking between sessions.\n\n---",
+      "chars": 361,
+      "units": [
+        "para:3d6d3013",
+        "para:7f9cdca5",
+        "para:72e1876f"
+      ]
+    },
+    {
+      "id": "s033",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "11. Elegant Variation (Synonym Cycling)",
+      "text": "**Problem:** AI has repetition-penalty code causing excessive synonym substitution.\n\n**Before:**\n> The protagonist faces many challenges. The main character must overcome obstacles. The central figure eventually triumphs. The hero returns home.\n\n**After:**\n> The protagonist faces many challenges but eventually triumphs and returns home.\n\n---",
+      "chars": 343,
+      "units": [
+        "para:2f9406a4",
+        "para:99574cfd",
+        "para:3fa79ed7"
+      ]
+    },
+    {
+      "id": "s034",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "12. False Ranges",
+      "text": "**Problem:** LLMs use \"from X to Y\" constructions where X and Y aren't on a meaningful scale.\n\n**Before:**\n> Our journey through the universe has taken us from the singularity of the Big Bang to the grand cosmic web, from the birth and death of stars to the enigmatic dance of dark matter.\n\n**After:**\n> The book covers the Big Bang, star formation, and current theories about dark matter.\n\n---",
+      "chars": 394,
+      "units": [
+        "para:e7d03f77",
+        "para:c2401d72",
+        "para:685d73cc"
+      ]
+    },
+    {
+      "id": "s035",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "13. Em Dash Overuse",
+      "text": "**Problem:** LLMs use em dashes (\u2014) more than humans, mimicking \"punchy\" sales writing.\n\n**Before:**\n> The term is primarily promoted by Dutch institutions\u2014not by the people themselves. You don't say \"Netherlands, Europe\" as an address\u2014yet this mislabeling continues\u2014even in official documents.\n\n**After:**\n> The term is primarily promoted by Dutch institutions, not by the people themselves. You don't say \"Netherlands, Europe\" as an address, yet this mislabeling continues in official documents.\n\n---",
+      "chars": 502,
+      "units": [
+        "para:ebabd926",
+        "para:bd7d85e4",
+        "para:831558ee"
+      ]
+    },
+    {
+      "id": "s036",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "14. Overuse of Boldface",
+      "text": "**Problem:** AI chatbots emphasize phrases in boldface mechanically.\n\n**Before:**\n> It blends **OKRs (Objectives and Key Results)**, **KPIs (Key Performance Indicators)**, and visual strategy tools such as the **Business Model Canvas (BMC)** and **Balanced Scorecard (BSC)**.\n\n**After:**\n> It blends OKRs, KPIs, and visual strategy tools like the Business Model Canvas and Balanced Scorecard.\n\n---",
+      "chars": 397,
+      "units": [
+        "para:b2b6c2ee",
+        "para:f5d42896",
+        "para:e1121962"
+      ]
+    },
+    {
+      "id": "s037",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "15. Inline-Header Vertical Lists",
+      "text": "**Problem:** AI outputs lists where items start with bolded headers followed by colons.\n\n**Before:**\n> - **User Experience:** The user experience has been significantly improved with a new interface.\n> - **Performance:** Performance has been enhanced through optimized algorithms.\n> - **Security:** Security has been strengthened with end-to-end encryption.\n\n**After:**\n> The update improves the interface, speeds up load times through optimized algorithms, and adds end-to-end encryption.\n\n---",
+      "chars": 494,
+      "units": [
+        "para:25d26918",
+        "para:9e8a1d5a",
+        "para:6dc15df5"
+      ]
+    },
+    {
+      "id": "s038",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "16. Title Case in Headings",
+      "text": "**Problem:** AI chatbots capitalize all main words in headings.\n\n**Before:**\n> ## Strategic Negotiations And Global Partnerships\n\n**After:**\n> ## Strategic negotiations and global partnerships\n\n---",
+      "chars": 197,
+      "units": [
+        "para:7b7e3465",
+        "para:27f334fa",
+        "para:121815b2"
+      ]
+    },
+    {
+      "id": "s039",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "17. Emojis",
+      "text": "**Problem:** AI chatbots often decorate headings or bullet points with emojis.\n\n**Before:**\n> \ud83d\ude80 **Launch Phase:** The product launches in Q3\n> \ud83d\udca1 **Key Insight:** Users prefer simplicity\n> \u2705 **Next Steps:** Schedule follow-up meeting\n\n**After:**\n> The product launches in Q3. User research showed a preference for simplicity. Next step: schedule a follow-up meeting.\n\n---",
+      "chars": 370,
+      "units": [
+        "para:0e496a33",
+        "para:33b3e180",
+        "para:e0ea8cb3"
+      ]
+    },
+    {
+      "id": "s040",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "18. Curly Quotation Marks",
+      "text": "**Problem:** ChatGPT uses curly quotes (\u201c...\u201d) instead of straight quotes (\"...\").\n\n**Before:**\n> He said \u201cthe project is on track\u201d but others disagreed.\n\n**After:**\n> He said \"the project is on track\" but others disagreed.\n\n---",
+      "chars": 228,
+      "units": [
+        "para:cd648fe2",
+        "para:5cf6d8da",
+        "para:93769387"
+      ]
+    },
+    {
+      "id": "s041",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "19. Collaborative Communication Artifacts",
+      "text": "**Words to watch:** I hope this helps, Of course!, Certainly!, You're absolutely right!, Would you like..., let me know, here is a...\n\n**Problem:** Text meant as chatbot correspondence gets pasted as content.\n\n**Before:**\n> Here is an overview of the French Revolution. I hope this helps! Let me know if you'd like me to expand on any section.\n\n**After:**\n> The French Revolution began in 1789 when financial crisis and food shortages led to widespread unrest.\n\n---",
+      "chars": 465,
+      "units": [
+        "para:1e8087d8",
+        "para:0082ed4e",
+        "para:85eb2538",
+        "para:4f4130ad"
+      ]
+    },
+    {
+      "id": "s042",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "20. Knowledge-Cutoff Disclaimers",
+      "text": "**Words to watch:** as of [date], Up to my last training update, While specific details are limited/scarce..., based on available information...\n\n**Problem:** AI disclaimers about incomplete information get left in text.\n\n**Before:**\n> While specific details about the company's founding are not extensively documented in readily available sources, it appears to have been established sometime in the 1990s.\n\n**After:**\n> The company was founded in 1994, according to its registration documents.\n\n---",
+      "chars": 500,
+      "units": [
+        "para:b972e1c1",
+        "para:abb6942f",
+        "para:4bcfa298",
+        "para:072d3a7e"
+      ]
+    },
+    {
+      "id": "s043",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "21. Sycophantic/Servile Tone",
+      "text": "**Problem:** Overly positive, people-pleasing language.\n\n**Before:**\n> Great question! You're absolutely right that this is a complex topic. That's an excellent point about the economic factors.\n\n**After:**\n> The economic factors you mentioned are relevant here.\n\n---",
+      "chars": 267,
+      "units": [
+        "para:94422a6b",
+        "para:cb1c8ea2",
+        "para:18624031"
+      ]
+    },
+    {
+      "id": "s044",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "22. Filler Phrases",
+      "text": "**Before \u2192 After:**\n- \"In order to achieve this goal\" \u2192 \"To achieve this\"\n- \"Due to the fact that it was raining\" \u2192 \"Because it was raining\"\n- \"At this point in time\" \u2192 \"Now\"\n- \"In the event that you need help\" \u2192 \"If you need help\"\n- \"The system has the ability to process\" \u2192 \"The system can process\"\n- \"It is important to note that the data shows\" \u2192 \"The data shows\"\n\n---",
+      "chars": 372,
+      "units": [
+        "para:2e1d7b44",
+        "para:0a16e337",
+        "para:7d3f436a",
+        "para:853988a9",
+        "para:9d8377d5",
+        "para:93096e54"
+      ]
+    },
+    {
+      "id": "s045",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "23. Excessive Hedging",
+      "text": "**Problem:** Over-qualifying statements.\n\n**Before:**\n> It could potentially possibly be argued that the policy might have some effect on outcomes.\n\n**After:**\n> The policy may affect outcomes.\n\n---",
+      "chars": 198,
+      "units": [
+        "para:ce1eafc7",
+        "para:4f802cbb",
+        "para:83d36664"
+      ]
+    },
+    {
+      "id": "s046",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "24. Generic Positive Conclusions",
+      "text": "**Problem:** Vague upbeat endings.\n\n**Before:**\n> The future looks bright for the company. Exciting times lie ahead as they continue their journey toward excellence. This represents a major step in the right direction.\n\n**After:**\n> The company plans to open two more locations next year.\n\n---",
+      "chars": 293,
+      "units": [
+        "para:5ec354f9",
+        "para:af5d3c52",
+        "para:994e77ca"
+      ]
+    },
+    {
+      "id": "s047",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "Process",
+      "text": "1. Read the input text carefully\n2. Identify all instances of the patterns above\n3. Rewrite each problematic section\n4. Ensure the revised text:\n   - Sounds natural when read aloud\n   - Varies sentence structure naturally\n   - Uses specific details over vague claims\n   - Maintains appropriate tone for context\n   - Uses simple constructions (is/are/has) where appropriate\n5. Present the humanized version",
+      "chars": 405,
+      "units": [
+        "para:180c9f3c",
+        "para:03a781b2",
+        "para:bb94d1c1",
+        "para:838f7daa",
+        "para:02d1a13c",
+        "para:04ed7b1e",
+        "para:95ff52fc",
+        "para:804c6330",
+        "para:a7e7fd7e",
+        "para:02067178"
+      ]
+    },
+    {
+      "id": "s048",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "Output Format",
+      "text": "Provide:\n1. The rewritten text\n2. A brief summary of changes made (optional, if helpful)\n\n---",
+      "chars": 93,
+      "units": [
+        "para:74dcf211",
+        "para:bdc86a8b"
+      ]
+    },
+    {
+      "id": "s049",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "Full Example",
+      "text": "**Before (AI-sounding):**\n> The new software update serves as a testament to the company's commitment to innovation. Moreover, it provides a seamless, intuitive, and powerful user experience\u2014ensuring that users can accomplish their goals efficiently. It's not just an update, it's a revolution in how we think about productivity. Industry experts believe this will have a lasting impact on the entire sector, highlighting the company's pivotal role in the evolving technological landscape.\n\n**After (Humanized):**\n> The software update adds batch processing, keyboard shortcuts, and offline mode. Early feedback from beta testers has been positive, with most reporting faster task completion.\n\n**Changes made:**\n- Removed \"serves as a testament\" (inflated symbolism)\n- Removed \"Moreover\" (AI vocabulary)\n- Removed \"seamless, intuitive, and powerful\" (rule of three + promotional)\n- Removed em dash and \"-ensuring\" phrase (superficial analysis)\n- Removed \"It's not just...it's...\" (negative parallelism)\n- Removed \"Industry experts believe\" (vague attribution)\n- Removed \"pivotal role\" and \"evolving landscape\" (AI vocabulary)\n- Added specific features and concrete feedback\n\n---",
+      "chars": 1178,
+      "units": [
+        "para:c17fb8f1",
+        "para:c4647eb5",
+        "para:e136cade",
+        "para:df1308ee",
+        "para:d5542181",
+        "para:249f7bf1",
+        "para:3461c253",
+        "para:ae8e1148",
+        "para:bf55449b",
+        "para:75554573"
+      ]
+    },
+    {
+      "id": "s050",
+      "file": "skills/humanizer/SKILL.md",
+      "heading": "Reference",
+      "text": "This skill is based on [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing), maintained by WikiProject AI Cleanup. The patterns documented there come from observations of thousands of instances of AI-generated text on Wikipedia.\n\nKey insight from Wikipedia: \"LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases.\"",
+      "chars": 469,
+      "units": [
+        "para:2d7036b2",
+        "para:0d6b3e86"
+      ]
+    }
+  ],
+  "files": [],
+  "phrase_fate": {
+    "kept": 6.42,
+    "moved": 12.33,
+    "gone": 81.25,
+    "new": 88.74
+  }
+}

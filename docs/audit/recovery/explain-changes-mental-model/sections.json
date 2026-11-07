@@ -1,0 +1,180 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "commands/explain-changes-mental-model.md",
+      "heading": "(preamble)",
+      "text": "---\ndescription: Build a mental model of changes by splitting them into smaller logical chunks\nargument-hint: [commit|branch|range|custom]\n---",
+      "chars": 142,
+      "units": [
+        "para:b38eb6e2"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "commands/explain-changes-mental-model.md",
+      "heading": "Mental Model Builder",
+      "text": "Analyze code changes and present them as a coherent mental model - breaking large diffs into logical chunks ordered by dependency so they can be understood incrementally.",
+      "chars": 170,
+      "units": [
+        "para:039236a5"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "commands/explain-changes-mental-model.md",
+      "heading": "What This Command Does",
+      "text": "1. **Gather changes** from the specified source (commit, branch, range, or custom input)\n2. **Analyze and categorize** changes into logical groups by theme/purpose\n3. **Identify dependencies** between change groups\n4. **Present ordered explanation** so changes can be reviewed in a sensible sequence",
+      "chars": 299,
+      "units": [
+        "para:84040ac5",
+        "para:86c3c1ae",
+        "para:3d2f4a73",
+        "para:a03c4c90"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "commands/explain-changes-mental-model.md",
+      "heading": "Usage",
+      "text": "```bash\n# Current working changes (staged + unstaged)\n/mental-model\n\n# Specific commit\n/mental-model abc1234\n/mental-model HEAD~3\n\n# Branch comparison (vs main)\n/mental-model feature/my-branch\n\n# Explicit range\n/mental-model main..HEAD\n/mental-model origin/main...HEAD\n\n# Custom - user will provide diff/changes in next message\n/mental-model custom\n```",
+      "chars": 352,
+      "units": [
+        "para:11b8636f"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "commands/explain-changes-mental-model.md",
+      "heading": "1. Determine Change Source",
+      "text": "Parse the argument to determine what changes to analyze:\n\n**No argument provided:**\n- Run `git diff HEAD` to get all uncommitted changes (staged + unstaged)\n- If no changes found, report \"No uncommitted changes to analyze\"\n\n**Argument looks like a commit hash** (7-40 hex chars):\n- Run `git show <hash> --stat` first to verify it exists\n- Run `git show <hash>` to get the full diff\n\n**Argument looks like a branch name** (contains letters, no `..`):\n- Detect main branch: check if `main` or `master` exists\n- Run `git diff <main-branch>...<argument>` to compare\n\n**Argument contains `..`** (explicit range):\n- Use as-is: `git diff <argument>`\n\n**Argument is \"custom\":**\n- Tell the user: \"Please paste or describe the changes you want me to analyze in your next message.\"\n- Wait for user input before proceeding",
+      "chars": 810,
+      "units": [
+        "para:d697f560",
+        "para:b04dabcc",
+        "para:31ddc3c8",
+        "para:a1b4effd",
+        "para:9c495d1c",
+        "para:c8331da4",
+        "para:5dab348c",
+        "para:602067b3",
+        "para:520672c1",
+        "para:4137d3fb",
+        "para:32d79676",
+        "para:866d986c",
+        "para:bce44c57",
+        "para:1a5bea20",
+        "para:a01a6178"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "commands/explain-changes-mental-model.md",
+      "heading": "2. Extract the Diff",
+      "text": "Run the appropriate git command and capture the output:\n\n```bash\n# Example for commit\ngit show <hash> --no-color\n\n# Example for range\ngit diff <range> --no-color\n```\n\nIf the diff is very large (>5000 lines), use `--stat` first to get an overview, then selectively read the most important files.",
+      "chars": 294,
+      "units": [
+        "para:6c598537",
+        "para:1770a1f4",
+        "para:7c951712"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "commands/explain-changes-mental-model.md",
+      "heading": "3. Analyze and Categorize Changes",
+      "text": "Group changes into logical categories based on:\n\n- **Purpose**: What problem does this change solve?\n- **Layer**: API, UI, business logic, data, infrastructure, tests, config\n- **Feature area**: Authentication, payments, search, etc.\n- **Type**: New feature, refactor, bug fix, cleanup\n\nFor each file changed, determine:\n- What logical group it belongs to\n- What other changes it depends on\n- What changes depend on it",
+      "chars": 418,
+      "units": [
+        "para:a2eb0536",
+        "para:7e724539",
+        "para:05a29d22",
+        "para:901dceb2",
+        "para:70b97eb8",
+        "para:a84bacd2",
+        "para:a9a21d96",
+        "para:9ab53af6",
+        "para:77c3cf75"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "commands/explain-changes-mental-model.md",
+      "heading": "4. Build Dependency Graph",
+      "text": "Identify how changes relate to each other:\n\n- **Foundation changes**: Types, interfaces, schemas that other code depends on\n- **Implementation changes**: Code that uses the foundation\n- **Integration changes**: Code that ties implementations together\n- **Test/config changes**: Usually depend on everything else\n\nOrder groups so that:\n1. Dependencies come before dependents\n2. Lower-level abstractions come before higher-level ones\n3. Core changes come before peripheral changes",
+      "chars": 478,
+      "units": [
+        "para:dad4396b",
+        "para:bd036358",
+        "para:996f2341",
+        "para:f6d32a66",
+        "para:ad7a6603",
+        "para:1157f13c",
+        "para:27fcc6e2",
+        "para:db9e8421",
+        "para:765a81a6"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "commands/explain-changes-mental-model.md",
+      "heading": "5. Present the Mental Model",
+      "text": "Output the analysis in this format:\n\n```markdown\n## Mental Model: [Brief title of what these changes accomplish]\n\n### High-Level Summary\n[2-3 sentences explaining the overall goal and approach of these changes]\n\n### Key Concepts to Understand\nBefore diving into the code, understand these concepts:\n- **[Concept 1]**: [Brief explanation]\n- **[Concept 2]**: [Brief explanation]\n- **[Concept 3]**: [Brief explanation]\n\n### Change Groups (in review order)\n\n#### 1. [Group Name] - [Purpose]\n**Files:** `file1.ts`, `file2.ts`\n**Why this matters:** [Explain the purpose and context]\n**Key changes:**\n- [Change 1 and why]\n- [Change 2 and why]\n**Depends on:** Nothing (foundation)\n**Enables:** [What other groups need this]\n\n#### 2. [Group Name] - [Purpose]\n**Files:** `file3.ts`, `file4.ts`\n**Why this matters:** [Explain the purpose and context]\n**Key changes:**\n- [Change 1 and why]\n- [Change 2 and why]\n**Depends on:** Group 1\n**Enables:** [What other groups need this]\n\n[Continue for all groups...]\n\n### Review Sequence\nFor the best understanding, review in this order:\n1. **[Group 1]** - Start here because [reason]\n2. **[Group 2]** - Then this because [reason]\n3. **[Group 3]** - Finally this because [reason]\n\n### Gotchas and Non-Obvious Details\n- [Any tricky parts or things that might be confusing]\n- [Implicit assumptions in the code]\n- [Things that look wrong but are intentional]\n```",
+      "chars": 1388,
+      "units": [
+        "para:36a1acb9",
+        "para:a36906bb"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "commands/explain-changes-mental-model.md",
+      "heading": "Important Notes",
+      "text": "- **Focus on understanding, not just describing**: Explain WHY changes were made, not just WHAT changed\n- **Use the user's domain language**: If the codebase has specific terminology, use it\n- **Be honest about complexity**: If something is genuinely complex, say so and break it down further\n- **Highlight the \"aha moments\"**: What insight makes everything click into place?\n- **Skip trivial changes**: Don't waste mental bandwidth on import reordering, formatting, etc.",
+      "chars": 471,
+      "units": [
+        "para:9d8638be",
+        "para:a8860185",
+        "para:54411625",
+        "para:0be01b8d",
+        "para:4ba80e2e"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "commands/explain-changes-mental-model.md",
+      "heading": "Error Handling",
+      "text": "If git command fails:\n- Report the specific error\n- Suggest alternatives (e.g., \"Did you mean branch X?\")\n\nIf diff is empty:\n- Report \"No changes found for the specified source\"\n\nIf changes are too large to analyze meaningfully:\n- Provide a high-level overview first\n- Offer to deep-dive into specific areas: \"This is a large changeset. Want me to focus on a specific area? (e.g., 'the API changes' or 'the database migrations')\"",
+      "chars": 429,
+      "units": [
+        "para:e273d720",
+        "para:2e954330",
+        "para:45097cef",
+        "para:a638864e",
+        "para:eb08d068",
+        "para:4ecf1aaf",
+        "para:7ace5402",
+        "para:a3a8448a"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "commands/explain-changes-mental-model.md",
+      "heading": "Example Output",
+      "text": "For a commit that adds user authentication:\n\n```markdown\n## Mental Model: Adding JWT-based User Authentication\n\n### High-Level Summary\nThese changes add user authentication using JWT tokens. The flow is: user submits credentials \u2192 server validates \u2192 server returns JWT \u2192 client stores and sends JWT with requests \u2192 server validates JWT on protected routes.\n\n### Key Concepts to Understand\n- **JWT (JSON Web Token)**: A signed token containing user identity, passed in Authorization header\n- **Middleware pattern**: Express middleware that runs before route handlers to check auth\n- **Token refresh**: Mechanism to get new tokens without re-entering credentials\n\n### Change Groups (in review order)\n\n#### 1. Auth Types & Interfaces - Foundation\n**Files:** `src/types/auth.ts`\n**Why this matters:** Defines the shape of auth data used everywhere else\n**Key changes:**\n- Added `User`, `TokenPayload`, `AuthResponse` types\n- These types ensure consistency across the auth system\n**Depends on:** Nothing\n**Enables:** All other auth code\n\n#### 2. JWT Utilities - Token Operations\n**Files:** `src/utils/jwt.ts`\n**Why this matters:** Core logic for creating and validating tokens\n**Key changes:**\n- `signToken()` - creates JWT with user data and expiration\n- `verifyToken()` - validates JWT and extracts payload\n**Depends on:** Auth types\n**Enables:** Auth middleware, login endpoint\n\n[etc...]\n```",
+      "chars": 1389,
+      "units": [
+        "para:562a048f",
+        "para:92b38085"
+      ]
+    }
+  ],
+  "files": [],
+  "phrase_fate": {
+    "kept": 3.39,
+    "moved": 0.0,
+    "gone": 96.61,
+    "new": 97.76
+  }
+}

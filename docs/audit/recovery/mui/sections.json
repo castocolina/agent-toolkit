@@ -1,0 +1,1153 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/mui/README.md",
+      "heading": "MUI v7 Patterns Skill",
+      "text": "A comprehensive skill for working with Material-UI v7 components, styling, and best practices in React applications.",
+      "chars": 116,
+      "units": [
+        "para:324dcf17"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/mui/README.md",
+      "heading": "Purpose",
+      "text": "This skill provides guidance and patterns for building React applications with Material-UI v7 (released March 2025). It covers component usage, the sx prop styling system, theme integration, responsive design, and MUI-specific utilities.\n\nMUI is one of the most popular React UI libraries, and v7 introduced several breaking changes from v6. This skill helps developers navigate these changes while following consistent, type-safe patterns.",
+      "chars": 440,
+      "units": [
+        "para:11853623",
+        "para:a93b6ac7"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/mui/README.md",
+      "heading": "When to Use",
+      "text": "Use this skill when you are:\n\n- **Styling components with the sx prop** - Need guidance on MUI's styling approach\n- **Working with MUI components** - Using Box, Grid, Paper, Typography, Button, Card, Dialog, and other MUI components\n- **Customizing themes** - Setting up or modifying MUI themes\n- **Building responsive layouts** - Using MUI's breakpoint system for mobile-first design\n- **Using MUI utilities and hooks** - Working with useTheme, useMediaQuery, or custom MUI hooks\n- **Migrating from MUI v6** - Understanding v7 breaking changes\n\n**Trigger phrases:**\n- \"style with sx prop\"\n- \"MUI component\"\n- \"Material-UI\"\n- \"theme customization\"\n- \"MUI responsive design\"\n- \"MUI Grid layout\"",
+      "chars": 693,
+      "units": [
+        "para:91b7e34b",
+        "para:4c1be948",
+        "para:6b4328a9",
+        "para:0429fc32",
+        "para:961fc47c",
+        "para:e050f800",
+        "para:33faa4b6",
+        "para:543489b1",
+        "para:2607188e",
+        "para:6758b1f5"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/mui/README.md",
+      "heading": "How It Works",
+      "text": "1. **Identify the MUI task** - Recognize when MUI patterns are relevant to the current work\n2. **Apply appropriate patterns** - Use the correct styling approach based on component complexity\n3. **Leverage theme tokens** - Use MUI's built-in theme values instead of hardcoded styles\n4. **Ensure type safety** - Apply proper TypeScript types for sx props\n5. **Build responsively** - Use MUI's breakpoint system for adaptive layouts",
+      "chars": 429,
+      "units": [
+        "para:7a0ba5ad",
+        "para:8f83c8fb",
+        "para:b98d0eae",
+        "para:9decfaa1",
+        "para:4b94cbbc"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/mui/README.md",
+      "heading": "MUI v7 Breaking Changes Awareness",
+      "text": "The skill includes guidance on v7-specific changes:\n- Deep imports no longer work (use package exports)\n- `onBackdropClick` removed from Modal (use `onClose` instead)\n- Standardized `slots` and `slotProps` pattern for all components\n- CSS layers support via `enableCssLayer` config (Tailwind v4 compatible)",
+      "chars": 306,
+      "units": [
+        "para:c7c31ee4",
+        "para:46dcc00e",
+        "para:1c18f78f",
+        "para:25d7be43",
+        "para:0809b908"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/mui/README.md",
+      "heading": "Styling Patterns",
+      "text": "Two approaches based on component complexity:\n- **Inline styles (< 100 lines)** - Define styles at component top\n- **Separate styles file (>= 100 lines)** - Create `ComponentName.styles.ts`",
+      "chars": 189,
+      "units": [
+        "para:ea0f0e8f",
+        "para:f7fbbe8f",
+        "para:7e7021fa"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/mui/README.md",
+      "heading": "Complete Component Coverage",
+      "text": "- Layout: Box, Paper, Container, Stack\n- Grid system: 12-column responsive grid\n- Typography: All variants with custom styling\n- Forms: TextField, validation, error states\n- Feedback: Dialog, Snackbar, Loading states\n- Navigation: Cards, Buttons, Icons",
+      "chars": 252,
+      "units": [
+        "para:c7bbbbd3",
+        "para:1223aa8c",
+        "para:927e6513",
+        "para:cce7d240",
+        "para:64917fd6",
+        "para:5c4e4458"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/mui/README.md",
+      "heading": "Theme Integration",
+      "text": "- Direct theme value access in sx prop\n- useTheme hook for programmatic access\n- Callback syntax for complex theme-dependent styles",
+      "chars": 131,
+      "units": [
+        "para:45fcec5a",
+        "para:d05834fd",
+        "para:7fb8d5a6"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/mui/README.md",
+      "heading": "Responsive Design",
+      "text": "- Mobile-first breakpoint system (xs, sm, md, lg, xl)\n- Responsive prop values for any CSS property\n- Conditional display based on screen size",
+      "chars": 142,
+      "units": [
+        "para:3b18ef30",
+        "para:b02b8079",
+        "para:50d6b8ae"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/mui/README.md",
+      "heading": "Basic Component with sx Prop",
+      "text": "```typescript\nimport { Box, Typography, Button, Paper } from '@mui/material';\nimport type { SxProps, Theme } from '@mui/material';\n\nconst styles: Record<string, SxProps<Theme>> = {\n  container: {\n    p: 2,\n    display: 'flex',\n    flexDirection: 'column',\n    gap: 2,\n  },\n  header: {\n    mb: 3,\n    fontSize: '1.5rem',\n    fontWeight: 600,\n  },\n};\n\nfunction MyComponent() {\n  return (\n    <Paper sx={styles.container}>\n      <Typography sx={styles.header}>Title</Typography>\n      <Button variant=\"contained\">Action</Button>\n    </Paper>\n  );\n}\n```",
+      "chars": 549,
+      "units": [
+        "para:13b22eb9"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/mui/README.md",
+      "heading": "Responsive Layout",
+      "text": "```typescript\n<Box\n  sx={{\n    width: {\n      xs: '100%',  // 0-600px\n      sm: '80%',   // 600-900px\n      md: '60%',   // 900-1200px\n      lg: '40%',   // 1200px+\n    },\n    display: {\n      xs: 'none',  // Hidden on mobile\n      md: 'block', // Visible on desktop\n    },\n  }}\n>\n  Responsive content\n</Box>\n```",
+      "chars": 312,
+      "units": [
+        "para:cc5c1f3a"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/mui/README.md",
+      "heading": "Grid System",
+      "text": "```typescript\nimport { Grid } from '@mui/material';\n\n<Grid container spacing={3}>\n  <Grid item xs={12} sm={6} md={4} lg={3}>\n    <Card>...</Card>\n  </Grid>\n  <Grid item xs={12} sm={6} md={4} lg={3}>\n    <Card>...</Card>\n  </Grid>\n</Grid>\n```",
+      "chars": 241,
+      "units": [
+        "para:1109c25e"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/mui/README.md",
+      "heading": "Theme-Aware Styling",
+      "text": "```typescript\n<Box\n  sx={(theme) => ({\n    color: theme.palette.primary.main,\n    bgcolor: 'background.paper',\n    p: 2,\n    '&:hover': {\n      color: theme.palette.primary.dark,\n    },\n  })}\n>\n  Theme-integrated content\n</Box>\n```",
+      "chars": 231,
+      "units": [
+        "para:7c0214e8"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/mui/README.md",
+      "heading": "Prerequisites",
+      "text": "- React 18 or later\n- Material-UI v7 packages installed:\n  - `@mui/material`\n  - `@mui/icons-material` (for icons)\n- TypeScript (recommended for type safety)",
+      "chars": 157,
+      "units": [
+        "para:159cc665",
+        "para:d75cd54c",
+        "para:bbc5a02a",
+        "para:0341b24d"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/mui/README.md",
+      "heading": "Output",
+      "text": "This skill produces:\n- Type-safe component code using MUI patterns\n- Properly structured style definitions\n- Responsive, theme-integrated layouts\n- Accessible UI components following MUI conventions",
+      "chars": 198,
+      "units": [
+        "para:67630db7",
+        "para:3b6ebb82",
+        "para:ac3db544",
+        "para:e15fff47",
+        "para:f2d4cd76"
+      ]
+    },
+    {
+      "id": "s016",
+      "file": "skills/mui/README.md",
+      "heading": "1. Always Type Your sx Props",
+      "text": "```typescript\nimport type { SxProps, Theme } from '@mui/material';\n\nconst styles: Record<string, SxProps<Theme>> = {\n  container: { p: 2 },\n};\n```",
+      "chars": 146,
+      "units": [
+        "para:fe5c3a4e"
+      ]
+    },
+    {
+      "id": "s017",
+      "file": "skills/mui/README.md",
+      "heading": "2. Use Theme Tokens Over Hardcoded Values",
+      "text": "```typescript\n// Good\n<Box sx={{ color: 'primary.main', p: 2 }} />\n\n// Avoid\n<Box sx={{ color: '#1976d2', padding: '16px' }} />\n```",
+      "chars": 131,
+      "units": [
+        "para:da1043a4"
+      ]
+    },
+    {
+      "id": "s018",
+      "file": "skills/mui/README.md",
+      "heading": "3. Use MUI Spacing Scale",
+      "text": "```typescript\n// Good - Uses theme.spacing()\n<Box sx={{ p: 2, mb: 3, mt: 1 }} />\n\n// Avoid - Random pixel values\n<Box sx={{ padding: '17px', marginBottom: '25px' }} />\n```",
+      "chars": 171,
+      "units": [
+        "para:bc103e58"
+      ]
+    },
+    {
+      "id": "s019",
+      "file": "skills/mui/README.md",
+      "heading": "4. Organize Styles by Component Complexity",
+      "text": "- Small components: Define styles at the top of the file\n- Large components: Create separate `ComponentName.styles.ts` file",
+      "chars": 123,
+      "units": [
+        "para:4a6366e3",
+        "para:637e0b19"
+      ]
+    },
+    {
+      "id": "s020",
+      "file": "skills/mui/README.md",
+      "heading": "5. Use Semantic Color Names",
+      "text": "Access palette colors by their semantic names:\n- `primary.main`, `primary.light`, `primary.dark`\n- `secondary.main`, `error.main`, `warning.main`\n- `text.primary`, `text.secondary`\n- `background.paper`, `background.default`",
+      "chars": 223,
+      "units": [
+        "para:afcd7c7c",
+        "para:22de052a",
+        "para:7dfbdf69",
+        "para:a386a8a8",
+        "para:8663ffb6"
+      ]
+    },
+    {
+      "id": "s021",
+      "file": "skills/mui/README.md",
+      "heading": "Additional Resources",
+      "text": "The skill includes supplementary documentation:\n- `resources/styling-guide.md` - Advanced styling patterns\n- `resources/component-library.md` - Extended component examples\n- `resources/theme-customization.md` - Theme setup and customization",
+      "chars": 240,
+      "units": [
+        "para:eeefac89",
+        "para:75ca036b",
+        "para:2805665f",
+        "para:c1b02ab5"
+      ]
+    },
+    {
+      "id": "s022",
+      "file": "skills/mui/README.md",
+      "heading": "Related Documentation",
+      "text": "- [MUI Official Documentation](https://mui.com/material-ui/)\n- [MUI v7 Migration Guide](https://mui.com/material-ui/migration/upgrade-to-v7/)\n- [MUI System (sx prop)](https://mui.com/system/getting-started/)",
+      "chars": 207,
+      "units": [
+        "para:3970e8a7",
+        "para:b47c4aed",
+        "para:d9b3e073"
+      ]
+    },
+    {
+      "id": "s023",
+      "file": "skills/mui/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: mui\ndescription: Material-UI v7 component library patterns including sx prop styling, theme integration, responsive design, and MUI-specific hooks. Use when working with MUI components, styling with sx prop, theme customization, or MUI utilities.\n---",
+      "chars": 260,
+      "units": [
+        "para:b7a79b14"
+      ]
+    },
+    {
+      "id": "s024",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Purpose",
+      "text": "Material-UI v7 (released March 2025) patterns for component usage, styling with sx prop, theme integration, and responsive design.\n\n**Note**: MUI v7 breaking changes from v6:\n- Deep imports no longer work - use package exports field\n- `onBackdropClick` removed from Modal - use `onClose` instead\n- All components now use standardized `slots` and `slotProps` pattern\n- CSS layers support via `enableCssLayer` config (works with Tailwind v4)",
+      "chars": 439,
+      "units": [
+        "para:ca03f10d",
+        "para:3b3b1d82",
+        "para:55743b71",
+        "para:1c18f78f",
+        "para:8675e355",
+        "para:c1e6567d"
+      ]
+    },
+    {
+      "id": "s025",
+      "file": "skills/mui/SKILL.md",
+      "heading": "When to Use This Skill",
+      "text": "- Styling components with MUI sx prop\n- Using MUI components (Box, Grid, Paper, Typography, etc.)\n- Theme customization and usage\n- Responsive design with MUI breakpoints\n- MUI-specific utilities and hooks\n\n---",
+      "chars": 210,
+      "units": [
+        "para:78b0c533",
+        "para:423e5af0",
+        "para:a21fed3c",
+        "para:62a50143",
+        "para:0283ee32"
+      ]
+    },
+    {
+      "id": "s026",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Basic MUI Component",
+      "text": "```typescript\nimport { Box, Typography, Button, Paper } from '@mui/material';\nimport type { SxProps, Theme } from '@mui/material';\n\nconst styles: Record<string, SxProps<Theme>> = {\n  container: {\n    p: 2,\n    display: 'flex',\n    flexDirection: 'column',\n    gap: 2,\n  },\n  header: {\n    mb: 3,\n    fontSize: '1.5rem',\n    fontWeight: 600,\n  },\n};\n\nfunction MyComponent() {\n  return (\n    <Paper sx={styles.container}>\n      <Typography sx={styles.header}>\n        Title\n      </Typography>\n      <Button variant=\"contained\">\n        Action\n      </Button>\n    </Paper>\n  );\n}\n```\n\n---",
+      "chars": 586,
+      "units": [
+        "para:13b22eb9"
+      ]
+    },
+    {
+      "id": "s027",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Inline Styles (< 100 lines)",
+      "text": "For components with simple styling, define styles at the top:\n\n```typescript\nimport type { SxProps, Theme } from '@mui/material';\n\nconst componentStyles: Record<string, SxProps<Theme>> = {\n  container: {\n    p: 2,\n    display: 'flex',\n    flexDirection: 'column',\n  },\n  header: {\n    mb: 2,\n    color: 'primary.main',\n  },\n  button: {\n    mt: 'auto',\n    alignSelf: 'flex-end',\n  },\n};\n\nfunction Component() {\n  return (\n    <Box sx={componentStyles.container}>\n      <Typography sx={componentStyles.header}>Header</Typography>\n      <Button sx={componentStyles.button}>Action</Button>\n    </Box>\n  );\n}\n```",
+      "chars": 608,
+      "units": [
+        "para:b1bf24a7",
+        "para:73ebeb0e"
+      ]
+    },
+    {
+      "id": "s028",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Separate Styles File (>= 100 lines)",
+      "text": "For complex components, create separate style file:\n\n```typescript\n// UserProfile.styles.ts\nimport type { SxProps, Theme } from '@mui/material';\n\nexport const userProfileStyles: Record<string, SxProps<Theme>> = {\n  container: {\n    p: 3,\n    maxWidth: 800,\n    mx: 'auto',\n  },\n  header: {\n    display: 'flex',\n    justifyContent: 'space-between',\n    alignItems: 'center',\n    mb: 3,\n  },\n  // ... many more styles\n};\n\n// UserProfile.tsx\nimport { userProfileStyles as styles } from './UserProfile.styles';\n\nfunction UserProfile() {\n  return <Box sx={styles.container}>...</Box>;\n}\n```\n\n---",
+      "chars": 590,
+      "units": [
+        "para:3dea83fe",
+        "para:01d40d1f"
+      ]
+    },
+    {
+      "id": "s029",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Layout Components",
+      "text": "```typescript\n// Box - Generic container\n<Box sx={{ p: 2, bgcolor: 'background.paper' }}>\n  Content\n</Box>\n\n// Paper - Elevated surface\n<Paper elevation={2} sx={{ p: 3 }}>\n  Content\n</Paper>\n\n// Container - Centered content with max-width\n<Container maxWidth=\"lg\">\n  Content\n</Container>\n\n// Stack - Flex container with spacing\n<Stack spacing={2} direction=\"row\">\n  <Item />\n  <Item />\n</Stack>\n```",
+      "chars": 398,
+      "units": [
+        "para:a86ed746"
+      ]
+    },
+    {
+      "id": "s030",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Grid System",
+      "text": "```typescript\nimport { Grid } from '@mui/material';\n\n// 12-column grid\n<Grid container spacing={2}>\n  <Grid item xs={12} md={6}>\n    Left half\n  </Grid>\n  <Grid item xs={12} md={6}>\n    Right half\n  </Grid>\n</Grid>\n\n// Responsive grid\n<Grid container spacing={3}>\n  <Grid item xs={12} sm={6} md={4} lg={3}>\n    Card\n  </Grid>\n  {/* Repeat for more cards */}\n</Grid>\n```",
+      "chars": 369,
+      "units": [
+        "para:ad2a23e2"
+      ]
+    },
+    {
+      "id": "s031",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Typography",
+      "text": "```typescript\n<Typography variant=\"h1\">Heading 1</Typography>\n<Typography variant=\"h2\">Heading 2</Typography>\n<Typography variant=\"body1\">Body text</Typography>\n<Typography variant=\"caption\">Small text</Typography>\n\n// With custom styling\n<Typography\n  variant=\"h4\"\n  sx={{\n    color: 'primary.main',\n    fontWeight: 600,\n    mb: 2,\n  }}\n>\n  Custom Heading\n</Typography>\n```",
+      "chars": 374,
+      "units": [
+        "para:603a9cf0"
+      ]
+    },
+    {
+      "id": "s032",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Buttons",
+      "text": "```typescript\n// Variants\n<Button variant=\"contained\">Contained</Button>\n<Button variant=\"outlined\">Outlined</Button>\n<Button variant=\"text\">Text</Button>\n\n// Colors\n<Button variant=\"contained\" color=\"primary\">Primary</Button>\n<Button variant=\"contained\" color=\"secondary\">Secondary</Button>\n<Button variant=\"contained\" color=\"error\">Error</Button>\n\n// With icons\nimport { Add as AddIcon } from '@mui/icons-material';\n\n<Button startIcon={<AddIcon />}>Add Item</Button>\n```\n\n---",
+      "chars": 477,
+      "units": [
+        "para:e600ea76"
+      ]
+    },
+    {
+      "id": "s033",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Using Theme Values",
+      "text": "```typescript\nimport { useTheme } from '@mui/material';\n\nfunction Component() {\n  const theme = useTheme();\n\n  return (\n    <Box\n      sx={{\n        p: 2,\n        bgcolor: theme.palette.primary.main,\n        color: theme.palette.primary.contrastText,\n        borderRadius: theme.shape.borderRadius,\n      }}\n    >\n      Themed box\n    </Box>\n  );\n}\n```",
+      "chars": 352,
+      "units": [
+        "para:e2fd09b5"
+      ]
+    },
+    {
+      "id": "s034",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Theme in sx Prop",
+      "text": "```typescript\n<Box\n  sx={{\n    // Access theme in sx\n    color: 'primary.main',          // theme.palette.primary.main\n    bgcolor: 'background.paper',     // theme.palette.background.paper\n    p: 2,                            // theme.spacing(2)\n    borderRadius: 1,                 // theme.shape.borderRadius\n  }}\n>\n  Content\n</Box>\n\n// Callback for advanced usage\n<Box\n  sx={(theme) => ({\n    color: theme.palette.primary.main,\n    '&:hover': {\n      color: theme.palette.primary.dark,\n    },\n  })}\n>\n  Hover me\n</Box>\n```\n\n---",
+      "chars": 531,
+      "units": [
+        "para:43545e73"
+      ]
+    },
+    {
+      "id": "s035",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Breakpoints",
+      "text": "```typescript\n// Mobile-first responsive values\n<Box\n  sx={{\n    width: {\n      xs: '100%',    // 0-600px\n      sm: '80%',     // 600-900px\n      md: '60%',     // 900-1200px\n      lg: '40%',     // 1200-1536px\n      xl: '30%',     // 1536px+\n    },\n  }}\n>\n  Responsive width\n</Box>\n\n// Responsive display\n<Box\n  sx={{\n    display: {\n      xs: 'none',    // Hidden on mobile\n      md: 'block',   // Visible on desktop\n    },\n  }}\n>\n  Desktop only\n</Box>\n```",
+      "chars": 457,
+      "units": [
+        "para:42ed4ba8"
+      ]
+    },
+    {
+      "id": "s036",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Responsive Typography",
+      "text": "```typescript\n<Typography\n  sx={{\n    fontSize: {\n      xs: '1rem',\n      md: '1.5rem',\n      lg: '2rem',\n    },\n    lineHeight: {\n      xs: 1.5,\n      md: 1.75,\n    },\n  }}\n>\n  Responsive text\n</Typography>\n```\n\n---",
+      "chars": 216,
+      "units": [
+        "para:f9b061df"
+      ]
+    },
+    {
+      "id": "s037",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Forms",
+      "text": "```typescript\nimport { TextField, Stack, Button } from '@mui/material';\n\n<Box component=\"form\" onSubmit={handleSubmit}>\n  <Stack spacing={2}>\n    <TextField\n      label=\"Email\"\n      type=\"email\"\n      value={email}\n      onChange={(e) => setEmail(e.target.value)}\n      fullWidth\n      required\n      error={!!errors.email}\n      helperText={errors.email}\n    />\n    <Button type=\"submit\" variant=\"contained\">Submit</Button>\n  </Stack>\n</Box>\n```\n\n---",
+      "chars": 452,
+      "units": [
+        "para:86ef1390"
+      ]
+    },
+    {
+      "id": "s038",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Card Component",
+      "text": "```typescript\nimport { Card, CardContent, CardActions, Typography, Button } from '@mui/material';\n\n<Card>\n  <CardContent>\n    <Typography variant=\"h5\" component=\"div\">\n      Title\n    </Typography>\n    <Typography variant=\"body2\" color=\"text.secondary\">\n      Description\n    </Typography>\n  </CardContent>\n  <CardActions>\n    <Button size=\"small\">Learn More</Button>\n  </CardActions>\n</Card>\n```",
+      "chars": 396,
+      "units": [
+        "para:ccf886e0"
+      ]
+    },
+    {
+      "id": "s039",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Dialog/Modal",
+      "text": "```typescript\nimport { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';\n\n<Dialog open={open} onClose={handleClose}>\n  <DialogTitle>Confirm Action</DialogTitle>\n  <DialogContent>\n    Are you sure you want to proceed?\n  </DialogContent>\n  <DialogActions>\n    <Button onClick={handleClose}>Cancel</Button>\n    <Button onClick={handleConfirm} variant=\"contained\">\n      Confirm\n    </Button>\n  </DialogActions>\n</Dialog>\n```",
+      "chars": 453,
+      "units": [
+        "para:12c7ca65"
+      ]
+    },
+    {
+      "id": "s040",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Loading States",
+      "text": "```typescript\nimport { CircularProgress, Skeleton } from '@mui/material';\n\n// Spinner\n<Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>\n  <CircularProgress />\n</Box>\n\n// Skeleton\n<Stack spacing={1}>\n  <Skeleton variant=\"text\" width=\"60%\" />\n  <Skeleton variant=\"rectangular\" height={200} />\n  <Skeleton variant=\"text\" width=\"40%\" />\n</Stack>\n```\n\n---",
+      "chars": 363,
+      "units": [
+        "para:24f174b9"
+      ]
+    },
+    {
+      "id": "s041",
+      "file": "skills/mui/SKILL.md",
+      "heading": "useMuiSnackbar",
+      "text": "```typescript\nimport { useMuiSnackbar } from '@/hooks/useMuiSnackbar';\n\nfunction Component() {\n  const { showSuccess, showError, showInfo } = useMuiSnackbar();\n\n  const handleSave = async () => {\n    try {\n      await saveData();\n      showSuccess('Saved successfully');\n    } catch (error) {\n      showError('Failed to save');\n    }\n  };\n\n  return <Button onClick={handleSave}>Save</Button>;\n}\n```\n\n---",
+      "chars": 403,
+      "units": [
+        "para:dc3b0585"
+      ]
+    },
+    {
+      "id": "s042",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Icons",
+      "text": "```typescript\nimport { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';\nimport { Button, IconButton } from '@mui/material';\n\n<Button startIcon={<AddIcon />}>Add</Button>\n<IconButton onClick={handleDelete}><DeleteIcon /></IconButton>\n```\n\n---",
+      "chars": 259,
+      "units": [
+        "para:33eb0bce"
+      ]
+    },
+    {
+      "id": "s043",
+      "file": "skills/mui/SKILL.md",
+      "heading": "1. Type Your sx Props",
+      "text": "```typescript\nimport type { SxProps, Theme } from '@mui/material';\n\n// \u2705 Good\nconst styles: Record<string, SxProps<Theme>> = {\n  container: { p: 2 },\n};\n\n// \u274c Avoid\nconst styles = {\n  container: { p: 2 }, // No type safety\n};\n```",
+      "chars": 229,
+      "units": [
+        "para:c58555b5"
+      ]
+    },
+    {
+      "id": "s044",
+      "file": "skills/mui/SKILL.md",
+      "heading": "2. Use Theme Tokens",
+      "text": "```typescript\n// \u2705 Good: Use theme tokens\n<Box sx={{ color: 'primary.main', p: 2 }} />\n\n// \u274c Avoid: Hardcoded values\n<Box sx={{ color: '#1976d2', padding: '16px' }} />\n```",
+      "chars": 171,
+      "units": [
+        "para:42a0cb16"
+      ]
+    },
+    {
+      "id": "s045",
+      "file": "skills/mui/SKILL.md",
+      "heading": "3. Consistent Spacing",
+      "text": "```typescript\n// \u2705 Good: Use spacing scale\n<Box sx={{ p: 2, mb: 3, mt: 1 }} />\n\n// \u274c Avoid: Random pixel values\n<Box sx={{ padding: '17px', marginBottom: '25px' }} />\n```\n\n---",
+      "chars": 175,
+      "units": [
+        "para:14cd090b"
+      ]
+    },
+    {
+      "id": "s046",
+      "file": "skills/mui/SKILL.md",
+      "heading": "Additional Resources",
+      "text": "For more detailed patterns, see:\n- [styling-guide.md](resources/styling-guide.md) - Advanced styling patterns\n- [component-library.md](resources/component-library.md) - Component examples\n- [theme-customization.md](resources/theme-customization.md) - Theme setup",
+      "chars": 262,
+      "units": [
+        "para:5829c908",
+        "para:476f1d34",
+        "para:e3b7f73d",
+        "para:50fd85ad"
+      ]
+    },
+    {
+      "id": "s047",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Box",
+      "text": "The fundamental building block:\n\n```typescript\n<Box\n  component=\"section\"\n  sx={{\n    display: 'flex',\n    flexDirection: 'column',\n    gap: 2,\n    p: 3,\n    bgcolor: 'background.paper',\n    borderRadius: 2\n  }}\n>\n  <Typography variant=\"h5\">Section Title</Typography>\n  <Typography variant=\"body1\">Content goes here</Typography>\n</Box>\n```",
+      "chars": 339,
+      "units": [
+        "para:7e42b85e",
+        "para:bff81f39"
+      ]
+    },
+    {
+      "id": "s048",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Container",
+      "text": "Centers content with max-width:\n\n```typescript\n<Container maxWidth=\"lg\" sx={{ py: 4 }}>\n  {/* Content automatically centered and constrained */}\n</Container>\n```",
+      "chars": 161,
+      "units": [
+        "para:961ae3bc",
+        "para:4967ccc3"
+      ]
+    },
+    {
+      "id": "s049",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Grid (v2)",
+      "text": "Responsive grid layout:\n\n```typescript\nimport Grid from '@mui/material/Grid2';\n\n<Grid container spacing={2}>\n  <Grid xs={12} sm={6} md={4}>\n    <Card>Item 1</Card>\n  </Grid>\n  <Grid xs={12} sm={6} md={4}>\n    <Card>Item 2</Card>\n  </Grid>\n  <Grid xs={12} sm={6} md={4}>\n    <Card>Item 3</Card>\n  </Grid>\n</Grid>\n```",
+      "chars": 315,
+      "units": [
+        "para:1b548023",
+        "para:53af1c1c"
+      ]
+    },
+    {
+      "id": "s050",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Stack",
+      "text": "One-dimensional layout with spacing:\n\n```typescript\n<Stack direction=\"row\" spacing={2} alignItems=\"center\">\n  <Avatar src={user.avatar} />\n  <Typography>{user.name}</Typography>\n  <Chip label={user.role} />\n</Stack>\n```",
+      "chars": 219,
+      "units": [
+        "para:a40dc3bb",
+        "para:dffd4b3b"
+      ]
+    },
+    {
+      "id": "s051",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Typography",
+      "text": "Text with theme variants:\n\n```typescript\n<Typography variant=\"h1\" component=\"h1\" gutterBottom>\n  Main Heading\n</Typography>\n<Typography variant=\"body1\" color=\"text.secondary\">\n  Body text with secondary color\n</Typography>\n<Typography variant=\"caption\" sx={{ fontWeight: 'bold' }}>\n  Bold caption\n</Typography>\n```",
+      "chars": 314,
+      "units": [
+        "para:7c0f72fe",
+        "para:48450493"
+      ]
+    },
+    {
+      "id": "s052",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Card",
+      "text": "Content container:\n\n```typescript\n<Card>\n  <CardMedia\n    component=\"img\"\n    height=\"200\"\n    image=\"/image.jpg\"\n    alt=\"Description\"\n  />\n  <CardContent>\n    <Typography variant=\"h5\" component=\"h2\">\n      Card Title\n    </Typography>\n    <Typography variant=\"body2\" color=\"text.secondary\">\n      Card description text\n    </Typography>\n  </CardContent>\n  <CardActions>\n    <Button size=\"small\">Learn More</Button>\n    <Button size=\"small\">Share</Button>\n  </CardActions>\n</Card>\n```",
+      "chars": 485,
+      "units": [
+        "para:c7659d95"
+      ]
+    },
+    {
+      "id": "s053",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "List",
+      "text": "Structured content lists:\n\n```typescript\n<List>\n  <ListItem disablePadding>\n    <ListItemButton onClick={handleClick}>\n      <ListItemIcon>\n        <InboxIcon />\n      </ListItemIcon>\n      <ListItemText\n        primary=\"Inbox\"\n        secondary=\"5 new messages\"\n      />\n    </ListItemButton>\n  </ListItem>\n  <Divider />\n  <ListItem>\n    <ListItemAvatar>\n      <Avatar src=\"/avatar.jpg\" />\n    </ListItemAvatar>\n    <ListItemText\n      primary=\"John Doe\"\n      secondary=\"Online\"\n    />\n  </ListItem>\n</List>\n```",
+      "chars": 513,
+      "units": [
+        "para:a6687d3b",
+        "para:8d0b3863"
+      ]
+    },
+    {
+      "id": "s054",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Table",
+      "text": "Data tables:\n\n```typescript\n<TableContainer component={Paper}>\n  <Table>\n    <TableHead>\n      <TableRow>\n        <TableCell>Name</TableCell>\n        <TableCell>Email</TableCell>\n        <TableCell align=\"right\">Actions</TableCell>\n      </TableRow>\n    </TableHead>\n    <TableBody>\n      {rows.map((row) => (\n        <TableRow key={row.id} hover>\n          <TableCell>{row.name}</TableCell>\n          <TableCell>{row.email}</TableCell>\n          <TableCell align=\"right\">\n            <IconButton size=\"small\">\n              <EditIcon />\n            </IconButton>\n          </TableCell>\n        </TableRow>\n      ))}\n    </TableBody>\n  </Table>\n</TableContainer>\n```",
+      "chars": 666,
+      "units": [
+        "para:ede6d6b7"
+      ]
+    },
+    {
+      "id": "s055",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "TextField",
+      "text": "Text input with validation:\n\n```typescript\n<TextField\n  label=\"Email\"\n  type=\"email\"\n  value={email}\n  onChange={(e) => setEmail(e.target.value)}\n  error={!!emailError}\n  helperText={emailError}\n  fullWidth\n  required\n/>\n```",
+      "chars": 224,
+      "units": [
+        "para:1df429fb",
+        "para:00a502d4"
+      ]
+    },
+    {
+      "id": "s056",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Select",
+      "text": "Dropdown selection:\n\n```typescript\n<FormControl fullWidth>\n  <InputLabel>Country</InputLabel>\n  <Select\n    value={country}\n    onChange={(e) => setCountry(e.target.value)}\n    label=\"Country\"\n  >\n    <MenuItem value=\"us\">United States</MenuItem>\n    <MenuItem value=\"uk\">United Kingdom</MenuItem>\n    <MenuItem value=\"ca\">Canada</MenuItem>\n  </Select>\n</FormControl>\n```",
+      "chars": 371,
+      "units": [
+        "para:e8c4cb4b"
+      ]
+    },
+    {
+      "id": "s057",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Checkbox & Switch",
+      "text": "Boolean inputs:\n\n```typescript\n<FormControlLabel\n  control={<Checkbox checked={agreed} onChange={handleChange} />}\n  label=\"I agree to the terms\"\n/>\n\n<FormControlLabel\n  control={<Switch checked={enabled} onChange={handleToggle} />}\n  label=\"Enable notifications\"\n/>\n```",
+      "chars": 270,
+      "units": [
+        "para:9705e5a1"
+      ]
+    },
+    {
+      "id": "s058",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Radio Group",
+      "text": "Single selection:\n\n```typescript\n<FormControl>\n  <FormLabel>Payment Method</FormLabel>\n  <RadioGroup value={payment} onChange={(e) => setPayment(e.target.value)}>\n    <FormControlLabel value=\"card\" control={<Radio />} label=\"Credit Card\" />\n    <FormControlLabel value=\"paypal\" control={<Radio />} label=\"PayPal\" />\n    <FormControlLabel value=\"crypto\" control={<Radio />} label=\"Cryptocurrency\" />\n  </RadioGroup>\n</FormControl>\n```",
+      "chars": 433,
+      "units": [
+        "para:bf3795ee"
+      ]
+    },
+    {
+      "id": "s059",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Autocomplete",
+      "text": "Searchable select:\n\n```typescript\n<Autocomplete\n  options={options}\n  getOptionLabel={(option) => option.label}\n  value={value}\n  onChange={(event, newValue) => setValue(newValue)}\n  renderInput={(params) => (\n    <TextField {...params} label=\"Search\" placeholder=\"Type to search...\" />\n  )}\n/>\n```",
+      "chars": 298,
+      "units": [
+        "para:8f0ffc23"
+      ]
+    },
+    {
+      "id": "s060",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Button Variants",
+      "text": "```typescript\n<Stack direction=\"row\" spacing={2}>\n  <Button variant=\"contained\">Contained</Button>\n  <Button variant=\"outlined\">Outlined</Button>\n  <Button variant=\"text\">Text</Button>\n</Stack>\n```",
+      "chars": 197,
+      "units": [
+        "para:bffa2865"
+      ]
+    },
+    {
+      "id": "s061",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Button with Icons",
+      "text": "```typescript\n<Button\n  variant=\"contained\"\n  startIcon={<SaveIcon />}\n  onClick={handleSave}\n>\n  Save Changes\n</Button>\n\n<IconButton color=\"primary\">\n  <DeleteIcon />\n</IconButton>\n\n<Fab color=\"primary\" sx={{ position: 'fixed', bottom: 16, right: 16 }}>\n  <AddIcon />\n</Fab>\n```",
+      "chars": 279,
+      "units": [
+        "para:f60af0e7"
+      ]
+    },
+    {
+      "id": "s062",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Alert",
+      "text": "Status messages:\n\n```typescript\n<Alert severity=\"success\" onClose={handleClose}>\n  Operation completed successfully!\n</Alert>\n\n<Alert severity=\"error\" icon={<ErrorIcon />}>\n  An error occurred. Please try again.\n</Alert>\n```",
+      "chars": 224,
+      "units": [
+        "para:86b7e42b"
+      ]
+    },
+    {
+      "id": "s063",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Snackbar",
+      "text": "Toast notifications:\n\n```typescript\n<Snackbar\n  open={open}\n  autoHideDuration={6000}\n  onClose={handleClose}\n  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}\n>\n  <Alert onClose={handleClose} severity=\"success\">\n    Changes saved!\n  </Alert>\n</Snackbar>\n```",
+      "chars": 269,
+      "units": [
+        "para:6f6806a7"
+      ]
+    },
+    {
+      "id": "s064",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Dialog",
+      "text": "Modal dialogs:\n\n```typescript\n<Dialog open={open} onClose={handleClose} maxWidth=\"sm\" fullWidth>\n  <DialogTitle>Confirm Delete</DialogTitle>\n  <DialogContent>\n    <DialogContentText>\n      Are you sure you want to delete this item? This action cannot be undone.\n    </DialogContentText>\n  </DialogContent>\n  <DialogActions>\n    <Button onClick={handleClose}>Cancel</Button>\n    <Button onClick={handleDelete} color=\"error\" variant=\"contained\">\n      Delete\n    </Button>\n  </DialogActions>\n</Dialog>\n```",
+      "chars": 503,
+      "units": [
+        "para:35e65f94"
+      ]
+    },
+    {
+      "id": "s065",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "CircularProgress & LinearProgress",
+      "text": "Loading indicators:\n\n```typescript\n<CircularProgress />\n<CircularProgress size={20} />\n<CircularProgress variant=\"determinate\" value={progress} />\n\n<LinearProgress />\n<LinearProgress variant=\"determinate\" value={progress} />\n<LinearProgress color=\"secondary\" />\n```",
+      "chars": 265,
+      "units": [
+        "para:a1d6a19e"
+      ]
+    },
+    {
+      "id": "s066",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Skeleton",
+      "text": "Content placeholders:\n\n```typescript\n<Stack spacing={1}>\n  <Skeleton variant=\"text\" width=\"60%\" height={40} />\n  <Skeleton variant=\"rectangular\" width=\"100%\" height={200} />\n  <Skeleton variant=\"circular\" width={40} height={40} />\n</Stack>\n```",
+      "chars": 243,
+      "units": [
+        "para:2da3398c"
+      ]
+    },
+    {
+      "id": "s067",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "AppBar & Toolbar",
+      "text": "Application header:\n\n```typescript\n<AppBar position=\"static\">\n  <Toolbar>\n    <IconButton edge=\"start\" color=\"inherit\">\n      <MenuIcon />\n    </IconButton>\n    <Typography variant=\"h6\" sx={{ flexGrow: 1 }}>\n      App Title\n    </Typography>\n    <IconButton color=\"inherit\">\n      <AccountCircle />\n    </IconButton>\n  </Toolbar>\n</AppBar>\n```",
+      "chars": 343,
+      "units": [
+        "para:30416e02"
+      ]
+    },
+    {
+      "id": "s068",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Drawer",
+      "text": "Side navigation:\n\n```typescript\n<Drawer\n  anchor=\"left\"\n  open={open}\n  onClose={handleClose}\n>\n  <Box sx={{ width: 250 }} role=\"presentation\">\n    <List>\n      <ListItem button onClick={() => navigate('/dashboard')}>\n        <ListItemIcon><DashboardIcon /></ListItemIcon>\n        <ListItemText primary=\"Dashboard\" />\n      </ListItem>\n      <ListItem button onClick={() => navigate('/settings')}>\n        <ListItemIcon><SettingsIcon /></ListItemIcon>\n        <ListItemText primary=\"Settings\" />\n      </ListItem>\n    </List>\n  </Box>\n</Drawer>\n```",
+      "chars": 548,
+      "units": [
+        "para:f1ff62c4"
+      ]
+    },
+    {
+      "id": "s069",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Tabs",
+      "text": "Tabbed navigation:\n\n```typescript\n<Box sx={{ borderBottom: 1, borderColor: 'divider' }}>\n  <Tabs value={tab} onChange={handleChange}>\n    <Tab label=\"Overview\" />\n    <Tab label=\"Details\" />\n    <Tab label=\"Settings\" />\n  </Tabs>\n</Box>\n<TabPanel value={tab} index={0}>\n  Overview content\n</TabPanel>\n```",
+      "chars": 304,
+      "units": [
+        "para:ed6209d2"
+      ]
+    },
+    {
+      "id": "s070",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Breadcrumbs",
+      "text": "Navigation trail:\n\n```typescript\n<Breadcrumbs>\n  <Link underline=\"hover\" color=\"inherit\" href=\"/\">\n    Home\n  </Link>\n  <Link underline=\"hover\" color=\"inherit\" href=\"/products\">\n    Products\n  </Link>\n  <Typography color=\"text.primary\">Electronics</Typography>\n</Breadcrumbs>\n```",
+      "chars": 279,
+      "units": [
+        "para:fd5481f5"
+      ]
+    },
+    {
+      "id": "s071",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Tooltip",
+      "text": "Helpful hints:\n\n```typescript\n<Tooltip title=\"Delete item\" arrow placement=\"top\">\n  <IconButton>\n    <DeleteIcon />\n  </IconButton>\n</Tooltip>\n```",
+      "chars": 146,
+      "units": [
+        "para:d67f3f94"
+      ]
+    },
+    {
+      "id": "s072",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Popover",
+      "text": "Floating content:\n\n```typescript\n<Popover\n  open={open}\n  anchorEl={anchorEl}\n  onClose={handleClose}\n  anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}\n>\n  <Box sx={{ p: 2 }}>\n    <Typography>Popover content</Typography>\n  </Box>\n</Popover>\n```",
+      "chars": 256,
+      "units": [
+        "para:68a0e6ef"
+      ]
+    },
+    {
+      "id": "s073",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Menu",
+      "text": "Context menus:\n\n```typescript\n<Menu\n  anchorEl={anchorEl}\n  open={open}\n  onClose={handleClose}\n>\n  <MenuItem onClick={handleEdit}>\n    <ListItemIcon><EditIcon /></ListItemIcon>\n    <ListItemText>Edit</ListItemText>\n  </MenuItem>\n  <MenuItem onClick={handleDelete}>\n    <ListItemIcon><DeleteIcon /></ListItemIcon>\n    <ListItemText>Delete</ListItemText>\n  </MenuItem>\n</Menu>\n```",
+      "chars": 379,
+      "units": [
+        "para:1d16eb9d"
+      ]
+    },
+    {
+      "id": "s074",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Chip",
+      "text": "Compact information:\n\n```typescript\n<Stack direction=\"row\" spacing={1}>\n  <Chip label=\"Active\" color=\"success\" />\n  <Chip label=\"Pending\" color=\"warning\" />\n  <Chip\n    label=\"Admin\"\n    onDelete={handleDelete}\n    deleteIcon={<CloseIcon />}\n  />\n</Stack>\n```",
+      "chars": 259,
+      "units": [
+        "para:3e6ad90a"
+      ]
+    },
+    {
+      "id": "s075",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Badge",
+      "text": "Notification indicators:\n\n```typescript\n<Badge badgeContent={4} color=\"error\">\n  <MailIcon />\n</Badge>\n\n<Badge variant=\"dot\" color=\"success\">\n  <Avatar src=\"/avatar.jpg\" />\n</Badge>\n```",
+      "chars": 185,
+      "units": [
+        "para:3f247f7a"
+      ]
+    },
+    {
+      "id": "s076",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Avatar",
+      "text": "User images:\n\n```typescript\n<Stack direction=\"row\" spacing={2}>\n  <Avatar src=\"/avatar.jpg\" />\n  <Avatar sx={{ bgcolor: 'primary.main' }}>JD</Avatar>\n  <Avatar variant=\"square\" src=\"/logo.png\" />\n  <AvatarGroup max={3}>\n    <Avatar src=\"/user1.jpg\" />\n    <Avatar src=\"/user2.jpg\" />\n    <Avatar src=\"/user3.jpg\" />\n    <Avatar src=\"/user4.jpg\" />\n  </AvatarGroup>\n</Stack>\n```",
+      "chars": 377,
+      "units": [
+        "para:5e3b354b"
+      ]
+    },
+    {
+      "id": "s077",
+      "file": "skills/mui/resources/component-library.md",
+      "heading": "Form Example",
+      "text": "Complete form with validation:\n\n```typescript\n<Box component=\"form\" onSubmit={handleSubmit} sx={{ maxWidth: 600 }}>\n  <Stack spacing={3}>\n    <TextField\n      label=\"Full Name\"\n      required\n      fullWidth\n      error={!!errors.name}\n      helperText={errors.name}\n    />\n\n    <TextField\n      label=\"Email\"\n      type=\"email\"\n      required\n      fullWidth\n      error={!!errors.email}\n      helperText={errors.email}\n    />\n\n    <FormControl fullWidth>\n      <InputLabel>Role</InputLabel>\n      <Select label=\"Role\" value={role} onChange={(e) => setRole(e.target.value)}>\n        <MenuItem value=\"user\">User</MenuItem>\n        <MenuItem value=\"admin\">Admin</MenuItem>\n      </Select>\n    </FormControl>\n\n    <FormControlLabel\n      control={<Checkbox checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />}\n      label=\"I agree to the terms and conditions\"\n    />\n\n    <Stack direction=\"row\" spacing={2} justifyContent=\"flex-end\">\n      <Button variant=\"outlined\" onClick={handleCancel}>\n        Cancel\n      </Button>\n      <Button type=\"submit\" variant=\"contained\" disabled={!agreed}>\n        Submit\n      </Button>\n    </Stack>\n  </Stack>\n</Box>\n```",
+      "chars": 1167,
+      "units": [
+        "para:4953ed4b",
+        "para:3592d48d"
+      ]
+    },
+    {
+      "id": "s078",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "The sx Prop",
+      "text": "The `sx` prop is the primary styling method in MUI v7+:\n\n```typescript\n<Box\n  sx={{\n    p: 2,                    // padding: theme.spacing(2)\n    mb: 3,                   // marginBottom: theme.spacing(3)\n    bgcolor: 'primary.main', // theme.palette.primary.main\n    color: 'white',\n    borderRadius: 1,         // theme.shape.borderRadius\n    '&:hover': {\n      bgcolor: 'primary.dark'\n    }\n  }}\n/>\n```",
+      "chars": 405,
+      "units": [
+        "para:e2992a6b",
+        "para:c3e6b50f"
+      ]
+    },
+    {
+      "id": "s079",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "Theme-Aware Values",
+      "text": "```typescript\n// Spacing (multiplied by theme.spacing, default 8px)\nsx={{ p: 2 }}  // padding: 16px\n\n// Colors from palette\nsx={{ bgcolor: 'primary.main', color: 'text.secondary' }}\n\n// Breakpoints\nsx={{\n  width: { xs: '100%', sm: '50%', md: '33%' }\n}}\n\n// Typography variants\nsx={{ typography: 'h4' }}  // Applies theme.typography.h4\n```",
+      "chars": 338,
+      "units": [
+        "para:163d215b"
+      ]
+    },
+    {
+      "id": "s080",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "Responsive Styles",
+      "text": "```typescript\n<Box\n  sx={{\n    display: { xs: 'block', md: 'flex' },\n    flexDirection: { xs: 'column', md: 'row' },\n    gap: { xs: 1, sm: 2, md: 3 },\n    p: { xs: 2, sm: 3, md: 4 }\n  }}\n/>\n```",
+      "chars": 193,
+      "units": [
+        "para:dbfe645a"
+      ]
+    },
+    {
+      "id": "s081",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "Pseudo-Selectors and Nested Styles",
+      "text": "```typescript\n<Button\n  sx={{\n    '&:hover': {\n      bgcolor: 'primary.dark'\n    },\n    '&:disabled': {\n      opacity: 0.5\n    },\n    '& .MuiButton-startIcon': {\n      mr: 1\n    }\n  }}\n/>\n```",
+      "chars": 191,
+      "units": [
+        "para:f5543b8a"
+      ]
+    },
+    {
+      "id": "s082",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "Dynamic Styles",
+      "text": "```typescript\ninterface CardProps {\n  isActive: boolean;\n  priority: 'low' | 'medium' | 'high';\n}\n\nfunction Card({ isActive, priority }: CardProps) {\n  return (\n    <Paper\n      sx={{\n        borderLeft: 4,\n        borderColor: isActive ? 'success.main' : 'grey.300',\n        bgcolor: priority === 'high' ? 'error.light' : 'background.paper',\n        opacity: isActive ? 1 : 0.7\n      }}\n    />\n  );\n}\n```",
+      "chars": 405,
+      "units": [
+        "para:e978ded4"
+      ]
+    },
+    {
+      "id": "s083",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "Global Styles with GlobalStyles",
+      "text": "```typescript\nimport { GlobalStyles } from '@mui/material';\n\n<GlobalStyles\n  styles={{\n    body: {\n      margin: 0,\n      padding: 0\n    },\n    '*': {\n      boxSizing: 'border-box'\n    },\n    '.custom-scrollbar::-webkit-scrollbar': {\n      width: 8\n    }\n  }}\n/>\n```",
+      "chars": 266,
+      "units": [
+        "para:ef2e759e"
+      ]
+    },
+    {
+      "id": "s084",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "Styled Components API",
+      "text": "For reusable styled components:\n\n```typescript\nimport { styled } from '@mui/material/styles';\n\nconst StyledCard = styled(Card)(({ theme }) => ({\n  padding: theme.spacing(2),\n  borderRadius: theme.shape.borderRadius * 2,\n  backgroundColor: theme.palette.background.paper,\n  transition: theme.transitions.create(['transform', 'box-shadow']),\n  '&:hover': {\n    transform: 'translateY(-4px)',\n    boxShadow: theme.shadows[8]\n  }\n}));\n\n// With props\ninterface StyledButtonProps {\n  variant: 'primary' | 'secondary';\n}\n\nconst StyledButton = styled(Button)<StyledButtonProps>(({ theme, variant }) => ({\n  backgroundColor: variant === 'primary'\n    ? theme.palette.primary.main\n    : theme.palette.secondary.main,\n  color: theme.palette.primary.contrastText,\n  '&:hover': {\n    backgroundColor: variant === 'primary'\n      ? theme.palette.primary.dark\n      : theme.palette.secondary.dark\n  }\n}));\n```",
+      "chars": 894,
+      "units": [
+        "para:3c1d7e0b",
+        "para:d699d088"
+      ]
+    },
+    {
+      "id": "s085",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "Theme Overrides",
+      "text": "```typescript\nimport { createTheme } from '@mui/material/styles';\n\nconst theme = createTheme({\n  components: {\n    MuiButton: {\n      styleOverrides: {\n        root: {\n          borderRadius: 8,\n          textTransform: 'none',\n          fontWeight: 600\n        },\n        containedPrimary: {\n          boxShadow: 'none',\n          '&:hover': {\n            boxShadow: 'none'\n          }\n        }\n      },\n      defaultProps: {\n        disableRipple: true\n      }\n    },\n    MuiCard: {\n      styleOverrides: {\n        root: {\n          borderRadius: 12,\n          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'\n        }\n      }\n    }\n  }\n});\n```",
+      "chars": 638,
+      "units": [
+        "para:d32d178a"
+      ]
+    },
+    {
+      "id": "s086",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "CSS Variables (MUI v7+)",
+      "text": "```typescript\n// In theme configuration\nconst theme = createTheme({\n  cssVariables: true\n});\n\n// Use in sx prop\n<Box sx={{ color: 'var(--mui-palette-primary-main)' }} />\n\n// Use in CSS\n.custom-element {\n  background-color: var(--mui-palette-background-paper);\n  padding: var(--mui-spacing-2);\n}\n```",
+      "chars": 298,
+      "units": [
+        "para:06d1bbc0"
+      ]
+    },
+    {
+      "id": "s087",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "Card with Hover Effect",
+      "text": "```typescript\n<Card\n  sx={{\n    p: 3,\n    transition: 'all 0.3s',\n    '&:hover': {\n      transform: 'scale(1.02)',\n      boxShadow: 4\n    }\n  }}\n/>\n```",
+      "chars": 151,
+      "units": [
+        "para:608b0b29"
+      ]
+    },
+    {
+      "id": "s088",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "Gradient Background",
+      "text": "```typescript\n<Box\n  sx={{\n    background: (theme) =>\n      `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,\n    color: 'white'\n  }}\n/>\n```",
+      "chars": 188,
+      "units": [
+        "para:2b8910f2"
+      ]
+    },
+    {
+      "id": "s089",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "Sticky Header",
+      "text": "```typescript\n<AppBar\n  sx={{\n    position: 'sticky',\n    top: 0,\n    zIndex: (theme) => theme.zIndex.drawer + 1\n  }}\n/>\n```",
+      "chars": 124,
+      "units": [
+        "para:b08141c1"
+      ]
+    },
+    {
+      "id": "s090",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "Flexbox Layouts",
+      "text": "```typescript\n<Box\n  sx={{\n    display: 'flex',\n    alignItems: 'center',\n    justifyContent: 'space-between',\n    gap: 2\n  }}\n/>\n```",
+      "chars": 133,
+      "units": [
+        "para:8f7b1fe5"
+      ]
+    },
+    {
+      "id": "s091",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "Performance Tips",
+      "text": "- **Use sx prop for dynamic styles** - Better tree-shaking\n- **Use styled() for static reusable components** - Better performance\n- **Avoid inline functions in sx** - Can cause re-renders\n- **Leverage theme tokens** - Consistent and performant\n\n```typescript\n// \u274c Bad: Inline function in sx\n<Box sx={() => ({ p: 2 })} />\n\n// \u2705 Good: Direct object\n<Box sx={{ p: 2 }} />\n\n// \u2705 Good: Memoized function for complex logic\nconst getSx = useMemo(() => ({ p: 2, /* complex logic */ }), [deps]);\n<Box sx={getSx} />\n```",
+      "chars": 509,
+      "units": [
+        "para:828523a0",
+        "para:8cbe388b",
+        "para:5bbbf6ef",
+        "para:65ac85be",
+        "para:3289a42e"
+      ]
+    },
+    {
+      "id": "s092",
+      "file": "skills/mui/resources/styling-guide.md",
+      "heading": "Debugging Styles",
+      "text": "```typescript\n// Inspect theme in console\n<Box sx={(theme) => {\n  console.log('Theme:', theme);\n  return { p: 2 };\n}} />\n\n// Use sx as array for conditional styles\n<Box sx={[\n  { p: 2 },\n  isActive && { bgcolor: 'primary.main' },\n  isDisabled && { opacity: 0.5 }\n]} />\n```",
+      "chars": 272,
+      "units": [
+        "para:1cf8679b"
+      ]
+    },
+    {
+      "id": "s093",
+      "file": "skills/mui/resources/theme-customization.md",
+      "heading": "Creating a Custom Theme",
+      "text": "```typescript\nimport { createTheme, ThemeProvider } from '@mui/material/styles';\nimport CssBaseline from '@mui/material/CssBaseline';\n\nconst theme = createTheme({\n  palette: {\n    mode: 'light',\n    primary: {\n      main: '#1976d2',\n      light: '#42a5f5',\n      dark: '#1565c0',\n      contrastText: '#fff'\n    },\n    secondary: {\n      main: '#9c27b0',\n      light: '#ba68c8',\n      dark: '#7b1fa2',\n      contrastText: '#fff'\n    },\n    error: {\n      main: '#d32f2f'\n    },\n    warning: {\n      main: '#ed6c02'\n    },\n    info: {\n      main: '#0288d1'\n    },\n    success: {\n      main: '#2e7d32'\n    }\n  },\n  typography: {\n    fontFamily: '\"Inter\", \"Roboto\", \"Helvetica\", \"Arial\", sans-serif',\n    h1: {\n      fontSize: '2.5rem',\n      fontWeight: 600\n    },\n    h2: {\n      fontSize: '2rem',\n      fontWeight: 600\n    },\n    button: {\n      textTransform: 'none',\n      fontWeight: 600\n    }\n  },\n  shape: {\n    borderRadius: 8\n  },\n  spacing: 8\n});\n\nfunction App() {\n  return (\n    <ThemeProvider theme={theme}>\n      <CssBaseline />\n      {/* Your app */}\n    </ThemeProvider>\n  );\n}\n```",
+      "chars": 1093,
+      "units": [
+        "para:94b31e9d"
+      ]
+    },
+    {
+      "id": "s094",
+      "file": "skills/mui/resources/theme-customization.md",
+      "heading": "Dark Mode Support",
+      "text": "```typescript\nconst getTheme = (mode: 'light' | 'dark') => createTheme({\n  palette: {\n    mode,\n    ...(mode === 'light'\n      ? {\n          // Light mode colors\n          primary: { main: '#1976d2' },\n          background: {\n            default: '#f5f5f5',\n            paper: '#ffffff'\n          }\n        }\n      : {\n          // Dark mode colors\n          primary: { main: '#90caf9' },\n          background: {\n            default: '#121212',\n            paper: '#1e1e1e'\n          }\n        })\n  }\n});\n\nfunction App() {\n  const [mode, setMode] = useState<'light' | 'dark'>('light');\n  const theme = useMemo(() => getTheme(mode), [mode]);\n\n  return (\n    <ThemeProvider theme={theme}>\n      <CssBaseline />\n      <IconButton onClick={() => setMode(m => m === 'light' ? 'dark' : 'light')}>\n        {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}\n      </IconButton>\n      {/* Your app */}\n    </ThemeProvider>\n  );\n}\n```",
+      "chars": 931,
+      "units": [
+        "para:4aee2808"
+      ]
+    },
+    {
+      "id": "s095",
+      "file": "skills/mui/resources/theme-customization.md",
+      "heading": "Typography Customization",
+      "text": "```typescript\nconst theme = createTheme({\n  typography: {\n    fontFamily: '\"Inter\", sans-serif',\n    fontSize: 14,\n    fontWeightLight: 300,\n    fontWeightRegular: 400,\n    fontWeightMedium: 500,\n    fontWeightBold: 700,\n    h1: {\n      fontSize: '3rem',\n      fontWeight: 700,\n      lineHeight: 1.2,\n      letterSpacing: '-0.01562em'\n    },\n    h2: {\n      fontSize: '2.5rem',\n      fontWeight: 700,\n      lineHeight: 1.3\n    },\n    body1: {\n      fontSize: '1rem',\n      lineHeight: 1.5,\n      letterSpacing: '0.00938em'\n    },\n    button: {\n      fontSize: '0.875rem',\n      fontWeight: 600,\n      textTransform: 'none',\n      letterSpacing: '0.02857em'\n    }\n  }\n});\n```",
+      "chars": 674,
+      "units": [
+        "para:784e9024"
+      ]
+    },
+    {
+      "id": "s096",
+      "file": "skills/mui/resources/theme-customization.md",
+      "heading": "Component Style Overrides",
+      "text": "```typescript\nconst theme = createTheme({\n  components: {\n    MuiButton: {\n      styleOverrides: {\n        root: {\n          borderRadius: 8,\n          padding: '8px 16px',\n          boxShadow: 'none',\n          '&:hover': {\n            boxShadow: 'none'\n          }\n        },\n        contained: {\n          '&:hover': {\n            transform: 'translateY(-2px)',\n            transition: 'transform 0.2s'\n          }\n        }\n      },\n      defaultProps: {\n        disableElevation: true\n      }\n    },\n    MuiCard: {\n      styleOverrides: {\n        root: {\n          borderRadius: 12,\n          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'\n        }\n      }\n    },\n    MuiTextField: {\n      defaultProps: {\n        variant: 'outlined',\n        size: 'medium'\n      },\n      styleOverrides: {\n        root: {\n          '& .MuiOutlinedInput-root': {\n            borderRadius: 8\n          }\n        }\n      }\n    },\n    MuiChip: {\n      styleOverrides: {\n        root: {\n          borderRadius: 6,\n          fontWeight: 500\n        }\n      }\n    }\n  }\n});\n```",
+      "chars": 1053,
+      "units": [
+        "para:75b4f0ba"
+      ]
+    },
+    {
+      "id": "s097",
+      "file": "skills/mui/resources/theme-customization.md",
+      "heading": "Breakpoints",
+      "text": "```typescript\nconst theme = createTheme({\n  breakpoints: {\n    values: {\n      xs: 0,\n      sm: 600,\n      md: 960,\n      lg: 1280,\n      xl: 1920\n    }\n  }\n});\n\n// Usage\n<Box\n  sx={{\n    width: {\n      xs: '100%',  // 0-599px\n      sm: '80%',   // 600-959px\n      md: '60%',   // 960-1279px\n      lg: '50%'    // 1280px+\n    }\n  }}\n/>\n```",
+      "chars": 339,
+      "units": [
+        "para:19ab2fbb"
+      ]
+    },
+    {
+      "id": "s098",
+      "file": "skills/mui/resources/theme-customization.md",
+      "heading": "Spacing",
+      "text": "```typescript\nconst theme = createTheme({\n  spacing: 8  // Base unit: 8px\n});\n\n// Usage: theme.spacing(2) = 16px\n<Box sx={{ p: 2, m: 3 }} />  // padding: 16px, margin: 24px\n```",
+      "chars": 176,
+      "units": [
+        "para:23c5b68d"
+      ]
+    },
+    {
+      "id": "s099",
+      "file": "skills/mui/resources/theme-customization.md",
+      "heading": "Custom Palette Colors",
+      "text": "```typescript\ndeclare module '@mui/material/styles' {\n  interface Palette {\n    tertiary: Palette['primary'];\n  }\n  interface PaletteOptions {\n    tertiary?: PaletteOptions['primary'];\n  }\n}\n\nconst theme = createTheme({\n  palette: {\n    primary: {\n      main: '#1976d2'\n    },\n    secondary: {\n      main: '#9c27b0'\n    },\n    tertiary: {\n      main: '#ff9800',\n      light: '#ffb74d',\n      dark: '#f57c00',\n      contrastText: '#000'\n    }\n  }\n});\n\n// Usage\n<Button color=\"tertiary\">Tertiary Button</Button>\n```",
+      "chars": 513,
+      "units": [
+        "para:d0fa4503"
+      ]
+    },
+    {
+      "id": "s100",
+      "file": "skills/mui/resources/theme-customization.md",
+      "heading": "Shadows",
+      "text": "```typescript\nconst theme = createTheme({\n  shadows: [\n    'none',\n    '0 2px 4px rgba(0,0,0,0.1)',\n    '0 4px 8px rgba(0,0,0,0.12)',\n    '0 8px 16px rgba(0,0,0,0.14)',\n    // ... up to shadows[24]\n  ]\n});\n\n// Usage\n<Paper elevation={2} />  // Uses shadows[2]\n```",
+      "chars": 263,
+      "units": [
+        "para:f50c5fc8"
+      ]
+    },
+    {
+      "id": "s101",
+      "file": "skills/mui/resources/theme-customization.md",
+      "heading": "Z-Index Layers",
+      "text": "```typescript\nconst theme = createTheme({\n  zIndex: {\n    mobileStepper: 1000,\n    speedDial: 1050,\n    appBar: 1100,\n    drawer: 1200,\n    modal: 1300,\n    snackbar: 1400,\n    tooltip: 1500\n  }\n});\n```",
+      "chars": 202,
+      "units": [
+        "para:6d329bf3"
+      ]
+    },
+    {
+      "id": "s102",
+      "file": "skills/mui/resources/theme-customization.md",
+      "heading": "Transitions",
+      "text": "```typescript\nconst theme = createTheme({\n  transitions: {\n    duration: {\n      shortest: 150,\n      shorter: 200,\n      short: 250,\n      standard: 300,\n      complex: 375,\n      enteringScreen: 225,\n      leavingScreen: 195\n    },\n    easing: {\n      easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',\n      easeOut: 'cubic-bezier(0.0, 0, 0.2, 1)',\n      easeIn: 'cubic-bezier(0.4, 0, 1, 1)',\n      sharp: 'cubic-bezier(0.4, 0, 0.6, 1)'\n    }\n  }\n});\n\n// Usage\n<Box\n  sx={{\n    transition: (theme) =>\n      theme.transitions.create(['transform', 'background-color'], {\n        duration: theme.transitions.duration.standard\n      })\n  }}\n/>\n```",
+      "chars": 638,
+      "units": [
+        "para:5c903949"
+      ]
+    },
+    {
+      "id": "s103",
+      "file": "skills/mui/resources/theme-customization.md",
+      "heading": "Complete Theme Example",
+      "text": "```typescript\nimport { createTheme } from '@mui/material/styles';\n\nconst theme = createTheme({\n  palette: {\n    mode: 'light',\n    primary: {\n      main: '#2563eb',\n      light: '#60a5fa',\n      dark: '#1e40af',\n      contrastText: '#ffffff'\n    },\n    secondary: {\n      main: '#7c3aed',\n      light: '#a78bfa',\n      dark: '#5b21b6',\n      contrastText: '#ffffff'\n    },\n    error: {\n      main: '#dc2626'\n    },\n    warning: {\n      main: '#f59e0b'\n    },\n    info: {\n      main: '#0ea5e9'\n    },\n    success: {\n      main: '#10b981'\n    },\n    background: {\n      default: '#f8fafc',\n      paper: '#ffffff'\n    },\n    text: {\n      primary: '#0f172a',\n      secondary: '#64748b'\n    }\n  },\n  typography: {\n    fontFamily: '\"Inter\", \"Segoe UI\", \"Roboto\", sans-serif',\n    fontSize: 14,\n    h1: {\n      fontSize: '3rem',\n      fontWeight: 700,\n      lineHeight: 1.2\n    },\n    h2: {\n      fontSize: '2.25rem',\n      fontWeight: 700,\n      lineHeight: 1.3\n    },\n    h3: {\n      fontSize: '1.875rem',\n      fontWeight: 600,\n      lineHeight: 1.4\n    },\n    h4: {\n      fontSize: '1.5rem',\n      fontWeight: 600,\n      lineHeight: 1.5\n    },\n    h5: {\n      fontSize: '1.25rem',\n      fontWeight: 600,\n      lineHeight: 1.6\n    },\n    h6: {\n      fontSize: '1rem',\n      fontWeight: 600,\n      lineHeight: 1.6\n    },\n    button: {\n      textTransform: 'none',\n      fontWeight: 600,\n      fontSize: '0.875rem'\n    }\n  },\n  shape: {\n    borderRadius: 10\n  },\n  spacing: 8,\n  components: {\n    MuiButton: {\n      styleOverrides: {\n        root: {\n          borderRadius: 8,\n          padding: '10px 20px',\n          fontWeight: 600,\n          boxShadow: 'none',\n          '&:hover': {\n            boxShadow: 'none'\n          }\n        },\n        contained: {\n          '&:hover': {\n            transform: 'translateY(-1px)',\n            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'\n          }\n        }\n      },\n      defaultProps: {\n        disableElevation: true\n      }\n    },\n    MuiCard: {\n      styleOverrides: {\n        root: {\n          borderRadius: 12,\n          boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',\n          '&:hover': {\n            boxShadow: '0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)'\n          }\n        }\n      }\n    },\n    MuiTextField: {\n      defaultProps: {\n        variant: 'outlined'\n      },\n      styleOverrides: {\n        root: {\n          '& .MuiOutlinedInput-root': {\n            borderRadius: 8,\n            '&:hover .MuiOutlinedInput-notchedOutline': {\n              borderColor: '#2563eb'\n            }\n          }\n        }\n      }\n    },\n    MuiChip: {\n      styleOverrides: {\n        root: {\n          borderRadius: 6,\n          fontWeight: 500,\n          height: 28\n        }\n      }\n    },\n    MuiAppBar: {\n      styleOverrides: {\n        root: {\n          boxShadow: '0 1px 3px rgba(0,0,0,0.12)'\n        }\n      }\n    }\n  }\n});\n\nexport default theme;\n```",
+      "chars": 2931,
+      "units": [
+        "para:b7f37f4c"
+      ]
+    },
+    {
+      "id": "s104",
+      "file": "skills/mui/resources/theme-customization.md",
+      "heading": "Theme Provider Setup",
+      "text": "```typescript\n// src/theme.ts - Export your theme\nexport { default as theme } from './theme';\n\n// src/main.tsx or src/index.tsx\nimport { ThemeProvider } from '@mui/material/styles';\nimport CssBaseline from '@mui/material/CssBaseline';\nimport theme from './theme';\n\nroot.render(\n  <StrictMode>\n    <ThemeProvider theme={theme}>\n      <CssBaseline />\n      <App />\n    </ThemeProvider>\n  </StrictMode>\n);\n```",
+      "chars": 406,
+      "units": [
+        "para:63bbd11e"
+      ]
+    },
+    {
+      "id": "s105",
+      "file": "skills/mui/resources/theme-customization.md",
+      "heading": "Accessing Theme in Components",
+      "text": "```typescript\nimport { useTheme } from '@mui/material/styles';\n\nfunction MyComponent() {\n  const theme = useTheme();\n\n  return (\n    <Box\n      sx={{\n        color: theme.palette.primary.main,\n        padding: theme.spacing(2),\n        borderRadius: theme.shape.borderRadius\n      }}\n    />\n  );\n}\n```",
+      "chars": 301,
+      "units": [
+        "para:b6d4246e"
+      ]
+    },
+    {
+      "id": "s106",
+      "file": "skills/mui/resources/theme-customization.md",
+      "heading": "Theme Nesting",
+      "text": "```typescript\nimport { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';\n\nfunction NestedTheme() {\n  const outerTheme = useTheme();\n\n  const innerTheme = createTheme({\n    ...outerTheme,\n    palette: {\n      ...outerTheme.palette,\n      mode: 'dark'\n    }\n  });\n\n  return (\n    <ThemeProvider theme={innerTheme}>\n      <Box sx={{ bgcolor: 'background.default', p: 2 }}>\n        Dark section within light app\n      </Box>\n    </ThemeProvider>\n  );\n}\n```",
+      "chars": 470,
+      "units": [
+        "para:7c045581"
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "skills/mui/skill-rules-fragment.json",
+      "status": "deleted",
+      "lines": 84,
+      "kept": 0
+    }
+  ],
+  "phrase_fate": {
+    "kept": 14.96,
+    "moved": 3.55,
+    "gone": 81.49,
+    "new": 75.35
+  }
+}

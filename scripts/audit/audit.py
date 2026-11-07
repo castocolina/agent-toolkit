@@ -2420,6 +2420,8 @@ def batches_op(root: Path, args) -> int:
                 continue
             keys = {finding_key(w["artifact"], w) for w in b["waived"]}
             for a in b["artifacts"]:
+                if a.get("mode") == "report-only":  # never judged (plan 14): its batch closes on sources and facts alone
+                    continue
                 e = entries.get(a["name"])
                 if e is None or e.get("percent") is None or e["percent"] < TARGET_CLOSE:
                     print(f"batch {b['id']}: {a['name']} has no verdict or scores below {TARGET_CLOSE}")
@@ -2435,6 +2437,399 @@ def batches_op(root: Path, args) -> int:
         return 1 if bad else 0
     save_queue(out, queue)
     return 0
+
+
+# ---------- content recovery (plan 14) ----------
+
+RECOVERY = Path("docs/audit/recovery")
+SECTION_MIN_WORDS, CHUNK_CHARS = 12, 1500
+VERDICTS = ("present", "partial", "absent", "contradicted")
+PRESENCE_QUESTION = (
+    "Is this previous section's guidance in the current files? Answer on one line with two words: present, partial, "
+    "absent or contradicted; then yes or no for whether the section is substantive (a template, procedure, rule or "
+    "fact a user would miss)."
+)
+RECORD_HEADER = ["item", "fate", "value", "decision", "reason class", "reason"]
+RESTORE_CLASSES = ("users-ask-by-name", "reusable-template", "tested-example", "procedure-depends")
+REASON_CLASSES = {
+    "restore-references": RESTORE_CLASSES, "restore-main": RESTORE_CLASSES,
+    "drop": ("generic-model-knowledge", "stale", "wrong", "out-of-scope", "superseded-by "),
+    "drop-pending": ("generic-model-knowledge", "stale", "wrong", "out-of-scope", "superseded-by "),
+    "intended-change": ("safety-fix", "fact-update", "scope-change"),
+    "purpose-change-pending": ("safety-fix", "fact-update", "scope-change"),
+    "none": ("moved-to ", "text-present"),
+}  # a trailing space marks a prefix class that needs an argument
+
+
+def find_artifact(root: Path, name: str, kind: str | None = None) -> dict:
+    found = [a for a in list_artifacts(root) if a["name"] == name and kind in (None, a["kind"])]
+    if len(found) != 1:
+        raise ValueError(f"{name}: not a unique skill, command or agent in this repo")
+    return found[0]
+
+
+def text_files(snap: dict) -> dict[str, str]:
+    out = {}
+    for p, b in snap.items():
+        with contextlib.suppress(UnicodeDecodeError):
+            out[p] = b.decode("utf-8")
+    return out
+
+
+def commit_of(root: Path, ref: str) -> str | None:
+    got = git_bytes(root, "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}") if not ref.startswith("-") else None
+    return got.decode().strip() if got else None
+
+
+def split_sections(text: str) -> list[tuple[str, list[str]]]:
+    sections, heading, body, fenced = [], "(preamble)", [], False
+    for line in text.splitlines():
+        fenced ^= bool(FENCE_RE.match(line))
+        if not fenced and HEADING_RE.match(line):
+            sections.append((heading, body))
+            heading, body = line.strip().lstrip("#").strip(), []
+        else:
+            body.append(line)
+    return sections + [(heading, body)]
+
+
+def chunk_units(body: str, units: list[str]) -> list[tuple[str, list[str]]]:
+    """(text, unit ids) chunks of at most CHUNK_CHARS, cut at unit boundaries (one unit over the cap stays whole)."""
+    if len(body) <= CHUNK_CHARS or not units:
+        return [(body, [unit_id(u) for u in units])]
+    chunks: list[list[str]] = [[]]
+    for u in units:
+        if chunks[-1] and len("\n\n".join(chunks[-1] + [u])) > CHUNK_CHARS:
+            chunks.append([])
+        chunks[-1].append(u)
+    return [("\n\n".join(c), [unit_id(u) for u in c]) for c in chunks]
+
+
+def inventory_sections(snap: dict) -> list[dict]:
+    out = []
+    for path in sorted(p for p in snap if p.endswith(".md")):
+        for heading, lines in split_sections(_text(snap[path])):
+            body = "\n".join(lines).strip()
+            if len(norm_tokens(body)) < SECTION_MIN_WORDS:
+                continue
+            for text, ids in chunk_units(body, digest_units(body)):
+                out.append({"id": f"s{len(out) + 1:03d}", "file": path, "heading": heading, "text": text,
+                            "chars": len(text), "units": ids})
+    return out
+
+
+def phrase_fate(root: Path, prev: dict, cur: dict) -> dict:
+    """Share of the baseline's 5-word shingles kept in the same file, moved to another file of any artifact, or gone."""
+    owners: dict[tuple, set[str]] = {}
+    for a in list_artifacts(root):
+        for path, text in text_files(artifact_snapshot(root, a["kind"], a["name"], None) or {}).items():
+            for sh in shingles(text):
+                owners.setdefault(sh, set()).add(path)
+    counts, total, old = Counter(), 0, set()
+    for path, text in text_files({p: b for p, b in prev.items() if p.endswith(".md")}).items():
+        for sh in shingles(text):
+            total += 1
+            old.add(sh)
+            where = owners.get(sh, set())
+            counts["kept" if path in where else "moved" if where else "gone"] += 1
+    now = set().union(*(shingles(t) for t in text_files(cur).values()))
+    pct = lambda n, d: round(100 * n / d, 2) if d else 0.0
+    kept, moved = pct(counts["kept"], total), pct(counts["moved"], total)
+    return {"kept": kept, "moved": moved, "gone": round(100 - kept - moved, 2) if total else 0.0,
+            "new": pct(len(now - old), len(now))}
+
+
+def recovery_inventory(root: Path, args) -> int:
+    art = find_artifact(root, args.artifact, args.kind)
+    if not resolves(root, args.base):
+        raise ValueError(f"cannot resolve --base {args.base}")
+    prev = artifact_snapshot(root, art["kind"], art["name"], args.base)
+    if prev is None:
+        raise ValueError(f"{art['name']} does not exist at {args.base}")
+    cur = artifact_snapshot(root, art["kind"], art["name"], None) or {}
+    fate = phrase_fate(root, prev, cur)
+    if args.fate_only:
+        print(json.dumps(fate, indent=2))
+        return 0
+    data = {"base": args.base, "sections": inventory_sections(prev), "files": removed_files(prev, cur, 1.0), "phrase_fate": fate}
+    d = root / RECOVERY / art["name"]
+    write_atomic(root / RECOVERY, d / "sections.json", json.dumps(data, indent=2) + "\n")
+    (d / "presence.partial.json").unlink(missing_ok=True)  # its verdicts belong to the old sections
+    return 0
+
+
+def read_recovery(root: Path, name: str, what: str):
+    path = root / RECOVERY / name / what
+    if not path.is_file():
+        raise ValueError(f"{path} does not exist")
+    return load_json(path)
+
+
+def parse_presence(out: str) -> tuple[str, bool]:
+    line = next((x for x in out.splitlines() if x.strip()), "")
+    tok = line.lower().split()
+    if len(tok) != 2 or tok[0] not in VERDICTS or tok[1] not in ("yes", "no"):
+        raise ValueError(f"malformed answer line {line[:80]!r}")
+    return tok[0], tok[1] == "yes"
+
+
+def recovery_presence(root: Path, args) -> int:
+    art = find_artifact(root, args.artifact)
+    name = art["name"]
+    sections = read_recovery(root, name, "sections.json")["sections"]
+    argv = resolve_runner(args.runner)
+    state = "".join(f"=== {p} ===\n{t.rstrip(chr(10))}\n" for p, t in sorted(text_files(artifact_snapshot(root, art["kind"], name, None) or {}).items()))
+    base, d = root / RECOVERY, root / RECOVERY / name
+    partial = d / "presence.partial.json"
+    done = {e["id"]: e for e in (load_json(partial) if partial.is_file() else [])}
+    failed = []
+    for s in sections:
+        if s["id"] in done:
+            continue
+        prompt = (f"MODE: presence\nKEY: {name}/{s['id']}\n\n{state}\n=== previous section {s['id']}: {s['heading']} ===\n"
+                  f"{s['text']}\n\n{PRESENCE_QUESTION}\n")
+        try:
+            verdict, substantive = parse_presence(call_runner(argv, prompt, args.timeout))
+        except (HarnessError, ValueError) as e:
+            failed.append(f"{s['id']}: {e}")
+            continue
+        done[s["id"]] = {"id": s["id"], "verdict": verdict, "substantive": substantive}
+        write_atomic(base, partial, json.dumps(list(done.values()), indent=2) + "\n")
+    if failed:
+        print(f"presence: {len(failed)} section(s) failed, re-run to resume:\n" + "\n".join(failed), file=sys.stderr)
+        return 1
+    write_atomic(base, d / "presence.json", json.dumps([done[s["id"]] for s in sections], indent=2) + "\n")
+    partial.unlink(missing_ok=True)
+    return 0
+
+
+def recovery_grep(root: Path, args) -> int:
+    art = find_artifact(root, args.artifact)
+    sections = {s["id"]: s for s in read_recovery(root, art["name"], "sections.json")["sections"]}
+    others = {}
+    for a in list_artifacts(root):
+        if a["name"] != art["name"]:
+            others.update(text_files(artifact_snapshot(root, a["kind"], a["name"], None) or {}))
+    other_sh = {p: shingles(t) for p, t in others.items()}
+    out = []
+    for e in read_recovery(root, art["name"], "presence.json"):
+        if e["verdict"] not in ("absent", "partial"):
+            continue
+        s = sections[e["id"]]
+        sh = shingles(s["text"])
+        hits = sorted(((len(sh & o) / len(sh), p) for p, o in other_sh.items() if sh), key=lambda m: (-m[0], m[1]))
+        out.append({"id": s["id"], "heading": s["heading"], "verdict": e["verdict"],
+                    "matches": [{"path": p, "share": round(sh_, 4)} for sh_, p in hits if sh_ >= args.min_share]})
+    print(json.dumps(out, indent=2))
+    return 0
+
+
+def recovery_mode(root: Path, a: dict, base: str) -> str:
+    if a["name"] in SYNCED:
+        return "report-only"
+    if artifact_snapshot(root, a["kind"], a["name"], base) is None:
+        return "facts-only"
+    return "facts-only" if git_bytes(root, "diff", "--quiet", base, "--", a["path"]) is not None else "full"
+
+
+def parse_record(path: Path) -> tuple[list[dict], list[str]]:
+    """Rows of a record.md table and the format problems found while reading it."""
+    if not path.is_file():
+        return [], []
+    rows, problems, header = [], [], False
+    for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip().startswith("|"):
+            continue
+        cells = [c.strip().strip("`").strip() for c in line.strip().strip("|").split("|")]
+        if not header:
+            header = True
+            if cells != RECORD_HEADER:
+                problems.append(f"record.md:{n}: header is not '| {' | '.join(RECORD_HEADER)} |'")
+            continue
+        if all(set(c) <= set("-: ") for c in cells):
+            continue
+        if len(cells) < 6:
+            problems.append(f"record.md:{n}: row has {len(cells)} fields, needs 6")
+            continue
+        rows.append(dict(zip(RECORD_HEADER, cells[:5] + ["|".join(cells[5:])]), line=n))
+    return rows, problems
+
+
+def row_problems(row: dict) -> list[str]:
+    item, fate, value, decision = row["item"], row["fate"], row["value"], row["decision"]
+    where, out = f"record.md:{row['line']} {item}", []
+    classes = REASON_CLASSES.get(decision)
+    redistributed = fate.startswith("redistributed ") and bool(fate[len("redistributed "):].strip())
+    if classes is None:
+        return [f"{where}: unknown decision {decision!r}"]
+    if not (fate in ("removed-to-fit", "removed-on-merit", "not-lost") or redistributed):
+        out.append(f"{where}: unknown fate {fate!r}")
+    if value not in ("real", "low"):
+        out.append(f"{where}: value must be real or low, got {value!r}")
+    rc = row["reason class"]
+    if not any(rc == c or (c.endswith(" ") and rc.startswith(c) and rc[len(c):].strip()) for c in classes):
+        out.append(f"{where}: reason class {rc!r} is not valid for decision {decision}")
+    if not row["reason"]:
+        out.append(f"{where}: empty reason")
+    allowed = {
+        "restore-references": fate == "removed-to-fit" and value == "real",
+        "restore-main": fate == "removed-to-fit" and value == "real",
+        "drop": fate == "removed-on-merit" or (fate == "removed-to-fit" and value == "low"),
+        "drop-pending": fate == "removed-on-merit" or (fate == "removed-to-fit" and value == "low"),
+        "intended-change": fate == "removed-on-merit",
+        "purpose-change-pending": fate != "not-lost" and not redistributed,
+        "none": fate == "not-lost" or redistributed,
+    }[decision]
+    if not allowed:
+        out.append(f"{where}: ({fate}, {value}, {decision}) is not an allowed combination")
+    return out
+
+
+def has_row(rows: list[dict], key: str) -> bool:
+    return any(r["item"] == key or (r["item"].startswith(key) and not re.match(r"\w", r["item"][len(key):])) for r in rows)
+
+
+def recovery_record_check(root: Path, args) -> int:
+    art = find_artifact(root, args.artifact)
+    name = art["name"]
+    inv = read_recovery(root, name, "sections.json")
+    sections = inv["sections"]
+    rows, problems = parse_record(root / RECOVERY / name / "record.md")
+    for r in rows:
+        problems += row_problems(r)
+    pres_path = root / RECOVERY / name / "presence.json"
+    verdicts = {e["id"]: e["verdict"] for e in load_json(pres_path)} if pres_path.is_file() else {}
+    for s in sections:
+        if s["id"] not in verdicts:
+            problems.append(f"presence.json has no verdict for {s['id']} {s['heading']}")
+        elif verdicts[s["id"]] != "present" and not has_row(rows, s["id"]):
+            problems.append(f"{s['id']} {s['heading']} ({verdicts[s['id']]}) has no record row")
+    for f in inv["files"]:
+        if not has_row(rows, f"file:{f['path']}"):
+            problems.append(f"file:{f['path']} ({f['status']}) has no record row")
+    cur = artifact_snapshot(root, art["kind"], name, None) or {}
+    for ref in args.previous:
+        prev = artifact_snapshot(root, art["kind"], name, ref)
+        if prev is None:
+            problems.append(f"{name} does not exist at {ref}")
+            continue
+        at_base = (commit_of(root, ref) or ref) == (commit_of(root, inv["base"]) or inv["base"])
+        reported: set[str] = set()
+        for u in removed_units(prev, cur):
+            owning = [s for s in sections if u["id"] in s["units"]] if at_base else []
+            if any(has_row(rows, s["id"]) for s in owning) or has_row(rows, u["id"]):
+                continue
+            if owning:  # one report per section; a section with no verdict row is reported above already
+                for s in owning:
+                    if verdicts.get(s["id"]) == "present" and s["id"] not in reported:
+                        reported.add(s["id"])
+                        problems.append(f"{s['id']} {s['heading']} (present) has removed units and no record row")
+            else:
+                problems.append(f"{u['id']} removed since {ref} ({u['path']}) has no record row")
+        for f in removed_files(prev, cur, 0.5):
+            if not has_row(rows, f"file:{f['path']}"):
+                problems.append(f"file:{f['path']} removed since {ref} has no record row")
+    for p in dict.fromkeys(problems):
+        print(p)
+    return 1 if problems else 0
+
+
+def recovery_brief(batch: dict, info: dict, pending: dict[str, list[dict]]) -> str:
+    lines = [f"# Recovery batch {batch['id']:02d}", ""]
+    for a in batch["artifacts"]:
+        i = info[a["name"]]
+        lines += [f"## {a['name']} ({a['kind']})", "", f"- mode: {a['mode']}"]
+        if a["mode"] == "full":
+            rel = (RECOVERY / a["name"]).as_posix()
+            lines += [f"- sections: {rel}/sections.json", f"- presence: {rel}/presence.json", "", "### Sections to triage", ""]
+            lines += [f"- {s['id']} {s['heading']} | {v} | {s['chars']} chars" for s, v in i["lost"]] or ["- none"]
+            lines += ["", "### Files", ""]
+            for f in i["files"]:
+                lines.append(f"- file:{f['path']} {f['status']}" + ("" if f["lines"] is None else f" ({f['lines']} lines)"))
+            lines += [] if i["files"] else ["- none"]
+        rows = pending.get(a["name"], [])
+        lines += ["", "### Pending purpose change", ""] if rows else []
+        lines += [f"- {r['item']} | {r['fate']} | {r['value']} | {r['decision']} | {r['reason class']} | {r['reason']}" for r in rows]
+        lines.append("")
+    return "\n".join(lines)
+
+
+def recovery_queue(root: Path, args) -> int:
+    out = Path(os.path.abspath(args.out)) if args.out else root / RECOVERY
+    if commit_of(root, args.base) is None:
+        raise ValueError(f"cannot resolve --base {args.base}")
+    path = out / "batches.json"
+    if args.append is None and path.is_file():
+        print(f"queue: {path} exists; the queue is built once (use --append NAME to add a batch)", file=sys.stderr)
+        return 1
+    if args.append is not None and not path.is_file():
+        print(f"queue: {path} does not exist", file=sys.stderr)
+        return 1
+    arts = [find_artifact(root, args.append)] if args.append is not None else list_artifacts(root)
+    info, missing = {}, []
+    for a in arts:
+        i = {"mode": recovery_mode(root, a, args.base), "share": 0.0, "lost": [], "files": []}
+        if i["mode"] == "full":
+            try:
+                inv = read_recovery(root, a["name"], "sections.json")
+                pres = {e["id"]: e["verdict"] for e in read_recovery(root, a["name"], "presence.json")}
+            except (OSError, ValueError):
+                missing.append(f"{a['name']}: needs sections.json and a complete presence.json")
+                continue
+            gap = [s["id"] for s in inv["sections"] if s["id"] not in pres]
+            if gap:
+                missing.append(f"{a['name']}: presence.json lacks {', '.join(gap)}")
+                continue
+            i["lost"] = [(s, pres[s["id"]]) for s in inv["sections"] if pres[s["id"]] != "present"]
+            total = sum(s["chars"] for s in inv["sections"])
+            i["share"] = sum(s["chars"] for s, _ in i["lost"]) / total if total else 0.0
+            i["files"] = inv["files"]
+        info[a["name"]] = i
+    if missing:
+        print("\n".join(missing), file=sys.stderr)
+        return 1
+    rank = {"full": 0, "facts-only": 1, "report-only": 2}
+    ordered = sorted(arts, key=lambda a: (rank[info[a["name"]]["mode"]], -info[a["name"]]["share"], a["name"]))
+    groups: list[list[dict]] = []
+    for a in ordered:
+        if groups and len(groups[-1]) < args.max_artifacts and info[groups[-1][0]["name"]]["mode"] == info[a["name"]]["mode"]:
+            groups[-1].append(a)
+        else:
+            groups.append([a])
+    queue = load_json(path) if args.append is not None else []
+    next_id = max((b["id"] for b in queue), default=0) + 1
+    pending = {}
+    if args.append is not None:
+        rows, _ = parse_record(root / RECOVERY / args.append / "record.md")
+        pending = {args.append: [r for r in rows if r["decision"] == "purpose-change-pending"]}
+    new = []
+    for k, g in enumerate(groups):
+        entries = [{"kind": a["kind"], "name": a["name"], "percent": None, "findings": batch_counts({}),
+                    "mode": info[a["name"]]["mode"]} for a in g]
+        new.append({"id": next_id + k, "artifacts": entries, "brief": brief_path(root, out, next_id + k, entries),
+                    "status": "queued", "rounds": 0, "requeues": 0, "waived": []})
+    for b in new:
+        write_inside(out, root / b["brief"] if not Path(b["brief"]).is_absolute() else Path(b["brief"]),
+                     recovery_brief(b, info, pending))
+    save_queue(out, queue + new)
+    return 0
+
+
+def recovery_check(root: Path, args) -> int:
+    out = Path(os.path.abspath(args.out)) if args.out else root / RECOVERY
+    rounds = []
+    for bd in (out / "batches").glob("*") if (out / "batches").is_dir() else []:
+        for rd in bd.glob("r*") if bd.is_dir() and bd.name.isdigit() else []:
+            if rd.name[1:].isdigit() and (rd / "merged.json").is_file():
+                rounds.append((int(bd.name), int(rd.name[1:]), rd / "merged.json"))
+    ns = argparse.Namespace(op="check", out=out, merged=[f for _, _, f in sorted(rounds)])
+    return batches_op(root, ns)
+
+
+def recovery_op(root: Path, args) -> int:
+    ops = {"inventory": recovery_inventory, "presence": recovery_presence, "grep": recovery_grep,
+           "queue": recovery_queue, "record-check": recovery_record_check, "check": recovery_check}
+    return ops[args.op](root, args)
 
 
 def csv(value: str) -> list[str]:
@@ -2505,6 +2900,25 @@ def build_parser() -> argparse.ArgumentParser:
     bw.add_argument("--file", required=True)
     bw.add_argument("--reason", required=True)
     bt_sub.choices["requeue"].add_argument("--artifact", required=True)
+    rc = sub.add_parser("recovery", help="plan 14 content recovery: inventory, presence, grep, queue, record-check, check")
+    rc_sub = rc.add_subparsers(dest="op", required=True)
+    for op in ("inventory", "presence", "grep", "record-check"):
+        rc_sub.add_parser(op).add_argument("--artifact", required=True)
+    ri = rc_sub.choices["inventory"]
+    ri.add_argument("--base", required=True)
+    ri.add_argument("--kind", choices=sorted(ARTIFACT_KINDS), default=None)
+    ri.add_argument("--fate-only", action="store_true")
+    rp = rc_sub.choices["presence"]
+    rp.add_argument("--runner", required=True)
+    rp.add_argument("--timeout", type=float, default=300)
+    rc_sub.choices["grep"].add_argument("--min-share", type=float, default=0.3)
+    rc_sub.choices["record-check"].add_argument("--previous", action="append", default=[], metavar="REF")
+    rq = rc_sub.add_parser("queue")
+    rq.add_argument("--base", required=True)
+    rq.add_argument("--out", type=Path, default=None)
+    rq.add_argument("--max-artifacts", type=int, default=3)
+    rq.add_argument("--append", default=None, metavar="NAME")
+    rc_sub.add_parser("check").add_argument("--out", type=Path, default=None)
     ar = sub.add_parser("artifacts", help="list skills, commands and agents as JSON")
     ar.add_argument("--kind", choices=sorted(ARTIFACT_KINDS), default=None)
     r = sub.add_parser("rubric-check")
@@ -2638,6 +3052,12 @@ def main(argv: list[str] | None = None) -> int:
             return batches_op(root, args)
         except (OSError, ValueError, KeyError, TypeError, HarnessError) as e:
             print(f"batches {args.op}: {e}", file=sys.stderr)
+            return 2
+    if args.cmd == "recovery":
+        try:
+            return recovery_op(root, args)
+        except (OSError, ValueError, KeyError, TypeError, HarnessError) as e:
+            print(f"recovery {args.op}: {e}", file=sys.stderr)
             return 2
     if args.cmd == "artifacts":
         try:

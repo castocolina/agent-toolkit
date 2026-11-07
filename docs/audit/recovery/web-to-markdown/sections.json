@@ -1,0 +1,366 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "web-to-markdown",
+      "text": "Convert web pages to clean Markdown using local browser automation with Puppeteer and Readability.",
+      "chars": 98,
+      "units": [
+        "para:a4a44094"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "Purpose",
+      "text": "This skill enables Claude Code to convert web pages (including JavaScript-rendered content) into clean, readable Markdown format by leveraging the `web2md` CLI tool. It's particularly useful for extracting article content, documentation, or any web content that needs to be processed, archived, or analyzed in Markdown format.",
+      "chars": 326,
+      "units": [
+        "para:19016f43"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "When to Use",
+      "text": "Use this skill when you need to:\n\n- Extract article content from news sites, blogs, or documentation\n- Convert JavaScript-heavy pages that simple HTTP fetching can't handle\n- Archive web content in a readable, portable format\n- Process web content for analysis or documentation\n- Handle pages with login walls or human verification (using interactive mode)\n- Batch convert multiple URLs to Markdown files\n\n**Important:** This skill must be explicitly invoked by the user with phrases like:\n- \"use the skill web-to-markdown ...\"\n- \"use a skill web-to-markdown ...\"\n\nThis is a hard requirement to prevent accidental usage when simpler tools might suffice.",
+      "chars": 653,
+      "units": [
+        "para:c6dc12c9",
+        "para:33e44963",
+        "para:494eb1d6",
+        "para:038f6f90",
+        "para:3b795553",
+        "para:bb82f620",
+        "para:78548bf1",
+        "para:ddbc535f",
+        "para:d0ec5870",
+        "para:f143869e",
+        "para:d81b92bb"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "How It Works",
+      "text": "The skill uses the `web2md` CLI tool which:\n\n1. **Launches a real browser** (Chrome/Chromium/Brave/Edge) via Puppeteer\n2. **Renders the page** including all JavaScript and dynamic content\n3. **Extracts main content** using Mozilla's Readability library\n4. **Converts to Markdown** using Turndown with cleaned links\n5. **Outputs** to stdout or saves to file(s) with optional YAML frontmatter\n\nThis approach handles modern single-page applications and JavaScript-rendered content that simple HTTP fetchers cannot process.",
+      "chars": 519,
+      "units": [
+        "para:3c27ff85",
+        "para:4833973b",
+        "para:3fe963b3",
+        "para:eada9e61",
+        "para:55c76ef1",
+        "para:e8ade246",
+        "para:e0bff2c1"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "Key Features",
+      "text": "- **JavaScript Support**: Renders pages with Puppeteer, capturing dynamically loaded content\n- **Smart Content Extraction**: Uses Readability to identify and extract main article content\n- **Flexible Output**: Print to stdout, save to specific files, or auto-name files in a directory\n- **Interactive Mode**: Handle login walls and human verification challenges\n- **Batch Processing**: Convert multiple URLs in one operation\n- **Wait Strategies**: Multiple options to ensure content is fully loaded before extraction\n- **Browser Profiles**: Support for persistent user data directories (sessions, logins)\n- **Clean Markdown**: Produces readable, well-formatted Markdown with optional metadata",
+      "chars": 692,
+      "units": [
+        "para:bba162d6",
+        "para:ba6b986c",
+        "para:7aed63d9",
+        "para:caa6ca3c",
+        "para:1db188be",
+        "para:955585c4",
+        "para:11cadc50",
+        "para:c36cc09d"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "Prerequisites",
+      "text": "The `web2md` CLI tool must be installed. The skill will check for it and provide installation instructions if needed:\n\n```bash\ncd ~/workspace/softaworks/projects/web2md\nnpm install\nnpm run build\nnpm link\n```",
+      "chars": 207,
+      "units": [
+        "para:c4b7d0c0",
+        "para:f0a9a825"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "Basic Conversion",
+      "text": "Convert a single URL and save to a file:\n\n```bash\nuse the skill web-to-markdown to convert https://example.com/article to article.md\n```\n\nThis will run:\n```bash\nweb2md 'https://example.com/article' --out ./article.md\n```",
+      "chars": 220,
+      "units": [
+        "para:def2f74f",
+        "para:d443aa53",
+        "para:940cda88",
+        "para:7aeaed8f"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "Auto-Named Output",
+      "text": "Convert a URL and let the tool name the file based on page title:\n\n```bash\nuse the skill web-to-markdown to convert https://example.com/article and save to ./output/\n```\n\nThis creates a directory and auto-names the file:\n```bash\nmkdir -p ./output\nweb2md 'https://example.com/article' --out ./output/\n```",
+      "chars": 303,
+      "units": [
+        "para:cdc0c833",
+        "para:470e7fb0",
+        "para:60513f8f",
+        "para:263b63e0"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "Print to Console",
+      "text": "Convert and display the Markdown (useful for quick inspection):\n\n```bash\nuse the skill web-to-markdown to convert https://example.com/article and print the result\n```\n\nThis will run:\n```bash\nweb2md 'https://example.com/article' --print\n```",
+      "chars": 239,
+      "units": [
+        "para:747598d8",
+        "para:8fb62091",
+        "para:940cda88",
+        "para:58564941"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "Interactive Mode (Login Walls)",
+      "text": "Handle pages requiring login or human verification:\n\n```bash\nuse the skill web-to-markdown to convert https://example.com/protected-article in interactive mode\n```\n\nThis will run:\n```bash\nmkdir -p ./tmp/web2md-profile\nweb2md 'https://example.com/protected-article' --interactive --user-data-dir ./tmp/web2md-profile --out ./output/\n```\n\nThe browser window will appear, allowing you to complete login or verification, then press Enter to continue.",
+      "chars": 446,
+      "units": [
+        "para:39af77a8",
+        "para:e38807e5",
+        "para:940cda88",
+        "para:f2c51dab",
+        "para:352462a8"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "Batch Conversion",
+      "text": "Convert multiple URLs:\n\n```bash\nuse the skill web-to-markdown to convert these URLs:\n- https://example.com/article1\n- https://example.com/article2\n- https://example.com/article3\nSave them to ./articles/\n```\n\nThis will create the directory and run separate commands for each URL:\n```bash\nmkdir -p ./articles\nweb2md 'https://example.com/article1' --out ./articles/\nweb2md 'https://example.com/article2' --out ./articles/\nweb2md 'https://example.com/article3' --out ./articles/\n```",
+      "chars": 478,
+      "units": [
+        "para:c8db22b0",
+        "para:8ef0dcb5",
+        "para:bd2d362d",
+        "para:48d95db6"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "Advanced Wait Strategies",
+      "text": "For heavy JavaScript applications:\n\n```bash\nuse the skill web-to-markdown to convert https://app.example.com/dashboard\nWait for the main selector to appear\n```\n\nThis will run:\n```bash\nweb2md 'https://app.example.com/dashboard' --wait-until domcontentloaded --wait-for 'main' --out ./dashboard.md\n```",
+      "chars": 299,
+      "units": [
+        "para:0b52d999",
+        "para:8453534f",
+        "para:940cda88",
+        "para:49119b79"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "Advanced Options",
+      "text": "The skill supports various options to handle tricky pages:\n\n- `--chrome-path <path>`: Specify Chrome/Chromium location if auto-detection fails\n- `--interactive`: Show browser and pause for manual intervention\n- `--wait-until <event>`: Wait for `load`, `domcontentloaded`, `networkidle0`, or `networkidle2` (default: `networkidle2`)\n- `--wait-for '<selector>'`: Wait for specific CSS selector to appear\n- `--wait-ms <milliseconds>`: Additional wait time in milliseconds\n- `--headful`: Show browser window (useful for debugging)\n- `--no-sandbox`: Disable sandbox (sometimes required in containers/CI)\n- `--user-data-dir <dir>`: Use persistent browser profile (for sessions/logins)",
+      "chars": 678,
+      "units": [
+        "para:b0b4bf13",
+        "para:0f570e33",
+        "para:addb8f6c",
+        "para:f9c00c72",
+        "para:a6b6f3fc",
+        "para:67cc583f",
+        "para:dc01fd12",
+        "para:d08a77c2",
+        "para:15db1f2f"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "Output Format",
+      "text": "The generated Markdown includes:\n\n- **YAML Frontmatter** (optional): Title, author, publication date, URL, excerpt\n- **Main Content**: Article text with preserved formatting\n- **Clean Links**: Properly formatted Markdown links\n- **Images**: Preserved with alt text and captions where available",
+      "chars": 293,
+      "units": [
+        "para:620b8df9",
+        "para:87b00c91",
+        "para:9310c4dd",
+        "para:003ce243",
+        "para:d7f7194e"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "Technical Details",
+      "text": "- **Browser Automation**: Uses `puppeteer-core` with local Chrome/Chromium\n- **Content Extraction**: Mozilla Readability library\n- **Markdown Conversion**: Turndown library\n- **Supported Browsers**: Chrome, Chromium, Brave, Edge (Chromium-based)",
+      "chars": 245,
+      "units": [
+        "para:13fdba3c",
+        "para:c6280df1",
+        "para:d8d123db",
+        "para:e4b47299"
+      ]
+    },
+    {
+      "id": "s016",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "Troubleshooting",
+      "text": "**Chrome not found:**\n- Install Chrome/Chromium or specify path with `--chrome-path`\n\n**Page content incomplete:**\n- Try `--wait-until networkidle2` (waits for network to settle)\n- Use `--wait-for '<selector>'` to wait for specific elements\n- Add `--wait-ms 2000` for additional delay\n\n**Login required:**\n- Use `--interactive` mode to manually login\n- Use `--user-data-dir` to persist session across runs\n\n**Verification/CAPTCHA:**\n- Use `--interactive` mode to complete verification manually",
+      "chars": 493,
+      "units": [
+        "para:cde0734b",
+        "para:29157d73",
+        "para:fde31961",
+        "para:f036bd44",
+        "para:9e22f471",
+        "para:e9639da9",
+        "para:a769eb0c",
+        "para:0b5ed0ec",
+        "para:39c2d442"
+      ]
+    },
+    {
+      "id": "s017",
+      "file": "skills/web-to-markdown/README.md",
+      "heading": "Related Tools",
+      "text": "For simpler use cases without JavaScript, consider using Claude Code's built-in `WebFetch` tool instead.",
+      "chars": 104,
+      "units": [
+        "para:24d306d8"
+      ]
+    },
+    {
+      "id": "s018",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: web-to-markdown\ndescription: \"Use ONLY when the user explicitly says: 'use the skill web-to-markdown ...' (or 'use a skill web-to-markdown ...'). Converts webpage URLs to clean Markdown by calling the local web2md CLI (Puppeteer + Readability), suitable for JS-rendered pages.\"\nmetadata:\n  version: 0.1.0\n---",
+      "chars": 318,
+      "units": [
+        "para:da7084d3"
+      ]
+    },
+    {
+      "id": "s019",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "heading": "web-to-markdown",
+      "text": "Convert web pages to clean Markdown by driving a locally installed browser (via `web2md`).",
+      "chars": 90,
+      "units": [
+        "para:66cc8203"
+      ]
+    },
+    {
+      "id": "s020",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "heading": "Hard trigger gate (must enforce)",
+      "text": "This skill MUST NOT be used unless the user explicitly wrote **exactly** a phrase like:\n- `use the skill web-to-markdown ...`\n- `use a skill web-to-markdown ...`\n\nIf the user did not explicitly request this skill by name, stop and ask them to re-issue the request including: `use the skill web-to-markdown`.",
+      "chars": 307,
+      "units": [
+        "para:03badd4c",
+        "para:d0ec5870",
+        "para:f143869e",
+        "para:66484726"
+      ]
+    },
+    {
+      "id": "s021",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "heading": "What this skill does",
+      "text": "- Handles JS-rendered pages (Puppeteer \u2192 user Chrome).\n- Works best with Chromium-family browsers (Chrome/Chromium/Brave/Edge) via `puppeteer-core`.\n- Extracts main content (Readability).\n- Converts to Markdown (Turndown) with cleaned links and optional YAML frontmatter.",
+      "chars": 271,
+      "units": [
+        "para:d07b274a",
+        "para:8eef2779",
+        "para:9efd5009",
+        "para:4c2156d8"
+      ]
+    },
+    {
+      "id": "s022",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "heading": "Non-goals",
+      "text": "- Do not use Playwright or other browser automation stacks; the mechanism is `web2md`.",
+      "chars": 86,
+      "units": [
+        "para:75275fd9"
+      ]
+    },
+    {
+      "id": "s023",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "heading": "Inputs you should collect (ask only if missing)",
+      "text": "- `url` (or a list of URLs)\n- Output preference:\n  - Print to stdout (`--print`), OR\n  - Save to a file (`--out ./file.md`), OR\n  - Save to a directory (`--out ./some-dir/` to auto-name by page title)\n- Optional rendering controls for tricky pages:\n  - `--chrome-path <path>` (if Chrome auto-detection fails)\n  - `--interactive` (show Chrome and pause so the user can complete human checks/login, then press Enter)\n  - `--wait-until load|domcontentloaded|networkidle0|networkidle2`\n  - `--wait-for '<css selector>'`\n  - `--wait-ms <milliseconds>`\n  - `--headful` (debug)\n  - `--no-sandbox` (sometimes required in containers/CI)\n  - `--user-data-dir <dir>` (login/session; use a dedicated profile directory)",
+      "chars": 706,
+      "units": [
+        "para:038daa78",
+        "para:6d06aa95",
+        "para:5bd8d522",
+        "para:14a34fe3",
+        "para:133708b8",
+        "para:1007779d",
+        "para:8f79c412",
+        "para:e62e95ad",
+        "para:b32d9249",
+        "para:309ac530",
+        "para:155decd2",
+        "para:ab3bfb2c"
+      ]
+    },
+    {
+      "id": "s024",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "heading": "Workflow",
+      "text": "1) Confirm the user explicitly invoked the skill (`use the skill web-to-markdown`).\n2) Validate URL(s) start with `http://` or `https://`.\n3) Ensure `web2md` is installed:\n   - Run: `command -v web2md`\n   - If missing, instruct the user to install it (assume the project exists at `~/workspace/softaworks/projects/web2md`):\n     - `cd ~/workspace/softaworks/projects/web2md && npm install && npm run build && npm link`\n     - Or: `cd ~/workspace/softaworks/projects/web2md && npm install && npm run build && npm install -g .`\n4) Convert:\n   - Single URL \u2192 file:\n     - `web2md '<url>' --out ./page.md`\n   - Single URL \u2192 auto-named file in directory:\n     - `mkdir -p ./out && web2md '<url>' --out ./out/`\n   - Human verification / login walls (interactive):\n     - `mkdir -p ./out && web2md '<url>' --interactive --user-data-dir ./tmp/web2md-profile --out ./out/`\n     - Then: complete the check in the browser window and press Enter in the terminal to continue.\n   - Print to stdout:\n     - `web2md '<url>' --print`\n   - Multiple URLs (batch):\n     - Create output dir (e.g. `./out/`) then run one `web2md` command per URL using `--out ./out/`\n5) Validate output:\n   - If writing files, verify they exist and are non-empty (e.g. `ls -la <path>` and `wc -c <path>`).\n6) Return:\n   - The saved file path(s), or the Markdown (stdout mode).",
+      "chars": 1337,
+      "units": [
+        "para:290277fb",
+        "para:32893535",
+        "para:cdc26a00",
+        "para:ad4ab01d",
+        "para:b88d6f15",
+        "para:237767bd",
+        "para:9aebc259",
+        "para:62901ef0",
+        "para:f5172d7a",
+        "para:beafa9fe",
+        "para:077eb6d1",
+        "para:fa7ee631",
+        "para:8e887b70",
+        "para:9069bfea",
+        "para:fba6f8af",
+        "para:88e4c34d",
+        "para:aa83b5c9",
+        "para:5086e48b",
+        "para:45290cfe",
+        "para:35730ad0",
+        "para:264c82f0"
+      ]
+    },
+    {
+      "id": "s025",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "heading": "Defaults (recommended)",
+      "text": "- For most pages: `--wait-until networkidle2`\n- For heavy apps: start with `--wait-until domcontentloaded --wait-ms 2000`, then add `--wait-for 'main'` (or another stable selector) if needed.",
+      "chars": 191,
+      "units": [
+        "para:29076c8e",
+        "para:a3e4a7f0"
+      ]
+    }
+  ],
+  "files": [],
+  "phrase_fate": {
+    "kept": 65.98,
+    "moved": 2.42,
+    "gone": 31.6,
+    "new": 31.91
+  }
+}
