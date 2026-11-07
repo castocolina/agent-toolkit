@@ -1,0 +1,68 @@
+{
+  "skill": "cal-c",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/cal-c.md",
+      "line": 12,
+      "evidence": "Start from the earliest of `Error`, `FAILED`, `Traceback`, `exit code`, `npm ERR!`, `##[error]`",
+      "fix": "Keep the non-obvious parts ('first failure, not the last', 'later errors are usually fallout', `##[error]`, `npm ERR!`, `error TS`); the generic markers `Error`, `FAILED`, `Traceback` the model already searches unprompted \u2014 trim them and record the removal in the recovery record"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 15,
+      "evidence": "- Environment (check first, cheapest to confirm), Test (name the test, expected and actual), Build (name the file and line).",
+      "fix": "Give Environment confirming evidence parallel to Test and Build, e.g. 'Environment (check first, cheapest to confirm: missing or empty env variable, network or DNS error, toolchain or image version mismatch, disk-space or setup timeout)'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 40,
+      "evidence": "**Evidence:** `<log file>:<line>` - `<the decisive log line>`",
+      "fix": "Define the value for pasted input (line 8 allows 'pasted log text' with no path): '<log file>' is the given path, or 'pasted log' when the caller pasted text without a file"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "agents/cal-c.md",
+      "line": 18,
+      "evidence": "If the line is missing, verify the run's commit against the checkout before claiming a revision mismatch.",
+      "fix": "Say how with only Read/Grep/Glob (no Bash): compare the commit SHA the log prints against `.git/HEAD` and the ref file under `.git/refs/heads/` in the project root"
+    }
+  ]
+}

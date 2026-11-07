@@ -1,0 +1,22 @@
+---
+name: collateral-paragraph
+description: Rotate an application's database credentials on a schedule or after a suspected leak. Use when asked to rotate a database password, roll credentials or respond to a leaked connection string. Not for rotating cloud provider keys or TLS certificates.
+---
+
+# Credential Rotation
+
+Replace the password of one database role without dropping live connections.
+
+## Workflow
+
+1. Create the new password in the secret store and keep the old one active.
+2. Add the new password to the role with `ALTER ROLE app_rw PASSWORD '<new>'` only after the application reads both values.
+3. Restart the application pods one at a time and watch the connection error rate.
+
+## Rollback
+
+Restore the previous secret version as soon as the first connection error appears. Then restart the pods again to drop the cached value and confirm that the error rate returns to its baseline.
+
+## Verification
+
+After the last pod restarts, query `pg_stat_activity` for sessions that still authenticate with the old password. The list must be empty before the old value is revoked.

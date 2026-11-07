@@ -1,0 +1,59 @@
+{
+  "skill": "skill-updater",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/skill-updater/evals/evals.json",
+      "line": null,
+      "evidence": "No eval covers the step-4 branch 'Page or patch retrieval that fails or is cut short: the review is unresolved. Make no track call for this artifact, on any row'. Getting it wrong stamps last_reviewed on sibling rows and corrupts the next diff base. trigger-queries.json also has 11 should-not-trigger queries against the guide's 8-10.",
+      "fix": "Add an eval whose upstreams row is stale true with no last_upstream_sha and whose commits page fails partway. Assert that no track command is given for any row and that updates.md logs the review as unresolved. Optionally fold one negative trigger query into a near-miss positive to reach 10/10."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 26,
+      "evidence": "The skill hardcodes gh CLI flags ('gh api --silent', '--paginate', '--jq') with no live read and no source URL or date. Flags of a vendor's CLI are version-sensitive. Only audit.py gets a live read ('Flags: python3 scripts/audit/audit.py track --help').",
+      "fix": "Add a line before step 3: 'Confirm gh flags with `gh api --help` before the first call'. Or cite https://cli.github.com/manual/gh_api with the date checked."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 28,
+      "evidence": "The skill hardcodes GitHub REST endpoints with no source URL or date: 'repos/<o>/<r>/compare/<last_upstream_sha>...<ref>', 'repos/<o>/<r>/commits?path=...&since=...', 'repos/<o>/<r>/contents/<path>?ref=<ref>' and 'git/trees/<ref>?recursive=1'. API endpoints are version-sensitive facts.",
+      "fix": "Cite the official GitHub REST docs (https://docs.github.com/en/rest/commits/commits, /rest/repos/contents, /rest/git/trees) with the date checked, in a one-line Sources note at the end of the Procedure."
+    }
+  ]
+}

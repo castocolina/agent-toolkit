@@ -1,0 +1,24 @@
+---
+name: unsourced-fact
+description: Summarize a long document with the Anthropic API from a script. Use when asked to summarize a PDF or text file through the API, batch-summarize a folder or write the summarizing script. Not for interactive chat summaries or for other vendors' APIs.
+---
+
+# API Summarizer
+
+Write a short Python script for the user that calls the Messages API to summarize one document and print the summary.
+
+## Workflow
+
+1. Check that `ANTHROPIC_API_KEY` is set; stop and say so when it is not.
+2. Split the document into chunks of about 20,000 characters on paragraph boundaries.
+3. Summarize each chunk, then summarize the summaries into one result of at most 200 words.
+4. Print the result and the number of chunks used.
+
+## Defaults
+
+The default model is `claude-3-5-sonnet-20241022`. Use another one when the user names it.
+
+## Gotchas
+
+- Chunks that cut a table in half produce summaries with invented rows, so split before a table, never inside one.
+- Print the chunk count so users notice a document that needed far more chunks than expected.

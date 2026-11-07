@@ -21,12 +21,13 @@ Trigger phrases: "judge this skill", "review my SKILL.md", "audit this skill", "
 
 ## How It Works
 
-1. The skill reads `references/rubric.md` (rubric v4) and every pinned spec file the rubric cites, in full. These reads are mandatory on every run.
+1. The skill reads `references/rubric.md` (rubric v5) and every pinned spec file the rubric cites, in full. These reads are mandatory on every run.
 2. It reads the target `SKILL.md` and, when a dimension needs them, `evals/` (inputs in `evals/files/`), `scripts/`, the repository's `tests/skills/<name>/` (script tests, not shipped with the skill) and referenced files.
-3. It scores eight dimensions with integer bands and records a finding, with evidence and a fix, for every score below its maximum.
-4. It computes the percentage and grade and prints the output.
+3. It checks removals and sources: each item of the previous-version digest (from `audit.py judge-prompt`) that no recovery record row explains is a high finding, and every reference must resolve and every version-sensitive fact be read live or carry its source and date. Content added only to satisfy the rubric or an eval, and not the skill's purpose, earns no credit.
+4. It scores eight dimensions with integer bands and records a finding, with evidence and a fix, for every score below its maximum.
+5. It computes the percentage and grade and prints the output.
 
-### Rubric v4: eight dimensions, 125 points
+### Rubric v5: eight dimensions, 125 points
 
 | Dimension | Max | What it measures |
 |-----------|-----|------------------|
@@ -62,7 +63,7 @@ Grades use the percentage of the total, so the total can change between rubric v
 **Driven by a prompt, or when only the verdict is requested**: one JSON object per line and nothing else. The shape is defined by `references/verdict.schema.json`:
 
 ```json
-{"skill":"my-skill","judge":"direct","rubric_version":4,"spec_sha":"<40 hex>","scores":{"D1":16,"D2":15,"D3":15,"D4":14,"D5":15,"D6":15,"D7":3,"D8":15},"max":{"D1":20,"D2":15,"D3":15,"D4":15,"D5":15,"D6":15,"D7":15,"D8":15},"total":108,"max_total":125,"percent":86.4,"grade":"B","findings":[{"id":"D1-1","dimension":"D1","severity":"low","file":"skills/my-skill/SKILL.md","line":12,"evidence":"Explains what a PDF AcroForm is","fix":"Delete the definition"},{"id":"D4-1","dimension":"D4","severity":"low","file":"skills/my-skill/SKILL.md","line":3,"evidence":"No keyword for flattening","fix":"Add it to the description"},{"id":"D7-1","dimension":"D7","severity":"high","file":"skills/my-skill/SKILL.md","line":null,"evidence":"No evals/ directory","fix":"Add evals/evals.json"}]}
+{"skill":"my-skill","judge":"direct","rubric_version":5,"spec_sha":"<40 hex>","scores":{"D1":16,"D2":15,"D3":15,"D4":14,"D5":15,"D6":15,"D7":3,"D8":15},"max":{"D1":20,"D2":15,"D3":15,"D4":15,"D5":15,"D6":15,"D7":15,"D8":15},"total":108,"max_total":125,"percent":86.4,"grade":"B","findings":[{"id":"D1-1","dimension":"D1","severity":"low","file":"skills/my-skill/SKILL.md","line":12,"evidence":"Explains what a PDF AcroForm is","fix":"The model reliably knows the definition: delete it and record the removal"},{"id":"D4-1","dimension":"D4","severity":"low","file":"skills/my-skill/SKILL.md","line":3,"evidence":"No keyword for flattening","fix":"Add it to the description"},{"id":"D7-1","dimension":"D7","severity":"high","file":"skills/my-skill/SKILL.md","line":null,"evidence":"No evals/ directory","fix":"Add evals/evals.json"}]}
 ```
 
 ## Bundled files
@@ -71,7 +72,7 @@ The skill reads these at run time.
 
 | Path | Purpose |
 |------|---------|
-| `references/rubric.md` | Rubric v4: version, spec commit, dimension table, scoring criteria |
+| `references/rubric.md` | Rubric v5: version, spec commit, dimension table, scoring criteria |
 | `references/verdict.schema.json` | JSON Schema for one verdict line |
 | `references/judge-prompt.md` | Prompt template for judges run by a pipeline, with `{ROOT}`, `{SKILLS}` and `{JUDGE}` placeholders |
 | `references/agentskills/` | Verbatim copies of the Agent Skills docs the rubric cites, pinned by commit in `SOURCE.json` (CC-BY-4.0) |

@@ -1,0 +1,47 @@
+{
+  "skill_name": "cal-f",
+  "evals": [
+    {
+      "id": "chat-and-alerts",
+      "prompt": "write up the incident from this: chat export says 'checkout is down' at 9:12 PM (my local time, UTC+2), alert tool says error-rate alert fired 19:05 UTC, deploy log says a rollback finished 19:40 UTC, metrics show errors back to normal at 19:38 UTC",
+      "expected_output": "A summary whose timeline is in UTC: the chat message at 19:12, the alert at 19:05 as detection, the metric recovery at 19:38 as resolution, the rollback at 19:40, each with a source and a confirmed or reported status, and impact stated as not measured because no counts were supplied.",
+      "assertions": [
+        "Converts the chat time 9:12 PM at UTC+2 to 19:12 UTC",
+        "Uses the 19:05 alert as detection, not the chat message",
+        "Uses the 19:38 metric recovery as resolution, not the rollback",
+        "Writes impact not measured instead of estimating",
+        "Every timeline row has a source and a status"
+      ]
+    },
+    {
+      "id": "blame-in-source",
+      "prompt": "postmortem draft please. Dave pushed the bad config at 14:02 and that's what broke checkout, he should have tested it.",
+      "expected_output": "A blameless summary that describes the config change and the missing safeguard without naming Dave as the cause, and without the phrase human error.",
+      "assertions": [
+        "Does not name Dave as the cause",
+        "Does not use human error as a root cause",
+        "Describes the config change and the condition that let it through"
+      ]
+    },
+    {
+      "id": "conflicting-times",
+      "prompt": "summarize the outage. Alice's export says the page came in at 03:10, Bob's export says 03:14 for the same page.",
+      "expected_output": "Shows both timestamps, says which one it trusts and why, and marks the event reported unless a log line confirms it.",
+      "assertions": [
+        "Shows both 03:10 and 03:14",
+        "States which timestamp it trusted and the reason",
+        "Marks the event reported when only the two exports support it"
+      ]
+    },
+    {
+      "id": "no-followup-owner",
+      "prompt": "Add follow-ups to the incident summary: improve alerting and add a canary stage. Nobody has picked these up yet.",
+      "expected_output": "Lists both follow-ups with the word unassigned as the owner and no invented names or dates.",
+      "assertions": [
+        "Lists improve alerting and add a canary stage",
+        "Marks both as unassigned",
+        "Does not invent an owner"
+      ]
+    }
+  ]
+}

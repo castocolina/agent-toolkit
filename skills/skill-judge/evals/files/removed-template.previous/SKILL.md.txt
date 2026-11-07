@@ -1,0 +1,41 @@
+---
+name: removed-template
+description: Write a changelog entry for a release from merged pull requests. Use when asked to draft release notes, a changelog entry or "what changed in vX.Y". Not for commit-message writing or for generating version numbers.
+---
+
+# Release Notes
+
+Turn the merged pull requests of one release into a changelog entry that readers can scan in under a minute.
+
+## Workflow
+
+1. List the pull requests merged since the previous tag with `gh pr list --state merged --search "merged:>DATE"`.
+2. Group them under Added, Changed, Fixed and Removed. A pull request with a breaking change also goes under Breaking.
+3. Write one line per pull request in the user's terms, not the diff's terms, and link the pull request number.
+4. Put the entry at the top of `CHANGELOG.md`.
+
+## Template
+
+```markdown
+## [X.Y.Z] - YYYY-MM-DD
+
+### Breaking
+- <what breaks, who is affected, the migration step> (#123)
+
+### Added
+- <new capability in the user's words> (#124)
+
+### Changed
+- <behaviour that differs from the previous release> (#125)
+
+### Fixed
+- <the symptom users saw, not the root cause> (#126)
+
+### Removed
+- <what is gone and what replaces it> (#127)
+```
+
+## Gotchas
+
+- Squash-merged pull requests carry the title of the branch, so reread each title before copying it; titles such as "fix stuff" need the diff.
+- Dependency bumps belong in one line under Changed unless they fix a security advisory, which goes under Fixed with the advisory id.

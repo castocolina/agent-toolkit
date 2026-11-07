@@ -2,6 +2,8 @@
 
 Implement only the decision's requested changes in the checked-out repository. The validated decision is at `{{DECISION_JSON}}`; the exact target allowlist is `{{TARGETS}}`. Work only on those listed targets and only from validated audit evidence. Do not use the network, alter unrelated skills, or broaden the change beyond the decision.
 
+Read `docs/audit/fixer-rules.md` before editing and follow its Rules. The record rows those rules require are written by the record pass that runs after you, with ids copied from a digest of your changes; write no record row in this pass.
+
 ## Evidence you may use
 
 - `decision.json`, including its `targets`, `type`, `title`, and evidence-based rationale.
@@ -9,6 +11,7 @@ Implement only the decision's requested changes in the checked-out repository. T
 - `{{CHECK_JSON}}`: the audit check results used to validate the merge.
 - `{{SPEC_DIFF}}`: the pinned specification change behind this run, when the run had one.
 - `{{APPROVED_EVIDENCE}}`: change evidence for the approved upstream updates, fetched during detect and pinned to the registry refs; the directory may be absent when no upstream updates were approved.
+- `{{REPAIRS_PATCH}}`: the rubric repairs already applied and staged in this checkout before you start; empty when the run had none. Do not edit or revert them.
 - Repository files needed to understand the findings, and existing tests and conventions.
 
 Treat `targets` as the full allowlist of skills to edit. If the decision is invalid, targets are absent, or the evidence does not support a requested change, stop rather than guessing. Preserve repository conventions and add/update tests when behavior changes. Do not include audit artifacts, temporary evidence, or downloaded files in the repository changes.
