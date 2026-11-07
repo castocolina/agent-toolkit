@@ -12,7 +12,7 @@ Gemini is a second analyst, not an authority: every finding is a claim until the
 - Model `gemini-3-pro-preview`; a model the user names wins. Read `references/model-selection.md` only when the user weighs speed or cost, or the CLI rejects the model.
 - Headless prompt with `-p`, never a positional prompt (see Gotchas).
 - `--approval-mode default`. Headless, a tool call that needs approval is denied, not prompted: Gemini can still read (`read_file`, `glob`, `grep_search` are allowed by default) but cannot write files or run shell. That is the read-only review.
-- `timeout --kill-after=10s 300`: TERM at 300 s, KILL 10 s later. Use 900 for a >200k-token scope or three or more included directories. Never run unbounded.
+- `timeout --kill-after=10s 300`: TERM at 300 s, KILL 10 s later. Use 900 for a >200k-token scope or a workspace of three or more directories (the cwd plus `--include-directories`). Never run unbounded.
 
 | `--approval-mode` | Headless effect | Use |
 |---|---|---|
@@ -36,8 +36,9 @@ Gemini is a second analyst, not an authority: every finding is a claim until the
    ```
 
    When only proposing, say the command was not run and give no findings.
-4. **Check the exit.** `0` with a non-empty response is the only complete run. `124` timeout (`137` if KILL was needed), `1` API or auth error, `42` bad arguments, `53` turn limit, `FatalUntrustedWorkspaceError` untrusted folder. Anything else is incomplete: report the code and symptom, never present partial output as a review, and ask before retrying with a longer timeout, a narrower scope or a different mode.
+4. **Check the exit.** `0` with a non-empty response is the only complete run. `timeout` itself returns `124` when TERM stopped the run and `137` when KILL was needed; both mean the review is incomplete because the budget ran out. Gemini's own codes: `1` API or auth error, `42` bad arguments, `53` turn limit; `FatalUntrustedWorkspaceError` untrusted folder. Anything else is incomplete: report the code and symptom, never present partial output as a review, and ask before retrying with a longer timeout, a narrower scope or a different mode. For a run that looks hung or ran out of memory, read `references/troubleshooting.md` to describe the symptom.
 5. **Verify, then report.** Open each cited file and line. Go/no-go per finding: **accepted** only when the source shows it; **rejected** when the source contradicts it (say why); **unverified** when the cited file is unavailable or the evidence is ambiguous. Report accepted findings, rejected and unverified claims, limits (scope, denied tools, timeout), and the exact command and model. Verifying confirms or refutes Gemini's claims only; add findings of your own only when the user asks for your review too.
+6. **Follow-up.** When the user asks a follow-up about a finished run, Gemini CLI can continue the earlier session: `gemini --resume latest` (or `--list-sessions`, then `--resume <index>`) loads it, and the CLI reference shows `gemini -r "latest" "query"` continuing it with a new prompt, which is interactive, so give that as a command for the user's terminal in the bounded interactive form, with the same model and approval mode: `timeout --foreground --kill-after=10s 1800 gemini -m gemini-3-pro-preview --approval-mode default -r "latest" "query"`. The docs do not say that `--resume` combines with `-p` headless (checked 2026-11-07; run `gemini --help`). Without that confirmation, start a new headless run and put the earlier accepted findings in the prompt. Keep the same model and `--approval-mode`, and verify the answer as in step 5. Sources: [CLI reference](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/cli-reference.md), [session management](https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/session-management.md).
 
 ## Command shapes
 
@@ -57,6 +58,16 @@ timeout --kill-after=10s 300 gemini -m gemini-3-pro-preview --approval-mode defa
   < /work/plan.md
 ```
 
+Document set, checked for contradictions:
+
+```bash
+cd /work/docs && timeout --kill-after=10s 300 gemini -m gemini-3-pro-preview --approval-mode default \
+  --include-directories /work/specs \
+  -p "Find contradictions between the documents in /work/docs and /work/specs. For each: both sides with file:section, the conflicting statements quoted, uncertainty. Change nothing."
+```
+
+A scope well over 200k tokens: split it by area (one directory or document group per run), run each with the same criteria, verify each run's findings as in step 5, then merge the accepted findings and drop duplicates.
+
 Interactive, for the user's terminal:
 
 ```bash
@@ -75,3 +86,13 @@ cd /srv/payments && timeout --foreground --kill-after=10s 1800 gemini -m gemini-
 - `FatalUntrustedWorkspaceError`: `--skip-trust` or `GEMINI_CLI_TRUST_WORKSPACE=true` trusts the folder for the session, which also loads its `.gemini/settings.json`, `.env` files and MCP servers. Use either only after the user confirms they trust the repository.
 - Never `pkill -f gemini`: it also kills the user's own Gemini sessions. Stop only the PID you launched.
 - `-y`/`--yolo` is deprecated; write `--approval-mode yolo`. Check `gemini --version` when a flag is rejected.
+
+Sources for the behavior claims above, all under `https://github.com/google-gemini/gemini-cli/blob/main/docs/`, checked 2026-11-07; re-read the page or run `gemini --help` when a claim fails:
+
+- Headless denial of tools that need approval, and read-only tools such as `read_file` and `glob` allowed by default: `reference/policy-engine.md`.
+- Headless `plan` exit switching to `yolo`: `cli/plan-mode.md` (Non-interactive execution).
+- `--skip-trust`, `GEMINI_CLI_TRUST_WORKSPACE=true` and `FatalUntrustedWorkspaceError`: `cli/trusted-folders.md`.
+- `--include-directories` takes at most 5 directories: `reference/configuration.md`.
+- Exit codes `1`, `42` and `53`: `cli/headless.md`.
+- `-p` text appended to stdin input: `cli/cli-reference.md`.
+- `--approval-mode` values and the `-y`/`--yolo` deprecation: `cli/cli-reference.md`.

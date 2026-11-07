@@ -1,0 +1,29 @@
+{
+  "skill": "design-system-starter",
+  "mode": "output",
+  "pass_rate": 0.9111,
+  "passed": 41,
+  "total": 45,
+  "failures": [
+    {
+      "eval": "accessible-dark-tokens",
+      "assertion": "Defines Button props with their defaults (intent, size and type, with type defaulting to button) and maps its hover, focus-visible, disabled and loading states to semantic token roles",
+      "evidence": "The props and defaults are present (`type?: \"button\" | \"submit\" | \"reset\"; // default \"button\"`), but the state mapping \"(`bg`, `bgHover`, `bgActive`, `focus.ring`, `disabled.*`)\" gives the loading state no token role; loading is only described as \"aria-busy, label kept, clicks ignored\"."
+    },
+    {
+      "eval": "accessible-dark-tokens",
+      "assertion": "Defines FormField props with a required control id tied to the label, a hint, and an error that sets aria-invalid and points aria-describedby at the displayed message",
+      "evidence": "The control id is optional rather than required (`id?: string; // default useId()`), even though hint and error are wired via \"`aria-describedby` lists the hint and error ids\" and the error sets aria-invalid."
+    },
+    {
+      "eval": "token-scales-request",
+      "assertion": "Writes typography sizes, weights, line heights and letter spacing, with em-based tracking converted because DTCG dimensions allow only px and rem, or says why",
+      "evidence": "Sizes, weights, line heights and tracking are written, but tracking such as \"tight\": { \"value\": -0.01, \"unit\": \"rem\" } just swaps em for rem without converting the value per font size, and the output never says why."
+    },
+    {
+      "eval": "touch-target-question",
+      "assertion": "Recommends recording which level the system targets",
+      "evidence": "The output only says to \"document both numbers as tokens\", labelling 24px the \"(AA) floor\" and 44px the default, and never recommends recording which conformance level the system targets."
+    }
+  ]
+}

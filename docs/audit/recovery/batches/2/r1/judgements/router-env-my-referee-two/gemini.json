@@ -1,0 +1,95 @@
+{
+  "skill": "gemini",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 29,
+      "evidence": "Cut list (showing 40 of 218 removed units) from the dbff837f digest is one medium finding. The 40 shown units map to section ids s001-s054, each with an allowed record row. The second digest (89cb6a11) has 0 removed units.",
+      "fix": "No restore: the shown units are explained. Record the 178 unshown units in docs/audit/recovery/gemini/record.md only if a later digest shows one is substantive and unexplained."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/gemini/SKILL.md",
+      "line": 24,
+      "evidence": "Workflow is a numbered procedure without a checklist, and step 6 leaves resume versus a new headless run as two open paths.",
+      "fix": "Add a short progress checklist to Workflow (scope, secret scan, run or propose, exit code, verify, follow-up) and make the headless follow-up the default: new -p run with accepted findings in the prompt, interactive --resume only when the user will run it in their terminal."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/gemini/SKILL.md",
+      "line": 68,
+      "evidence": "Gotchas covers shell escaping the include list, positional prompts, timeout process groups, plan-to-yolo, silent tool denial, trust loading settings, and pkill, but not the 5-directory cap or a positional prompt combined with -p.",
+      "fix": "Add two Gotchas: a sixth --include-directories path is dropped (cap 5, configuration.md), and a positional argument next to -p is not the prompt and can open a session; put extra instruction only inside -p or on stdin."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/gemini/SKILL.md",
+      "line": 13,
+      "evidence": "references/model-selection.md and references/troubleshooting.md are gated, but the sources list at lines 81-84 is ungated detail the agent does not need on every run.",
+      "fix": "Move the four source URLs and the 2026-11-07 check date into references/troubleshooting.md (or a references/sources.md) and leave one line in Gotchas: re-read that file or run gemini --help when a claim fails."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/gemini/SKILL.md",
+      "line": 13,
+      "evidence": "Model choice is a default plus a reference menu, but step 6 offers interactive --resume and a new headless run as equal follow-ups, and yolo's sandbox requirement is only inside a table cell.",
+      "fix": "State one follow-up default in step 6 (new headless -p run; interactive --resume only when the user will run it). In Defaults, say yolo without a confirmed -s sandbox or an isolated copy is not allowed."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/gemini/evals/evals.json",
+      "line": 1,
+      "evidence": "Nine evals have realistic prompts and verifiable assertions, but none exercises the secret-file scan before launch or the 900s budget for a >200k-token or three-directory scope. Trigger queries are 10/10 with near-misses, yet several should-trigger lines are keyword-explicit.",
+      "fix": "Add one eval whose scope contains a .env or *.pem and asserts the command is not launched until the user decides, and one three-directory or >200k eval that asserts timeout 900. Rewrite two should-trigger queries so they omit the words Gemini and CLI."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 45,
+      "evidence": "Step 4 says 124 means timeout (137 if KILL was needed) and maps only 0, 1, 42 and 53. The launch example uses timeout, so a killed run exits 137 from timeout, which the agent would treat as incomplete for the wrong reason.",
+      "fix": "In step 4, say a timeout-wrapped run returns 124 on TERM and 137 when KILL was needed; both mean the review is incomplete. Keep 1, 42 and 53 as Gemini's own codes when gemini itself exits."
+    }
+  ]
+}

@@ -24,11 +24,6 @@
         "Defines Button props with their defaults (intent, size and type, with type defaulting to button) and maps its hover, focus-visible, disabled and loading states to semantic token roles",
         "Defines FormField props with a required control id tied to the label, a hint, and an error that sets aria-invalid and points aria-describedby at the displayed message",
         "For both the light and the dark theme, lists at least one text/background pair as resolved hex values with a computed contrast ratio of 4.5 or more"
-      ],
-      "files": [
-        "templates/design-tokens-template.json",
-        "templates/component-template.tsx",
-        "references/component-examples.md"
       ]
     },
     {
@@ -71,6 +66,63 @@
         "Identifies color.semantic.border.default as referencing the missing token color.gray.350",
         "Reports text.secondary on surface.default as below 4.5:1 and proposes a replacement value that passes",
         "Fixes all three defects before writing component code, or states that component work is blocked until they are fixed"
+      ]
+    },
+    {
+      "id": "token-scales-request",
+      "prompt": "Add typography, spacing, radius and shadow tokens to our design system, plus warning and info feedback colors. We use the DTCG 2025.10 token format.",
+      "expected_output": "Full scales in DTCG object form, shadows as DTCG shadow objects named by their own steps, and warning and info roles with a contrast-checked value.",
+      "assertions": [
+        "Writes the spacing scale as dimension objects with numeric value and unit (for example 0.25rem to 6rem), not as strings like \"16px\"",
+        "Writes typography sizes, weights, line heights and letter spacing, with em-based tracking converted because DTCG dimensions allow only px and rem, or says why",
+        "Writes shadows as DTCG shadow objects (color, offsetX, offsetY, blur, spread) and does not claim v3-era Tailwind shadow names as the current Tailwind names",
+        "Uses a warning color that passes 3:1 as text or icon on white (for example yellow-700 at 4.92:1) and does not use yellow-600 (2.94:1) or gray-200 borders (1.24:1) as accessible",
+        "Gives a computed or measured ratio for each new feedback role"
+      ]
+    },
+    {
+      "id": "native-dialog-modal",
+      "prompt": "Write a Modal component for our React design system with a title, a close button and sizes. It must be accessible.",
+      "expected_output": "A Modal built on native dialog with showModal(), labelled by its heading, closing on Escape natively and returning focus to the opener.",
+      "assertions": [
+        "Builds the Modal on a native <dialog> opened with showModal(), not a styled div with role=dialog and aria-modal",
+        "Labels the dialog by its heading with aria-labelledby",
+        "Relies on native Escape handling (the close event) and has a visible close button",
+        "Returns focus to the element that opened the dialog on close",
+        "Does not hand-write a focus trap or key handler for Tab"
+      ]
+    },
+    {
+      "id": "touch-target-question",
+      "prompt": "What is the minimum touch target size our Button and icon buttons must have to meet WCAG, and how should the design system document it?",
+      "expected_output": "AA minimum 24x24 CSS px (SC 2.5.8), AAA 44x44 CSS px (SC 2.5.5), and a documented choice of level.",
+      "assertions": [
+        "States that WCAG 2.2 Level AA (SC 2.5.8) requires at least 24x24 CSS px",
+        "States that 44x44 CSS px is the Level AAA criterion (SC 2.5.5), not the AA minimum",
+        "Recommends recording which level the system targets"
+      ]
+    },
+    {
+      "id": "theme-toggle-no-flash",
+      "prompt": "Add a dark mode toggle button to our React app. The theme is stored in localStorage and defaults to the system preference.",
+      "expected_output": "A head script sets data-theme before first paint and the toggle reads that value instead of deciding the theme after mount.",
+      "assertions": [
+        "Sets data-theme from an inline script in the head before first paint, from the stored choice or prefers-color-scheme",
+        "The toggle component reads the value the head script set (document.documentElement.dataset.theme) for its initial state",
+        "Does not default the theme to light and then set data-theme in an effect after mount",
+        "Exposes the toggle state with aria-pressed on a native button"
+      ]
+    },
+    {
+      "id": "rename-and-deprecate",
+      "prompt": "We're renaming the token color.action.primary to color.action.default and Button's variant prop to intent, across four apps that each consume our design system package. How do we ship this without breaking anyone?",
+      "expected_output": "The old token path and the old prop stay as deprecated aliases through the next major release and are removed in the one after; consumers move one per release; no token changes meaning in a minor release.",
+      "assertions": [
+        "Keeps color.action.primary as an alias that resolves to color.action.default and marks it deprecated (for example DTCG $deprecated) instead of deleting it",
+        "Maps the old variant prop to intent with the same default value, so existing call sites render unchanged",
+        "States the deprecation window: the aliases keep working through the next major release and are removed in the one after, not sooner while consumers live in separate repositories",
+        "Orders the migration one consuming app per release, removing the aliases only after the last app has moved",
+        "Does not change what an existing token means in a minor or patch release"
       ]
     }
   ]

@@ -44,6 +44,8 @@ PY
 
 ## Contrast ratio
 
+Large text for the 3:1 threshold means at least 18pt, or at least 14pt bold (or the CJK equivalent); anything smaller is normal text and needs 4.5:1 (WCAG 2.2 SC 1.4.3, https://www.w3.org/TR/WCAG22/, checked 2026-11-07). Essential UI boundaries (SC 1.4.11) also need 3:1.
+
 Arguments: foreground, background, threshold (4.5 or 3), and (only when the background is translucent) the opaque surface beneath it. Hex as `#rgb`, `#rrggbb`, `#rgba` or `#rrggbbaa`. Foreground alpha is composited over the background; a translucent background is first composited over its own underlying surface, never assumed opaque. Pass/fail compares the unrounded ratio, so 4.499 never passes as 4.5; `display` is for the table only. This example prints `{"ratio": 2.5388, "display": 2.54, "threshold": 4.5, "pass": false}`.
 
 ```bash
