@@ -1,0 +1,41 @@
+{
+  "skill": "skill-updater",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 124,
+  "max_total": 125,
+  "percent": 99.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 24,
+      "evidence": "Step 4 says a contents check 'Not Found (HTTP 404)' means moved and step 5, but audit.py fetch_source_updated treats an empty commits array as IndexError and reports error 'list index out of range', so a deleted path never reaches error null",
+      "fix": "In the step-3 table, keep 'list index out of range' on a github-path row as the only path-gone signal and send it to step 5. In step 4, use the contents check to confirm the stored path still exists before classifying a row whose error is already null; do not say a contents 404 is how a deleted path is detected."
+    }
+  ]
+}
