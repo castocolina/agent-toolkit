@@ -1,0 +1,95 @@
+{
+  "skill": "mui",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 12,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/mui/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest mui at dbff837f: \"removed units (114, showing 40)\". All 40 shown para items and file:skills/mui/skill-rules-fragment.json resolve to valid record rows through sections.json. The other 74 units could not be checked one by one.",
+      "fix": "Regenerate the dbff837f digest without the cut so every removed unit is listed. Then confirm that each unit maps to a section row in docs/audit/recovery/mui/record.md, or add a row for it."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/mui/SKILL.md",
+      "line": 62,
+      "evidence": "\"**Icon-only buttons.** An `IconButton` has no accessible name of its own: set `aria-label` to the action\". This is general a11y knowledge, not a v7 fact, and it repeats what the ui-ux-principles route already covers.",
+      "fix": "Shorten it to one activation clause under Gotchas (for example \"IconButton: aria-label names the action, not the icon\"), or move it to resources/ui-ux-mapping.md and record the move in record.md. Do not delete it."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/mui/SKILL.md",
+      "line": 26,
+      "evidence": "\"3. **Apply the matching trap** from v7 facts and Gotchas.\" A migration has no sweep procedure, so the agent fixes only the file in front of it and misses the same legacy APIs elsewhere in the repo.",
+      "fix": "Add a migration sweep step before step 3: grep the repo for `components=`, `componentsProps=`, `onBackdropClick`, `<Grid item`, `@mui/material/[A-Z][a-zA-Z]*/` and `inputProps=`. Migrate every hit with the v7 facts, then typecheck."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/mui/SKILL.md",
+      "line": 61,
+      "evidence": "\"show `Skeleton` in their shape ... not a lone `CircularProgress`\". The bullet gives the rule but not the reason, so the agent cannot tell when the rule applies.",
+      "fix": "Add the why: a lone spinner gives no layout preview and causes layout shift when the content arrives, and a skeleton shaped like the content keeps the layout stable. Keep the variants as they are."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/mui/evals/evals.json",
+      "line": 16,
+      "evidence": "dialog-v7 assertions \"Includes Cancel and Delete\" and \"Uses MUI imports\" pass without the skill. legacy-api uses \"Rejects deep imports\" with a terse prompt and no input file. The recipe evals list `references/component-recipes.md` under `files`, which is the skill's own file, not an eval input under evals/files/.",
+      "fix": "Replace the always-pass assertions with checks the skill drives, for example \"onClose branches on reason\" and \"DialogTitle present for the accessible name\". Give legacy-api a fixture in evals/files/. Move the reference paths out of `files`, or replace them with real input files."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/mui/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "The negatives include easy ones (\"Configure Vite for React.\", \"Explain React server components in Next.js.\"). No negative covers the description's named near-miss neighbours: Joy UI, MUI X data grid and MUI X pickers. Almost every positive names MUI explicitly.",
+      "fix": "Replace two easy negatives with near-misses such as \"add sorting to our MUI X DataGrid columns\" and \"style a Joy UI Button\". Add two positives that edit an existing MUI screen without naming MUI or v7."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/mui/SKILL.md",
+      "line": 12,
+      "evidence": "\"On v9, read the official upgrade guide ... before applying v7 advice\". This branch covers v7 and v9 only. Following it with an installed 8.x package reaches no instruction, because no v8 guide or check is named.",
+      "fix": "Generalise the branch: when the installed major is above 7, read the official upgrade guide for each major between 7 and the installed one (https://mui.com/material-ui/migration/upgrade-to-v<N>/) before applying v7 advice. Then keep the v9 list as the worked example."
+    }
+  ]
+}

@@ -22,7 +22,8 @@ cp -r skills/commit-work ~/.claude/skills/
 commit-work/
 ├── SKILL.md                                 # Intent routing, workflow, gotchas
 ├── README.md                                # This file
-├── references/commit-message-template.md    # Repository message rules, commitlint defaults, spec edge cases
+├── references/commit-message-template.md    # Repository message rules, commitlint defaults, spec edge cases, worked messages, report block
+├── references/split-one-file.md             # Two commits from one file without git add -p
 └── evals/                                   # Output evals, fixtures in evals/files/, trigger queries
 ```
 
@@ -30,3 +31,9 @@ commit-work/
 
 - [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/)
 - [`@commitlint/config-conventional`](https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional)
+- [GitHub Docs, creating a pull request template](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/creating-a-pull-request-template-for-your-repository)
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+The same workflow text is in [jMerta/codex-skills](https://github.com/jMerta/codex-skills) by Jakub Merta (MIT), committed there on 2025-12-14, before softaworks added it on 2026-01-18.

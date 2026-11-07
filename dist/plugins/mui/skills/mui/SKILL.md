@@ -7,12 +7,25 @@ description: "Use when writing, fixing or migrating React code on Material UI v7
 
 Only the v7 facts a model gets wrong are here. Keep the repository's own styling conventions.
 
+## Version check
+
+This skill is written for v7. Read the installed `@mui/material` version first (`package.json`, or `pnpm view @mui/material dist-tags` for the registry's current tags: on 2026-11-07 `latest` was 9.5.0 and `latest-v7` was 7.3.11, npm registry, https://www.npmjs.com/package/@mui/material, checked 2026-11-07). On v9, read the official upgrade guide, https://mui.com/material-ui/migration/upgrade-to-v9/, before applying v7 advice. Removals in that guide that change v7 code (each confirmed on the page, checked 2026-11-07):
+
+- `GridLegacy` is removed; use `Grid` with `size`. `Grid` no longer takes `direction="column"`: use `Stack`.
+- System props (`mt`, `color`, ...) are removed from `Box`, `Grid`, `Stack` and `Typography` (also `DialogContentText`, `Link` and the Timeline content components): use `sx`.
+- `Dialog` and `Modal` lose `disableEscapeKeyDown`: check `reason === 'escapeKeyDown'` in `onClose`.
+- Deprecated `styleOverrides` class keys (`Button` `containedPrimary`, and the `Button`, `Chip` and `Alert` class lists in the guide) move to `variants` entries under `root`.
+- 23 `@mui/icons-material` exports ending in `Outline` are removed: import the `...Outlined` name.
+
+The guide has more breaking changes than these (for example higher default browser targets); the page, not this list, is the complete set.
+
 ## Decision order
 
-1. **Confirm the installed API.** Read the version in `package.json` and the component's `node_modules/@mui/material/<Component>/<Component>.d.ts` before relying on a prop. No `node_modules`: use the v7 upgrade guide and say which source you used.
+1. **Confirm the installed API.** Read the version in `package.json` and the component's `node_modules/@mui/material/<Component>/<Component>.d.ts` before relying on a prop. No `node_modules`: use the v7 upgrade guide and say which source you used. Installed major below 7 and the user did not ask to upgrade: keep the installed API, check each v7 fact against the installed `.d.ts` before using it, and offer the migration instead of applying it. For a major this skill does not cover, read that version's official upgrade or migration guide. On v9, the Version check above applies.
 2. **Pick the layer.** `sx` for one instance, `styled` for a reused component, theme `components` overrides for an app-wide default. Extract styles when reuse or readability asks for it, not at a line count.
-3. **Apply the matching trap** from v7 facts and Gotchas.
-4. **Verify.** Run the repo's typecheck script; if it has none, run `npx tsc --noEmit`. Then exercise what the change touches: each breakpoint, keyboard focus, every dialog close path.
+3. **Sweep the repo for a migration.** Search the whole repository, not just the file in hand, for the legacy APIs the v7 facts list: `components=`, `componentsProps=`, `onBackdropClick`, `<Grid item`, deep `@mui/material/<Component>/` imports and `inputProps=` (TextField). List every hit. Migrate the hits in the files the user named with the v7 facts below, then typecheck. Report hits elsewhere with file and line, and migrate them only when the user asked for a full migration or agrees.
+4. **Apply the matching trap** from v7 facts and Gotchas.
+5. **Verify.** Run the repo's typecheck script; if it has none, run `npx tsc --noEmit`. Then exercise what the change touches: each breakpoint, keyboard focus, every dialog close path.
 
 ## Worked branch: a v6 dialog
 
@@ -63,4 +76,7 @@ This file covers every prop or import migration; load nothing for one.
 
 - `resources/theme-customization.md`: when writing `createTheme` or provider setup: the full augmentation code, `cssVariables` with `colorSchemes`, the CSS layer setup, a nested theme. Not for an `sx` edit.
 - `resources/styling-guide.md`: when a `styled` component or a theme `styleOverrides` must beat a state class (`Mui-focused`, `Mui-error`) or style by color mode (`theme.applyStyles`, `theme.vars`). Not for theme setup; theme-customization.md owns that.
+- `references/component-recipes.md`: when the user asks for a component example: a TextField with validation, Stack, Card, List, Autocomplete, Snackbar, Dialog, Popover, Menu, Avatar or a complete form. Not for a prop or import migration.
+- `references/sx-and-styled-recipes.md`: when the user asks for an example of conditional or dynamic `sx`, the `sx` array form, `GlobalStyles`, a reusable `styled()` component with a custom prop, a card hover effect, a gradient, a sticky header, or how to debug `sx`.
+- `references/theme-recipes.md`: when the user asks for an example of theme typography, component `styleOverrides` or `defaultProps`, custom breakpoints, shadows, transitions, or the `ThemeProvider` and `CssBaseline` root setup. Palette augmentation and CSS layers stay in `resources/theme-customization.md`.
 - For a new or redesigned screen's loading, responsive, hierarchy, tokens, consistency, a11y, states or interaction work: load the `ui-ux-principles` skill first, then `resources/ui-ux-mapping.md` for the MUI construct per rule. Load neither for a migration or a single-prop fix.

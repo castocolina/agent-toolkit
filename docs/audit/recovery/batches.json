@@ -475,10 +475,158 @@
       }
     ],
     "brief": "docs/audit/recovery/batches/04-meme-factory-mui-commit-work.md",
-    "status": "queued",
+    "status": "closed",
     "rounds": 0,
     "requeues": 0,
-    "waived": []
+    "waived": [
+      {
+        "artifact": "commit-work",
+        "dimension": "D8",
+        "file": "skills/commit-work/SKILL.md",
+        "fix": "In step 8, write: 'Repeat steps 3 (staging only, reusing the same `<run>`; rebuild the temporary index from the new HEAD) to 7'. In step 3, scope the leftover check and mktemp to the first commit of the run.",
+        "reason": "fixed after round 3 (2026-11-07): a multi-commit run reuses its run directory (leftover check and mktemp on the first commit only, temporary index rebuilt from the new HEAD); pick.diff keeps its header lines and drops only whole hunks; not re-judged (3-round cap); listed for the user"
+      },
+      {
+        "artifact": "commit-work",
+        "dimension": "D8",
+        "file": "skills/commit-work/SKILL.md",
+        "fix": "State that pick.diff keeps the diff --git, index and ---/+++ header lines and drops only whole @@ hunks, and that a failed --check means stop and ask rather than edit the hunk.",
+        "reason": "fixed after round 3 (2026-11-07): a multi-commit run reuses its run directory (leftover check and mktemp on the first commit only, temporary index rebuilt from the new HEAD); pick.diff keeps its header lines and drops only whole hunks; not re-judged (3-round cap); listed for the user"
+      },
+      {
+        "artifact": "commit-work",
+        "dimension": "D2",
+        "file": "skills/commit-work/SKILL.md",
+        "fix": "Split step 3 into labelled sub-steps: 3a run directory (create, list leftovers, clean up), 3b choose the index (overlap check included), 3c stage (whole file or part of a file). Keep every sentence and only regroup them.",
+        "reason": "declined (2026-11-07): regrouping step 3 into sub-steps is layout only; listed for the user"
+      },
+      {
+        "artifact": "commit-work",
+        "dimension": "D2",
+        "file": "skills/commit-work/SKILL.md",
+        "fix": "Split step 3 into numbered checkpoints (choose the index, stage, review the overlap) while keeping the same commands and the behavior-split rule.",
+        "reason": "declined (2026-11-07): regrouping step 3 into sub-steps is layout only; listed for the user"
+      },
+      {
+        "artifact": "commit-work",
+        "dimension": "D7",
+        "file": "skills/commit-work/evals/evals.json",
+        "fix": "Remove references/split-one-file.md from that eval's files list, keeping only evals/files/refactor-and-bugfix.txt. Add an assertion that the run reads references/split-one-file.md or follows its order (bugfix first, `--check` before apply).",
+        "reason": "declined (2026-11-07): run-evals passes only SKILL.md plus files, so the eval needs the reference it tests; listed for the user"
+      },
+      {
+        "artifact": "commit-work",
+        "dimension": "D7",
+        "file": "skills/commit-work/evals/trigger-queries.json",
+        "fix": "Add a fixed train/validation split and near-misses such as amending a message, reverting one commit, or writing a changelog from commits already made.",
+        "reason": "declined (2026-11-07): run-evals reads no train or validation split; triggers at 1.0; listed for the user"
+      },
+      {
+        "artifact": "meme-factory",
+        "dimension": "D8",
+        "file": "skills/meme-factory/SKILL.md",
+        "fix": "After the usage line, add: 'Quote each caption in double quotes when it contains an apostrophe (\"don't deploy\"), or escape it as '\\''; never pre-escape it to memegen form.' Add an apostrophe caption to tests/skills/meme-factory/test_meme_generator.py run_cli cases.",
+        "reason": "fixed after round 3 (2026-11-07): apostrophe captions are double-quoted or written with the shell escape, never pre-escaped, with a generator test; status meanings add the empty path segment (404) and custom without background (422) from references/image-memes.md; not re-judged (3-round cap); listed for the user"
+      },
+      {
+        "artifact": "meme-factory",
+        "dimension": "D8",
+        "file": "skills/meme-factory/SKILL.md",
+        "fix": "Add the two other causes references/image-memes.md already states: 404 is also an empty path segment, and 422 is also template custom with no background parameter.",
+        "reason": "fixed after round 3 (2026-11-07): apostrophe captions are double-quoted or written with the shell escape, never pre-escaped, with a generator test; status meanings add the empty path segment (404) and custom without background (422) from references/image-memes.md; not re-judged (3-round cap); listed for the user"
+      },
+      {
+        "artifact": "meme-factory",
+        "dimension": "D1",
+        "file": "skills/meme-factory/references/text-memes.md",
+        "fix": "Delete that sentence from references/text-memes.md (the same payoff-first rule is already SKILL.md step 4) and add a row for it to docs/audit/recovery/meme-factory/record.md.",
+        "reason": "declined under rail 1 (2026-11-07): the three-layers sentence is restored guidance for every text format; listed for the user"
+      },
+      {
+        "artifact": "meme-factory",
+        "dimension": "D7",
+        "file": "skills/meme-factory/evals/trigger-queries.json",
+        "fix": "Add two near-miss queries that share the skill's own words but need something else: one asking to caption a photo when an image URL is supplied but the user wants the pixels edited, and one asking for a meme-style diagram of a real incident timeline. Keep the current photo.jpg query.",
+        "reason": "declined (2026-11-07): triggers at 1.0 with near-misses added in round 2; listed for the user"
+      },
+      {
+        "artifact": "meme-factory",
+        "dimension": "D8",
+        "file": "skills/meme-factory/references/blog-posts.md",
+        "fix": "Restore the three emoji lines from the source sample in references/text-memes.md section 11 (walking figure, thinking face, target, sparkles, relieved face) into the Success Metrics block of references/blog-posts.md.",
+        "reason": "declined as false (2026-11-07): the flagged lines hold no emoji and no U+FFFD; listed for the user"
+      },
+      {
+        "artifact": "mui",
+        "dimension": "D6",
+        "file": "skills/mui/SKILL.md",
+        "fix": "Keep the repo-wide search but gate the edits: 'Search the whole repository for the legacy APIs ... and list every hit. Migrate the hits in the files the user named. For hits elsewhere, report them with file and line and migrate them only when the user asked for a full migration or agrees.'",
+        "reason": "fixed after round 3 (2026-11-07): the migration sweep lists every hit and migrates only the files the user named, reporting the rest unless a full migration was asked for; not re-judged (3-round cap); listed for the user"
+      },
+      {
+        "artifact": "mui",
+        "dimension": "D6",
+        "file": "skills/mui/SKILL.md",
+        "fix": "State one default file per task (component-recipes for a component example, theme-customization for createTheme, styling-guide for a losing state class) and name the other files as the not-loaded set",
+        "reason": "fixed after round 3 (2026-11-07): the migration sweep lists every hit and migrates only the files the user named, reporting the rest unless a full migration was asked for; not re-judged (3-round cap); listed for the user"
+      },
+      {
+        "artifact": "mui",
+        "dimension": "D8",
+        "file": "skills/mui/SKILL.md",
+        "fix": "Use the package manager's own command: '`npm view @mui/material dist-tags` (or `pnpm view` / `yarn npm info` in those repos)'. To read the installed version rather than the registry, use '`npm ls @mui/material`'.",
+        "reason": "fixed after round 3 (2026-11-07): the registry tags line cites https://www.npmjs.com/package/@mui/material, checked 2026-11-07; not re-judged (3-round cap); listed for the user"
+      },
+      {
+        "artifact": "mui",
+        "dimension": "D8",
+        "file": "skills/mui/SKILL.md",
+        "fix": "Keep the pnpm view instruction and append the vendor URL and date already used in facts.md: https://www.npmjs.com/package/@mui/material, checked 2026-11-07",
+        "reason": "fixed after round 3 (2026-11-07): the registry tags line cites https://www.npmjs.com/package/@mui/material, checked 2026-11-07; not re-judged (3-round cap); listed for the user"
+      },
+      {
+        "artifact": "mui",
+        "dimension": "D8",
+        "file": "skills/mui/references/theme-recipes.md",
+        "fix": "Move the variants array to components.MuiButton.variants, sibling of styleOverrides and defaultProps, and say the v9 guide's 'under root' wording means the root slot rather than a key inside styleOverrides.root",
+        "reason": "declined as false (2026-11-07): https://mui.com/material-ui/customization/theme-components/ puts variants inside styleOverrides.root, as the reference shows; listed for the user"
+      },
+      {
+        "artifact": "mui",
+        "dimension": "D5",
+        "file": "skills/mui/README.md",
+        "fix": "Keep the Credits section and the links; move the duplicate Usage Examples and Best Practices snippets out of the always-loaded README into the matching references file, and record each moved paragraph",
+        "reason": "declined under rail 1 (2026-11-07): README usage examples stay; listed for the user"
+      },
+      {
+        "artifact": "commit-work",
+        "dimension": "D1",
+        "file": "docs/audit/recovery/commit-work/record.md",
+        "fix": "Regenerate the digest without the cut, or confirm that every remaining unit's section (s001-s022) has a valid row in docs/audit/recovery/commit-work/record.md. The sections.json units already list them, so no content needs restoring.",
+        "reason": "digest list cut by the 40-unit cap; record-check clean on the uncapped list (2026-11-07)"
+      },
+      {
+        "artifact": "meme-factory",
+        "dimension": "D1",
+        "file": "docs/audit/recovery/meme-factory/record.md",
+        "fix": "Re-run the removal digest without the cut (or in pages) and confirm that every one of the 458 units has a destination in the current files or a valid row in docs/audit/recovery/meme-factory/record.md.",
+        "reason": "digest list cut by the 40-unit cap; record-check clean on the uncapped list (2026-11-07)"
+      },
+      {
+        "artifact": "mui",
+        "dimension": "D1",
+        "file": "skills/mui/SKILL.md",
+        "fix": "Re-run the digest without a cap (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/mui/SKILL.md --judge direct --digest-dir <tmp>), or confirm that every unit in docs/audit/recovery/mui/sections.json maps to a section row in record.md. Restore any unit that has no row, into references/ when it is domain-specific, or add a row for it to docs/audit/recovery/mui/record.md.",
+        "reason": "digest list cut by the 40-unit cap; record-check clean on the uncapped list (2026-11-07)"
+      },
+      {
+        "artifact": "mui",
+        "dimension": "D1",
+        "file": "skills/mui/README.md",
+        "fix": "Expand the dbff837f digest to every para id (or confirm each remaining id is listed in sections.json units for a record row) so the unshown 74 can be judged; do not delete the restored recipes in references/",
+        "reason": "digest list cut by the 40-unit cap; record-check clean on the uncapped list (2026-11-07)"
+      }
+    ]
   },
   {
     "id": 5,

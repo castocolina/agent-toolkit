@@ -87,6 +87,10 @@ class GenerateCliTests(unittest.TestCase):
         out = run_cli("generate", "buzz", "C++ @ 9:00!", "ok")
         self.assertEqual(out.strip(), f"{BASE_URL}/images/buzz/C%2B%2B_%40_9%3A00%21/ok.png")
 
+    def test_apostrophe_caption_is_kept_as_is(self):
+        out = run_cli("generate", "buzz", "don't deploy on friday", "ok")
+        self.assertEqual(out.strip(), f"{BASE_URL}/images/buzz/don't_deploy_on_friday/ok.png")
+
 
 class SuggestCliTests(unittest.TestCase):
     def test_suggest_json_prints_template(self):
