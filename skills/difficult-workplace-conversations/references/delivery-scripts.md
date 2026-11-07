@@ -10,7 +10,9 @@ Load only to rehearse specific reactions, or to word a sensitive personal disclo
 | Deflection | "What about when you did X?" | "That's fair to raise, and I'll take it seriously. Can we finish this first and then come to it?" | Acknowledges without trading one issue for another. |
 | Attack | "You're overreacting." | "Maybe. Tell me what you think I'm missing." | Refuses the fight without conceding the facts. |
 | Shutdown | Silence, one-word answers | "I've done most of the talking. What's your view?" then wait at least ten seconds. | Filling the silence lets them stay out. |
-| Tears or a raised voice | Visible distress | "Let's pause. Do you want ten minutes, or to pick this up tomorrow at [time]?" | A choice with a time keeps it a pause, not an end. |
+| Tears or a raised voice | Visible distress | "Let's pause. Do you want twenty minutes or more, or to pick this up tomorrow at [time]?" | A choice with a time keeps it a pause, not an end. |
+
+A flooded person needs at least twenty minutes for the body to return to a calm baseline, so do not offer a shorter break. Source: The Gottman Institute, https://www.gottman.com/blog/conversational-boundaries-without-stonewalling (checked 2026-11-07).
 
 ## Reactions to a decision (SKILL.md Section 4)
 

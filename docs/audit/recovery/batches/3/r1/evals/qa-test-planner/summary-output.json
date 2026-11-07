@@ -1,0 +1,24 @@
+{
+  "skill": "qa-test-planner",
+  "mode": "output",
+  "pass_rate": 0.9615,
+  "passed": 75,
+  "total": 78,
+  "failures": [
+    {
+      "eval": "auth-plan",
+      "assertion": "Excludes an area only with cited evidence that the change cannot reach it; otherwise records impact as Unknown, names the missing-information owner or marks it Unknown, and retains a minimal smoke check or an owned Blocked check",
+      "evidence": "Nothing is excluded, but the Unknown-impact row for rate limiting has neither a smoke check nor an owned Blocked check: \"Rate limiting / lockout | `Unknown` | Does it apply to reset requests? | none until specified (listed gap)\"."
+    },
+    {
+      "eval": "checkout-cases",
+      "assertion": "Each case has a cleanup step that resets the data it seeded",
+      "evidence": "TC-CHK-001 seeds 'exactly 1 item in the cart' and 0 prior orders, but its cleanup says 'Reset the cart to empty' and deletes the order only 'if the environment allows it', so it does not restore the seeded state for a rerun."
+    },
+    {
+      "eval": "script-bug-file",
+      "assertion": "Checks that the logged command single-quotes every flag value and passes ./bugs as the output directory",
+      "evidence": "The output never mentions quoting of flag values and never checks `./bugs` as the positional output-directory argument; it only cites the resulting path \"`./bugs/BUG-CHK-5521.md`\"."
+    }
+  ]
+}

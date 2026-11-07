@@ -127,6 +127,111 @@
         "Confirms from the attached TC-PAY-007.md that Requirement reads REQ-PAY-7, Risk reads 'A declined payment still creates an order', and Cleanup lists emptying the cart of qa+decline@example.test",
         "Confirms from the attached TC-PAY-007.md that Estimated Time reads Unknown and is listed under its Open Questions, and asks the user for the duration"
       ]
+    },
+    {
+      "id": "regression-tiers",
+      "prompt": "/qa-test-planner build a regression suite structure for the payment module: which tiers, when each runs, how to find the critical paths, and in what order to run them.",
+      "files": [
+        "references/regression_testing.md"
+      ],
+      "expected_output": "Four tiers (smoke, targeted, full, sanity) each with its purpose, when it runs and its coverage, durations marked as examples to replace with measured times, the four critical-path questions, a run order (smoke first and stop on failure, then the impact precedence, then an exploratory pass), and no pass-rate threshold as an exit gate.",
+      "assertions": [
+        "Defines smoke, targeted, full and sanity tiers, each with when it runs (every build, after a change, before a release, after a hotfix) and what it covers",
+        "Labels any duration as an example or placeholder to be replaced by the team's measured time, not as a target",
+        "Asks the critical-path questions: what users cannot live without, what generates revenue, what handles sensitive data, what is used most often",
+        "Runs smoke first and stops on a smoke failure, then orders by the failure-impact precedence, and closes with an unscripted exploratory pass that is not reported as a pass of a listed case",
+        "Gives a run frequency per priority as a default the team's cadence overrides, and does not use a pass-rate percentage as the release gate"
+      ]
+    },
+    {
+      "id": "full-plan-sections",
+      "prompt": "/qa-test-planner write the full test plan document for the checkout redesign release. I need entry criteria and a risk table. Browsers and dates are not decided yet.",
+      "files": [
+        "references/test_plan_template.md"
+      ],
+      "expected_output": "A plan document with an executive summary, scope, test types and approach, an entry criteria checklist, a risk table with probability, impact, mitigation, covering cases and owner, exit gates from the release gate, deliverables, and Unknown for browsers, dates and any unsupplied probability, repeated under Open Questions.",
+      "assertions": [
+        "Has an executive summary, a test types and approach section, an entry criteria checklist (requirements, designs, environment, seeded data, deployed build) and a deliverables list",
+        "The risk table has probability, impact, mitigation, covering case IDs and an owner column, and writes Unknown where the requester gave no basis instead of inventing H, M or L",
+        "Writes browsers and dates as Unknown and lists them under Open Questions with who can answer",
+        "Exit gates apply the release gate (critical requirements passing, no open P0, blocked cases owned) and contain no pass-rate percentage",
+        "Says a criterion not met when testing starts makes the dependent cases Blocked with an owner"
+      ]
+    },
+    {
+      "id": "security-bug-owasp",
+      "prompt": "/qa-test-planner bug: the order lookup endpoint returns another customer's order when I change the order ID in the URL. It is a security issue; which OWASP category is it? Draft the report.",
+      "files": [
+        "references/bug_report_templates.md"
+      ],
+      "expected_output": "A confidential security report from the security template: class, affected data, a safe verification on a test account with no real customer data, the OWASP category named together with its edition (OWASP Top 10:2025 or the edition the team follows) or a pointer to the live list, never a bare category id, severity set by impact with P0 priority for the data exposure, and the reproduction rate and disclosure owner as Unknown.",
+      "assertions": [
+        "Marks the report confidential and keeps it out of a public tracker",
+        "Names the OWASP category together with its edition (for example OWASP Top 10:2025) or tells the user to read the live list at top10.owasp.org; never writes a category id without an edition",
+        "Describes the verification on a dedicated test account without exploit code, live tokens or real customer data",
+        "Sets severity from the impact (data exposure) and starts priority at P0 for a security or data-exposure bug, with the risk level not replacing the severity",
+        "Writes reproduction rate, environment facts not supplied and the disclosure owner as Unknown, listed under Open Questions"
+      ]
+    },
+    {
+      "id": "run-report-without-pass-rate",
+      "prompt": "/qa-test-planner write the run report for build 2.4.0-rc2 on staging. 120 cases executed, 5 failed including TC-PAY-001 (a P0, double charge on retry), 1 blocked because the ledger is unreachable. Give the release decision.",
+      "files": [
+        "references/regression_testing.md"
+      ],
+      "expected_output": "A run report from the template with the counts, a by-priority table, per-case evidence, the critical failure TC-PAY-001, the blocked case with an owner Unknown, risks, and a Block decision from the release gate; no pass percentage decides anything.",
+      "assertions": [
+        "Includes the build, environment, a summary of counts and a by-priority table, and writes any count the requester did not give (the by-priority split, passed total) as Unknown rather than inventing it",
+        "Lists TC-PAY-001 under critical failures and keeps it reported as failing",
+        "Lists the blocked case with its missing prerequisite (ledger unreachable) and an owner written as Unknown",
+        "The release decision is Block, justified by the open P0 and the release gate, not by a pass-rate percentage",
+        "Includes risks and next steps (retest after the fix, final smoke on the release build)"
+      ]
+    },
+    {
+      "id": "figma-mcp-states",
+      "prompt": "/qa-test-planner a Figma MCP server is connected. Validate the primary button on our settings page against this frame link: https://www.figma.com/design/FILEKEY/App?node-id=12-345. Give me the checklist of what to compare.",
+      "files": [
+        "references/figma_validation.md"
+      ],
+      "expected_output": "Reads the connected server's tool list before calling anything (no assumed tool names), pulls variables, a screenshot and layer properties for the frame, records viewport, DPR and theme, compares tokens and computed values, and checks all seven states including loading and error, listing untested states as not covered.",
+      "assertions": [
+        "Lists or reads the connected server's own tools first and does not assume tool names",
+        "Pulls the frame's variables or tokens, a screenshot and layer properties, and notes the frame link carries the node it points at (node-id) and asks which design version the build targets",
+        "Records viewport, device-pixel ratio and theme before judging a difference",
+        "Compares tokens or computed styles, and does not sample screenshot pixels or use a browser color picker for color",
+        "Covers default, hover, active, focus, disabled, loading and error states, listing any untested state as not covered rather than passing"
+      ]
+    },
+    {
+      "id": "login-case-example",
+      "prompt": "/qa-test-planner show me a complete manual login case with its variations, ready to copy into our test tool.",
+      "files": [
+        "references/test_case_templates.md",
+        "references/test_case_examples.md"
+      ],
+      "expected_output": "A complete case with a seeded account, no real or sample password written in the case, an observable expected result per step, post-conditions, cleanup, and the invalid-password, unknown-email, injection and long-password variations as separate cases, with the unknown email giving the same message as the invalid password.",
+      "assertions": [
+        "Uses a seeded test account and writes no password value; the credential comes from the team's test-data store",
+        "Every step has an observable expected result, including the landing page and the session state",
+        "Has post-conditions and a cleanup that signs out and clears cookies",
+        "Lists invalid password, unknown email, an injection string and an over-long password as separate cases rather than steps of one case",
+        "States that the unknown-email case must give the same message and status as the invalid-password case"
+      ]
+    },
+    {
+      "id": "performance-case-placeholders",
+      "prompt": "/qa-test-planner write a manual-plus-tool performance case for the product search results. We have no recorded baseline yet.",
+      "files": [
+        "references/test_case_templates.md"
+      ],
+      "expected_output": "A performance case with a criteria table (response time at a percentile, throughput, error rate, resource use) and normal, peak and stress load scenarios whose target and acceptable values are placeholders or Unknown, because no baseline exists, listed under Open Questions.",
+      "assertions": [
+        "Has a criteria table with target, acceptable, actual and status columns and a percentile (p95) for response time",
+        "Writes every target and acceptable value as a placeholder or Unknown and asks for the baseline under Open Questions; it recommends no numeric threshold of its own",
+        "Has normal, peak and stress load scenarios with the user counts and durations left as placeholders",
+        "States that the case runs on an isolated environment with the data size the baseline will use"
+      ]
     }
   ]
 }

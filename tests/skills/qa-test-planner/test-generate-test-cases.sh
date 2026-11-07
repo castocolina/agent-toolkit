@@ -150,6 +150,36 @@ EOF
   check title "$(grep -c '# TC LOGIN 002: Sanitized ID case' "$root/out/TCLOGIN002.md")" 1
 }
 
+test_out_of_range_priority_and_type_are_not_guessed() {
+  local root; new_sandbox; root=$root
+  cat > "$root/stdin" << 'EOF'
+TC-OOR-001
+Out of range answers
+9
+9
+
+Verify unrecognized answers
+
+Step one
+Works
+done
+
+
+
+
+
+EOF
+  run_case "$root" "$root/stdin"
+  check exit "$?" 0
+  local report="$root/out/TC-OOR-001.md"
+  check priority "$(grep -c '^\*\*Priority:\*\* Untriaged$' "$report")" 1
+  check type "$(grep -c '^\*\*Type:\*\* Unknown$' "$report")" 1
+  check no_guessed_priority "$(grep -c 'P2 (Medium)' "$report")" 0
+  check no_guessed_type "$(grep -c '^\*\*Type:\*\* Functional$' "$report")" 0
+  check oq_priority "$(grep -c '^- Priority: Untriaged$' "$report")" 1
+  check oq_type "$(grep -c '^- Type: Unknown$' "$report")" 1
+}
+
 test_rerun_preserves_existing_case_unless_overwrite_requested() {
   local root; new_sandbox; root=$root
   cat > "$root/stdin" << 'EOF'

@@ -54,7 +54,7 @@ In 2 of 10 attempts, two orders and two charges
 
 **Console Errors:**
 ```
-Not provided (whether console errors were observed is unknown)
+Unknown (whether console errors were observed)
 ```
 
 ---
@@ -63,7 +63,7 @@ Not provided (whether console errors were observed is unknown)
 
 - **Reproduction rate:** 2/10
 - **User Impact:** Unknown
-- **Workaround:** Not provided (availability is unknown)
+- **Workaround:** Unknown (whether a workaround exists)
 
 ---
 

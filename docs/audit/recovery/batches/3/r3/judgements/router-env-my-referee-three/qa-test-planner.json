@@ -1,0 +1,86 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/qa-test-planner/record.md",
+      "line": null,
+      "evidence": "Digest at dbff837f: 'removed units (597, showing 40)'. All 40 shown para items and both file: items match valid record rows or content found in references/ (for example s049/s122 base format, s051 test_plan_template.md, s070/s071 test_case_examples.md, s072-s074/s077 bug templates, s095/s125 figma_validation.md section 5, s107/s118 regression_testing.md). The other 557 units could not be checked one by one.",
+      "fix": "Rerun the removal check with the full digest (no 'showing' cut), or confirm that every one of the 597 units falls under a section row in docs/audit/recovery/qa-test-planner/record.md through sections.json."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 143,
+      "evidence": "'5. In every supplied-log reply, end with one line on reading results: exit 0 the `file` path in the JSON line, exit 2 the `missing` flags or bad value, exit 1 the file exists...' This repeats, almost word for word, the script-bug-file eval assertion 'Says how to read the result: the file path from the JSON line on exit 0, the missing flags on exit 2...'. When exit 0 has already happened, the rule adds nothing for the user.",
+      "fix": "Tie the sub-step to the user's purpose: 'When the logged run did not exit 0, tell the user what that exit code means (steps 3-5).' Then record the narrowed wording in docs/audit/recovery/qa-test-planner/record.md. Keep the per-exit guidance in steps 3-5, which do serve the user."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 108,
+      "evidence": "Section 7 'Optional scripts' takes about 50 of the roughly 185 body lines. That includes a five-part 'A run log is supplied' review protocol for an optional helper, which breaks the Process/Navigation pattern the rest of the file follows well.",
+      "fix": "Keep the flag table and exit-code rules in SKILL.md. Move the supplied-run-log review sub-steps (1.1-1.5) into a new references/script_runs.md, gated by a routing row: 'a script run log or a generated file is supplied: read references/script_runs.md'. Record the move in docs/audit/recovery/qa-test-planner/record.md."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 140,
+      "evidence": "'List every flag in the logged command with its value, one per line, and check each against the source'. This fixes an exact output layout for a low-consequence review step, while the checks it lists (build exact, rate, no unsupported flag) are what actually matter.",
+      "fix": "Replace it with: 'Check each flag in the logged command against the source (for a bug: title, description including environment context, expected, actual, steps, build, rate, severity, priority; for a case: requirement, risk, seeded preconditions, data, cleanup, ACTION | EXPECTED steps, section 5 priority) and quote any value that differs or is missing.'"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/qa-test-planner/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "There are 23 queries: 14 should-trigger and 9 should-not-trigger. That goes beyond the 8-10 per side the guidance suggests and leans toward positives, several of which only vary the same named-invocation form.",
+      "fix": "Bring the set to about 10 and 10. Merge or drop four near-duplicate named-invocation positives (for example the two 'smoke suite for tonight's hotfix' variants). Add one near-miss negative that names a different skill or asks for QA automation in a qa-like phrasing, such as 'write a playwright smoke test for the payment module'."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/scripts/generate_test_cases.sh",
+      "line": 168,
+      "evidence": "In interactive mode an unrecognized answer falls back to '*) PRIORITY=\"P2 (Medium)\" ;;' and '*) TEST_TYPE=\"Functional\" ;;' (line 177). That writes a guessed value, against SKILL.md section 2 'NEVER fill a gap with a plausible value' and section 7's claim that the script 'applies section 2 inside the file'. create_bug_report.sh uses Untriaged instead.",
+      "fix": "Re-prompt on an invalid priority or type answer (prompt_input is already required=true), or write 'Untriaged' / 'Unknown' and add it to OPEN_QUESTIONS, as create_bug_report.sh does. Add a case to tests/skills/qa-test-planner/test-generate-test-cases.sh for an out-of-range interactive answer."
+    }
+  ]
+}

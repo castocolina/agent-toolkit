@@ -71,6 +71,82 @@
         "Keeps `id` as a standard, clear abbreviation",
         "States explicitly that no change is warranted for these names"
       ]
+    },
+    {
+      "id": "injection-token-strings",
+      "prompt": "We have an Angular `export const API_URL = new InjectionToken<string>('api.url')` used with `inject(API_URL)` in a dozen services, and a NestJS provider registered as `{ provide: 'CONNECTION', useValue: conn }` injected with `@Inject('CONNECTION')`. I want to rename the string 'api.url' to 'apiBaseUrl' and the string 'CONNECTION' to 'DB_CONNECTION'. Is either rename risky?",
+      "expected_output": "Says the Angular rename is safe for injection because the InjectionToken string is only a debug description and the token instance (the API_URL constant) is the identity, so only the constant and its imports matter. Says the NestJS rename is not safe as a one-sided edit: the string is the provider key, so the provider and every @Inject('CONNECTION') must change together, and a string search is needed.",
+      "assertions": [
+        "States that the Angular `InjectionToken` string is only a debug description and that injection is matched by the token instance, so renaming the string 'api.url' does not break injection",
+        "Does not claim that Angular string tokens behave like NestJS string tokens",
+        "States that the NestJS 'CONNECTION' token is matched as a string, so the provider and every `@Inject('CONNECTION')` must change together and a string search is needed",
+        "Rates the NestJS rename as hidden or higher compatibility risk, not as a symbol-only IDE rename"
+      ]
+    },
+    {
+      "id": "ts-fallback-convention",
+      "prompt": "Review the naming in this TypeScript snippet. The repo has no ESLint config, no style guide doc and no other TypeScript to compare with. `const max_retries = 3; class user_profile { is_active = true } function GetOrders() { return []; }`",
+      "expected_output": "Writes that no project convention was found and names the convention used: a named community guide such as the Google TypeScript style guide (UpperCamelCase classes, lowerCamelCase variables, functions and fields, CONSTANT_CASE for global constants), not the TypeScript handbook. Proposes UserProfile, isActive and getOrders, with the constant in the guide's form, and mentions that a lint rule (@typescript-eslint/naming-convention) would enforce it.",
+      "assertions": [
+        "Writes that no project convention was found and names the convention it used",
+        "Names a style guide such as the Google TypeScript style guide, or the project's lint rule `@typescript-eslint/naming-convention`, and does not cite the TypeScript handbook as the naming source",
+        "Proposes `UserProfile` for the class and a lowerCamelCase form for the function (`getOrders`) and the field (`isActive`)",
+        "Proposes a CONSTANT_CASE form for `max_retries` (for example `MAX_RETRIES`) or states the guide's rule for constants"
+      ]
+    },
+    {
+      "id": "convention-split-grouped",
+      "prompt": "Review the boolean naming across this repo's services. Here is what I found: 8 of the 14 files under src/services use `is`/`has` prefixes (`isActive`, `hasError`), the other 6 use bare names (`active`, `error`, `enabled`), and `enabled` is also a JSON key in the public settings API. Report what to do.",
+      "expected_output": "Reports the split as one grouped finding, not one row per identifier: the locations (8 prefixed files, 6 bare), the dominant form (prefixed), and the direction to converge on, with the compatibility rated by the riskiest member (`enabled`, a public JSON key, so contract). Keeps the public key and proposes a local alias if renamed.",
+      "assertions": [
+        "Reports the prefix split as one grouped finding naming the locations and the dominant form, not as a separate row for every identifier",
+        "Recommends a direction to converge on based on the dominant project form (prefixed booleans)",
+        "Rates the group by its riskiest member and identifies `enabled` as a public JSON key, so contract compatibility with an alias or mapping instead of a plain rename"
+      ]
+    },
+    {
+      "id": "created-at-time-basis",
+      "prompt": "Is `createdAt` a good name in evals/files/audit_events.py? A reviewer says it is fine and I should keep it.",
+      "files": [
+        "evals/files/audit_events.py"
+      ],
+      "expected_output": "Rejects the naive keep verdict: createdAt is written with naive local datetime.now() but compared with a UTC-aware cutoff in events_since, so the name hides a time-basis bug. Flags the bug, offers created_at_local only if the value stays local, otherwise fixes the write, and cites the lines that show each basis.",
+      "assertions": [
+        "Does not accept keeping `createdAt` as is; it flags the naive-local versus UTC time-basis mismatch as a bug",
+        "Cites the write in `record_event` (`datetime.now()`, naive local) and the comparison in `events_since` (UTC `cutoff_utc`) as the evidence",
+        "Offers `created_at_local` (or an equivalent local-basis name) only if the value stays local, otherwise says to fix the write to UTC, rather than a plain rename to match one side"
+      ]
+    },
+    {
+      "id": "temp-dir-persistence",
+      "prompt": "The name `tempDir` in evals/files/draft_store.ts looks wrong because the directory is never deleted. Should I rename it to `cacheDir`?",
+      "files": [
+        "evals/files/draft_store.ts"
+      ],
+      "expected_output": "Rejects cacheDir: persistence alone does not make the contents disposable, and the file shows the directory holds unsaved drafts that cannot be rebuilt. Proposes stateDir (durable app state) or a draft-specific name tied to that evidence.",
+      "assertions": [
+        "Rejects the rename to `cacheDir` and says that persistence alone is not enough to call the contents a cache",
+        "Cites the comment or the `saveDraft` writes showing the directory holds unsaved user drafts that cannot be rebuilt",
+        "Proposes `stateDir` (durable state) or a draft-specific name such as `draftsDir`, tied to that evidence"
+      ]
+    },
+    {
+      "id": "repo-wide-triage",
+      "prompt": "Do a naming review of everything under evals/files/repo-wide/ and tell me what to fix. It is a small stock-tracking service.",
+      "files": [
+        "evals/files/repo-wide/inventory.py",
+        "evals/files/repo-wide/reports.py",
+        "evals/files/repo-wide/exports.py",
+        "evals/files/repo-wide/low_stock_email.html"
+      ],
+      "expected_output": "Triages the folder: reports at most 10 ranked rows ordered by the Decide table (behavior contradicting the name first, such as get_stock and get_report writing, then the callers-disagree and contract rows), ends with the counts line saying how many candidates were found and that the rest is available as the next batch or by naming a path. Every reported name still gets the repo and string-literal search: sku_nm is searched in full (not as a lexical local) and found as a CSV header string in EXPORT_COLUMNS, reached through getattr in to_feed and in the HTML template, so it is kept as an external contract name with an alias or mapping if renamed. A purely local name such as d or r only gets a scope-local search and ranks last.",
+      "assertions": [
+        "The table has at most 10 rows, ranked by the Decide table order with names whose behavior contradicts them (`get_stock` and `get_report`, which write) ahead of purely local abbreviations",
+        "Ends with a counts line of the form 'Reviewed N identifiers; M candidates (Priority 1: ..., 2: ..., 3: ...); K not shown, ask for the next batch or name a path' with K greater than zero, because the folder has more than ten candidate names",
+        "Does not treat `sku_nm` as a lexical local: it runs the full repo and string-literal search and reports that the name is also a string in `EXPORT_COLUMNS`, reached by `getattr(row, key)` in `to_feed`, and used in `{{ row.sku_nm }}` in `low_stock_email.html`",
+        "Rates a rename of `sku_nm` (and `qty_oh`) as contract or hidden, keeps the external name, and proposes an alias or mapping rather than a plain rename",
+        "Does not give the lexical locals `d` and `r` the full search or rank them above the contract and behavior findings"
+      ]
     }
   ]
 }

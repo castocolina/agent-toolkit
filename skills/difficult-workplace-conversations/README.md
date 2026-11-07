@@ -10,13 +10,17 @@ A skill for Claude Code that prepares, rehearses, and follows up on high-stakes 
 - Puts safety, harassment, and retaliation concerns on a formal channel instead of informal coaching.
 - Ends with a factual written summary that keeps disputed points marked as disputed.
 
+The flow has three phases: prepare (classify, check readiness, optional worksheet), deliver (openings, reactions, phrase bank), and follow up (spoken read-back, written summary, check-in).
+
 `SKILL.md` holds the workflow, gotchas, and the gated reference list. The references hold worked material:
 
 | Reference | Content |
 | --- | --- |
-| `references/preparation-template.md` | Full written worksheet with negotiation, bad-news, and conflict add-ons |
+| `references/preparation-template.md` | Templates: 10-minute quick prep, full written worksheet with an extended block, add-ons for negotiation, bad news, conflict, and upward asks; goals, time and place defaults, preparation failure modes |
 | `references/delivery-scripts.md` | Lines for denial, deflection, attack, shutdown, distress, reactions to a decision, sensitive disclosures, escalation |
-| `references/emotional-regulation.md` | Regulation worksheet, trigger inventory, day-of preparation, one-technique picker |
+| `references/phrase-bank.md` | Openings, acknowledging without conceding, redirecting to facts, buying time, returning to your point, reframes, impasse lines |
+| `references/closing-and-followup.md` | Spoken read-back, setting a follow-up, no-agreement close, follow-up cover note, check-in agenda |
+| `references/emotional-regulation.md` | Regulation worksheet, trigger inventory, day-of preparation, feeling-to-first-move table, one-technique picker, night-before steps, reframes, pre-conversation ritual |
 | `references/facilitation.md` | Facilitated session plan: confidentiality limits, facts table, ground rules, turns, stop conditions, agreements |
 
 ## When to Use
@@ -50,3 +54,9 @@ difficult-workplace-conversations/
 
 - **feedback-mastery**: feedback delivery with SBI, recognition, receiving criticism, and expectation resets
 - **professional-communication**: general workplace emails, messages, and updates
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+Further reading: the identity-goal prompt follows the identity conversation in *Difficult Conversations* by Douglas Stone, Bruce Patton, and Sheila Heen. The twenty-minute pause is from The Gottman Institute, [Conversational Boundaries without Stonewalling](https://www.gottman.com/blog/conversational-boundaries-without-stonewalling); the breathing count follows the NHS page [Breathing exercises for stress](https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/).

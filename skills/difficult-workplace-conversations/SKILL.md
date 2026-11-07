@@ -13,10 +13,10 @@ Settle four things first: the user's role and power relative to each person; the
 | Situation | Go to | Load |
 | --- | --- | --- |
 | Threats, harassment, discrimination, retaliation, safety | Section 7 first | nothing |
-| Compensation, promotion, title, or workload terms | Section 3 | preparation-template.md only for a full worksheet |
+| Compensation, promotion, title, or workload terms | Section 3 | preparation-template.md only for a written worksheet |
 | Delivering a decision the person will not want | Section 4 | delivery-scripts.md only to rehearse reactions |
 | A conflict the user is in: public criticism, a blowup, disputed facts | Section 5 | delivery-scripts.md only to rehearse reactions |
-| Raising a sensitive personal matter (health, family) | Section 5 opening, impact-on-work only | delivery-scripts.md sensitive-matter line |
+| Raising a sensitive personal matter (health, family) | delivery-scripts.md sensitive-matter line (impact on work plus the adjustment needed; the diagnosis is optional); Section 7 if it involves harassment | delivery-scripts.md |
 | A dispute between other people | Section 6 gate | facilitation.md only after the gate passes |
 | User may lose composure, or already did | Section 2 | emotional-regulation.md only if they ask for a technique |
 | Feedback on one behavior, recognition, a reply to vague criticism, a scope or deadline reset, a recap | the feedback-mastery skill | nothing from this skill |
@@ -25,11 +25,13 @@ Tie-break: if a single behavior is the topic but the relationship has already br
 
 ## 2. Readiness
 
-Before scheduling, ask the user: can you state the other person's likely account in one sentence they would agree with, and listen for two minutes without rebutting? If not, wait: draft the message but do not send it, and fix a specific reconvening time ("Thursday 10:00"), not "when things calm down". An open-ended pause reads as avoidance and the issue resurfaces worse.
+Before scheduling, ask the user: can you state the other person's likely account in one sentence they would agree with, and listen for two minutes without rebutting? If not, wait: draft the message but do not send it, and fix a specific reconvening time ("Thursday 10:00"), not "when things calm down". An open-ended pause reads as avoidance and the issue resurfaces worse. If the time is fixed by someone else or by a decision timeline (a decision delivery already scheduled, a manager-booked 1:1), do not postpone: shorten the goal to the one point that must be made, prepare the opening and one buying-time line ([phrase-bank.md](references/phrase-bank.md)), and book the deeper conversation for a dated slot.
 
-Readiness never delays urgent matters. Safety goes to Section 7 now. An urgent operational issue (a broken release, a customer at risk) is raised now with the decision owner, facts only; the relationship conversation waits for a dated slot.
+Readiness never delays urgent matters. Safety goes to Section 7 now; so do harassment, discrimination, retaliation and formal proceedings, at once, and the raise-it-now exception below covers only operational incidents that are none of these. An urgent operational issue (a broken release, a customer at risk) is raised now with the decision owner, facts only; the relationship conversation waits for a dated slot.
 
 Repair after the user got defensive: one sentence owning the specific behavior ("I cut you off and argued instead of listening"), no explanation of why, then a question that returns to the substance. An explanation attached to an apology is heard as an excuse.
+
+Read [phrase-bank.md](references/phrase-bank.md) only when the user needs lines to buy time in the room or to say they are triggered. Read [preparation-template.md](references/preparation-template.md) only when their goals, the time and place, or a named preparation habit (over-preparing, winging it, preparing to attack or to avoid) needs work. For a short readiness question, answer from this file and load neither.
 
 When the conversation must happen before a weekend, leave, or a long absence, arrange named support (an HR contact, EAP details, a person to talk to) and book the follow-up date in the same conversation; otherwise the person is left alone with it until the return.
 
@@ -58,6 +60,8 @@ When the conversation must happen before a weekend, leave, or a long absence, ar
 ## 5. A conflict the user is in
 
 Sort the user's account into three columns: observed facts (dated, checkable), disputed points, and interpretations (motive, intent). Open with the situation, the observable behavior, its impact, and an open question that invites their account: "In Monday's planning meeting, the release date changed after QA had signed off. That left the team without a test window. What drove the change, and how should we handle date changes from here?" For each disputed point, name what would settle it (ticket history, calendar, chat log) instead of arguing it; if it stays disputed, agree on the impact and the next step anyway, and record it as disputed.
+
+Read [phrase-bank.md](references/phrase-bank.md) when the user needs an opening for another topic, a way to acknowledge without conceding, to redirect to facts or return to their point, to reframe a blaming sentence, or a line for a defensive person or an impasse.
 
 ## 6. Disputes between others: the joint-meeting gate
 
@@ -89,6 +93,8 @@ Logistics handed over: [dates, contacts, next steps]   (decisions only)
 Next checkpoint: [date]; if not met: [fallback or escalation]
 ```
 
+Read [closing-and-followup.md](references/closing-and-followup.md) for the spoken read-back before leaving the room, a cover note around the summary, the check-in agenda, or what to say when no agreement was reached.
+
 ## Gotchas
 
 - **Assume any written summary may be read in a formal HR or legal process.** Write facts, agreements, and dates only; no speculation about health, motive, or character; share need-to-know.
@@ -102,7 +108,9 @@ Next checkpoint: [date]; if not met: [fallback or escalation]
 
 Load only the file the route needs; for a short request, answer from this file alone.
 
-- [preparation-template.md](references/preparation-template.md): only when the user asks for a full written worksheet.
+- [preparation-template.md](references/preparation-template.md): only when the user asks for a written worksheet (a 10-minute quick prep or the full one), or when goals, time and place, or preparation habits need work.
+- [phrase-bank.md](references/phrase-bank.md): only for wording a moment in the conversation (openings for other topics, acknowledging without conceding, buying time, returning to the point, reframes, an impasse).
+- [closing-and-followup.md](references/closing-and-followup.md): only when closing the conversation, when no agreement came, or for a follow-up note or check-in agenda.
 - [delivery-scripts.md](references/delivery-scripts.md): only to rehearse specific reactions (denial, deflection, attack, shutdown, distress, reactions to a decision), or to word a sensitive personal disclosure or an escalation to a manager.
-- [emotional-regulation.md](references/emotional-regulation.md): only when the user asks how to stay composed. Do NOT load it for negotiation or bad-news delivery.
+- [emotional-regulation.md](references/emotional-regulation.md): only when the user asks how to stay composed (feeling-to-first-move table, one technique, night-before steps, reframes, pre-conversation ritual). Do NOT load it for negotiation or bad-news delivery.
 - [facilitation.md](references/facilitation.md): only after the Section 6 gate passes.

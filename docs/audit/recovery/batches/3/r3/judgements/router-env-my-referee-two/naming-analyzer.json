@@ -1,0 +1,95 @@
+{
+  "skill": "naming-analyzer",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 14,
+    "D5": 14,
+    "D6": 14,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/references/naming-guidelines.md",
+      "line": 49,
+      "evidence": "Use a prefix that states what the boolean means: `is` for a state (`isActive`, `isVisible`), `has` for possession (`hasPermission`, `hasError`), `can` for ability (`canEdit`, `canDelete`), `should` for a decision (`shouldRender`, `shouldValidate`).",
+      "fix": "Keep the prefix list in references/naming-guidelines.md Boolean names, since the skill loads it only when choosing a boolean name, and add one line that a project already using another prefix wins; do not delete it, and record nothing as a removal."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/naming-analyzer/references/naming-guidelines.md",
+      "line": 66,
+      "evidence": "Is it a boolean?\n\u251c\u2500 Yes \u2192 state, possession, ability or decision prefix\n\u2514\u2500 No \u2192 Is it a function?",
+      "fix": "Keep the Convention fallback tree in references/naming-guidelines.md; it is the reusable fallback the skill loads only when no project convention exists. Do not move it back into SKILL.md and do not delete it."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 64,
+      "evidence": "- Celery's unregistered-task failure is not assumed for RQ: check the live `job.func_name` first, and do not rate an RQ rename `contract` until that value shows the queued name.",
+      "fix": "Keep the Gotchas section and add one line under the RQ bullet: a queued name that matches the old dotted path is `contract` even when the symbol search is clean, because already-queued jobs fail after deploy."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 3,
+      "evidence": "Review code identifiers (variables, functions, classes, booleans, constants, fields, files) and suggest clearer names backed by the implementation and its call sites, with a confidence and a compatibility risk for each rename. Use when asked to review naming, \"is this name misleading\", \"better name for X\", to clarify abbreviations or hidden units (`timeout`, `ttl`, `delay`, `createdAt`), to check a getter that writes, to fix boolean polarity, or to check names against project conventions, even when the user only pastes code and asks if it reads well. Returns a rename table and edits nothing. Not for applying renames or codemods across a repo (an IDE rename or a codemod tool such as LibCST does that), database or API migrations, product or brand naming, or formatting and style guides.",
+      "fix": "Review identifiers in pasted code or a path (variables, functions, classes, booleans, constants, fields, files, and contract names such as DB columns and API fields) and return a ranked rename table with evidence, confidence and compatibility. Use when asked to review naming, whether a name is misleading, a better name for a symbol, abbreviations, hidden units (timeout, ttl, delay, createdAt), a getter that writes, boolean polarity, or project naming conventions, even if the user only pastes code and asks if it reads well. Not for applying renames or codemods (IDE rename or LibCST), writing database or API migrations, product or brand naming, or formatting and style-guide setup."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 27,
+      "evidence": "Read only the section of [references/naming-guidelines.md](references/naming-guidelines.md) for the case at hand: Priority classes when you assign a Priority class, Boolean names when you choose a boolean name, Acceptable abbreviations when you decide whether a short or abbreviated name is acceptable, Convention fallback tree when you name a symbol with no project convention, Convention splits when you find a convention split across the repo.",
+      "fix": "After that sentence, add: Do NOT load references/naming-guidelines.md for a name the Decide row already keeps, or for a pasted snippet whose meaning is still unsettled (ask the one question in the third Decide row first)."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 42,
+      "evidence": "| `tempDir` that is never deleted and is reused across runs | keep | `cacheDir` only if the contents are shown disposable or reconstructible (rebuilt on a miss, safe to delete); persistence alone is not enough. Otherwise ask what it stores, or offer `stateDir` (durable app state) or `workspaceDir` (persistent working files), each tied to that evidence |",
+      "fix": "In that Cases row, make the default `stateDir` when the contents cannot be rebuilt, and mention `workspaceDir` only as the escape hatch when the evidence shows shared working files rather than durable app state."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 30,
+      "evidence": "3. **Rate** confidence and compatibility from the evidence you actually gathered, using the scales below, then **report** and end with the counts line from that reference.",
+      "fix": "In step 3, point the report at the worked-example table (Priority, Location, Current \u2192 proposed, Evidence, Confidence, Compatibility) and say a keep row uses an em dash in Priority; then end with the counts line from references/naming-guidelines.md Counts line, dropping its last clause when nothing was cut."
+    }
+  ]
+}

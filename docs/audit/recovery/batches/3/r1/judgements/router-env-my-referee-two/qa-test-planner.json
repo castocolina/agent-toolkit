@@ -1,0 +1,95 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 13,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/qa-test-planner/references/test_plan_template.md",
+      "line": 16,
+      "evidence": "Approach: black box; positive and negative cases; boundary value analysis; equivalence partitioning.",
+      "fix": "Move this named-technique list into the plan template only as a one-line reminder that the oracle table and money-flow partitions in SKILL.md section 4 decide the cases; record the generic ISTQB names in docs/audit/recovery/qa-test-planner/record.md if they are deleted."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 66,
+      "evidence": "## 4. Cases: write the oracle before the steps ... For the integration, security and performance case blocks, read `references/test_case_templates.md`; for a per-component visual case and its state checklist, read `references/figma_validation.md` section 5.",
+      "fix": "Section 4 is the default cases row, which already loads test_case_templates.md in full, then this sentence loads it again and also loads figma_validation.md section 5. Gate the type blocks: read the Integration, Security or Performance block in references/test_case_templates.md only when the case type is that type, and read references/figma_validation.md section 5 only when the case is a per-component visual case."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 135,
+      "evidence": "Then list every flag in the logged command with its value, one per line, and check each against the source: for a bug `--title`, `--description` ... `--priority`, and no flag the source does not support",
+      "fix": "Keep the exact-value checks for the fields that change triage (build, rate, severity, priority, expected, actual, steps). Collapse the remaining flag audit into one rule: quote any logged flag whose value is not exactly the source text, instead of requiring one line per flag on every supplied-log review."
+    },
+    {
+      "id": "D6-2",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/qa-test-planner/references/bug_report_templates.md",
+      "line": 157,
+      "evidence": "Start from severity, then raise or lower one step for how often and how widely it hits. This grid is an illustrative default, not policy:",
+      "fix": "Delete the raise-or-lower sentence or say it is only a sanity check. The rate-by-severity grid is already the default; following both can move a cell one step off the table."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "10 should-trigger queries all name qa-test-planner or /qa-test-planner; the 10 should-not-trigger queries include near-misses such as Draft a QA test plan with entry and exit criteria",
+      "fix": "Add 2-3 should-trigger queries that name the skill inside a longer request (typos, extra files, a second task) so the explicit-invocation rule is tested beyond the clean forms already covered. Do not add unnamed QA prompts as should-trigger: the description forbids them."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/qa-test-planner/evals/evals.json",
+      "line": 4,
+      "evidence": "\"files\": [\"references/test_case_templates.md\"]",
+      "fix": "Drop references/test_case_templates.md from the checkout-cases files list. It is a skill reference the routing table already loads, not an input; the same eval's assertions do not depend on that path."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 69,
+      "evidence": "Unknown account or input (enumeration) ... Timing: state the sampling plan (for example 30 alternating requests per input) and the agreed tolerance (for example medians within 50 ms)",
+      "fix": "Mark both numbers as placeholders the team must replace, same as the performance criteria block: write Unknown and an Open Question when no sampling plan or tolerance was agreed, and never copy 30 or 50 ms into a case as the recommended plan."
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "skill": "naming-analyzer",
+  "mode": "output",
+  "pass_rate": 0.9355,
+  "passed": 29,
+  "total": 31,
+  "failures": [
+    {
+      "eval": "convention-split-grouped",
+      "assertion": "Reports the prefix split as one grouped finding naming the locations and the dominant form, not as a separate row for every identifier",
+      "evidence": "The table splits the identifiers into separate rows (\"`error` \u2192 `hasError`\", \"`enabled` \u2192 **keep**\", \"`active` \u2192 keep\") and cites only \"`src/services/*` (bare group)\" rather than naming the 8 prefixed and 6 bare file locations."
+    },
+    {
+      "eval": "convention-split-grouped",
+      "assertion": "Rates the group by its riskiest member and identifies `enabled` as a public JSON key, so contract compatibility with an alias or mapping instead of a plain rename",
+      "evidence": "It does say \"`enabled` is a JSON key in the public API (contract)\" and allows \"an internal `isEnabled` with mapping at the serializer\", but the grouped row's compatibility is \"\u2014\" instead of being rated contract by its riskiest member."
+    }
+  ]
+}
