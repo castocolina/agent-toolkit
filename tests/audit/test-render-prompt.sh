@@ -84,8 +84,10 @@ fi
 
 # The fix prompt must reference the decision inside the workspace, not $RUNNER_TEMP.
 printf '{"update":true,"targets":["skill-judge"]}' > "$WS/.audit-evidence/decision.json"
+: > "$WS/.audit-evidence/repairs.patch"
 if python3 "$RENDER" "$ROOT/.github/audit/fix-prompt.md" "$TMP/fix-rendered.md" \
     --path DECISION_JSON=.audit-evidence/decision.json \
+    --path REPAIRS_PATCH=.audit-evidence/repairs.patch \
     --path MERGED_JSON=.audit-evidence/merged.json \
     --path CHECK_JSON=.audit-evidence/check.json \
     --path SPEC_DIFF=.audit-evidence/spec.diff \
@@ -96,7 +98,7 @@ else
   echo 'fix prompt render unexpectedly failed' >&2
   exit 1
 fi
-for marker in '.audit-evidence/decision.json' '.audit-evidence/merged.json' '.audit-evidence/check.json' '.audit-evidence/spec.diff' '.audit-evidence/approved-evidence'; do
+for marker in '.audit-evidence/decision.json' '.audit-evidence/merged.json' '.audit-evidence/check.json' '.audit-evidence/spec.diff' '.audit-evidence/approved-evidence' '.audit-evidence/repairs.patch'; do
   grep -qF "$marker" "$TMP/fix-rendered.md" || { echo "fix render lost $marker" >&2; exit 1; }
 done
 
