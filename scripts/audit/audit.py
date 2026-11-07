@@ -13,7 +13,7 @@ Usage:
         [--out DIR] [--fail-under 0.8]
     python3 scripts/audit/audit.py pi-cmd runner|judge [--model ID] [--print0]
     python3 scripts/audit/audit.py judge-prompt [--kind skill|command|agent] --artifact PATH [--artifact PATH ...]
-        --judge SLUG [--root DIR]
+        --judge SLUG [--root DIR] [--previous SRC ...] [--recovery-gate QUEUE] [--digest-dir DIR]
     python3 scripts/audit/audit.py interval-due --state JSON --days 15|30 [--now ISO] [--event NAME]
     python3 scripts/audit/audit.py validate-knobs   (reads AUDIT_* knobs from the environment)
     python3 scripts/audit/audit.py track --artifact NAME [--artifact-kind K] [--source SOURCE] --status S
@@ -24,6 +24,7 @@ import argparse
 import contextlib
 import copy
 import datetime
+import hashlib
 import json
 import math
 import os
@@ -591,6 +592,9 @@ def check_source_anchors(rubric_path: Path, ref_dir: Path) -> list[str]:
     return reasons
 
 
+REMOVALS_HEADING = "## Removals and sources (every judgment)"
+
+
 def rubric_check(root: Path, rubric: Path) -> list[str]:
     """Return reasons the rubric is invalid (empty = ok)."""
     try:
@@ -598,6 +602,8 @@ def rubric_check(root: Path, rubric: Path) -> list[str]:
     except (OSError, ValueError) as e:
         return [str(e)]
     reasons = [f"{d}: missing or max <= 0" for d in DIMENSIONS if r["max"].get(d, 0) <= 0]
+    if REMOVALS_HEADING not in rubric.read_text().splitlines():
+        reasons.append(f"missing section: {REMOVALS_HEADING}")
     try:
         sha = source_sha(root)
     except ValueError as e:
@@ -876,8 +882,275 @@ def artifact_label(kind: str, path: Path) -> str:
     return path.parent.name if kind == "skill" else path.stem
 
 
-def render_judge_prompt(root: Path, kind: str, artifacts: list[Path], judge: str) -> str:
-    """Fill judge-prompt.md. Command and agent replace four skill sentences and append a profile."""
+# ---------- previous-version digest ----------
+
+FENCE_RE = re.compile(r"^\s*(```|~~~)")
+HEADING_RE = re.compile(r"^\s{0,3}#{1,6}\s")
+ITEM_RE = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+")
+DIGEST_SHOWN, DIGEST_UNIT_CUT, DIGEST_LINE_CUT = 40, 300, 120
+ARTIFACT_DIRS = {"command": "commands", "agent": "agents"}
+
+
+def norm_tokens(text: str) -> list[str]:
+    return re.findall(r"\w+", text.lower())
+
+
+def shingles(text: str, n: int = 5) -> set[tuple[str, ...]]:
+    t = norm_tokens(text)
+    return {tuple(t[i:i + n]) for i in range(len(t) - n + 1)}
+
+
+def digest_units(text: str) -> list[str]:
+    """Paragraphs, list items, table rows and fenced blocks of one markdown file; headings and units under 3 words are skipped."""
+    units: list[str] = []
+    cur: list[str] = []
+    fence = None
+
+    def flush() -> None:
+        if cur:
+            units.append("\n".join(cur))
+            cur.clear()
+
+    for line in text.splitlines():
+        if fence:
+            cur.append(line)
+            if line.strip().startswith(fence):
+                fence = None
+                flush()
+        elif m := FENCE_RE.match(line):
+            flush()
+            fence = m.group(1)
+            cur.append(line)
+        elif HEADING_RE.match(line) or not line.strip():
+            flush()
+        elif line.lstrip().startswith("|"):
+            flush()
+            units.append(line)
+        else:
+            if ITEM_RE.match(line):
+                flush()
+            cur.append(line)
+    flush()
+    return [u for u in units if len(norm_tokens(u)) >= 3]
+
+
+def unit_id(text: str) -> str:
+    return "para:" + hashlib.sha256(" ".join(norm_tokens(text)).encode()).hexdigest()[:8]
+
+
+def snapshot_skips(name: str) -> list[str]:
+    """Skill paths outside the digest: eval files, and the vendored spec mirror of skill-judge."""
+    return [f"skills/{name}/evals/"] + (["skills/skill-judge/references/agentskills/"] if name == "skill-judge" else [])
+
+
+def git_bytes(root: Path, *args: str) -> bytes | None:
+    """stdout of `git -C root ARGS`, None on a non-zero exit (or no git)."""
+    try:
+        p = subprocess.run(["git", "-C", str(root), *args], capture_output=True)
+    except OSError:
+        return None
+    return p.stdout if p.returncode == 0 else None
+
+
+def artifact_snapshot(root: Path, kind: str, name: str, src: str | None) -> dict[str, bytes] | None:
+    """Repo-relative path to bytes for the artifact's files in the working tree (src None), at a git ref, or in a directory."""
+    skill = kind == "skill"
+    single = f"{ARTIFACT_DIRS[kind]}/{name}.md" if not skill else ""
+    found: dict[str, bytes] = {}
+    if src is not None and Path(src).is_dir():
+        base = Path(src)
+        for f in sorted(base.rglob("*")) if skill else [base / f"{name}.md"]:
+            if f.is_file():
+                found[f"skills/{name}/{f.relative_to(base).as_posix()}" if skill else single] = f.read_bytes()
+    elif src is not None:
+        listing = git_bytes(root, "ls-tree", "-r", "--name-only", "-z", src, "--", f"skills/{name}/" if skill else single)
+        for rel in (listing or b"").decode("utf-8", "replace").split("\0"):
+            if rel and (blob := git_bytes(root, "show", f"{src}:{rel}")) is not None:
+                found[rel] = blob
+    else:
+        base = root / (f"skills/{name}" if skill else single)
+        for f in sorted(base.rglob("*")) if skill else [base]:
+            if f.is_file():
+                found[f.relative_to(root).as_posix()] = f.read_bytes()
+    found = {p: b for p, b in found.items() if not any(p.startswith(s) for s in snapshot_skips(name))}
+    return found if found and (not skill or f"skills/{name}/SKILL.md" in found) else None  # a skill needs its SKILL.md
+
+
+def _text(data: bytes) -> str:
+    return data.decode("utf-8", "replace")
+
+
+def removed_units(prev: dict, cur: dict) -> list[dict]:
+    """Units of the previous *.md files that no longer survive in any current file, longest first."""
+    texts = [_text(b) for b in cur.values()]
+    union = set().union(*(shingles(t) for t in texts))
+    flat = [" " + " ".join(norm_tokens(t)) + " " for t in texts]
+    out = []
+    for path in sorted(p for p in prev if p.endswith(".md")):
+        for unit in digest_units(_text(prev[path])):
+            sh = shingles(unit)
+            gone = 2 * len(sh & union) < len(sh) if sh else not any(" " + " ".join(norm_tokens(unit)) + " " in f for f in flat)
+            if gone:
+                out.append({"id": unit_id(unit), "path": path, "text": unit})
+    return sorted(out, key=lambda u: -len(u["text"]))
+
+
+def _lines(data: bytes) -> list[str] | None:
+    try:
+        return [s.strip() for s in data.decode("utf-8").splitlines() if s.strip()]
+    except UnicodeDecodeError:
+        return None
+
+
+def removed_files(prev: dict, cur: dict, threshold: float = 0.5) -> list[dict]:
+    """Previous non-markdown files that are gone, or that kept fewer than THRESHOLD of their non-blank lines."""
+    out = []
+    for path in sorted(p for p in prev if not p.endswith(".md")):
+        old = _lines(prev[path])
+        if path not in cur:
+            out.append({"path": path, "status": "deleted", "lines": None if old is None else len(old), "kept": None if old is None else 0})
+            continue
+        new = _lines(cur[path])
+        if old is None or new is None:
+            if prev[path] != cur[path]:
+                out.append({"path": path, "status": "changed", "lines": None, "kept": None})
+        elif old:
+            kept = len([s for s in old if s in set(new)])
+            if kept < threshold * len(old):
+                out.append({"path": path, "status": "changed", "lines": len(old), "kept": kept})
+    return out
+
+
+def render_digest(root: Path, name: str, src: str, prev: dict, cur: dict) -> str:
+    units = removed_units(prev, cur)
+    shown = units[:DIGEST_SHOWN]
+    lines = [f"=== previous-version digest: {name} at {src} ===", "sections:"]
+    for path in sorted(p for p in prev if p.endswith(".md")):
+        text, fenced = _text(prev[path]).splitlines(), False
+        for i, line in enumerate(text):
+            fenced ^= bool(FENCE_RE.match(line))
+            if not fenced and HEADING_RE.match(line):
+                lines.append(f"- {path}: {line.strip()} | {next((s.strip() for s in text[i + 1:] if s.strip()), '')[:DIGEST_LINE_CUT]}")
+    lines += ["- none"] if lines[-1] == "sections:" else []
+    lines.append(f"removed units ({len(units)}, showing {len(shown)}):")
+    lines += [f"- {u['id']} {u['path']}: {' '.join(u['text'].split())[:DIGEST_UNIT_CUT]}" for u in shown] or ["- none"]
+    lines.append("removed or reduced files:")
+    files = removed_files(prev, cur)
+    for f in files:
+        detail = "(binary)" if f["lines"] is None else f"({f['lines']} lines)" if f["status"] == "deleted" else f"({f['kept']}/{f['lines']} lines kept)"
+        lines.append(f"- file:{f['path']} {f['status']} {detail}")
+    lines += [] if files else ["- none"]
+    record = root / "docs" / "audit" / "recovery" / name / "record.md"
+    lines.append(f"record: {record.resolve() if record.is_file() else 'none'}")
+    return "\n".join(lines) + "\n"
+
+
+def resolves(root: Path, src: str) -> bool:
+    """SRC names an existing directory or a git commit of ROOT."""
+    return Path(src).is_dir() or (not src.startswith("-") and git_bytes(root, "rev-parse", "--verify", "--quiet", f"{src}^{{commit}}") is not None)
+
+
+def default_ref(root: Path, kind: str, name: str) -> str | None:
+    """Merge base with main when the branch has its own commits, else the parent of the artifact's newest commit."""
+    head = (git_bytes(root, "rev-parse", "HEAD") or b"").decode().strip()
+    base = "main" if git_bytes(root, "rev-parse", "--verify", "--quiet", "main") is not None else "origin/main"
+    merge_base = (git_bytes(root, "merge-base", "HEAD", base) or b"").decode().strip()
+    if merge_base and merge_base != head:
+        return merge_base
+    spec = [f"skills/{name}"] + [f":(exclude){s}" for s in snapshot_skips(name)] if kind == "skill" else [f"{ARTIFACT_DIRS[kind]}/{name}.md"]
+    newest = (git_bytes(root, "log", "-1", "--format=%H", "--", *spec) or b"").decode().strip()
+    parent = git_bytes(root, "rev-parse", "--verify", "--quiet", f"{newest}^") if newest else None
+    return parent.decode().strip() if parent else None
+
+
+def close_commit(root: Path, rel: str, batch_id) -> str | None:
+    """The oldest commit at which the queue file shows the batch closed."""
+    for sha in (git_bytes(root, "log", "--reverse", "--format=%H", "--", rel) or b"").decode().split():
+        try:
+            queue = json.loads(git_bytes(root, "show", f"{sha}:{rel}") or b"")
+        except ValueError:
+            continue
+        if isinstance(queue, list) and any(isinstance(b, dict) and b.get("id") == batch_id and b.get("status") == "closed" for b in queue):
+            return sha
+    return None
+
+
+def recovery_gate(root: Path, rel: str, name: str) -> tuple[bool, str | None]:
+    """(deferred, close commit): deferred while a batch listing the artifact is not closed or the queue is absent."""
+    path = root / rel
+    if not path.is_file():
+        return True, None
+    try:
+        queue = json.loads(path.read_text(encoding="utf-8"))
+        batches = [b for b in queue if any((a.get("name") if isinstance(a, dict) else a) == name for a in b.get("artifacts", []))]
+    except (ValueError, AttributeError, TypeError) as e:
+        raise ValueError(f"--recovery-gate {rel}: not a batch queue ({e})") from e
+    if any(b.get("status") != "closed" for b in batches):
+        return True, None
+    floor = None
+    for b in batches:
+        c = close_commit(root, rel, b.get("id"))
+        if c and (floor is None or git_bytes(root, "merge-base", "--is-ancestor", floor, c) is not None):
+            floor = c
+    return False, floor
+
+
+def digest_extras(root: Path, kind: str, names: list[str], previous: list[str], gate: str | None,
+                  digest_dir: Path | None) -> str:
+    """Text appended after the prompt: digest blocks (or digest-file lines) and notes; '' when none applies."""
+    gate_rel = None
+    if gate and not previous:  # an explicit --previous ignores the gate
+        resolved = (root / gate).resolve()
+        if not resolved.is_relative_to(root.resolve()):
+            raise ValueError(f"--recovery-gate {gate} is outside the root")
+        gate_rel = resolved.relative_to(root.resolve()).as_posix()
+    for src in previous:
+        if not resolves(root, src):
+            raise ValueError(f"--previous {src} does not resolve")
+        if Path(src).is_dir() and len(names) != 1:
+            raise ValueError(f"--previous {src} is a directory: it needs exactly one --artifact")
+    extra: list[str] = []
+    blocks: dict[str, list[str]] = {}
+    for src, name in [(s, n) for s in previous for n in names] if previous else [(None, n) for n in names]:
+        ref, floor = src, None
+        if src is None:
+            if gate_rel:
+                deferred, floor = recovery_gate(root, gate_rel, name)
+                if deferred:
+                    extra.append(f"removal check deferred for {name}: its content recovery has not closed ({gate})\n")
+                    continue
+            if not (root / ".git").exists():
+                continue
+            ref = default_ref(root, kind, name)
+            if ref and floor and git_bytes(root, "merge-base", "--is-ancestor", ref, floor) is not None:
+                ref = floor
+        prev = artifact_snapshot(root, kind, name, ref) if ref else None
+        if prev is None:
+            extra.append(f"no previous version available for {name} at {ref or 'HEAD'}; the removal check was not run for it\n")
+            continue
+        block = render_digest(root, name, ref, prev, artifact_snapshot(root, kind, name, None) or {})
+        if digest_dir is None:
+            extra.append(block)
+        else:
+            if name not in blocks:
+                extra.append(f"previous-version digest for {name}: {digest_dir.resolve() / (name + '.md')}\n")
+            blocks.setdefault(name, []).append(block)
+    if digest_dir is not None and blocks:
+        digest_dir.mkdir(parents=True, exist_ok=True)
+        for name, parts in blocks.items():
+            (digest_dir / f"{name}.md").write_text("\n".join(parts), encoding="utf-8")
+    return "\n".join(extra)
+
+
+def render_judge_prompt(root: Path, kind: str, artifacts: list[Path], judge: str, previous: list[str] | None = None,
+                        gate: str | None = None, digest_dir: Path | None = None) -> str:
+    """Fill judge-prompt.md (command and agent: replace four sentences, append a profile), then append the digest."""
+    text = judge_template_text(root, kind, artifacts, judge)
+    extra = digest_extras(root, kind, [artifact_label(kind, p) for p in artifacts], previous or [], gate, digest_dir)
+    return text.rstrip("\n") + "\n\n" + extra if extra else text
+
+
+def judge_template_text(root: Path, kind: str, artifacts: list[Path], judge: str) -> str:
     if kind not in JUDGE_KINDS:
         raise ValueError(f"unknown kind {kind!r}")
     if kind != "skill" and len(artifacts) != 1:
@@ -1406,8 +1679,8 @@ def validate_entry(root: Path, entry) -> str | None:
         if not artifact_exists(root, skill, artifact_kind):
             label = "directory" if artifact_kind == "skill" else "file"
             return f"artifact {skill!r} does not exist as a {artifact_kind} {label}"
-    if "artifact_kind" in entry and kind != "local":
-        return "artifact_kind is valid only on local rows"
+    if "artifact_kind" in entry and kind == "repo":
+        return "artifact_kind is not valid on repo rows"
     if "credit" in entry:
         if kind in ("repo", "local"):
             return "credit is not valid on repo or local rows"
@@ -1570,7 +1843,11 @@ def ours_updated(root: Path, entry: dict) -> str | None:
     if entry["kind"] == "repo":
         return repo_ours_updated(root, entry)[0]
     name = entry["skill"]
-    paths = [f"skills/{name}/SKILL.md", f"skills/{name}/references/"]
+    artifact_kind = entry.get("artifact_kind", "skill")
+    if artifact_kind == "skill":
+        paths = [f"skills/{name}/SKILL.md", f"skills/{name}/references/"]
+    else:
+        paths = [f"{'commands' if artifact_kind == 'command' else 'agents'}/{name}.md"]
     args = ["git", "log", "-1", "--format=%cI", "--", *paths]
     try:
         proc = subprocess.run(args, cwd=root, capture_output=True, text=True)
@@ -2271,6 +2548,11 @@ def build_parser() -> argparse.ArgumentParser:
     jp.add_argument("--kind", default="skill")
     jp.add_argument("--artifact", type=Path, action="append", required=True)
     jp.add_argument("--judge", required=True)
+    jp.add_argument("--previous", action="append", default=[], metavar="SRC",
+                    help="git ref or directory holding the previous version (repeatable)")
+    jp.add_argument("--recovery-gate", metavar="QUEUE", default=None,
+                    help="batches queue: defer the default digest until the artifact's batch closes")
+    jp.add_argument("--digest-dir", type=Path, default=None, help="write each artifact's digest to DIR/<name>.md")
     return p
 
 
@@ -2387,7 +2669,8 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if args.cmd == "judge-prompt":
         try:
-            sys.stdout.write(render_judge_prompt(root, args.kind, args.artifact, args.judge))
+            sys.stdout.write(render_judge_prompt(root, args.kind, args.artifact, args.judge, args.previous,
+                                                 args.recovery_gate, args.digest_dir))
         except (OSError, ValueError) as e:
             print(f"judge-prompt: {e}", file=sys.stderr)
             return 2
