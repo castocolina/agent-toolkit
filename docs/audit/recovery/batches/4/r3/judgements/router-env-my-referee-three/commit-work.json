@@ -1,0 +1,95 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 15,
+    "D4": 14,
+    "D5": 13,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/commit-work/record.md",
+      "line": null,
+      "evidence": "previous-version digest dbff837f: 'removed units (108, showing 40)'. All 40 shown items map to valid section rows (s001-s022) or to content found in SKILL.md and references/. The other 68 units could not be checked.",
+      "fix": "Regenerate the digest without the cut, or confirm that every remaining unit's section (s001-s022) has a valid row in docs/audit/recovery/commit-work/record.md. The sections.json units already list them, so no content needs restoring."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 29,
+      "evidence": "'Never `git add -A` or `git add .`: they sweep in untracked artifacts.' Also the secrets check in step 4. Both are activation content the model mostly already knows, written in very long dense lines.",
+      "fix": "Keep both, because they are short activation reminders. Tighten the surrounding sentences in step 3 so the expert material (temporary index, overlap check, run directory) stays prominent. Remove nothing without a record row."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 25,
+      "evidence": "Step 3 is one paragraph that mixes the run-directory lifecycle, cleanup on every exit route, the index choice, the overlap check, temporary-index setup and the staging methods. That is about five decisions in one step of the Process pattern.",
+      "fix": "Split step 3 into labelled sub-steps: 3a run directory (create, list leftovers, clean up), 3b choose the index (overlap check included), 3c stage (whole file or part of a file). Keep every sentence and only regroup them."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 3,
+      "evidence": "'...and writing Conventional Commits messages.' Step 6 uses the repository's own vocabulary first, and Conventional Commits only when the repository has no rules. Eval repository-own-vocabulary expects no type(scope) prefix.",
+      "fix": "Stage and commit Git changes so each commit holds only the approved change, leaving content the user already staged untouched, splitting mixed hunks without an interactive terminal, verifying the staged version rather than the working tree, and writing messages in the repository's own convention (commitlint, commit template, recent history), Conventional Commits by default. Use when asked to commit, check in or save work to git, stage selected files or hunks, split a mixed tree into commits, review what is staged, or draft a commit message. Not for rebasing, squashing, amending or force-pushing history, resolving merge conflicts, opening pull requests, or code review unrelated to a commit."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 35,
+      "evidence": "Step 6 says 'Read `references/commit-message-template.md` only when the repository sets its own message rules ... or you want worked messages and the report block of step 8'. Step 8 then requires 'the block format of `references/commit-message-template.md`' on every commit, so the condition never actually gates the read.",
+      "fix": "Either inline the three-line report block in step 8, which removes the unconditional dependency, or change step 6's condition to 'always at step 8 for the report block'. If you inline it, keep the block in the reference too."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/commit-work/evals/evals.json",
+      "line": null,
+      "evidence": "Eval split-one-file-two-commits lists 'references/split-one-file.md' under files. That passes the reference in as an input, so the eval never tests whether step 3's loading trigger makes the agent read it.",
+      "fix": "Remove references/split-one-file.md from that eval's files list, keeping only evals/files/refactor-and-bugfix.txt. Add an assertion that the run reads references/split-one-file.md or follows its order (bugfix first, `--check` before apply)."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 35,
+      "evidence": "Step 8 says 'Repeat steps 3-7 until the approved set is committed'. Following that branch for a multi-commit run, step 3 then says 'First list `<gitdir>/commit-work.*` ... report any you find' and 'create yours with mktemp -d'. On the second commit the agent finds its own run directory, reports it as a leftover, and creates another one, while step 8 removes only one `<run>`.",
+      "fix": "In step 8, write: 'Repeat steps 3 (staging only, reusing the same `<run>`; rebuild the temporary index from the new HEAD) to 7'. In step 3, scope the leftover check and mktemp to the first commit of the run."
+    }
+  ]
+}

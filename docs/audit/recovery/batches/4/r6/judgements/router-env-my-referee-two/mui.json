@@ -1,0 +1,104 @@
+{
+  "skill": "mui",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/mui/README.md",
+      "line": 1,
+      "evidence": "cut list (showing 40 of 122 removed units) for mui at dbff837f, plus a second digest at be9701bfdd44f2f7722b6f813932075820ec4ecd showing 36 of 36; record.md has a valid row for every listed para and the deleted skill-rules-fragment.json",
+      "fix": "Keep the recorded rows. Do not restore the truncated units unless a later digest names a para id that record.md lacks."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/mui/references/component-recipes.md",
+      "line": 9,
+      "evidence": "\"A list row that acts on click is `ListItemButton`. `ListItem` has no `button` prop\" repeats the same rule stated again at line 39",
+      "fix": "Keep the rule once, in the List recipe the agent loads for a clickable row, and leave the opening pointer as a one-line cross-reference."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/mui/SKILL.md",
+      "line": 16,
+      "evidence": "\"The guide has more breaking changes than these (for example higher default browser targets); the page, not this list, is the complete set.\"",
+      "fix": "Name the browser-target change as its own v7-facts bullet with the guide's checked source, so an agent does not ship syntax the new targets drop."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/mui/SKILL.md",
+      "line": 76,
+      "evidence": "The load list says theme-recipes.md is for \"component `styleOverrides` or `defaultProps`, custom breakpoints or shadows\" and does not say not to load it for palette augmentation or CSS layers",
+      "fix": "Add one Do NOT Load clause: do not load references/theme-recipes.md for palette augmentation, colorSchemes or CSS layers; those stay in resources/theme-customization.md."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/mui/resources/theme-customization.md",
+      "line": 52,
+      "evidence": "`<GlobalStyles styles=\"@layer theme, base, mui, components, utilities;\" />` is the only layer-order string, while the same section says installed 7.3 types also declare `modularCssLayers` on `ThemeOptions`",
+      "fix": "Make the GlobalStyles line the default, and add the escape hatch: when the installed ThemeOptions declares modularCssLayers, set that instead and still verify the generated style contains `@layer mui`."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/mui/evals/trigger-queries.json",
+      "line": 15,
+      "evidence": "\"Current MUI installation commands?\" is a should-not-trigger query, but the description says to use the skill when writing or fixing @mui/material code and gives no install boundary",
+      "fix": "Replace it with a near-miss the description already excludes, such as adding server-side row grouping to an MUI X Data Grid Pro license key, and keep the install question only if the description gains an explicit not-for-installing boundary."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/mui/README.md",
+      "line": 180,
+      "evidence": "\"read the installed version's with `pnpm view @mui/material@<version> peerDependencies`\"",
+      "fix": "Change the sentence to \"read the installed version's peerDependencies with `pnpm view @mui/material@<version> peerDependencies`\"."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/mui/references/theme-recipes.md",
+      "line": 22,
+      "evidence": "`variants` is nested inside `styleOverrides.root` (`root: { borderRadius: 8, textTransform: 'none', fontWeight: 600, variants: [...] }`), so the documented theme callback shape is not separated from ordinary CSS keys",
+      "fix": "Split the example the way the cited theme-components Variants section does: keep CSS on `styleOverrides.root` and put `variants` where that section places it, and say to confirm the key against the installed createTheme types before writing it."
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest commit-work at dbff837f: 'removed units (108, showing 40)'. The prompt showed only 40 of 108 removed units. All 40 shown are explained by valid rows in docs/audit/recovery/commit-work/record.md (s002-s022 via sections.json units), but the other 68 could not be checked.",
+      "fix": "Re-run the removal check with the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/commit-work/SKILL.md --judge direct --digest-dir <tmp>). For any unit that no row explains, restore it (into references/ when it is domain-specific, a template users ask for or a tested example; into the main file only when the procedure depends on it) or add a row for it to docs/audit/recovery/commit-work/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 33,
+      "evidence": "Step 6: 'The body says why, and `!` or a `BREAKING CHANGE:` footer marks only a real compatibility break.' This is Conventional Commits basics the model already knows. It is activation content inside an otherwise expert step.",
+      "fix": "Keep step 6 to the non-obvious parts (no bare `git commit` because an editor cannot run in an agent shell, -F <run>/msg.txt, no trailers by default, copy the repository's vocabulary). Leave the why-body and breaking-change basics to references/commit-message-template.md \u00a7 Message template, where they already appear, and add a record row for the trimmed sentence."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 25,
+      "evidence": "Step 3 ('Stage. Scratch files ... go in a run directory of their own ...') and its four sub-bullets make up about a third of the body. Run-directory lifecycle, index choice, overlap check, temporary-index setup and three staging methods are mixed together, which weakens the Process pattern's checkpoint structure.",
+      "fix": "Split step 3 into labelled sub-steps without removing any content: 3a run directory (create, list leftovers, cleanup), 3b choose the index (including the overlap check), 3c stage (whole file / part of a tracked file / untracked file). Keep every command and rule as written."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/commit-work/evals/evals.json",
+      "line": null,
+      "evidence": "Eval 'split-one-file-two-commits' lists \"references/split-one-file.md\" under \"files\". That is the skill's own reference, not an eval input, so the eval cannot test whether the agent loads it from step 3. Eval 'review-and-commit' gives its repo state only in prose and ships no fixture.",
+      "fix": "Remove references/split-one-file.md from that eval's files and add an assertion that the run reads it, or follows its pick-patch sequence, when one file holds two commits. Add an evals/files/ fixture (git status plus the src/auth.ts diff) for review-and-commit."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 14,
+      "evidence": "Route 'draft a message': 'with none, read-only inspection only (`git status`, `git diff --cached`, `git log`); reply with the message text only'. Following this branch with an empty index has no outcome: the skill does not say whether to draft from the unstaged `git diff` or to ask.",
+      "fix": "Add to the draft-a-message row: 'when nothing is staged, say so and draft from `git diff` only if the user confirms that is the change to commit; otherwise ask which changes the message is for.'"
+    }
+  ]
+}

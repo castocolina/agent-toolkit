@@ -1,0 +1,77 @@
+{
+  "skill": "gemini",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest gemini at dbff837f: removed units (218, showing 40). All 40 shown units map through sections.json to valid record rows, and all 10 be9701bf units have accepted-drop or intended-change rows; the other 178 units were not shown.",
+      "fix": "Regenerate the dbff837f digest without the cut and confirm each of the remaining 178 units maps to a record row in docs/audit/recovery/gemini/record.md. Add a row, or restore the content into references/, for any unit that has none."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/gemini/references/model-selection.md",
+      "line": 5,
+      "evidence": "The model table lists gemini-3-pro-preview, gemini-3.1-pro-preview, gemini-3-flash-preview, gemini-2.5-pro, gemini-2.5-flash and gemini-2.5-flash-lite as peer 'Choose when' rows, while SKILL.md only says a model the user names wins.",
+      "fix": "Keep gemini-3-pro-preview as the single default in the table and mark the other rows as escape hatches (newest Pro only if /model lists it and the user asks; flash only when the user says latency matters; 2.5 only when preview access is refused)."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/gemini/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "The 10 should-trigger queries all name Gemini, Google's model, a second model, or a 300k-400k context, so none tests the description's unnamed case of a repository or document set too large for one context.",
+      "fix": "Add a should-trigger query that describes only the size problem without naming Gemini or a second model, for example a monorepo the agent cannot hold whose services and shared packages need one architecture pass, and keep a near-miss negative that is merely a large file the agent can read itself."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 43,
+      "evidence": "Follow-up says to give `timeout --foreground --kill-after=10s 1800 gemini ... -r \"latest\" \"query\"` and, without confirmation that --resume combines with -p, to start a new headless run instead. The cited interactive form is `gemini -r \"latest\" \"query\"` with a positional prompt, which Gotchas says opens a waiting TTY session, so the proposed command is neither that form nor the headless fallback.",
+      "fix": "Give the documented interactive resume as `timeout --foreground --kill-after=10s 1800 gemini -m gemini-3-pro-preview --approval-mode default -i \"query\" -r latest` only if gemini --help shows -i and -r together; otherwise give only the new headless -p run that restates the accepted findings."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/gemini/README.md",
+      "line": 32,
+      "evidence": "Resources lists https://github.com/google/generative-ai-docs as Gemini CLI Documentation and https://ai.google.dev/docs plus https://ai.google.dev/models/gemini, while SKILL.md's checked behavior claims all cite https://github.com/google-gemini/gemini-cli docs.",
+      "fix": "Point Resources at the gemini-cli docs pages SKILL.md already cites (cli-reference.md, headless.md, model.md), dated 2026-11-07, and drop the generative-ai-docs and ai.google.dev links unless a fresh check shows they document the CLI."
+    }
+  ]
+}

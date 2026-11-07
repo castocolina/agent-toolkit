@@ -32,3 +32,11 @@ cp -r skills/naming-analyzer ~/.claude/skills/
 ## Evals
 
 `evals/evals.json` holds output evals (fixtures in `evals/files/`), and `evals/trigger-queries.json` holds trigger queries, including near-miss requests that should go to a rename or migration tool instead.
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+Framework and language facts (PEP 8, Effective Go, TypeScript style guides, Protocol Buffers, Django, SQLAlchemy, Spring, pytest, Celery, RQ, NestJS, Angular and others) were checked against their official documentation.
+
+Documentation owners credited (official pages listed in `docs/audit/upstream-sources.json`, checked 2026-11-07): Python Software Foundation, Python Packaging Authority, The Go Authors, Microsoft, Django Software Foundation, SQLAlchemy authors, Broadcom (Spring), pytest-dev, Vercel, Rails contributors, Celery Project, Google (Angular), Pydantic Services, FasterXML, Instagram (Meta).

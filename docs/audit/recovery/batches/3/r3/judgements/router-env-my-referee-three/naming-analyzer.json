@@ -1,0 +1,86 @@
+{
+  "skill": "naming-analyzer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": null,
+      "evidence": "Digest naming-analyzer at dbff837f: 'removed units (139, showing 40)'. This is a cut list, so 99 removed units could not be checked against docs/audit/recovery/naming-analyzer/record.md. All 40 shown items are explained by valid rows: s002, s004, s006, s008, s011, s017/s031, s018, s024-s030 or not-lost rows, with content kept in references/naming-guidelines.md.",
+      "fix": "Re-run the judge with the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/naming-analyzer/SKILL.md ...) without truncation so every removed unit can be checked. If a unit has no row, restore it (into references/ when it is domain-specific) or add a row to docs/audit/recovery/naming-analyzer/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 61,
+      "evidence": "Most of '## Gotchas' repeats rules already in the file: 'Follow the `disableRetry` row of the Cases table', 'Search for the string as listed under \"String-key and reflective access\" in Hidden consumers', 'as stated under \"Generated code\" in Hidden consumers'. The RQ item repeats the String import paths bullet.",
+      "fix": "Keep in Gotchas only the facts that appear nowhere else, and cut the repeated sentences from the Cases table and Hidden consumers sections they point to, so each fact is stated once. Record the merge in docs/audit/recovery/naming-analyzer/record.md. Do not drop the RQ and polarity warnings themselves."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 12,
+      "evidence": "Step 0 packs triage, the top-10 cap, the batching message and a search exemption into one paragraph: 'Cutting the list never cuts the search: every name you report still gets the repo and string-literal search of step 1, except an identifier whose definition and uses show it is a lexical local ... members, exported names and anything unproven get the full search.'",
+      "fix": "Split step 0 into short sub-bullets: (a) rank by the Decide table order and report at most 10; (b) say how many candidates are not shown; (c) search rule: lexical locals get a scope-local search, and every other reported name gets the full symbol and string-literal search. Keep every rule."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/references/naming-guidelines.md",
+      "line": 39,
+      "evidence": "'## What not to flag or suggest' (and the issue list in '## What to look for') has no loading trigger. The gating list at SKILL.md:31 names only Priority classes, Boolean names, Acceptable abbreviations, Convention fallback tree and Convention splits. Step 1 points only at the Convention layers paragraph.",
+      "fix": "Add to the gating sentence in SKILL.md step 2: 'What not to flag or suggest before you propose a vague-name, single-letter or class-suffix rename'. Name What to look for as the place to read the issue list when the user asks for a broad review."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/naming-analyzer/evals/trigger-queries.json",
+      "line": 75,
+      "evidence": "'Format this Python file with black and sort the imports.' shares no intent with naming review, so this negative tests nothing. The same goes for the camelCase-vs-snake_case explainer at the end.",
+      "fix": "Replace it with a near-miss such as 'Add type hints and docstrings to the functions in billing.py so reviewers understand what they return', which overlaps with clarity but is not a naming review."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 33,
+      "evidence": "Step 3 goes straight from rating to 'report and end with the counts line'. There is no self-check that each row cites its evidence line, has both scale values, and that hidden or contract rows propose an alias, not a plain rename.",
+      "fix": "Add before reporting: 'Check each row: evidence cites a line or caller; confidence and compatibility are set; every hidden or contract row keeps the external name and proposes an alias or migration; each tentative row carries its settling question. Fix any row that fails, then report.'"
+    }
+  ]
+}

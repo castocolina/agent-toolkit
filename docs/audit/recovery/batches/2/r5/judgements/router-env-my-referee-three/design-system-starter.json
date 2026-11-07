@@ -1,0 +1,59 @@
+{
+  "skill": "design-system-starter",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/design-system-starter/record.md",
+      "line": null,
+      "evidence": "previous-version digest design-system-starter at dbff837f: 'removed units (485, showing 40)'. The digest is cut, so 445 removed units could not be checked one by one. All 40 shown units, both file: items and all 25 units of the be9701bf digest map to valid record rows.",
+      "fix": "Re-run `python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/design-system-starter/SKILL.md` with a larger digest limit, or split the digest per file, so every removed unit can be checked against record.md. For any unit with no row, restore it (into references/ when it is domain-specific, a template users ask for or a tested example) or add a row for it to docs/audit/recovery/design-system-starter/record.md."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/design-system-starter/evals/evals.json",
+      "line": 82,
+      "evidence": "\"files\": [ \"references/token-scales.md\" ]. The token-scales-request, native-dialog-modal, touch-target-question and theme-toggle-no-flash evals list the skill's own reference files as eval input files.",
+      "fix": "Remove skill reference files from `files`. Give these evals only user inputs from evals/files/ (for example an existing tokens.json to extend, or an app shell for the theme toggle). That way the with-skill and without-skill runs differ only by the skill, and the assertions test whether the skill's loading triggers fire."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/design-system-starter/references/component-examples.md",
+      "line": 81,
+      "evidence": "\"jsdom does not compute rendered colors, so jest-axe turns color contrast off ... axe's `color-contrast` rule checks text only\". This states library defaults with no source URL and no check date.",
+      "fix": "Add the official sources and a checked date, for example the jest-axe README (https://github.com/nickcolley/jest-axe, color-contrast disabled by default) and the axe-core rule docs (https://dequeuniversity.com/rules/axe/4.10/color-contrast). Or tell the agent to read the installed jest-axe and axe-core docs before relying on the default."
+    }
+  ]
+}

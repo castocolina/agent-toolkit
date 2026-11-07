@@ -1,0 +1,759 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/reducing-entropy/README.md",
+      "heading": "Reducing Entropy",
+      "text": "A manual-only skill for minimizing total codebase size by measuring success through final code amount, not effort. Biases toward deletion and aggressive simplification.",
+      "chars": 168,
+      "units": [
+        "para:cbdaff27"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/reducing-entropy/README.md",
+      "heading": "Purpose",
+      "text": "This skill exists to counter the natural tendency of codebases to grow over time. It provides a framework for evaluating changes based on whether they **reduce the total amount of code** in the final codebase, not just minimize the work required now.\n\nMore code creates more entropy. More entropy means more bugs, more maintenance, more cognitive load. This skill fights that trend.",
+      "chars": 382,
+      "units": [
+        "para:37043f10",
+        "para:f66dfa0d"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/reducing-entropy/README.md",
+      "heading": "When to Use It",
+      "text": "Use this skill when:\n\n- Refactoring existing code and want to minimize the result\n- Evaluating feature requests (should we add this?)\n- Cleaning up technical debt\n- Deciding between implementation approaches\n- The user explicitly asks to \"reduce entropy\" or \"minimize code\"\n- You need to bias toward deletion over addition\n\n**Do NOT use automatically.** This is a manual-only skill that requires explicit user request.",
+      "chars": 418,
+      "units": [
+        "para:dbba4837",
+        "para:5c858b3e",
+        "para:e19c9ead",
+        "para:c59d6b94",
+        "para:3f8775d6",
+        "para:75aee5c0",
+        "para:f79da719",
+        "para:acca88b7"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/reducing-entropy/README.md",
+      "heading": "Core Philosophy",
+      "text": "**Measure the end state, not the effort.**\n\n- Writing 50 lines that delete 200 lines = net win (-150 lines)\n- Keeping 14 functions to avoid writing 2 = net loss (+12 functions)\n- \"No churn\" is not a goal. Less total code is the goal.",
+      "chars": 233,
+      "units": [
+        "para:09569cc5",
+        "para:89167fc1",
+        "para:6e1466f8",
+        "para:afa112c8"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/reducing-entropy/README.md",
+      "heading": "The Three Questions",
+      "text": "Every change must answer:\n\n1. **What's the smallest codebase that solves this?**\n   - Not \"smallest change\" but smallest *result*\n   - Could this be 2 functions instead of 14?\n   - Could this be 0 functions (delete the feature)?\n\n2. **Does this result in less total code?**\n   - Count lines/functions before vs. after\n   - If after > before, reject it\n   - \"Better organized\" but more code = more entropy\n\n3. **What can we delete?**\n   - What does this make obsolete?\n   - What was only needed because of what we're replacing?\n   - What's the maximum we could remove?",
+      "chars": 567,
+      "units": [
+        "para:b07adcae",
+        "para:44d68917",
+        "para:4848a1d9",
+        "para:b8c0cb8c",
+        "para:c323ef49",
+        "para:fadeb216",
+        "para:5762254a",
+        "para:41a00de7",
+        "para:2bb0950c",
+        "para:68e83946",
+        "para:d4617533",
+        "para:63615cae",
+        "para:ea2bb2d9"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/reducing-entropy/README.md",
+      "heading": "Reference Mindsets",
+      "text": "Before starting, **you must load at least one mindset** from the `references/` directory. These provide philosophical grounding for radical simplification:\n\n1. List files in `references/`\n2. Read frontmatter to see which applies\n3. Load at least one\n4. State which you loaded and its core principle\n\n**Do not proceed without loading a mindset.**",
+      "chars": 345,
+      "units": [
+        "para:a1f347b9",
+        "para:f816457c",
+        "para:0075f652",
+        "para:6e047d28",
+        "para:103c6139",
+        "para:0364d0c9"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/reducing-entropy/README.md",
+      "heading": "Key Features",
+      "text": "- **Deletion Bias**: Default action is to remove, not add\n- **Total Code Metric**: Success measured by final codebase size\n- **Anti-Pattern Detection**: Flags common excuses for adding code\n- **Mindset-Driven**: Loads philosophical frameworks to guide decisions\n- **Effort Agnostic**: Doesn't care about rewrite effort, only end result",
+      "chars": 335,
+      "units": [
+        "para:f11ace8e",
+        "para:9ffd98d9",
+        "para:530fc931",
+        "para:f7a1003c",
+        "para:89b8ad76"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/reducing-entropy/README.md",
+      "heading": "Red Flags",
+      "text": "This skill actively rejects these common arguments:\n\n| Argument | Why It's Rejected |\n|----------|-------------------|\n| \"Keep what exists\" | Status quo bias. The question is total code, not churn. |\n| \"This adds flexibility\" | Flexibility for what? YAGNI. |\n| \"Better separation of concerns\" | More files/functions = more code. Separation isn't free. |\n| \"Type safety\" | Worth how many lines? Sometimes runtime checks win. |\n| \"Easier to understand\" | 14 things are not easier than 2 things. |",
+      "chars": 494,
+      "units": [
+        "para:9fdc0c98",
+        "para:da4f2e0f",
+        "para:d010b289",
+        "para:edaadc54",
+        "para:92de80bc",
+        "para:ab2b705c",
+        "para:d149e9ba"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/reducing-entropy/README.md",
+      "heading": "When This Doesn't Apply",
+      "text": "Don't use this skill when:\n\n- The codebase is already minimal for what it does\n- Working in a framework with strong conventions (don't fight it)\n- Regulatory/compliance requirements mandate certain structures\n- User wants to add functionality and accepts the code cost",
+      "chars": 268,
+      "units": [
+        "para:5b09dd10",
+        "para:777ac546",
+        "para:e7669d24",
+        "para:a3c3143d",
+        "para:bb54cf60"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/reducing-entropy/README.md",
+      "heading": "Usage Example",
+      "text": "```\nUser: \"I need to add validation to these 5 forms\"\n\nStandard approach:\n- Create validation schema for each form (5 files)\n- Add validation helper functions (1 file)\n- Update each form component (5 files modified)\n- Total: +6 files, ~300 lines added\n\nReducing Entropy approach:\n1. Load mindset (e.g., \"worse-is-better.md\")\n2. Ask: What's the smallest codebase that solves this?\n   - Could we have 1 validation function instead of 5 schemas?\n   - Do all 5 forms need validation or just 2?\n   - Can we delete 3 forms and merge functionality?\n3. Count before/after:\n   - Before: 5 forms + 0 validation = 500 lines\n   - Option A: 5 forms + 6 validation files = 800 lines (reject)\n   - Option B: 2 forms + 1 validation function = 350 lines (accept)\n4. Delete: Remove 3 forms, add 1 function\n   - Net result: -150 lines\n```",
+      "chars": 819,
+      "units": [
+        "para:4a3eb308"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/reducing-entropy/README.md",
+      "heading": "Related Files",
+      "text": "- `references/` - Philosophical mindsets to load before starting\n- `adding-reference-mindsets.md` - How to add new mindsets",
+      "chars": 123,
+      "units": [
+        "para:6629d398",
+        "para:7385478a"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/reducing-entropy/README.md",
+      "heading": "Success Metrics",
+      "text": "You've succeeded when:\n\n- Total lines of code decreased\n- Number of files decreased\n- Number of functions/classes decreased\n- Features work the same (or better) with less code\n- You deleted more than you added\n\n---\n\n**Bias toward deletion. Measure the end state.**",
+      "chars": 264,
+      "units": [
+        "para:339398fb",
+        "para:d3d01669",
+        "para:98e10ea3",
+        "para:8da75c0a",
+        "para:19e07eb1",
+        "para:463efc7b",
+        "para:58757bab"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/reducing-entropy/README.md",
+      "heading": "Attribution",
+      "text": "- Original skill by @joshuadavidthomas from [joshuadavidthomas/agent-skills](https://github.com/joshuadavidthomas/agent-skills) (MIT)",
+      "chars": 133,
+      "units": [
+        "para:bd416e5e"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: reducing-entropy\ndescription: Manual-only skill for minimizing total codebase size. Only activate when explicitly requested by user. Measures success by final code amount, not effort. Bias toward deletion.\n---",
+      "chars": 219,
+      "units": [
+        "para:407fa190"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "heading": "Reducing Entropy",
+      "text": "More code begets more code. Entropy accumulates. This skill biases toward the smallest possible codebase.\n\n**Core question:** \"What does the codebase look like *after*?\"",
+      "chars": 169,
+      "units": [
+        "para:35aceadc",
+        "para:27e86fdc"
+      ]
+    },
+    {
+      "id": "s016",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "heading": "Before You Begin",
+      "text": "**Load at least one mindset from `references/`**\n\n1. List the files in the reference directory\n2. Read frontmatter descriptions to pick which applies\n3. Load at least one\n4. State which you loaded and its core principle\n\n**Do not proceed until you've done this.**",
+      "chars": 263,
+      "units": [
+        "para:8ce89a90",
+        "para:c0302bfb",
+        "para:eb77b9f5",
+        "para:6e047d28",
+        "para:103c6139",
+        "para:99009e01"
+      ]
+    },
+    {
+      "id": "s017",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "heading": "The Goal",
+      "text": "The goal is **less total code in the final codebase** - not less code to write right now.\n\n- Writing 50 lines that delete 200 lines = net win\n- Keeping 14 functions to avoid writing 2 = net loss\n- \"No churn\" is not a goal. Less code is the goal.\n\n**Measure the end state, not the effort.**",
+      "chars": 289,
+      "units": [
+        "para:9e848d92",
+        "para:2f27a3cd",
+        "para:e486be9d",
+        "para:d9b4d897",
+        "para:09569cc5"
+      ]
+    },
+    {
+      "id": "s018",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "heading": "1. What's the smallest codebase that solves this?",
+      "text": "Not \"what's the smallest change\" - what's the smallest *result*.\n\n- Could this be 2 functions instead of 14?\n- Could this be 0 functions (delete the feature)?\n- What would we delete if we did this?",
+      "chars": 197,
+      "units": [
+        "para:5bf902cd",
+        "para:b8c0cb8c",
+        "para:c323ef49",
+        "para:59531e62"
+      ]
+    },
+    {
+      "id": "s019",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "heading": "2. Does the proposed change result in less total code?",
+      "text": "Count lines before and after. If after > before, reject it.\n\n- \"Better organized\" but more code = more entropy\n- \"More flexible\" but more code = more entropy\n- \"Cleaner separation\" but more code = more entropy",
+      "chars": 209,
+      "units": [
+        "para:c2bb7dd9",
+        "para:2bb0950c",
+        "para:6ff7ba56",
+        "para:042426b3"
+      ]
+    },
+    {
+      "id": "s020",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "heading": "3. What can we delete?",
+      "text": "Every change is an opportunity to delete. Ask:\n\n- What does this make obsolete?\n- What was only needed because of what we're replacing?\n- What's the maximum we could remove?",
+      "chars": 173,
+      "units": [
+        "para:70dd4e41",
+        "para:d4617533",
+        "para:63615cae",
+        "para:ea2bb2d9"
+      ]
+    },
+    {
+      "id": "s021",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "heading": "Red Flags",
+      "text": "- **\"Keep what exists\"** - Status quo bias. The question is total code, not churn.\n- **\"This adds flexibility\"** - Flexibility for what? YAGNI.\n- **\"Better separation of concerns\"** - More files/functions = more code. Separation isn't free.\n- **\"Type safety\"** - Worth how many lines? Sometimes runtime checks in less code wins.\n- **\"Easier to understand\"** - 14 things are not easier than 2 things.",
+      "chars": 399,
+      "units": [
+        "para:d010b289",
+        "para:edaadc54",
+        "para:92de80bc",
+        "para:4092758a",
+        "para:d149e9ba"
+      ]
+    },
+    {
+      "id": "s022",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "heading": "When This Doesn't Apply",
+      "text": "- The codebase is already minimal for what it does\n- You're in a framework with strong conventions (don't fight it)\n- Regulatory/compliance requirements mandate certain structures",
+      "chars": 179,
+      "units": [
+        "para:777ac546",
+        "para:2c77bbb1",
+        "para:a3c3143d"
+      ]
+    },
+    {
+      "id": "s023",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "heading": "Reference Mindsets",
+      "text": "See `references/` for philosophical grounding.\n\nTo add new mindsets, see `adding-reference-mindsets.md`.\n\n---\n\n**Bias toward deletion. Measure the end state.**",
+      "chars": 159,
+      "units": [
+        "para:655ccf46",
+        "para:5e831b64",
+        "para:58757bab"
+      ]
+    },
+    {
+      "id": "s024",
+      "file": "skills/reducing-entropy/adding-reference-mindsets.md",
+      "heading": "Adding Reference Mindsets",
+      "text": "Reference mindsets are philosophical foundations for simplicity. They explain *why* less is more, giving agents deeper calibration beyond the mechanical checkpoints.",
+      "chars": 165,
+      "units": [
+        "para:b65f125f"
+      ]
+    },
+    {
+      "id": "s025",
+      "file": "skills/reducing-entropy/adding-reference-mindsets.md",
+      "heading": "Where They Live",
+      "text": "Mindsets live in @reference/. Each is a standalone file named by concept.",
+      "chars": 73,
+      "units": [
+        "para:1f04c466"
+      ]
+    },
+    {
+      "id": "s026",
+      "file": "skills/reducing-entropy/adding-reference-mindsets.md",
+      "heading": "File Structure",
+      "text": "```yaml\n---\ndescription: One-sentence summary of the core insight and why it matters.\n---\n\n# Concept Name\n\n## The Core Insight\n\nThe central idea in 1-2 sentences. Quotable. Memorable.\n\n## Why This Matters\n\nHow this connects to avoiding complexity. Why an LLM should care.\nWhat goes wrong when you ignore this principle.\n\n## Practical Application\n\nConcrete questions to ask or checks to apply.\nHow to use this mindset when evaluating design options.\n\n## External References\n\nLinks to primary sources - talks, papers, books that originated or best explain this concept.\n```",
+      "chars": 571,
+      "units": [
+        "para:aca1db14"
+      ]
+    },
+    {
+      "id": "s027",
+      "file": "skills/reducing-entropy/adding-reference-mindsets.md",
+      "heading": "Quality Checklist",
+      "text": "Before adding a mindset:\n\n- [ ] **Counters over-engineering?** Does it help resist the urge to add?\n- [ ] **Distinct from existing?** Not redundant with current mindsets\n- [ ] **Concise?** Can be explained in under 50 lines\n- [ ] **Memorable core insight?** Has a quotable central principle\n- [ ] **Named by concept?** Not by person or source",
+      "chars": 342,
+      "units": [
+        "para:f2beb574",
+        "para:807ae6e2",
+        "para:4ab3be7f",
+        "para:a141487a",
+        "para:bde54938",
+        "para:f1b58bb8"
+      ]
+    },
+    {
+      "id": "s028",
+      "file": "skills/reducing-entropy/adding-reference-mindsets.md",
+      "heading": "Good Candidates",
+      "text": "Ideas that would make strong mindsets:\n\n| Concept | Core Insight |\n|---------|--------------|\n| `worse-is-better` | Shipping a simple thing beats perfecting a complex one |\n| `essential-vs-accidental` | Most complexity is accidental and can be eliminated |\n| `locality-of-behavior` | Code should be understandable without jumping around |\n| `boring-technology` | Innovation tokens are limited; use boring tech by default |\n| `separation-of-concerns` | Each piece should have one reason to change |\n| `rule-of-three` | Don't abstract until you've seen the pattern three times |",
+      "chars": 576,
+      "units": [
+        "para:5432974d",
+        "para:d0e22948",
+        "para:03c03aa2",
+        "para:e78bc320",
+        "para:2a122156",
+        "para:c797f356",
+        "para:5ec33965",
+        "para:56a79377"
+      ]
+    },
+    {
+      "id": "s029",
+      "file": "skills/reducing-entropy/adding-reference-mindsets.md",
+      "heading": "What NOT to Add",
+      "text": "**Technology-specific advice** \u2192 Belongs in project docs or tech-specific skills\n- \"React components should...\" \n- \"In Rust, prefer...\"\n\n**Process/workflow rules** \u2192 Belongs in skills, not mindsets\n- \"Always run tests before...\"\n- \"Use TDD when...\"\n\n**Vague platitudes** \u2192 If there's no actionable insight, skip it\n- \"Write clean code\"\n- \"Think before you code\"\n\n**Anything requiring context** \u2192 Mindsets should be universal\n- \"In microservices architectures...\"\n- \"When working with legacy code...\"",
+      "chars": 499,
+      "units": [
+        "para:e60feabe",
+        "para:8a8f36e7",
+        "para:db66db37",
+        "para:b77e6c2f",
+        "para:f7368f00",
+        "para:3a083f38",
+        "para:ae83c207",
+        "para:650bfe7f",
+        "para:a46acd1d",
+        "para:f51aa95d",
+        "para:edb66536",
+        "para:af2ed4f7"
+      ]
+    },
+    {
+      "id": "s030",
+      "file": "skills/reducing-entropy/adding-reference-mindsets.md",
+      "heading": "The Test",
+      "text": "A good mindset should help an agent answer: \"Should I add this abstraction?\"\n\nIf the mindset doesn't directly inform that question, it probably belongs somewhere else.",
+      "chars": 167,
+      "units": [
+        "para:ca9b09ea",
+        "para:717782ab"
+      ]
+    },
+    {
+      "id": "s031",
+      "file": "skills/reducing-entropy/adding-reference-mindsets.md",
+      "heading": "Source Material",
+      "text": "Primary sources for simplicity thinking. Draw from these when creating new mindsets:\n\n- [Simple Made Easy](https://www.infoq.com/presentations/Simple-Made-Easy/) - Rich Hickey\n- [Hammock Driven Development](https://www.youtube.com/watch?v=f84n5oFoZBc) - Rich Hickey\n- [The Value of Values](https://www.infoq.com/presentations/Value-Values/) - Rich Hickey\n- [Out of the Tar Pit](https://curtclifton.net/papers/MosesleyMarks06a.pdf) - Moseley & Marks\n- [No Silver Bullet](https://www.cs.unc.edu/techreports/86-020.pdf) - Fred Brooks\n- [The Grug Brained Developer](https://grugbrain.dev/) - grugbrain.dev\n- [Worse Is Better](https://www.dreamsongs.com/WorseIsBetter.html) - Richard Gabriel\n- [A Philosophy of Software Design](https://www.amazon.com/dp/173210221X) - John Ousterhout\n- [The Zen of Python](https://peps.python.org/pep-0020/) - Tim Peters",
+      "chars": 848,
+      "units": [
+        "para:16d09475",
+        "para:c8572029",
+        "para:d70676b2",
+        "para:e5d7e78f",
+        "para:ea672363",
+        "para:f8c28058",
+        "para:afac6bea",
+        "para:b1c289fb",
+        "para:32af22c6",
+        "para:5d70a559"
+      ]
+    },
+    {
+      "id": "s032",
+      "file": "skills/reducing-entropy/references/data-over-abstractions.md",
+      "heading": "(preamble)",
+      "text": "---\ndescription: 100 functions on one data structure beats 10 functions on 10 structures. Generic data and operations enable composition.\n---",
+      "chars": 141,
+      "units": [
+        "para:b2d1613f"
+      ]
+    },
+    {
+      "id": "s033",
+      "file": "skills/reducing-entropy/references/data-over-abstractions.md",
+      "heading": "The Core Principle",
+      "text": "> \"It is better to have 100 functions operate on one data structure than 10 functions on 10 data structures.\"\n\nGeneric operations on generic data structures beat specialized operations on specialized structures.",
+      "chars": 211,
+      "units": [
+        "para:7f4163ff",
+        "para:585f048b"
+      ]
+    },
+    {
+      "id": "s034",
+      "file": "skills/reducing-entropy/references/data-over-abstractions.md",
+      "heading": "Why Custom Abstractions Hurt",
+      "text": "Every custom type, wrapper class, or specialized structure:\n- Adds a concept to understand\n- Requires its own operations\n- Limits composition with other code\n- Creates maintenance burden\n\nA `Map<String, Value>` can be processed by hundreds of existing functions. A `SettingsManager` class can only be processed by the methods you write for it.",
+      "chars": 343,
+      "units": [
+        "para:63b145e3",
+        "para:d871493b",
+        "para:46ec80da",
+        "para:19f8402c",
+        "para:a1da4586",
+        "para:03bac19a"
+      ]
+    },
+    {
+      "id": "s035",
+      "file": "skills/reducing-entropy/references/data-over-abstractions.md",
+      "heading": "Information Over Objects",
+      "text": "Model the information domain, not the behavior.\n\n- What data exists?\n- What are the essential relationships?\n- What transformations do you need?\n\nThen use generic structures (maps, vectors, sets) to represent that information. The behavior comes from functions that operate on data - not from methods bound to custom objects.",
+      "chars": 325,
+      "units": [
+        "para:43c06474",
+        "para:1f38d13e",
+        "para:35b9d1da",
+        "para:c5cb9825",
+        "para:106d25cc"
+      ]
+    },
+    {
+      "id": "s036",
+      "file": "skills/reducing-entropy/references/data-over-abstractions.md",
+      "heading": "Practical Application",
+      "text": "Before creating a new class/type, ask:\n- Could this be a map/dict with well-known keys?\n- Could this be a simple tuple/record?\n- Do I need custom behavior, or just data?\n\nIf you just need data, use data structures. Save custom types for when you genuinely need custom behavior that can't be a function.\n\n**The power is in the combinations, not the custom constructs.**",
+      "chars": 368,
+      "units": [
+        "para:73d484c8",
+        "para:d167f743",
+        "para:8960f4dc",
+        "para:92d84541",
+        "para:ee546dca",
+        "para:41a2970e"
+      ]
+    },
+    {
+      "id": "s037",
+      "file": "skills/reducing-entropy/references/data-over-abstractions.md",
+      "heading": "External References",
+      "text": "- [The Value of Values](https://www.infoq.com/presentations/Value-Values/) - Rich Hickey on data vs objects\n- [Data-Oriented Design](https://www.dataorienteddesign.com/dodbook/) - Richard Fabian's book on DOD\n- [CppCon 2014: Mike Acton \"Data-Oriented Design\"](https://www.youtube.com/watch?v=rX0ItVEVjHc) - Practical DOD in game engines",
+      "chars": 336,
+      "units": [
+        "para:5f439702",
+        "para:aa56cec7",
+        "para:5b223943"
+      ]
+    },
+    {
+      "id": "s038",
+      "file": "skills/reducing-entropy/references/design-is-taking-apart.md",
+      "heading": "(preamble)",
+      "text": "---\ndescription: Design is taking things apart, not adding features. Separate concerns, remove dependencies, compose simple pieces.\n---",
+      "chars": 135,
+      "units": [
+        "para:f8a73e33"
+      ]
+    },
+    {
+      "id": "s039",
+      "file": "skills/reducing-entropy/references/design-is-taking-apart.md",
+      "heading": "The Core Insight",
+      "text": "> \"Design is about taking things apart.\"\n\nGood design is not about adding features. It's about removing dependencies. It's about separating concerns so cleanly that each piece can be understood, tested, and changed independently.",
+      "chars": 229,
+      "units": [
+        "para:1145d659",
+        "para:6a3dd121"
+      ]
+    },
+    {
+      "id": "s040",
+      "file": "skills/reducing-entropy/references/design-is-taking-apart.md",
+      "heading": "Taking Things Apart",
+      "text": "When you see a complex system, the instinct is to understand how the pieces fit together. But the real skill is seeing how to *pull them apart*.\n\n- What different concerns are mixed here?\n- Which responsibilities could be separate?\n- Where are we conflating different concepts?\n\nEach separation reduces complexity. Each coupling increases it.",
+      "chars": 342,
+      "units": [
+        "para:ed3a2005",
+        "para:cb435dea",
+        "para:40701836",
+        "para:b9c1f2d7",
+        "para:b6cd7380"
+      ]
+    },
+    {
+      "id": "s041",
+      "file": "skills/reducing-entropy/references/design-is-taking-apart.md",
+      "heading": "Building from Simple Parts",
+      "text": "Once you have simple, independent pieces:\n- They compose freely\n- They test trivially\n- They change safely\n\nInheritance complects. Composition liberates.\n\nA system built from small, focused functions that transform data is:\n- Easier to understand (each piece does one thing)\n- Easier to test (pure functions, clear inputs/outputs)\n- Easier to change (modify one piece without touching others)",
+      "chars": 392,
+      "units": [
+        "para:cb7ed9a4",
+        "para:e38d467d",
+        "para:f91d9548",
+        "para:5921c5d6",
+        "para:c1396012",
+        "para:9ee24a0c",
+        "para:bb6789ef",
+        "para:47c77f52",
+        "para:95bdf9e4"
+      ]
+    },
+    {
+      "id": "s042",
+      "file": "skills/reducing-entropy/references/design-is-taking-apart.md",
+      "heading": "The Anti-Pattern",
+      "text": "The opposite of composition is the \"god object\" or \"kitchen sink\" - one thing that knows about everything, does everything, and can't be changed without breaking everything else.\n\nEvery helper method you add to a class is a small step toward the kitchen sink. Every layer of abstraction is a coupling waiting to cause pain.",
+      "chars": 323,
+      "units": [
+        "para:ef78cea9",
+        "para:0d934ff5"
+      ]
+    },
+    {
+      "id": "s043",
+      "file": "skills/reducing-entropy/references/design-is-taking-apart.md",
+      "heading": "Practical Application",
+      "text": "Before adding a method, wrapper, or abstraction:\n- Does this *separate* concerns, or *combine* them?\n- Am I making pieces more independent, or more coupled?\n- Could I solve this with a function that takes data and returns data?\n\n**Separate, don't combine. Compose, don't construct.**",
+      "chars": 283,
+      "units": [
+        "para:89aaf41f",
+        "para:0490b0ed",
+        "para:335f877b",
+        "para:efdf9090",
+        "para:46098507"
+      ]
+    },
+    {
+      "id": "s044",
+      "file": "skills/reducing-entropy/references/design-is-taking-apart.md",
+      "heading": "External References",
+      "text": "- [Simple Made Easy](https://www.infoq.com/presentations/Simple-Made-Easy/) - Rich Hickey on complecting vs composing\n- [Out of the Tar Pit](https://curtclifton.net/papers/MosesleyMarks06a.pdf) - Moseley & Marks on essential vs accidental complexity\n- [A Philosophy of Software Design](https://www.amazon.com/dp/173210221X) - John Ousterhout on deep vs shallow modules",
+      "chars": 368,
+      "units": [
+        "para:82afe830",
+        "para:c79e466e",
+        "para:0d2bd855"
+      ]
+    },
+    {
+      "id": "s045",
+      "file": "skills/reducing-entropy/references/expensive-to-add-later.md",
+      "heading": "(preamble)",
+      "text": "---\ndescription: Some things you Probably Are Gonna Need - know when YAGNI doesn't apply because retrofitting is dramatically more expensive than building it in from the start.\n---",
+      "chars": 180,
+      "units": [
+        "para:e0c71b31"
+      ]
+    },
+    {
+      "id": "s046",
+      "file": "skills/reducing-entropy/references/expensive-to-add-later.md",
+      "heading": "The Core Insight",
+      "text": "> \"When should you override YAGNI? When the cost of adding something later is so dramatically expensive compared with the cost of adding it early on that it's worth taking the risk.\"\n\nYAGNI is a good default. But some things are genuinely cheaper to build in from the start than to retrofit later. Know the difference.",
+      "chars": 318,
+      "units": [
+        "para:59867fa2",
+        "para:57ec194a"
+      ]
+    },
+    {
+      "id": "s047",
+      "file": "skills/reducing-entropy/references/expensive-to-add-later.md",
+      "heading": "Why This Matters",
+      "text": "Ruthless YAGNI application can backfire when:\n- Adding it later requires touching everything (logging, timestamps, audit trails)\n- You can't add it retroactively at all (API versioning, mobile app kill switches)\n- The cost of not having it is catastrophic (security fundamentals, data you threw away)\n\nThe avoiding-complexity skill pushes toward less. This mindset identifies the exceptions where \"add it now\" beats \"add it later.\"",
+      "chars": 431,
+      "units": [
+        "para:c4c92f5a",
+        "para:64aa1d62",
+        "para:ed073dc4",
+        "para:53a4e92d",
+        "para:10b58a7b"
+      ]
+    },
+    {
+      "id": "s048",
+      "file": "skills/reducing-entropy/references/expensive-to-add-later.md",
+      "heading": "Common PAGNIs",
+      "text": "**Data you can't get back:**\n- `created_at` / `updated_at` timestamps on every table\n- Audit logs (who did what when)\n- Many-to-many from the start if there's any hint you'll need more than one\n\n**Infrastructure that's painful to retrofit:**\n- API versioning (even if v1 is the only version)\n- API pagination (even if lists are small now)\n- Automated deploys and CI from day one\n- Logging infrastructure\n\n**Security fundamentals:**\n- Vulnerability disclosure policy and security@ email\n- Session/password invalidation mechanisms\n- Safe ways to move redacted data out of production",
+      "chars": 580,
+      "units": [
+        "para:d1827f32",
+        "para:c3b48a0c",
+        "para:d0e122c1",
+        "para:1ac3837d",
+        "para:250726df",
+        "para:82711a9e",
+        "para:5c98b1cc",
+        "para:44f9f5ef",
+        "para:b2773786",
+        "para:d72e230e",
+        "para:bfaf4943"
+      ]
+    },
+    {
+      "id": "s049",
+      "file": "skills/reducing-entropy/references/expensive-to-add-later.md",
+      "heading": "The Test",
+      "text": "Before invoking PAGNI, ask:\n1. **Is retrofitting dramatically more expensive?** (10x+, not 2x)\n2. **Is this a known pattern from experience?** (not speculative)\n3. **Is the cost of adding it now actually low?** (minutes/hours, not days)\n\nIf yes to all three, it's a PAGNI. Otherwise, YAGNI still applies.",
+      "chars": 304,
+      "units": [
+        "para:9e30c600",
+        "para:4fa942b7",
+        "para:173d5dce",
+        "para:0ac0cd23",
+        "para:90e6ad87"
+      ]
+    },
+    {
+      "id": "s050",
+      "file": "skills/reducing-entropy/references/expensive-to-add-later.md",
+      "heading": "The Balance",
+      "text": "PAGNI is not an escape hatch for over-engineering. It's a small, specific list of exceptions learned from painful experience. When in doubt, YAGNI wins.\n\n**Most features: YAGNI. Infrastructure and data collection: probably PAGNI.**",
+      "chars": 231,
+      "units": [
+        "para:9a10630b",
+        "para:6f1200fd"
+      ]
+    },
+    {
+      "id": "s051",
+      "file": "skills/reducing-entropy/references/expensive-to-add-later.md",
+      "heading": "External References",
+      "text": "- [PAGNIs: Probably Are Gonna Need Its](https://simonwillison.net/2021/Jul/1/pagnis/) - Simon Willison\n- [YAGNI Exceptions](https://lukeplant.me.uk/blog/posts/yagni-exceptions/) - Luke Plant\n- [Application Security PAGNIs](https://jacobian.org/2021/jul/8/appsec-pagnis/) - Jacob Kaplan-Moss",
+      "chars": 290,
+      "units": [
+        "para:52c1a754",
+        "para:46d46f8a",
+        "para:6f7c0b65"
+      ]
+    },
+    {
+      "id": "s052",
+      "file": "skills/reducing-entropy/references/simplicity-vs-easy.md",
+      "heading": "(preamble)",
+      "text": "---\ndescription: Simple is objective (not intertwined), easy is subjective (familiar). Choose simple over easy for long-term maintainability.\n---",
+      "chars": 145,
+      "units": [
+        "para:d9e3d633"
+      ]
+    },
+    {
+      "id": "s053",
+      "file": "skills/reducing-entropy/references/simplicity-vs-easy.md",
+      "heading": "The Core Distinction",
+      "text": "**Simple** and **easy** are not the same thing. We conflate them constantly, and it costs us.\n\n- **Simple**: One concept, not intertwined with others. Objective measure.\n- **Easy**: Near at hand, familiar, relative to our capabilities. Subjective.\n\nEasy changes over time as you learn. Simple is absolute.",
+      "chars": 305,
+      "units": [
+        "para:34594ff0",
+        "para:6b5397a8",
+        "para:963feda7",
+        "para:d64f544a"
+      ]
+    },
+    {
+      "id": "s054",
+      "file": "skills/reducing-entropy/references/simplicity-vs-easy.md",
+      "heading": "Why This Matters",
+      "text": "When we reach for the \"easy\" solution - the familiar pattern, the framework we know, the abstraction we've used before - we often add complexity. The easy path introduces concepts that intertwine with others.\n\nThe simple solution might be unfamiliar. It might require thinking. But it doesn't braid together concerns that should be separate.",
+      "chars": 341,
+      "units": [
+        "para:76965640",
+        "para:1d152dbb"
+      ]
+    },
+    {
+      "id": "s055",
+      "file": "skills/reducing-entropy/references/simplicity-vs-easy.md",
+      "heading": "Complecting",
+      "text": "\"Complect\" means to intertwine or braid together.\n\nComplexity comes from braiding together concepts that should be separate. Every time we couple things, we create complexity. Every coupling is a future debugging session.\n\nSimple means:\n- One role\n- One task  \n- One concept\n\nIf you can't explain it simply, it's too complex.",
+      "chars": 325,
+      "units": [
+        "para:6daadf31",
+        "para:54a485c3",
+        "para:3caf61af"
+      ]
+    },
+    {
+      "id": "s056",
+      "file": "skills/reducing-entropy/references/simplicity-vs-easy.md",
+      "heading": "The Choice",
+      "text": "When designing, ask: \"Am I choosing this because it's simple, or because it's familiar?\"\n\nFamiliar feels productive. Simple *is* productive - over the lifetime of the code.\n\n**Choose simple over easy. Always.**",
+      "chars": 210,
+      "units": [
+        "para:5c30bccf",
+        "para:f4227108",
+        "para:2d80714d"
+      ]
+    },
+    {
+      "id": "s057",
+      "file": "skills/reducing-entropy/references/simplicity-vs-easy.md",
+      "heading": "External References",
+      "text": "- [Simple Made Easy](https://www.infoq.com/presentations/Simple-Made-Easy/) - Rich Hickey's canonical talk on this distinction\n- [The Value of Values](https://www.infoq.com/presentations/Value-Values/) - Related talk on immutability and simplicity",
+      "chars": 247,
+      "units": [
+        "para:c66661fb",
+        "para:31c07f30"
+      ]
+    }
+  ],
+  "files": [],
+  "phrase_fate": {
+    "kept": 13.18,
+    "moved": 4.37,
+    "gone": 82.45,
+    "new": 74.43
+  }
+}

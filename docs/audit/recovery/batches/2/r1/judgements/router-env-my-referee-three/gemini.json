@@ -1,0 +1,86 @@
+{
+  "skill": "gemini",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/gemini/record.md",
+      "line": null,
+      "evidence": "previous-version digest: gemini at dbff837f \u2014 removed units (218, showing 40)",
+      "fix": "The digest is cut off, so only 40 of the 218 removed units could be checked. Every unit shown maps to a valid section row in record.md (for example s023, s035, s042, s047 and s054 through sections.json). Re-run the judge with the full digest, or confirm that sections.json covers all 218 units, so the 178 unseen units can be checked against record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 3,
+      "evidence": "Description promises \"big-context (>200k token) analysis of repositories, multi-directory projects or document sets\", but Command shapes gives only code, plan and interactive commands, and the prompt criteria are left as \"<criteria>\"",
+      "fix": "Add one more Command shape for a doc set, for example cd into docs/ with --include-directories specs and -p \"Find contradictions between these documents; cite file:section for both sides\". Also add one line on how to split a scope over about 200k tokens into per-area runs before merging the verified findings."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/gemini/evals/trigger-queries.json",
+      "line": 2,
+      "evidence": "Several queries are terse and name the skill outright, with no realistic context: \"use Gemini CLI for a cross-directory architecture review\", \"run a background Gemini review of the auth changes\". Some negatives are easy, for example \"summarize this one short source file\".",
+      "fix": "Rewrite 3-4 positive queries to describe the need with file paths and personal context but without naming Gemini, for example \"my manager wants a second pair of eyes on ~/work/billing before the audit, it's way too big for one pass\". Replace the easy negatives with near-misses such as \"run gemini-cli's /init in this repo\" or \"review this diff yourself, no other model\"."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 37,
+      "evidence": "\"`124` timeout (`137` if KILL was needed), `1` API or auth error, `42` bad arguments, `53` turn limit\" \u2014 the Gemini CLI exit codes have no source URL or checked date. The Sources list below Gotchas covers only the policy engine, plan mode, trusted folders and include-directories.",
+      "fix": "Add a Sources line for the exit codes, for example \"Exit codes 1/42/53: `cli/headless.md`, checked <date>\". Or tell the agent to check `gemini --help` or the headless docs when it sees an unmapped code."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/gemini/references/model-selection.md",
+      "line": 5,
+      "evidence": "Model table (gemini-3-pro-preview, gemini-3.1-pro-preview \"rolling out\", gemini-3-flash-preview, gemini-2.5-* and aliases) has no source URL and no checked date",
+      "fix": "Add under the table: \"Source: https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/model.md, checked <date>; `/model` in the CLI lists what the account can use.\" The model.md row already exists in docs/audit/upstream-sources.json."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 76,
+      "evidence": "\"`-y`/`--yolo` is deprecated; write `--approval-mode yolo`.\" This is a vendor CLI flag fact, it is not in the Sources list and has no checked date.",
+      "fix": "Add a Sources entry for the deprecation, for example \"`-y` deprecation: `cli/cli-reference.md`, checked <date>\", next to the existing Sources lines below Gotchas."
+    }
+  ]
+}

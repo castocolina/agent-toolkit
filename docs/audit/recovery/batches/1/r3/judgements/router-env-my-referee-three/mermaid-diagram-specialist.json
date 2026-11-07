@@ -1,0 +1,59 @@
+{
+  "skill": "mermaid-diagram-specialist",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": null,
+      "evidence": "previous-version digest at dbff837f: \"removed units (143, showing 40)\". The judge could check only the 40 listed items. Each of them maps to a section row in docs/audit/recovery/mermaid-diagram-specialist/record.md through sections.json, and each row is an allowed combination: not-lost or redistributed rows have decision none, and s020 is removed-to-fit, low, drop, generic-model-knowledge for a generic error-handling flowchart.",
+      "fix": "Have the digest list all 143 removed units, or confirm that each unit in sections.json s001-s021 is covered by its section row, so every removal can be checked."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 15,
+      "evidence": "\"1. If asked for a non-Mermaid format, stop (see the output contract). Next check the material can support a diagram: ... Then name the task kind and make its first decision:\" Also, \"parse failure and wrong meaning together\" sits at the same level as the task kinds, not under repair.",
+      "fix": "Split step 1 into three numbered steps: (1) format gate, (2) material sufficiency gate, (3) task-kind dispatch. Indent the \"parse failure and wrong meaning together\" bullet under \"repair\". This keeps every rule and only reorders it."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 15,
+      "evidence": "\"If asked for a non-Mermaid format, stop (see the output contract).\" Followed for a request like \"give me this as Mermaid and as PlantUML\", this rule stops the whole task, so the Mermaid part that could be delivered is never returned.",
+      "fix": "Add to step 1: \"If the request asks for Mermaid and a non-Mermaid format together, produce the Mermaid diagrams and name the unsupported format in the reply instead of stopping.\""
+    }
+  ]
+}

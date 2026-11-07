@@ -1,0 +1,59 @@
+{
+  "skill": "mermaid-diagram-specialist",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": null,
+      "evidence": "previous-version digest at dbff837f: 'removed units (143, showing 40)'. The list was cut, so 103 removed units could not be checked one by one. The 40 shown all map to rows in docs/audit/recovery/mermaid-diagram-specialist/record.md through sections.json: s006-s021 are redistributed into skills/mermaid-diagrams/, s001-s005 are not-lost, and s020 has an allowed removed-to-fit/low/drop/generic-model-knowledge row.",
+      "fix": "Re-run the digest without the cut, for example `python3 scripts/audit/audit.py judge-prompt --kind agent --artifact agents/mermaid-diagram-specialist.md --judge direct --digest-dir <tmp>`, so every removed unit can be checked against record.md. Then restore any unit with no row into skills/mermaid-diagrams/references/, or add a row for it to docs/audit/recovery/mermaid-diagram-specialist/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 15,
+      "evidence": "Step 1 packs both stop checks plus every task kind (new, repair with three sub-branches, parse+meaning together, mixed, extend/update, restyle) into one numbered item. 'parse failure and wrong meaning together' sits at task-kind level, but it is a repair sub-case.",
+      "fix": "Make step 1 'Stop checks' (non-Mermaid format, missing core facts). Make step 2 'Pick the task kind', with new / repair / extend / restyle / mixed as siblings, and nest 'parse failure and wrong meaning together' under repair. Renumber Draft/validate and Report to 3 and 4. Keep every branch's wording."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 25,
+      "evidence": "'mixed kinds (for example restyle plus a fix): repair first, then restyle'. No branch orders a request that combines extend/update with restyle and does not need a repair, so that combination has no defined order.",
+      "fix": "Extend the mixed-kinds rule: 'mixed kinds: repair first, then extend/update, then restyle, and report each change list.' This gives every combination one order."
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "skill": "database-schema-designer",
+  "mode": "output",
+  "pass_rate": 0.9516,
+  "passed": 59,
+  "total": 62,
+  "failures": [
+    {
+      "eval": "mysql-explain-on-writes-and-reading-plans",
+      "assertion": "States that MySQL 8.4 does not measure a single-table UPDATE with EXPLAIN ANALYZE and tells the user to run it on their server to see the exact output, instead of promising an exact message",
+      "evidence": "The output asserts a specific result, \"it reports that the statement is not executable by the iterator executor\", and never tells the user to run it on their server to confirm the exact output."
+    },
+    {
+      "eval": "mysql-explain-on-writes-and-reading-plans",
+      "assertion": "Points to the MySQL manual's EXPLAIN pages for the plan columns (for example https://dev.mysql.com/doc/refman/8.4/en/explain.html) and says their meanings vary by server version, instead of asserting version-specific column semantics from memory",
+      "evidence": "It links \"https://dev.mysql.com/doc/refman/8.4/en/explain-output.html\" but never says the meanings vary by server version, and it asserts column semantics from memory in a table (e.g. \"`type` | `range` / `ref` | `ALL` (full scan of 20M rows)\")."
+    },
+    {
+      "eval": "sqlite-live-rebuild-with-gate",
+      "assertion": "Drops the `order_totals` view before dropping the table and recreates `orders_customer_idx` and the view after the rename",
+      "evidence": "`DROP VIEW order_totals;` comes before the drop and `CREATE INDEX orders_customer_idx ON orders (customer_id);` comes after the rename, but the view appears only as a comment, `-- CREATE VIEW order_totals AS <saved SQL with total -> total_cents>;`, marked \"BLOCKED until filled in\", so the script as written never recreates it."
+    }
+  ]
+}

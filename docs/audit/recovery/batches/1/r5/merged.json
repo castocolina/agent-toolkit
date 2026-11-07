@@ -1,0 +1,97 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "database-schema-designer",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0,
+        "router-env-my-referee-two": 92.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/database-schema-designer/record.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: 'removed units (321, showing 40)'. All 40 items shown are explained through section rows in record.md and sections.json, but the other 281 could not be checked.",
+          "fix": "Regenerate the dbff837f digest without the cut, or check the hidden units against sections.json. For each one with no valid row, restore it (into `references/` when it is domain-specific, a template users ask for or a tested example) or add a row for it to `docs/audit/recovery/database-schema-designer/record.md`."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/database-schema-designer/record.md",
+          "line": null,
+          "evidence": "previous-version digest at be9701bf: 'removed units (71, showing 40)'. All 40 items shown have para: rows ('user accepted the drop' or intended-change), but 31 units were not shown.",
+          "fix": "Regenerate the be9701bf digest without the cut and confirm that each of the remaining 31 units has a para: row in `docs/audit/recovery/database-schema-designer/record.md`. Add a row, or restore the content into `references/schema-fundamentals.md`, for any unit that has none."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 48,
+          "evidence": "'Shape changes happen in place, in this order: (1) deploy readers that accept both shapes everywhere; ... (5) only then tighten the validator with `collMod`.' This five-step procedure sits inside a Gotchas bullet, and workflow step 1 sends the agent there for it.",
+          "fix": "Move the five-step MongoDB shape-change sequence into its own workflow sub-step or a short '### MongoDB shape change' block under Workflow. Keep the gotcha to the trap itself (no FKs, validators do not re-check old documents) and point it at the procedure. Delete nothing."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/database-schema-designer/evals/evals.json",
+          "line": 32,
+          "evidence": "\"files\": [\"references/migrations.md\"]. Several evals list the skill's own reference files as eval input files, but those are not user-supplied inputs.",
+          "fix": "In `files`, list only user inputs under `evals/files/` (for example `evals/files/mysql-users-orders.sql`). If an eval must exercise a reference, say so in its `expected_output` or an assertion (for example 'follows the NOT NULL phases in references/migrations.md')."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 27,
+          "evidence": "'PostgreSQL 18+ can skip the CHECK: `ADD CONSTRAINT users_phone_nn NOT NULL phone NOT VALID;`'. This minimum-version fact has no source URL and no date checked, while every other version fact in the file has both.",
+          "fix": "Add the official source and a check date, for example '(https://www.postgresql.org/docs/release/18.0/, checked <date>)', or tell the agent to confirm the form on the target server's ALTER TABLE page before using it."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 23,
+          "evidence": "showing 40 of 321 removed units at dbff837f, and showing 40 of 71 at be9701bf",
+          "fix": "No per-item restore: sections.json maps every shown dbff837f para to a record row, and every shown be9701bf para has its own accepted-drop or intended-change row. Record the two cut lists in docs/audit/recovery/database-schema-designer/record.md so the digests are fully explained."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 3,
+          "evidence": "description is one 809-character sentence with WHAT, WHEN, keywords and a Not-for boundary, but no imperative trigger",
+          "fix": "Design and review SQL and MongoDB schemas: tables or collections, keys, foreign keys, constraints, multi-tenant isolation, soft deletes, timestamp and money types, query-aligned indexes, and staged live migrations (expand-contract, NOT NULL, online DDL) for PostgreSQL, MySQL and SQLite. Use when users need a data model, DDL, an ERD-ready table list, an embed-or-reference decision, a schema review, or a safe migration plan, even if they only describe entities and queries or a symptom such as re-signup failing after soft delete, cross-tenant data leaking, or a migration that locked production. Not for REST or GraphQL API models, ORM classes for an existing schema, data-warehouse dashboards, database deployment, backups or connection pooling, or tuning a query without changing the schema."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/evals/evals.json",
+          "line": 1,
+          "evidence": "11 evals with input files and specific assertions, but no with-skill versus without-skill grading or benchmark results",
+          "fix": "Run each evals.json case with and without the skill, save grading.json pass/fail evidence per assertion, and add benchmark.json pass-rate, time and token deltas beside the skill."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

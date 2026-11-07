@@ -1,0 +1,95 @@
+{
+  "skill": "naming-analyzer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/naming-analyzer/record.md",
+      "line": null,
+      "evidence": "previous-version digest naming-analyzer at dbff837f: \"removed units (139, showing 40)\". All 40 shown items are explained by section rows (s001-s032) through sections.json units or by content now in references/naming-guidelines.md. The other 99 items could not be checked.",
+      "fix": "Regenerate the digest without the cut, or with a higher limit, and check the remaining 99 para: items against record.md. Add a row to docs/audit/recovery/naming-analyzer/record.md for each item that is not yet covered by a section row."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 63,
+      "evidence": "## Gotchas holds a single item: \"Celery's unregistered-task failure is not assumed for RQ: check the live `job.func_name` first...\". It repeats the RQ sentence already in Hidden consumers (line 58), so the section looks like it exists to fill a Gotchas slot.",
+      "fix": "Tie the section to the skill's purpose by moving the skill's real traps into it, or fold its one new rule (\"do not rate an RQ rename `contract` until job.func_name shows the queued name\") into the line 58 bullet and remove the heading with a record row. Do not drop the rule itself."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 61,
+      "evidence": "The strongest anti-patterns are spread through long prose and table cells: a symbol-only IDE rename on `disableRetry` -> `retryEnabled` (line 43), `makemigrations --noinput` dropping column data (line 52), and string `mock.patch` targets (line 58). None of them is listed as a NEVER item with its reason.",
+      "fix": "Turn ## Gotchas into a short NEVER list that points to those rows. For example: \"NEVER apply a polarity-flip rename with a symbol-only IDE rename: defaults keep their old value and the meaning inverts.\" and \"NEVER let non-interactive makemigrations handle a Django field rename: it emits RemoveField+AddField and drops data.\" Keep the detailed text where it is."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 55,
+      "evidence": "\"pytest collects only `test_*.py` or `*_test.py` by default, so `user_tests.py` is silently skipped\": a default of a vendor tool, with no source URL or checked date and no live-read instruction.",
+      "fix": "Add the source and date, for example \"([pytest python_files](https://docs.pytest.org/en/stable/reference/reference.html#confval-python_files), checked <date>)\". Or tell the agent to read the project's live `python_files` setting (pytest.ini, pyproject `[tool.pytest.ini_options]`) or run `pytest --collect-only -q`."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 58,
+      "evidence": "\"Celery task names default to `module.function`, so jobs already queued under the old name fail after deploy (Celery logs \\\"Received unregistered task\\\")\": a vendor default and log message, with no source URL or checked date.",
+      "fix": "Cite the official page and the date, for example \"([Celery Tasks, names](https://docs.celeryq.dev/en/stable/userguide/tasks.html#names), checked <date>)\". Or tell the agent to check the project's explicit `name=` arguments and run `celery inspect registered` before rating the rename."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 54,
+      "evidence": "\"Spring derives the default bean name from the class name (`UserService` becomes `userService`)\": a framework default, with no source URL or checked date. The NestJS and Angular claims in the same bullet do carry them.",
+      "fix": "Add the same citation format used for NestJS and Angular, for example \"([Spring classpath scanning, naming autodetected components](https://docs.spring.io/spring-framework/reference/core/beans/classpath-scanning.html), checked <date>)\"."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 102,
+      "evidence": "Worked example row \"| 1 | billing.py:8 | `get_total` \u2192 split ...\": in the snippet, `def get_total` is on line 9 (line 8 is the second blank line after `to_dict`).",
+      "fix": "Change the location to `billing.py:9` so the example shows the exact-location habit it asks for."
+    }
+  ]
+}

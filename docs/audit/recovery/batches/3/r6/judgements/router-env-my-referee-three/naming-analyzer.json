@@ -1,0 +1,68 @@
+{
+  "skill": "naming-analyzer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest naming-analyzer at dbff837f: \"removed units (139, showing 40)\". All 40 shown items map to valid record or sections.json rows, but the other 99 units were not shown, so they could not be checked",
+      "fix": "Re-run `python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/naming-analyzer/SKILL.md` with no cut so all 139 units are listed. Then confirm each unit maps to a section row in docs/audit/recovery/naming-analyzer/record.md through sections.json, and add a row for any unit that has none"
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 61,
+      "evidence": "The four `## Gotchas` bullets repeat facts already stated in Hidden consumers (RQ `job.func_name`, string-key access, generated clients) and in the Cases table (`disableRetry` polarity flip). Each one even points back to that section",
+      "fix": "Keep one full statement of each fact and replace the other with a one-line cross-reference. For example, keep the Gotchas bullet and point the Hidden consumers bullet at it. Record the move in docs/audit/recovery/naming-analyzer/record.md. Delete nothing"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/naming-analyzer/evals/evals.json",
+      "line": 107,
+      "evidence": "Eval `convention-split-grouped` lists `\"files\": [\"references/naming-guidelines.md\"]`. That is the skill's own reference, not a user input fixture, and the prompt names no file (`repo-wide-triage` does the same)",
+      "fix": "Take references/naming-guidelines.md out of these `files` arrays, because the skill loads it itself at the step-2 trigger. If the eval needs a repo to inspect, add a fixture under evals/files/ that shows the 8/6 prefix split and the public `enabled` JSON key"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 33,
+      "evidence": "Step 3 says \"end with the counts line from that reference\", but step 2 (line 31) says \"Do not load it ... when the user asked about one identifier whose row is decided\". On that branch with a rename verdict, the agent must emit a line whose format lives only in a file it was told not to load",
+      "fix": "Put the counts-line shape inline in step 3: `Reviewed <n> identifiers; <m> candidates (Priority 1: <a>, 2: <b>, 3: <c>); <k> not shown, ask for the next batch or name a path.` (drop the last clause when nothing was cut). Alternatively, say that a single-identifier answer skips the counts line"
+    }
+  ]
+}

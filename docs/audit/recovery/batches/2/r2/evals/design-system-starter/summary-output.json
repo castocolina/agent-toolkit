@@ -1,0 +1,29 @@
+{
+  "skill": "design-system-starter",
+  "mode": "output",
+  "pass_rate": 0.9,
+  "passed": 36,
+  "total": 40,
+  "failures": [
+    {
+      "eval": "accessible-dark-tokens",
+      "assertion": "Defines Button props with their defaults (intent, size and type, with type defaulting to button) and maps its hover, focus-visible, disabled and loading states to semantic token roles",
+      "evidence": "The props table gives `intent` default `'primary'`, `size` default `'md'` and `type` default `'button'`, and hover, focus-visible and disabled use `--action-*-bg-hover`, `--border-focus` and `--action-disabled-*`, but loading only gets `.ds-button[aria-busy=\"true\"] { cursor: progress; }` with no semantic token role."
+    },
+    {
+      "eval": "accessible-dark-tokens",
+      "assertion": "Defines FormField props with a required control id tied to the label, a hint, and an error that sets aria-invalid and points aria-describedby at the displayed message",
+      "evidence": "Hint and error are wired correctly (`'aria-invalid': error ? true : undefined` and `describedBy = [hintId, errorId]` referencing `<p id={errorId}>`), but the id prop is optional rather than required, as shown by \"| `id` | string | auto via `useId` |\" and `id?: string;`."
+    },
+    {
+      "eval": "token-scales-request",
+      "assertion": "Writes typography sizes, weights, line heights and letter spacing, with em-based tracking converted because DTCG dimensions allow only px and rem, or says why",
+      "evidence": "Sizes, weights, line heights and letter spacing are all present, but tracking is given as \"tight\": { \"value\": -0.02, \"unit\": \"rem\" } with no em-to-rem conversion and no note that DTCG dimensions allow only px and rem."
+    },
+    {
+      "eval": "touch-target-question",
+      "assertion": "Recommends recording which level the system targets",
+      "evidence": "The output only states \"**Assumption:** your conformance target is WCAG 2.2 Level AA\". Its contribution-guide rule asks components to \"declare its minimum hit area and which token it uses\", but nowhere does it recommend documenting the system's chosen WCAG conformance level."
+    }
+  ]
+}

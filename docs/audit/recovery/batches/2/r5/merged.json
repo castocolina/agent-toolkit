@@ -1,0 +1,249 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "design-system-starter",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.8,
+        "router-env-my-referee-two": 90.4
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/design-system-starter/record.md",
+          "line": null,
+          "evidence": "previous-version digest design-system-starter at dbff837f: 'removed units (485, showing 40)'. The digest is cut, so 445 removed units could not be checked one by one. All 40 shown units, both file: items and all 25 units of the be9701bf digest map to valid record rows.",
+          "fix": "Re-run `python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/design-system-starter/SKILL.md` with a larger digest limit, or split the digest per file, so every removed unit can be checked against record.md. For any unit with no row, restore it (into references/ when it is domain-specific, a template users ask for or a tested example) or add a row for it to docs/audit/recovery/design-system-starter/record.md."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/design-system-starter/evals/evals.json",
+          "line": 82,
+          "evidence": "\"files\": [ \"references/token-scales.md\" ]. The token-scales-request, native-dialog-modal, touch-target-question and theme-toggle-no-flash evals list the skill's own reference files as eval input files.",
+          "fix": "Remove skill reference files from `files`. Give these evals only user inputs from evals/files/ (for example an existing tokens.json to extend, or an app shell for the theme toggle). That way the with-skill and without-skill runs differ only by the skill, and the assertions test whether the skill's loading triggers fire."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/design-system-starter/references/component-examples.md",
+          "line": 81,
+          "evidence": "\"jsdom does not compute rendered colors, so jest-axe turns color contrast off ... axe's `color-contrast` rule checks text only\". This states library defaults with no source URL and no check date.",
+          "fix": "Add the official sources and a checked date, for example the jest-axe README (https://github.com/nickcolley/jest-axe, color-contrast disabled by default) and the axe-core rule docs (https://dequeuniversity.com/rules/axe/4.10/color-contrast). Or tell the agent to read the installed jest-axe and axe-core docs before relying on the default."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/design-system-starter/references/token-scales.md",
+          "line": 1,
+          "evidence": "dbff837f digest cut list: removed units (485, showing 40). The 40 shown paragraphs are explained by section rows in docs/audit/recovery/design-system-starter/sections.json plus record.md; the other 445 are not listed, so they cannot be ruled explained.",
+          "fix": "Emit the remaining 445 para ids (or confirm they are only sub-units of the recorded sections) and add a record row for any substantive unit not already covered, restoring domain templates into references/."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 3,
+          "evidence": "description names DTCG .tokens.json and semantic tokens, but not the file shapes the workflow actually writes: design-tokens.json, $schema, CSS custom properties, or data-theme.",
+          "fix": "Set up or evolve a shared design system: semantic design tokens in a DTCG 2025.10 .tokens.json or design-tokens.json ($type, $value, $schema), CSS custom properties switched by data-theme for light and dark, reusable component APIs (atoms, molecules, organisms), contrast-checked token pairs, and versioned migration off scattered styles. Use when asked to create a design system or token file, convert raw hex, px or palette names into semantic tokens, standardize UI across apps or teams, define component library conventions, or version and deprecate shared tokens and components, even when the user only says the screens look inconsistent or all over the place. Not for reviewing or fixing one screen or component against UI rules (ui-ux-principles), one-off pages, ARIA how-to questions in an existing form, Storybook stories for existing components, SVG icon optimization, logos, or marketing copy."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 61,
+          "evidence": "Step 7 says to run the theme-state check in references/component-examples.md, but does not say to load only the Theme-state validation section, and the file also holds Card, Modal, navigation and theme-toggle examples that step does not need.",
+          "fix": "In step 7, say to load only the Theme-state validation section of references/component-examples.md, and not the Card, Modal, navigation or theme-toggle sections, unless step 5 is also in scope."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 30,
+          "evidence": "Step 6's default is data-theme CSS custom properties, but the escape hatch (Tailwind variants or a ThemeProvider) is chosen by whether the project already depends on it or needs runtime theme objects, with no tie-break when both are true.",
+          "fix": "Keep data-theme as the default; if both Tailwind and a ThemeProvider already exist, keep the one the consuming screens already use and record the choice in the checklist scope line."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/design-system-starter/evals/trigger-queries.json",
+          "line": 1,
+          "evidence": "19 trigger queries (10 should-trigger, 9 should-not), short of about 20 with 8-10 on each side, and no train/validation split.",
+          "fix": "Add one realistic should-not-trigger near-miss (for example a finished-token export or a one-file CSS rename) and mark a fixed 60/40 train/validation split in the query file."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/design-system-starter/evals/evals.json",
+          "line": 62,
+          "evidence": "token-scales-request, native-dialog-modal, touch-target-question and theme-toggle-no-flash pass files references/token-scales.md, references/component-examples.md or references/component-specs.md, so they grade the bundled reference rather than the skill producing it from a user input.",
+          "fix": "Point those evals at user-owned inputs under evals/files/ (a partial token file, an existing non-native modal, a component list) and keep the references as the skill's own material, not as the prompt's file."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 72,
+          "evidence": "The color-vision gotcha cites https://developer.chrome.com/docs/devtools/rendering/apply-effects for Rendering tab > Emulate vision deficiencies. The recovery fact was checked against https://developer.chrome.com/docs/devtools/accessibility/reference, and the registry row uses that page too.",
+          "fix": "Cite https://developer.chrome.com/docs/devtools/accessibility/reference (the page that was checked on 2026-11-07), or re-check the rendering/apply-effects URL on this date and keep it only if Emulate vision deficiencies is actually documented there."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/design-system-starter/references/token-checks.md",
+          "line": 30,
+          "evidence": "The contrast script's worked example says #9ca3af on #fff prints ratio 2.5388 and pass false. The same relative-luminance formula yields about 2.54 only for the darker gray #9ca3af; #9ca3af on white is about 2.74, so the printed example is not what the script prints.",
+          "fix": "Re-run the script on #9ca3af and #fff and replace 2.5388 and 2.54 with the printed ratio and display values, keeping pass false."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/design-system-starter/references/component-examples.md",
+          "line": 15,
+          "evidence": "The naming rule says color.semantic.border.default becomes --color-border by dropping trailing default, but the deprecation example is rooted at color.action.default with no semantic segment, which the same rule would emit as --color-action-default, not --color-action.",
+          "fix": "State the rule for both shapes: a token under color.semantic drops semantic and a trailing default or ring, while a theme file rooted at color.action.default maps to --color-action."
+        }
+      ]
+    },
+    {
+      "name": "gemini",
+      "percent": 94.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0,
+        "router-env-my-referee-two": 93.6
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/gemini/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest gemini at dbff837f: 'removed units (218, showing 40)'. All 40 shown items map to section rows s001-s054 in docs/audit/recovery/gemini/record.md that fixer-rules.md allows, but the other 178 units could not be checked one by one.",
+          "fix": "Re-run the removal check with the full unit list (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/gemini/SKILL.md ...) and add a para: row, or confirm a section row covers it via sections.json, for any unit that no s0xx row explains in docs/audit/recovery/gemini/record.md"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/gemini/SKILL.md",
+          "line": 41,
+          "evidence": "Workflow step 6 packs resume flags, an interactive command, a doc caveat with date, a fallback and two source links into one paragraph of more than 120 words",
+          "fix": "Keep the step in Workflow but split it into a short decision: (a) user will continue interactively: give the bounded `-r \"latest\"` command; (b) otherwise: new headless run with the accepted findings in the prompt. Move the two source links next to the other Sources lines at the end of Gotchas"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/gemini/evals/trigger-queries.json",
+          "line": 51,
+          "evidence": "\"write a Python script to scan our repository\" and \"summarize this one short source file\" (line 67) share almost no wording with the skill and test little",
+          "fix": "Replace them with near-misses, for example \"review this diff yourself, no need to call another tool\" (should_trigger false) and \"have gemini rewrite the failing tests in src/ and commit\" (should_trigger false, implementation rather than review)"
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/gemini/evals/evals.json",
+          "line": null,
+          "evidence": "The description and Command shapes cover document-set contradiction reviews, but no output eval tests that branch",
+          "fix": "Add an eval such as 'propose a gemini command to find contradictions between /work/docs and /work/specs, don't run it', with assertions: cd into /work/docs, --include-directories /work/specs, -p with --approval-mode default, a timeout bound, and a statement that the command was not run"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/gemini/SKILL.md",
+          "line": 41,
+          "evidence": "`timeout --foreground --kill-after=10s 1800 gemini -m gemini-3-pro-preview --approval-mode default -r \"latest\" \"query\"`: the follow-up command has no `cd`, unlike every other command shape, so `latest` can resolve against a different working directory than the original run",
+          "fix": "Prefix the follow-up command with `cd <original cwd> &&` (the first target from step 2), and say that resume must run from the same directory as the original session"
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/gemini/README.md",
+          "line": null,
+          "evidence": "Resources: '[Gemini CLI Documentation](https://github.com/google/generative-ai-docs)' is labeled as the CLI docs, but the CLI docs are in google-gemini/gemini-cli (listed one line above)",
+          "fix": "Keep the link but relabel it to what it is, for example '[Google generative AI docs](https://github.com/google/generative-ai-docs)'. Leave the Credits section unchanged"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/gemini/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest gemini at dbff837f: removed units (218, showing 40). All 40 shown units map through sections.json to valid record rows, and all 10 be9701bf units have accepted-drop or intended-change rows; the other 178 units were not shown.",
+          "fix": "Regenerate the dbff837f digest without the cut and confirm each of the remaining 178 units maps to a record row in docs/audit/recovery/gemini/record.md. Add a row, or restore the content into references/, for any unit that has none."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/gemini/references/model-selection.md",
+          "line": 5,
+          "evidence": "The model table lists gemini-3-pro-preview, gemini-3.1-pro-preview, gemini-3-flash-preview, gemini-2.5-pro, gemini-2.5-flash and gemini-2.5-flash-lite as peer 'Choose when' rows, while SKILL.md only says a model the user names wins.",
+          "fix": "Keep gemini-3-pro-preview as the single default in the table and mark the other rows as escape hatches (newest Pro only if /model lists it and the user asks; flash only when the user says latency matters; 2.5 only when preview access is refused)."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/gemini/evals/trigger-queries.json",
+          "line": 1,
+          "evidence": "The 10 should-trigger queries all name Gemini, Google's model, a second model, or a 300k-400k context, so none tests the description's unnamed case of a repository or document set too large for one context.",
+          "fix": "Add a should-trigger query that describes only the size problem without naming Gemini or a second model, for example a monorepo the agent cannot hold whose services and shared packages need one architecture pass, and keep a near-miss negative that is merely a large file the agent can read itself."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/gemini/SKILL.md",
+          "line": 43,
+          "evidence": "Follow-up says to give `timeout --foreground --kill-after=10s 1800 gemini ... -r \"latest\" \"query\"` and, without confirmation that --resume combines with -p, to start a new headless run instead. The cited interactive form is `gemini -r \"latest\" \"query\"` with a positional prompt, which Gotchas says opens a waiting TTY session, so the proposed command is neither that form nor the headless fallback.",
+          "fix": "Give the documented interactive resume as `timeout --foreground --kill-after=10s 1800 gemini -m gemini-3-pro-preview --approval-mode default -i \"query\" -r latest` only if gemini --help shows -i and -r together; otherwise give only the new headless -p run that restates the accepted findings."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/gemini/README.md",
+          "line": 32,
+          "evidence": "Resources lists https://github.com/google/generative-ai-docs as Gemini CLI Documentation and https://ai.google.dev/docs plus https://ai.google.dev/models/gemini, while SKILL.md's checked behavior claims all cite https://github.com/google-gemini/gemini-cli docs.",
+          "fix": "Point Resources at the gemini-cli docs pages SKILL.md already cites (cli-reference.md, headless.md, model.md), dated 2026-11-07, and drop the generative-ai-docs and ai.google.dev links unless a fresh check shows they document the CLI."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

@@ -1,0 +1,685 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "React useEffect Best Practices",
+      "text": "A comprehensive guide teaching when to use `useEffect` in React, and more importantly, when NOT to use it. This skill is based on official React documentation and provides practical alternatives to common useEffect anti-patterns.",
+      "chars": 229,
+      "units": [
+        "para:7dc10efc"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "Purpose",
+      "text": "Effects are an **escape hatch** from React's reactive paradigm. They let you synchronize with external systems like browser APIs, third-party widgets, or network requests. However, many developers overuse Effects for tasks that React handles better through other means.\n\nThis skill helps you:\n- Identify when you truly need an Effect vs. when you don't\n- Recognize common anti-patterns and their fixes\n- Apply better alternatives like `useMemo`, `key` prop, and event handlers\n- Write Effects that are clean, maintainable, and free from race conditions",
+      "chars": 552,
+      "units": [
+        "para:53e45721",
+        "para:8850a22d",
+        "para:ad4508e3",
+        "para:33741d30",
+        "para:fa6aadf1",
+        "para:28c6548d"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "When to Use This Skill",
+      "text": "Use this skill when you're:\n- Writing or reviewing `useEffect` code\n- Using `useState` to store derived values\n- Implementing data fetching or subscriptions\n- Synchronizing state between components\n- Facing bugs with stale data or race conditions\n- Wondering if your Effect is necessary\n\n**Trigger phrases:**\n- \"Should I use useEffect for this?\"\n- \"How do I fix this useEffect?\"\n- \"My Effect is causing too many re-renders\"\n- \"Data fetching with useEffect\"\n- \"Reset state when props change\"\n- \"Derived state from props\"",
+      "chars": 519,
+      "units": [
+        "para:1da245e7",
+        "para:b9132ea6",
+        "para:56d7d32f",
+        "para:a6f3d4a0",
+        "para:36255599",
+        "para:9dad5574",
+        "para:0232ca92",
+        "para:51cef4d1",
+        "para:bc708366",
+        "para:21c67c4c",
+        "para:f1f9f3cd",
+        "para:4dde9923",
+        "para:be07a64d"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "How It Works",
+      "text": "This skill provides guidance through three key resources:\n\n1. **Quick Reference Table** - Fast lookup for common scenarios with DO/DON'T patterns\n2. **Decision Tree** - Visual flowchart to determine the right approach\n3. **Detailed Anti-Patterns** - 9 common mistakes with explanations and fixes\n4. **Better Alternatives** - 8 proven patterns to replace unnecessary Effects\n\nThe skill teaches you to ask the right questions:\n- Is there an external system involved?\n- Am I responding to a user event or component appearance?\n- Can this value be calculated during render?\n- Do I need to reset state when a prop changes?",
+      "chars": 617,
+      "units": [
+        "para:88075b17",
+        "para:21f64fa4",
+        "para:087ffebf",
+        "para:ba0f49b0",
+        "para:86936298",
+        "para:d444b1e3",
+        "para:5df660eb",
+        "para:39ca26d0",
+        "para:5e5c24fd",
+        "para:02a4a882"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "1. Quick Reference Guide",
+      "text": "Visual table showing the DO/DON'T for common scenarios:\n- Derived state from props/state\n- Expensive calculations\n- Resetting state on prop change\n- User event responses\n- Notifying parent components\n- Data fetching",
+      "chars": 215,
+      "units": [
+        "para:d9c88510",
+        "para:d06838d4",
+        "para:e761d2d9",
+        "para:f90d5581",
+        "para:30104bee"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "2. Decision Tree",
+      "text": "Clear flowchart that guides you from \"Need to respond to something?\" to the correct solution:\n- User interaction \u2192 Event handler\n- Component appeared \u2192 Effect (for external sync/analytics)\n- Derived value needed \u2192 Calculate during render (+ useMemo if expensive)\n- Reset state on prop change \u2192 Key prop",
+      "chars": 302,
+      "units": [
+        "para:4440dafe",
+        "para:00cda3a7",
+        "para:7f36d7e5",
+        "para:b67028b4",
+        "para:eb1ed48d"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "3. Anti-Pattern Recognition",
+      "text": "Detailed examples of 9 common mistakes:\n1. Redundant state for derived values\n2. Filtering/transforming data in Effect\n3. Resetting state on prop change\n4. Event-specific logic in Effect\n5. Chains of Effects\n6. Notifying parent via Effect\n7. Passing data up to parent\n8. Fetching without cleanup (race conditions)\n9. App initialization in Effect\n\nEach anti-pattern includes:\n- Bad example with explanation\n- Good example with fix\n- Why the anti-pattern is problematic",
+      "chars": 467,
+      "units": [
+        "para:964cce5e",
+        "para:c4f3a347",
+        "para:84e2747f",
+        "para:e0924112",
+        "para:1fa2ec0b",
+        "para:b7283e45",
+        "para:765c9ce9",
+        "para:d896c1e9",
+        "para:78ff4faa",
+        "para:98e0cc61",
+        "para:1fddf78f",
+        "para:3ac12f5e",
+        "para:579ff8c4",
+        "para:e1769bf9"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "4. Better Alternatives",
+      "text": "8 proven patterns to replace unnecessary Effects:\n1. Calculate during render for derived state\n2. `useMemo` for expensive calculations\n3. `key` prop to reset state\n4. Store ID instead of object for stable references\n5. Event handlers for user actions\n6. `useSyncExternalStore` for external stores\n7. Lifting state up for shared state\n8. Custom hooks for data fetching with cleanup",
+      "chars": 380,
+      "units": [
+        "para:b4b74dd7",
+        "para:05ae7522",
+        "para:470bc892",
+        "para:7b78ace3",
+        "para:f5d0f391",
+        "para:478e8b8a",
+        "para:d823d48f",
+        "para:00105415",
+        "para:65ae20d5"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "Example 1: Derived State",
+      "text": "**Bad - Unnecessary Effect:**\n```tsx\nfunction Form() {\n  const [firstName, setFirstName] = useState('Taylor');\n  const [lastName, setLastName] = useState('Swift');\n  const [fullName, setFullName] = useState('');\n\n  useEffect(() => {\n    setFullName(firstName + ' ' + lastName);\n  }, [firstName, lastName]);\n}\n```\n\n**Good - Calculate during render:**\n```tsx\nfunction Form() {\n  const [firstName, setFirstName] = useState('Taylor');\n  const [lastName, setLastName] = useState('Swift');\n  const fullName = firstName + ' ' + lastName; // Just compute it\n}\n```",
+      "chars": 555,
+      "units": [
+        "para:36568819",
+        "para:f4c7f185",
+        "para:fb4a7bab",
+        "para:f01b444c"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "Example 2: Resetting State",
+      "text": "**Bad - Effect to reset:**\n```tsx\nfunction ProfilePage({ userId }) {\n  const [comment, setComment] = useState('');\n\n  useEffect(() => {\n    setComment('');\n  }, [userId]);\n}\n```\n\n**Good - Key prop:**\n```tsx\nfunction ProfilePage({ userId }) {\n  return <Profile userId={userId} key={userId} />;\n}\n\nfunction Profile({ userId }) {\n  const [comment, setComment] = useState(''); // Resets automatically\n}\n```",
+      "chars": 402,
+      "units": [
+        "para:5ee953b6",
+        "para:d13f759a",
+        "para:9664850a",
+        "para:8ad07024"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "Example 3: Data Fetching with Cleanup",
+      "text": "**Bad - Race condition:**\n```tsx\nfunction SearchResults({ query }) {\n  const [results, setResults] = useState([]);\n\n  useEffect(() => {\n    fetchResults(query).then(json => {\n      setResults(json); // \"hello\" response may arrive after \"hell\"\n    });\n  }, [query]);\n}\n```\n\n**Good - Cleanup flag:**\n```tsx\nfunction SearchResults({ query }) {\n  const [results, setResults] = useState([]);\n\n  useEffect(() => {\n    let ignore = false;\n\n    fetchResults(query).then(json => {\n      if (!ignore) setResults(json);\n    });\n\n    return () => { ignore = true; };\n  }, [query]);\n}\n```",
+      "chars": 575,
+      "units": [
+        "para:7fd84903",
+        "para:ef9a64b3",
+        "para:3df740c8",
+        "para:a171aebd"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "Example 4: Event Handler Instead of Effect",
+      "text": "**Bad - Effect watching state:**\n```tsx\nfunction ProductPage({ product, addToCart }) {\n  useEffect(() => {\n    if (product.isInCart) {\n      showNotification(`Added ${product.name}!`);\n    }\n  }, [product]);\n\n  function handleBuyClick() {\n    addToCart(product);\n  }\n}\n```\n\n**Good - Handle in event:**\n```tsx\nfunction ProductPage({ product, addToCart }) {\n  function handleBuyClick() {\n    addToCart(product);\n    showNotification(`Added ${product.name}!`);\n  }\n}\n```",
+      "chars": 467,
+      "units": [
+        "para:a0cfe7ec",
+        "para:9213d3dc",
+        "para:b31de320",
+        "para:2fad7e32"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "When You DO Need Effects",
+      "text": "Effects are appropriate for:\n\n- **Synchronizing with external systems** - Browser APIs, third-party widgets, non-React code\n- **Subscriptions** - WebSocket connections, global event listeners (prefer `useSyncExternalStore`)\n- **Analytics/logging** - Code that needs to run because the component displayed\n- **Data fetching** - With proper cleanup (or use your framework's built-in mechanism)",
+      "chars": 391,
+      "units": [
+        "para:e5cc96c3",
+        "para:2d5bbbc7",
+        "para:5eb4b66a",
+        "para:14aea16f",
+        "para:54a45ed5"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "When You DON'T Need Effects",
+      "text": "Avoid Effects for:\n\n1. **Transforming data for rendering** - Calculate at the top level instead\n2. **Handling user events** - Use event handlers where you know exactly what happened\n3. **Deriving state** - Just compute it: `const fullName = firstName + ' ' + lastName`\n4. **Chaining state updates** - Calculate all next state in the event handler\n5. **Notifying parent components** - Call the callback in the same event handler\n6. **Resetting state** - Use the `key` prop to create a fresh component instance",
+      "chars": 508,
+      "units": [
+        "para:474ec08e",
+        "para:aecb7fae",
+        "para:cdfc2f8f",
+        "para:0e89ea30",
+        "para:5f496f98",
+        "para:1703d5fa",
+        "para:8b7d0b48"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "1. Start Without an Effect",
+      "text": "Before adding an Effect, ask: \"Is there an external system involved?\" If no, you probably don't need an Effect.",
+      "chars": 111,
+      "units": [
+        "para:d439194d"
+      ]
+    },
+    {
+      "id": "s016",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "2. Prefer Derived State",
+      "text": "If you can calculate a value from props or state, don't store it in state with an Effect updating it.",
+      "chars": 101,
+      "units": [
+        "para:f7f4bacc"
+      ]
+    },
+    {
+      "id": "s017",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "3. Use the Right Tool",
+      "text": "- Expensive calculation \u2192 `useMemo`\n- User interaction \u2192 Event handler\n- Reset on prop change \u2192 `key` prop\n- External subscription \u2192 `useSyncExternalStore`\n- Shared state \u2192 Lift state up",
+      "chars": 186,
+      "units": [
+        "para:8055d817",
+        "para:00cda3a7",
+        "para:ec22ce41",
+        "para:acdd8928",
+        "para:d3f52424"
+      ]
+    },
+    {
+      "id": "s018",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "4. Always Clean Up",
+      "text": "If your Effect subscribes, fetches, or sets timers, return a cleanup function to prevent memory leaks and race conditions.",
+      "chars": 122,
+      "units": [
+        "para:bec7cf9a"
+      ]
+    },
+    {
+      "id": "s019",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "5. Avoid Effect Chains",
+      "text": "Multiple Effects triggering each other causes unnecessary re-renders and makes code hard to follow. Calculate everything in one place (usually an event handler).",
+      "chars": 161,
+      "units": [
+        "para:45cafef0"
+      ]
+    },
+    {
+      "id": "s020",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "6. Test in Strict Mode",
+      "text": "React 18+ Strict Mode mounts components twice in development to expose missing cleanup. If your Effect breaks, you need cleanup.",
+      "chars": 128,
+      "units": [
+        "para:fc7f2224"
+      ]
+    },
+    {
+      "id": "s021",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "7. Consider Framework Solutions",
+      "text": "For data fetching, prefer your framework's built-in solution (Next.js, Remix) or libraries (React Query, SWR) over manual Effects.",
+      "chars": 130,
+      "units": [
+        "para:3ca3d6fe"
+      ]
+    },
+    {
+      "id": "s022",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "Reference Files",
+      "text": "This skill includes three detailed reference documents:\n\n1. **SKILL.md** - Quick reference table and decision tree\n2. **anti-patterns.md** - 9 common mistakes with detailed explanations\n3. **alternatives.md** - 8 better alternatives with code examples",
+      "chars": 251,
+      "units": [
+        "para:1d2ceaf7",
+        "para:20be4175",
+        "para:fb421e63",
+        "para:48f367f9"
+      ]
+    },
+    {
+      "id": "s023",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "Multiple Re-renders",
+      "text": "**Symptom:** Component re-renders many times in quick succession.\n\n**Cause:** Effect that sets state based on state it depends on, creating a loop.\n\n**Fix:** Calculate the final value in an event handler or during render.",
+      "chars": 221,
+      "units": [
+        "para:f2e65609",
+        "para:039645d9",
+        "para:1b531c71"
+      ]
+    },
+    {
+      "id": "s024",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "Stale Data",
+      "text": "**Symptom:** UI shows outdated values briefly before updating.\n\n**Cause:** Using Effect to update derived state causes an extra render pass.\n\n**Fix:** Calculate derived values during render instead of in state.",
+      "chars": 210,
+      "units": [
+        "para:407c4902",
+        "para:bf9c76fd",
+        "para:a1a34bd5"
+      ]
+    },
+    {
+      "id": "s025",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "Race Conditions",
+      "text": "**Symptom:** Fast typing shows results for old queries after new ones.\n\n**Cause:** Missing cleanup in data fetching Effect.\n\n**Fix:** Use cleanup flag (`ignore` variable) or AbortController.",
+      "chars": 190,
+      "units": [
+        "para:e8618ab8",
+        "para:0ade86c2",
+        "para:221439ec"
+      ]
+    },
+    {
+      "id": "s026",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "Runs Twice in Development",
+      "text": "**Symptom:** Effect runs twice on component mount in development.\n\n**Cause:** React 18 Strict Mode intentionally mounts components twice to expose bugs.\n\n**Fix:** Add proper cleanup. If it's app initialization that shouldn't run twice, use a module-level guard.",
+      "chars": 261,
+      "units": [
+        "para:fcdfc62a",
+        "para:d2c878e7",
+        "para:1abd59a1"
+      ]
+    },
+    {
+      "id": "s027",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "Resources",
+      "text": "This skill is based on:\n- [React Official Docs: You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)\n- [React Official Docs: Synchronizing with Effects](https://react.dev/learn/synchronizing-with-effects)\n- [React Official Docs: Lifecycle of Reactive Effects](https://react.dev/learn/lifecycle-of-reactive-effects)",
+      "chars": 345,
+      "units": [
+        "para:d72cbe5b",
+        "para:5adc544c",
+        "para:5a994b91",
+        "para:f002772b"
+      ]
+    },
+    {
+      "id": "s028",
+      "file": "skills/react-useeffect/README.md",
+      "heading": "Summary",
+      "text": "The golden rule: **Effects are an escape hatch from React.** If you're not synchronizing with an external system, you probably don't need an Effect.\n\nBefore writing `useEffect`, ask yourself:\n1. Is this responding to a user interaction? \u2192 Use event handler\n2. Is this a value I can calculate from props/state? \u2192 Calculate during render\n3. Is this resetting state when a prop changes? \u2192 Use key prop\n4. Is this synchronizing with an external system? \u2192 Use Effect with cleanup\n\nFollow these patterns, and your React code will be more maintainable, performant, and bug-free.",
+      "chars": 571,
+      "units": [
+        "para:cd9a4902",
+        "para:474f93f1",
+        "para:54aa1b06",
+        "para:5b1a6a02",
+        "para:cdff7755",
+        "para:baa995a4",
+        "para:0b21e61a"
+      ]
+    },
+    {
+      "id": "s029",
+      "file": "skills/react-useeffect/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: react-useeffect\ndescription: React useEffect best practices from official docs. Use when writing/reviewing useEffect, useState for derived values, data fetching, or state synchronization. Teaches when NOT to use Effect and better alternatives.\n---",
+      "chars": 257,
+      "units": [
+        "para:c6e85b20"
+      ]
+    },
+    {
+      "id": "s030",
+      "file": "skills/react-useeffect/SKILL.md",
+      "heading": "You Might Not Need an Effect",
+      "text": "Effects are an **escape hatch** from React. They let you synchronize with external systems. If there is no external system involved, you shouldn't need an Effect.",
+      "chars": 162,
+      "units": [
+        "para:6f27940b"
+      ]
+    },
+    {
+      "id": "s031",
+      "file": "skills/react-useeffect/SKILL.md",
+      "heading": "Quick Reference",
+      "text": "| Situation | DON'T | DO |\n|-----------|-------|-----|\n| Derived state from props/state | `useState` + `useEffect` | Calculate during render |\n| Expensive calculations | `useEffect` to cache | `useMemo` |\n| Reset state on prop change | `useEffect` with `setState` | `key` prop |\n| User event responses | `useEffect` watching state | Event handler directly |\n| Notify parent of changes | `useEffect` calling `onChange` | Call in event handler |\n| Fetch data | `useEffect` without cleanup | `useEffect` with cleanup OR framework |",
+      "chars": 528,
+      "units": [
+        "para:5e79900f",
+        "para:b483c05f",
+        "para:b19b9371",
+        "para:b8b381a8",
+        "para:ecd5b687",
+        "para:8a0d0115",
+        "para:d1fe91d6"
+      ]
+    },
+    {
+      "id": "s032",
+      "file": "skills/react-useeffect/SKILL.md",
+      "heading": "When You DO Need Effects",
+      "text": "- Synchronizing with **external systems** (non-React widgets, browser APIs)\n- **Subscriptions** to external stores (use `useSyncExternalStore` when possible)\n- **Analytics/logging** that runs because component displayed\n- **Data fetching** with proper cleanup (or use framework's built-in mechanism)",
+      "chars": 299,
+      "units": [
+        "para:7f1d09f5",
+        "para:2e057a08",
+        "para:2bb7ad3f",
+        "para:72bd7c4c"
+      ]
+    },
+    {
+      "id": "s033",
+      "file": "skills/react-useeffect/SKILL.md",
+      "heading": "When You DON'T Need Effects",
+      "text": "1. **Transforming data for rendering** - Calculate at top level, re-runs automatically\n2. **Handling user events** - Use event handlers, you know exactly what happened\n3. **Deriving state** - Just compute it: `const fullName = firstName + ' ' + lastName`\n4. **Chaining state updates** - Calculate all next state in the event handler",
+      "chars": 332,
+      "units": [
+        "para:ca442311",
+        "para:14d4ec1f",
+        "para:0e89ea30",
+        "para:5f496f98"
+      ]
+    },
+    {
+      "id": "s034",
+      "file": "skills/react-useeffect/SKILL.md",
+      "heading": "Decision Tree",
+      "text": "```\nNeed to respond to something?\n\u251c\u2500\u2500 User interaction (click, submit, drag)?\n\u2502   \u2514\u2500\u2500 Use EVENT HANDLER\n\u251c\u2500\u2500 Component appeared on screen?\n\u2502   \u2514\u2500\u2500 Use EFFECT (external sync, analytics)\n\u251c\u2500\u2500 Props/state changed and need derived value?\n\u2502   \u2514\u2500\u2500 CALCULATE DURING RENDER\n\u2502       \u2514\u2500\u2500 Expensive? Use useMemo\n\u2514\u2500\u2500 Need to reset state when prop changes?\n    \u2514\u2500\u2500 Use KEY PROP on component\n```",
+      "chars": 379,
+      "units": [
+        "para:14829afb"
+      ]
+    },
+    {
+      "id": "s035",
+      "file": "skills/react-useeffect/SKILL.md",
+      "heading": "Detailed Guidance",
+      "text": "- [Anti-Patterns](./anti-patterns.md) - Common mistakes with fixes\n- [Better Alternatives](./alternatives.md) - useMemo, key prop, lifting state, useSyncExternalStore",
+      "chars": 166,
+      "units": [
+        "para:fbf4c011",
+        "para:6cf3e05b"
+      ]
+    },
+    {
+      "id": "s036",
+      "file": "skills/react-useeffect/alternatives.md",
+      "heading": "1. Calculate During Render (Derived State)",
+      "text": "For values derived from props or state, just compute them:\n\n```tsx\nfunction Form() {\n  const [firstName, setFirstName] = useState('Taylor');\n  const [lastName, setLastName] = useState('Swift');\n\n  // Runs every render - that's fine and intentional\n  const fullName = firstName + ' ' + lastName;\n  const isValid = firstName.length > 0 && lastName.length > 0;\n}\n```\n\n**When to use**: The value can be computed from existing props/state.\n\n---",
+      "chars": 439,
+      "units": [
+        "para:df6dca71",
+        "para:1fec2b22",
+        "para:1383b667"
+      ]
+    },
+    {
+      "id": "s037",
+      "file": "skills/react-useeffect/alternatives.md",
+      "heading": "2. useMemo for Expensive Calculations",
+      "text": "When computation is expensive, memoize it:\n\n```tsx\nimport { useMemo } from 'react';\n\nfunction TodoList({ todos, filter }) {\n  const visibleTodos = useMemo(\n    () => getFilteredTodos(todos, filter),\n    [todos, filter]\n  );\n}\n```\n\n**How to know if it's expensive**:\n```tsx\nconsole.time('filter');\nconst visibleTodos = getFilteredTodos(todos, filter);\nconsole.timeEnd('filter');\n// If > 1ms, consider memoizing\n```\n\n**Note**: React Compiler can auto-memoize, reducing manual useMemo needs.\n\n---",
+      "chars": 493,
+      "units": [
+        "para:dc89e614",
+        "para:56b56856",
+        "para:6b8e9759",
+        "para:e44e9ed5",
+        "para:d7d3aebe"
+      ]
+    },
+    {
+      "id": "s038",
+      "file": "skills/react-useeffect/alternatives.md",
+      "heading": "3. Key Prop to Reset State",
+      "text": "To reset ALL state when a prop changes, use key:\n\n```tsx\n// Parent passes userId as key\nfunction ProfilePage({ userId }) {\n  return (\n    <Profile\n      userId={userId}\n      key={userId}  // Different userId = different component instance\n    />\n  );\n}\n\nfunction Profile({ userId }) {\n  // All state here resets when userId changes\n  const [comment, setComment] = useState('');\n  const [likes, setLikes] = useState([]);\n}\n```\n\n**When to use**: You want a \"fresh start\" when an identity prop changes.\n\n---",
+      "chars": 505,
+      "units": [
+        "para:aec056db",
+        "para:62ecd400",
+        "para:315777db"
+      ]
+    },
+    {
+      "id": "s039",
+      "file": "skills/react-useeffect/alternatives.md",
+      "heading": "4. Store ID Instead of Object",
+      "text": "To preserve selection when list changes:\n\n```tsx\n// BAD: Storing object that needs Effect to \"adjust\"\nfunction List({ items }) {\n  const [selection, setSelection] = useState(null);\n\n  useEffect(() => {\n    setSelection(null); // Reset when items change\n  }, [items]);\n}\n\n// GOOD: Store ID, derive object\nfunction List({ items }) {\n  const [selectedId, setSelectedId] = useState(null);\n\n  // Derived - no Effect needed\n  const selection = items.find(item => item.id === selectedId) ?? null;\n}\n```\n\n**Benefit**: If item with selectedId exists in new list, selection preserved.\n\n---",
+      "chars": 579,
+      "units": [
+        "para:d39461d6",
+        "para:51e41f85",
+        "para:55c2ce21"
+      ]
+    },
+    {
+      "id": "s040",
+      "file": "skills/react-useeffect/alternatives.md",
+      "heading": "5. Event Handlers for User Actions",
+      "text": "User clicks/submits/drags should be handled in event handlers, not Effects:\n\n```tsx\n// Event handler knows exactly what happened\nfunction ProductPage({ product, addToCart }) {\n  function handleBuyClick() {\n    addToCart(product);\n    showNotification(`Added ${product.name}!`);\n    analytics.track('product_added', { id: product.id });\n  }\n\n  function handleCheckoutClick() {\n    addToCart(product);\n    showNotification(`Added ${product.name}!`);\n    navigateTo('/checkout');\n  }\n}\n```\n\n**Shared logic**: Extract a function, call from both handlers:\n\n```tsx\nfunction buyProduct() {\n  addToCart(product);\n  showNotification(`Added ${product.name}!`);\n}\n\nfunction handleBuyClick() { buyProduct(); }\nfunction handleCheckoutClick() { buyProduct(); navigateTo('/checkout'); }\n```\n\n---",
+      "chars": 780,
+      "units": [
+        "para:b942c905",
+        "para:310447d5",
+        "para:624731a0",
+        "para:126ab06d"
+      ]
+    },
+    {
+      "id": "s041",
+      "file": "skills/react-useeffect/alternatives.md",
+      "heading": "6. useSyncExternalStore for External Stores",
+      "text": "For subscribing to external data (browser APIs, third-party stores):\n\n```tsx\n// Instead of manual Effect subscription\nfunction useOnlineStatus() {\n  const [isOnline, setIsOnline] = useState(true);\n\n  useEffect(() => {\n    function update() { setIsOnline(navigator.onLine); }\n    window.addEventListener('online', update);\n    window.addEventListener('offline', update);\n    return () => {\n      window.removeEventListener('online', update);\n      window.removeEventListener('offline', update);\n    };\n  }, []);\n\n  return isOnline;\n}\n\n// Use purpose-built hook\nimport { useSyncExternalStore } from 'react';\n\nfunction subscribe(callback) {\n  window.addEventListener('online', callback);\n  window.addEventListener('offline', callback);\n  return () => {\n    window.removeEventListener('online', callback);\n    window.removeEventListener('offline', callback);\n  };\n}\n\nfunction useOnlineStatus() {\n  return useSyncExternalStore(\n    subscribe,\n    () => navigator.onLine,      // Client value\n    () => true                   // Server value (SSR)\n  );\n}\n```\n\n---",
+      "chars": 1057,
+      "units": [
+        "para:e06f82d3",
+        "para:5940d36f"
+      ]
+    },
+    {
+      "id": "s042",
+      "file": "skills/react-useeffect/alternatives.md",
+      "heading": "7. Lifting State Up",
+      "text": "When two components need synchronized state, lift it to common ancestor:\n\n```tsx\n// Instead of syncing via Effects between siblings\nfunction Parent() {\n  const [value, setValue] = useState('');\n\n  return (\n    <>\n      <Input value={value} onChange={setValue} />\n      <Preview value={value} />\n    </>\n  );\n}\n```\n\n---",
+      "chars": 318,
+      "units": [
+        "para:52b340f6",
+        "para:a6d03d66"
+      ]
+    },
+    {
+      "id": "s043",
+      "file": "skills/react-useeffect/alternatives.md",
+      "heading": "8. Custom Hooks for Data Fetching",
+      "text": "Extract fetch logic with proper cleanup:\n\n```tsx\nfunction useData(url) {\n  const [data, setData] = useState(null);\n  const [error, setError] = useState(null);\n  const [loading, setLoading] = useState(true);\n\n  useEffect(() => {\n    let ignore = false;\n    setLoading(true);\n\n    fetch(url)\n      .then(res => res.json())\n      .then(json => {\n        if (!ignore) {\n          setData(json);\n          setError(null);\n        }\n      })\n      .catch(err => {\n        if (!ignore) setError(err);\n      })\n      .finally(() => {\n        if (!ignore) setLoading(false);\n      });\n\n    return () => { ignore = true; };\n  }, [url]);\n\n  return { data, error, loading };\n}\n\n// Usage\nfunction SearchResults({ query }) {\n  const { data, error, loading } = useData(`/api/search?q=${query}`);\n}\n```\n\n**Better**: Use framework's data fetching (React Query, SWR, Next.js, etc.)\n\n---",
+      "chars": 868,
+      "units": [
+        "para:59ced644",
+        "para:0a6db341",
+        "para:5e173bcd"
+      ]
+    },
+    {
+      "id": "s044",
+      "file": "skills/react-useeffect/alternatives.md",
+      "heading": "Summary: When to Use What",
+      "text": "| Need | Solution |\n|------|----------|\n| Value from props/state | Calculate during render |\n| Expensive calculation | `useMemo` |\n| Reset all state on prop change | `key` prop |\n| Respond to user action | Event handler |\n| Sync with external system | `useEffect` with cleanup |\n| Subscribe to external store | `useSyncExternalStore` |\n| Share state between components | Lift state up |\n| Fetch data | Custom hook with cleanup / framework |",
+      "chars": 440,
+      "units": [
+        "para:64997cd6",
+        "para:8055d817",
+        "para:31f4630c",
+        "para:d95b8e9b",
+        "para:3cd1e89c",
+        "para:9e577a0f",
+        "para:f6401bbe",
+        "para:b86aebb2"
+      ]
+    },
+    {
+      "id": "s045",
+      "file": "skills/react-useeffect/anti-patterns.md",
+      "heading": "1. Redundant State for Derived Values",
+      "text": "```tsx\n// BAD: Extra state + Effect for derived value\nfunction Form() {\n  const [firstName, setFirstName] = useState('Taylor');\n  const [lastName, setLastName] = useState('Swift');\n  const [fullName, setFullName] = useState('');\n\n  useEffect(() => {\n    setFullName(firstName + ' ' + lastName);\n  }, [firstName, lastName]);\n}\n\n// GOOD: Calculate during rendering\nfunction Form() {\n  const [firstName, setFirstName] = useState('Taylor');\n  const [lastName, setLastName] = useState('Swift');\n  const fullName = firstName + ' ' + lastName; // Just compute it\n}\n```\n\n**Why it's bad**: Causes extra render pass with stale value, then re-renders with updated value.\n\n---",
+      "chars": 664,
+      "units": [
+        "para:118f3567",
+        "para:3fbceeaa"
+      ]
+    },
+    {
+      "id": "s046",
+      "file": "skills/react-useeffect/anti-patterns.md",
+      "heading": "2. Filtering/Transforming Data in Effect",
+      "text": "```tsx\n// BAD: Effect to filter list\nfunction TodoList({ todos, filter }) {\n  const [visibleTodos, setVisibleTodos] = useState([]);\n\n  useEffect(() => {\n    setVisibleTodos(getFilteredTodos(todos, filter));\n  }, [todos, filter]);\n}\n\n// GOOD: Filter during render (memoize if expensive)\nfunction TodoList({ todos, filter }) {\n  const visibleTodos = useMemo(\n    () => getFilteredTodos(todos, filter),\n    [todos, filter]\n  );\n}\n```\n\n---",
+      "chars": 435,
+      "units": [
+        "para:017c1681"
+      ]
+    },
+    {
+      "id": "s047",
+      "file": "skills/react-useeffect/anti-patterns.md",
+      "heading": "3. Resetting State on Prop Change",
+      "text": "```tsx\n// BAD: Effect to reset state\nfunction ProfilePage({ userId }) {\n  const [comment, setComment] = useState('');\n\n  useEffect(() => {\n    setComment('');\n  }, [userId]);\n}\n\n// GOOD: Use key prop\nfunction ProfilePage({ userId }) {\n  return <Profile userId={userId} key={userId} />;\n}\n\nfunction Profile({ userId }) {\n  const [comment, setComment] = useState(''); // Resets automatically\n}\n```\n\n**Why key works**: React treats components with different keys as different components, recreating state.\n\n---",
+      "chars": 507,
+      "units": [
+        "para:5c5c1830",
+        "para:a190159b"
+      ]
+    },
+    {
+      "id": "s048",
+      "file": "skills/react-useeffect/anti-patterns.md",
+      "heading": "4. Event-Specific Logic in Effect",
+      "text": "```tsx\n// BAD: Effect for button click result\nfunction ProductPage({ product, addToCart }) {\n  useEffect(() => {\n    if (product.isInCart) {\n      showNotification(`Added ${product.name}!`);\n    }\n  }, [product]);\n\n  function handleBuyClick() {\n    addToCart(product);\n  }\n}\n\n// GOOD: Handle in event handler\nfunction ProductPage({ product, addToCart }) {\n  function handleBuyClick() {\n    addToCart(product);\n    showNotification(`Added ${product.name}!`);\n  }\n}\n```\n\n**Why it's bad**: Effect fires on page refresh (isInCart is true), showing notification unexpectedly.\n\n---",
+      "chars": 575,
+      "units": [
+        "para:a3c53108",
+        "para:b6cebfbe"
+      ]
+    },
+    {
+      "id": "s049",
+      "file": "skills/react-useeffect/anti-patterns.md",
+      "heading": "5. Chains of Effects",
+      "text": "```tsx\n// BAD: Effects triggering each other\nfunction Game() {\n  const [card, setCard] = useState(null);\n  const [goldCardCount, setGoldCardCount] = useState(0);\n  const [round, setRound] = useState(1);\n  const [isGameOver, setIsGameOver] = useState(false);\n\n  useEffect(() => {\n    if (card?.gold) setGoldCardCount(c => c + 1);\n  }, [card]);\n\n  useEffect(() => {\n    if (goldCardCount > 3) {\n      setRound(r => r + 1);\n      setGoldCardCount(0);\n    }\n  }, [goldCardCount]);\n\n  useEffect(() => {\n    if (round > 5) setIsGameOver(true);\n  }, [round]);\n}\n\n// GOOD: Calculate in event handler\nfunction Game() {\n  const [card, setCard] = useState(null);\n  const [goldCardCount, setGoldCardCount] = useState(0);\n  const [round, setRound] = useState(1);\n  const isGameOver = round > 5; // Derived!\n\n  function handlePlaceCard(nextCard) {\n    if (isGameOver) throw Error('Game ended');\n\n    setCard(nextCard);\n    if (nextCard.gold) {\n      if (goldCardCount < 3) {\n        setGoldCardCount(goldCardCount + 1);\n      } else {\n        setGoldCardCount(0);\n        setRound(round + 1);\n        if (round === 5) alert('Good game!');\n      }\n    }\n  }\n}\n```\n\n**Why it's bad**: Multiple re-renders (setCard -> setGoldCardCount -> setRound -> setIsGameOver). Also fragile for features like history replay.\n\n---",
+      "chars": 1299,
+      "units": [
+        "para:45c3e8c6",
+        "para:967da596"
+      ]
+    },
+    {
+      "id": "s050",
+      "file": "skills/react-useeffect/anti-patterns.md",
+      "heading": "6. Notifying Parent via Effect",
+      "text": "```tsx\n// BAD: Effect to notify parent\nfunction Toggle({ onChange }) {\n  const [isOn, setIsOn] = useState(false);\n\n  useEffect(() => {\n    onChange(isOn);\n  }, [isOn, onChange]);\n\n  function handleClick() {\n    setIsOn(!isOn);\n  }\n}\n\n// GOOD: Notify in same event\nfunction Toggle({ onChange }) {\n  const [isOn, setIsOn] = useState(false);\n\n  function updateToggle(nextIsOn) {\n    setIsOn(nextIsOn);\n    onChange(nextIsOn); // Same event, batched render\n  }\n\n  function handleClick() {\n    updateToggle(!isOn);\n  }\n}\n\n// BEST: Fully controlled component\nfunction Toggle({ isOn, onChange }) {\n  function handleClick() {\n    onChange(!isOn);\n  }\n}\n```\n\n---",
+      "chars": 653,
+      "units": [
+        "para:94ee204b"
+      ]
+    },
+    {
+      "id": "s051",
+      "file": "skills/react-useeffect/anti-patterns.md",
+      "heading": "7. Passing Data Up to Parent",
+      "text": "```tsx\n// BAD: Child fetches, passes up via Effect\nfunction Parent() {\n  const [data, setData] = useState(null);\n  return <Child onFetched={setData} />;\n}\n\nfunction Child({ onFetched }) {\n  const data = useSomeAPI();\n\n  useEffect(() => {\n    if (data) onFetched(data);\n  }, [onFetched, data]);\n}\n\n// GOOD: Parent fetches, passes down\nfunction Parent() {\n  const data = useSomeAPI();\n  return <Child data={data} />;\n}\n```\n\n**Why**: Data should flow down. Upward flow via Effects makes debugging hard.\n\n---",
+      "chars": 504,
+      "units": [
+        "para:1a5bc91c",
+        "para:9bec5c8d"
+      ]
+    },
+    {
+      "id": "s052",
+      "file": "skills/react-useeffect/anti-patterns.md",
+      "heading": "8. Fetching Without Cleanup (Race Condition)",
+      "text": "```tsx\n// BAD: No cleanup - race condition\nfunction SearchResults({ query }) {\n  const [results, setResults] = useState([]);\n\n  useEffect(() => {\n    fetchResults(query).then(json => {\n      setResults(json); // \"hello\" response may arrive after \"hell\"\n    });\n  }, [query]);\n}\n\n// GOOD: Cleanup ignores stale responses\nfunction SearchResults({ query }) {\n  const [results, setResults] = useState([]);\n\n  useEffect(() => {\n    let ignore = false;\n\n    fetchResults(query).then(json => {\n      if (!ignore) setResults(json);\n    });\n\n    return () => { ignore = true; };\n  }, [query]);\n}\n```\n\n---",
+      "chars": 595,
+      "units": [
+        "para:7a6f8e34"
+      ]
+    },
+    {
+      "id": "s053",
+      "file": "skills/react-useeffect/anti-patterns.md",
+      "heading": "9. App Initialization in Effect",
+      "text": "```tsx\n// BAD: Runs twice in dev, may break auth\nfunction App() {\n  useEffect(() => {\n    loadDataFromLocalStorage();\n    checkAuthToken(); // May invalidate token on second call!\n  }, []);\n}\n\n// GOOD: Module-level guard\nlet didInit = false;\n\nfunction App() {\n  useEffect(() => {\n    if (!didInit) {\n      didInit = true;\n      loadDataFromLocalStorage();\n      checkAuthToken();\n    }\n  }, []);\n}\n\n// ALSO GOOD: Module-level execution\nif (typeof window !== 'undefined') {\n  checkAuthToken();\n  loadDataFromLocalStorage();\n}\n```",
+      "chars": 528,
+      "units": [
+        "para:4aab03c2"
+      ]
+    }
+  ],
+  "files": [],
+  "phrase_fate": {
+    "kept": 2.2,
+    "moved": 0.75,
+    "gone": 97.05,
+    "new": 97.45
+  }
+}

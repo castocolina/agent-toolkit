@@ -1,0 +1,374 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "commit-work",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 97.6,
+        "router-env-my-referee-two": 94.4
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest commit-work at dbff837f: 'removed units (108, showing 40)'. The digest lists only 40 of 108 removed units. All 40 shown items are explained by valid rows in docs/audit/recovery/commit-work/record.md, through sections.json units s001-s022, or by content still present in the current files. The other 68 could not be checked.",
+          "fix": "Regenerate the digest without truncation (or with a higher show limit) and re-run the removal check on all 108 units. Add a row to docs/audit/recovery/commit-work/record.md for any unit that no section row covers."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 25,
+          "evidence": "Step 3 packs too much into one item and its sub-bullets: run-directory setup and cleanup, the 'Two questions pick the index, then the method' decision, the overlap check, temporary-index setup and three staging methods. This bends the Process pattern's one-checkpoint-per-phase shape.",
+          "fix": "Split step 3 into 3a 'Set up <run>' (mktemp, list leftovers, cleanup rule), 3b 'Pick the index' (the which-index question plus the overlap check as a short decision list) and 3c 'Stage' (whole file / part of a tracked file / untracked file). Move the existing sentences without rewording or dropping any."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 34,
+          "evidence": "'if another commit landed meanwhile, rebuild the index from the new HEAD, or your commit silently reverts it.' After the rebuild, this branch does not say to re-stage the approved change and repeat the step 4 review and the step 5 check on the rebuilt index. The tree from `git write-tree` could then go to the commit without review or verification.",
+          "fix": "Append: 'then redo steps 3-5 on the rebuilt index (re-stage the approved paths or patches, review, verify) before running `git write-tree` and committing.'"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 37,
+          "evidence": "A commit joins whatever operation is in progress. During a merge it becomes the merge commit, with two parents and the other branch's changes.",
+          "fix": "Keep the non-obvious rebase, cherry-pick and revert outcomes; move the merge-commit-has-two-parents sentence to references/ or record the removal, since an agent already knows a commit during a merge is a merge commit."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 33,
+          "evidence": "Read `references/commit-message-template.md` only when the repository sets its own message rules (commitlint config, commit template, CONTRIBUTING, PR template), you need footers beyond `BREAKING CHANGE`, or you want worked messages and the report block of step 8.",
+          "fix": "Split the load: read the report-block section of references/commit-message-template.md on every step 8 report, and load the repository-rules, commitlint defaults and spec sections only when the repository sets its own rules or a footer beyond BREAKING CHANGE is needed."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 31,
+          "evidence": "Verify the staged version with the fastest relevant check: tests for the touched paths, else lint, else build.",
+          "fix": "Name the default lookup (the repository's test script for the touched paths, else its lint script, else its build script) and say to ask only when none of those exists."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/commit-work/evals/evals.json",
+          "line": 1,
+          "evidence": "\"id\": \"review-and-commit\" ... \"Shows ordered `git status`, `git diff`, `git add -- src/auth.ts`, `git diff --cached`, and `git commit` commands.\"",
+          "fix": "Add assertions for a failed git apply --cached --check, a repository with no commits yet (read-tree --empty), and a pre-existing <gitdir>/commit-work.* directory that must be reported and left alone; keep the existing 15 prompts."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 29,
+          "evidence": "Overlap check, real index, before staging anything: `git diff --cached --name-only -- <approved paths>` lists approved paths that already hold staged content. Any listed path whose staged diff the user did not approve: stop and ask",
+          "fix": "State the overlap outcome when the user did approve that staged diff: commit that exact staged version, do not restage the working-tree file over it, and do not stop."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/commit-work/references/commit-message-template.md",
+          "line": 20,
+          "evidence": "header-max-length 100; body-max-line-length and footer-max-line-length 100",
+          "fix": "Read the installed @commitlint/config-conventional preset (or the cited index.ts) for header-max-length, body-max-line-length and footer-max-line-length instead of hardcoding 100; keep the source URL and the checked date only as the fallback, and note that the preset sets those lengths to Infinity."
+        }
+      ]
+    },
+    {
+      "name": "meme-factory",
+      "percent": 94.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0,
+        "router-env-my-referee-two": 92.0
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest dbff837f: \"removed units (458, showing 40)\"; all 40 shown items resolve to valid rows in docs/audit/recovery/meme-factory/record.md (via sections.json units) or to content in references/, but the other 418 items could not be checked",
+          "fix": "Regenerate the dbff837f digest without the cut and confirm each remaining para: item maps to a record.md row or to content in a named destination; for any that do not, restore it (into references/ when it is domain-specific) or add a row to docs/audit/recovery/meme-factory/record.md"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 12,
+          "evidence": "\"3. **Pick the template** from the table below. Check that the joke fits the template's line count before writing it.\"",
+          "fix": "Add one decision line to step 3 for when several templates fit, for example: \"Outcome unknown: fry; failure the team is joking about: fine; two options: drake; confirmed win only: success\". This mirrors the deploy rule already in references/image-memes.md (Worked requests), so the choice no longer depends on the suggest heuristic"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 73,
+          "evidence": "Gotchas has no entry for `watermark=none`, but evals/evals.json `no-watermark-parameter` and `blog-post-mix` assert the skill says the public API has no watermark parameter. No skill file says this; only record.md s106 records it (\"302 strips it, absent from OpenAPI\")",
+          "fix": "Add a gotcha: \"**Never add `watermark=none`.** The public API has no watermark parameter: the service answers 302 and strips it (memegen OpenAPI, checked 2026-11-07). Old guides and users often ask for it.\""
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 10,
+          "evidence": "Step 1 opens with \"**Text-only request** ... answer in text, and stop. Do not build an image URL.\" and then, in the same step, says \"a post that mixes text and image memes, read `references/blog-posts.md`\"",
+          "fix": "Move the blog-post sentence out of step 1, for example: \"Blog or docs post: read `references/blog-posts.md`; for each image meme in it, continue with steps 2-6.\" Then a mixed post never skips redaction or the URL check"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/meme-factory/references/text-memes.md",
+          "line": 28,
+          "evidence": "Aim for three layers in every format: a setup that sets context, a pattern that builds expectation, then a punchline or twist that subverts or amplifies it.",
+          "fix": "Move this generic setup-pattern-punchline sentence into the recovery record as a drop (generic-model-knowledge). Keep the next sentence, which points at SKILL.md step 4, and keep the format samples."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 42,
+          "evidence": "layout: only `default` or `top` (all text at the top). Any other value is silently ignored.",
+          "fix": "Add one Gotchas bullet: a layout other than default or top returns 200 and is silently ignored, so a bottom-caption request never errors and looks successful. Keep the existing four NEVER bullets."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 3,
+          "evidence": "Build memegen.link image-meme URLs with real template IDs, correctly escaped captions, size and layout options, or a custom background image, and write text-only memes such as greentext and copypasta.",
+          "fix": "Build memegen.link image-meme URLs with real template IDs, correctly escaped captions, size and layout options, or a custom background image, and write text-only memes such as greentext, copypasta, ASCII, chat logs and corporate satire. Use when the user asks for a meme, a reaction or comparison image (drake, \"this is fine\", \"X everywhere\"), a meme URL for Slack, a PR, docs or a social post, captions on an image URL they supply, or a text meme for a blog or docs page (MkDocs, Docusaurus, admonition, collapsible section), even if they never say memegen or template. Not for a caption on a photo with no image URL or template, editing text inside an existing image file, logos or graphic design, slide decks, serious infographics, or turning video into GIFs."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/meme-factory/references/image-memes.md",
+          "line": 81,
+          "evidence": "## Checks and diagnosis",
+          "fix": "Gate this file in SKILL.md step 6 as well as the paragraph after the slash invocation: read references/image-memes.md Checks and diagnosis when curl is not 200, and do not load references/blog-posts.md or references/text-memes.md for a plain image URL."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 45,
+          "evidence": "style: a name from the template's `styles` array, or an image URL to overlay. An overlay also takes `center=<x>,<y>` (position relative to the top-left corner) and `scale=<ratio>` (relative to the background image's dimensions).",
+          "fix": "Default style to omitted. Use a styles-array name only when the user names that look, and an overlay URL with center and scale only when they ask to stamp a second image. Do not invent center or scale."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/meme-factory/evals/evals.json",
+          "line": 4,
+          "evidence": "\"expected_output\": \"A relevant template and complete memegen.link image URL with concise encoded text.\"",
+          "fix": "Add a verifiable assertion to casual-meme and precise-meme that the URL is what scripts/meme_generator.py generate prints for those captions, and that sensitive words were checked before the URL was built. Keep the existing template and extension assertions."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/meme-factory/evals/trigger-queries.json",
+          "line": 2,
+          "evidence": "\"query\": \"mak a meem about bugs everywhere in our 2.3 relase lol\", \"should_trigger\": true",
+          "fix": "Add two near-miss should-not-trigger queries: one that asks only where the distracted-boyfriend image originally came from, and one that asks to edit text inside an existing PNG. Keep the current 11 should-trigger and 9 should-not-trigger queries."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 14,
+          "evidence": "Build the URL from the skill root. Pass one raw caption per template line (as many as `lines`)",
+          "fix": "Before step 5, if the user did not supply one caption per template line, ask for the missing lines or pick a template whose lines match the captions they did give. Do not invent caption text, and do not call generate with a different count."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/meme-factory/references/text-memes.md",
+          "line": 185,
+          "evidence": "emoji glyphs in the Emojicore sample are the Unicode replacement character",
+          "fix": "Replace each U+FFFD in the Emojicore sample with the emoji the tips describe (leaving, coffee, target, sparkles), and keep the vertical stacking. Record the corrupted glyphs as a fact-update in docs/audit/recovery/meme-factory/record.md."
+        }
+      ]
+    },
+    {
+      "name": "mui",
+      "percent": 92.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.0,
+        "router-env-my-referee-two": 92.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/mui/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest mui at dbff837f: \"removed units (114, showing 40)\". All 40 shown para items and file:skills/mui/skill-rules-fragment.json resolve to valid record rows through sections.json. The other 74 units could not be checked one by one.",
+          "fix": "Regenerate the dbff837f digest without the cut so every removed unit is listed. Then confirm that each unit maps to a section row in docs/audit/recovery/mui/record.md, or add a row for it."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 62,
+          "evidence": "\"**Icon-only buttons.** An `IconButton` has no accessible name of its own: set `aria-label` to the action\". This is general a11y knowledge, not a v7 fact, and it repeats what the ui-ux-principles route already covers.",
+          "fix": "Shorten it to one activation clause under Gotchas (for example \"IconButton: aria-label names the action, not the icon\"), or move it to resources/ui-ux-mapping.md and record the move in record.md. Do not delete it."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/mui/SKILL.md",
+          "line": 26,
+          "evidence": "\"3. **Apply the matching trap** from v7 facts and Gotchas.\" A migration has no sweep procedure, so the agent fixes only the file in front of it and misses the same legacy APIs elsewhere in the repo.",
+          "fix": "Add a migration sweep step before step 3: grep the repo for `components=`, `componentsProps=`, `onBackdropClick`, `<Grid item`, `@mui/material/[A-Z][a-zA-Z]*/` and `inputProps=`. Migrate every hit with the v7 facts, then typecheck."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 61,
+          "evidence": "\"show `Skeleton` in their shape ... not a lone `CircularProgress`\". The bullet gives the rule but not the reason, so the agent cannot tell when the rule applies.",
+          "fix": "Add the why: a lone spinner gives no layout preview and causes layout shift when the content arrives, and a skeleton shaped like the content keeps the layout stable. Keep the variants as they are."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/mui/evals/evals.json",
+          "line": 16,
+          "evidence": "dialog-v7 assertions \"Includes Cancel and Delete\" and \"Uses MUI imports\" pass without the skill. legacy-api uses \"Rejects deep imports\" with a terse prompt and no input file. The recipe evals list `references/component-recipes.md` under `files`, which is the skill's own file, not an eval input under evals/files/.",
+          "fix": "Replace the always-pass assertions with checks the skill drives, for example \"onClose branches on reason\" and \"DialogTitle present for the accessible name\". Give legacy-api a fixture in evals/files/. Move the reference paths out of `files`, or replace them with real input files."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/mui/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "The negatives include easy ones (\"Configure Vite for React.\", \"Explain React server components in Next.js.\"). No negative covers the description's named near-miss neighbours: Joy UI, MUI X data grid and MUI X pickers. Almost every positive names MUI explicitly.",
+          "fix": "Replace two easy negatives with near-misses such as \"add sorting to our MUI X DataGrid columns\" and \"style a Joy UI Button\". Add two positives that edit an existing MUI screen without naming MUI or v7."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 12,
+          "evidence": "\"On v9, read the official upgrade guide ... before applying v7 advice\". This branch covers v7 and v9 only. Following it with an installed 8.x package reaches no instruction, because no v8 guide or check is named.",
+          "fix": "Generalise the branch: when the installed major is above 7, read the official upgrade guide for each major between 7 and the installed one (https://mui.com/material-ui/migration/upgrade-to-v<N>/) before applying v7 advice. Then keep the v9 list as the worked example."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 74,
+          "evidence": "This file covers every prop or import migration; load nothing for one.",
+          "fix": "Keep the gate, but name the migrations it covers (imports, Grid size, slots/slotProps, onClose) so a slots task is not told to skip the slot recipes; record any sentence you drop in docs/audit/recovery/mui/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 19,
+          "evidence": "4. Verify. Run the repo's typecheck script; if it has none, run `npx tsc --noEmit`. Then exercise what the change touches: each breakpoint, keyboard focus, every dialog close path.",
+          "fix": "Keep the typecheck default, and add the ordering an expert uses: read the installed .d.ts before editing, typecheck before the manual pass, and stop the manual pass when the changed prop has no breakpoint, focus or close path."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 67,
+          "evidence": "Never spread a resolved `useTheme()` into `createTheme`: `borderRadius` is multiplied again and flipping `palette.mode` does not derive the dark palette.",
+          "fix": "Keep the gotcha, and add the paired failure: a nested theme built once at module scope ignores a runtime mode toggle, so the light and dark buttons render the same palette."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/mui/resources/theme-customization.md",
+          "line": 21,
+          "evidence": "For the stock dark palette write `colorSchemes: { dark: true }` in place of the explicit `dark` object; keep the object when you override colors.",
+          "fix": "Make the stock form the default in the code block and keep the explicit dark object only as the escape hatch for overridden colors."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/mui/evals/trigger-queries.json",
+          "line": 11,
+          "evidence": "\"query\": \"Make plain CSS responsive with media queries.\", \"should_trigger\": false",
+          "fix": "Replace the obvious negatives (plain CSS, React server components, Vite, CSS specificity) with near-misses a description can misfire on: MUI X Data Grid, Joy UI, Base UI, a Radix dialog, and installing @mui/material."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/mui/evals/files/theme-toggle.tsx",
+          "line": 12,
+          "evidence": "createTheme({ ...outerTheme, palette: { ...outerTheme.palette, mode: 'dark' } })",
+          "fix": "The fixture's mode state never reaches the theme, so following the nested-theme recipe still leaves the toggle dark-only; add a branch that drives setMode from useColorScheme when the click must change the rendered scheme, and keep the shared-ThemeOptions build only for a region whose scheme is fixed."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

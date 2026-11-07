@@ -151,7 +151,7 @@ import { Grid } from '@mui/material';
 
 ## Prerequisites
 
-- React 18 or later
+- React `^17 || ^18 || ^19`, the `peerDependencies` range of `@mui/material` 7.3.11 and 9.5.0 (npm registry, checked 2026-11-07); read the installed version's with `pnpm view @mui/material@<version> peerDependencies`
 - Material-UI v7 packages installed:
   - `@mui/material`
   - `@mui/icons-material` (for icons)
@@ -215,9 +215,17 @@ The skill includes supplementary documentation:
 - `resources/styling-guide.md` - Beating MUI state-class specificity and styling by color mode
 - `resources/theme-customization.md` - Palette augmentation, colorSchemes, nested themes and CSS layers
 - `resources/ui-ux-mapping.md` - MUI constructs for the ui-ux rules skill
+- `references/component-recipes.md` - Stack, List, Autocomplete, Snackbar, Menu and a complete form
+- `references/sx-and-styled-recipes.md` - the sx array form and styled() with a custom prop
+- `references/theme-recipes.md` - component overrides and defaults, breakpoints and shadows
 
 ## Related Documentation
 
 - [MUI Official Documentation](https://mui.com/material-ui/)
 - [MUI v7 Migration Guide](https://mui.com/material-ui/migration/upgrade-to-v7/)
 - [MUI System (sx prop)](https://mui.com/system/getting-started/)
+- [MUI v9 Upgrade Guide](https://mui.com/material-ui/migration/upgrade-to-v9/)
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.

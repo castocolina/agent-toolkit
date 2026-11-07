@@ -1,0 +1,86 @@
+{
+  "skill": "mui",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/mui/record.md",
+      "line": null,
+      "evidence": "Digest for mui at dbff837f: 'removed units (114, showing 40)'. The 40 listed items are all explained: each has a valid record row, or its content now sits in references/component-recipes.md, references/sx-and-styled-recipes.md or references/theme-recipes.md. The other 74 units could not be checked one by one.",
+      "fix": "Re-run the removal digest without the display cap, or check that every unit listed under the sections in sections.json has a valid row in docs/audit/recovery/mui/record.md. Also, the many drop-pending rows that use reason class 'scope-change' should use a reason class fixer-rules.md allows for drop-pending (for example generic-model-knowledge). Their content was restored to references/, so nothing has to be put back."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/mui/SKILL.md",
+      "line": 12,
+      "evidence": "The Version check section repeats several version-specific v9 removal bullets ahead of the decision order. They are expert content, but they weigh on the core file even for a v7-only task.",
+      "fix": "Keep the version read and the upgrade-guide link in SKILL.md. Move the five v9 removal bullets into a references file, for example references/v9-deltas.md, and load it with a gate: 'read when package.json shows @mui/material 9.x'. Record the move in docs/audit/recovery/mui/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/mui/SKILL.md",
+      "line": 24,
+      "evidence": "'1. **Confirm the installed API.** Read the version in `package.json`...' repeats the earlier '## Version check' instruction 'Read the installed `@mui/material` version first (`package.json`...)'. The procedure starts twice.",
+      "fix": "Merge Version check into Decision order step 1: read the installed version, and if it is 9.x, follow the v9 guide or the gated v9 reference. Then the workflow has one entry point and the Tool pattern stays clean."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/mui/evals/evals.json",
+      "line": null,
+      "evidence": "recipe-list-grid, recipe-form-select, recipe-theme-overrides and recipe-styled-custom-prop give the skill's own reference files as inputs ('files': ['references/component-recipes.md']). The other evals give bare evals/files names ('legacy-api.tsx'). dialog-v7 also has vague assertions such as 'Uses MUI imports'.",
+      "fix": "Give each recipe eval a user input under evals/files/ (for example a legacy settings list in a .tsx file) instead of a skill reference. A with-skill run loads the reference anyway, and a without-skill baseline must not get it. Replace 'Uses MUI imports' with a checkable assertion, for example 'imports Dialog, DialogTitle, DialogActions from @mui/material or its one-level paths'."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/mui/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "Several should-not-trigger queries share nothing with the skill and test little: 'Configure Vite for React.', 'Explain CSS specificity.', 'Explain React server components in Next.js.'",
+      "fix": "Replace them with near-misses that share MUI keywords but belong elsewhere, for example 'Add a date range picker from @mui/x-date-pickers to our filter bar' or 'Style a Joy UI Sheet with the sx prop'."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/mui/SKILL.md",
+      "line": 24,
+      "evidence": "Decision order step 1 reads the installed version, but only 9.x has a branch ('On v9, read the official upgrade guide'). Following the decision order with package.json at @mui/material ^5 or ^6 on a task that is not a migration ('editing an existing MUI screen' triggers the skill) still applies v7-only facts such as the Grid size prop, slotProps.htmlInput and one-level exports, which may not exist in the installed version.",
+      "fix": "Add a branch to step 1: 'Installed major below 7 and the user did not ask to upgrade: keep the installed API, check each v7 fact against the installed .d.ts before using it, and offer the migration instead of applying it.' Also say what to do for any major not covered (read that version's upgrade guide)."
+    }
+  ]
+}

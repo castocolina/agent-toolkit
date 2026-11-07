@@ -1,0 +1,86 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/references/commit-message-template.md",
+      "line": 35,
+      "evidence": "A one-line fix, no body needed: `fix(auth): treat a token at its expiry time as expired`",
+      "fix": "The three worked messages are templates a user can ask for, so keep them in references/. Move the three lines that only restate Conventional Commits defaults the model already writes (one-line fix needs no body; the body says why; mark a break in the header and the footer) into the Message checklist as one rule, and record that shortening in docs/audit/recovery/commit-work/record.md."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 31,
+      "evidence": "if `git apply --cached --check` fails, stop and ask, and never edit inside a hunk",
+      "fix": "Name the failure mode: a failed `--check` means the copied header or a deleted hunk boundary is wrong, and editing a line count or context line makes `git apply` accept a patch that no longer matches the file. Keep the stop-and-ask rule."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 31,
+      "evidence": "Read `references/split-one-file.md` when one file holds hunks for two different commits",
+      "fix": "After that sentence add: Do NOT load `references/split-one-file.md` when the file is wholly approved, the hunks belong to one commit, or the file is untracked (ask for the approved content instead)."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/commit-work/references/commit-message-template.md",
+      "line": 44,
+      "evidence": "The summary starts with a concrete verb (`fix`, `add`, `remove`, `rename`) rather than `Update` or `Change`.",
+      "fix": "Add the condition: this applies only when the repository has no subject-case rule. Under `@commitlint/config-conventional`, `subject-case` rejects a capitalised verb, so the summary stays lowercase (`fix(auth): treat a token at its expiry time as expired`)."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/commit-work/evals/evals.json",
+      "line": 5,
+      "evidence": "Shows ordered `git status`, `git diff`, `git add -- src/auth.ts`, `git diff --cached`, and `git commit` commands.",
+      "fix": "review-and-commit omits the scratch directory the workflow always creates. Assert a proposed `mktemp -d \"$(git rev-parse --absolute-git-dir)/commit-work.XXXXXX\"` and an `rm -rf -- \"<run>\"` of only that directory, and keep the existing ordered status, diff, add, cached-diff and commit assertions."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 29,
+      "evidence": "When the user approved a path's staged diff, commit that exact staged version and never restage the whole working-tree file over it",
+      "fix": "Before the overlap check, add the case the approved path also has unstaged edits: `git add -- <path>` would replace the approved staged blob. Copy the staged blob with `git diff --cached --binary -- <path>` and `git apply --cached` into the temporary index (or leave it untouched in the real index) and do not `git add` that path."
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "skill": "naming-analyzer",
+  "mode": "output",
+  "pass_rate": 0.9459,
+  "passed": 35,
+  "total": 37,
+  "failures": [
+    {
+      "eval": "convention-split-grouped",
+      "assertion": "Reports the prefix split as one grouped finding naming the locations and the dominant form, not as a separate row for every identifier",
+      "evidence": "The table splits the identifiers into separate rows: one for `error` \u2192 `hasError`/`lastError`, one for `enabled` \u2192 keep on the wire, and one for `active` \u2192 `isActive` plus internal `enabled`. This is not one grouped split finding, even though finding 3 mentions the 8/14 majority."
+    },
+    {
+      "eval": "convention-split-grouped",
+      "assertion": "Rates the group by its riskiest member and identifies `enabled` as a public JSON key, so contract compatibility with an alias or mapping instead of a plain rename",
+      "evidence": "The output does say \"Keep the wire key `enabled`\" and rates that row \"contract\". However, the convention group row is rated \"local/repo per field\" instead of by its riskiest member, because `enabled` was split out into its own row."
+    }
+  ]
+}

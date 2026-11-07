@@ -1,0 +1,31 @@
+$ git status
+On branch fix/token-expiry
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   src/auth.ts
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+$ git diff --cached
+$ git diff
+diff --git a/src/auth.ts b/src/auth.ts
+index 2b8d7e4..c0f19a2 100644
+--- a/src/auth.ts
++++ b/src/auth.ts
+@@ -10,5 +10,5 @@ export function isExpired(token: Token, now: number = Date.now()): boolean {
+   if (!token.expiresAt) {
+     return true;
+   }
+-  return now > token.expiresAt;
++  return now >= token.expiresAt;
+ }
+
+$ git rev-parse --absolute-git-dir
+/home/dev/app/.git
+$ ls -d /home/dev/app/.git/commit-work.*
+/home/dev/app/.git/commit-work.Ab12Cd
+$ ls -l /home/dev/app/.git/commit-work.Ab12Cd
+total 8
+-rw-r--r-- 1 dev dev  412 Nov  6 22:14 all.diff
+-rw-r--r-- 1 dev dev   96 Nov  6 22:15 msg.txt

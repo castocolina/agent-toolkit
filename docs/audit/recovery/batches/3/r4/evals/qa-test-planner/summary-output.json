@@ -1,0 +1,29 @@
+{
+  "skill": "qa-test-planner",
+  "mode": "output",
+  "pass_rate": 0.9487,
+  "passed": 74,
+  "total": 78,
+  "failures": [
+    {
+      "eval": "checkout-cases",
+      "assertion": "Each case has a cleanup step that resets the data it seeded",
+      "evidence": "TC-CHK-001 and TC-CHK-002 reset their carts, but TC-CHK-003's cleanup says 'None needed. Confirm the cart is still empty and no order exists', which only checks state and does not reset or remove the seeded account."
+    },
+    {
+      "eval": "script-bug-file",
+      "assertion": "Checks that the logged command single-quotes every flag value and passes ./bugs as the output directory",
+      "evidence": "The output never mentions quoting of flag values or the positional `./bugs` output-directory argument; it only cites the resulting file path `./bugs/BUG-CHK-5521.md`."
+    },
+    {
+      "eval": "script-bug-file",
+      "assertion": "Says how to read the result: the file path from the JSON line on exit 0, the missing flags on exit 2, and asking before --overwrite on exit 1",
+      "evidence": "It only says \"exit 0, so the report is at the `file` path in the JSON line\" and never mentions exit 2 or exit 1/--overwrite."
+    },
+    {
+      "eval": "run-report-without-pass-rate",
+      "assertion": "Includes the build, environment, a summary of counts and a by-priority table, and writes any count the requester did not give (the by-priority split, passed total) as Unknown rather than inventing it",
+      "evidence": "The by-priority split is Unknown, but the summary derives the passed total instead of writing Unknown: \"Passed 115 (120 executed \u2212 5 failed)\", even though it also admits \"It is Unknown whether the blocked case is counted inside the 120.\""
+    }
+  ]
+}

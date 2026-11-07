@@ -18,6 +18,7 @@ Requires the Gemini CLI (`npm install -g @google/gemini-cli`) with authenticatio
 
 - `SKILL.md` - defaults, approval-mode table, workflow, command shapes and gotchas.
 - `references/model-selection.md` - model choices, loaded only when the model choice matters.
+- `references/troubleshooting.md` - hung-run diagnosis, loaded only when a run misbehaves.
 - `evals/` - output evals, trigger queries, and fixtures in `evals/files/`.
 
 ## Maintenance
@@ -30,3 +31,9 @@ Flags, approval modes, exit codes and model names follow the official Gemini CLI
 - [Gemini CLI Documentation](https://github.com/google/generative-ai-docs)
 - [Gemini API Reference](https://ai.google.dev/docs)
 - [Model Comparison](https://ai.google.dev/models/gemini)
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+CLI flags, approval modes, exit codes, models and session behavior were checked against the official Gemini CLI documentation (Google).

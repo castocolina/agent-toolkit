@@ -1,0 +1,86 @@
+{
+  "skill": "gemini",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest gemini at dbff837f: 'removed units (218, showing 40)'. All 40 shown items map to section rows s001-s054 in docs/audit/recovery/gemini/record.md that fixer-rules.md allows, but the other 178 units could not be checked one by one.",
+      "fix": "Re-run the removal check with the full unit list (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/gemini/SKILL.md ...) and add a para: row, or confirm a section row covers it via sections.json, for any unit that no s0xx row explains in docs/audit/recovery/gemini/record.md"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/gemini/SKILL.md",
+      "line": 41,
+      "evidence": "Workflow step 6 packs resume flags, an interactive command, a doc caveat with date, a fallback and two source links into one paragraph of more than 120 words",
+      "fix": "Keep the step in Workflow but split it into a short decision: (a) user will continue interactively: give the bounded `-r \"latest\"` command; (b) otherwise: new headless run with the accepted findings in the prompt. Move the two source links next to the other Sources lines at the end of Gotchas"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/gemini/evals/trigger-queries.json",
+      "line": 51,
+      "evidence": "\"write a Python script to scan our repository\" and \"summarize this one short source file\" (line 67) share almost no wording with the skill and test little",
+      "fix": "Replace them with near-misses, for example \"review this diff yourself, no need to call another tool\" (should_trigger false) and \"have gemini rewrite the failing tests in src/ and commit\" (should_trigger false, implementation rather than review)"
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/gemini/evals/evals.json",
+      "line": null,
+      "evidence": "The description and Command shapes cover document-set contradiction reviews, but no output eval tests that branch",
+      "fix": "Add an eval such as 'propose a gemini command to find contradictions between /work/docs and /work/specs, don't run it', with assertions: cd into /work/docs, --include-directories /work/specs, -p with --approval-mode default, a timeout bound, and a statement that the command was not run"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 41,
+      "evidence": "`timeout --foreground --kill-after=10s 1800 gemini -m gemini-3-pro-preview --approval-mode default -r \"latest\" \"query\"`: the follow-up command has no `cd`, unlike every other command shape, so `latest` can resolve against a different working directory than the original run",
+      "fix": "Prefix the follow-up command with `cd <original cwd> &&` (the first target from step 2), and say that resume must run from the same directory as the original session"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/gemini/README.md",
+      "line": null,
+      "evidence": "Resources: '[Gemini CLI Documentation](https://github.com/google/generative-ai-docs)' is labeled as the CLI docs, but the CLI docs are in google-gemini/gemini-cli (listed one line above)",
+      "fix": "Keep the link but relabel it to what it is, for example '[Google generative AI docs](https://github.com/google/generative-ai-docs)'. Leave the Credits section unchanged"
+    }
+  ]
+}

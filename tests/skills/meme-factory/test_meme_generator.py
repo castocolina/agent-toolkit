@@ -48,11 +48,22 @@ class GenerateCliTests(unittest.TestCase):
         )
 
     def test_generate_markdown_flag_prints_markdown_image(self):
-        out = run_cli("generate", "buzz", "memes", "memes everywhere", "--markdown")
+        out = run_cli("generate", "buzz", "memes", "memes everywhere", "--markdown", "--alt", "Buzz: memes everywhere")
         self.assertIn(
-            f"![Meme]({BASE_URL}/images/buzz/memes/memes_everywhere.png)",
+            f"![Buzz: memes everywhere]({BASE_URL}/images/buzz/memes/memes_everywhere.png)",
             out,
         )
+
+    def test_generate_markdown_without_alt_is_an_error(self):
+        result = subprocess.run(
+            [sys.executable, str(SCRIPT), "generate", "buzz", "a", "b", "--markdown"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, "")
+        self.assertIn("--alt", result.stderr)
+        self.assertIn("picture and the joke", result.stderr)
 
     def test_generate_alt_flag_sets_markdown_alt_text(self):
         out = run_cli("generate", "fine", "a", "b", "--markdown", "--alt", "Dog in fire: prod is fine")
@@ -86,6 +97,10 @@ class GenerateCliTests(unittest.TestCase):
     def test_remaining_reserved_characters_are_percent_encoded(self):
         out = run_cli("generate", "buzz", "C++ @ 9:00!", "ok")
         self.assertEqual(out.strip(), f"{BASE_URL}/images/buzz/C%2B%2B_%40_9%3A00%21/ok.png")
+
+    def test_apostrophe_caption_is_kept_as_is(self):
+        out = run_cli("generate", "buzz", "don't deploy on friday", "ok")
+        self.assertEqual(out.strip(), f"{BASE_URL}/images/buzz/don't_deploy_on_friday/ok.png")
 
 
 class SuggestCliTests(unittest.TestCase):
@@ -186,6 +201,12 @@ class ModuleApiTests(unittest.TestCase):
         self.assertEqual(
             self.generator.get_markdown_image(f"{BASE_URL}/images/buzz/a/b.png", alt_text="My meme"),
             f"![My meme]({BASE_URL}/images/buzz/a/b.png)",
+        )
+
+    def test_get_markdown_image_escapes_closing_bracket_in_alt(self):
+        self.assertEqual(
+            self.generator.get_markdown_image(f"{BASE_URL}/images/buzz/a/b.png", alt_text="a [b] c"),
+            f"![a \\[b\\] c]({BASE_URL}/images/buzz/a/b.png)",
         )
 
     def test_get_markdown_image_with_width_uses_img_tag(self):

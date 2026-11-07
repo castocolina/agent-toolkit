@@ -1,0 +1,104 @@
+{
+  "skill": "mui",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 12,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/mui/references/theme-recipes.md",
+      "line": 48,
+      "evidence": "Where `variants` goes: the docs document one form, `variants` inside a slot of `styleOverrides` (`components.MuiButton.styleOverrides.root.variants`), not as a sibling of `styleOverrides` and `defaultProps`",
+      "fix": "Correct the placement to the documented sibling form `components.MuiButton.variants` next to `styleOverrides` and `defaultProps`, move the example at lines 18-24 out of `styleOverrides.root`, and record the old placement as a fact-update. The theme-components page and the v9 Button CSS classes section both show `variants` as that sibling, so an agent following this recipe writes a theme the installed types reject."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/mui/references/theme-recipes.md",
+      "line": 18,
+      "evidence": "variants: [ { props: { variant: 'contained', color: 'primary' }, style: { boxShadow: 'none' } } ] nested inside styleOverrides.root",
+      "fix": "Put `variants` beside `styleOverrides` and `defaultProps` (`components.MuiButton.variants`), keep the slot key as `root` only for ordinary style overrides, and re-check the cited theme-components and v9 upgrade pages. The current block is the example an agent copies, and it does not typecheck."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/mui/evals/trigger-queries.json",
+      "line": 6,
+      "evidence": "MUI TextField required email with inline errors. should_trigger true",
+      "fix": "Replace this should-trigger query with a case the skill uniquely owns and the description names, such as moving `inputProps` onto `slotProps.htmlInput`, and add a should-not-trigger near-miss for a plain TextField label or helperText with no v7 trap. As written it rewards loading the skill for generic form code the description does not claim."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/mui/evals/evals.json",
+      "line": 106,
+      "evidence": "assertions: Makes each clickable row a `ListItemButton` ... Lays the cards out with `Grid` ... using `size={{ ... }}`",
+      "fix": "Add assertions that the List recipe's `disablePadding` row, the Autocomplete `isOptionEqualToValue` trap, and the Snackbar `clickaway` reason are present in the output, so recipe-list-grid and recipe-form-select do not pass on the two rules already in SKILL.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/mui/SKILL.md",
+      "line": 29,
+      "evidence": "5. **Verify.** Run the repo's typecheck script; if it has none, run `npx tsc --noEmit`. Then exercise what the change touches: each breakpoint, keyboard focus, every dialog close path.",
+      "fix": "Turn step 5 into a short checklist whose items depend on the branch taken (typecheck always; slot name query after a slotProps edit; each dialog reason after a Dialog edit; hover and focus after a state-class override; computed colors after a nested theme), so the verification is a procedure rather than one sentence."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/mui/resources/theme-customization.md",
+      "line": 51,
+      "evidence": "Installed 7.3 types declare `enableCssLayer` on `StyledEngineProvider` and `modularCssLayers` on `ThemeOptions`.",
+      "fix": "Name the `.d.ts` each key was read from (`StyledEngineProvider` and `ThemeOptions` in the installed `@mui/material` 7.3.11 types) the way theme-recipes.md names `shadows.d.ts`, so the version pin is checkable rather than a bare \"7.3\"."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/mui/SKILL.md",
+      "line": 67,
+      "evidence": "`resources/styling-guide.md`: when a `styled` component or a theme `styleOverrides` must beat a state class",
+      "fix": "Name the sibling files not to load for that scenario (do not load `resources/theme-customization.md` or the recipe files for a state-class override), matching the explicit \"Not for\" gates already written for theme setup and migrations."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/mui/SKILL.md",
+      "line": 44,
+      "evidence": "`Hidden` is removed: use `sx={{ display: { xs: 'none', md: 'block' } }}` or `useMediaQuery`.",
+      "fix": "Make the `sx` display map the default and keep `useMediaQuery` as the escape hatch only when the markup itself changes, which `resources/ui-ux-mapping.md` already states, so the two options are not equal."
+    }
+  ]
+}

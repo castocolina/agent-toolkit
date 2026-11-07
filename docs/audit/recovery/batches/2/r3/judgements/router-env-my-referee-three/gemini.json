@@ -1,0 +1,68 @@
+{
+  "skill": "gemini",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/gemini/record.md",
+      "line": null,
+      "evidence": "previous-version digest gemini at dbff837f: 'removed units (218, showing 40)'. This is a cut list. All 40 shown items resolve to valid record rows through sections.json, or to content now in references/troubleshooting.md, but the other 178 units could not be checked one by one",
+      "fix": "Regenerate the digest without the cut, or confirm that every unit in sections.json has a valid row in docs/audit/recovery/gemini/record.md, so that all 218 removed units can be checked"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/gemini/evals/trigger-queries.json",
+      "line": 51,
+      "evidence": "Several negative queries are easy non-matches with no realistic context: 'write a Python script to scan our repository', 'summarize this one short source file' (line 67), 'make a small code change in this repository yourself'",
+      "fix": "Replace them with near-misses that use realistic paths and context, for example 'review src/auth/ for security holes yourself, no other tools' (a review without Gemini) or 'run gemini to refactor services/billing and apply the changes' (Gemini implementing changes, which the description excludes)"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 15,
+      "evidence": "'Use 900 for a >200k-token scope or three or more included directories.' It is unclear whether the cwd counts. The big-scope-budget eval calls cwd plus two --include-directories a 'three-directory' scope, but the literal rule counts only the included directories",
+      "fix": "Say what is counted: 'Use 900 for a >200k-token scope or a workspace of three or more directories (cwd plus --include-directories).'"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/gemini/README.md",
+      "line": 31,
+      "evidence": "'[Gemini CLI Documentation](https://github.com/google/generative-ai-docs)'. This is an inherited link labelled as the CLI docs, but it points to a different repository from the official google-gemini/gemini-cli docs that SKILL.md cites",
+      "fix": "Relabel it as 'Generative AI docs' or point it at https://github.com/google-gemini/gemini-cli/tree/main/docs. Keep the entry; do not remove it"
+    }
+  ]
+}

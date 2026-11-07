@@ -1,0 +1,380 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Backend to Frontend Handoff Documentation",
+      "text": "A Claude Code skill that generates comprehensive API handoff documentation for frontend developers after backend work is complete.",
+      "chars": 130,
+      "units": [
+        "para:6458da1a"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Purpose",
+      "text": "This skill automates the creation of structured API handoff documents that provide frontend developers (or their AI assistants) with complete business and technical context needed to build integrations and UI without requiring back-and-forth questions with backend developers.",
+      "chars": 276,
+      "units": [
+        "para:857c59ec"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "When to Use",
+      "text": "Use this skill when:\n\n- Backend API work is complete (endpoints, DTOs, validation, business logic implemented)\n- You need to document API changes for frontend integration\n- A feature requires handoff documentation between backend and frontend teams\n- You want to ensure frontend has all context to build integration correctly\n- User explicitly requests: \"create handoff\", \"document API\", \"frontend handoff\", or \"API documentation\"\n\n**Timing**: Run this after completing backend implementation, before frontend development begins.",
+      "chars": 529,
+      "units": [
+        "para:dbba4837",
+        "para:e4a46f3a",
+        "para:68229dba",
+        "para:27381f38",
+        "para:516a21ee",
+        "para:8d11b32a",
+        "para:fea9b9d4"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "How It Works",
+      "text": "1. **Analyzes** your completed backend code (endpoints, controllers, services, DTOs, validation)\n2. **Extracts** business context, constraints, edge cases, and gotchas\n3. **Generates** a structured markdown document with all integration details\n4. **Saves** to `.claude/docs/ai/<feature-name>/api-handoff.md`\n5. **Versions** subsequent updates (v2, v3, etc.) for iteration tracking",
+      "chars": 381,
+      "units": [
+        "para:80ea281e",
+        "para:9b2ef587",
+        "para:35e2bb01",
+        "para:48bd7845",
+        "para:a15ecb65"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Workflow",
+      "text": "```\nBackend Code \u2192 Skill Analysis \u2192 Handoff Document \u2192 Frontend Implementation\n```\n\nThe skill operates in \"no-chat\" mode: it produces only the handoff document without discussion or explanation.",
+      "chars": 194,
+      "units": [
+        "para:a1315a26",
+        "para:6313344b"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Comprehensive Coverage",
+      "text": "- **Business Context**: Problem statement, users, domain terminology\n- **Endpoint Details**: Methods, paths, auth requirements, request/response shapes\n- **Data Models**: TypeScript interfaces, field types, nullability, enums\n- **Validation Rules**: Required fields, constraints, formats for frontend UX\n- **Business Logic**: Non-obvious behaviors, edge cases, gotchas\n- **Integration Guidance**: Recommended flows, caching, optimistic UI, real-time updates\n- **Test Scenarios**: Happy paths, error cases, acceptance criteria",
+      "chars": 525,
+      "units": [
+        "para:1daf5548",
+        "para:070540c4",
+        "para:815f0fc1",
+        "para:0c9d201f",
+        "para:bc87b9cd",
+        "para:a9f69685",
+        "para:f2cd3260"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Smart Shortcuts",
+      "text": "For simple CRUD APIs with obvious validation and no complex business logic, the skill can skip the full template and provide just:\n- Endpoint + method\n- Example request/response JSON\n\nFrontend can infer the rest.",
+      "chars": 212,
+      "units": [
+        "para:b0c06d57",
+        "para:0fde3de6",
+        "para:6a2f73e7"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Version Management",
+      "text": "Automatically increments iteration suffixes (`-v2`, `-v3`) when regenerating documentation after feedback or changes.",
+      "chars": 117,
+      "units": [
+        "para:87a816e3"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Example 1: Full Feature Handoff",
+      "text": "```\nUser: \"I just completed the expense approval API. Create handoff docs for frontend.\"\n\nSkill Output: Creates `.claude/docs/ai/expense-approval/api-handoff.md` with:\n- Business context about approval workflows\n- POST /api/expenses/:id/approve endpoint details\n- ExpenseDto and ApprovalDto models\n- Status enums (pending, approved, rejected)\n- Validation rules (amount limits, required fields)\n- Edge cases (can only approve once, manager-only permission)\n- Test scenarios for happy/error paths\n```",
+      "chars": 499,
+      "units": [
+        "para:d3420684"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Example 2: Simple CRUD API",
+      "text": "```\nUser: \"Document the user profile GET endpoint for frontend.\"\n\nSkill Output: Creates minimal handoff with:\n- GET /api/users/:id\n- Example response JSON with user fields\n- 404 for not found case\n```",
+      "chars": 200,
+      "units": [
+        "para:8fad8ac4"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Example 3: Iteration After Feedback",
+      "text": "```\nUser: \"Frontend asked about pagination. Update the handoff.\"\n\nSkill Output: Creates `.claude/docs/ai/user-list/api-handoff-v2.md` with:\n- Updated pagination parameters\n- Response shape with page metadata\n- Sorting options\n```",
+      "chars": 229,
+      "units": [
+        "para:aa64d137"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Document Structure",
+      "text": "The generated handoff follows this structure:\n\n```markdown\n# API Handoff: [Feature Name]\n\n## Business Context\n[Problem, users, domain terms]\n\n## Endpoints\n### [METHOD] /path\n- Purpose\n- Auth requirements\n- Request/Response examples\n- Error cases\n- Edge case notes\n\n## Data Models / DTOs\n[TypeScript interfaces]\n\n## Enums & Constants\n[Status codes, magic values, display labels]\n\n## Validation Rules\n[Frontend should mirror for UX]\n\n## Business Logic & Edge Cases\n[Non-obvious behaviors]\n\n## Integration Notes\n- Recommended flow\n- Optimistic UI guidance\n- Caching strategy\n- Real-time considerations\n\n## Test Scenarios\n[Key acceptance criteria]\n\n## Open Questions / TODOs\n[Unresolved items]\n```",
+      "chars": 693,
+      "units": [
+        "para:7f30d849",
+        "para:1e7aef6d"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "For Backend Developers",
+      "text": "1. **Run after completion**: Generate handoff only when backend work is done\n2. **Include context**: Don't assume frontend knows domain logic\n3. **Real examples**: Use actual request/response payloads, not placeholders\n4. **Surface gotchas**: Document edge cases discovered during implementation\n5. **Version updates**: Regenerate when API changes after feedback",
+      "chars": 362,
+      "units": [
+        "para:fe05d089",
+        "para:496950f5",
+        "para:771b20c7",
+        "para:ba164e7e",
+        "para:7ab2546d"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "For Frontend Developers",
+      "text": "1. **Trust the doc**: All necessary context should be in the handoff\n2. **Flag gaps**: If something is unclear, request v2 with specifics\n3. **Use test scenarios**: Convert to frontend test cases or acceptance criteria\n4. **Validate types**: Use provided TypeScript interfaces for type safety",
+      "chars": 292,
+      "units": [
+        "para:251bc7a7",
+        "para:a624bd7c",
+        "para:cf956055",
+        "para:bd72bd9b"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Output Location",
+      "text": "Documents are saved to:\n```\n.claude/docs/ai/<feature-name>/api-handoff.md\n```\n\nSubsequent versions:\n```\n.claude/docs/ai/<feature-name>/api-handoff-v2.md\n.claude/docs/ai/<feature-name>/api-handoff-v3.md\n```",
+      "chars": 205,
+      "units": [
+        "para:82e3763c",
+        "para:85a9a963",
+        "para:8d7c2c17"
+      ]
+    },
+    {
+      "id": "s016",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "What's NOT Included",
+      "text": "The skill deliberately excludes:\n- Backend implementation details (file paths, class names, internal services)\n- Database schema or internal data structures\n- Deployment or infrastructure details\n- Backend testing strategies\n\nFocus is purely on integration contract and business context.",
+      "chars": 287,
+      "units": [
+        "para:45185e54",
+        "para:79683d3b",
+        "para:689b098e",
+        "para:c1a9feec",
+        "para:cd5fe153",
+        "para:d3996c4b"
+      ]
+    },
+    {
+      "id": "s017",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Example Output",
+      "text": "Here's a sample of what the skill generates:\n\n```markdown\n# API Handoff: Expense Approval\n\n## Business Context\nEmployees submit expenses for manager approval. Managers review and approve/reject\nwith optional comments. Approved expenses move to accounting for reimbursement.\nDomain terms: \"Submitter\" (employee), \"Approver\" (manager), \"Reimbursable\" (approved).\n\n## Endpoints\n\n### POST /api/expenses/:id/approve\n- **Purpose**: Approve or reject an expense submission\n- **Auth**: Manager role required\n- **Request**:\n  ```json\n\n  {\n    \"decision\": \"approved | rejected\",\n    \"comment\": \"string (optional, max 500 chars)\"\n  }\n\n  ```\n- **Response** (success):\n  ```json\n\n  {\n    \"id\": 123,\n    \"status\": \"approved\",\n    \"approvedBy\": \"Jane Smith\",\n    \"approvedAt\": \"2026-01-18T10:30:00Z\"\n  }\n\n  ```\n- **Response** (error): 403 if not manager, 404 if expense not found, 422 if already approved\n- **Notes**: Can only approve once. Action is permanent (no undo).\n\n## Data Models / DTOs\n\n```typescript\n\ninterface ExpenseApprovalDto {\n  decision: 'approved' | 'rejected';\n  comment?: string; // max 500 chars\n}\n\ninterface ExpenseDto {\n  id: number;\n  status: 'pending' | 'approved' | 'rejected';\n  approvedBy?: string;\n  approvedAt?: string; // ISO 8601\n}",
+      "chars": 1247,
+      "units": [
+        "para:4bc4bc29",
+        "para:f270e6cc",
+        "para:8e765493",
+        "para:f00f6a1f",
+        "para:4bed31ff",
+        "para:f48aae2a",
+        "para:e2b23140",
+        "para:66461f60"
+      ]
+    },
+    {
+      "id": "s018",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Example Output",
+      "text": "```\n\n## Validation Rules\n- `decision`: Required, must be 'approved' or 'rejected'\n- `comment`: Optional, max 500 characters, trimmed\n- Frontend should show character counter for comment field\n\n## Business Logic & Edge Cases\n- User must have Manager role to approve\n- Cannot approve own expenses (enforced by backend)\n- Once approved/rejected, decision is final (no re-approval)\n- Soft-deleted expenses return 404\n\n## Integration Notes\n- **Recommended flow**: Fetch expense \u2192 show approval modal \u2192 submit decision \u2192 refresh list\n- **Optimistic UI**: NOT recommended (permission checks may fail)\n- **Real-time**: No websocket events; polling or manual refresh after approval\n\n## Test Scenarios\n1. **Happy path**: Manager approves pending expense \u2192 200 with updated status\n2. **Validation error**: Empty decision \u2192 422 with validation message\n3. **Permission denied**: Non-manager attempts approval \u2192 403\n4. **Already approved**: Approve same expense twice \u2192 422 conflict\n```",
+      "chars": 972,
+      "units": [
+        "para:a311f7cf"
+      ]
+    },
+    {
+      "id": "s019",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Related Skills",
+      "text": "- **frontend-to-backend-requirements**: Documents frontend data needs for backend developers (reverse direction)\n- **code-reviewer**: Can review the generated handoff for completeness\n- **dev-spec**: Creates full development specs that may include API design",
+      "chars": 258,
+      "units": [
+        "para:24074227",
+        "para:364274ea",
+        "para:0e56e82b"
+      ]
+    },
+    {
+      "id": "s020",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Tips",
+      "text": "1. **Keep it updated**: Regenerate when API contracts change\n2. **Link from PRs**: Reference handoff doc in backend PR descriptions\n3. **Version control**: Commit handoff docs to git for team visibility\n4. **Frontend feedback loop**: If frontend has questions, it means the handoff missed something\u2014update it\n5. **Use as spec**: Can also generate handoff BEFORE implementation as API specification",
+      "chars": 397,
+      "units": [
+        "para:9be2b98e",
+        "para:a9886521",
+        "para:366f1a21",
+        "para:f782bc71",
+        "para:529f8c9f"
+      ]
+    },
+    {
+      "id": "s021",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "heading": "Invocation",
+      "text": "```bash\n# As a Claude Code skill\n/backend-to-frontend-handoff-docs\n\n# Or via natural language\n\"Create API handoff documentation for the user profile endpoints\"\n\"Document the new authentication API for frontend\"\n\"Generate frontend handoff for expense approval feature\"\n```",
+      "chars": 271,
+      "units": [
+        "para:6878f4ae"
+      ]
+    },
+    {
+      "id": "s022",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: backend-to-frontend-handoff-docs\ndescription: Create API handoff documentation for frontend developers. Use when backend work is complete and needs to be documented for frontend integration, or user says 'create handoff', 'document API', 'frontend handoff', or 'API documentation'.\n---",
+      "chars": 295,
+      "units": [
+        "para:bfa3278e"
+      ]
+    },
+    {
+      "id": "s023",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "heading": "API Handoff Mode",
+      "text": "> **No Chat Output**: Produce the handoff document only. No discussion, no explanation\u2014just the markdown block saved to the handoff file.\n\nYou are a backend developer completing API work. Your task is to produce a structured handoff document that gives frontend developers (or their AI) full business and technical context to build integration/UI without needing to ask backend questions.\n\n> **When to use**: After completing backend API work\u2014endpoints, DTOs, validation, business logic\u2014run this mode to generate handoff documentation.\n\n> **Simple API shortcut**: If the API is straightforward (CRUD, no complex business logic, obvious validation), skip the full template\u2014just provide the endpoint, method, and example request/response JSON. Frontend can infer the rest.",
+      "chars": 770,
+      "units": [
+        "para:4d654a6b",
+        "para:e8b65d8a",
+        "para:385b968b",
+        "para:da851c75"
+      ]
+    },
+    {
+      "id": "s024",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "heading": "Goal",
+      "text": "Produce a copy-paste-ready handoff document with all context a frontend AI needs to build UI/integration correctly and confidently.",
+      "chars": 131,
+      "units": [
+        "para:c93afee2"
+      ]
+    },
+    {
+      "id": "s025",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "heading": "Inputs",
+      "text": "- Completed API code (endpoints, controllers, services, DTOs, validation).\n- Related business context from the task/user story.\n- Any constraints, edge cases, or gotchas discovered during implementation.",
+      "chars": 203,
+      "units": [
+        "para:ffa48fba",
+        "para:492ad9bb",
+        "para:ebc3ab2b"
+      ]
+    },
+    {
+      "id": "s026",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "heading": "Workflow",
+      "text": "1. **Collect context** \u2014 confirm feature name, relevant endpoints, DTOs, auth rules, and edge cases.\n2. **Create/update handoff file** \u2014 write the document to `.claude/docs/ai/<feature-name>/api-handoff.md`. Increment the iteration suffix (`-v2`, `-v3`, \u2026) if rerunning after feedback.\n3. **Paste template** \u2014 fill every section below with concrete data. Omit subsections only when truly not applicable (note why).\n4. **Double-check** \u2014 ensure payloads match actual API behavior, auth scopes are accurate, and enums/validation reflect backend logic.",
+      "chars": 549,
+      "units": [
+        "para:93957460",
+        "para:0e17b143",
+        "para:9d4dc8e2",
+        "para:886a3991"
+      ]
+    },
+    {
+      "id": "s027",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "heading": "Output Format",
+      "text": "Produce a single markdown block structured as follows. Keep it dense\u2014no fluff, no repetition.\n\n```markdown\n# API Handoff: [Feature Name]\n\n## Business Context\n[2-4 sentences: What problem does this solve? Who uses it? Why does it matter? Include any domain terms the frontend needs to understand.]\n\n## Endpoints\n\n### [METHOD] /path/to/endpoint\n- **Purpose**: [1 line: what it does]\n- **Auth**: [required role/permission, or \"public\"]\n- **Request**:\n  ```json\n\n  {\n    \"field\": \"type \u2014 description, constraints\"\n  }\n\n  ```\n- **Response** (success):\n  ```json\n\n  {\n    \"field\": \"type \u2014 description\"\n  }\n\n  ```\n- **Response** (error): [HTTP codes and shapes, e.g., 422 validation, 404 not found]\n- **Notes**: [edge cases, rate limits, pagination, sorting, anything non-obvious]\n\n[Repeat for each endpoint]\n\n## Data Models / DTOs\n[List key models/DTOs the frontend will receive or send. Include field types, nullability, enums, and business meaning.]\n\n```typescript\n\n// Example shape for frontend typing\ninterface ExampleDto {\n  id: number;\n  status: 'pending' | 'approved' | 'rejected';\n  createdAt: string; // ISO 8601\n}",
+      "chars": 1117,
+      "units": [
+        "para:205ef20c",
+        "para:b4934b35",
+        "para:720abfae",
+        "para:f00f6a1f",
+        "para:0e4ebfdb",
+        "para:54fc348d",
+        "para:50fb21ef"
+      ]
+    },
+    {
+      "id": "s028",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "heading": "Output Format",
+      "text": "```\n\n## Enums & Constants\n[List any enums, status codes, or magic values the frontend needs to know. Include display labels if relevant.]\n\n| Value | Meaning | Display Label |\n|-------|---------|---------------|\n| `pending` | Awaiting review | Pending |\n\n## Validation Rules\n[Summarize key validation rules the frontend should mirror for UX\u2014required fields, min/max, formats, conditional rules.]\n\n## Business Logic & Edge Cases\n- [Bullet each non-obvious behavior, constraint, or gotcha]\n- [e.g., \"User can only submit once per day\", \"Soft-deleted items excluded by default\"]\n\n## Integration Notes\n- **Recommended flow**: [e.g., \"Fetch list \u2192 select item \u2192 submit form \u2192 poll for status\"]\n- **Optimistic UI**: [safe or not, why]\n- **Caching**: [any cache headers, invalidation triggers]\n- **Real-time**: [websocket events, polling intervals if applicable]\n\n## Test Scenarios\n[Key scenarios frontend should handle\u2014happy path, errors, edge cases. Use as acceptance criteria or test cases.]\n\n1. **Happy path**: [brief description]\n2. **Validation error**: [what triggers it, expected response]\n3. **Not found**: [when 404 is returned]\n4. **Permission denied**: [when 403 is returned]\n\n## Open Questions / TODOs\n[Anything unresolved, pending PM decision, or needs frontend input. If none, omit section.]\n```",
+      "chars": 1302,
+      "units": [
+        "para:0df1be13"
+      ]
+    },
+    {
+      "id": "s029",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "heading": "Rules",
+      "text": "- **NO CHAT OUTPUT**\u2014produce only the handoff markdown block, nothing else.\n- Be precise: types, constraints, examples\u2014not vague prose.\n- Include real example payloads where helpful.\n- Surface non-obvious behaviors\u2014don't assume frontend will \"just know.\"\n- If backend made trade-offs or assumptions, document them.\n- Keep it scannable: headers, tables, bullets, code blocks.\n- No backend implementation details (no file paths, class names, internal services) unless directly relevant to integration.\n- If something is incomplete or TBD, say so explicitly.",
+      "chars": 555,
+      "units": [
+        "para:16712575",
+        "para:a989c3b0",
+        "para:eaae8799",
+        "para:07518ad0",
+        "para:2f12c915",
+        "para:c7972ca6",
+        "para:60382b28",
+        "para:d44b24de"
+      ]
+    },
+    {
+      "id": "s030",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "heading": "After Generating",
+      "text": "Write the final markdown into the handoff file only\u2014do not echo it in chat. (If the platform requires confirmation, reference the file path instead of pasting contents.)",
+      "chars": 169,
+      "units": [
+        "para:b032f30d"
+      ]
+    }
+  ],
+  "files": [],
+  "phrase_fate": {
+    "kept": 61.59,
+    "moved": 1.65,
+    "gone": 36.76,
+    "new": 38.96
+  }
+}

@@ -1,0 +1,419 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "commit-work",
+      "percent": 92.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 91.2,
+        "router-env-my-referee-three": 93.6
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 28,
+          "evidence": "Never `git add -A` or `git add .`: they sweep in untracked artifacts. Never `git commit -a` or `-am` either: they stage every modified tracked file",
+          "fix": "Keep the never-list (it blocks a real agent shortcut) but drop the clause restating what `git add -A`, `git add .` and `git commit -a` do; the model already knows those flags. Record the shortened wording in docs/audit/recovery/commit-work/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/commit-work/evals/evals.json",
+          "line": 1,
+          "evidence": "The first 40 digest items are reported as `showing 40` of 111 removed units, so the removal check covered only that cut list.",
+          "fix": "Re-run the removal check against the full digest (all 111 para items) rather than the 40-item cut, and add a record row only for any item still unexplained."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 36,
+          "evidence": "a scope naming pre-move paths",
+          "fix": "Name the failure: after a rename, `git status` shows the new path while a scope copied from the old path (for example `auth` after the file moved to `identity`) is what commitlint and reviewers reject. Keep the check; add the reason."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 30,
+          "evidence": "put that same `GIT_INDEX_FILE=` prefix on every git command of steps 3-7, including the re-inspection after a failed commit and `git show --stat`",
+          "fix": "Step 3 names `git show --stat` as a prefixed command, but no workflow step says when to run it (step 7 compares the tree and shows `git diff <tree> HEAD`). Either add the one case that runs it, or drop the mention and record the removal."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 34,
+          "evidence": "If `git diff --quiet` succeeds and no untracked file feeds the check, run it in place. Otherwise the tree is not the commit: export the index with `git checkout-index -a --prefix=<run>/verify/`",
+          "fix": "`git diff --quiet` is true when unstaged tracked edits exist but nothing is staged, so an in-place run then tests the working tree, not the index. Gate the in-place run on `git diff --cached --quiet` failing (there is a staged delta) and `git diff --quiet` succeeding, and name that case."
+        },
+        {
+          "id": "D6-2",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/commit-work/references/commit-message-template.md",
+          "line": 9,
+          "evidence": "None of these: copy the type and scope vocabulary of `git log --format=%s -30`, then check each scope against current paths.",
+          "fix": "Say what the check decides: keep a scope only when it names a current path or directory, otherwise drop the scope or ask. The instruction currently has no outcome."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/commit-work/evals/evals.json",
+          "line": 1,
+          "evidence": "18 output evals and 20 trigger queries (10 should-trigger, 10 should-not) with verifiable assertions, but the prompt's `files` are never checked against the fixtures: whitespace-staged.txt has no `git diff --cached --check` output, and no-commits-yet.txt shows `nothing added to commit but untracked files present` while the prompt says config/settings.json is staged.",
+          "fix": "Add the `git diff --cached --check` trailing-whitespace line at src/report.ts:11 to evals/files/whitespace-staged.txt, and show config/settings.json as staged (not untracked) in evals/files/no-commits-yet.txt, so each assertion is decidable from its fixture."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 34,
+          "evidence": "export the index with `git checkout-index -a --prefix=<run>/verify/` (the trailing slash matters) and run the check there. If it cannot run there (missing dependencies or untracked config), report \"staged version not verified\"",
+          "fix": "`git checkout-index -a` writes only the index's tracked files, so the exported tree has no node_modules, lockfile-installed deps or untracked config and the check cannot run there in a normal project. State the fallback that actually verifies the staged blob (a temporary worktree or a copy of the dependencies into the prefix) and reserve \"staged version not verified\" for when that also fails."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 26,
+          "evidence": "When the user approved a path's staged diff, commit that exact staged version and never restage the whole working-tree file over it: leave it in the real index, or copy it into the temporary index with `git diff --cached --binary -- <path> > <run>/staged.diff` and `GIT_INDEX_FILE=<run>/index git apply --cached <run>/staged.diff`.",
+          "fix": "The capture command has no `GIT_INDEX_FILE` prefix, so in temporary-index mode it reads the real index and can overwrite `<run>/staged.diff` with content the user did not approve. Say the capture always reads the real index and must run before any command writes that file, and give the order."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/commit-work/references/commit-message-template.md",
+          "line": 7,
+          "evidence": "`git config commit.template` (often `.gitmessage`), `.czrc` or `cz.json` (Commitizen; read whichever Commitizen config the repository actually has, since the file name depends on its setup).",
+          "fix": "`.czrc` and `cz.json` are examples, not the full set (facts.md: not re-read from the Commitizen docs). Add the source URL and the date checked, or replace the two names with an instruction to read the Commitizen config the repository points at."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest commit-work at dbff837f: \"removed units (111, showing 40)\": the digest shows only part of the removed units, so 71 items could not be checked one by one. All 40 shown items are explained by section rows in docs/audit/recovery/commit-work/record.md through sections.json units, or by the accepted-drop rows.",
+          "fix": "Rerun `python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/commit-work/SKILL.md` with a digest that lists all 111 units, so every removed unit is checked against the record's section rows (s001-s022)."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 30,
+          "evidence": "\"Never `git add -A` or `git add .`: they sweep in untracked artifacts. Never `git commit -a` or `-am` either: they stage every modified tracked file, the user's unapproved edits included.\"",
+          "fix": "Models already avoid sweeping staging commands, so this is activation. Merge the two sentences into one clause, 'Never `git add -A`, `git add .`, `git commit -a` or `-am`: they stage untracked artifacts and the user's unapproved edits'. Keep both reasons so no content is removed."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 25,
+          "evidence": "Step 3 holds the run-directory setup, the index choice, the overlap check, the stage-only record, temporary-index setup, whole-file staging and partial-file staging in one step of about 700 words. This departs from the Process pattern's phased checkpoints.",
+          "fix": "Split step 3 into labelled sub-steps that keep every sentence: 3a run directory, 3b pick the index and run the overlap check, 3c stage (whole file or part of a file). Alternatively, move the temporary-index setup to references/temporary-index.md and read it only when 'commit request and the user has staged content that must stay out'."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 31,
+          "evidence": "\"ask whether the whole file is approved, or for its exact approved content, and never build a patch from `/dev/null`\" has no reason, unlike the other NEVER items.",
+          "fix": "Add the reason in the same sentence. For example: 'never build a patch from `/dev/null`: an all-added hunk cannot be split without editing hunk counts by hand, which `git apply --check` then rejects or misapplies'."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/commit-work/evals/evals.json",
+          "line": null,
+          "evidence": "18 evals cover the commit, stage-only and draft-with-diff routes, but none covers the 'review what is staged' route or the 'draft a message' route with no supplied diff (read-only inspection). Only a trigger query covers review.",
+          "fix": "Add an output eval with a fixture of staged content that includes a stray console.log and a lockfile change. Assert that it reports both, runs `git diff --cached --check`, and proposes no index-changing command. Also add a draft-message eval with no diff that asserts only `git status`, `git diff --cached` or `git log` are run."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 32,
+          "evidence": "The route table sends 'review what is staged' to steps 1 and 4. Step 4 then ends with \"if that is not clean, the commit is too big or mixed, so go back to step 2\". Step 2 is outside the review route, so a review-only request reaches a branch it cannot take.",
+          "fix": "In step 4 add: 'For a review request, report that the staged set is mixed and name the split you would make; do not return to step 2 or change the index.'"
+        }
+      ]
+    },
+    {
+      "name": "meme-factory",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 94.4,
+        "router-env-my-referee-three": 92.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: removed units (463, showing 40)",
+          "fix": "The 40 shown paragraphs are explained by section rows in docs/audit/recovery/meme-factory/record.md (via sections.json) or by a para: row. For the 423 unshown units, list each in the digest or add a record row, and restore any substantive one into references/."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/meme-factory/evals/evals.json",
+          "line": 1,
+          "evidence": "no-watermark-parameter lists files references/image-memes.md, but the no-watermark rule is only in SKILL.md Gotchas",
+          "fix": "Point that eval's files at SKILL.md, or add the watermark gotcha to references/image-memes.md and keep the eval file pointer."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/meme-factory/evals/trigger-queries.json",
+          "line": 10,
+          "evidence": "write a funny caption onto photo.jpg from my desktop, it's the team offsite pic is should_trigger false",
+          "fix": "Change it to should_trigger true: the description covers captions on an image URL the user supplies, and the body only excludes a photo with no URL."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/meme-factory/references/text-memes.md",
+          "line": 209,
+          "evidence": "Emojicore sample renders as replacement characters (leaving my responsibilities) instead of emoji",
+          "fix": "Restore the original emoji in that sample (and the three emoji lines in references/blog-posts.md Success Metrics) as UTF-8, and record the repair."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 55,
+          "evidence": "color: text line colors as <name or hex>[,<name or hex>], such as red,blue or FF80ED",
+          "fix": "Mark color as a hand-built parameter only: the generate command has no --color flag, so an agent that passes it to the helper will fail."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest meme-factory at dbff837f: 'removed units (463, showing 40)'. All 40 shown items resolve to valid rows in docs/audit/recovery/meme-factory/record.md or sections.json, or to content in references/ (for example s066 to image-memes.md 'Where the URL goes', and s124/s125 to blog-posts.md 'Complete post example'). The other 423 units could not be checked from the digest.",
+          "fix": "Re-run the removal check with the full unit list (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/meme-factory/SKILL.md ...) and add a row to docs/audit/recovery/meme-factory/record.md for any unit that is not yet explained. Restore nothing that is already recorded."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 47,
+          "evidence": "'- `font`: a font ID or alias from `https://api.memegen.link/fonts/`, such as `impact` or `notosans`.' Some Query parameters bullets (font, color) restate parameter meanings the agent can read from the API docs. They are activation content, not expert content.",
+          "fix": "Keep the non-obvious facts inline (layout values other than default and top are silently ignored; both width and height pad the image; background must be public or the service returns 415). Move the plain font and color descriptions to the Endpoints section of references/image-memes.md, and record the move in docs/audit/recovery/meme-factory/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 15,
+          "evidence": "Step 5 ends with 'let the helper escape them:'. The next line is 'Before calling `generate`, compare the number of captions with the template's `lines`...', and only then comes the command. The inserted sentence splits the colon from the command it introduces and repeats the line-count rule from line 14, which blurs an otherwise clean Process pattern.",
+          "fix": "Merge the line-count check into one sentence at the start of step 5, before 'Pass one raw caption per template line', so the colon leads directly into the `python3 scripts/meme_generator.py generate ...` command."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 19,
+          "evidence": "Step 6 says 'Present the result as a Markdown image whose alt text describes both the picture and the joke.' The Slack and Discord exception (post the plain image URL) appears only in references/image-memes.md 'Where the URL goes'. An agent making a Slack meme, the most common request in the evals, may never load that file.",
+          "fix": "Add a gotcha to SKILL.md: '- **Never paste Markdown image syntax into Slack or Discord.** They show `![alt](url)` as literal text; post the plain `.png` or `.jpg` URL and give the Markdown form as a fallback.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 14,
+          "evidence": "Line 14 says 'ask for the missing lines, or pick a template whose `lines` matches the captions given'. Line 15 says 'when they differ, stop and ask the user instead of generating.' Following the mismatch branch (for example a user giving 3 captions for `drake`) gives two different instructions: switch template, or stop and ask.",
+          "fix": "Give one rule: 'If the caption count differs from the template's `lines`, switch to a template whose `lines` matches only when the user named no template; otherwise stop and ask for the missing or extra lines. Never invent caption text.'"
+        }
+      ]
+    },
+    {
+      "name": "mui",
+      "percent": 93.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 91.2,
+        "router-env-my-referee-three": 95.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/mui/references/theme-recipes.md",
+          "line": 48,
+          "evidence": "Where `variants` goes: the docs document one form, `variants` inside a slot of `styleOverrides` (`components.MuiButton.styleOverrides.root.variants`), not as a sibling of `styleOverrides` and `defaultProps`",
+          "fix": "Correct the placement to the documented sibling form `components.MuiButton.variants` next to `styleOverrides` and `defaultProps`, move the example at lines 18-24 out of `styleOverrides.root`, and record the old placement as a fact-update. The theme-components page and the v9 Button CSS classes section both show `variants` as that sibling, so an agent following this recipe writes a theme the installed types reject."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/mui/references/theme-recipes.md",
+          "line": 18,
+          "evidence": "variants: [ { props: { variant: 'contained', color: 'primary' }, style: { boxShadow: 'none' } } ] nested inside styleOverrides.root",
+          "fix": "Put `variants` beside `styleOverrides` and `defaultProps` (`components.MuiButton.variants`), keep the slot key as `root` only for ordinary style overrides, and re-check the cited theme-components and v9 upgrade pages. The current block is the example an agent copies, and it does not typecheck."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/mui/evals/trigger-queries.json",
+          "line": 6,
+          "evidence": "MUI TextField required email with inline errors. should_trigger true",
+          "fix": "Replace this should-trigger query with a case the skill uniquely owns and the description names, such as moving `inputProps` onto `slotProps.htmlInput`, and add a should-not-trigger near-miss for a plain TextField label or helperText with no v7 trap. As written it rewards loading the skill for generic form code the description does not claim."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/mui/evals/evals.json",
+          "line": 106,
+          "evidence": "assertions: Makes each clickable row a `ListItemButton` ... Lays the cards out with `Grid` ... using `size={{ ... }}`",
+          "fix": "Add assertions that the List recipe's `disablePadding` row, the Autocomplete `isOptionEqualToValue` trap, and the Snackbar `clickaway` reason are present in the output, so recipe-list-grid and recipe-form-select do not pass on the two rules already in SKILL.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 29,
+          "evidence": "5. **Verify.** Run the repo's typecheck script; if it has none, run `npx tsc --noEmit`. Then exercise what the change touches: each breakpoint, keyboard focus, every dialog close path.",
+          "fix": "Turn step 5 into a short checklist whose items depend on the branch taken (typecheck always; slot name query after a slotProps edit; each dialog reason after a Dialog edit; hover and focus after a state-class override; computed colors after a nested theme), so the verification is a procedure rather than one sentence."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/mui/resources/theme-customization.md",
+          "line": 51,
+          "evidence": "Installed 7.3 types declare `enableCssLayer` on `StyledEngineProvider` and `modularCssLayers` on `ThemeOptions`.",
+          "fix": "Name the `.d.ts` each key was read from (`StyledEngineProvider` and `ThemeOptions` in the installed `@mui/material` 7.3.11 types) the way theme-recipes.md names `shadows.d.ts`, so the version pin is checkable rather than a bare \"7.3\"."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 67,
+          "evidence": "`resources/styling-guide.md`: when a `styled` component or a theme `styleOverrides` must beat a state class",
+          "fix": "Name the sibling files not to load for that scenario (do not load `resources/theme-customization.md` or the recipe files for a state-class override), matching the explicit \"Not for\" gates already written for theme setup and migrations."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 44,
+          "evidence": "`Hidden` is removed: use `sx={{ display: { xs: 'none', md: 'block' } }}` or `useMediaQuery`.",
+          "fix": "Make the `sx` display map the default and keep `useMediaQuery` as the escape hatch only when the markup itself changes, which `resources/ui-ux-mapping.md` already states, so the two options are not equal."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/mui/record.md",
+          "line": null,
+          "evidence": "previous-version digest mui at dbff837f: 'removed units (122, showing 40)'. The digest lists only 40 of the 122 removed units. Each of the 40 shown resolves to a valid record row through sections.json, but the other 82 cannot be checked from the digest.",
+          "fix": "Regenerate the digest without the cap, or check the other 82 units against record.md and sections.json. Add a row in docs/audit/recovery/mui/record.md for any unit that has none."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 62,
+          "evidence": "'**Loading.** While the title and body are not rendered yet, show `Skeleton` in their shape ...' and line 63 '**Icon-only buttons.** An `IconButton` has no accessible name of its own: set `aria-label` to the action'. These are activation reminders of general UI and accessibility practice, not v7 facts a model gets wrong.",
+          "fix": "Keep both bullets: the loading-card and theme-toggle evals depend on them. Move them out of 'v7 facts' into a short 'Defaults to apply' line so the v7 facts section holds only version facts. Do not delete them."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 81,
+          "evidence": "'`references/theme-recipes.md`: ... Palette augmentation and CSS layers stay in `resources/theme-customization.md`.' Theme code is split across two parallel directories, resources/ and references/, with overlapping names. Every load trigger has to state which directory owns which part.",
+          "fix": "Use one directory for on-demand files (references/). Move the four resources/*.md files there, or merge theme-customization.md and theme-recipes.md. Update the pointers in SKILL.md and README.md, and record each move as `redistributed <path>` in docs/audit/recovery/mui/record.md."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/mui/evals/evals.json",
+          "line": null,
+          "evidence": "The 'files' entries mix two path roots. 'legacy-api.tsx' and 'outlined-input-theme.tsx' are in evals/files/, but 'resources/styling-guide.md', 'references/component-recipes.md', 'references/theme-recipes.md' and 'references/sx-and-styled-recipes.md' are relative to the skill root, not evals/files/. A runner that resolves files under evals/files/ will not find them.",
+          "fix": "Use one convention for every 'files' entry, for example skill-root paths such as 'evals/files/legacy-api.tsx' and 'references/component-recipes.md'. Or drop the skill's own reference files from 'files', because the skill loads them itself."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/mui/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "Several negatives test nothing: 'Configure Vite for React.', 'Explain React server components in Next.js.', 'Explain CSS specificity.' share no MUI concept. The set also has 35 queries against the recommended ~20.",
+          "fix": "Replace the unrelated negatives with near-misses that share MUI terms but need something else, for example an MUI X Date Picker locale question or a Material Design 3 token question with no MUI code. Trim to about 20 queries split 10/10."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 57,
+          "evidence": "'v7 `Grid` is the former Grid2: `<Grid size={{ xs: 12, md: 6 }}>`, `offset` for gaps, no `item`.' `offset` shifts an item by whole columns. 'for gaps' reads like spacing, which is `spacing` / `rowSpacing` / `columnSpacing` on the container.",
+          "fix": "Reword: '`offset={{ md: 2 }}` to push an item right by columns (gutters are the container's `spacing`), no `item`.'"
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

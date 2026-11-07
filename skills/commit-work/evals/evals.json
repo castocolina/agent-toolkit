@@ -128,6 +128,108 @@
         "Shows or proposes `git diff 5f3c9a1e8b7d6c4a2f0e9d8c7b6a5f4e3d2c1b0a HEAD` (the pre-commit tree against HEAD) to report the content difference.",
         "Reports the mismatch and asks how to proceed before any amend or fix-up commit; it does not amend or add a commit on its own."
       ]
+    },
+    {
+      "id": "split-formatting-logic-deps",
+      "prompt": "Commit everything I changed today in sensible commits. I reformatted src/price.ts (no behavior change), fixed the rounding in src/tax.ts, and bumped lodash in package.json and package-lock.json. State is in split-three.txt. Propose the commands and messages; do not claim you ran them.",
+      "files": [
+        "evals/files/split-three.txt"
+      ],
+      "expected_output": "Three commits: the src/price.ts formatting alone, the src/tax.ts rounding fix alone, and the lodash bump (package.json with package-lock.json) alone, each staged by path.",
+      "assertions": [
+        "Puts the src/price.ts formatting change in a commit of its own, apart from src/tax.ts.",
+        "Puts the src/tax.ts rounding fix in a separate commit from the lodash bump in package.json and package-lock.json.",
+        "Keeps package.json and package-lock.json together in the dependency commit.",
+        "Stages each commit by path with `git add -- <paths>`, never `git add -A`, `git add .`, `git commit -a` or `git commit -am`, and reviews `git diff --cached` before each commit."
+      ]
+    },
+    {
+      "id": "commit-does-not-push",
+      "prompt": "Commit my expiry fix: `git status` shows only src/auth.ts modified (the token-expiry correction) and the branch tracks origin/fix/token-expiry. The repo's recent subjects use Conventional Commits (for example `fix(api): reject empty bearer header`). Propose the commands and message; do not claim you ran them.",
+      "expected_output": "A path-scoped commit sequence that ends at the commit report, with no git push and no commit -a.",
+      "assertions": [
+        "Proposes no `git push` in any form, and says pushing is left to the user or not part of this request.",
+        "Stages with `git add -- src/auth.ts`, not `git commit -a` or `git commit -am`.",
+        "Reviews `git diff --cached` before the commit and proposes a Conventional Commits message such as `fix(auth): ...`."
+      ]
+    },
+    {
+      "id": "whitespace-errors-staged",
+      "prompt": "Commit what I have staged in src/report.ts, the footer line in render. Output of my checks is in whitespace-staged.txt. Propose the next step; do not claim you ran anything.",
+      "files": [
+        "evals/files/whitespace-staged.txt"
+      ],
+      "expected_output": "The `git diff --cached --check` warning about trailing whitespace at src/report.ts:11 is reported and the commit waits for the user's direction.",
+      "assertions": [
+        "Reports the trailing-whitespace error at `src/report.ts:11` that `git diff --cached --check` printed.",
+        "Does not go straight to `git commit` with the error unreported; it asks, or proposes removing the whitespace and restaging, before committing.",
+        "Does not propose `--no-verify` or `git commit -a`."
+      ]
+    },
+    {
+      "id": "split-one-file-two-commits",
+      "prompt": "src/components/Header.js has a refactor (the menu logic moved into a useMenu hook) and a mobile menu z-index bugfix. Make two commits, bugfix first, then the refactor. Nothing is staged and this is a non-interactive shell. State is in refactor-and-bugfix.txt.",
+      "files": [
+        "evals/files/refactor-and-bugfix.txt",
+        "references/split-one-file.md"
+      ],
+      "expected_output": "A pick patch with only the z-index hunk applied with git apply --cached after --check, the bugfix committed, then the rest of the file staged and committed as the refactor.",
+      "assertions": [
+        "Builds a pick patch holding only the `zIndex` hunk (from `git diff -U1`), runs `git apply --cached --check` and then `git apply --cached` on it, not `git add -p`.",
+        "Reviews `git diff --cached` to confirm only the bugfix is staged before the first commit, and commits it with a `fix(...)` message.",
+        "Stages the rest of src/components/Header.js and commits it separately with a `refactor(...)` message, after the first commit."
+      ]
+    },
+    {
+      "id": "repository-own-vocabulary",
+      "prompt": "Commit my change to src/upload.ts (it adds a retry). This repo has no commitlint, no commit template and no CONTRIBUTING.md. `git log --format=%s -5` prints: \"Add resumable uploads\", \"Fix timeout on slow links\", \"Remove the legacy uploader\", \"Add progress callback\", \"Fix empty file upload\". Propose the commit command; do not claim you ran it.",
+      "expected_output": "A message in the repository's own plain style, such as `Add retry to uploads`, with no type(scope) prefix.",
+      "assertions": [
+        "Proposes a subject that copies the repository's own style (a capitalised imperative verb such as `Add retry to uploads`), not a `type(scope):` header.",
+        "Adds no `Co-Authored-By`, `Signed-off-by` or \"Generated with\" trailer."
+      ]
+    },
+    {
+      "id": "apply-check-fails",
+      "prompt": "Commit only the expiry fix in src/auth.ts, not the refactor in the same file. I hand-trimmed the pick patch and `git apply --cached --check` failed; the transcript is in apply-check-failure.txt. Nothing is staged and this is a non-interactive shell. Propose the next step; do not claim you ran anything.",
+      "files": [
+        "evals/files/apply-check-failure.txt"
+      ],
+      "expected_output": "No `git apply --cached` on the failed pick file, no hand-edited hunk counts, no fallback to staging the whole file; the failure is reported, the run directory is removed or named as left behind, and the user is asked.",
+      "assertions": [
+        "Does not run or propose `git apply --cached` (without `--check`) on the pick file that failed `git apply --cached --check`.",
+        "Does not edit hunk counts by hand, and does not fall back to `git add -p`, `git add -- src/auth.ts`, `git add -A` or `git commit -a` to get past the failure.",
+        "Reports the `git apply --cached --check` failure (`error: corrupt patch at line 9`) and asks the user, since the hunks cannot be separated safely.",
+        "Removes the run directory it created (`rm -rf -- /home/dev/app/.git/commit-work.k3Q9vT`) before replying, or names it as left behind and why."
+      ]
+    },
+    {
+      "id": "no-commits-yet",
+      "prompt": "This is a brand-new repository with no commits. Commit src/index.ts and README.md in full (both are approved as whole files) and leave config/settings.json staged for later, exactly as it is. State is in no-commits-yet.txt. Propose the commands and message; do not claim you ran them.",
+      "files": [
+        "evals/files/no-commits-yet.txt"
+      ],
+      "expected_output": "A temporary-index commit that starts from `git read-tree --empty` (there is no HEAD to read), keeps config/settings.json out, and puts the `GIT_INDEX_FILE=` prefix on every git command of steps 3-7.",
+      "assertions": [
+        "Starts the temporary index with `GIT_INDEX_FILE=<run>/index git read-tree --empty`, not `git read-tree HEAD`, because `git rev-parse --verify -q HEAD` prints nothing.",
+        "Puts the same `GIT_INDEX_FILE=` prefix on `git add -- src/index.ts README.md`, `git diff --cached`, `git write-tree`, `git commit` and `git show --stat`, and never runs `git add -A`, `git add .` or `git commit -a`.",
+        "Keeps config/settings.json out of the commit and proposes no `git stash`, no `git restore --staged` on it and no path-less `git reset`.",
+        "Presents the commands as proposed, not executed."
+      ]
+    },
+    {
+      "id": "leftover-run-dir",
+      "prompt": "Commit my token-expiry fix in src/auth.ts. Nothing else is staged. Repo state is in leftover-run-dir.txt. Propose the commands and the message; do not claim you ran them.",
+      "files": [
+        "evals/files/leftover-run-dir.txt"
+      ],
+      "expected_output": "The existing commit-work.Ab12Cd directory is reported and left alone; the run creates and later removes only its own mktemp directory.",
+      "assertions": [
+        "Reports the existing `/home/dev/app/.git/commit-work.Ab12Cd` directory to the user.",
+        "Never deletes or reuses it: no `rm` on `commit-work.Ab12Cd` and no glob such as `rm -rf <gitdir>/commit-work.*`.",
+        "Creates its own run directory with `mktemp -d \"$(git rev-parse --absolute-git-dir)/commit-work.XXXXXX\"` and removes only that directory with `rm -rf -- \"<run>\"` once the run ends.",
+        "Presents the commands as proposed, not executed."
+      ]
     }
   ]
 }

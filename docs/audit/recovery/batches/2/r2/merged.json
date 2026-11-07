@@ -1,0 +1,200 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "design-system-starter",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/design-system-starter/record.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: \"removed units (479, showing 40)\". The digest lists only 40 of the 479 removed units. All 40 shown map through sections.json to valid record rows (for example s114/s108/s111 restore-references restored in references/component-examples.md, s038-s041 restored in references/token-scales.md, s106/s109/s110 intended-change safety-fix), but the other 439 could not be checked item by item.",
+          "fix": "Regenerate the digest without the cut (or with a higher show limit) and confirm that every remaining para: unit maps to a row in docs/audit/recovery/design-system-starter/record.md through its section id in sections.json. For any unit with no row, restore it (into references/ when it is domain-specific, a template users ask for or a tested example) or add a row for it."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 35,
+          "evidence": "\"6. **Choose the theme mechanism.** Default: semantic CSS custom properties switched by a `data-theme` attribute. Use Tailwind variants or a ThemeProvider only when...\" comes after step 5, where components and their props are derived.",
+          "fix": "The mechanism decides how components consume roles (CSS variables or runtime theme objects). Move the mechanism choice into step 3 (\"Define semantic contracts\") or put it before step 5, so components are not scaffolded against one mechanism and then reworked for another. Keep the text and its reference to references/process-and-tooling.md unchanged."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/design-system-starter/evals/evals.json",
+          "line": null,
+          "evidence": "The description promises \"version and deprecate shared tokens and components\" and SKILL.md step 8 sets a deprecation window and a migration order. None of the 9 output evals asks for a token or prop rename, a deprecation or a release.",
+          "fix": "Add an output eval such as \"We're renaming color.action.primary to color.action.default and Button's variant prop to intent across four apps; how do we ship this?\". Assertions: keeps the old token path as an alias with $deprecated; maps variant to intent with the same default; states removal in the major after next; does not change a token meaning in a minor release; orders migration one consumer per release."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 49,
+          "evidence": "\"Check them side by side under a color-vision-deficiency simulation (Chrome DevTools, Rendering > Emulate vision deficiencies)\": a vendor UI path that changes between releases, with no source URL or date checked at this line.",
+          "fix": "Add the source and a date beside the path, e.g. \"(Chrome DevTools, Rendering > Emulate vision deficiencies; https://developer.chrome.com/docs/devtools/accessibility/reference, checked <date>)\", or tell the agent to look up the current menu path in the installed Chrome's DevTools docs."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/design-system-starter/templates/design-tokens-template.json",
+          "line": 3,
+          "evidence": "\"color.semantic holds the light theme, dark is a second file with the same paths\". No dark value set exists in the template or references, and component-examples.md uses --brand-*-dark variables that nothing defines. The agent must invent every dark value even though the Complete starter requires theme mappings and per-theme contrast rows.",
+          "fix": "Add a short dark value set for the template's semantic paths (text, surface, border, action, focus, feedback) to references/token-scales.md, with its measured contrast rows on the dark surface. Point the template's $description and SKILL.md step 3 at it."
+        }
+      ]
+    },
+    {
+      "name": "gemini",
+      "percent": 96.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/gemini/record.md",
+          "line": null,
+          "evidence": "previous-version digest gemini at dbff837f: 'removed units (218, showing 40)'. This is a cut list, so 178 removed units could not be checked one by one. All 40 units shown map through sections.json to valid record rows (s001-s054).",
+          "fix": "Re-run the removal check with the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/gemini/SKILL.md --judge direct --digest-dir <tmp>). For any unit without a row, restore it (into references/ when it is domain-specific) or add a row for it to docs/audit/recovery/gemini/record.md."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/gemini/evals/trigger-queries.json",
+          "line": 51,
+          "evidence": "\"query\": \"write a Python script to scan our repository\" (should_trigger false). This negative shares no Gemini, review or big-context terms, so it tests nothing about the description's boundary.",
+          "fix": "Replace it with a near-miss, for example: \"use the gemini-cli npm package's config to change my default model to flash\" (Gemini CLI configuration, not a review run) or \"have Gemini rewrite src/auth to fix the bugs it finds\" (implementation, which the description excludes)."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/gemini/SKILL.md",
+          "line": 27,
+          "evidence": "\"Send a single file from outside (a plan, a spec) on stdin rather than widening the workspace: `-p` text is appended to stdin.\" This is a version-sensitive CLI behaviour, and the plan-review command shape depends on it. The Sources list at the end of Gotchas does not cite it and gives no date checked.",
+          "fix": "Add a line to the Sources list: \"`-p` text appended to stdin input: `cli/headless.md`\" (the vendor page that documents it), checked <date>. Keep the instruction to run `gemini --help` when the claim fails."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/gemini/SKILL.md",
+          "line": 41,
+          "evidence": "Step 6 gives `gemini --resume latest` and `gemini -r \"latest\" \"query\"` as commands for the user's terminal with no wrapper. Defaults says \"Never run unbounded\", and Gotchas says \"Interactive commands need `--foreground`\". Followed as written, this branch gives an unbounded interactive command, which the follow-up-resume eval assertion ('a bounded `timeout` on any command it proposes') rejects.",
+          "fix": "Show the resume command in the same form as the interactive shape: `timeout --foreground --kill-after=10s 1800 gemini --resume latest -m <same model> --approval-mode default`. Name the same model and approval mode in it, and keep the note that combining `--resume` with `-p` is not documented."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/gemini/README.md",
+          "line": 31,
+          "evidence": "\"- [Gemini CLI Documentation](https://github.com/google/generative-ai-docs)\". The label says Gemini CLI docs, but the link is a different Google repository. The line above it already links the official CLI repository and docs.",
+          "fix": "Relabel the link to say what it points to (\"Google generative AI docs (legacy)\") and keep it in Resources. Do not delete it: it is a carried-over upstream resource."
+        }
+      ]
+    },
+    {
+      "name": "viral-tweet",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/viral-tweet.md",
+          "line": null,
+          "evidence": "Digest at dbff837f: 'removed units (75, showing 40)'. The list is cut, so 35 removed units could not be checked against docs/audit/recovery/viral-tweet/record.md. All 40 listed items, and para:5e05a69b from the 89cb6a11 digest (rewritten as the THREAD line), are explained.",
+          "fix": "Re-run the removal check with the full unit list (python3 scripts/audit/audit.py judge-prompt --kind command --artifact commands/viral-tweet.md ...). Then confirm that each of the 35 hidden units is covered by a valid section row in docs/audit/recovery/viral-tweet/record.md, or add a para: row for it."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/viral-tweet.md",
+          "line": 22,
+          "evidence": "'Sound human, not like a marketer: short sentences, no corporate-speak, match the author's voice, specific over generic, confident over hedging.'",
+          "fix": "This is activation content the model mostly knows. Keep it, since the record restores it on purpose, but cut it to the one correction that matters, for example 'Counter your default marketer tone: no corporate-speak, keep the author's voice; any odd angle stays within the supplied facts.' Delete nothing without a record row."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/viral-tweet.md",
+          "line": 27,
+          "evidence": "Step 4d packs the thread question, the three-thread fallback, the single-thread expansion and the longer-allowance ceiling into one sentence chain.",
+          "fix": "Split 4d into labelled sub-branches (4d-i over the limit: ask about a thread; 4d-ii no answer: three alternative threads; 4d-iii user expands one post: THREAD block; 4d-iv longer allowance: ask for the ceiling, else 280) so the process pattern has clear checkpoints. Keep every rule."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/viral-tweet.md",
+          "line": 39,
+          "evidence": "'Add hashtag stacks, \"link in bio\", or unrelated @mentions or links. Keep a link only if it substantiates the claim, and prefer it outside the main post text.' This is the only NEVER item with no reason.",
+          "fix": "Add the reason the other items have, for example '...: readers read stacked tags and off-topic mentions as spam and scroll past, and a URL costs 23 characters of the 280'."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/viral-tweet.md",
+          "line": 19,
+          "evidence": "3a(a) hook-led: 'lead with the concrete outcome if supplied; a contrast only when both sides are supported; else the author's concrete observation; ...'. This is a fixed fallback chain for a creative choice.",
+          "fix": "Keep the hard factual limits (supported contrast only, a closed curiosity gap) and turn the order into a default with an escape hatch: 'Default: lead with the concrete outcome; pick another supported angle when it reads stronger.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "commands/viral-tweet.md",
+          "line": 47,
+          "evidence": "Step 2 says of the primary objective 'State it in ANALYSIS', but the template reads '**ANALYSIS:** facts kept, the intended reader and payoff, friction points, facts you would need confirmed', with no objective slot. Step 3b's minimal-edit trim is also forced under the label 'VERSION 1 (hook)'.",
+          "fix": "Change the template to '**ANALYSIS:** facts kept, the intended reader and payoff, primary objective (and why), friction points, facts you would need confirmed' and label VERSION 1 '(hook, or minimal-edit trim when the user only asked to shorten)'."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

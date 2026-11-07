@@ -4,9 +4,9 @@ How to compare an implementation with a Figma design so that each reported misma
 
 ## 1. Pin the reference
 
-- Get a link to the exact frame (the URL carries `node-id`), not the file. A file-level link lets you compare against the wrong frame or variant.
+- Get a link to the exact frame (a link to a selected frame typically carries `node-id`), not the file. A file-level link lets you compare against the wrong frame or variant.
 - Note the file's last-edited date or version and the frame's dev status. A design edited after the build was cut is a design change, not a bug; ask which version the build targeted.
-- With a Figma MCP server available, list its tools first (names differ between server versions), then pull the frame's variables or tokens, a screenshot and the layer properties. Without one, ask for a 1x frame export plus the inspect values, and state in the deliverable that values come from the requester, not from Figma.
+- With a Figma MCP server available, read the tool names from the connected server's own tool list first (names and the set of tools differ by server and version; do not assume any), then pull the frame's variables or tokens, a screenshot and the layer properties. Without one, ask for a 1x frame export plus the inspect values, and state in the deliverable that values come from the requester, not from Figma.
 
 ## 2. Match the rendering conditions
 
@@ -36,3 +36,55 @@ Record these for both sides before judging any difference:
 | Card title | font weight | 600 | 400, rendered font Inter Regular | 1440px, DPR 2, light | Defect, or font not loaded: check the network panel |
 
 File one bug per root cause (a wrong token, a missing state), listing every affected element, with the frame link and conditions from section 2.
+
+## 5. Per-component case and checklist
+
+Use this when the request is a visual case for a component. Fill it with measured values (section 3), under the conditions of section 2.
+
+**States to force and compare against their Figma variants** (section 3 names the first four; an untested state is listed as not covered):
+
+- [ ] Default
+- [ ] Hover
+- [ ] Active or pressed
+- [ ] Focus
+- [ ] Disabled
+- [ ] Loading
+- [ ] Error
+
+**Common color discrepancies to look for** (compare tokens or computed values, not sampled pixels):
+
+- A hex value off by a shade (compare the token first; one wrong token is one bug)
+- Opacity not applied, or applied to the wrong layer
+- A gradient angle or stop that differs
+- A shadow color or alpha that differs
+
+**Visual case for one component:**
+
+```markdown
+## TC-UI-[NNN]: [Component] matches the design
+
+**Figma:** [exact frame link, version or last-edited date]
+**Conditions:** viewport [width], DPR [n], theme [light/dark], locale [xx], build [vX.Y.Z]; tolerance [agreed, e.g. 1px]
+
+| Group | Property | Design value | Measured (computed style) | Status |
+| :- | :- | :- | :- | :- |
+| Layout | width, height, padding, margin | [value] | [value] | [ ] |
+| Typography | family, size, weight, line height, color | [value] | [value] | [ ] |
+| Color | background, border, text (token or computed value) | [value] | [value] | [ ] |
+
+**States:** one row per state in the list above, each forced in DevTools: [ ] matches / [ ] differs / [ ] not covered
+**Responsive:** one block per breakpoint the design defines ([width] px, taken from the design): [ ] layout adapts, [ ] elements visible, [ ] touch targets adequate on touch widths, [ ] content readable
+**Status:** Pass | Fail | Blocked (design incomplete)
+```
+
+**Checklist per component:**
+
+- [ ] Frame link and version documented
+- [ ] Layout validated at each breakpoint the design defines
+- [ ] Every state in the list above tested, or listed as not covered
+- [ ] Colors match the tokens or computed values within the agreed tolerance
+- [ ] Typography (family, size, weight, line height) matches by computed value
+- [ ] Spacing (padding, margin) matches by computed value
+- [ ] Icons match the design (size, color)
+- [ ] Shadows and borders match
+- [ ] Animation timing and easing match the design's values
