@@ -1,0 +1,86 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest commit-work at dbff837f: 'removed units (111, showing 40)'. All 40 units shown are explained, either by a section row in docs/audit/recovery/commit-work/record.md or by text in the current files. The other 71 could not be checked.",
+      "fix": "Regenerate the dbff837f digest without the cut. Confirm that each of the 71 unshown units has a destination in the current files or a valid row in docs/audit/recovery/commit-work/record.md. For any that has neither, restore it (into references/ when it is domain-specific, or into the main file when the procedure depends on it) or add a row for it."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 34,
+      "evidence": "Step 6: 'Take the message vocabulary from the repository, in the order of references/commit-message-template.md: commitlint config, commit.template, CONTRIBUTING, a PR template, then ...'. This repeats the source list that 'Collect the repository's rules' in the reference already holds.",
+      "fix": "Keep the order in one place. Leave the full list in references/commit-message-template.md \u00a7 Collect the repository's rules. In step 6, keep only the default rule ('Conventional Commits only when all of those are absent') and the conditional read trigger. Record the moved sentence in docs/audit/recovery/commit-work/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 25,
+      "evidence": "Step 3 mixes run-directory setup, the leftover check, cleanup on every exit route, index choice, the overlap check, the stage-only record, the temporary-index build and both staging methods. It runs to seven dense paragraphs (lines 25-31), so its checkpoints are hard to follow in order.",
+      "fix": "Keep every sentence, but split step 3 into numbered sub-steps with one checkpoint each: 3a run directory and leftover check, 3b which index plus the overlap check, 3c temporary-index build, 3d whole-file or partial staging. That gives the Process pattern clear phase boundaries."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 29,
+      "evidence": "'For the temporary index, first capture the approved staged patches above from the real index ... put that same GIT_INDEX_FILE= prefix on every git command of steps 3-7'. The temporary-index procedure loads on every run, including the draft-message and review routes that never use it.",
+      "fix": "Move the temporary-index build commands (capture, read-tree HEAD or --empty, the prefix rule) to references/temporary-index.md. In step 3, keep the rule that picks the index and add: 'Read references/temporary-index.md when a commit request must keep user-staged content out.' The Gotchas line about fresh shells stays in SKILL.md. Record the move in docs/audit/recovery/commit-work/record.md."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/commit-work/evals/evals.json",
+      "line": null,
+      "evidence": "The routing table has a 'review what is staged | steps 1 and 4, report findings | change the index or the tree' route. trigger-queries.json covers it ('before i push, look over what i've got staged'), but none of the 18 output evals exercises it.",
+      "fix": "Add an output eval with a fixture where the staged set is mixed, for example a stray console.log next to the fix. Assert that the reply names the problem and the split it would make, and that it runs or proposes no git add, git reset, git restore --staged or git commit."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 33,
+      "evidence": "'export the index with git checkout-index -a --prefix=<run>/verify/'. <run> is created inside the git dir, so the export path contains '/.git/'. Some runners, such as Jest's haste map, ignore files under VCS directories, so the check finds no tests and exits non-zero. The agent then reports a test failure that is not real.",
+      "fix": "Add a sentence after the export command: 'If the runner reports no tests found or no files matched in <run>/verify/, it is ignoring paths under .git: export to mktemp -d outside the repository instead (same link and cleanup rules), or report \"staged version not verified\"; never treat it as a test failure.'"
+    }
+  ]
+}

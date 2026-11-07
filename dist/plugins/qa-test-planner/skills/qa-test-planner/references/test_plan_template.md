@@ -52,7 +52,7 @@ Write the release gate of SKILL.md section 3, step 4, as the checklist below. Ne
 - [ ] Every critical requirement has an executed, passing case
 - [ ] No P0 failure is open, or each one has a waiver that meets the gate
 - [ ] Each blocked case has an owner
-- [ ] The regression tier the plan selected has run (smoke at minimum; tiers in `references/regression_testing.md`)
+- [ ] Plan exit check (not part of the release gate of section 3, step 4): the regression tier the plan selected has run (smoke at minimum; tiers in `references/regression_testing.md`)
 
 ## Plan checklist
 

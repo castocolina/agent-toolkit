@@ -175,11 +175,15 @@ The template's `radius.control` aliases one of these steps per brand.
 
 ## Shadow (elevation)
 
-DTCG `shadow` objects take `color`, `offsetX`, `offsetY`, `blur`, `spread`; a token whose `$value` is an array stacks several layers. The steps below use Tailwind CSS v4's own names and values (https://tailwindcss.com/docs/box-shadow, checked 2026-11-07). Tailwind v4 renamed its scale: the `base`, `md`, `lg`, `xl` steps of the v3-era values now carry the names `md`, `lg`, `xl`, `2xl`, so do not copy a v3 table. Every layer here is black at the alpha shown in the table.
+DTCG `shadow` objects take `color`, `offsetX`, `offsetY`, `blur`, `spread`; a token whose `$value` is an array stacks several layers. The steps below (`2xs`, `xs`, `sm`, `md`, `lg`, `xl`, `2xl`) use Tailwind CSS v4's own names and values (https://tailwindcss.com/docs/box-shadow, checked 2026-11-07). Tailwind v3 (https://v3.tailwindcss.com/docs/box-shadow, checked 2026-11-07) already used `shadow-md` `0 4px 6px -1px`, `shadow-lg` `0 10px 15px -3px`, `shadow-xl` `0 20px 25px -5px` and `shadow-2xl` `0 25px 50px -12px`. Tailwind v4 (https://tailwindcss.com/docs/box-shadow, checked 2026-11-07) renamed only the two smallest steps (v3 `shadow-sm` became `shadow-xs`, v3 `shadow` became `shadow-sm`) and added `shadow-2xs`, so do not copy a v3 table for those. The `base` label the old skill used for the 4px/6px layer was its own and not a Tailwind name. Every layer here is black at the alpha shown in the table.
 
 ```json
 {
   "shadow": {
+    "2xs": {
+      "$type": "shadow",
+      "$value": {"color": {"colorSpace": "srgb", "components": [0, 0, 0], "alpha": 0.05}, "offsetX": {"value": 0, "unit": "px"}, "offsetY": {"value": 1, "unit": "px"}, "blur": {"value": 0, "unit": "px"}, "spread": {"value": 0, "unit": "px"}}
+    },
     "xs": {
       "$type": "shadow",
       "$value": {"color": {"colorSpace": "srgb", "components": [0, 0, 0], "alpha": 0.05}, "offsetX": {"value": 0, "unit": "px"}, "offsetY": {"value": 1, "unit": "px"}, "blur": {"value": 2, "unit": "px"}, "spread": {"value": 0, "unit": "px"}}

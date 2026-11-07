@@ -35,10 +35,6 @@ Placement:
 - Avoid five images in a row (visual fatigue), three long copypastas back to back (reader exhaustion), and an image with no context (confusing).
 - Template IDs in the examples are live ones. Look up any other in `https://api.memegen.link/templates/` rather than guessing (see `image-memes.md`).
 
-## Alt text and search
-
-Text memes are indexed as text and read well by screen readers. For image memes, write alt text that describes the picture and the joke, with the good and bad examples in `image-memes.md` (Alt text and search). The generated image URL carries no useful filename, so the alt text and an optional caption below the image carry the meaning.
-
 ## Platform tricks
 
 Check each against the platform's own docs; syntax differs between platforms that look alike. Sources, checked 2026-11-07: Material for MkDocs [admonitions](https://squidfunk.github.io/mkdocs-material/reference/admonitions/) and [content tabs](https://squidfunk.github.io/mkdocs-material/reference/content-tabs/); Docusaurus [admonitions](https://docusaurus.io/docs/markdown-features/admonitions) and [tabs](https://docusaurus.io/docs/markdown-features/tabs); MDN Web Docs [`<details>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details); Python-Markdown [md_in_html](https://python-markdown.github.io/extensions/md_in_html/).

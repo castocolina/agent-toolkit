@@ -9,7 +9,10 @@ Fill this in with the user, briefly:
 - Trigger or disputed issue:
 - Evidence or context still missing:
 - The response I want to avoid (e.g. "rebutting before they finish"):
-- The pause I will ask for, and when we resume:
+- How I feel, and my first move for that feeling (from "Feeling to first move" below):
+- My part in it:
+- The one in-the-moment technique I will use (from "Pick one in-the-moment technique" below):
+- The pause I will ask for, and when we resume (a dated time, not "later"):
 - The next safe, documented step:
 
 ## Trigger inventory
@@ -51,7 +54,7 @@ When the user names a feeling before the conversation, give the first move for t
 | "I'll start arguing back" | Write their point down before answering; answer only after reading it back to them. |
 | "I go blank when I'm criticized" | "Can you give me a specific example?" then "I want to think about that; can I come back to you by [day]?" |
 | "I'll get angry and say something" | Ask for a break with a time: "I want to give this proper attention. Can we pick it up at [time]?" |
-| "I'll cave and agree to everything" | Decide the one thing they will not agree to in the room, and the line: "I'll need to check that before I commit." |
+| "I'll cave and agree to everything" | Decide the one thing they will not agree to in the room, and the line: "I'll need to check that before I commit." Use it in a negotiation or conflict; when the user is delivering a decision, use the decision-reaction lines in delivery-scripts.md instead, since Section 4 does not reopen a delivered decision. |
 | "I need to stall or think before I answer" | The buying-time lines in phrase-bank.md. |
 | "I keep imagining the worst" | Worst-case check (below). |
 | "I'm furious at them" | Perspective shift, or the angry path of the night-before steps (below). |

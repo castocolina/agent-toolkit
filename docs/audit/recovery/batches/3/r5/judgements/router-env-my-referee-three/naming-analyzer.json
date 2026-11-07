@@ -1,0 +1,59 @@
+{
+  "skill": "naming-analyzer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 15
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/naming-analyzer/record.md",
+      "line": null,
+      "evidence": "previous-version digest naming-analyzer at dbff837f: 'removed units (139, showing 40)'. The digest is cut, so only 40 of the 139 removed units could be checked. All 40 resolve to valid rows (s001-s032 section rows whose units in sections.json list them, for example s004, s006, s007, s011, s015 and s031 as restore-references with their content now in references/naming-guidelines.md). The other 99 units were not checked.",
+      "fix": "Re-run the removal check on the full digest without the cut (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/naming-analyzer/SKILL.md ...). Then confirm that every one of the 139 para ids maps to a section row in docs/audit/recovery/naming-analyzer/record.md through sections.json, and add a para:<id> row for any id that does not."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 61,
+      "evidence": "## Gotchas: all four items restate rules already in the body. 'Celery's unregistered-task failure is not assumed for RQ' repeats the RQ sentence in Hidden consumers. The polarity item repeats the disableRetry row of the Cases table. 'A symbol rename misses a name read through a string key... as listed under \"String-key and reflective access\"' and 'A generated client... as stated under \"Generated code\"' point back to Hidden consumers.",
+      "fix": "Keep the four items, which serve the review. Put in their place, or add next to them, gotchas the body does not already state. One example: a Pydantic Field(alias=...) changes the serialized key only when the model is dumped with by_alias=True, so an alias without that flag silently renames the wire key."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/naming-analyzer/evals/evals.json",
+      "line": 98,
+      "evidence": "Eval 'convention-split-grouped' (and 'repo-wide-triage') lists \"references/naming-guidelines.md\" in \"files\". That passes the skill's own reference as a user input, so the eval cannot show whether step 2 makes the agent load the Convention splits section on its own.",
+      "fix": "Remove references/naming-guidelines.md from the \"files\" arrays and keep only real user inputs (for example the evals/files/repo-wide/* fixtures). Add an assertion that checks the grouped-finding behavior the reference teaches, so the eval tests the skill's loading trigger."
+    }
+  ]
+}

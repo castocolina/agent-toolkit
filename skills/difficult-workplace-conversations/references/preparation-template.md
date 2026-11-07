@@ -135,6 +135,8 @@ Defaults; adjust them to the people and the stakes:
 
 ## Extended worksheet block (optional)
 
+The full worksheet is the default; append only the extended fields it lacks (for example emotional state, constraints, logistics) when the user wants them written out.
+
 Add to the full worksheet when the user wants to process their feelings and the other person's view in writing.
 
 ```markdown

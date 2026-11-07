@@ -22,7 +22,7 @@ cp -r skills/commit-work ~/.claude/skills/
 commit-work/
 ├── SKILL.md                                 # Intent routing, workflow, gotchas
 ├── README.md                                # This file
-├── references/commit-message-template.md    # Repository message rules, commitlint defaults, spec edge cases, worked messages, report block
+├── references/commit-message-template.md    # Repository message rules, commitlint defaults, spec edge cases, worked messages
 ├── references/split-one-file.md             # Two commits from one file without git add -p
 └── evals/                                   # Output evals, fixtures in evals/files/, trigger queries
 ```

@@ -112,32 +112,14 @@
       ]
     },
     {
-      "id": "normal-forms-and-denormalizing",
-      "prompt": "Explain 1NF, 2NF and 3NF to me with a small example, and tell me when it is OK to denormalize. Use a customers table that has postal_code and country columns.",
-      "files": [
-        "references/schema-fundamentals.md"
-      ],
-      "expected_output": "The three normal forms with a violation example each, the postal_code to country transitive dependency fixed by a separate table, and denormalization allowed only for a stated reason with a plan to keep derived columns consistent.",
-      "assertions": [
-        "States the three rules: atomic values (1NF), no partial dependency on part of a composite key (2NF), no transitive dependency (3NF)",
-        "Shows `country` depending on `postal_code` as a 3NF violation and fixes it with a separate postal codes table referenced by a foreign key",
-        "Says to normalize first and denormalize selectively, and lists a concrete reason such as read-heavy reporting, expensive joins or a materialized view",
-        "Says a denormalized derived column (a total or a count) must be kept in step by a trigger or the writing service, or that the reason for denormalizing is documented",
-        "Uses PostgreSQL syntax in its DDL, such as an identity column, rather than MySQL `AUTO_INCREMENT`, unless it labels the dialect"
-      ]
-    },
-    {
       "id": "fk-actions-and-junction-table",
-      "prompt": "I have students and courses in Postgres, and a student can enrol in many courses. Show me the enrollments table and tell me which ON DELETE and ON UPDATE rules to use and which indexes to add.",
-      "files": [
-        "references/schema-fundamentals.md"
-      ],
-      "expected_output": "A junction table with a composite primary key and timestamptz enrolled_at, CASCADE on the dependent junction rows, ON UPDATE CASCADE not made a default, and an index starting with course_id.",
+      "prompt": "I have students and courses in Postgres, and a student can enrol in many courses. Show me the enrollments table and tell me which ON DELETE rules to use and which indexes to add.",
+      "files": [],
+      "expected_output": "An enrollments table with foreign keys to both parents, a deliberate ON DELETE on each with a reason, timestamptz enrolled_at, and the PostgreSQL foreign-key indexing rule applied.",
       "assertions": [
-        "Defines `enrollments` with a composite primary key `(student_id, course_id)` and foreign keys to both parents",
-        "Chooses an explicit `ON DELETE` for each foreign key and explains it (for example CASCADE for rows that mean nothing without the parent, RESTRICT where a delete is likely an accident)",
-        "Does not recommend `ON UPDATE CASCADE` as a blanket default, noting it matters only when parent key values change",
-        "Adds an index starting with `course_id` (or explains why none is needed), because the primary key only serves lookups that start with `student_id`; it does not say blindly to index every foreign key",
+        "Defines `enrollments` with a primary key and foreign keys to both `students` and `courses`",
+        "Chooses an explicit `ON DELETE` for each foreign key and says why (for example CASCADE for rows that mean nothing without the parent, RESTRICT where a delete is likely an accident)",
+        "Applies the PostgreSQL foreign-key indexing rule: PostgreSQL does not index referencing columns, so it indexes them when parents are deleted or joined from the parent side unless an existing index already starts with those columns (or explains why none is needed); it does not say blindly to index every foreign key",
         "Uses `TIMESTAMPTZ` for an enrollment time column, not plain `TIMESTAMP`"
       ]
     },
@@ -153,15 +135,13 @@
     },
     {
       "id": "mysql-explain-on-writes-and-reading-plans",
-      "prompt": "On MySQL 8.4 I want to see the plan for `UPDATE orders SET status = 'shipped' WHERE customer_id = 123 AND status = 'pending'`, and tell me how to read the plan columns. The orders table has 20M rows.",
-      "files": [
-        "references/schema-fundamentals.md"
-      ],
-      "expected_output": "Plain EXPLAIN by default for the write, EXPLAIN ANALYZE only on disposable data or inside a rollback with MySQL 8.4 limits stated as to be confirmed on the server, and a reading of type, key and rows.",
+      "prompt": "On MySQL 8.4 I want to see the plan for `UPDATE orders SET status = 'shipped' WHERE customer_id = 123 AND status = 'pending'`, and tell me where to read up on the plan columns. The orders table has 20M rows.",
+      "files": [],
+      "expected_output": "Plain EXPLAIN by default for the write, EXPLAIN ANALYZE only on disposable data or inside a rollback with MySQL 8.4 limits stated as to be confirmed on the server, and a pointer to the MySQL manual for the plan columns.",
       "assertions": [
         "Defaults to plain `EXPLAIN` for the `UPDATE` because `EXPLAIN ANALYZE` executes the statement, and allows `EXPLAIN ANALYZE` only on disposable production-like data or inside `BEGIN; ... ROLLBACK;`",
         "States that MySQL 8.4 does not measure a single-table UPDATE with EXPLAIN ANALYZE and tells the user to run it on their server to see the exact output, instead of promising an exact message",
-        "Explains `type: ALL` as a full scan, `type: ref` as an index lookup, `key: NULL` as no index used, and a high `rows` as many rows examined",
+        "Points to the engine's own EXPLAIN page for the plan columns (for MySQL https://dev.mysql.com/doc/refman/8.4/en/explain.html) instead of quoting them from memory",
         "Suggests a composite index with the equality columns first (`customer_id`, `status`) for the WHERE clause"
       ]
     },

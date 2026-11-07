@@ -7,7 +7,7 @@ How to select a regression or smoke suite from a change, keep its results trustw
 1. List what changed (tickets, commits, config, dependency bumps) and, for each, the behavior it touches.
 2. Add the direct dependencies and the integration boundaries each change crosses (an API, a queue, a payment provider).
 3. Widen to every critical journey when the impact is broad, ownership of a dependency is unclear, or a shared component (auth, checkout, a design-system token) changed.
-4. Smoke first: the few P0 checks that prove the build is testable at all. The default smoke set is the cases the catalog or suite marks `SMOKE-`, in ID order; a product with no smoke cases uses the SKILL.md section 5 precedence until the first non-smoke case. If smoke fails, stop and report; later results on a broken build are noise.
+4. Smoke first: the few P0 checks that prove the build is testable at all. The default smoke set is the cases the catalog or suite marks `SMOKE-`, in ID order; a product with no smoke cases uses the SKILL.md section 5 precedence until the first non-smoke case. When the requester supplies no catalog and no `SMOKE-` cases, write the smoke set as `Unknown`, name its owner under Open Questions, and keep one Blocked smoke check per critical journey instead of inventing `SMOKE-` IDs. If smoke fails, stop and report; later results on a broken build are noise.
 5. Fit the time box: order by the SKILL.md precedence, run down the list, and list every case that did not fit as residual risk with its owner. A cut case is never reported as passing.
 
 ## Suite tiers
@@ -33,6 +33,8 @@ SMOKE-004: The data store answers a seeded read
 SMOKE-005: The user can complete the primary action
 SMOKE-006: The user can sign out
 ```
+
+Those six IDs illustrate the shape only; when the requester supplies no catalog and no `SMOKE-` cases, follow the smoke step and write the smoke set as `Unknown` instead of copying them.
 
 ## Build the suite
 
@@ -165,10 +167,3 @@ After execution:
 - [ ] Update the cases
 - [ ] Report to stakeholders
 - [ ] Archive the artifacts
-
-## Keep the suite current
-
-- After each release, update the suite: seeded data, cases the change made obsolete, and new critical paths.
-- Run the smoke tier on every build (the cadence in the tier table), not only before a release.
-- Track coverage in the matrix above so gaps show before a release, not after it.
-- Do not skip regression before a release to save time, and do not test everything every time: the time-box rule above decides, and what it cuts is residual risk.

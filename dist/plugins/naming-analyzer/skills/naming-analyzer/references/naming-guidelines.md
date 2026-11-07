@@ -46,10 +46,6 @@ Inside a class, keep the Decide table order, and say when a rename is only less 
 - Do not add Hungarian notation, and do not flag it where the project's whole codebase uses it.
 - Do not use vague class suffixes such as `Manager`, `Helper` or `Utility` in a proposal unless the codebase convention already uses them; a name that says what the class owns (`PaymentProcessor`, `EmailValidator`) is clearer.
 
-## Acceptable abbreviations
-
-Keep a well-known abbreviation and write "no change warranted": `id`, `url`/`URL`, `api`, `html`, `ETag`, `req`/`res` in a handler, `i`/`j`/`k` as short-loop counters. Anything a reader of the project could not decode without the code (`usrCfg`, `calcTtl`) is a candidate. When the project already spells a word one way, follow it.
-
 ## Convention fallback tree
 
 Use it only for the last two Decide rows, when step 1 found no project convention. Write the casing in the language's own form (camelCase, snake_case) and say which convention you used.
@@ -72,7 +68,13 @@ A split across the repository (booleans with and without `is` in 8 files, camelC
 
 ## Counts line
 
-End the report with one line after the table, built only from what you actually read:
+End the report with one line after the table, built only from what you actually read. Shape of the line:
+
+```text
+Reviewed <n> identifiers; <m> candidates (Priority 1: <a>, 2: <b>, 3: <c>); <k> not shown, ask for the next batch or name a path.
+```
+
+Filled, for example (these numbers are illustrative, not a target):
 
 ```text
 Reviewed 156 identifiers; 23 candidates (Priority 1: 5, 2: 12, 3: 6); 13 not shown, ask for the next batch or name a path.

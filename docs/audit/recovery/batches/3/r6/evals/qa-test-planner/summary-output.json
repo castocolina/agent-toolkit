@@ -1,0 +1,24 @@
+{
+  "skill": "qa-test-planner",
+  "mode": "output",
+  "pass_rate": 0.9615,
+  "passed": 75,
+  "total": 78,
+  "failures": [
+    {
+      "eval": "script-bug-file",
+      "assertion": "Checks that the logged command passes the observed rate 2/10 and the build 2.4.0-rc2 from the notes, and no --os, --browser or --device value",
+      "evidence": "It checks \"`--build` | `2.4.0-rc2` | \u2705 It is exact\" and \"`--rate` | `2/10`\", but never explicitly confirms that no --os, --browser or --device value was passed; it only lists missing `--console` and `--impact`."
+    },
+    {
+      "eval": "script-bug-file",
+      "assertion": "Checks that the logged command single-quotes every flag value and passes ./bugs as the output directory",
+      "evidence": "The output never mentions single-quoting of flag values or the `./bugs` positional output-directory argument; it only cites `./bugs/BUG-CHK-5521.md` as the result file."
+    },
+    {
+      "eval": "run-report-without-pass-rate",
+      "assertion": "Includes the build, environment, a summary of counts and a by-priority table, and writes any count the requester did not give (the by-priority split, passed total) as Unknown rather than inventing it",
+      "evidence": "The by-priority split is Unknown, but the summary derives \"Passed 115\" (\"Passed = 120 executed \u2212 5 failed. This assumes the blocked case is not among the 120 executed\") instead of writing the passed total as Unknown."
+    }
+  ]
+}

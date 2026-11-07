@@ -133,12 +133,11 @@
     },
     {
       "id": "recipe-theme-overrides",
-      "prompt": "Write a MUI v7 theme where buttons are flat with no uppercase text, cards have 12px corners, the font is Inter, and wire it into the app root.",
-      "expected_output": "A createTheme with typography.fontFamily, MuiButton and MuiCard overrides, and a ThemeProvider with CssBaseline at the root.",
+      "prompt": "Write a MUI v7 theme where buttons are flat with no uppercase text, cards have 12px corners, and text fields have 8px corners.",
+      "expected_output": "A createTheme with MuiButton, MuiCard and MuiOutlinedInput overrides.",
       "assertions": [
-        "Sets `typography.fontFamily` to include Inter and notes that the font itself must be loaded separately",
         "Uses `components.MuiButton` with `defaultProps` such as `disableElevation: true` and a `styleOverrides` entry keyed by a slot name such as `root` with `textTransform: 'none'`, and `components.MuiCard` with a 12px radius",
-        "Wraps the app in `ThemeProvider` with the theme created once at module scope and renders `CssBaseline` inside it",
+        "Puts the text-field corner radius on `components.MuiOutlinedInput` (`styleOverrides.root`), because a `TextField` is a wrapper and the border radius belongs to the `OutlinedInput` it renders",
         "Does not rely on removed-in-v9 class keys such as `containedPrimary` for the flat contained button without saying they are removed in v9 and pointing to the upgrade guide or a `variants` entry under `root`"
       ],
       "files": [

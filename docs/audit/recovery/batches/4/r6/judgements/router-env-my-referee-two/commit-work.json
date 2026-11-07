@@ -1,0 +1,104 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 13,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 32,
+      "evidence": "Never `git add -A` or `git add .`: they sweep in untracked artifacts. Never `git commit -a` or `-am` either: they stage every modified tracked file",
+      "fix": "Keep the never-list (it blocks a real agent shortcut). Move the flag explanations, which current models already know from git help, into one clause, and record the shortened wording in docs/audit/recovery/commit-work/record.md."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 44,
+      "evidence": "Never propose `--no-verify`, not even as an option; use it only when the user asks for it by name, because it skips the checks the repository relies on.",
+      "fix": "Add the non-obvious consequence: a passing retry after `--no-verify` reports a commit the repository's own hook rejected, so the report must say the hook was skipped."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 43,
+      "evidence": "Read `references/commit-message-template.md` only when the repository sets its own message rules (commitlint config, commit template, CONTRIBUTING, PR template), you need footers beyond `BREAKING CHANGE`, or you want worked messages.",
+      "fix": "Split the trigger: load it for repository rules, extra footers, or the commitlint defaults; add Do NOT Load it when writing one default Conventional Commits message for an empty repository."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 27,
+      "evidence": "Which index? Commit request and the user has staged content that must stay out: a temporary index",
+      "fix": "Name the case where approved paths and the user's staged paths are disjoint: `git commit -- <approved paths>` commits those paths and leaves the user's index entries untouched. Keep the temporary index for mixed hunks, approved staged blobs, and any path that also has unstaged edits."
+    },
+    {
+      "id": "D6-2",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 36,
+      "evidence": "Verify the staged version with the fastest relevant check: tests for the touched paths, else lint, else build.",
+      "fix": "Add the default when several checks exist: run the repository's test command scoped to the touched paths; fall back to lint, then build, only when no test command exists."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/commit-work/evals/evals.json",
+      "line": 1,
+      "evidence": "\"id\": \"review-and-commit\" ... \"Shows ordered `git status`, `git diff`, `git add -- src/auth.ts`, `git diff --cached`, and `git commit` commands.\"",
+      "fix": "Add one eval whose prompt has an approved path with both an approved staged diff and extra unstaged edits, asserting the staged blob is committed with `git diff --cached --binary` and `git apply --cached` and the unstaged edits stay out. Soften the review-and-commit assertion so it checks the ordered review and a path-scoped stage, not one exact command sequence."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 36,
+      "evidence": "If `git diff --quiet` succeeds and no untracked file feeds the check, run it in place. Otherwise the tree is not the commit: export the index",
+      "fix": "Before the in-place branch, require `git diff --quiet` and an empty `git ls-files --others --exclude-standard`. An untracked source file that is part of the approved commit makes the in-place run test a tree the commit does not contain."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 27,
+      "evidence": "When the user approved a path's staged diff, commit that exact staged version and never restage the whole working-tree file over it",
+      "fix": "State the overlapping case: an approved staged blob plus unstaged hunks in the same path is captured with `git diff --cached --binary` and applied to the temporary index; `git add -- <path>` is forbidden for that path."
+    }
+  ]
+}

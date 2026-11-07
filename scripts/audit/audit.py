@@ -21,6 +21,7 @@ Usage:
 """
 
 import argparse
+import collections
 import contextlib
 import copy
 import datetime
@@ -1015,7 +1016,7 @@ def removed_files(prev: dict, cur: dict, threshold: float = 0.5) -> list[dict]:
             if prev[path] != cur[path]:
                 out.append({"path": path, "status": "changed", "lines": None, "kept": None})
         elif old:
-            kept = len([s for s in old if s in set(new)])
+            kept = sum((collections.Counter(old) & collections.Counter(new)).values())
             if kept < threshold * len(old):
                 out.append({"path": path, "status": "changed", "lines": len(old), "kept": kept})
     return out
@@ -2482,10 +2483,17 @@ def commit_of(root: Path, ref: str) -> str | None:
 
 
 def split_sections(text: str) -> list[tuple[str, list[str]]]:
-    sections, heading, body, fenced = [], "(preamble)", [], False
+    sections, heading, body, fence = [], "(preamble)", [], None
     for line in text.splitlines():
-        fenced ^= bool(FENCE_RE.match(line))
-        if not fenced and HEADING_RE.match(line):
+        if fence:
+            body.append(line)
+            s = line.strip()
+            if len(s) >= len(fence) and s == fence[0] * len(s):
+                fence = None
+        elif FENCE_RE.match(line):
+            fence = re.match(r"\s*(`+|~+)", line).group(1)
+            body.append(line)
+        elif HEADING_RE.match(line):
             sections.append((heading, body))
             heading, body = line.strip().lstrip("#").strip(), []
         else:

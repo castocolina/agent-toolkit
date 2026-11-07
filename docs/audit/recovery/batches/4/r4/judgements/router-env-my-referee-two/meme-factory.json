@@ -1,0 +1,104 @@
+{
+  "skill": "meme-factory",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 1,
+      "evidence": "removed units (463, showing 40)",
+      "fix": "The cut list is recorded in docs/audit/recovery/meme-factory/record.md; keep the record, do not restore the 463 units in bulk."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 10,
+      "evidence": "Step 1 routes text-only, step 5 routes the helper, and image details sit in references/image-memes.md, but SKILL.md still carries the full escape table, query-parameter list and worked URLs instead of staying a short router.",
+      "fix": "Keep the workflow, template table and gotchas in SKILL.md; move the escape table and worked URLs into references/image-memes.md and load them only when building a URL by hand."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 80,
+      "evidence": "The watermark gotcha says the public API has no watermark parameter because OpenAPI lists none, but does not say what a caller who wants the mark gone should do instead.",
+      "fix": "Add one line: the public renderer always draws its own mark, so tell the user it cannot be removed through the URL rather than inventing a parameter."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 10,
+      "evidence": "Step 1 says to read references/markdown-memes-guide.md for every text-only request, then also read references/text-memes.md for one of the 15 named formats, even though the guide is only a pointer into text-memes.md.",
+      "fix": "Load references/text-memes.md for a named text format and references/markdown-memes-guide.md only for the greentext, copypasta and ASCII fence rules; say not to load both unless both are needed."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 49,
+      "evidence": "`color` is documented as `<name or hex>[,<name or hex>]` with examples `red,blue` or `FF80ED`, and `center` and `scale` are named with no default or worked value, while the helper cannot emit any of the three.",
+      "fix": "Give one default (`color` omitted, or `FFFFFF,000000`) and one hand-built example for `center` and `scale`, and say to omit all three unless the user asked for them."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/meme-factory/evals/evals.json",
+      "line": 1,
+      "evidence": "The 14 eval prompts have verifiable assertions, but no evals/files/ inputs, and trigger-queries.json has 12 should-trigger and 10 should-not-trigger queries with no train/validation split.",
+      "fix": "Add one eval input file under evals/files/ for the sensitive-caption case, and split trigger-queries.json into a fixed train set and a validation set with both polarities in each."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 16,
+      "evidence": "Step 5 says never call generate with a caption count different from the template's lines, but the helper accepts any number of captions and the skill gives no check before the call.",
+      "fix": "Before calling generate, compare the caption count with the template's lines (table, list-templates, or /templates/<id>) and stop to ask when they differ."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/meme-factory/references/text-memes.md",
+      "line": 197,
+      "evidence": "The emojicore sample is four lines of replacement characters (`\ufffd\ufffd\ufffd\ufffd leaving my responsibilities`) instead of the emoji the tips tell the agent to use as syntax.",
+      "fix": "Replace those four lines with the original emoji (or name the emoji in words) so the sample can be adapted."
+    }
+  ]
+}

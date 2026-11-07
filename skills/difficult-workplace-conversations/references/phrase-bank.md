@@ -39,7 +39,7 @@ When the conversation turns emotional or accusatory:
 
 ## Buying time
 
-Use these when you need a moment to think or to steady yourself. They buy seconds; if you need longer, ask for a break with a named time (SKILL.md Section 2: "come back to you by [day]").
+Use these when you need a moment to think or to steady yourself. They buy seconds; if you need longer, ask for a break with a named time (SKILL.md Section 2: fix a specific reconvening time, for example "Thursday 10:00"; or the "come back to you by [day]" line in emotional-regulation.md).
 
 - "That's an interesting point. Let me think about that."
 - "I want to respond thoughtfully. Give me a moment."
@@ -69,7 +69,7 @@ If the drift is a counter-accusation, acknowledge it first, then ask to finish t
 | You get triggered | "I need a moment to think about that." "I'm feeling defensive. Can you help me understand your point?" "Let's take a break and come back to this at [time]." |
 | You hit an impasse | "We seem stuck. Can we agree on what we do agree on?" "What would help us move forward?" "Would it help to bring in [neutral party]?" |
 
-A break after strong emotion needs twenty minutes or more, not five (the pause line in delivery-scripts.md, with its source). For a neutral party, the person must be someone both sides accept; for a dispute with an allegation or a reporting line between the parties, follow SKILL.md Sections 6 and 7.
+A break after strong emotion needs twenty minutes or more, not five (the pause line in delivery-scripts.md, with its source: the Gottman Institute note that follows the Tears or a raised voice row). For a neutral party, the person must be someone both sides accept; for a dispute with an allegation or a reporting line between the parties, follow SKILL.md Sections 6 and 7.
 
 ## Reframes
 
@@ -83,7 +83,3 @@ Move a blaming sentence toward something the other person can answer. Offer the 
 | Past to future | "That presentation was a disaster." | "For the next presentation, let's talk about what would make it stronger." |
 | Positions to interests | "I need you to do X." | "The outcome I'm trying to achieve is Y. What would work for you?" |
 | Positions to interests | "That won't work for me." | "My concern with that is... What alternatives can we explore?" |
-
-## When a conflict stays stuck
-
-Four principles to return to: work from interests, not positions; acknowledge the emotions on both sides; look for options that work for both people; rebuild trust through small actions that are kept. Section 5 and Section 6 hold the procedure; these are the stance behind it.

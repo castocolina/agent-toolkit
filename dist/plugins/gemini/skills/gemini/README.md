@@ -18,7 +18,7 @@ Requires the Gemini CLI (`npm install -g @google/gemini-cli`) with authenticatio
 
 - `SKILL.md` - defaults, approval-mode table, workflow, command shapes and gotchas.
 - `references/model-selection.md` - model choices, loaded only when the model choice matters.
-- `references/troubleshooting.md` - hung-run and out-of-memory symptoms, loaded only when a run misbehaves.
+- `references/troubleshooting.md` - hung-run diagnosis, loaded only when a run misbehaves.
 - `evals/` - output evals, trigger queries, and fixtures in `evals/files/`.
 
 ## Maintenance

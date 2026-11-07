@@ -3443,6 +3443,20 @@ class DigestTests(Base):
         got = audit.removed_files({"e.json": ten}, cur, threshold=1.0)
         self.assertEqual(got, [{"path": "e.json", "status": "changed", "lines": 10, "kept": 6}])
 
+    def test_removed_files_counts_duplicate_lines_as_a_multiset(self):
+        got = audit.removed_files({"d.txt": b"same\nsame\nsame\n"}, {"d.txt": b"same\nsame\n"}, threshold=1.0)
+        self.assertEqual(got, [{"path": "d.txt", "status": "changed", "lines": 3, "kept": 2}])
+
+    def test_split_sections_other_fence_marker_does_not_close_a_block(self):
+        text = "# One\n~~~\n```\n# not a heading\n~~~\n# Two\nbody\n"
+        self.assertEqual([h for h, _ in audit.split_sections(text)], ["(preamble)", "One", "Two"])
+
+    def test_split_sections_closes_a_fence_only_on_a_run_as_long_as_the_opener(self):
+        text = "# One\n````markdown\n```markdown\n# Inner\n```\n````\n# Two\nbody\n"
+        got = audit.split_sections(text)
+        self.assertEqual([h for h, _ in got], ["(preamble)", "One", "Two"])
+        self.assertIn("# Inner", got[1][1])
+
     # snapshots
     def test_snapshot_skill_command_agent_and_exclusions(self):
         self.write("skills/x/SKILL.md", "s\n")

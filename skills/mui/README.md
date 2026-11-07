@@ -215,9 +215,9 @@ The skill includes supplementary documentation:
 - `resources/styling-guide.md` - Beating MUI state-class specificity and styling by color mode
 - `resources/theme-customization.md` - Palette augmentation, colorSchemes, nested themes and CSS layers
 - `resources/ui-ux-mapping.md` - MUI constructs for the ui-ux rules skill
-- `references/component-recipes.md` - TextField, Stack, Card, List, Autocomplete, Snackbar, Dialog, Popover, Menu, Avatar and a complete form
-- `references/sx-and-styled-recipes.md` - dynamic sx, the sx array form, GlobalStyles, styled() with a custom prop, hover card, gradient and sticky header
-- `references/theme-recipes.md` - typography, component overrides and defaults, breakpoints, shadows, transitions and the ThemeProvider root setup
+- `references/component-recipes.md` - Stack, List, Autocomplete, Snackbar, Menu and a complete form
+- `references/sx-and-styled-recipes.md` - the sx array form and styled() with a custom prop
+- `references/theme-recipes.md` - component overrides and defaults, breakpoints and shadows
 
 ## Related Documentation
 

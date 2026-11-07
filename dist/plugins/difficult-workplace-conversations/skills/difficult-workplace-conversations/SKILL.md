@@ -103,6 +103,7 @@ Read [closing-and-followup.md](references/closing-and-followup.md) for the spoke
 - **Never accept "let's revisit later" without a date.** It is a soft no that resets the clock each time.
 - **Never cite an outside offer or ultimatum the user will not act on.** If it is called, the user loses credibility and the relationship.
 - **Never put the topic in a calendar invite title** ("Role discussion", "Performance concern"). Shared calendars expose it to others, and the person spends the hours before the meeting dreading it or asking around.
+- **Never advise secretly recording the conversation.** Consent rules differ by jurisdiction and employer policy, and a covert recording can breach policy and weaken the user's standing in the formal process it was meant to support. Write a dated note of what was said right after instead, and for Section 7 matters keep records as that section says.
 
 ## Conditional references
 

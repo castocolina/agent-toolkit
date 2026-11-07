@@ -10,8 +10,6 @@ A skill for Claude Code that prepares, rehearses, and follows up on high-stakes 
 - Puts safety, harassment, and retaliation concerns on a formal channel instead of informal coaching.
 - Ends with a factual written summary that keeps disputed points marked as disputed.
 
-The flow has three phases: prepare (classify, check readiness, optional worksheet), deliver (openings, reactions, phrase bank), and follow up (spoken read-back, written summary, check-in).
-
 `SKILL.md` holds the workflow, gotchas, and the gated reference list. The references hold worked material:
 
 | Reference | Content |

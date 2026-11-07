@@ -1,6 +1,6 @@
 # Repository message rules
 
-Read this when the repository sets its own commit-message rules, a commit needs footers beyond `BREAKING CHANGE`, or you want worked messages and the report block of step 8. The shape and the no-trailers default live in SKILL.md step 6.
+Read this when the repository sets its own commit-message rules, a commit needs footers beyond `BREAKING CHANGE`, or you want worked messages. The shape and the no-trailers default live in SKILL.md step 6.
 
 ## Collect the repository's rules
 
@@ -27,19 +27,6 @@ Values from the [preset source](https://github.com/conventional-changelog/commit
 - In a footer, `BREAKING CHANGE` must be upper case; `BREAKING-CHANGE` is a synonym. Every other footer token uses `-` for spaces (`Reviewed-by: name`, `Refs: #123`) and is separated by `: ` or ` #`.
 - Footers start one blank line after the body; a footer value can continue over lines until the next token.
 - For a revert, the spec suggests the `revert` type with a `Refs:` footer listing the reverted SHAs.
-
-## Message template
-
-```text
-<type>(<scope>): <summary>
-
-<What changed.>
-<Why it changed.>
-```
-
-- Keep the summary imperative and specific ("add", "fix", "remove", "extract"), lower case when commitlint's `subject-case` applies.
-- Describe behavior and intent, not implementation minutiae.
-- A real compatibility break: `!` in the header, a `BREAKING CHANGE:` footer, or both. No other footer is added unless the user or the repository requires it.
 
 ## Worked messages
 
@@ -73,13 +60,3 @@ BREAKING CHANGE: /v1/* now returns 404; use the /v2/* routes.
 
 - The summary starts with a concrete verb (`fix`, `add`, `remove`, `rename`) rather than `Update` or `Change`.
 - `Closes #123` appears only when merging this commit should close the issue; otherwise use `Refs: #123`.
-
-## Report block per commit
-
-SKILL.md step 8 asks for a short block per commit, after the hash, subject and verification line:
-
-```text
-<hash> <subject>
-what/why: <one line: what changed and why>
-commands: <the staging, review and verification commands you ran, for example git add -- <paths>, git diff --cached, vitest run>
-```

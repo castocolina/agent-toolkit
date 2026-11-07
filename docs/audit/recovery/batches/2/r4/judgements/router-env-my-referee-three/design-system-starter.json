@@ -1,0 +1,77 @@
+{
+  "skill": "design-system-starter",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/design-system-starter/record.md",
+      "line": null,
+      "evidence": "Digest at dbff837f: 'removed units (485, showing 40)'. All 40 shown items and both file: items resolve to valid record rows or restored content (token-scales.md, component-examples.md, process-and-tooling.md), but the other 445 units could not be checked one by one from the prompt.",
+      "fix": "Re-run the removal check without the cut, or check every unit in sections.json against record.md. For each para: unit with no explaining section row, restore it (into references/ when it is domain-specific) or add a row for it to docs/audit/recovery/design-system-starter/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 12,
+      "evidence": "Most of the body is expert content (blocking token validation, the promotion rule, the deprecation window, the Gotchas). A few workflow lines are activation-level guidance the model mostly knows (e.g. step 6's default of CSS custom properties switched by data-theme).",
+      "fix": "Keep these lines short as they are. Add no further generic guidance to SKILL.md. Put any new detail in the matching references/ file behind its step trigger."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 19,
+      "evidence": "'One app, no repeated pattern yet ... tokens plus two or three primitives; defer the hierarchy (step 5) and versioning (step 8)'. Step 5 also holds the props rules those primitives need (semantic props, no root className), so this branch skips rules it still depends on.",
+      "fix": "Reword the branch: 'tokens plus two or three primitives built to step 5's Props and Scaffold rules; defer only the level hierarchy and promotion (step 5) and versioning (step 8) until a second consumer exists.'"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/design-system-starter/evals/trigger-queries.json",
+      "line": 28,
+      "evidence": "'Our design tokens should map cleanly to CSS variables and Tailwind.' Several should-trigger queries are terse and generic (also 'How do we version and deprecate components used by multiple teams?'), with no file paths, product names or personal context. Total is 19 queries (9 positive, 10 negative).",
+      "fix": "Rewrite two or three terse positives with realistic context (e.g. 'our tokens live in packages/ui/tokens.json and the marketing site uses Tailwind 4; how do I map both apps to the same CSS variables without forking names?'). Add one more should-trigger query to reach 20."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/design-system-starter/references/component-examples.md",
+      "line": 159,
+      "evidence": "'.ds-card[data-variant=\"outlined\"] { border: 1px solid var(--color-border); }'. The Card, Modal and skip-link CSS use --color-border, --radius-lg, --spacing-6, --shadow-lg and --shadow-xl. The 'Semantic tokens and state contract' block defines none of them, and nothing states how DTCG paths (spacing.scale.6, radius.lg, color.semantic.border.default) become CSS variable names.",
+      "fix": "Add a short naming rule under 'Semantic tokens and state contract': DTCG path segments joined with '-' (spacing.scale.6 -> --spacing-6, shadow.lg -> --shadow-lg). Also add --color-border (border.default, gray-500 passes 3:1) to both theme blocks, so every variable the examples use is defined."
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "skill": "mui",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 12,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/mui/README.md",
+      "line": 1,
+      "evidence": "The first 30 lines restate what a model already knows: MUI is popular, use theme tokens, type sx, build responsively, and a trigger-phrase list the description already carries.",
+      "fix": "Move the user-facing overview (Purpose through Trigger phrases) into a short README lead, and record the generic remainder (How It Works steps 1 and 3-5, Theme Integration, Responsive Design) in docs/audit/recovery/mui/record.md; keep the v7-specific bullets."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/mui/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "35 queries, 19 should-trigger and 16 should-not, but 11 of the 16 negatives share no MUI keyword (plain CSS, Chakra, Vue, Vite, Tailwind) and several positives are restatements of the description.",
+      "fix": "Replace the obvious negatives with near-misses that name Material UI but need a neighbour the description excludes (MUI X date picker, Joy UI, Base UI, a native dialog beside an MUI screen) and add casual should-trigger queries that never say v7, sx or slots."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/mui/references/theme-recipes.md",
+      "line": 25,
+      "evidence": "The MuiButton example puts `variants` inside `styleOverrides.root` while also setting `borderRadius: 8` on that same slot object, so the slot style is an object that contains a variants array rather than CSS.",
+      "fix": "Split the slot: keep CSS properties on `styleOverrides.root` and put the `variants` array where the cited v9 'Button CSS classes' section places it, or show both forms and say which one the installed 7.3 and 9.5 theme types accept."
+    }
+  ]
+}

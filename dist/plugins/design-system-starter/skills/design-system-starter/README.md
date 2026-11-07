@@ -19,7 +19,7 @@ Reviewing or fixing a single screen against UI rules belongs to the `ui-ux-princ
 - `references/component-examples.md` - semantic CSS roles, accessible field composition, browser theme-state check, additive variants, props conventions, compound Card, polymorphic component, native dialog Modal, skip link, theme toggle, responsive navigation
 - `references/token-scales.md` - DTCG object-form typography, spacing, radius, shadow, duration, easing and layer scales, plus warning and info roles with measured contrast
 - `references/component-specs.md` - per-component variants, states and accessibility, layout primitives, feedback patterns and target sizes (AA 24x24, AAA 44x44 CSS px)
-- `references/process-and-tooling.md` - theming alternatives, ARIA basics, testing, documentation and rollout checklists
+- `references/process-and-tooling.md` - theming alternatives (Tailwind variants, a ThemeProvider)
 - `checklists/design-system-checklist.md` - scope-dependent audit and release gate
 - `evals/` - output evals, trigger queries and their input files
 
@@ -29,9 +29,6 @@ Reviewing or fixing a single screen against UI rules belongs to the `ui-ux-princ
 Create a design system for my React app with dark mode support
 Turn this token file into semantic tokens with light and dark values
 Here's our legacy settings page; plan an incremental migration to shared tokens
-Set up design tokens for colors and spacing using the 8px scale
-Design the component structure for my dashboard (primitives, composed patterns, product modules)
-Implement theming with dark mode using CSS variables
 ```
 
 ## License

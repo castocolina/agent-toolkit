@@ -13,6 +13,7 @@ Examples focus on semantic-token contracts, accessible composition, theme valida
   --color-focus: var(--brand-focus-light);
   --color-surface: var(--brand-surface-light);
   --color-text: var(--brand-text-light);
+  --color-border: var(--brand-border-light); /* UI boundary: at least 3:1 against --color-surface */
   --color-danger: var(--brand-danger-light);
 }
 
@@ -23,9 +24,12 @@ Examples focus on semantic-token contracts, accessible composition, theme valida
   --color-focus: var(--brand-focus-dark);
   --color-surface: var(--brand-surface-dark);
   --color-text: var(--brand-text-dark);
+  --color-border: var(--brand-border-dark); /* UI boundary: at least 3:1 against the dark --color-surface */
   --color-danger: var(--brand-danger-dark);
 }
 ```
+
+Variable naming: a token's DTCG path becomes its CSS variable by joining the path segments with `-` after the group prefix and dropping the structural segments `semantic` and `scale`, plus a trailing `default` or `ring`. So `color.semantic.border.default` is `--color-border` (the border token in `references/token-scales.md`, gray-500 in the starter template, 4.8345:1 on white), `color.semantic.focus.ring` is `--color-focus`, `spacing.scale.6` is `--spacing-6`, `radius.lg` is `--radius-lg` and `shadow.lg` is `--shadow-lg`. The scale variables (`--spacing-*`, `--radius-*`, `--shadow-*`) come from those scales as they are and need no per-theme block; only color roles change per theme.
 
 Components consume roles for default, hover, focus, and error states; they never select product palette values directly. Every state gets its own role (no `color-mix()` or opacity derivation in components), so each state pair can be contrast-checked at token level:
 
@@ -74,7 +78,7 @@ function FormField({ controlId, label, required = false, hint, error, children }
 
 ## Theme-state validation
 
-Run this in a real browser: jsdom does not compute rendered colors, so jest-axe turns color contrast off and computed-style assertions there prove nothing. axe's `color-contrast` rule checks text only; check non-text pairs (borders, focus ring) from the resolved token values.
+Run this in a real browser: jsdom does not compute rendered colors, so jest-axe turns color contrast off ([jest-axe README](https://github.com/NickColley/jest-axe): "Color contrast checks do not work in JSDOM so are turned off in jest-axe", checked 2026-11-07) and computed-style assertions there prove nothing. axe's `color-contrast` rule checks text only; check non-text pairs (borders, focus ring) from the resolved token values.
 
 ```ts
 import { test, expect } from '@playwright/test';

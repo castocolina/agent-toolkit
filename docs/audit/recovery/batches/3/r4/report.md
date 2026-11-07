@@ -1,0 +1,27 @@
+# Audit report
+
+| Skill | Percent | Grade | Judges |
+|---|---|---|---|
+| difficult-workplace-conversations | 93.6 | A | router-env-my-referee-three, router-env-my-referee-two |
+| naming-analyzer | 96.4 | A | router-env-my-referee-three, router-env-my-referee-two |
+| qa-test-planner | 92.0 | A | router-env-my-referee-three, router-env-my-referee-two |
+
+## Disagreements
+
+None.
+
+## Missing verdicts
+
+None.
+
+## Below target
+
+None.
+
+## Waived
+
+None.
+
+## Synced
+
+None.

@@ -194,7 +194,7 @@ Reusable workflows invoked with `/command-name`:
 | `/sync-skills-readme` | Update README skills table |
 | `/viral-tweet` | Optimize tweet ideas for X engagement |
 
-Command credits: viral-tweet is adapted from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit/blob/main/commands/viral-tweet.md) by Leonardo Flores (@leonardocouy).
+Command credits: viral-tweet is adapted from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit/blob/main/commands/viral-tweet.md) by Leonardo Flores (@leonardocouy), via softaworks/agent-toolkit.
 
 ---
 

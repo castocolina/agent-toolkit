@@ -1,6 +1,6 @@
 # Image meme details
 
-Read this after SKILL.md steps 3 to 6 when you need more than the template table and the escape table: a template outside the table, an extension or animation choice, a custom or screenshot background, a status code you cannot explain, worked requests, where the URL will be posted, or alt text. Facts below were checked live against `api.memegen.link` and the service README (https://github.com/jacebrowning/memegen) on 2026-11-07; re-read the live catalog when a value matters.
+Read this after SKILL.md steps 3 to 6 when you need more than the template table and the escape table: a template outside the table, an extension or animation choice, a custom or screenshot background, a status code you cannot explain, worked requests, or where the URL will be posted. Facts below were checked live against `api.memegen.link` and the service README (https://github.com/jacebrowning/memegen) on 2026-11-07; re-read the live catalog when a value matters.
 
 ## More templates by use case
 
@@ -15,9 +15,10 @@ Template IDs are short, not the meme's full name. Line counts come from `https:/
 | `spongebob` | 2 | Mocking someone's statement |
 | `pigeon` | 3 | Misidentifying something obvious |
 | `success` | 2 | A small win, once confirmed |
+| `ds` | 3 | The two-buttons meme (Daily Struggle): a hard choice between two buttons, a third caption for the sweating face |
 | `custom` | any | Any image the user supplies, with `background` |
 
-The long IDs `two-buttons`, `distracted-boyfriend`, `gru-plan`, `change-my-mind`, `mocking-spongebob`, `is-this-a-pigeon`, `success-kid`, `surprised-pikachu` and `uno-draw-25` all return 404. The working IDs are `db` (distracted-boyfriend), `gru` (gru-plan), `cmm` (change-my-mind), `spongebob` (mocking-spongebob), `pigeon` (is-this-a-pigeon) and `success` (success-kid). There is no `two-buttons`, `surprised-pikachu` or `uno-draw-25` template at all: use `drake` for a two-option choice, or tell the user no such template exists. `python3 scripts/meme_generator.py list-templates` prints more verified IDs.
+The long IDs `two-buttons`, `distracted-boyfriend`, `gru-plan`, `change-my-mind`, `mocking-spongebob`, `is-this-a-pigeon`, `success-kid`, `surprised-pikachu` and `uno-draw-25` all return 404. The working IDs are `db` (distracted-boyfriend), `gru` (gru-plan), `cmm` (change-my-mind), `spongebob` (mocking-spongebob), `pigeon` (is-this-a-pigeon), `success` (success-kid) and `ds` (Daily Struggle, the two-buttons meme, 3 lines; `https://api.memegen.link/templates/ds`, source https://knowyourmeme.com/memes/daily-struggle-two-buttons, checked 2026-11-07). There is no `surprised-pikachu` or `uno-draw-25` template at all (catalog checked 2026-11-07): say so, and offer a template from the table that fits the joke. `python3 scripts/meme_generator.py list-templates` prints more verified IDs.
 
 ## Image formats and animation
 
@@ -62,33 +63,15 @@ Request to URL, each checked with HTTP 200:
 | Request | URL |
 |---|---|
 | bugs everywhere | `https://api.memegen.link/images/buzz/bugs/bugs_everywhere.png` |
-| manual vs automated testing | `https://api.memegen.link/images/drake/manual_testing/automated_testing.png` |
-| not sure if improvements or over-engineering (outcome unknown) | `https://api.memegen.link/images/fry/not_sure_if_improvements/or_over_engineering.png` |
 | production is down (confirmed) | `https://api.memegen.link/images/fine/production_is_down/this_is_fine.png` |
 | memory at 99% (percent is `~p`) | `https://api.memegen.link/images/fine/memory_usage_at_99~p/this_is_fine.png` |
-| tests passed (user confirmed) | `https://api.memegen.link/images/success/all_tests_passing/on_the_first_try.png` |
 | social card | `https://api.memegen.link/images/buzz/features/features_everywhere.png?width=1200&height=630` |
 | text only at the top | `https://api.memegen.link/images/rollsafe/cant_have_bugs_in_production/_.png?layout=top` |
 
-Match the template to the confirmed outcome. For a deploy: `fry` while the result is unknown, `fine` when it failed and the team is joking about it, `success` only after the user confirms it worked.
-
 ## Where the URL goes
 
-- GitHub comments, PR descriptions and docs: the Markdown image `![alt](url)`.
 - Slack and Discord: post the plain image URL ending in `.png` or `.jpg`; they usually show a preview. Also give the user the Markdown form in case the preview does not appear.
-- Bots and CI jobs that post memes on their own: choose the template from the confirmed status only, never map an unconfirmed result to `success`, and redact captions first (SKILL.md steps 2 and gotchas). From Python, `scripts/meme_generator.py` exposes `MemeGenerator.generate`; see its module docstring.
 
 ## Checks and diagnosis
 
-- `curl -sI "<url>"` should print HTTP 200 and an `image/*` content type. To test other extensions, run it once per extension (`.png`, `.jpg`, `.webp`).
 - 404: wrong template ID or an empty path segment. 422: unknown `style` or `font`, a width or height of 1-9, or `custom` without `background`. 415: the `background` or `style` image URL is not publicly reachable or not an image.
-- Too much text, a wrong template and a vague message are the three common failures. Keep each line to about 2-6 words (under 30 characters). Use `fine` for an outage, not `success`. Say the actual thing: `bugs/bugs_everywhere`, not `stuff/things`.
-
-## Alt text and search
-
-Alt text is the only text a screen reader or a search engine gets for an image meme, so describe both the picture and the joke, never just "meme image".
-
-- Good: `![Drake rejecting documentation, approving memes](...)`.
-- Bad: `![funny meme](...)`.
-
-Consider a one-line caption below the image for context. For a whole post that mixes text and image memes, read `blog-posts.md`.

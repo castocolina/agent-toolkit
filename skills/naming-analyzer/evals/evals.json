@@ -22,7 +22,7 @@
         "Proposes a snake_case name for `calc_ttl` that says total or sum (for example `calculate_total` or `sum_line_amounts`), citing the loop that adds `x.amount`, and does not read `ttl` as time-to-live",
         "Renames `MAX` to an UPPER_SNAKE_CASE name that names the retry or attempt limit (for example `MAX_FETCH_ATTEMPTS`), citing its use in `range(MAX)`",
         "Proposes a seconds unit in the timeout constant's name (for example `DEFAULT_TIMEOUT_S` or `DEFAULT_TIMEOUT_SECONDS`)",
-        "Renames `user_profile` to `UserProfile`"
+        "Renames the class `user_profile` to the class casing the project or PEP 8 uses (CapWords, for example `UserProfile`), not another snake_case name"
       ]
     },
     {
@@ -102,6 +102,9 @@
         "Reports the prefix split as one grouped finding naming the locations and the dominant form, not as a separate row for every identifier",
         "Recommends a direction to converge on based on the dominant project form (prefixed booleans)",
         "Rates the group by its riskiest member and identifies `enabled` as a public JSON key, so contract compatibility with an alias or mapping instead of a plain rename"
+      ],
+      "files": [
+        "references/naming-guidelines.md"
       ]
     },
     {
@@ -113,7 +116,7 @@
       "expected_output": "Rejects the naive keep verdict: createdAt is written with naive local datetime.now() but compared with a UTC-aware cutoff in events_since, so the name hides a time-basis bug. Flags the bug, offers created_at_local only if the value stays local, otherwise fixes the write, and cites the lines that show each basis.",
       "assertions": [
         "Does not accept keeping `createdAt` as is; it flags the naive-local versus UTC time-basis mismatch as a bug",
-        "Cites the write in `record_event` (`datetime.now()`, naive local) and the comparison in `events_since` (UTC `cutoff_utc`) as the evidence",
+        "Cites, in any wording, the naive `datetime.now()` write and the UTC cutoff comparison (for example `cutoff_utc`) as the evidence, without having to name the two functions",
         "Offers `created_at_local` (or an equivalent local-basis name) only if the value stays local, otherwise says to fix the write to UTC, rather than a plain rename to match one side"
       ]
     },
@@ -137,7 +140,8 @@
         "evals/files/repo-wide/inventory.py",
         "evals/files/repo-wide/reports.py",
         "evals/files/repo-wide/exports.py",
-        "evals/files/repo-wide/low_stock_email.html"
+        "evals/files/repo-wide/low_stock_email.html",
+        "references/naming-guidelines.md"
       ],
       "expected_output": "Triages the folder: reports at most 10 ranked rows ordered by the Decide table (behavior contradicting the name first, such as get_stock and get_report writing, then the callers-disagree and contract rows), ends with the counts line saying how many candidates were found and that the rest is available as the next batch or by naming a path. Every reported name still gets the repo and string-literal search: sku_nm is searched in full (not as a lexical local) and found as a CSV header string in EXPORT_COLUMNS, reached through getattr in to_feed and in the HTML template, so it is kept as an external contract name with an alias or mapping if renamed. A purely local name such as d or r only gets a scope-local search and ranks last.",
       "assertions": [

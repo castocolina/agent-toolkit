@@ -29,7 +29,7 @@ Include the engine and version, rough row counts, whether the data is live, and 
 | `SKILL.md` | Defaults, the design workflow and engine gotchas |
 | `references/migrations.md` | Expand-contract, NOT NULL on live tables, PostgreSQL and MySQL lock rules |
 | `references/schema-design-checklist.md` | Review checks and report format |
-| `references/schema-fundamentals.md` | Normal forms, keys, foreign-key actions, junction tables, MongoDB index syntax, MySQL EXPLAIN reading and a basic-design checklist |
+| `references/schema-fundamentals.md` | A basic-design checklist for a sketch |
 | `assets/templates/migration-template.sql` | PostgreSQL migration skeleton with a MySQL variant (SQLite uses the rebuild order in `migrations.md`) |
 
 ## Install

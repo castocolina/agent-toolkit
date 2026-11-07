@@ -15,7 +15,6 @@ Read this with `markdown-memes-guide.md` (greentext, copypasta and ASCII fence r
 
 - **Hard line breaks.** Markdown joins consecutive lines into one paragraph. For poetry or timed lines end each line with two trailing spaces or `<br>`. Some themes strip trailing whitespace, so use `<br>` when the timing matters.
 - **Horizontal rule.** `---` resets the pacing or marks an uncanny jump between bits. Put a blank line above it: text directly above `---` turns into a heading.
-- **Emphasis as stage directions.** `**me:** i'm fine` then `*narrator:* he was not fine`. Bold labels name speakers, italics carry tone and emotional beats.
 
 ## Pick a container
 
@@ -26,8 +25,6 @@ Read this with `markdown-memes-guide.md` (greentext, copypasta and ASCII fence r
 | Reddit AITA/TIFU, fake documentation | Heading plus narrative |
 | Corporate satire, fake legal notices | List |
 | Emojicore, slang mutations | Plain paragraph |
-
-Aim for three layers in every format: a setup that sets context, a pattern that builds expectation, then a punchline or twist that subverts or amplifies it. Write the payoff first, as SKILL.md step 4 says.
 
 ## The 15 formats
 
