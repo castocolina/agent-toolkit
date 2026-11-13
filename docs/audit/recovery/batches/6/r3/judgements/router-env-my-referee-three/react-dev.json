@@ -1,0 +1,77 @@
+{
+  "skill": "react-dev",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/react-dev/record.md",
+      "line": null,
+      "evidence": "previous-version digest react-dev at dbff837f: 'removed units (463, showing 40)'. The digest lists only 40 of the 463 removed units, so the other 423 were not checked one by one. All 40 that were listed map through sections.json to valid record rows (for example para:dafb3235 -> s092 restore-references, now in react-19-patterns.md; para:3b0f05b0 -> s177 restore-references, now in tanstack-router.md section 5).",
+      "fix": "Regenerate the digest without the cut, or with a higher show limit, and judge the remaining 423 units against record.md. Add a para: or section row for any unit that no valid row covers."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/react-dev/SKILL.md",
+      "line": 16,
+      "evidence": "'Migration target first: when the task is upgrading an app to React 19, the target is 19 regardless of what is installed.' followed by steps 0-3 inside '## 1. Pin versions before choosing an API'",
+      "fix": "Keep the steps and their wording, but give the React 19 upgrade procedure its own sub-heading (for example '### Upgrading to React 19') under step 1. Then the version-classification table that follows is plainly the non-migration path, and the Process/Tool structure reads cleanly."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/react-dev/evals/evals.json",
+      "line": 165,
+      "evidence": "\"files\": [ \"references/react-router.md\" ] (also in rr7-middleware-migration, route-handle-breadcrumbs, tanstack-search-updater and imperative-handle-ref)",
+      "fix": "Five evals give the skill's own reference file as their input, so they test whether the agent can repeat the reference, not how it handles user code. Replace each with a user-side fixture under evals/files/ (for example a v7.5 server.ts with getLoadContext, a root.tsx with the failing useMatches breadcrumb, and a products route with the filter bar). Keep the same assertions."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/react-dev/references/tanstack-router.md",
+      "line": 42,
+      "evidence": "'Why the adapter matters is in the SKILL.md gotcha; inside it use `fallback()`, not Zod 3 `.catch()`, which types the field as `unknown`.' The Zod 3 vs Zod 4 validateSearch behaviour and the @tanstack/zod-adapter requirement have no source URL and no checked date, here or in the SKILL.md line 120 gotcha.",
+      "fix": "Add a source line under section 3 citing the TanStack Router search-params or validation guide (https://tanstack.com/router/latest/docs/framework/react/guide/search-params) with the date checked, as section 5 already does."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/react-dev/references/react-19-patterns.md",
+      "line": 174,
+      "evidence": "'Run the codemod exactly as the SKILL.md React 19 gotcha says (pinned version, real source roots, opt-in transforms ...)'. The gotcha only says 'The migration order and codemods are in step 1.'; the commands are in SKILL.md section 1, steps 0-2.",
+      "fix": "Change the pointer to 'Run the codemod exactly as SKILL.md section 1 (migration steps 0-2) says (pinned version, real source roots, opt-in transforms for ref-callback returns and `ReactElement` props).'"
+    }
+  ]
+}

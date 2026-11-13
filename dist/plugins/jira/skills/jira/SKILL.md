@@ -9,7 +9,7 @@ description: "Work with live Jira issues through the jira CLI, Atlassian MCP or 
 
 - **Fictional example or offline draft** the user asked for: write it, label it fictional or draft, and do not probe backends or ask for authentication.
 - **Live operation:** choose backend and deployment (section 2), then follow section 3.
-- **No backend:** say no backend can reach Jira and do not invent issue contents. Offer setup: install jira-cli (`https://github.com/ankitpokhrel/jira-cli`) and have the user run `jira init` themselves, or connect the Atlassian MCP server.
+- **No backend:** say no backend can reach Jira and do not invent issue contents. Offer setup: install jira-cli (follow its Installation guide, `https://github.com/ankitpokhrel/jira-cli#installation`, which covers Homebrew, Nix, releases and Docker; checked 2026-11-07) and have the user run `jira init` themselves, or connect the Atlassian MCP server.
 
 ## 2. Backend and deployment
 
@@ -33,7 +33,7 @@ Pick the backend per step, in this order:
 |---|---|---|
 | View / search | `jira issue view KEY`, `jira issue list -q"JQL"` | `getJiraIssue`, `searchJiraIssuesUsingJql` |
 | Create / edit | `jira issue create --no-input ...`, `jira issue edit KEY --no-input ...` | `createJiraIssue`, `editJiraIssue` |
-| Transition | `jira issue move KEY "Status"` (cannot list transitions) | `listJiraIssueTransitions`, then `transitionJiraIssue` |
+| Transition | `jira issue move KEY "Status"` (cannot list transitions; a failed move's error lists the states, commands.md) | `listJiraIssueTransitions`, then `transitionJiraIssue` |
 | Comment | `jira issue comment add KEY --template FILE` | `addOrEditJiraIssueComment` |
 
 ## 3. Procedure for every change
@@ -46,7 +46,7 @@ Pick the backend per step, in this order:
 
 **Batch:** list every change first. Default batch is 10 issues, so the list stays reviewable and a failure stays small; the user may raise it. Apply one issue at a time, verify each, and stop at the first failure: report done, failed (with the error) and not attempted, and ask how to continue. Propose no command for the not-attempted issues, not even a conditional one, until the user decides.
 
-**Story or task:** creating one or rewriting its description, also read `references/story-anatomy.md` (statement format per deployment, sections, epic, sprint and assignee rules), plus `references/mcp.md` when that create goes through MCP or REST. For a draft card, the reply opens with the three bold As a / I want / so that lines as its first characters, with no heading, title or metadata before them; the sections follow. A draft is not a creation: say nothing was created and end by asking the user to review it before you create. Sprint: the next future sprint, never the active one (adding scope changes a running sprint's commitment); state that reason and write the chosen sprint id into the command, not a placeholder. Do not load story-anatomy.md for bugs, reads, transitions or comments.
+**Story or task:** creating one or rewriting its description, also read `references/story-anatomy.md` (statement format per deployment, sections, epic, sprint and assignee rules), plus `references/mcp.md` when that create goes through MCP or REST. For a draft card, the reply opens with the three bold As a / I want / so that lines as its first characters, with no heading, title or metadata before them; the sections follow. A draft is not a creation: say nothing was created and end by asking the user to review it before you create. Sprint: the next future sprint by default, never the active one unless the user explicitly asks (adding scope changes a running sprint's commitment); state that reason and write the chosen sprint id into the command, not a placeholder. Do not load story-anatomy.md for bugs, reads, transitions or comments.
 
 ## Gotchas
 
@@ -56,7 +56,7 @@ Pick the backend per step, in this order:
 - Custom field ids (Sprint, Epic Link, story points) differ per instance. Discover them; an id copied from another site writes the wrong field or fails.
 - Link direction is easy to invert: neither jira-cli nor the REST docs say plainly which side of `Blocks` reads "blocks" (the REST docs only call the outward issue the "from" issue). Read the link back (`jira issue view A`, or `fields=issuelinks`) and fix a reversed one.
 - jira-cli `edit` with a body replaces the whole description; show the original first.
-- `jira issue list -q` ANDs `project=<configured>` onto the JQL unless the JQL has its own `project` clause (VERIFIED, jira-cli `pkg/jql`), so a cross-project query silently returns one project. Add `project in (A, B)` or run the full JQL through MCP `searchJiraIssuesUsingJql` or REST `GET /rest/api/3/search/jql` (Cloud; the old `/search` is being removed) or `/rest/api/2/search` (DC, UNVERIFIED).
+- `jira issue list -q` ANDs `project=<configured>` onto the JQL unless the JQL has its own `project` clause (VERIFIED, jira-cli `pkg/jql`), so a cross-project query silently returns one project. Add `project in (A, B)` or run the full JQL through MCP `searchJiraIssuesUsingJql` or REST `GET /rest/api/3/search/jql` (Cloud; the old `/search` is being removed: the v3 reference marks `GET /rest/api/3/search` deprecated with "Endpoint is currently being removed", linking https://developer.atlassian.com/changelog/#CHANGE-2046, in https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/, checked 2026-11-07) or `/rest/api/2/search` (DC, UNVERIFIED: not in the Cloud spec and the DC docs were not read, 2026-11-07).
 
 ## Load only what the step needs
 

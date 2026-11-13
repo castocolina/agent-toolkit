@@ -1,0 +1,86 @@
+{
+  "skill": "react-dev",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/react-dev/record.md",
+      "line": null,
+      "evidence": "previous-version digest: react-dev at dbff837f: 'removed units (463, showing 40)'. All 40 shown items are explained through section rows in sections.json and record.md (for example s092 and s177 were restored into react-19-patterns.md and tanstack-router.md section 5), but the other 423 removed units could not be checked.",
+      "fix": "Generate the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/react-dev/SKILL.md ...) and confirm that every para: unit maps to a section row in docs/audit/recovery/react-dev/record.md. For any unit with no row, restore it into references/ or add a row."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/react-dev/evals/evals.json",
+      "line": 166,
+      "evidence": "\"files\": [\"references/react-router.md\"] (also used by rr7-middleware-migration, route-handle-breadcrumbs, tanstack-search-updater and imperative-handle-ref)",
+      "fix": "Remove the skill's own reference files from these evals' `files` lists, so the runs test whether the SKILL.md load table makes the agent read react-router.md, tanstack-router.md or react-19-patterns.md. Add a small fixture under evals/files/ only where the prompt needs project code."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/react-dev/SKILL.md",
+      "line": 19,
+      "evidence": "run `npx types-react-codemod@3.5.3 preset-19 <dirs>`, then always the two transforms it leaves off by default",
+      "fix": "Add the source and the date checked next to the pinned version and the claim that the two transforms are off by default, for example '(eps1lon/types-react-codemod README, checked <date>)'. Or have the agent read `npx types-react-codemod@3.5.3 --help` live."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/react-dev/references/react-router.md",
+      "line": 16,
+      "evidence": "always `RouterContextProvider`; `AppLoadContext` is gone (removed in 8.0.1)",
+      "fix": "Cite the official react-router CHANGELOG entry for 8.0.1 with its URL and the date checked, in the same style as the middleware and handle sections of this file."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/react-dev/SKILL.md",
+      "line": 133,
+      "evidence": "| Next.js 15.5+ using `PageProps` / `LayoutProps` helpers | `next typegen` (not available before 15.5) |",
+      "fix": "Add the source URL and the date checked for the 15.5 minimum (https://nextjs.org/blog/next-15-5 or the Next.js CLI reference), here or in the matching paragraph of examples/server-components.md, or tell the agent to confirm with `npx next --help`."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/react-dev/references/react-19-patterns.md",
+      "line": 174,
+      "evidence": "2. Run the codemod exactly as the SKILL.md React 19 gotcha says (pinned version, real source roots, opt-in transforms ...)",
+      "fix": "Point at the right place: 'Run the codemod exactly as SKILL.md section 1 (Migration target first, step 2) says'. The gotcha only refers back to step 1."
+    }
+  ]
+}

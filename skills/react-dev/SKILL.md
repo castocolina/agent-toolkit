@@ -16,7 +16,7 @@ Read `package.json` (and the lockfile if ranges are wide) for `react`, `@types/r
 Migration target first: when the task is upgrading an app to React 19, the target is 19 regardless of what is installed.
 0. Before touching anything, run `git status --porcelain`. If it prints anything, ask the user to commit or stash first, or work in a separate clean `git worktree` from HEAD, so the later diff shows only the upgrade.
 1. Update `react`, `react-dom`, `@types/react` and `@types/react-dom` to 19 together.
-2. With `<dirs>` = the real source roots (from `tsconfig.json` `include` and the layout: `app/`, `components/`, `src/`, or each package's source directory), run `npx types-react-codemod@3.5.3 preset-19 <dirs>`, then always the two transforms it leaves off by default: `npx types-react-codemod@3.5.3 no-implicit-ref-callback-return <dirs>` and `npx types-react-codemod@3.5.3 react-element-default-any-props <dirs>`. Fix by hand only what a transform could not rewrite.
+2. With `<dirs>` = the real source roots (from `tsconfig.json` `include` and the layout: `app/`, `components/`, `src/`, or each package's source directory), run `npx types-react-codemod@3.5.3 preset-19 <dirs>`, then always the two transforms it leaves off by default (eps1lon/types-react-codemod README, https://github.com/eps1lon/types-react-codemod, checked 2026-11-07): `npx types-react-codemod@3.5.3 no-implicit-ref-callback-return <dirs>` and `npx types-react-codemod@3.5.3 react-element-default-any-props <dirs>`. Fix by hand only what a transform could not rewrite.
 3. Review `git diff`, then typecheck (step 5). A published package whose peers allow 18 stays React 18-compatible unless changing that peer contract was requested.
 
 Otherwise, preflight: if the installed `react` major and the `@types/react` / `@types/react-dom` majors differ, pin the types to the runtime major first; otherwise every later type error is noise. Then pick the API target; first matching row wins:
@@ -68,6 +68,7 @@ Activation checklist, no explanation needed: native props via `ComponentPropsWit
 | Component used only by a React 19 app | `ref?: Ref<HTMLButtonElement>` as an ordinary prop |
 | Library or shared package whose peers allow React 18 | `forwardRef`; it still works in 19 (React plans to deprecate it later, it is not removed) |
 | Generic component plus a ref on React 18 | `forwardRef` erases `T`; re-assert the call signature (react-19-patterns.md) |
+| Parent calls commands (`focus`, `clear`) on the component | `useImperativeHandle`; type the ref `Ref<Handle>` with the handle, not the element (react-19-patterns.md) |
 
 | Form need (React 19; on 18 use `onSubmit` with your own state) | Use |
 |---|---|
@@ -129,7 +130,7 @@ export function columnContract() {
    |---|---|
    | React Router Framework Mode (`@react-router/dev` installed) | `react-router typegen` |
    | TanStack Router file-based routing | its configured `@tanstack/router-plugin` (runs with dev/build) or `tsr generate` from `@tanstack/router-cli` |
-   | Next.js 15.5+ using `PageProps` / `LayoutProps` helpers | `next typegen` (not available before 15.5) |
+   | Next.js 15.5+ using `PageProps` / `LayoutProps` helpers | `next typegen` (not available before 15.5; Next.js 15.5 release post, https://nextjs.org/blog/next-15-5, checked 2026-11-07) |
    | React Router Data or Declarative Mode, TanStack code-based routes, no router | nothing; never install router tooling just to validate |
 
 2. Run the project's typecheck script, or `npx tsc --noEmit -p .` when a `tsconfig.json` exists. If that `tsconfig.json` is a solution file (`"files": []` plus `references`, as in the Vite react-ts template), `-p .` checks nothing and passes silently: run `npx tsc -b`, or `npx tsc --noEmit -p tsconfig.app.json` on the referenced app config, and check that config's `include` covers your `*.type-test.tsx` files. If it fails, fix the first error your change caused, rerun, and repeat until it passes; report errors that existed before your change separately. With no tsconfig, say the contract is unchecked.

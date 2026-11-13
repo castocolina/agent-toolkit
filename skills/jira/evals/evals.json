@@ -150,6 +150,45 @@
         "Asks for approval before transitioning and does not claim the move was made.",
         "Says it will re-read PROJ-77 afterwards to confirm the new status."
       ]
+    },
+    {
+      "id": "subtask-create",
+      "prompt": "Our jira CLI is set up for Cloud. Add a sub-task \"Write migration script\" under PROJ-123 in PROJ, assigned to me. Show me the exact command before you run it.",
+      "files": [
+        "references/commands.md"
+      ],
+      "expected_output": "Shows a non-interactive create command for the Sub-task type that passes the parent PROJ-123 with -P, asks for approval and says it will re-read the created sub-task.",
+      "assertions": [
+        "Shows `jira issue create` with `--no-input`, a Sub-task type flag (`-tSub-task` or `-t Sub-task`), the summary and the parent passed with `-P PROJ-123` (or `-PPROJ-123`).",
+        "Treats the parent as mandatory for a sub-task and does not create it with `jira issue link` or without a parent.",
+        "Asks for approval before creating, does not claim the sub-task was created, and says it will re-read the issue to check the parent and assignee."
+      ]
+    },
+    {
+      "id": "sprint-close",
+      "prompt": "Sprint 123 on our board ended yesterday. Close it with the jira CLI. Tell me what you will run.",
+      "files": [
+        "references/commands.md"
+      ],
+      "expected_output": "Proposes `jira sprint close 123` for approval after listing the sprint's issues, and says it will re-read the sprint afterwards.",
+      "assertions": [
+        "Names the command `jira sprint close 123` (alias `complete`), not a transition, edit or REST guess.",
+        "Proposes listing the sprint's issues first (for example `jira sprint list 123 --plain`) and asks for approval before closing, because closing affects the whole team.",
+        "Does not claim the sprint was closed, and says it will re-read the sprint and its issues afterwards, without asserting where unfinished issues go."
+      ]
+    },
+    {
+      "id": "mcp-cloudid-and-projects",
+      "prompt": "Only the Atlassian MCP (v2 tools) is connected. I want to file a bug but don't know the project key. How do you find the cloudId and the list of projects before creating?",
+      "files": [
+        "references/mcp.md"
+      ],
+      "expected_output": "Gets the cloudId from getAccessibleAtlassianResources, lists projects with listJiraProjects to pick the key, then reads the issue types and required fields before proposing the create.",
+      "assertions": [
+        "Names `getAccessibleAtlassianResources` as the source of the `cloudId`, not a guessed tool or a made-up id.",
+        "Uses `listJiraProjects` (the v2 name) to list projects and obtain the project key.",
+        "Reads the issue types and required fields (`listJiraProjectIssueTypesMetadata`, `getJiraIssueTypeMetaWithFields`) before proposing a create, and asks for approval instead of creating."
+      ]
     }
   ]
 }

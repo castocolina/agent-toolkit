@@ -32,6 +32,8 @@ const onSubmit = (e: FormEvent<HTMLFormElement>) => {
 | `wheel`, `touchstart` and `touchmove` are registered as passive | `e.preventDefault()` in `onWheel` is ignored: add a native listener with `{ passive: false }` in an Effect |
 | `onFocus` / `onBlur` bubble (they map to `focusin` / `focusout`) | a container's `onBlur` fires when focus moves between its children; check `e.currentTarget.contains(e.relatedTarget)` |
 
+Source for the "Since React 17" rows (root-container listeners, `onScroll` bubbling, passive `onWheel`/`onTouchStart`/`onTouchMove`): React v17 release post, https://legacy.reactjs.org/blog/2020/10/20/react-v17.html, checked 2026-11-08.
+
 ## Enter to submit and IME composition
 
 An `<input>` inside a form already submits on Enter natively, and browsers generally do not submit on the Enter that confirms an IME composition. Do not add a `keydown` handler for that case: a handler calling `requestSubmit()` on top of the native submission submits twice.
