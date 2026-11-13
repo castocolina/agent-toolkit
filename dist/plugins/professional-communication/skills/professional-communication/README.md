@@ -206,6 +206,12 @@ Before sending any professional communication, verify:
 - `feedback-mastery` - For difficult conversations and feedback delivery
 - `/draft-email` - Generate emails using these frameworks
 
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy. The "No Hello" principle is from [nohello.net](https://nohello.net).
+
+Documentation owners for the pages cited in `references/` (checked 2026-11-07): Atlassian (4Ls, Mad/Sad/Glad and Start/Stop/Continue retrospective formats), Esther Derby and Diana Larsen (retrospective phase names), Ken Schwaber and Jeff Sutherland (The Scrum Guide, Daily Scrum and Retrospective time boxes), and the Node.js Release Working Group (release schedule).
+
 ## Version
 
 - **v1.0.0** (2025-12-26) - Initial release

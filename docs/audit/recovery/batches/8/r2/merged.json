@@ -1,0 +1,260 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codex",
+      "percent": 84.0,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 84.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/codex/record.md",
+          "line": null,
+          "evidence": "previous-version digest codex at dbff837f: 'removed units (44, showing 40)'",
+          "fix": "Re-run the digest without truncation (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/codex/SKILL.md) so all 44 units can be checked. The 40 units shown are all covered by valid section rows s008-s015 or para rows in docs/audit/recovery/codex/record.md. Add a row for any hidden unit that turns out not to be covered."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 56,
+          "evidence": "'Never interpolate task text directly into shell syntax. Use a safely quoted argument or stdin to avoid command expansion.' (line 38 already says 'never interpolate arbitrary user text into shell syntax')",
+          "fix": "This is generic shell-safety advice the model already knows, and it appears twice. Keep the copy in Resume (line 38) and delete the gotcha bullet, with a row in docs/audit/recovery/codex/record.md (reason class superseded-by Resume quoting rule). Or replace it with a Codex-specific fact."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 14,
+          "evidence": "'Resolve model and effort. Resolve task intent, model, and effort (high for architecture/refactor/security, medium for features/bugs, low for formatting/docs).'",
+          "fix": "Remove the repeated lead-in so the step reads 'Resolve task intent, model, and effort (...)'. Also say when to pick xhigh or above, for example 'xhigh only for deep multi-file analysis the user marks as hard, and only if `codex debug models` lists it for the model'. Line 28 lists that level, but the decision mapping skips it."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/codex/SKILL.md",
+          "line": 52,
+          "evidence": "'## Authorization and gotchas' holds 4 bullets, one of them generic shell quoting. The highest-value landmines are spread across Run: '`--full-auto` is rejected by current CLIs' (line 25) and 'Never redirect stderr to `/dev/null` by default' (line 34).",
+          "fix": "Add short gotcha bullets with their WHY next to the authorization bullets: '--full-auto fails with unexpected argument on codex-cli 0.162.1, so never copy it from older examples' and 'stderr to /dev/null hides the only failure diagnostics'. Keep the detailed text in Run as it is."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 3,
+          "evidence": "description names codex exec and resume but no intent keywords such as second opinion, GPT or delegating to another agent",
+          "fix": "Run or resume OpenAI Codex CLI tasks with `codex exec` or `codex exec resume`, choosing the sandbox (read-only analysis, user-authorized workspace edits, network) and reporting model, effort and whether edits occurred. Use when asked to invoke Codex or a GPT coding agent for review, debugging, refactoring, automated edits, a second opinion, or to continue an existing Codex session, even if the user only says 'ask codex' or 'have GPT look at this'. Not for installing the CLI, configuring credentials, conceptual explanations, summarizing prior output without invocation, or other vendors' CLIs."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 40,
+          "evidence": "'Confirm the session belongs to the intended repository/task: ...' repeats line 38 'only after confirming the most recent session belongs to the intended repository/task' and line 55",
+          "fix": "Merge line 40's concrete check (run from the repo directory, leave `--all` off, check the earlier context) into line 38. Keep line 55 as the short gotcha. No content is lost, so no record row is needed."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 26,
+          "evidence": "'Network: network need is not permission for broad filesystem access. Use the narrowest supported network/workspace configuration. Reserve `--sandbox danger-full-access` ...' (the default comes only after the caveats)",
+          "fix": "Start with the default: 'Network: use `--sandbox workspace-write -c sandbox_workspace_write.network_access=true`; use `danger-full-access` only with explicit approval when that cannot work.' Keep the source URL and date after it."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/codex/evals/evals.json",
+          "line": 1,
+          "evidence": "resume-session assertion 'Pipes the follow-up prompt via stdin', while SKILL.md line 45 gives the 'Complete example' as a positional argument: codex exec resume --last \"Continue the review...\"",
+          "fix": "Align the assertion with the rule chosen in the D8-1 fix. For example: 'Passes the follow-up as a safely quoted final argument or via stdin with `-`, and adds no model, sandbox or effort flags'."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/codex/SKILL.md",
+          "line": 38,
+          "evidence": "'Pipe the follow-up prompt as stdin, with shell-safe quoting or a heredoc' contradicts line 45's complete example, which passes the prompt as a quoted argument, and line 48, which uses stdin only for 'a longer follow-up'",
+          "fix": "Make line 38 one rule: 'Pass the follow-up as a single-quoted final argument; for long or untrusted text pass `-` and feed it on stdin from a file or heredoc.' This matches the examples at lines 45 and 48."
+        }
+      ]
+    },
+    {
+      "name": "command-creator",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/command-creator/record.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: 'removed units (618, showing 40)'. The list is cut, so only the 40 shown items could be checked. Each of those 40 maps to a section row that holds: an allowed fate/value/decision combination, a user-accepted drop, or a low-value wrong/superseded drop.",
+          "fix": "Re-run the removal check with the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/command-creator/SKILL.md --judge direct --digest-dir <tmp>) so all 618 units can be checked against record.md and sections.json. Add a row in docs/audit/recovery/command-creator/record.md for any unit no section row explains."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 86,
+          "evidence": "'NEVER let the body splice arguments into shell unquoted... 2. Encode the value as one single-quoted shell word: wrap it in '...' and write each ' inside it as '\\''' takes about 6 lines to explain POSIX single-quote escaping, which the model already knows. The only expert part is the rule that the command body must spell out this step and where the value goes relative to `--`.",
+          "fix": "Keep the NEVER rule, the reason (the model running the command meets text nobody has seen yet), the option-value versus operand rule and the example line. Shorten the escaping tutorial in steps 2-3 to one clause, e.g. \"single-quote it, each ' written as '\\''\". Move the longer wording to references/patterns.md next to the Workflow with side effects skeleton, and add a row for the move in docs/audit/recovery/command-creator/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 15,
+          "evidence": "Workflow step 2 'Command or skill?' runs from line 15 to line 24. It packs three things into one numbered step: the command-versus-skill decision, the name-collision lookup in three directories, and a 3-option reply template with its own approval rules. The phased flow is harder to follow, and step 2 now holds the most important checkpoint.",
+          "fix": "Split it into 'Step 2: Command or skill?' (the decision and the existing-scripts fallback) and 'Step 3: Name collision check' (the lookup plus the reply template, kept word for word). Renumber the later steps and the 'run steps 6-7' cross-reference to match. No content is removed."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 77,
+          "evidence": "'`\\$0` is the FIRST positional argument (`\\$ARGUMENTS[0]`); `\\$1` is the second.' Claude Code changed its placeholder indexing between releases, so this is a version-sensitive fact. Unlike the Frontmatter and Gotchas facts, the Arguments section gives no source URL and no checked date.",
+          "fix": "Add the source to the bullet: '(Source: https://code.claude.com/docs/en/skills, string substitutions section, checked <date>)'. Or tell the agent to confirm the indexing on that page before relying on $0 versus $1."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/references/examples.md",
+          "line": 68,
+          "evidence": "'gt submit --stack --publish --no-edit' gives Graphite CLI flags and their meanings, which are vendor CLI flags. examples.md has no source URL, no checked date and no instruction to read them live (`gt submit --help`). README.md only names the Graphite command reference, without a date.",
+          "fix": "Under the flag list, add: 'Flags per https://graphite.com/docs/command-reference, checked <date>; confirm with `gt submit --help` before reusing.' Keep the erk example unchanged otherwise."
+        }
+      ]
+    },
+    {
+      "name": "professional-communication",
+      "percent": 88.0,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 88.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/professional-communication/record.md",
+          "line": null,
+          "evidence": "Digest at dbff837f: 'removed units (394, showing 40)'. All 40 listed items resolve through sections.json to valid record rows or to restored content, but the other 354 were not shown and could not be checked.",
+          "fix": "Regenerate the dbff837f digest without the cut (or split it by file) so every removed unit can be checked against record.md. Add a row to docs/audit/recovery/professional-communication/record.md for any unit no section row covers."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 11,
+          "evidence": "'Three golden rules: a clear subject or purpose, scannable formatting (bullets, headlines), and the key message first.' Generic writing advice the model applies unprompted. The Audience and accuracy checks line 29 is also mostly activation content.",
+          "fix": "Keep What-Why-How (commands/compose-email.md depends on it). Fold the three golden rules into the Route by goal leads, for example 'key message first = the route's first field', so the line adds a domain mapping. Do not delete it; if you shorten it, add a row to docs/audit/recovery/professional-communication/record.md (README.md keeps the full rules)."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 9,
+          "evidence": "The steps are spread across Frame (line 15 'Final check'), Route by goal, Audience and accuracy checks (line 29 'Before drafting...') and Load by deliverable. The skill never gives them as one ordered sequence.",
+          "fix": "Add a short ordered procedure near the top: 1) list the facts supplied and the unknowns; 2) pick the route by goal; 3) pick the channel; 4) load the matching reference; 5) draft with What-Why-How or the escalation order; 6) run the Final check. Keep the existing text and point each step to its section."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 33,
+          "evidence": "'\"EOD\" is ambiguous across time zones; use an explicit date, time, and zone or ask which zone applies.' Unlike the other gotchas, this one does not say what goes wrong.",
+          "fix": "Add the consequence, for example: 'a Singapore reader's EOD lands before a New York sender's workday starts, so the deadline is missed with nobody at fault.'"
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 25,
+          "evidence": "The channel has a clear default ('Default to the lightest channel the recipient reads daily'), but length and register (executive brevity vs peer detail) have none. commands/compose-email.md defaults to 'under 150 words'.",
+          "fix": "Add one default with an escape hatch, for example: 'Default to under 150 words and one ask for stakeholder or executive updates; go longer only when the facts supplied need it.'"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/professional-communication/evals/evals.json",
+          "line": null,
+          "evidence": "Several prompts read like notes, not real user messages ('Email non-technical stakeholders: critical payment issue delays release one week to March 15; QA retests Thursday, update Friday.'). 'files' lists the skill's own references (\"references/email-templates.md\") instead of input files. 'Informative subject' is a vague assertion.",
+          "fix": "Rewrite 2-3 prompts as casual messages with real context (names, a pasted draft to improve). Put pasted drafts or notes in evals/files/ and list those under 'files'. Make 'Informative subject' checkable, for example 'Subject names the release and the delay'."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/professional-communication/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "Most should-trigger queries are short and full of keywords ('Escalate production issue; lead with impact.', 'Project status report with progress, risks, next steps.'). Few test cases where the user describes the need without naming the domain.",
+          "fix": "Replace 3-4 terse positives with realistic queries that don't name the domain, for example 'my VP keeps asking what the migration means for Q3, here's what eng told me: ...'. Keep the strong near-miss negatives."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 39,
+          "evidence": "The unknown-fact rule appears three times with different actions: line 15 'mark anything else `Proposed:` or unknown', line 29 'marked as unknown or ask a targeted question', line 39 'say it is unknown ... label any proposed next step or owner \"Proposed:\"'. Following the branch 'deadline missing' gives ask, mark unknown or propose, and nothing says which.",
+          "fix": "Add one decision rule in Audience and accuracy checks: 'Ask a targeted question when the missing fact blocks the message (recipient, the ask itself); otherwise draft with it marked unknown, or as \"Proposed:\" when you suggest a value.' Point lines 15 and 39 to it."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

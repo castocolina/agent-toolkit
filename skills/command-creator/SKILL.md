@@ -39,7 +39,7 @@ Read [examples](references/examples.md) only when the user asks for a worked exa
 | Not inside a repository | `~/.claude/commands/<name>.md` |
 | Signals conflict ("for my team" with no repository open; "just for me" but they want it committed) | Ask; offer both paths |
 
-The pinned Claude Code docs document the project path only; `~/.claude/commands/` is the long-standing personal location. You cannot see the `/` menu: tell the user to check that `/<name>` appears, and offer the project path if it does not.
+Both locations are documented: the [`.claude` directory reference](https://code.claude.com/docs/en/claude-directory) lists `commands/*.md` for project and global scope (checked 2026-11-07). You cannot see the `/` menu: tell the user to check that `/<name>` appears, and offer the project path if it does not.
 
 ## Patterns
 
@@ -50,7 +50,7 @@ The pinned Claude Code docs document the project path only; `~/.claude/commands/
 | Several steps that commit, push, publish, deploy or send | Workflow with side effects | read-only checks first, the authorization point, what to inspect after a timeout before any retry, the report |
 | Draft a plan, wait for approval, then act | Plan, approve, execute | the approval signal, that nothing is written before it, where the approved plan is saved |
 
-Plan, approve, execute is an approval gate, not a delegation pattern. Before delegating any step, ask: what does a subagent give here that the main thread lacks: isolation from a large search, a specialized registered agent, or parallel work? If none, run it directly. When it does help, name an agent type that exists (built-ins: `Explore`, `Plan`, `general-purpose`; check the environment for custom ones) or use `context: fork` with `agent:`. Honor "no agents" when the user says it.
+Plan, approve, execute is an approval gate, not a delegation pattern. Before delegating any step, ask: what does a subagent give here that the main thread lacks: isolation from a large search, a specialized registered agent, or parallel work? If none, run it directly. When it does help, name an agent type that exists (built-ins: `Explore`, `Plan`, `general-purpose` (built-ins per https://code.claude.com/docs/en/sub-agents, checked 2026-11-08; confirm the live list there); check the environment for custom ones) or use `context: fork` with `agent:`. Honor "no agents" when the user says it.
 
 ## Frontmatter
 
@@ -64,16 +64,18 @@ Every field is optional. Use only what the body needs:
 | `disable-model-invocation: true` | the command commits, pushes, publishes, deploys, sends or deletes | otherwise Claude may start it on its own when it judges it relevant |
 | `allowed-tools` | the user wants fewer prompts for safe tools | pre-approves tools for the turn; it does not restrict the others (`disallowed-tools` does) |
 | `model`, `effort` | the user asks | apply to the rest of the turn |
-| `context: fork`, `agent` | an isolated subagent run is worth it (see Patterns) | the body becomes the subagent's task; `agent` defaults to `general-purpose` |
+| `context: fork`, `agent` | an isolated subagent run is worth it (see Patterns) | the body becomes the subagent's task; `agent` defaults to `general-purpose` (confirm the live default on the [subagents page](https://code.claude.com/docs/en/sub-agents)) |
 
 Do not add `name` or `paths`: command files do not accept them. The frontmatter is read only when `---` is on line 1; broken YAML loads the body with no fields and no error.
+
+This table leaves out some fields (for example `when_to_use`, `user-invocable`, `hooks`, `shell`). Read the live [frontmatter reference](https://code.claude.com/docs/en/skills#frontmatter-reference) for those and for any field added since this table was written (checked 2026-11-07).
 
 ## Arguments and pre-run context
 
 Before choosing placeholders, ask: is the input free text that may contain spaces (a message, a search string)? Take `\$ARGUMENTS` whole. Is it one or more fixed-shape values (a version, a branch, a file)? Declare them in `arguments:` so the body can test each for empty. Never use `\$1` for the first value.
 
 - `\$ARGUMENTS` is everything after the command name, as typed. If the body has no placeholder, the text is appended as `ARGUMENTS: <value>`.
-- `\$0` is the FIRST positional argument (`\$ARGUMENTS[0]`); `\$1` is the second. How a quoted multi-word value is split is not documented, so when a value may contain spaces, take `\$ARGUMENTS` whole.
+- `\$0` is the FIRST positional argument (`\$ARGUMENTS[0]`); `\$1` is the second. The docs describe shell-style quoting (`/my-skill "hello world" second` makes `\$0` expand to `hello world`), so tell users to quote a multi-word value; when a value may contain spaces and you cannot rely on quoting, take `\$ARGUMENTS` whole. (source: https://code.claude.com/docs/en/skills, string substitutions section, checked 2026-11-13; confirm the indexing there before relying on `\$0` versus `\$1`)
 - A missing indexed placeholder stays literal (`\$1` shows up as that text). In a command file, a dollar sign that must stay literal where it would read as a placeholder (an awk field such as `\$1`) needs a backslash directly before it.
 - A bang line is an exclamation mark immediately followed by a backtick-quoted shell command (see the skeleton in `patterns.md`). It runs while the prompt is built, before the model reads a word, and its output replaces it. A failing command aborts the whole invocation, so end context that may be absent with `|| true` (for example `git status --short 2>/dev/null || true`).
 - `\${CLAUDE_PROJECT_DIR}` is the project root, for paths that must not depend on the current directory.
@@ -90,7 +92,8 @@ Before choosing placeholders, ask: is the input free text that may contain space
   Example body line: "Search with `rg -n -F -- <encoded text>`; for `it's` that is `rg -n -F -- 'it'\''s'`."
 - NEVER retry a publish, push, deploy or send blindly after a timeout: it may have succeeded. The body must say how to check (`npm view <pkg>@<version> version`, `git ls-remote origin refs/tags/v1.2.3 'refs/tags/v1.2.3^{}'`, `gh pr view`) and retry only when the check proves it did not happen.
 - A same-named skill in `.claude/skills/` or `~/.claude/skills/` shadows the command with no warning: the user types `/name` and gets the skill. Check before writing (Workflow step 2).
-- Frontmatter that does not start on line 1, or YAML that does not parse, is dropped silently, `disable-model-invocation: true` included: a publish command then becomes one Claude may start on its own. Keep `---` on line 1 and quote values that contain `:` or `#`.
+- Frontmatter that does not start on line 1, or YAML that does not parse, is dropped silently, `disable-model-invocation: true` included: a publish command then becomes one Claude may start on its own. Keep `---` on line 1 and quote values that contain `:` or `#`. To find a parse error, start Claude Code with `claude --debug`; `claude plugin validate <dir>` lists files whose frontmatter does not parse (the docs show it on skill directories such as `.claude/skills`, and state Claude Code v2.1.233 or later; `claude plugin validate --help` gives the live form). Source: the Skills page, "Skill not triggering" section, checked 2026-11-07.
+- `<` and `>` inside `description` display as `&lt;` and `&gt;`. Write a placeholder there with square brackets (`[number]`) or move it to `argument-hint`, which shows as typed. Source: https://code.claude.com/docs/en/skills#angle-brackets-in-a-skill-description, checked 2026-11-07.
 - NEVER add a global override (a `git config --global` change, a user-level settings edit) the user did not ask for: it changes behavior for every later run in every project, not just this command.
 - NEVER write a step that names a tool or integration the environment lacks (Slack, Jira, a custom agent type). Report it as a manual step, or ask which tool to use.
 - Running the command is the user's authorization for what its description says, nothing broader. Anything outside it (a destructive cleanup, a force push, editing files the workflow does not own) needs an explicit confirmation step in the body.
