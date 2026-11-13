@@ -1,0 +1,86 @@
+{
+  "skill": "daily-meeting-update",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 14,
+    "D5": 15,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 19,
+      "evidence": "`gh auth status`, repo commands, MCP calls and history reads all touch account or private data, so they run only after approval.",
+      "fix": "Drop the restated privacy reason (the model already treats account data as consent-gated); keep the non-obvious rule that only `command -v` or an advertised tool is checked before approval."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 3,
+      "evidence": "Use when preparing for a daily team sync or short yesterday/today update, even without saying standup.",
+      "fix": "Generate a concise Markdown daily standup or scrum update (yesterday, today, blockers, discussion topics) from an interview, optionally enriched with explicitly approved GitHub, Jira or Claude Code activity. Use when the user asks for a daily, standup, scrum update, status update, morning update or team sync, or says what they did yesterday or today, even without saying standup. Not for weekly reports, meeting agendas, performance reviews, timesheets or retrospectives."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 19,
+      "evidence": "or that a tool is advertised (any tool of an Atlassian or Jira MCP server; the server name is the user's choice, so `mcp__atlassian__*` is only the common one).",
+      "fix": "Default the detection to an advertised tool whose name starts with `mcp__atlassian__`; mention other Atlassian or Jira server names only as the escape hatch when that prefix is absent."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/evals/evals.json",
+      "line": 8,
+      "evidence": "\"id\": \"approved-integration-merge\" ... Does not cite repositories other than acme/payments or claim to have run further commands",
+      "fix": "Add an eval whose digest sessions span two local days of one window and asserts the agent runs `claude_digest.py` once per day and merges by id, project and branch; add another where `gh pr view` fails and the agent asks instead of matching the PR to a session on search data alone."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 30,
+      "evidence": "an event (`mergedAt`, your review's `submittedAt`, `resolutiondate`) belongs to the window only when it falls in [`START`, `END`)",
+      "fix": "State the tie-break when one PR has both `createdAt` and `mergedAt` inside the window (report it as merged, not also opened) and when a review's `submittedAt` is missing (ask, per the no-event-time rule, rather than using search `updated`)."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/scripts/claude_digest.py",
+      "line": 258,
+      "evidence": "print(f\"Error parsing {file_path.name}: {e}\", file=sys.stderr)",
+      "fix": "On a non-JSONL read error, print the file name and exception type only; do not interpolate the exception text, which can echo path or content details into the standup reply."
+    }
+  ]
+}

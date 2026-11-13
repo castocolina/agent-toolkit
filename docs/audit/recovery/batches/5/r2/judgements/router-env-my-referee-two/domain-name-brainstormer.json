@@ -1,0 +1,113 @@
+{
+  "skill": "domain-name-brainstormer",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 14,
+    "D4": 14,
+    "D5": 14,
+    "D6": 13,
+    "D7": 11,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 110,
+  "max_total": 125,
+  "percent": 88.0,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 16,
+      "evidence": "dbff837f digest: removed units (111, showing 40). Section rows in docs/audit/recovery/domain-name-brainstormer/record.md cover every listed para id via sections.json units (s001-s032), and 972b61fb lists no removed units. The cut list itself is still one finding.",
+      "fix": "No restore: each shown unit sits in a section whose record row is an allowed (fate, value, decision) pair, including the user-accepted drop of s029. Leave the digest's 'showing 40 of 111' note as the record of the cut."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 38,
+      "evidence": "`.de` says `Status: free`, others `No match`, `NOT FOUND` or `Domain not found.` is a reply catalog a model does not need in order to follow 'explicit no-record reply'.",
+      "fix": "Move the four example phrases to references/example.md as a WHOIS reply table the agent reads only on the WHOIS fallback, and record the move. Keep 'explicit no-record reply' in SKILL.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 16,
+      "evidence": "Procedure step 2 names four naming directions (compound, affix, evocative real word, coined blend) but never says how an expert chooses among them for a given product.",
+      "fix": "Add one decision line: lead with an evocative real word or a coined blend when the product is new and unknown, and a compound only when the user needs the name to say what it does, because compounds are taken first."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 42,
+      "evidence": "WHOIS fallback says any reply other than an explicit no-record is `unverified`, but does not name the common trap: a registrar's WHOIS (GoDaddy, Namecheap) answering for a name the registry does not host, which looks like a record and is not one.",
+      "fix": "Add a Gotcha: NEVER classify from a registrar's WHOIS. Only the server named in `whois.iana.org`'s `whois:` line for that TLD is a registry answer; a registrar reply is `unverified`."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 3,
+      "evidence": "Description covers WHAT, WHEN, keywords and a boundary, but never says to use it when the user pastes RDAP or WHOIS output and asks which names they can buy.",
+      "fix": "Brainstorm, screen and rank brandable domain names (.com, .io, .app, .dev and other TLDs) for apps, products, companies and personal brands, and report registration status honestly via RDAP/WHOIS lookups. Use when naming a project, launching or rebranding, asking \"is this domain available\", replacing a taken first choice, or pasting RDAP or WHOIS output to ask which names can be bought, even if the user only describes the business. Not for DNS, email, hosting or transfers on a domain already owned, naming without domains, social handles, or legal trademark clearance."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 40,
+      "evidence": "Step 5's curl, registry-host table and WHOIS fallback are about 20 lines loaded on every run, including when the user only wants names or already pasted results.",
+      "fix": "Move the curl command, the printed-result table and the WHOIS server steps to references/lookup.md, and in step 5 say: read references/lookup.md only when a shell can run curl or whois; do not load it when classifying pasted results or when no network tool exists."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 14,
+      "evidence": "Defaults lock every unnamed request to 10 candidates, about 12 characters, no hyphens or digits, and .com plus two TLDs, with no escape for a request that is itself a constraint ('give me one name', 'long coined names are fine').",
+      "fix": "Keep those as the default, and add: a number, length, character or TLD the user states replaces the default it touches; only the unstated ones apply."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/domain-name-brainstormer/evals/evals.json",
+      "line": 1,
+      "evidence": "Five prompts and verifiable assertions exist, but none asks for a budget cap, so the rule that a cap cuts a name only from a registrar quote, otherwise `unverified`, is untested. Trigger queries are 10/10 with near-misses. No scripts/.",
+      "fix": "Add one eval whose prompt gives a dollar cap and no registrar quote, asserting every candidate's budget fit is `unverified` and no price is quoted, plus a second prompt that includes a checkout quote and asserts names over the cap are cut."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 40,
+      "evidence": "The WHOIS step says `timeout 20 whois -h whois.iana.org <tld>` names the registry server in its `whois:` line. For .io that reply has no `whois:` line; the server is in `remarks: Registration information: http://www.nic.io`. The instruction then has no next step.",
+      "fix": "When the IANA reply has no `whois:` line, label the name `unverified`, quote the remark or URL it did give, and point the user at a registrar search. Do not guess a WHOIS host."
+    }
+  ]
+}

@@ -82,6 +82,46 @@
         "Reports PAY-240 (Duplicate refund emails) as a triage outcome such as closed as duplicate, never as completed or delivered work",
         "Does not list PAY-219 (Payout CSV export) under Yesterday: its resolutiondate 2026-11-01T22:30:00Z is before the 2026-11-02 UTC window"
       ]
+    },
+    {
+      "id": "session-picker-many-sessions",
+      "prompt": "Meeting date 2026-11-03, timezone UTC. Daily update please. I approved Claude Code history for yesterday; claude-digest-many.json is the digest output the skill's script printed. The AskUserQuestion tool is available in this session. Before drafting, let me choose which sessions belong in my standup.",
+      "files": [
+        "evals/files/claude-digest-many.json"
+      ],
+      "expected_output": "The reply asks the user to pick sessions from a plain-text numbered list of all six digest sessions (a question takes at most 4 options, so a multiSelect cannot hold six), identified by session id, project, branch and files, names the tool AskUserQuestion exactly if it names it, and does not draft the update yet.",
+      "assertions": [
+        "Offers all six sessions (11aa22bb, 33cc44dd, 55ee66ff, 77aa88bb, 99cc00dd, bbee11ff) for the choice, as a numbered list in plain text rather than one multiSelect question with six options",
+        "Identifies each session by id, project, branch or files taken from the digest, and invents no titles or descriptions of what the session was about",
+        "If it names the question tool, calls it AskUserQuestion and never AskUserQuestionTool; any single question it would send through the tool holds at most 4 options",
+        "Asks which sessions to keep without drafting the update yet, and does not mention how many sessions will be left out"
+      ]
+    },
+    {
+      "id": "pr-section-layout",
+      "prompt": "Meeting date 2026-11-03, timezone UTC, window 2026-11-02. I approved GitHub for acme/payments; gh-prs.json holds the `gh search prs` and `gh pr view` results. Yesterday I fixed the flaky checkout test and opened the draft idempotency spike PR. Today I continue the spike. No blockers. No topics. Include the PRs & Reviews section and the links.",
+      "files": [
+        "references/output-template.md",
+        "evals/files/gh-prs.json"
+      ],
+      "expected_output": "A Markdown update with a PRs & Reviews section using Opened, Merged and Reviews lines: PR #412 under Merged and in Yesterday, draft PR #415 under Opened but never under Yesterday as delivered, PR #420's approval left out (submitted after the window), and a Links footer with the known URLs.",
+      "assertions": [
+        "Has a PRs & Reviews section with a **Merged:** line naming PR #412 with its title (Fix flaky checkout integration test)",
+        "Lists draft PR #415 (Spike: idempotency keys for payment retries) on the **Opened:** line with its draft or open state, and in Today as continuing work",
+        "Does not list PR #415 under Yesterday as completed or merged work",
+        "Does not list the approval of PR #420 on the **Reviews:** line: it was submitted on 2026-11-03, after the window",
+        "Ends with a Links footer holding the PR URLs from gh-prs.json for the PRs named in the update, and invents no other URL"
+      ]
+    },
+    {
+      "id": "window-command-needs-python-tzdata",
+      "prompt": "I approved GitHub for acme/payments and want the window for yesterday, 2026-11-02, in America/New_York. On my Windows machine the skill's window one-liner failed with: zoneinfo._common.ZoneInfoNotFoundError: 'No time zone found with key America/New_York'. What now?",
+      "expected_output": "Explains that the one-liner needs Python 3.9 or later and that Windows has no system time zone database, so the tzdata package must be installed; does not query GitHub before the window is fixed.",
+      "assertions": [
+        "Says Windows needs the tzdata package (for example pip install tzdata) because it has no system time zone database",
+        "Mentions that the one-liner and digest script need Python 3.9 or later, or suggests checking python3 --version",
+        "Does not run or simulate any gh query or report PR activity before the window is fixed"
+      ]
     }
   ]
 }

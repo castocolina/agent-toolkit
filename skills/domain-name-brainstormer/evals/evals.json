@@ -4,9 +4,10 @@
     {
       "id": "casual-climate-names",
       "prompt": "I’m making an app that helps apartment renters track home energy use. Toss me some memorable domain ideas?",
-      "expected_output": "A set of relevant, pronounceable name candidates across suitable TLDs, with honest limits on live availability claims and concise rationale.",
+      "expected_output": "One line stating the default assumptions, candidates grouped by naming direction, and a ranked table with intended pronunciation, rationale, spelling or confusion risk, TLD fit, a status label and the full https://rdap.org/domain/<name> URL per row, closed by the note that price and renewal terms must be confirmed at a registrar's checkout.",
       "assertions": [
         "Provides multiple distinct domain-name candidates tied to energy or home use",
+        "Groups candidates by naming direction and gives a ranked table whose columns are candidate, intended pronunciation, rationale, spelling or confusion risk, TLD fit, status label and RDAP URL",
         "Includes at least two plausible TLD options",
         "States its default assumptions (for example audience, length, .com first) instead of stopping to ask clarifying questions",
         "Never calls a name available. Without lookup tools, labels every candidate `unverified` and gives its RDAP URL; if a lookup did run, any candidate labeled `registered` or `not found in registry` cites the lookup source and UTC check time"
@@ -48,6 +49,32 @@
         "Treats the voltnest.io result as no lookup (`unverified`) because rdap.org has no RDAP service for .io, not as not-found, and suggests a WHOIS check",
         "Labels wattly.com (HTTP 429) and the unchecked kilowren as `unverified`",
         "Quotes no price for any candidate"
+      ]
+    },
+    {
+      "id": "budget-cap-no-quote",
+      "prompt": "Find me 5 brandable .com names for a budgeting app. I can spend at most $15 a year per domain. I have no registrar quote yet, so just tell me which names fit my budget.",
+      "expected_output": "A shortlist whose budget-fit column reads `unverified` for every candidate, with a request for the registrar checkout price (first year and renewal) and no price quoted anywhere.",
+      "assertions": [
+        "Gives a budget-fit column and marks every candidate's budget fit `unverified`, because no registrar checkout quote was supplied",
+        "Cuts no candidate for price and does not say any candidate is within or over the $15 cap",
+        "Quotes no price, price range or renewal estimate for any candidate",
+        "Asks for the registrar checkout price, first year and renewal, before calling any name within budget"
+      ]
+    },
+    {
+      "id": "sample-shortlist-honesty",
+      "prompt": "Show me a filled-in sample shortlist for a developer tool that shares code snippets, so I can see what your output looks like. Include the ranked table.",
+      "files": [
+        "references/example.md"
+      ],
+      "expected_output": "A sample shortlist grouped by naming direction with the status-label table, flagged as illustrative, with no availability claim, no price and no pressure to register.",
+      "assertions": [
+        "Groups candidates by naming direction and gives a ranked table with a status label, an RDAP URL and a source with UTC time for every checked name",
+        "Every status label is exactly `unverified`, `registered` or `not found in registry`, and any candidate marked `registered` or `not found in registry` names the lookup source and a UTC time",
+        "Says the sample's statuses are illustrative or that no live lookup produced them, rather than presenting them as current results",
+        "Never calls any name available and does not tell the user to register or buy a name immediately",
+        "Quotes no price or value estimate for any candidate and says price and renewal terms must be confirmed at a registrar"
       ]
     }
   ]

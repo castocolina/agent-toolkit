@@ -111,4 +111,17 @@ class ClaudeDigestTests(unittest.TestCase):
             (d/f"{sid}.jsonl").write_text(json.dumps({"type":"user","timestamp":"2026-01-20T12:00:00Z","cwd":str(cwd),"message":{"content":"x"}})+"\n")
         r=self.run_cli("--date","2026-01-20","--project",str(self.blog_path),"--format","json"); self.assertEqual(r.returncode,0,r.stderr)
         self.assertEqual(sorted(s["id"] for s in json.loads(r.stdout)["sessions"]),["childses","session-"])
+    def test_claude_config_dir_moves_the_transcript_tree(self):
+        config=Path(self.tmp.name)/"cfg"; d=config/"projects/-srv-app"; d.mkdir(parents=True)
+        (d/"moved000.jsonl").write_text(json.dumps({"type":"user","timestamp":"2026-01-20T12:00:00Z","cwd":"/srv/app","message":{"content":"x"}})+"\n")
+        env=os.environ.copy(); env.update(HOME=str(self.home),TZ="America/New_York",CLAUDE_CONFIG_DIR=str(config))
+        r=subprocess.run([sys.executable,str(SCRIPT),"--date","2026-01-20","--format","json"],capture_output=True,text=True,env=env); self.assertEqual(r.returncode,0,r.stderr)
+        self.assertEqual([s["id"] for s in json.loads(r.stdout)["sessions"]],["moved000"])
+    def test_project_filter_finds_truncated_directory_names_of_long_paths(self):
+        path=Path(self.tmp.name)/("deep"*60)/"app"; path.mkdir(parents=True)  # encoded name is over 200 characters
+        encoded=re.sub(r"[^A-Za-z0-9]","-",str(path)); self.assertGreater(len(encoded),200)
+        d=self.home/".claude/projects"/(encoded[:200]+"-0123abcd"); d.mkdir(parents=True)  # truncated name plus a hash suffix
+        (d/"longpath.jsonl").write_text(json.dumps({"type":"user","timestamp":"2026-01-20T12:00:00Z","cwd":str(path),"message":{"content":"x"}})+"\n")
+        r=self.run_cli("--date","2026-01-20","--project",str(path),"--format","json"); self.assertEqual(r.returncode,0,r.stderr)
+        self.assertEqual([s["id"] for s in json.loads(r.stdout)["sessions"]],["longpath"])
 if __name__=="__main__": unittest.main()

@@ -1,0 +1,68 @@
+{
+  "skill": "domain-name-brainstormer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest at dbff837f: \"removed units (111, showing 40)\". All 40 listed items map through sections.json to valid record rows (s001-s032), but the other 71 items were not shown, so this check could not cover them.",
+      "fix": "Re-run the removal check with the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/domain-name-brainstormer/SKILL.md ...). Confirm that each of the 111 units maps to a section row in docs/audit/recovery/domain-name-brainstormer/record.md, and add a row for any unit that does not."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 20,
+      "evidence": "\"5. **Report status from a lookup or not at all.**\" This step holds the label list, the curl command, a four-row classification table and the WHOIS fallback. It is a Tool-pattern block inside a Process/Mindset skill, so step 5 is several times longer than steps 1-4 and 6-7.",
+      "fix": "Keep the three labels and the rule \"label from a lookup or unverified\" in step 5. Move the curl command, the classification table and the WHOIS fallback verbatim to references/lookup.md, which step 5 reads \"when a shell or fetch tool is available\". Record the move as a `redistributed references/lookup.md` row in docs/audit/recovery/domain-name-brainstormer/record.md."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/evals/evals.json",
+      "line": 17,
+      "evidence": "\"id\": \"short-ai-names\" is the id of an eval whose prompt is about a Spanish-English language-learning product on .com and .app. Nothing in it concerns AI or .ai, so the id misleads anyone reading grading results.",
+      "fix": "Rename the id to \"bilingual-language-app-names\" (or similar) to match the prompt. Leave the prompt and assertions unchanged."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 25,
+      "evidence": "\"Verisign closes the connection on a 404 and curl prints error 56 after `404 https://rdap.verisign.com/...`\". This is a vendor server behaviour that can change between releases. Unlike the IANA bootstrap fact (which gives its URL and \"October 2026\"), it has no source URL and no date checked.",
+      "fix": "Append the source and date to the sentence, for example \"(observed against rdap.verisign.com, checked <date>; see docs/audit/recovery/domain-name-brainstormer/facts.md)\". Alternatively, reword it as a live instruction: \"classify from the printed `%{http_code} %{url_effective}` whatever curl's exit code\". Keep the classify-on-non-zero-exit rule either way."
+    }
+  ]
+}
