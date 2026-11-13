@@ -27,6 +27,6 @@ Use these for the meaning of the phrase; keep scope, frequency, and cause only a
 | “The service is timing out.” | “Requests are failing because they take too long.” | Scope and frequency |
 | “We need to scale horizontally.” | “We need to add more servers or instances to handle the load.” | A capacity or cost figure |
 | “There's a regression in the latest release.” | “The new update broke something that used to work.” | Which users, or a fix date |
-| “We're doing a hotfix.” | “We're making a quick fix for a critical issue.” | When it will ship |
+| “We're doing a hotfix.” | “We're making a quick fix for a problem in the live system.” | When it will ship |
 | “That's a breaking change.” | “Existing integrations will stop working unless they are updated.” | Who must act, unless known |
 | “We need to deprecate this endpoint.” | “We're phasing out this feature; please move to [replacement].” | A replacement or an end date that was not supplied |

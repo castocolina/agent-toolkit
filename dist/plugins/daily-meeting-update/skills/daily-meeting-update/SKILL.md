@@ -31,7 +31,7 @@ If the user already gave the four required answers (step 4) and approved no inte
 | PRs you reviewed | `gh search prs --reviewed-by @me --repo OWNER/REPO --updated ">=START" --json number,title,state,url` |
 | PR details, for each PR you report as done, reviewed or matched to a session | `gh pr view NUMBER --repo OWNER/REPO --json number,title,state,createdAt,mergedAt,headRefName,reviews,url` |
 | Jira (MCP first, CLI only without it) | JQL `project IN ("KEY") AND assignee = currentUser() AND updated >= "FIRST_DAY"`, reading `status`, `resolution`, `resolutiondate`; CLI: `jira issue list --jql '<JQL>' --plain` |
-| Claude Code history, once per day of the window | `TZ=ZONE python3 "${CLAUDE_SKILL_DIR}/scripts/claude_digest.py" --date DAY --format json` (add `--project PATH`); merge days by `id`, `project` and `branch` |
+| Claude Code history, once per day of the window | `TZ=ZONE python3 "${CLAUDE_SKILL_DIR}/scripts/claude_digest.py" --date DAY --format json` (add `--project PATH`; if the harness does not substitute `${CLAUDE_SKILL_DIR}`, the script is `scripts/claude_digest.py` next to this SKILL.md); merge days by `id`, `project` and `branch` |
 
 (gh flags and state values: https://cli.github.com/manual/gh_search_prs, https://cli.github.com/manual/gh_pr_view, checked 2026-11-07)
 

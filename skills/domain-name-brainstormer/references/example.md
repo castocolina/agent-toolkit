@@ -8,7 +8,7 @@ Read this when the user asks for a sample, or when you are unsure how the groupe
 
 Assumptions: English-speaking audience, short names (about 12 characters or fewer), no hyphens or digits, `.com` first plus `.dev` and `.app`. Say if any of that is wrong.
 
-Cut during screening: `codeshare` (an established same-category brand sits nearby) and `sharecode` (reads as two common words, so it is hard to tell apart from others).
+Cut during screening: `codeshare` (an established same-category brand sits nearby) and `sharecode` (heard aloud it can be spelled `sharecode` or `sharekode`, with no tie-breaker).
 
 **Compound**
 
@@ -27,8 +27,8 @@ Cut during screening: `codeshare` (an established same-category brand sits nearb
 
 | Rank | Candidate | Pronunciation | Rationale | Spelling or confusion risk | TLD fit | Status | RDAP URL | Source and UTC time |
 |---|---|---|---|---|---|---|---|---|
-| 4 | snipply.app | SNIP-lee | Snip plus a friendly ending; distinctive | Medium; "snippily" and "snipply" can be confused | `.app` is HSTS-preloaded, so HTTPS only | `unverified` | https://rdap.org/domain/snipply.app | `429` from pubapi.registry.google, 2026-11-07T10:02:20Z; stopped, no retry |
-| 5 | snipply.io | SNIP-lee | Same name on a second TLD | Medium, as above | `.io` is common for developer tools | `unverified` | https://rdap.org/domain/snipply.io | `404` still on rdap.org (no RDAP service for `.io`), 2026-11-07T10:02:23Z; WHOIS fallback not run |
+| 4 | snipfold.app | SNIP-fold | Snip plus fold: a snippet kept folded away; distinctive | Low; both halves are common words with one obvious spelling | `.app` is HSTS-preloaded, so HTTPS only | `unverified` | https://rdap.org/domain/snipfold.app | not queried in this sample; run the RDAP check before offering it |
+| 5 | snipfold.io | SNIP-fold | Same name on a second TLD | Low, as above | `.io` is common for developer tools | `unverified` | https://rdap.org/domain/snipfold.io | not queried in this sample; `.io` has no RDAP service on rdap.org (seen for another `.io` name, 2026-11-07), so use the WHOIS fallback |
 
 **Evocative real word**
 

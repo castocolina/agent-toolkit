@@ -31,8 +31,7 @@ Previous: session-<N-1>.md or none, items carried forward or closed
 ## Scope and assumptions
 ## Baseline
 | Capability or fact | Live / built-but-unreleased / planned / unknown | Citation |
-| Streak reminders (roadmap still lists it as Planned) | Live | CHANGELOG.md 2.3.0; flags.yaml `streak_reminders` enabled, rollout 100; ignore the stale roadmap line |
-| Shared challenges | Built-but-unreleased | CHANGELOG.md 2.4.0 (behind flag); flags.yaml `shared_challenges` enabled false, rollout 0 |
+| <capability> | Live / built-but-unreleased / planned / unknown | <file:line or changelog entry> |
 ## Opportunities
 ### Massive Gems
 | Idea (in rank order) | Priority | Evidence or hypothesis | Mechanism | Reach ("hypothesis: ~20% of 12,000 weekly" or "unknown share of 12,000 weekly; measure X") | Effort (S under 1 week, M 1-6 weeks, L more than 6 weeks, for the team given) | Deciding trade-off (two factors: "high reach vs 3-week effort", never a bare label) | Assumption to validate |

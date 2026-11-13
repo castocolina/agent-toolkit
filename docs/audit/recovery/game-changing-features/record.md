@@ -1,7 +1,7 @@
 | item | fate | value | decision | reason class | reason |
 | --- | --- | --- | --- | --- | --- |
 | s003 When to Use | removed-on-merit | low | drop | superseded-by SKILL.md description frontmatter | trigger phrases now live in the description; "differentiate from competitors" is out of scope since the description excludes competitor research |
-| s004 The Approach | removed-on-merit | low | drop | superseded-by SKILL.md Workflow | the old 5-step summary is replaced by the current five-step Workflow (baseline, discover, rank, check and save) |
+| s004 The Approach | removed-on-merit | low | drop | superseded-by SKILL.md Workflow | user accepted the drop (2026-11-13, call delegated to the controller, confirmed in the PR 2 form): the old 5-step summary is replaced by the current five-step Workflow (baseline, discover, rank, check and save) |
 | s005 Three Scales of Thinking | removed-on-merit | real | drop | superseded-by SKILL.md Workflow step 4.1 tier tests | user accepted the drop (2026-11-07, call delegated to the controller): effort-based tiers superseded by the current test-based tiers; the per-tier questions return through s026-s028 |
 | s006 Evaluation Framework | removed-to-fit | real | restore-references | reusable-template | user rejected the drop (2026-11-07, call delegated to the controller): the frequency and defensibility lenses have no counterpart in the current scoring formula (reach, evidence, cost) |
 | s007 Systematic Exploration | removed-to-fit | real | restore-references | reusable-template | the 10-category forced-coverage checklist was a Key Feature and has no counterpart in the current Discover step; restored with s032 in one reference |

@@ -70,7 +70,7 @@ gt submit --stack --publish --no-edit
 
 - `--stack`: submit the entire stack (upstack and downstack)
 - `--publish`: publish any draft PRs
-- `--no-edit`: use commit messages as PR titles and descriptions without prompting
+- `--no-edit`: does not edit PR fields inline
 
 Flags per https://graphite.com/docs/command-reference, checked 2026-11-13; confirm with `gt submit --help` before reusing.
 

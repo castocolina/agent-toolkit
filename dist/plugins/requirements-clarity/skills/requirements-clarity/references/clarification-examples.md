@@ -36,8 +36,8 @@ Carried-over open questions: none yet
 Next questions:
 1. Why: what problem should login solve first: customers cannot see their own
    orders, part of the site must be restricted, or something else?
-2. Simpler: is one sign-in method, email with a password, enough for the first
-   release, with other methods deferred to a later one?
+2. Simpler: is a single sign-in method enough for the first release, with
+   other methods deferred to a later one?
 3. After repeated wrong passwords, what should happen: nothing special, a
    temporary lock, or a password-reset prompt?
 ```

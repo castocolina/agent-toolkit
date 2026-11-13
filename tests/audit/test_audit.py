@@ -4226,6 +4226,28 @@ class BatchTests(Base):
         self.assertEqual(self.chk(self.merged([("jud", 90.0, [])]))[0], 0)
         self.assertEqual(self.chk(self.merged([("other", 99.0, [])], "n.json"))[0], 1)
 
+    def test_check_honors_a_recorded_accepted_score_only_while_it_holds(self):
+        # Break: a closed batch below 90 fails even after the user accepted that score, or an accepted score hides a later drop.
+        def queue(accepted):
+            art = {"kind": "skill", "name": "low", "percent": None, "findings": audit.batch_counts({}), "mode": "full"}
+            if accepted:
+                art["accepted"] = accepted
+            self.out.mkdir(parents=True, exist_ok=True)
+            audit.save_queue(self.out, [{"id": 1, "artifacts": [art], "brief": "b.md", "status": "closed",
+                                         "rounds": 0, "requeues": 0, "waived": []}])
+        m = self.merged([("low", 84.8, [])])
+        queue(None)
+        self.assertEqual(self.chk(m)[0], 1)
+        queue({"percent": 84.8, "reason": "user accepted the score (2026-11-13)"})
+        self.assertEqual(self.chk(m)[0], 0)
+        self.assertEqual(self.chk(self.merged([("low", 80.0, [])], "d.json"))[0], 1)  # the score fell below the accepted one
+        self.assertEqual(self.chk(self.merged([("low", 86.0, [])], "e.json"))[0], 0)  # a higher score stays covered
+        self.assertEqual(self.chk(self.merged([("low", None, [])], "n.json"))[0], 1)  # no verdict score is never accepted
+        queue({"percent": 0, "reason": "user accepted a zero"})
+        self.assertEqual(self.chk(self.merged([("low", None, [])], "n.json"))[0], 1)
+        queue({"percent": 84.8, "reason": ""})
+        self.assertEqual(self.chk(m)[0], 1)
+
 
 FRONT = "---\nname: {n}\ndescription: d\n---\n\n"
 R_INTRO = "Intro words that are long enough to count as a section with at least twelve words in total here."

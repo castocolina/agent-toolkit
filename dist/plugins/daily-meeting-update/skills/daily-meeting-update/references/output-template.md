@@ -7,7 +7,7 @@ Read this when writing the update (SKILL.md step 4). It fixes the layout of the 
 | What the evidence shows | Where it goes |
 |---|---|
 | Merged PR, `mergedAt` inside the window | Yesterday (`merged PR #N - title`) and `**Merged:**` |
-| PR still open or draft, whatever the session or the user says | never Yesterday; `**Opened:**` with its state, and Today when the user continues it |
+| PR still open or draft, whatever the session or the user says | never Yesterday; `**Opened:**` (with its state) only under the window rule in the next row; Today when the user continues it |
 | PR you opened inside the window (`createdAt` in [`START`, `END`)) | `**Opened:**`, when `createdAt` from `gh pr view` falls in the window or the user says so; ask only when neither is known |
 | Your review with `submittedAt` inside the window | `**Reviews:**` with its outcome |
 | Review submitted at or after `END` | left out, like any later event |

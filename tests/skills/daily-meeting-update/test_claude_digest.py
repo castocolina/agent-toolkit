@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT=Path(__file__).resolve().parents[3]
 SCRIPT=ROOT/"skills/daily-meeting-update/scripts/claude_digest.py"
@@ -26,7 +27,7 @@ class ClaudeDigestTests(unittest.TestCase):
         (blog/"session-blog1234.jsonl").write_text(json.dumps({"type":"user","timestamp":"2026-01-20T12:00:00Z","cwd":str(self.blog_path),"message":{"content":"Update the blog homepage"}})+"\n")
     def tearDown(self): self.tmp.cleanup()
     def run_cli(self,*args,tz="America/New_York"):
-        env=os.environ.copy(); env["HOME"]=str(self.home); env["TZ"]=tz
+        env=os.environ.copy(); env.pop("CLAUDE_CONFIG_DIR",None); env["HOME"]=str(self.home); env["TZ"]=tz
         return subprocess.run([sys.executable,str(SCRIPT),*args],capture_output=True,text=True,env=env)
     def test_json_digest_filters_date_and_reports_session_details(self):
         r=self.run_cli("--date","2026-01-20","--format","json"); self.assertEqual(r.returncode,0,r.stderr)
@@ -117,6 +118,10 @@ class ClaudeDigestTests(unittest.TestCase):
         env=os.environ.copy(); env.update(HOME=str(self.home),TZ="America/New_York",CLAUDE_CONFIG_DIR=str(config))
         r=subprocess.run([sys.executable,str(SCRIPT),"--date","2026-01-20","--format","json"],capture_output=True,text=True,env=env); self.assertEqual(r.returncode,0,r.stderr)
         self.assertEqual([s["id"] for s in json.loads(r.stdout)["sessions"]],["moved000"])
+    def test_parent_claude_config_dir_does_not_hide_the_fake_home_tree(self):
+        with mock.patch.dict(os.environ,{"CLAUDE_CONFIG_DIR":str(Path(self.tmp.name)/"elsewhere")}):
+            r=self.run_cli("--date","2026-01-20","--format","json")
+        self.assertEqual(r.returncode,0,r.stderr); self.assertEqual(json.loads(r.stdout)["session_count"],2)
     def test_project_filter_finds_truncated_directory_names_of_long_paths(self):
         path=Path(self.tmp.name)/("deep"*60)/"app"; path.mkdir(parents=True)  # encoded name is over 200 characters
         encoded=re.sub(r"[^A-Za-z0-9]","-",str(path)); self.assertGreater(len(encoded),200)

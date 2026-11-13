@@ -114,6 +114,21 @@
       ]
     },
     {
+      "id": "older-open-pr-updated-in-window",
+      "prompt": "Meeting date 2026-11-03, timezone UTC, window 2026-11-02. I approved GitHub for acme/payments; gh-prs-older-open.json holds the `gh search prs` and `gh pr view` results. PR #431 shows as updated on 2026-11-02 because I pushed review fixes to it yesterday, and I keep working on it today. No blockers. No topics. Include the PRs & Reviews section and the links.",
+      "files": [
+        "references/output-template.md",
+        "evals/files/gh-prs-older-open.json"
+      ],
+      "expected_output": "A Markdown update where PR #431, open and created on 2026-10-20 (before the window), is not listed on an **Opened:** line even though it was updated in the window, is not presented as delivered under Yesterday, and appears under Today as continuing work.",
+      "assertions": [
+        "Does not report PR #431 (Refactor ledger export job) as opened in the window: its createdAt 2026-10-20T10:15:00Z is before the 2026-11-02 window (a note that it was opened earlier is fine)",
+        "Does not list PR #431 under Yesterday as completed, merged or opened work",
+        "Lists PR #431 under Today as continuing work, with its open state",
+        "Invents no other PR or URL and does not call PR #431 merged"
+      ]
+    },
+    {
       "id": "window-command-needs-python-tzdata",
       "prompt": "I approved GitHub for acme/payments and want the window for yesterday, 2026-11-02, in America/New_York. On my Windows machine the skill's window one-liner failed with: zoneinfo._common.ZoneInfoNotFoundError: 'No time zone found with key America/New_York'. What now?",
       "expected_output": "Explains that the one-liner needs Python 3.9 or later and that Windows has no system time zone database, so the tzdata package must be installed; does not query GitHub before the window is fixed.",

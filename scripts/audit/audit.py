@@ -2424,7 +2424,10 @@ def batches_op(root: Path, args) -> int:
                 if a.get("mode") == "report-only":  # never judged (plan 14): its batch closes on sources and facts alone
                     continue
                 e = entries.get(a["name"])
-                if e is None or e.get("percent") is None or e["percent"] < TARGET_CLOSE:
+                acc = a.get("accepted") or {}  # the user's recorded call: accept this score; a lower later score is not covered
+                accepted = (bool(acc.get("reason")) and e is not None and e.get("percent") is not None
+                            and e["percent"] >= acc.get("percent", 101))
+                if not accepted and (e is None or e.get("percent") is None or e["percent"] < TARGET_CLOSE):
                     print(f"batch {b['id']}: {a['name']} has no verdict or scores below {TARGET_CLOSE}")
                     bad = True
                 if e is None:
