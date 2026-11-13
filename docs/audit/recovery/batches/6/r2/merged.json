@@ -1,0 +1,206 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "jira",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/jira/record.md",
+          "line": null,
+          "evidence": "previous-version digest jira at dbff837f: \"removed units (351, showing 40)\". All 40 shown items map through sections.json to valid record rows (for example s045, s046 and s050 restore-references are present in commands.md; s068, s073 and s071 are user-accepted drops), but 311 removed units were not shown and could not be checked one by one",
+          "fix": "Re-run the removal check with the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/jira/SKILL.md ...). Confirm that every unlisted para: unit belongs to a section that already has a row in docs/audit/recovery/jira/record.md. For any unit without one, restore it (into references/ when it is domain-specific) or add a row."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/jira/SKILL.md",
+          "line": 42,
+          "evidence": "\"side effects (watchers are notified, a transition may be one-way)\". The baseline question \"Who else is affected? Check watchers, linked issues, parent epics\" was folded into the procedure, but linked issues and parent epics are no longer part of the pre-change check",
+          "fix": "Extend step 2's side effects: \"side effects (watchers are notified, linked or child issues and the parent epic may be affected, a transition may be one-way)\". The expert check then covers dependents as well as notifications."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/jira/evals/trigger-queries.json",
+          "line": 15,
+          "evidence": "\"move PROJ-27 to done after checking its available transitions\"; also \"update the summary of PROJ-18 after fetching its current details\" and \"add a comment to ticket OPS-92 but show me before posting\". These should-trigger queries quote the skill's own procedure, so any description triggers on them",
+          "fix": "Replace these three with realistic phrasings that do not echo the procedure and where the Jira link is less obvious, for example \"can you bump OPS-92's priority, the outage is back\" or \"close out the login bug from yesterday on our board\". Keep 8-10 positives."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/jira/SKILL.md",
+          "line": 41,
+          "evidence": "\"the available transitions for a move (names and ids differ per workflow; if the target is not in the list, propose a full multi-hop route only from a trusted workflow graph (for example MCP `getJiraWorkflows`, disabled by default); otherwise show ... re-read after each); CLI-only setups list transitions through REST ... (mcp.md, Transitions); the required fields ...\". The branches for edit, move, multi-hop, CLI-only and create sit in one nested sentence. The pointer \"mcp.md, Transitions\" names a table row, not a section",
+          "fix": "Split step 1 into sub-bullets: Edit (fetch the issue), Move (list transitions; target missing leads to multi-hop from a trusted graph or one approved hop at a time; CLI-only uses REST `GET /rest/api/{v}/issue/{key}/transitions?expand=transitions.fields` from the mcp.md REST fallback table), Create (required fields from create metadata). Keep every rule as written."
+        }
+      ]
+    },
+    {
+      "name": "lesson-learned",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/lesson-learned/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: 'removed units (93, showing 40)'. The list is cut, so 53 removed units could not be checked against docs/audit/recovery/lesson-learned/record.md. Every one of the 40 shown units maps through sections.json to a valid record row.",
+          "fix": "Run the judge again with the full digest (no cut list) so that every removed unit is checked against the record. Add a record row for any unit that turns out to be unexplained."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/lesson-learned/SKILL.md",
+          "line": 21,
+          "evidence": "| Last N commits, or recent work on the base branch | `git log -p --first-parent -n <N>` (default N=5) |",
+          "fix": "Keep the row, because the default N=5 and the --first-parent choice belong to the skill. In the table, put the non-obvious parts first: the base detection, --first-parent for merges and --untracked-files=all. That way the standard git log/diff invocations, which the model already knows, carry less weight. Move content only; delete nothing."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/lesson-learned/evals/evals.json",
+          "line": null,
+          "evidence": "The six evals cover the casual question, extraction, the rename, the range, untracked files and no changes. None covers a merge commit (`git show --first-parent`) or feature-branch base detection with a dirty tree. Those are the two Git gotchas most likely to go wrong. Also, casual-reflection lists 'references/se-principles.md' as an input file, but it is a skill file, not an input.",
+          "fix": "Add one eval under evals/files/ with a merge-commit `git show` output that is empty as a combined diff, plus the --first-parent version. Assert that the lesson comes from the --first-parent diff, not 'no changes'. Remove references/se-principles.md from the files list in casual-reflection."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/lesson-learned/SKILL.md",
+          "line": 50,
+          "evidence": "Line 16 says 'Run `git status --short` first.' Line 50 says 'Quick conversational question: ... Mention commands you would run in a sentence, if at all ... with no diff to read, make it conditional'. Line 26 says 'If nothing is in scope, say there is no change evidence and stop'. The skill does not say whether a quick question with no pasted diff should run git, use the user's description as evidence, or stop.",
+          "fix": "Add one sentence under 'Choose the evidence scope': 'If the user only describes a change in words and you cannot run git, treat the description as unverified evidence: answer in the conversational form with conditional claims. Use \"stop\" only when git ran and showed nothing in scope.'"
+        }
+      ]
+    },
+    {
+      "name": "react-dev",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/react-dev/record.md",
+          "line": null,
+          "evidence": "previous-version digest react-dev at dbff837f: 'removed units (463, showing 40)'. All 40 shown items map through sections.json to valid record rows, but 423 removed units were not shown and could not be checked one by one.",
+          "fix": "Re-run the removal check with the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/react-dev/SKILL.md ...) so every para: item is checked against record.md. Where a unit has no row, either restore it (into references/ if it is domain-specific) or add a row for it to docs/audit/recovery/react-dev/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 16,
+          "evidence": "'0. Before touching anything, run `git status --porcelain`...' The React 19 migration procedure is nested inside '## 1. Pin versions', and the React 19 upgrade breaks sit apart from it in Gotchas (line 123) and again in react-19-patterns.md's Migration checklist.",
+          "fix": "Keep the migration steps in one place and keep every step. Either give the migration its own sub-heading under section 1 that the line-123 gotcha and react-19-patterns.md point to, or move the full steps to react-19-patterns.md's Migration checklist and leave a one-line pointer in section 1. Record the move in docs/audit/recovery/react-dev/record.md."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/react-dev/evals/evals.json",
+          "line": 166,
+          "evidence": "\"files\": [\"references/react-router.md\"]. Evals rr7-app-load-context, rr7-middleware-migration, route-handle-breadcrumbs, tanstack-search-updater and imperative-handle-ref pass the skill's own reference as an input file instead of a user fixture.",
+          "fix": "Replace these entries with user-side fixtures under evals/files/ (for example a server.ts with getLoadContext, a root.tsx using useMatches, a products route file), or drop the files field. A with-skill vs without-skill run then measures whether the skill loads the right reference, instead of handing the answer to the run."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/references/hooks.md",
+          "line": 10,
+          "evidence": "'| `useRef<number>()` | allowed, `MutableRefObject<number \\| undefined>` | type error: an argument is required |'. This @types/react 19 behavior table has no source URL and no date checked.",
+          "fix": "Add the source and date under the table, for example 'Source: https://react.dev/blog/2024/04/25/react-19-upgrade-guide (TypeScript changes: useRef requires an argument, ref mutability), checked <date>'."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/examples/generic-components.md",
+          "line": 17,
+          "evidence": "'## Choose the inference source with `NoInfer` (TypeScript 5.4+)'. This and the 5.0/5.3 minimums for const type parameters (line 61) are minimum versions with no source URL or date.",
+          "fix": "Cite https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-4.html (NoInfer) and the 5.0 and 5.3 release notes (const type parameters, readonly constraint), each with the date checked."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/examples/server-components.md",
+          "line": 23,
+          "evidence": "'Check the installed version: Next 14 and earlier pass plain objects; 15.0 to 15.4 need the explicit Promise-typed props'. These are version boundaries with no source URL or date (only the 15.5 typegen fact in SKILL.md is sourced).",
+          "fix": "Add 'Source: https://nextjs.org/docs/app/api-reference/file-conventions/page (params and searchParams are Promises from v15), checked <date>' after the paragraph."
+        },
+        {
+          "id": "D8-4",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/references/event-handlers.md",
+          "line": 32,
+          "evidence": "'| `wheel`, `touchstart` and `touchmove` are registered as passive | `e.preventDefault()` in `onWheel` is ignored...'. This and the other 'Since React 17' rows have no source URL or date.",
+          "fix": "Add a source line under the table: 'Source: https://legacy.reactjs.org/blog/2020/10/20/react-v17.html (event delegation on the root, onScroll no longer bubbles, passive touch and wheel listeners), checked <date>'."
+        },
+        {
+          "id": "D8-5",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/react-dev/references/react-19-patterns.md",
+          "line": 174,
+          "evidence": "'2. Run the codemod exactly as the SKILL.md React 19 gotcha says'. The gotcha (SKILL.md line 123) has no codemod commands and itself says 'The migration order and codemods are in step 1.'",
+          "fix": "Point straight to the commands: '2. Run the codemod exactly as SKILL.md section 1 (migration step 2) says (pinned version, real source roots, opt-in transforms for ref-callback returns and `ReactElement` props).'"
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

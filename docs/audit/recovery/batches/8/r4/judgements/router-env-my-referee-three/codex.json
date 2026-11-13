@@ -1,0 +1,113 @@
+{
+  "skill": "codex",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 12,
+    "D3": 13,
+    "D4": 14,
+    "D5": 13,
+    "D6": 14,
+    "D7": 12,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 106,
+  "max_total": 125,
+  "percent": 84.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/codex/SKILL.md",
+      "line": null,
+      "evidence": "Digest for dbff837f is a cut list: \"removed units (44, showing 40)\". The 40 shown items all have valid rows in docs/audit/recovery/codex/record.md or are covered by section-id rows via sections.json units. The 4 hidden items could not be checked.",
+      "fix": "Regenerate the digest with the full list of 44 removed units and confirm the 4 hidden ones have record rows (`para:` or section-id rows) in docs/audit/recovery/codex/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/codex/SKILL.md",
+      "line": 25,
+      "evidence": "The `--full-auto` rejection appears in Run (line 25) and again in Authorization and gotchas. The `/dev/null` warning is also stated twice (Run and Gotchas).",
+      "fix": "Keep each fact once. Keep the Gotchas bullet and replace the Run copy with a pointer. Record any text removed in docs/audit/recovery/codex/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/codex/SKILL.md",
+      "line": 14,
+      "evidence": "\"Resolve task intent, model, and effort. ... As one decision: use the configured default model and the effort from the mapping; ask only when ...\" Step 3.2 restates the same decision twice in different words. The Preflight is otherwise a mechanical checklist with little expert reasoning (what could go wrong if the wrong sandbox or session is chosen).",
+      "fix": "Merge step 3.2 into one decision rule. Add one \"before running, ask: what is the worst that can be touched if the sandbox, session or directory is wrong?\" framing line."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/codex/SKILL.md",
+      "line": null,
+      "evidence": "The Gotchas bullets mostly repeat rules already in Run and Resume. Gotchas that defy assumption (`--skip-git-repo-check` must be repeated on `resume`, `resume` takes no `-s`/`-C`, `--last` is cwd-scoped) live in other sections.",
+      "fix": "Consolidate these environment-specific facts into the Authorization and gotchas list, each with its reason, and point the earlier sections to them."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/codex/SKILL.md",
+      "line": 3,
+      "evidence": "description: \"Run or resume OpenAI Codex CLI tasks with `codex exec` ... Use when asked to invoke Codex for review, debugging, ...\" It opens with the capability, not an imperative trigger, and does not cover requests that never say \"Codex\", such as \"get a second opinion from the OpenAI agent\".",
+      "fix": "Use when the user asks to run, resume or continue an OpenAI Codex CLI session (`codex exec`, `codex exec resume`) for read-only review, debugging, refactoring or automated edits, even if they only say \"get codex to look at X\" or \"continue the last codex run\". Choose the narrowest sandbox and report model, effort, sandbox and whether edits occurred. Not for installing the CLI, configuring credentials, conceptual explanations, summarizing prior output without invocation, or other vendors' CLIs."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/codex/SKILL.md",
+      "line": 28,
+      "evidence": "Long dense paragraphs carry repeated inline provenance such as \"Checked 2026-11-07 against codex-cli 0.162.1 and https://...\", \"(checked 2026-11-08 against codex-cli 0.162.1)\" and \"(checked with `codex exec resume --help`, codex-cli 0.162.1, 2026-11-13)\", which bloat the body.",
+      "fix": "Move the source and date notes to a single \"Sources checked\" line at the end of SKILL.md or to README.md. Keep the commands inline. Credits stay untouched."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/codex/SKILL.md",
+      "line": 14,
+      "evidence": "\"Ask only when an unresolved choice affects the result\" leaves unclear which choices count. The effort mapping (high/medium/low) is a default, but the escape conditions are vague.",
+      "fix": "Name the ask triggers explicitly, for example: ask only for an unnamed model that conflicts with the configured default, or for an effort level the model does not support."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/codex/evals/evals.json",
+      "line": null,
+      "evidence": "The `resume-other-project` and `network-needed` evals have only 2 terse assertions each (\"Does not use --last blindly\"). Trigger queries are short generic phrasings with no file paths, personal context or typos.",
+      "fix": "Expand those assertions to verifiable checks, such as the exact resume-by-id command shape and the `sandbox_workspace_write.network_access` key. Add trigger queries with realistic context: paths, casual phrasing, near-misses that say \"codex\" but need something else."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/codex/SKILL.md",
+      "line": null,
+      "evidence": "Resume says \"Pass the follow-up as a single-quoted final argument\", but the complete example uses double quotes (`\"Continue the review and list only new findings.\"`). Run says \"Put flags before the `resume` subcommand\" while Resume says `resume` takes no `-s` or `-C`. Facts not verified online.",
+      "fix": "Make the quoting instruction and the example agree. State once which flags may precede `resume` (only `--skip-git-repo-check`, outside Git) and that sandbox and directory are inherited."
+    }
+  ]
+}

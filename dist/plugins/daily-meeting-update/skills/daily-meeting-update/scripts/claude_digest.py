@@ -2,23 +2,34 @@
 """
 Get Claude Code conversation digest for daily standup integration.
 
+Needs Python 3.9 or later (Path.is_relative_to).
+Reads transcripts under $CLAUDE_CONFIG_DIR/projects (default ~/.claude/projects). Claude
+Code's transcript format is internal and can change on any release; unparseable lines are
+skipped, so a format change shows up as an empty digest.
+
 Usage:
     claude_digest.py [--date DATE] [--project PATH] [--format json|text]
 
 Examples:
     claude_digest.py                    # Yesterday's digest (default)
     claude_digest.py --date today       # Today's digest
-    claude_digest.py --date 2026-01-20  # Specific date
+    claude_digest.py --date 2026-01-20  # Specific date (local calendar day)
     claude_digest.py --format json      # JSON output for parsing
+
+Titles never contain message text (logs can hold secrets): a session's title is
+"Session <first 8 characters of its id>". Each message keeps its own recorded cwd and
+git branch, and a session that switched project or branch that day is listed once per pair.
+When no cwd was recorded, the project is "[unresolved project: <directory name>]" (the
+directory name is never decoded into a path).
 
 Output (JSON format):
 {
   "date": "2026-01-21",
-  "session_count": 5,
+  "session_count": 1,
   "sessions": [
     {
-      "id": "abc123",
-      "title": "Fix authentication bug",
+      "id": "abc12345",
+      "title": "Session abc12345",
       "project": "/home/user/my-app",
       "branch": "main",
       "files": ["auth.ts", "login.vue"],
@@ -52,8 +63,9 @@ class Session:
 
 
 def get_claude_projects_dir() -> Path:
-    """Get the Claude projects directory."""
-    return Path.home() / '.claude' / 'projects'
+    """Get the Claude projects directory; CLAUDE_CONFIG_DIR moves it off ~/.claude."""
+    config_dir = os.environ.get('CLAUDE_CONFIG_DIR')
+    return (Path(config_dir).expanduser() if config_dir else Path.home() / '.claude') / 'projects'
 
 
 def decode_project_path(encoded: str) -> str:
@@ -185,9 +197,10 @@ def get_sessions_for_date(
         # try the path as given and resolved, since symlinks (e.g. /home -> /var/home) differ.
         # A prefix match also finds sessions launched from subdirectories; the encoding is lossy
         # (/app-old shares the prefix of /app/old), so in_scope() still filters every message.
-        names = {re.sub(r'[^A-Za-z0-9]', '-', str(p)) for p in (given.absolute(), scope)}
+        # Names over 200 characters are truncated to 200 and get a hash suffix, so match that prefix.
+        names = {re.sub(r'[^A-Za-z0-9]', '-', str(p))[:200] for p in (given.absolute(), scope)}
         project_dirs = sorted(d for d in projects_dir.iterdir() if d.is_dir() and any(
-            d.name == n or d.name.startswith(n + '-') for n in names))
+            d.name == n or d.name.startswith(n if len(n) == 200 else n + '-') for n in names))
     else:
         project_dirs = [d for d in projects_dir.iterdir() if d.is_dir()]
 

@@ -29,6 +29,49 @@ export const List = forwardRef(ListInner) as <T>(props: ListProps<T> & { ref?: R
 
 Without the cast, `<List items={[1, 2]} label={(n) => ...} />` infers `n: unknown`. `memo()` erases generics the same way and takes the same cast.
 
+## Imperative handles: `useImperativeHandle`
+
+When the parent needs a few commands (focus, clear) instead of the DOM node, type the `ref` prop with the handle, not the element: `Ref<InputHandle>`.
+
+```tsx
+import { forwardRef, useImperativeHandle, useRef, type ForwardedRef, type Ref } from 'react';
+
+type InputHandle = { focus(): void; clear(): void };            // the whole public surface
+type NameInputProps = { label: string; ref?: Ref<InputHandle> };
+
+// React 19-only app: ref is an ordinary prop.
+export function NameInput({ label, ref }: NameInputProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  useImperativeHandle(ref, () => ({
+    focus() { inputRef.current?.focus(); },
+    clear() { if (inputRef.current) inputRef.current.value = ''; },
+  }), []);
+  return <label>{label}<input ref={inputRef} /></label>;
+}
+
+export function Form() {
+  const nameRef = useRef<InputHandle>(null);                    // RefObject<InputHandle | null> in @types/react 19
+  return (
+    <form>
+      <NameInput ref={nameRef} label="Name" />
+      <button type="button" onClick={() => nameRef.current?.focus()}>Focus</button>
+    </form>
+  );
+}
+
+// Peers allow React 18: same body, ref arrives from forwardRef (and the prop type drops `ref`).
+export const LibNameInput = forwardRef<InputHandle, Omit<NameInputProps, 'ref'>>(function LibNameInput({ label }, ref: ForwardedRef<InputHandle>) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  useImperativeHandle(ref, () => ({
+    focus() { inputRef.current?.focus(); },
+    clear() { if (inputRef.current) inputRef.current.value = ''; },
+  }), []);
+  return <label>{label}<input ref={inputRef} /></label>;
+});
+```
+
+`ref={useRef<HTMLInputElement>(null)}` on `<NameInput>` is a type error, which is the point: the parent sees only `InputHandle`. Keep the handle to commands that cannot be expressed as props; react.dev says to prefer a prop (for example `isOpen`, not `{ open, close }`) whenever one fits. `button type="button"` keeps a Focus button inside a form from submitting it. Source: https://react.dev/reference/react/useImperativeHandle (`ref` as a prop from React 19, `useImperativeHandle(ref, createHandle, dependencies?)`, the overuse pitfall), checked 2026-11-07; the page has no TypeScript notes, so the `Ref<Handle>` typing was type-checked under `strict` with `@types/react` 19.
+
 ## `useActionState`
 
 ```tsx

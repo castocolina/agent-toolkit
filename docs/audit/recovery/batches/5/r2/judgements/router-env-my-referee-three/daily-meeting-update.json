@@ -1,0 +1,86 @@
+{
+  "skill": "daily-meeting-update",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest at dbff837f: \"removed units (144, showing 40)\". All 40 shown items resolve to valid record rows or restored content (s013/s031/s036 in references/output-template.md, s022/s024/s026 at step 2), but the other 104 removed units could not be checked",
+      "fix": "Regenerate the digest without the cut (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/daily-meeting-update/SKILL.md --judge direct --digest-dir <dir>) so every removed unit can be checked against docs/audit/recovery/daily-meeting-update/record.md and sections.json"
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 72,
+      "evidence": "\"Never let tool activity replace the why, the blockers or the plans: tools show motion, not intent or impediments.\" repeats the opening line 9 \"The user's answers are the source of truth; integrations only jog memory\"",
+      "fix": "Merge the two into one statement. Keep the reason (\"tools show motion, not intent or impediments\") in the Never list and shorten line 9 to point to it, so no meaning is lost"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 40,
+      "evidence": "\"## Gotchas\" sits between \"## 2. Optional integrations\" and \"## 3. Interview\" and breaks the numbered Process flow it says to follow in order (\"Work through the steps in order\")",
+      "fix": "Make the Gotchas a sub-heading of step 2 (\"### Gotchas for step 2 queries\"), because every item concerns the gh, Jira or digest queries. Keep all eight items unchanged"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/evals/files/gh-prs.json",
+      "line": null,
+      "evidence": "pr_view entries for PRs 412 and 415 have no createdAt or reviews, although the SKILL.md query table asks gh pr view for \"number,title,state,createdAt,mergedAt,headRefName,reviews,url\" and output-template.md places a PR under Opened by createdAt",
+      "fix": "Add createdAt (for example 2026-11-02T10:15:00Z for #415) and an empty reviews array to the 412 and 415 pr_view entries. The pr-section-layout eval then tests the createdAt rule instead of relying on the user's statement"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 45,
+      "evidence": "\"JQL dates use the Jira profile's timezone, not `ZONE`\" and the JQL row (line 33: currentUser(), resolutiondate) carry no source URL or check date, unlike the gh, jira-cli and AskUserQuestion facts",
+      "fix": "Append \"(https://support.atlassian.com/jira-software-cloud/docs/jql-fields/, https://support.atlassian.com/jira-software-cloud/docs/jql-functions/, checked <date>)\" to the JQL gotcha. These sources are already listed for this skill in docs/audit/upstream-sources.json"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 32,
+      "evidence": "The window rule counts \"your review's `submittedAt`\", but gh pr view's reviews list every reviewer, and no step says how to identify the user's own login (the --reviewed-by @me search does not return it)",
+      "fix": "Add to the PR details row: \"keep only reviews whose author.login equals `gh api user --jq .login` (run once after GitHub approval)\""
+    }
+  ]
+}

@@ -158,6 +158,78 @@
         "Calls e.preventDefault() only for the plain Enter it handles, which removes the stray newline, and then calls requestSubmit() once",
         "Takes `ref` as a regular prop (typed Ref<HTMLTextAreaElement> or equivalent) attached to the <textarea>, and does not use forwardRef, since the fixture is a React 19 app component"
       ]
+    },
+    {
+      "id": "rr7-app-load-context",
+      "prompt": "Our app is on React Router 7.5 in Framework Mode with a custom Express server, no middleware. getLoadContext returns { apiClient, userId } and I want context.apiClient and context.userId typed in every loader. Write the type declaration file.",
+      "files": [
+        "references/react-router.md"
+      ],
+      "expected_output": "A declaration file that starts with import 'react-router' and augments AppLoadContext inside declare module 'react-router' with apiClient and userId, and explains that without the import the file is a script and the declaration shadows the package instead of augmenting it. Notes that nothing checks getLoadContext against the augmentation.",
+      "assertions": [
+        "Puts a bare import 'react-router' (or an export) at the top of the file so it is a module and declare module augments instead of replacing the package types",
+        "Declares apiClient and userId inside interface AppLoadContext within declare module 'react-router', not on RouterContextProvider and not through createContext, because v7 without middleware uses AppLoadContext",
+        "Explains that without the import the declaration shadows react-router and other imports fail",
+        "States that the augmentation is not checked against what getLoadContext returns"
+      ]
+    },
+    {
+      "id": "rr7-middleware-migration",
+      "prompt": "We are on React Router 7.18 and about to turn on future.v8_middleware, but we have 40 loaders reading context.apiClient and context.userId through an AppLoadContext augmentation, and a custom getLoadContext that returns a plain object. How do we adopt middleware without touching the loaders yet, and what is the catch?",
+      "files": [
+        "references/react-router.md"
+      ],
+      "expected_output": "Augment RouterContextProvider instead of AppLoadContext, make getLoadContext return a RouterContextProvider (for example Object.assign(new RouterContextProvider(), loadContext)), leave the loaders alone for now. Catches: it is a v7-only migration step that does not carry to v8, so move fields to createContext with set and get before upgrading, and the augmented fields are absent at runtime in clientMiddleware, clientLoader and clientAction.",
+      "assertions": [
+        "Changes the module augmentation from interface AppLoadContext to interface RouterContextProvider",
+        "Makes getLoadContext return an instance of RouterContextProvider populated from the existing object, instead of the plain object",
+        "Says the loaders can keep reading context.apiClient during the migration",
+        "Warns that this is only a migration step on v7 and the fields should move to createContext with context.set and context.get before React Router v8",
+        "Warns that the augmented fields are typed but missing at runtime in client middleware, clientLoader and clientAction"
+      ]
+    },
+    {
+      "id": "route-handle-breadcrumbs",
+      "prompt": "In our React Router Framework Mode app, routes export handle = { breadcrumb: () => <Link to=\"/posts\">Posts</Link> } and root.tsx does useMatches().filter(m => m.handle?.breadcrumb).map(m => m.handle.breadcrumb()). tsc strict says 'm.handle' is of type 'unknown'. Make it type-check without any or a blind cast.",
+      "files": [
+        "references/react-router.md"
+      ],
+      "expected_output": "Explains that UIMatch.handle is unknown, defines a Crumb type and a type guard (match is UIMatch<unknown, Crumb>) that checks handle is a non-null object with a function breadcrumb, filters useMatches() with it, and keys the list by match.id; route modules check their export with satisfies Crumb.",
+      "assertions": [
+        "Explains that useMatches() returns UIMatch whose handle is unknown by default, which is why property access fails under strict",
+        "Narrows with a user-defined type guard (a match is UIMatch<unknown, ...> predicate) that checks handle is a non-null object whose breadcrumb is a function, not with any or an unchecked as cast",
+        "Calls match.handle.breadcrumb(match) on the narrowed matches, passing the match",
+        "Keys the rendered list items by match.id rather than the array index"
+      ]
+    },
+    {
+      "id": "tanstack-search-updater",
+      "prompt": "On our TanStack Router /products route (validateSearch with category?: string, sortBy: 'price' | 'name', page: number) I write navigate({ to: '/products', search: { category } }) in the filter bar, which wipes sortBy and fails to compile when I add required keys. Write the category and sort handlers so the other params are kept, page resets to 1 on a category change, and sortBy: 'rating' is a compile error.",
+      "files": [
+        "references/tanstack-router.md"
+      ],
+      "expected_output": "Uses const navigate = useNavigate({ from: Route.fullPath }) and a functional search updater, navigate({ search: (prev) => ({ ...prev, category, page: 1 }) }) and navigate({ search: (prev) => ({ ...prev, sortBy }) }), and explains that from ties prev and the result to the route's validated search while spreading prev keeps the other params.",
+      "assertions": [
+        "Creates the navigate function with useNavigate({ from: Route.fullPath }) (or the route's id or path), not a bare useNavigate()",
+        "Passes search as a function of prev and spreads prev so sortBy and the other params survive",
+        "Resets page to 1 in the category handler",
+        "Types the sort handler's parameter as 'price' | 'name' (or lets the route's search type reject 'rating')",
+        "Explains that without from, prev does not carry this route's search type"
+      ]
+    },
+    {
+      "id": "imperative-handle-ref",
+      "prompt": "We are on React 19 with @types/react 19. Make the TextField component expose focus() and clear() to its parent through a ref, with types. Parent code: const ref = useRef<TextFieldHandle>(null); <TextField ref={ref} label=\"Name\" />.",
+      "files": [
+        "references/react-19-patterns.md"
+      ],
+      "expected_output": "Defines type TextFieldHandle = { focus(): void; clear(): void }, takes ref as an ordinary prop typed Ref<TextFieldHandle> (not Ref<HTMLInputElement>, no forwardRef), keeps an inner useRef<HTMLInputElement>(null) attached to the input, and calls useImperativeHandle(ref, () => ({ focus, clear }), []) exposing only the two commands.",
+      "assertions": [
+        "Types the ref prop as Ref<TextFieldHandle>, the handle type, rather than Ref<HTMLInputElement>",
+        "Takes ref as an ordinary prop on a React 19 component without forwardRef",
+        "Attaches an inner useRef<HTMLInputElement>(null) to the <input> and implements focus and clear through it",
+        "Calls useImperativeHandle(ref, ...) returning only focus and clear, not the input element"
+      ]
     }
   ]
 }

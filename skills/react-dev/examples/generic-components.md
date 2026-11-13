@@ -45,6 +45,8 @@ export function Select<T>({ options, value, onChange, getKey, getLabel }: Select
 
 With `value: T | null`, `<Select options={['asc', 'desc'] as const} value="random" … />` compiles because `T` widens to `'asc' | 'desc' | 'random'`; with `NoInfer` it is an error. Before TypeScript 5.4, get the same effect with a second parameter: `<T, V extends T = T>` and `value: V | null`.
 
+Source: TypeScript 5.4 release notes, "The `NoInfer` Utility Type", https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-4.html, checked 2026-11-08.
+
 Match options by `getKey`, not by reference (`value === option`): the selected object usually comes from a different fetch or a copy and is never `===` to an option.
 
 ## Literal unions from a prop: `const` type parameters (TypeScript 5.0+)
@@ -60,6 +62,8 @@ export function Tabs<const T extends readonly string[]>({ tabs, active }: { tabs
 ```
 
 Without `const`, `tabs` infers as `string[]` and any `active` string passes. On TypeScript 5.0 to 5.2 the constraint must be `readonly string[]` (a mutable constraint silently falls back to `string[]`); from 5.3 either works.
+
+Sources, checked 2026-11-08: `const` type parameters and the `readonly` constraint advice, TypeScript 5.0 release notes, https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-0.html. The relaxed mutable-constraint behavior is the TypeScript pull request https://github.com/microsoft/TypeScript/pull/55229 (merged during the 5.3 cycle; the 5.3 release notes at https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-3.html do not list it, so confirm the version with the compiler you target).
 
 ## Syntax traps
 

@@ -1,0 +1,188 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "jira",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/jira/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest: jira at dbff837f: 'removed units (351, showing 40)'. All 40 shown items are explained by the current files or by valid rows in docs/audit/recovery/jira/record.md (for example s045, s046 and s050 are restored in commands.md, and s068, s071 and s073 are accepted drops), but 311 items were not shown and could not be checked.",
+          "fix": "Re-run the removal check with the full digest, for example python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/jira/SKILL.md --judge direct --digest-dir <dir>, and add a row to docs/audit/recovery/jira/record.md for any unit no section row covers, or restore it to references/."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/jira/SKILL.md",
+          "line": 49,
+          "evidence": "'**Story or task:** creating one or rewriting its description, also read `references/story-anatomy.md` ... For a draft card, the reply opens with ... Sprint: the next future sprint by default ... Do not load story-anatomy.md for bugs, reads, transitions or comments.' One paragraph mixes the load trigger, the draft output format, sprint policy and a negative load rule. This breaks the process pattern that sections 3.1-3.5 set up.",
+          "fix": "Split the paragraph into a short numbered sub-procedure under section 3 (1. load story-anatomy.md; 2. draft format: three bold lines first, say nothing was created, ask for review; 3. sprint: next future sprint, reason stated, id written in). Keep every rule and keep the 'Do not load' line as the last item."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/jira/evals/trigger-queries.json",
+          "line": 15,
+          "evidence": "'move PROJ-27 to done after checking its available transitions' and 'update the summary of PROJ-18 after fetching its current details' (line 35). These should-trigger queries contain the skill's own procedure, so any description triggers on them. Negatives such as 'Design a Jira workflow policy in prose without accessing an instance' are also unnaturally phrased.",
+          "fix": "Rewrite these as natural user prompts, for example 'can you close out PROJ-27, it shipped yesterday' and 'PROJ-18's title is wrong, should say checkout not cart', and phrase the near-miss negatives the way a user would, for example 'what states should our bug workflow have? just brainstorming'."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/jira/references/mcp.md",
+          "line": 42,
+          "evidence": "'DC: UNVERIFIED (exists from Jira 8.4 in practice)'. This minimum-version fact for the createmeta issuetypes endpoint on Data Center has no source URL and no instruction to read it live.",
+          "fix": "Cite the Atlassian Data Center REST documentation page with the date checked, or replace the version claim with an instruction to probe GET /rest/api/2/issue/createmeta/{project}/issuetypes on the instance and fall back to editmeta or the old createmeta when it returns 404."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/jira/references/mcp.md",
+          "line": 30,
+          "evidence": "'the markdown claim is SOURCED from Atlassian developer community thread 101278, which reports raw ADF dropped on edit'. The MCP description format, which SKILL.md's deployment table relies on, cites a community thread, not the vendor's official documentation.",
+          "fix": "Point to an official Atlassian page or the live tool schema for the description format. If none exists, tell the agent to read the createJiraIssue/editJiraIssue schema description in the session and keep the read-back check, and keep the community thread as supporting context."
+        }
+      ]
+    },
+    {
+      "name": "lesson-learned",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/lesson-learned/record.md",
+          "line": null,
+          "evidence": "Digest at dbff837f: 'removed units (93, showing 40)'. All 40 listed para items map through sections.json to valid record rows (s003-s033), but the other 53 removed units could not be checked",
+          "fix": "Re-run the digest without truncation (or point the judge at the full digest file) so every removed unit can be matched to its record.md row; add a row in docs/audit/recovery/lesson-learned/record.md for any unit that has none"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/lesson-learned/SKILL.md",
+          "line": 41,
+          "evidence": "'Rank them by observable consequence and evidence strength; a demonstrated trade-off beats a neat principle match.' There is no tie-break when a success candidate and a warning candidate are equally strong, but the Load rule (line 13) loads anti-patterns.md only when the lesson is a warning, so two runs can pick different lessons and load different files",
+          "fix": "Add one clause to step 2: 'On a tie, prefer the candidate with test evidence; if both have it, lead with what the change got right and give the warning as the Also worth noting line (read anti-patterns.md for it).'"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/lesson-learned/evals/evals.json",
+          "line": null,
+          "evidence": "Six evals cover a casual question, a pasted diff, a rename, a range, untracked files and no changes. None covers the feature-branch base detection (symbolic-ref, then main/master, then the last-5 fallback) or the merge-commit gotcha ('git show <merge> prints a combined diff that is empty for a clean merge'). Eval 'casual-reflection' also lists references/se-principles.md under files, but that is a skill file, not an input",
+          "fix": "Add an eval with a fixture git log showing a clean merge commit that asserts the answer uses --first-parent evidence and does not report 'no changes', plus one where the repo has no origin/HEAD and only a master branch, asserting the stated base is master. Drop references/se-principles.md from the casual-reflection files list"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/lesson-learned/SKILL.md",
+          "line": 21,
+          "evidence": "'Feature branch (default off the base branch) | Base: `git symbolic-ref --short refs/remotes/origin/HEAD`...'. Followed the branch: nothing says how to tell whether HEAD is on the base branch (for example by comparing `git branch --show-current` with the base), and a detached HEAD (CI checkout, mid-rebase) matches neither the feature-branch row nor the base-branch rule on line 27",
+          "fix": "Add to the scope paragraph: 'Compare `git branch --show-current` with the base; an empty result means detached HEAD: use `git log -p --first-parent -n 5` and say the HEAD was detached.'"
+        }
+      ]
+    },
+    {
+      "name": "react-dev",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/react-dev/record.md",
+          "line": null,
+          "evidence": "previous-version digest react-dev at dbff837f: 'removed units (463, showing 40)'. The digest lists only 40 of the 463 removed units, so the other 423 were not checked one by one. All 40 that were listed map through sections.json to valid record rows (for example para:dafb3235 -> s092 restore-references, now in react-19-patterns.md; para:3b0f05b0 -> s177 restore-references, now in tanstack-router.md section 5).",
+          "fix": "Regenerate the digest without the cut, or with a higher show limit, and judge the remaining 423 units against record.md. Add a para: or section row for any unit that no valid row covers."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 16,
+          "evidence": "'Migration target first: when the task is upgrading an app to React 19, the target is 19 regardless of what is installed.' followed by steps 0-3 inside '## 1. Pin versions before choosing an API'",
+          "fix": "Keep the steps and their wording, but give the React 19 upgrade procedure its own sub-heading (for example '### Upgrading to React 19') under step 1. Then the version-classification table that follows is plainly the non-migration path, and the Process/Tool structure reads cleanly."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/react-dev/evals/evals.json",
+          "line": 165,
+          "evidence": "\"files\": [ \"references/react-router.md\" ] (also in rr7-middleware-migration, route-handle-breadcrumbs, tanstack-search-updater and imperative-handle-ref)",
+          "fix": "Five evals give the skill's own reference file as their input, so they test whether the agent can repeat the reference, not how it handles user code. Replace each with a user-side fixture under evals/files/ (for example a v7.5 server.ts with getLoadContext, a root.tsx with the failing useMatches breadcrumb, and a products route with the filter bar). Keep the same assertions."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/references/tanstack-router.md",
+          "line": 42,
+          "evidence": "'Why the adapter matters is in the SKILL.md gotcha; inside it use `fallback()`, not Zod 3 `.catch()`, which types the field as `unknown`.' The Zod 3 vs Zod 4 validateSearch behaviour and the @tanstack/zod-adapter requirement have no source URL and no checked date, here or in the SKILL.md line 120 gotcha.",
+          "fix": "Add a source line under section 3 citing the TanStack Router search-params or validation guide (https://tanstack.com/router/latest/docs/framework/react/guide/search-params) with the date checked, as section 5 already does."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/react-dev/references/react-19-patterns.md",
+          "line": 174,
+          "evidence": "'Run the codemod exactly as the SKILL.md React 19 gotcha says (pinned version, real source roots, opt-in transforms ...)'. The gotcha only says 'The migration order and codemods are in step 1.'; the commands are in SKILL.md section 1, steps 0-2.",
+          "fix": "Change the pointer to 'Run the codemod exactly as SKILL.md section 1 (migration steps 0-2) says (pinned version, real source roots, opt-in transforms for ref-callback returns and `ReactElement` props).'"
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

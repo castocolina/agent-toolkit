@@ -34,6 +34,12 @@ cp -r skills/react-dev ~/.claude/skills/
 
 `evals/evals.json` holds output evals (fixtures in `evals/files/`), and `evals/trigger-queries.json` holds trigger queries, including near-miss requests that belong to `react-useeffect`, React Native or styling.
 
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+Facts are checked against the official documentation: react.dev (including legacy.reactjs.org), nextjs.org, reactrouter.com, tanstack.com, typescriptlang.org, zod.dev and developer.mozilla.org, and against the README of eps1lon/types-react-codemod.
+
 ---
 
 **Version:** 1.0.0

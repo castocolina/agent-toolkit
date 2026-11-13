@@ -1,0 +1,152 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codex-plan",
+      "percent": 91.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 91.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": null,
+          "evidence": "Digest at dbff837f is a cut list: 'removed units (96, showing 40)'. Every shown item maps to a section row in docs/audit/recovery/codex-plan/record.md through sections.json, and each row is a combination fixer-rules.md allows. The 56 hidden units could not be checked one by one.",
+          "fix": "Regenerate the digest without the cap, or confirm that all 96 units fall under sections s001-s015 of docs/audit/recovery/codex-plan/sections.json, so every removed unit can be checked against its record row"
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 77,
+          "evidence": "'Add these task guidelines to the prompt: each task is specific and actionable, has clear inputs and outputs, is independently testable...' These are generic planning advice the model already produces unprompted.",
+          "fix": "Keep the restored template (record row s011, restore-references). Shorten the guidelines to the parts the skeleton does not already carry: parallel-ready dependencies and test-first. Record any wording that is removed in docs/audit/recovery/codex-plan/record.md"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 34,
+          "evidence": "Workflow step 6 puts a fenced code block and four separate paragraphs (flag sources, --skip-git-repo-check, run directory, wait instruction) inside one numbered item. This breaks the ordered phase list, so step 7 renders detached from steps 1-6.",
+          "fix": "Keep step 6 to one line ('Show the command, then stop.'). Move the command block and its flag notes into a '### Command' subsection right after the Workflow list, and point step 6 to it, so steps 1-7 stay one unbroken checklist"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 104,
+          "evidence": "The Gotchas list covers sandbox flags, secrets and relative paths, but not the argv size limit of '\"$(cat prompt_to_codex.md)\"'. A very large prompt can fail with 'Argument list too long' before Codex starts.",
+          "fix": "Add a gotcha: 'The prompt is passed as one argv string; keep it compact (paths and reasons, not pasted file contents), because a prompt past the shell ARG_MAX limit fails with \"Argument list too long\" before Codex runs.'"
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 29,
+          "evidence": "The baseline one-liner has three '<plan file>' placeholders and one '<literal path>' placeholder in a pipefail pipeline. The agent must hand-substitute them, identically, both in step 5 and again in step 7. This is low freedom in form, but substitution mistakes are easy and would silently change the comparison.",
+          "fix": "Have step 3 also fix the exact pathspec string (for example ':(exclude)codex-plan-2.md'). Tell the agent to copy the completed line verbatim from its step-5 Bash call into step 7, changing only the output path, so both runs are byte-identical"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 32,
+          "evidence": "Unborn-repo branch: 'record only git status --porcelain=v1 -uall ... step 7 then runs this same reduced line; then a printed failure message always means verification is unavailable'. The reduced line has no '|| echo \"baseline failed...\"' clause, so no failure message can be printed. Tracing the branch, failure detection does not resolve.",
+          "fix": "Give the reduced line its own fallback: 'git status --porcelain=v1 -uall -- . \":(exclude)<plan file>\" > \"<literal path>\" || echo \"baseline failed: change verification unavailable\"'. Put this unborn-repo case in a separate sub-bullet of step 5"
+        }
+      ]
+    },
+    {
+      "name": "openapi-to-typescript",
+      "percent": 99.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 99.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: 'removed units (135, showing 40)'. The list is cut, so 95 removed units could not be checked one by one. All 40 shown units map through sections.json to valid rows in docs/audit/recovery/openapi-to-typescript/record.md (s001-s036).",
+          "fix": "Regenerate the digest without a cut (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/openapi-to-typescript/SKILL.md --judge direct --digest-dir <tmp>) and confirm that each of the 135 units maps to a section row in docs/audit/recovery/openapi-to-typescript/record.md. Add a para:<id> row for any unit that does not."
+        }
+      ]
+    },
+    {
+      "name": "requirements-clarity",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/requirements-clarity/record.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: 'removed units (207, showing 40)'. All 40 shown items map through sections.json to valid record rows (s001-s032, with drop rows either low-value generic or 'user accepted the drop'), but 167 removed units were not shown and could not be checked item by item",
+          "fix": "Re-run the removal check with the full, uncut digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/requirements-clarity/SKILL.md ...), so that every para: unit is confirmed against sections.json and record.md. For any unit no section row covers, add a record row or restore the content to references/"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/requirements-clarity/evals/evals.json",
+          "line": 11,
+          "evidence": "\"Identifies missing auth/context decisions\" and, in clarified-spec, \"Asks about remaining boundaries or edge cases\" are loose assertions. No eval covers the Gotchas for an existing PRD file (save v1.1, never overwrite) or for 'you decide' (log the answer as an assumption, keep it out of acceptance criteria)",
+          "fix": "Replace the loose assertions with checkable ones, for example 'Asks at least one question about authentication method or account recovery, and does not ask for the stack'. Add two evals: (a) docs/prds/weekly-csv-export-v1.0-prd.md already exists \u2192 output targets v1.1 and says so; (b) the user answers 'you decide' on a retention period \u2192 the proposal appears under Assumptions owned by the user and in no acceptance criterion"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/requirements-clarity/SKILL.md",
+          "line": 21,
+          "evidence": "\"Stop asking after 3 rounds that together gained under 10 points, or after a round the user did not answer: offer a draft with the open items labelled\". The window is undefined (any 3 rounds, or the last 3 in a row?), and the branch where the user declines the offered draft has no outcome",
+          "fix": "Change it to: 'Stop asking when the last 3 consecutive rounds together gained under 10 points, or after a round the user did not answer: offer a draft with the open items labelled. If the user declines the draft, ask only the carried-over open questions in the next round and do not add new ones.'"
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

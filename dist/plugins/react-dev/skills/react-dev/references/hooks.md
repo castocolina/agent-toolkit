@@ -10,6 +10,8 @@ Only what differs by `@types/react` version or is easy to get subtly wrong. Effe
 | `useRef<number>()` | allowed, `MutableRefObject<number \| undefined>` | type error: an argument is required |
 | Timer ref | `useRef<ReturnType<typeof setTimeout>>()` | `useRef<ReturnType<typeof setTimeout> \| undefined>(undefined)` |
 
+Source: React 19 upgrade guide, "TypeScript changes" (useRef requires an argument; all refs mutable), https://react.dev/blog/2024/04/25/react-19-upgrade-guide, checked 2026-11-08.
+
 Code that must compile against both majors passes an explicit initial value everywhere and never assigns to a DOM ref's `current`.
 
 ## Reducers and context
