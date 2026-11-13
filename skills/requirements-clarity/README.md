@@ -16,6 +16,7 @@ The routing rule, workflow, scoring rubric, conflict rule and gotchas live in [S
 
 - `SKILL.md`: routing, workflow, pre-save check, rubric with anchors, gotchas.
 - `references/prd-template.md`: PRD layout, read only when generating the document.
+- `references/clarification-examples.md`: the Why? and Simpler? core questions and a worked two-round session, read when writing the first clarification response.
 
 ## Example prompts
 
@@ -29,6 +30,12 @@ The routing rule, workflow, scoring rubric, conflict rule and gotchas live in [S
 - `gepetto`: implementation plans once requirements are clear.
 - `frontend-to-backend-requirements`: data needs a frontend has from a backend.
 
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy; this version is rewritten.
+
+Documentation owners credited (official pages listed in `docs/audit/upstream-sources.json`, checked 2026-11-07): Anthropic (skills documentation).
+
 ## Installation
 
 **Claude Code:**
@@ -37,7 +44,7 @@ The routing rule, workflow, scoring rubric, conflict rule and gotchas live in [S
 cp -r skills/requirements-clarity ~/.claude/skills/
 ```
 
-**claude.ai:** add the skill to project knowledge or paste the contents of `SKILL.md` into the conversation.
+**claude.ai:** zip the skill folder and upload it under Customize > Skills ([Using Skills in Claude](https://support.claude.com/en/articles/12512180-using-skills-in-claude), checked 2026-11-07); pasting `SKILL.md` into a chat gives plain instructions, not an installed skill.
 
 ## Evals
 

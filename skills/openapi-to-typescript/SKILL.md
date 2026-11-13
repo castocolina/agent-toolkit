@@ -187,7 +187,8 @@ Emit guards only when the user asks for runtime validation or type guards. Then 
 
 ## Gotchas
 
-- FastAPI 0.99.0 and later emit `openapi: 3.1.0` by default (its release notes: "Upgrade OpenAPI 3.1.0, this uses JSON Schema 2020-12"), so a FastAPI `/openapi.json` hits the 3.1 stop. Read the version line; never assume 3.0 from the generator's name. Editing only the version string does not make the document 3.0: the schemas keep their 3.1 shapes. Ask for a document that really is 3.0.
+- FastAPI 0.99.0 and later emit `openapi: 3.1.0` by default (its release notes: "Upgrade OpenAPI 3.1.0, this uses JSON Schema 2020-12"; https://fastapi.tiangolo.com/release-notes/, checked 2026-11-08), so a FastAPI `/openapi.json` hits the 3.1 stop. Read the version line; never assume 3.0 from the generator's name. Editing only the version string does not make the document 3.0: the schemas keep their 3.1 shapes. Ask for a document that really is 3.0.
+- springdoc-openapi 2.8.0 and later also emit 3.1 by default; its `springdoc.api-docs.version` property selects 3.0 or 3.1, so a Spring document is 3.0 only when the project sets it. NestJS `DocumentBuilder` starts from `openapi: '3.0.0'`, so a NestJS document is usually 3.0, but the version line still decides. Sources, checked 2026-11-07: https://springdoc.org/ and https://github.com/springdoc/springdoc-openapi/blob/main/CHANGELOG.md; https://github.com/nestjs/swagger/blob/master/lib/fixtures/document.base.ts.
 - An interface with an optional fixed property and an index signature fails with TS2411 (`Property 'note' of type 'string | undefined' is not assignable to 'string' index type 'string'`) unless the index type includes `| undefined` or the project sets `exactOptionalPropertyTypes`.
 - Node's type stripping (`node file.ts`, used for the guard mutation tests) rejects `enum` with `ERR_UNSUPPORTED_TYPESCRIPT_SYNTAX`: TypeScript enum is not supported in strip-only mode.
 

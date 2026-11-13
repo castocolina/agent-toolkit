@@ -1,0 +1,161 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codex-plan",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: \"removed units (96, showing 40)\". The digest is cut, so 56 removed units were not listed. Every listed unit maps through sections.json to a valid row in docs/audit/recovery/codex-plan/record.md, and the s011 template, guidelines and decomposition are restored inline.",
+          "fix": "Regenerate the digest without the cut, or confirm that every unit in sections.json s001-s015 is covered by its section row in docs/audit/recovery/codex-plan/record.md. Record any unit that is not covered."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 39,
+          "evidence": "\"- Fix the exact pathspec once in step 3 (for example `':(exclude)codex-plan-2.md'`) and reuse it unchanged here and in step 7, so both runs are byte-identical.\" This repeats step 3 (\"Also fix the exact exclusion pathspec ... use it unchanged in steps 5 and 7\") and step 7 (\"so both runs are byte-identical\").",
+          "fix": "Delete this duplicate bullet. Steps 3 and 7 already say the same thing. Record the removal as an intended-change row (fate removed-on-merit) in docs/audit/recovery/codex-plan/record.md."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 32,
+          "evidence": "Step 5 gives the full baseline line first. Only afterwards does it say \"Run `git rev-parse --verify -q HEAD` first\". In an unborn repo, an agent that follows the text in order runs `git diff HEAD`, gets the failure message, and must then treat verification as unavailable because \"A printed failure message always means verification is unavailable\". The reduced-line branch is never reached.",
+          "fix": "Move the HEAD check to the start of step 5: \"Inside a git repo, first run `git rev-parse --verify -q HEAD`. If it prints a hash, run the full line below. If it prints nothing (unborn repo), run the reduced line instead.\" Then give the two code blocks."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 53,
+          "evidence": "Step 7 says \"then `diff` the two literal paths (or ask the user to). Flag any difference.\" It never says what follows a difference: whether to keep reviewing the plan, how to name the changed files, or whether to offer `git restore`/`git stash` for files Codex should not have touched.",
+          "fix": "Add an outcome to step 7: \"If the diff shows changes, list the changed paths. Tell the user that Codex modified files outside the plan. Suggest `git diff` or `git restore <path>` for them to review or revert, and do not revert anything yourself. Then continue the plan review.\""
+        }
+      ]
+    },
+    {
+      "name": "openapi-to-typescript",
+      "percent": 96.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/openapi-to-typescript/record.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: \"removed units (135, showing 40)\". All 40 listed para items resolve through sections.json to valid record rows (s005-s036), but 95 removed units were cut from the digest and could not be checked one by one.",
+          "fix": "Regenerate the digest without the cut, or with a larger show limit, and confirm that every removed unit maps through docs/audit/recovery/openapi-to-typescript/sections.json to a row in record.md. Add a row for any unit that has none."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 66,
+          "evidence": "Mapping decisions is almost all expert content (3.0.3 nullable semantics, Reference Object siblings, readOnly/writeOnly projections, open-object default). The Parameters and Bodies paragraphs repeat a few things the model already knows, such as \"`in: path` is always required\".",
+          "fix": "No removal needed. Optionally cut those restatements to a clause each so the non-obvious rules stand out, and record any removed sentence in record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 10,
+          "evidence": "\"Before emitting each type, ask: would a value the spec rejects compile, or a value it accepts fail to compile?\" This is the only explicit thinking prompt. The large Mapping decisions table is declarative and gives no rule for choosing a mapping for a construct the table does not list.",
+          "fix": "Add one sentence after the Mapping decisions table that applies the same test to unlisted constructs: map to the narrowest TS form that passes both directions of the opening question, else emit the base type marked `Approximate` and report the keyword."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 183,
+          "evidence": "\"npx tsc -p tsconfig.json --listFilesOnly ... npx tsc --noEmit --strict --target es2022 <out>, or npx -p typescript tsc ...\". These are flags of vendor CLIs (TypeScript's tsc, npm's npx). Unlike the FastAPI, springdoc and Node facts, they carry no source URL or checked date, and no instruction reads them live.",
+          "fix": "Add a source and date after the command, for example \"(flags: https://www.typescriptlang.org/docs/handbook/compiler-options.html and https://docs.npmjs.com/cli/v11/commands/npx, checked <date>)\", or tell the agent to confirm `--listFilesOnly` with `npx tsc --help` before relying on it."
+        }
+      ]
+    },
+    {
+      "name": "requirements-clarity",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/requirements-clarity/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest dbff837f: 'removed units (207, showing 40)'. The digest is cut, so 167 removed units could not be checked one by one. All 40 shown units, and para:126dfd1d from digest 7a1edfc2, are explained by allowed rows in docs/audit/recovery/requirements-clarity/record.md, mapped through sections.json.",
+          "fix": "Rerun the removal check with the full unit list (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/requirements-clarity/SKILL.md ...) so every removed unit is checked against the record. For any unit no section row covers, restore it (into references/ when it is domain-specific, a template users ask for or a tested example) or add a row for it to docs/audit/recovery/requirements-clarity/record.md."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/requirements-clarity/evals/evals.json",
+          "line": 22,
+          "evidence": "clarified-spec assertions: \"Asks about remaining boundaries or edge cases\" and \"Does not invent answers or generate finished PRD\". These are vague next to the other evals, there is no per-category score assertion, and nothing checks that the agent avoids asking again for the Next.js/Postgres stack it was given.",
+          "fix": "Replace them with checkable assertions, for example: 'Shows one line per rubric category with points against each maximum', 'Lists Next.js, Postgres, weekly CSV, under 30 seconds and role-based access as logged decisions with source user', 'Asks at most three questions, none of them about the stack', 'Writes no PRD'."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/requirements-clarity/SKILL.md",
+          "line": 63,
+          "evidence": "\"If `docs/prds/{feature-name}-v{version}-prd.md` already exists, never overwrite it ... Save the next minor version (`v1.1`) and say so.\" The fixed example `v1.1` sends the agent to a path that may also exist (a second revision, or a version the user named). That branch then overwrites an agreed PRD, which is exactly what the gotcha forbids.",
+          "fix": "Reword it to: \"If that file already exists, never overwrite it: it holds decisions someone already agreed to. List docs/prds/{feature-name}-v*-prd.md, save one minor version above the highest existing one (for example v1.2 when v1.1 exists), and report the version you chose.\""
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

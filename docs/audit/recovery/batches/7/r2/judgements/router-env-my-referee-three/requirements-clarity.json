@@ -1,0 +1,59 @@
+{
+  "skill": "requirements-clarity",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/requirements-clarity/record.md",
+      "line": null,
+      "evidence": "previous-version digest at dbff837f: 'removed units (207, showing 40)'. All 40 shown items map through sections.json to valid record rows (s001-s032, with drop rows either low-value generic or 'user accepted the drop'), but 167 removed units were not shown and could not be checked item by item",
+      "fix": "Re-run the removal check with the full, uncut digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/requirements-clarity/SKILL.md ...), so that every para: unit is confirmed against sections.json and record.md. For any unit no section row covers, add a record row or restore the content to references/"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/requirements-clarity/evals/evals.json",
+      "line": 11,
+      "evidence": "\"Identifies missing auth/context decisions\" and, in clarified-spec, \"Asks about remaining boundaries or edge cases\" are loose assertions. No eval covers the Gotchas for an existing PRD file (save v1.1, never overwrite) or for 'you decide' (log the answer as an assumption, keep it out of acceptance criteria)",
+      "fix": "Replace the loose assertions with checkable ones, for example 'Asks at least one question about authentication method or account recovery, and does not ask for the stack'. Add two evals: (a) docs/prds/weekly-csv-export-v1.0-prd.md already exists \u2192 output targets v1.1 and says so; (b) the user answers 'you decide' on a retention period \u2192 the proposal appears under Assumptions owned by the user and in no acceptance criterion"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/requirements-clarity/SKILL.md",
+      "line": 21,
+      "evidence": "\"Stop asking after 3 rounds that together gained under 10 points, or after a round the user did not answer: offer a draft with the open items labelled\". The window is undefined (any 3 rounds, or the last 3 in a row?), and the branch where the user declines the offered draft has no outcome",
+      "fix": "Change it to: 'Stop asking when the last 3 consecutive rounds together gained under 10 points, or after a round the user did not answer: offer a draft with the open items labelled. If the user declines the draft, ask only the carried-over open questions in the next round and do not add new ones.'"
+    }
+  ]
+}
