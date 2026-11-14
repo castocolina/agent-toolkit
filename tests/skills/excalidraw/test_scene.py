@@ -1,4 +1,6 @@
+import importlib.util
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -219,6 +221,31 @@ class SceneTests(unittest.TestCase):
         self.assertIn("already exists", err)
         self.assertEqual(out.read_text(), "keep me")
 
+    def test_edit_refuses_output_equal_to_input_or_existing(self):
+        src = self.tmp / "src.json"
+        shutil.copy(FIXTURE, src)
+        before = src.read_text()
+        code, _, err = run("edit", src, "-o", src, "--relabel", "Postgres=Postgres 16")
+        self.assertEqual(code, 1)
+        self.assertIn("already exists", err)
+        self.assertEqual(src.read_text(), before)
+        other = self.tmp / "other.json"
+        other.write_text("keep me")
+        code, _, err = run("edit", src, "-o", other, "--relabel", "Postgres=Postgres 16")
+        self.assertEqual(code, 1)
+        self.assertIn("already exists", err)
+        self.assertEqual(other.read_text(), "keep me")
+        self.assertFalse(Path(str(other) + ".tmp").exists())
+
+    def test_diff_strict_allowing_a_shape_covers_its_bound_text(self):
+        new = self.tmp / "new.json"
+        run("edit", FIXTURE, "-o", new, "--relabel", "Postgres=Postgres 16")
+        _, s, _ = run("summary", FIXTURE)
+        shape = next(x["id"] for x in s["shapes"] if x["label"] == "Postgres")
+        self.assertEqual(run("diff", FIXTURE, new, "--strict")[0], 1)
+        code, d, _ = run("diff", FIXTURE, new, "--strict", "--allow", shape)
+        self.assertEqual(code, 0, d)
+
     def test_strict_allows_only_named_files_and_appstate_keys(self):
         def mutate(sc):
             sc["files"]["img1"] = {"id": "img1", "mimeType": "image/png", "dataURL": "data:image/png;base64,AA=="}
@@ -305,6 +332,14 @@ class SceneTests(unittest.TestCase):
         code, _, err = run("summary", png)
         self.assertEqual(code, 1)
         self.assertIn("save as .excalidraw", err)
+
+    def test_new_ids_never_start_with_dash(self):
+        spec = importlib.util.spec_from_file_location("scene", SCRIPT)
+        scene = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(scene)
+        ids = [scene.new_id() for _ in range(500)]
+        self.assertFalse([i for i in ids if i.startswith("-")])
+        self.assertTrue(all(re.fullmatch(r"[A-Za-z0-9_-]+", i) for i in ids))
 
 
 if __name__ == "__main__":

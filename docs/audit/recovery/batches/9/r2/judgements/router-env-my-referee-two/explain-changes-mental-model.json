@@ -1,0 +1,95 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 13,
+    "D4": 14,
+    "D5": 15,
+    "D6": 13,
+    "D7": 12,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 111,
+  "max_total": 125,
+  "percent": 88.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 36,
+      "evidence": "Configuration or migrations go first when later behavior needs them, not last by category.",
+      "fix": "Keep the rule; add the non-obvious case a reviewer misses, such as a feature flag or migration that later groups silently depend on, and name the symptom when it is ordered last."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 38,
+      "evidence": "Group files by purpose (not by directory), one group per reviewable idea.",
+      "fix": "State the Process pattern's checkpoint: after section 2's manifest recheck passes, and only then, write section 3. The procedure is already there; the phase boundary is not."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 71,
+      "evidence": "Tool output is truncated beyond roughly 10-30K characters without warning.",
+      "fix": "Keep the Gotchas. Add one NEVER with a why for the two-dot trap already taught in rule 3: NEVER report an A..B diff as 'only this branch's changes', because git diff A B also shows later commits on A as reversed hunks."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 2,
+      "evidence": "Not for editing code, a defect-focused code review, or the PR-workflow command explain-pr-changes.",
+      "fix": "Explain a git diff, commit, branch, range, PR or pasted patch as dependency-ordered logical groups with file references and a review sequence. Use when the user wants to understand, onboard onto or walk through a changeset, asks what changed or what to read first, even without saying 'mental model'. Not for editing the code, a defect-focused review, or the PR-workflow command explain-pr-changes."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 30,
+      "evidence": "Above roughly 800 changed lines or 30 files, which is where the truncation gotcha below starts to bite, switch to this procedure",
+      "fix": "Make the threshold one default: above 30 files or 800 changed lines, always page; below both, read the full diff unless a tool result was visibly cut. Drop the 'roughly' and the separate 10-30K gotcha range, or tie that range to the same default."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "commands/evals/explain-changes-mental-model.json",
+      "line": 1,
+      "evidence": "Six scenarios cover range order, a missing ref, HEAD~3, custom, an empty diff and a large branch; none is a merge commit.",
+      "fix": "Add a merge-commit scenario: more than one parent, so git show is empty and the agent must run git diff \"<arg>^1\" \"<arg>\" --no-color, with assertions that no combined diff is reported as empty and the manifest uses git diff --name-only between those two revs."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 27,
+      "evidence": "Verified and it is a branch (`git show-ref --verify --quiet \"refs/heads/<arg>\"` or `refs/remotes/<arg>`): base is the first that exists of `main`, `master`, `origin/main`, `origin/master`",
+      "fix": "Resolve the branch test for a remote-tracking name: try refs/remotes/<arg> only when <arg> contains a slash, and also try refs/remotes/origin/<arg> for a local-looking name. A name that matches neither, such as origin/feature/x, currently falls through to rule 7 and is explained as one commit."
+    }
+  ]
+}

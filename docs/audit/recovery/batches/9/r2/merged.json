@@ -1,0 +1,248 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "excalidraw",
+      "percent": 97.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 100.0,
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest at dbff837f: removed units (175, showing 40).",
+          "fix": "Provide the complete digest so the remaining 135 removed units can be checked against the current files and docs/audit/recovery/excalidraw/record.md."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/excalidraw/evals/evals.json",
+          "line": 111,
+          "evidence": "The relabel-arrow eval requires --relabel \"HTTPS=HTTPS (TLS 1.3)\", while SKILL.md says a substantially longer label should go through the worker.",
+          "fix": "Align the eval and routing guidance: use a short relabel for the direct-command test and add a separate long-label case that checks the worker and layout-validation route."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 12,
+          "evidence": "The command guidance says \"JSON on stdout, exit 1 on any error\", but scene.py sends exceptions to stderr and argparse exits 2 for invalid usage.",
+          "fix": "Document that successful results and check failures use JSON on stdout, operational errors go to stderr with exit 1, and argparse usage errors exit 2."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 42,
+          "evidence": "The new-diagram route creates fixed 180x80 boxes and asks only to confirm edges; scene.py sizes text at 11 units per character without fitting it to the box.",
+          "fix": "Add a label-fit check to creation, and route labels that exceed their shapes to a layout-capable worker or update the builder to size and wrap shapes safely before publishing."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 44,
+          "evidence": "For an already-invalid original, the instructions say to \"repair only the named errors\" and then rerun the edit; the repair table permits dropping or rebinding broken references, which can change diagram meaning.",
+          "fix": "Show the user the original validation errors and proposed repair, obtain approval for semantic changes, and diff the final result against the original with both repair and requested changes reported before replacement."
+        },
+        {
+          "id": "D8-4",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 26,
+          "evidence": "The route says to use a command whenever it expresses the change, but the Gotchas section sends substantially longer or multiline relabels to a worker because the command does not adjust layout.",
+          "fix": "Make the long-label exception explicit in the routing table before the command-first rule, including the worker's layout check."
+        }
+      ]
+    },
+    {
+      "name": "explain-changes-mental-model",
+      "percent": 94.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 88.8,
+        "router-env-my-referee-one": 99.2
+      },
+      "missing_judges": [],
+      "disagreement": true,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 36,
+          "evidence": "Configuration or migrations go first when later behavior needs them, not last by category.",
+          "fix": "Keep the rule; add the non-obvious case a reviewer misses, such as a feature flag or migration that later groups silently depend on, and name the symptom when it is ordered last."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 38,
+          "evidence": "Group files by purpose (not by directory), one group per reviewable idea.",
+          "fix": "State the Process pattern's checkpoint: after section 2's manifest recheck passes, and only then, write section 3. The procedure is already there; the phase boundary is not."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 71,
+          "evidence": "Tool output is truncated beyond roughly 10-30K characters without warning.",
+          "fix": "Keep the Gotchas. Add one NEVER with a why for the two-dot trap already taught in rule 3: NEVER report an A..B diff as 'only this branch's changes', because git diff A B also shows later commits on A as reversed hunks."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 2,
+          "evidence": "Not for editing code, a defect-focused code review, or the PR-workflow command explain-pr-changes.",
+          "fix": "Explain a git diff, commit, branch, range, PR or pasted patch as dependency-ordered logical groups with file references and a review sequence. Use when the user wants to understand, onboard onto or walk through a changeset, asks what changed or what to read first, even without saying 'mental model'. Not for editing the code, a defect-focused review, or the PR-workflow command explain-pr-changes."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 30,
+          "evidence": "Above roughly 800 changed lines or 30 files, which is where the truncation gotcha below starts to bite, switch to this procedure",
+          "fix": "Make the threshold one default: above 30 files or 800 changed lines, always page; below both, read the full diff unless a tool result was visibly cut. Drop the 'roughly' and the separate 10-30K gotcha range, or tie that range to the same default."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "commands/evals/explain-changes-mental-model.json",
+          "line": 1,
+          "evidence": "Six scenarios cover range order, a missing ref, HEAD~3, custom, an empty diff and a large branch; none is a merge commit.",
+          "fix": "Add a merge-commit scenario: more than one parent, so git show is empty and the agent must run git diff \"<arg>^1\" \"<arg>\" --no-color, with assertions that no combined diff is reported as empty and the manifest uses git diff --name-only between those two revs."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 27,
+          "evidence": "Verified and it is a branch (`git show-ref --verify --quiet \"refs/heads/<arg>\"` or `refs/remotes/<arg>`): base is the first that exists of `main`, `master`, `origin/main`, `origin/master`",
+          "fix": "Resolve the branch test for a remote-tracking name: try refs/remotes/<arg> only when <arg> contains a slash, and also try refs/remotes/origin/<arg> for a local-looking name. A name that matches neither, such as origin/feature/x, currently falls through to rule 7 and is explained as one commit."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": null,
+          "evidence": "The dbff837f previous-version digest states \"removed units (59, showing 40)\"; 19 removal items are not included in the supplied digest. The displayed items are explained by current content or valid recovery-record rows, including the user-accepted drops, but the omitted items cannot be individually checked.",
+          "fix": "Supply the complete previous-version digest with all 59 removal items, retaining docs/audit/recovery/explain-changes-mental-model/record.md and sections.json, so the remaining items can be checked against their current destinations or valid record rows."
+        }
+      ]
+    },
+    {
+      "name": "feedback-mastery",
+      "percent": 94.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 99.2,
+        "router-env-my-referee-one": 90.4
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/feedback-mastery/record.md",
+          "line": null,
+          "evidence": "Digest at dbff837f lists 'removed units (459, showing 40)': only 40 of the 459 removed paragraphs could be checked; all 40 shown items are explained by content present in the current files or by valid record rows (s002, s013, s023, s036, s050, s065, s078, s084, s098, s104, para:ddb88926, para:dbb2774b among them), but the remaining 419 are unverifiable",
+          "fix": "Regenerate the judge digest with the full removed-units list (scripts/audit/audit.py) or add per-unit rows to docs/audit/recovery/feedback-mastery/record.md so every removed paragraph can be verified against the record"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/feedback-mastery/references/feedback-sbi-model.md",
+          "line": null,
+          "evidence": "para:a7a044be: Cross-team collaboration recognition example; record row s101 drops it as generic-model-knowledge.",
+          "fix": "Restore the substantive worked recognition example in references/feedback-sbi-model.md, or add a valid row for it to docs/audit/recovery/feedback-mastery/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": 33,
+          "evidence": "para:09742dea: R1 previously required recognition and corrective feedback to be delivered separately, never in the same conversation or message; the current rule permits an exception without a record row.",
+          "fix": "Restore the previous rule in the main file, or add a row explaining the intended change to docs/audit/recovery/feedback-mastery/record.md."
+        },
+        {
+          "id": "D1-3",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": 42,
+          "evidence": "para:728b5971: The previous dispute test required each factual assertion to be disputable by pointing to a record; the current test replaces that criterion without a record row.",
+          "fix": "Restore the previous test in the main file, or add a row explaining the intended change to docs/audit/recovery/feedback-mastery/record.md."
+        },
+        {
+          "id": "D1-4",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/feedback-mastery/record.md",
+          "line": null,
+          "evidence": "The dbff837f digest reports 'removed units (459, showing 40)', so the supplied removal list is incomplete.",
+          "fix": "Provide the complete digest and reconcile every omitted removal against current destinations or valid recovery-record rows."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": 48,
+          "evidence": "The pre-send gate requires 'the final text of every draft' to be 'written for private delivery', although R3 permits a team-wide norm and expectation resets may need a shared decision record.",
+          "fix": "Limit private-delivery requirements to identifiable corrective feedback and sensitive recaps; allow appropriately scoped group norms and shared stakeholder decisions subject to confidentiality checks."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/feedback-mastery/references/cause-exploration.md",
+          "line": 12,
+          "evidence": "The recurring-behavior path can load this playbook for a peer, but its sequence says to 'State the bar as required' and its no-reason example says 'I need everyone in at the start', without checking the user's authority.",
+          "fix": "Branch on the power relationship before stating a requirement: managers may state an authorized mandatory bar, while peers and upward feedback should make a specific request or seek the appropriate decision-maker."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

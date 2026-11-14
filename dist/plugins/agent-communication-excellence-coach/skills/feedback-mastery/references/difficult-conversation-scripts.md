@@ -4,6 +4,16 @@ Responses to rehearse once the opener is drafted (the opener and rules live in `
 
 ## Reactions that derail the outcome
 
+**Defensiveness, unfair framing** ("That's not fair, you don't understand the whole situation!")
+> "I want to understand. Can you walk me through what happened from your side? I might be missing context."
+
+Asking for their account first is the reply that lowers the temperature; do not argue the fairness.
+
+**Defensiveness, good intentions** ("I was just doing what I thought was right!")
+> "Thanks, that helps me see what you were aiming for. The effect was still [the impact], so let's talk about how to get what you were after without that effect."
+
+Do not assert their intent for them ("I know you meant well"); acknowledge the aim they stated, then return to the effect. To learn more about intent, ask (see SBII in `feedback-sbi-model.md`).
+
 **Deflection to workload** ("I've been so busy with [other project]...")
 > "That's worth discussing. Let's look at your commitments, because I still need [expectation]."
 

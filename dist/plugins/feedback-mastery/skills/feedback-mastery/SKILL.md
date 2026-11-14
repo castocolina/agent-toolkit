@@ -21,19 +21,22 @@ If the user has only an impression ("seems checked out") or hearsay, ask for one
 | Situation | Do | Load |
 | --- | --- | --- |
 | Recognition and corrective feedback in one request | R1 | nothing |
-| One incident, or recognition | SBI opener plus one open question | [feedback-sbi-model.md](references/feedback-sbi-model.md) only if evidence is disputed or there is a power gap |
+| Recognition only | Name the behavior and its effect, then stop (section 3) | nothing |
+| One incident of corrective feedback | SBI opener plus one open question | [feedback-sbi-model.md](references/feedback-sbi-model.md) only if evidence is disputed, there is a power gap, or the user wants to ask about the other person's intent (SBII) |
 | Someone else reported the behavior to the user | Use only an instance the user observed themselves; never name the reporter | [feedback-sbi-model.md](references/feedback-sbi-model.md) for the third-party example |
-| Recurring behavior | R2 | [difficult-conversation-scripts.md](references/difficult-conversation-scripts.md) only to rehearse reactions |
+| Recurring behavior | R2 | [difficult-conversation-scripts.md](references/difficult-conversation-scripts.md) only to rehearse reactions (including defensiveness); [cause-exploration.md](references/cause-exploration.md) when the cause of a repeated lateness or quality problem is unknown and the user will explore it with the person |
 | Same issue across several people or a team | R3 | nothing |
 | Feedback to the user's manager | R4 | [feedback-sbi-model.md](references/feedback-sbi-model.md) for the upward example |
-| User is receiving feedback | Section 4 | nothing |
-| Scope, date, ownership, or success criteria disputed | Section 5 | [expectation-alignment.md](references/expectation-alignment.md) for sample dialogue, the scope-change template, or an ownership reset |
+| User is receiving feedback | Section 4 | [receiving-feedback.md](references/receiving-feedback.md) when the feedback names specific instances and the user must reply, confirm it back or follow up |
+| Ownership disputed | Ownership reset procedure | [expectation-alignment.md](references/expectation-alignment.md), "Ownership reset" |
+| Success criteria or "done" disputed | Success-criteria procedure | [expectation-alignment.md](references/expectation-alignment.md), "Success criteria and assumptions" |
+| Deadline or scope reset | Section 5 (date goal first, then the scope/date trade-off options) | [expectation-alignment.md](references/expectation-alignment.md) for sample dialogue and the scope-change template |
 | Conflict between two other people | R5 | [difficult-conversation-scripts.md](references/difficult-conversation-scripts.md) only once R5's conditions hold |
 | Formal performance process, misconduct, harassment, discrimination, safety | R6 | nothing |
 
 ### Rules R1-R6
 
-- **R1 Mixed request:** deliver recognition and corrective feedback separately, never in the same conversation or message. The praise reads as a setup and the correction erases it.
+- **R1 Mixed request:** by default deliver recognition and corrective feedback separately, in different conversations and messages, so the praise does not read as a setup (the feedback sandwich) and the correction does not erase it. Allow one combined conversation only when the user explicitly needs one and the recognition is genuine and clearly distinct from the correction (its own behavior and effect, not a cushion for it); say that the two parts stay separate within it.
 - **R2 Recurring:** pick one or two instances, the most recent and clearest; never list every entry. A dated list turns the talk into litigating each item. Say what was raised before and what is new.
 - **R3 Several people:** give it to each person individually, on their own instance. A group announcement aimed at a few lands on everyone and changes nothing for the few. A team-wide norm ("CI green before review") may be restated to the group as a norm, with no names or examples.
 - **R4 Upward:** one instance and its effect on the user's work, then a request for a specific change. No verdict on the manager, no demand; private, in a 1:1.
@@ -42,13 +45,13 @@ If the user has only an impression ("seems checked out") or hearsay, ask for one
 
 ## 3. Deliver
 
-Dispute test, for each factual assertion in the opener: could the other person dispute it by pointing to a record? If not, it is an inference; cut it or turn it into a question.
+Dispute test, for each factual assertion in the opener: is it firsthand observable behavior (what the user saw or heard) or interpretation? Tell the two apart. Firsthand observation stays, stated as what was seen or heard, and does not need a record behind it; check any available evidence (PR, ticket, chat log, calendar) separately and acknowledge uncertainty where it is missing or the person may remember it differently ("As I saw it, ..."). Interpretation (motive, feeling, character, "always") is an inference: cut it or turn it into a question.
 
 - **Situation, Behavior, Impact, open question**: "In Tuesday's review [situation], you interrupted Maya twice before she finished [behavior]. We missed her deployment concern until Thursday [impact]. How did you see that discussion?"
 - **Impact** is an effect on the work (blocked merge, missed concern, slipped release) or the user's own reaction stated as theirs. Never the other person's feelings or motives.
 - **Recognition** names the behavior and its effect, then stops: no "but next time", no improvement point, no recap or check-in.
 
-Pre-send gate, on the final text of every draft: every factual assertion passes the dispute test (open questions, requests, commitments and the user's own labeled reactions are allowed; check future options against the stated estimates, assumptions and costs, not a record); no inferred motive or feeling; written for private delivery; passes the [Confidentiality test](#confidentiality-test). Revise until all four pass.
+Pre-send gate, on the final text of every draft: every factual assertion passes the dispute test (open questions, requests, commitments and the user's own labeled reactions are allowed; check future options against the stated estimates, assumptions and costs, not a record); no inferred motive or feeling; identifiable corrective feedback and sensitive recaps are written for private delivery, while an appropriately scoped group norm (R3) or a shared stakeholder decision record (section 5) may go to the group that needs it, with no names, examples or private details; passes the [Confidentiality test](#confidentiality-test). Revise until all four pass.
 
 ## 4. Receive
 
@@ -62,6 +65,8 @@ Sample reply to "You're unreliable":
 
 > "I want to fix this, so I need to know what you're seeing. Which project or date do you have in mind, and what was the effect?"
 > If no example: "Then can we come back to it when one comes up? Flag the next one to me the day it happens, and I'll act on it."
+
+Once the feedback names an instance and the user must reply to it, confirm it back, or follow up, read [receiving-feedback.md](references/receiving-feedback.md).
 
 ## 5. Expectation reset
 
@@ -78,7 +83,7 @@ Contrast. Weak: "Two weeks is really tight; we'll try our best." That accepts th
 
 ## 6. Follow up
 
-For corrective feedback and expectation resets, send a written recap within one working day:
+For corrective feedback and expectation resets, the default is a written recap within one working day. It is subject to the user's agreement, workplace policy, confidentiality needs and the importance of the conversation (a minor aside may need none; a disputed or high-stakes one may need it sooner):
 
 ```text
 Recap of [date]: [situation and behavior discussed]

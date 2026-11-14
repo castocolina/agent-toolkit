@@ -1,0 +1,86 @@
+{
+  "skill": "excalidraw",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": null,
+      "evidence": "Previous-version digest at dbff837f: removed units (175, showing 40).",
+      "fix": "Provide the complete digest so the remaining 135 removed units can be checked against the current files and docs/audit/recovery/excalidraw/record.md."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/excalidraw/evals/evals.json",
+      "line": 111,
+      "evidence": "The relabel-arrow eval requires --relabel \"HTTPS=HTTPS (TLS 1.3)\", while SKILL.md says a substantially longer label should go through the worker.",
+      "fix": "Align the eval and routing guidance: use a short relabel for the direct-command test and add a separate long-label case that checks the worker and layout-validation route."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 12,
+      "evidence": "The command guidance says \"JSON on stdout, exit 1 on any error\", but scene.py sends exceptions to stderr and argparse exits 2 for invalid usage.",
+      "fix": "Document that successful results and check failures use JSON on stdout, operational errors go to stderr with exit 1, and argparse usage errors exit 2."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 42,
+      "evidence": "The new-diagram route creates fixed 180x80 boxes and asks only to confirm edges; scene.py sizes text at 11 units per character without fitting it to the box.",
+      "fix": "Add a label-fit check to creation, and route labels that exceed their shapes to a layout-capable worker or update the builder to size and wrap shapes safely before publishing."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 44,
+      "evidence": "For an already-invalid original, the instructions say to \"repair only the named errors\" and then rerun the edit; the repair table permits dropping or rebinding broken references, which can change diagram meaning.",
+      "fix": "Show the user the original validation errors and proposed repair, obtain approval for semantic changes, and diff the final result against the original with both repair and requested changes reported before replacement."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 26,
+      "evidence": "The route says to use a command whenever it expresses the change, but the Gotchas section sends substantially longer or multiline relabels to a worker because the command does not adjust layout.",
+      "fix": "Make the long-label exception explicit in the routing table before the command-first rule, including the worker's layout check."
+    }
+  ]
+}

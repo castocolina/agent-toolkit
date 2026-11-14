@@ -14,9 +14,11 @@ A skill for Claude Code that prepares, delivers, receives, and follows up on spe
 
 | Reference | Content |
 | --- | --- |
-| `references/feedback-sbi-model.md` | Calibrated SBI examples: observation versus interpretation, recognition, disputed evidence, power gaps, third-party reports, recurring patterns |
-| `references/difficult-conversation-scripts.md` | Responses to common reactions, substitutions that prevent non-obvious failures, the separate-then-joint conflict sequence |
-| `references/expectation-alignment.md` | Deadline pushback dialogue, scope-change template, ownership reset |
+| `references/feedback-sbi-model.md` | Calibrated SBI examples: observation versus interpretation, recognition, disputed evidence, power gaps, third-party reports, recurring patterns, asking about intent (SBII) |
+| `references/difficult-conversation-scripts.md` | Responses to common reactions (defensiveness, deflection, denial), substitutions that prevent non-obvious failures, the separate-then-joint conflict sequence |
+| `references/cause-exploration.md` | Playbooks for recurring lateness and code-quality problems: explore the cause, respond per cause, state the bar, dated check-in |
+| `references/receiving-feedback.md` | Replying to feedback that names an instance: paraphrase, acknowledge the effect without conceding intent, then act and report back |
+| `references/expectation-alignment.md` | Deadline pushback dialogue, scope-change template, ownership reset, explicit success criteria and assumptions |
 
 ## When to Use
 
@@ -49,9 +51,13 @@ feedback-mastery/
 
 For deeper exploration of these concepts:
 
-- *Crucial Conversations* by Kerry Patterson and Joseph Grenny
+- *Crucial Conversations* by Kerry Patterson, Joseph Grenny, Ron McMillan, and Al Switzler
 - *Difficult Conversations* by Stone, Patton, and Heen
 - *Radical Candor* by Kim Scott
 - Amy Edmondson's research on psychological safety
 
 The SBI model was developed by the Center for Creative Leadership.
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy. The SBII extension (asking about intent) follows the Center for Creative Leadership's article [Use Situation-Behavior-Impact (SBI) To Understand Intent](https://www.ccl.org/articles/leading-effectively-articles/closing-the-gap-between-intent-vs-impact-sbii/).
