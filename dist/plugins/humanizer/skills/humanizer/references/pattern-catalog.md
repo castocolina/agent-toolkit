@@ -16,7 +16,7 @@ Praise of the reader or their question. Delete the praise and keep any substance
 
 > Before: Great question! You're absolutely right that this is a complex topic. That's an excellent point about the economic factors.
 >
-> After: This is a complex topic, and you raised a point about the economic factors.
+> After: The economic factors matter here.
 
 ### Corrective-framing disclaimers (current, mid-2026)
 
@@ -36,7 +36,11 @@ Cues: "It's important to note/remember that...", telling an imagined reader to c
 
 ### Knowledge-cutoff disclaimers (older-model, 2022-2023)
 
-Cues: "as of my last training update", "while specific details are limited/scarce", "based on available information". Delete the disclaimer, keep the uncertainty the sentence carries.
+Cues: "as of my last training update", "up to my last knowledge update". Older models with a fixed knowledge cutoff stated that their answer was accurate only up to a date. Delete the disclaimer, keep the uncertainty the sentence carries (a date the source gives stays; none is invented).
+
+### Hedging disclaimers about source availability (older-model, 2024-2025)
+
+Cues: "while specific details are limited/scarce", "not widely documented", "in the provided/available sources", "based on available information". Chatbots with web search that found no source say the information is unavailable, and often add a guess about what it "likely" is; Wikipedia calls the whole statement speculative, including the claim that nothing is documented. Delete the disclaimer, keep the uncertainty the sentence carries, and keep a guess only if the source supports it.
 
 > Before: While specific details about the company's founding are not extensively documented in readily available sources, it appears to have been established sometime in the 1990s.
 >
@@ -68,10 +72,12 @@ Collapse stacked qualifiers ("could potentially possibly") to one that matches t
 
 Read the lists literally: the listed word is the cue, not its synonyms, and a literal sense (a typographic underscore, a steady pulse) is fine. Only a dense cluster counts.
 
-- 2023-mid 2024 (older-model): additionally, crucial, delve (now rare), garner, interplay, intricate, key, landscape, meticulous, pivotal, tapestry, testament, vibrant.
-- Mid 2024-mid 2025 (older-model): align with, enhance, fostering, highlighting, showcasing, underscore.
+- 2023-mid 2024 (older-model): additionally, boasts, bolstered, crucial, delve (now rare), enduring, garner, interplay, intricate, key, landscape, meticulous, pivotal, tapestry, testament, valuable, vibrant.
+- Mid 2024-mid 2025 (older-model): align with, bolstered, enduring, enhance, fostering, highlighting, showcasing, underscore.
 - Mid 2025-mid 2026 (current): emphasizing, enhance, highlighting, showcasing.
-- Mid 2026 onward (current): leverage, multifaceted, foster, prioritize, practical, dependable, steady, quietly, universally, echoed, "matters".
+- Mid 2026 onward (current): leverage, multifaceted, foster, prioritize, practical, dependable, steady, quietly, universally, echoed, "matters", challenge, clearer. "Challenge" and "clearer" are ordinary words: count them only in a dense cluster with the others, and note that the "Despite... faces challenges" cue in SKILL.md is the formula, not the word.
+
+These lists follow Wikipedia:Signs of AI writing (AI-vocabulary section, checked 2026-11-13) and change often: for the current era, read the live page's AI-vocabulary section at https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing before relying on a pinned list.
 
 ## Style and mechanics (checklist; house style wins)
 
@@ -82,3 +88,5 @@ Read the lists literally: the listed word is the cue, not its synonyms, and a li
 ## License
 
 Adapted from [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) (revision 1383638008, 2026-11-03) by its contributors (WikiProject AI Cleanup), licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); paraphrased, condensed and reorganised for prose editing, with rewritten examples. See the page history for authors.
+
+Adapted from revision 1383638008; the page keeps changing, so read the live page for current cues and word lists (word lists checked against it on 2026-11-13).

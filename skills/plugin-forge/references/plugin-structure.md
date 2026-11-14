@@ -1,10 +1,10 @@
 # Plugin Structure Reference
 
-Source: https://code.claude.com/docs/en/plugins/manifest-reference and https://code.claude.com/docs/en/plugins/components (checked 2026-11-04).
+Source: https://code.claude.com/docs/en/plugins/manifest-reference and https://code.claude.com/docs/en/plugins/components (checked 2026-11-13).
 
 ## Default layout
 
-Every path is relative to the plugin root. Add only the directories you use.
+Every path is relative to the plugin root. Add only the directories you use. The tree below is the common part; the live Standard layout at https://code.claude.com/docs/en/plugins/manifest-reference#standard-layout is the full list (checked 2026-11-13) and also has `workflows/` (workflow `.js` files), `themes/` (theme JSON files) and `monitors/monitors.json` (the monitors array).
 
 ```
 plugin-name/
@@ -16,8 +16,7 @@ plugin-name/
 ├── .mcp.json
 ├── .lsp.json
 ├── output-styles/
-├── bin/                         # on the Bash tool's PATH while enabled; claude.ai and Cowork refuse plugins that have it
-└── settings.json                # only `agent` and `subagentStatusLine` take effect
+└── bin/                         # on the Bash tool's PATH while enabled; claude.ai and Cowork refuse plugins that have it
 ```
 
 A `CLAUDE.md` at the plugin root is not loaded as context (`claude plugin validate` warns); put instructions in a skill.
@@ -31,11 +30,11 @@ Every component is namespaced under the `plugin.json` `name`:
 - `commands/db/migrate.md` -> `/plugin-name:db:migrate` (each subdirectory adds a segment)
 - agent `reviewer` -> `plugin-name:reviewer`
 
-Confirm the names after install by typing `/plugin-name:` in a session. `claude plugin details <plugin-name>` lists skills and flat commands but omits commands in subdirectories (checked on Claude Code 2.1.318).
+Confirm the names after install by typing `/plugin-name:` in a session. `claude plugin details <plugin-name>` lists skills and flat commands but omits commands in subdirectories (checked on Claude Code 2.1.323, 2026-11-13).
 
 ## plugin.json
 
-`name` is the only required key: kebab-case, no spaces, `@`, `:` or path separators. Names starting with `claude-`, `anthropic-` or `cc-plugin-` fail validation as impersonating Anthropic.
+`name` is the only required key: kebab-case, no spaces, `@`, `:` or path separators. Names starting with `claude-`, `anthropic-`, `anthropics-` or `cc-plugin-` fail validation as impersonating Anthropic; the exact names and the other cases are in the `name` table at https://code.claude.com/docs/en/plugins/manifest-reference#name (checked 2026-11-13).
 
 Common optional keys: `version` (any string, not checked against semver; pins users until changed), `description`, `author` (`name` required, `email` and `url` optional), `homepage` (must parse as a URL or the plugin fails to load), `repository`, `license` (SPDX id), `keywords`, `displayName`, `dependencies`, `userConfig`.
 

@@ -1,0 +1,200 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "humanizer",
+      "percent": 98.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 98.4
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/humanizer/evals/evals.json",
+          "line": 1,
+          "evidence": "No evals/files/ input fixtures, and the three catalog evals (wrapper-and-identifier, vocabulary-era-lists-older-model, current-era-ordinary-words) only cite references/pattern-catalog.md rather than a pasted draft fixture.",
+          "fix": "Add evals/files/ drafts for the catalog cases (a changelog entry, the museum-loan sentence, the funding paragraph) and point those evals' files arrays at them, keeping the existing assertions."
+        }
+      ]
+    },
+    {
+      "name": "plugin-forge",
+      "percent": 91.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 91.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": null,
+          "evidence": "removed units (209, showing 40) from plugin-forge at dbff837f; the 40 shown paras map to section rows, but the unshown remainder has no per-item row",
+          "fix": "Add a record row for each unshown para:<id> in docs/audit/recovery/plugin-forge/record.md, or restore any still-missing template, procedure or fact into references/"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 17,
+          "evidence": "Workflow step 1 tells the agent to create a missing marketplace.json, while the script contract says the script never creates one and exits 2",
+          "fix": "Add a Gotchas line: never point create_plugin.py at a root with no marketplace.json; write the three required keys first, then run the script, because a missing manifest exits 2 with nothing written"
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 29,
+          "evidence": "For a standard-layout scaffold-only or bump-only request, the contract above is enough; do not load the references",
+          "fix": "Name the files not to load on that path: do not load references/plugin-structure.md, references/marketplace-schema.md or references/workflows.md for a standard-layout scaffold-only or bump-only request"
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/plugin-forge/references/workflows.md",
+          "line": 30,
+          "evidence": "then push the branch or open a pull request the way the repository releases (protected default branch, release branch, PR review)",
+          "fix": "Default to opening a pull request, with push-to-the-release-branch only when the repository's documented flow says so, and keep the existing never-push-to-default rule"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/plugin-forge/evals/trigger-queries.json",
+          "line": 1,
+          "evidence": "21 queries: 11 should-trigger and 10 should-not-trigger, short of about 20 with 8-10 on each side",
+          "fix": "Add about nine realistic should-trigger queries and about ten near-miss should-not-trigger queries (manifest-only edits, remote npm or git-subdir sources, and adjacent non-plugin packaging) so the set is about 20 per side"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/plugin-forge/scripts/bump_version.py",
+          "line": 3,
+          "evidence": "Bump plugin version in both plugin.json and marketplace.json.",
+          "fix": "Change the module docstring to the argparse description already on line 116: bump the version in plugin.json and/or the marketplace entry, wherever it is set, and never add an entry version"
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 9,
+          "evidence": "exact `claude`, `anthropic`, `anthropics`, `claude-code`, `claude-mods`",
+          "fix": "Add `anthropics` to the exact reserved names in references/plugin-structure.md so it matches the SKILL.md contract and check_reserved_name, or cite the name table there as the live list"
+        }
+      ]
+    },
+    {
+      "name": "reducing-entropy",
+      "percent": 91.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 91.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/reducing-entropy/references/simplicity-vs-easy.md",
+          "line": 7,
+          "evidence": "Choose the design with fewer entangled decisions, not merely fewer keystrokes.",
+          "fix": "The model already distinguishes simple from familiar. Keep the two decision questions and the counter-case that a smaller line count can hide coupling; move the restated distinction into the External References note and record the move."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 43,
+          "evidence": "NEVER drop schema columns, migrations or stored data as entropy reduction",
+          "fix": "Add the non-obvious recovery case beside that NEVER: a column dropped in an already-applied migration is not restored by reverting the migration file, so the rollback plan must be a forward migration or a restore from backup."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 3,
+          "evidence": "Use only when the user explicitly asks to reduce entropy, delete code, shrink or simplify a codebase or module",
+          "fix": "Deletion-biased codebase minimization: inventory code to delete or merge, guard behavior, public APIs and data-retention obligations, and measure first-party line counts before and after. Use only when the user explicitly asks to reduce entropy, delete code, shrink or simplify a codebase or module, rip out what is not needed, or pick the smallest (least-code) implementation, including a request buried in a larger review. Not for general refactoring, readability or local cleanups, performance reviews, or the smallest diff that fixes a bug."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/reducing-entropy/README.md",
+          "line": 19,
+          "evidence": "references/adding-reference-mindsets.md - file template and exclusion list for a new lens; read it when adding a reference, it is not loaded at runtime.",
+          "fix": "The runtime procedure never points at this optional file. Add one line to step 3b: when the user asks to add a lens, read references/adding-reference-mindsets.md and do not load the decision lenses for that request."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 14,
+          "evidence": "git ls-files -z ... | xargs -0 -r sh -c 'for f; do [ ! -e \"$f\" ] || cat -- \"$f\"; done' sh | wc -l",
+          "fix": "The measurement is fragile, but the command is not portable: busybox xargs rejects -r, so the counter exits before printing a count. State the default as the same command without -r, and say that an empty list then makes wc print 0; keep -r only as the GNU form."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/evals/evals.json",
+          "line": 103,
+          "evidence": "\"id\": \"stored-name-not-dead\"",
+          "fix": "Give that case an input fixture under evals/files/, such as legacy.py with the polymorphic identity and the Celery decorator, and list it in files so the assertions check the skill against the artifact rather than against the prompt."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 13,
+          "evidence": "NUL-safe, counts untracked files, skips deleted paths, still reports unreadable ones",
+          "fix": "The command does not report unreadable files: a permission error on cat prints a diagnostic and the pipeline still exits 0, so the count looks verified. Add '|| printf \"UNREADABLE %s\\n\" \"$f\" >&2' inside the loop and fail the command when any file is unreadable, matching the rule stated on this line."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 17,
+          "evidence": "Load no other reference.",
+          "fix": "A candidate can match two triggers, and the instruction then contradicts itself. Say to load every reference whose trigger matches that candidate and no reference whose trigger does not."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

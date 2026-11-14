@@ -1,0 +1,113 @@
+{
+  "skill": "reducing-entropy",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 14,
+    "D5": 13,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/reducing-entropy/references/data-over-abstractions.md",
+      "line": 5,
+      "evidence": "Generic operations on generic data structures beat specialized operations on specialized structures.",
+      "fix": "The sentence restates the Perlis line above it, which the model already knows. Delete it and record the removal in docs/audit/recovery/reducing-entropy/record.md, or fold the actionable limit into the three questions that follow."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 3,
+      "evidence": "Use only when the user explicitly asks to reduce entropy, delete code, shrink or simplify a codebase or module, rip out what is not needed, or pick the smallest (least-code) implementation.",
+      "fix": "Deletion-biased codebase minimization: inventory code to delete or merge, guard behavior, public APIs and data-retention obligations, and measure first-party line counts before and after. Use only when the user explicitly asks to reduce entropy, delete code, shrink or simplify a codebase or module, rip out what is not needed, or pick the smallest (least-code) implementation, including a request to drop unused tables, columns, migrations or stored data. Not for general refactoring, readability or local cleanups, performance reviews, or a request to drop unused imports or a single unused function."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/references/expensive-to-add-later.md",
+      "line": 1,
+      "evidence": "---\ndescription: Some things you Probably Are Gonna Need - know when YAGNI doesn't apply because retrofitting is dramatically more expensive than building it in from the start.\n---",
+      "fix": "Drop the YAML frontmatter. Step 3b already names when to load this file, and this description is the old 'read frontmatter to pick a mindset' surface the redesign removed. Record the removal."
+    },
+    {
+      "id": "D5-2",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/reducing-entropy/references/adding-reference-mindsets.md",
+      "line": 1,
+      "evidence": "description: Use when adding a new decision lens to the reducing-entropy references; it gives the file template and the kinds of content a lens must not hold.",
+      "fix": "The README Files list and Adding section already say to read this file when adding a reference. Remove the frontmatter description so the file matches the lens files, which carry no frontmatter, and record the removal."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 10,
+      "evidence": "The command below is the default for a git repo whose code lives under `src`; for any other layout, retarget the pathspec (`src`) and the exclude globs once.",
+      "fix": "Keep the git command as the default, and add one sentence for a non-git tree: run the same exclusions with `find` and `wc -l`, and say the count is not comparable to a later git count."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/evals/evals.json",
+      "line": 47,
+      "evidence": "\"id\": \"not-explicit\" ... \"Output contains no before/after line counts or net line-change figures.\"",
+      "fix": "Add one assertion that the output flags signup() dropping email.strip().lower(), so padded or mixed-case emails fail validation or pass the existing-user check. The prompt and expected_output already require that correctness finding, and the current assertions only check the absence of a deletion plan."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/reducing-entropy/evals/trigger-queries.json",
+      "line": 14,
+      "evidence": "\"remove the unused import on line 3\", \"should_trigger\": false",
+      "fix": "Add a should-not-trigger query for deleting one named unused function, and a should-trigger query that asks to drop an unused table or migration. The current negatives never share the delete verb with a request the description must still catch."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/references/red-flags-and-stop-conditions.md",
+      "line": 9,
+      "evidence": "If the after count is higher, reject the candidate unless a step-1 contract, security or compliance need requires the extra code; then say which one.",
+      "fix": "Name the same three step-1 needs SKILL.md step 6 names: a contract, security, or compliance need. The reference currently omits security, so a security-only increase can be rejected here and kept there."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 19,
+      "evidence": "If anything fails, restore the candidate or fix forward, then re-measure with the step-2 counter.",
+      "fix": "State the default: restore the candidate when the failure is not clearly caused by the change, and fix forward only when it is; then re-measure either way. The current or-choice has no rule for which branch to take."
+    }
+  ]
+}

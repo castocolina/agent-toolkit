@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Bump plugin version in both plugin.json and marketplace.json.
+Bump the plugin version in plugin.json and/or the marketplace entry, wherever it is set; never add an entry version.
 """
 
 import argparse

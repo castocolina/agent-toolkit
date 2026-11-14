@@ -1,0 +1,95 @@
+{
+  "skill": "plugin-forge",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 13,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": null,
+      "evidence": "removed units (209, showing 40) from plugin-forge at dbff837f; the 40 shown paras map to section rows, but the unshown remainder has no per-item row",
+      "fix": "Add a record row for each unshown para:<id> in docs/audit/recovery/plugin-forge/record.md, or restore any still-missing template, procedure or fact into references/"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 17,
+      "evidence": "Workflow step 1 tells the agent to create a missing marketplace.json, while the script contract says the script never creates one and exits 2",
+      "fix": "Add a Gotchas line: never point create_plugin.py at a root with no marketplace.json; write the three required keys first, then run the script, because a missing manifest exits 2 with nothing written"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 29,
+      "evidence": "For a standard-layout scaffold-only or bump-only request, the contract above is enough; do not load the references",
+      "fix": "Name the files not to load on that path: do not load references/plugin-structure.md, references/marketplace-schema.md or references/workflows.md for a standard-layout scaffold-only or bump-only request"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/plugin-forge/references/workflows.md",
+      "line": 30,
+      "evidence": "then push the branch or open a pull request the way the repository releases (protected default branch, release branch, PR review)",
+      "fix": "Default to opening a pull request, with push-to-the-release-branch only when the repository's documented flow says so, and keep the existing never-push-to-default rule"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/plugin-forge/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "21 queries: 11 should-trigger and 10 should-not-trigger, short of about 20 with 8-10 on each side",
+      "fix": "Add about nine realistic should-trigger queries and about ten near-miss should-not-trigger queries (manifest-only edits, remote npm or git-subdir sources, and adjacent non-plugin packaging) so the set is about 20 per side"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/plugin-forge/scripts/bump_version.py",
+      "line": 3,
+      "evidence": "Bump plugin version in both plugin.json and marketplace.json.",
+      "fix": "Change the module docstring to the argparse description already on line 116: bump the version in plugin.json and/or the marketplace entry, wherever it is set, and never add an entry version"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 9,
+      "evidence": "exact `claude`, `anthropic`, `anthropics`, `claude-code`, `claude-mods`",
+      "fix": "Add `anthropics` to the exact reserved names in references/plugin-structure.md so it matches the SKILL.md contract and check_reserved_name, or cite the name table there as the live list"
+    }
+  ]
+}

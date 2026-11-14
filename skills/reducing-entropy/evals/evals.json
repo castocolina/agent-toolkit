@@ -37,11 +37,11 @@
       "files": [
         "references/expensive-to-add-later.md"
       ],
-      "expected_output": "Declines to drop the table, columns or migrations as entropy reduction, names PAGNI (timestamps and audit logs cannot be backfilled), and says dropping them is a separate data-retention change that needs explicit approval and a rollback plan.",
+      "expected_output": "Declines to drop the table, columns or migrations as entropy reduction, names PAGNI (timestamps and audit logs cannot be backfilled), and says dropping them is a separate change from the shrink that needs a data plan or rollback.",
       "assertions": [
         "Does not drop the audit_log table, the timestamp columns or their migrations as part of the code reduction.",
         "Names PAGNI and explains that timestamps and audit history cannot be recovered once dropped.",
-        "Says removing them is a separate data-retention change that needs explicit approval and a rollback plan."
+        "Says removing them is a separate change, not part of the shrink, that needs a data plan or rollback; explicit approval is optional wording (or it says the user decides)."
       ]
     },
     {
@@ -55,6 +55,103 @@
       ],
       "files": [
         "evals/files/refactor-email-validation.diff"
+      ]
+    },
+    {
+      "id": "red-flags-less-code",
+      "prompt": "Reduce entropy in our payments SDK module. Review plan: replace the 20-line retry helper with a new 45-line RetryPolicy class 'for flexibility and cleaner separation of concerns', and strip the type annotations and runtime argument validators from the public charge() function because 'type safety isn't worth the lines' and 'the old code is easier to understand as it is anyway'. charge() is exported in __all__ and called by external SDK consumers. Give your verdict on each point.",
+      "files": [
+        "references/red-flags-and-stop-conditions.md"
+      ],
+      "expected_output": "Rejects the RetryPolicy rewrite because its after count (45) is higher than the before count (20) with no step-1 contract needing the extra code, answers the flexibility and separation arguments with the counts, and keeps the annotations and validators on charge() because it is a public contract that outranks line count.",
+      "assertions": [
+        "Rejects the 45-line RetryPolicy replacement of the 20-line helper because the after count is higher than the before count, and says 'better organized', 'more flexible' or 'cleaner separation' with more code is more entropy.",
+        "Does not strip the type annotations or runtime validators from charge(): it is a public exported name used by external consumers, so the step-1 contract rule outranks line count.",
+        "Rejects the 'adds flexibility' argument for lack of a current need (YAGNI, or no current consumer or named need) instead of accepting it.",
+        "Rejects the 'separation of concerns' argument because it adds code (more files or classes are more code, or more code is more entropy).",
+        "Does not accept 'the old code is easier to understand' as a reason to keep code without comparing counts, or rejects the argument with the counts."
+      ]
+    },
+    {
+      "id": "stop-conditions",
+      "prompt": "Please do a reducing-entropy pass on our Rails app's app/models and config/routes.rb. The models are already thin: each is a single ActiveRecord class with the standard associations and validations, with no wrappers, duplicated helpers or dead files. Delete whatever you can anyway so we get a smaller line count.",
+      "files": [
+        "references/red-flags-and-stop-conditions.md"
+      ],
+      "expected_output": "Reports no deletion candidates instead of inventing them: the code is already minimal for what it does and the framework conventions (standard ActiveRecord associations, validations, routes) should not be fought, so no after count is claimed beyond the unchanged baseline.",
+      "assertions": [
+        "Reports no or few candidates and does not invent deletions to lower the count.",
+        "Gives the reason as the code already being minimal for what it does, or the framework (Rails) conventions not to be fought.",
+        "Does not propose removing standard ActiveRecord associations, validations or Rails route conventions to cut lines."
+      ]
+    },
+    {
+      "id": "pagni-security-ci",
+      "prompt": "Explicit reducing-entropy pass: delete the clutter at the repo root. Candidates: SECURITY.md (it only says to email security@example.com), .github/workflows/ci.yml, and the /api/app-version endpoint that the mobile apps poll so we can force old installs to upgrade. Nobody has touched them in a year.",
+      "files": [
+        "references/expensive-to-add-later.md"
+      ],
+      "expected_output": "Keeps all three as PAGNI items (vulnerability disclosure policy with a security@ address, automated deploys and CI, a mobile kill switch), says they are costly or impossible to add later, and notes any removal needs a separate decision.",
+      "assertions": [
+        "Does not recommend deleting SECURITY.md; names it as a vulnerability disclosure policy with a security@ contact, a PAGNI security fundamental.",
+        "Keeps the CI workflow rather than deleting it as clutter, and names it as infrastructure that is expensive to add later (CI or automated deploys; naming deploys is optional).",
+        "Does not recommend deleting the mobile app-version or kill-switch endpoint; says it cannot be added retroactively to installed apps.",
+        "Names PAGNI (Probably Are Gonna Need It) for the reason, rather than keeping them only because they exist."
+      ]
+    },
+    {
+      "id": "stored-name-not-dead",
+      "prompt": "Explicit reducing-entropy pass on our orders service. I grepped the whole repo and found zero callers of LegacyInvoice (class in orders/legacy.py), zero references to the Celery task 'orders.tasks.send_legacy_receipt' (decorated function send_legacy_receipt, task name set in the decorator), so both are dead. Delete them, since 'no callers' is proof enough. Context: LegacyInvoice is a polymorphic ORM subclass (polymorphic_identity='legacy_invoice') and old rows with that identity are still in the invoices table; pickled LegacyInvoice objects sit in the Redis cache; the receipt task name is in messages already queued in the broker.",
+      "expected_output": "Keeps LegacyInvoice and send_legacy_receipt: an empty caller search is not proof of dead code, and stored data (ORM polymorphic identity rows, pickled objects) and queued Celery messages hold those names, so deleting or renaming them breaks loading in production. Offers a separate migration or drain plan with approval and rollback instead.",
+      "assertions": [
+        "Does not delete LegacyInvoice or send_legacy_receipt, and does not call them dead on the basis of the empty caller search.",
+        "Says the class name is held by stored data (the ORM polymorphic identity rows in the invoices table and the pickled objects in Redis) and that no code search finds that reference.",
+        "Says the Celery task name is held by messages already queued in the broker, so removing or renaming the task would fail when they are consumed.",
+        "Treats removal as a separate change, not part of the shrink, that needs a data plan (a drain or migration of the stored data and queued messages) or a rollback path; user approval is optional wording (or it says the user decides)."
+      ]
+    },
+    {
+      "id": "data-lens-principle-and-sources",
+      "prompt": "I want a reducing-entropy pass on config.py, which has Settings, SettingsManager and SettingsFactory classes that only hold or pass along three dict-like fields. State the principle of the data-over-abstractions lens and who it is credited to, list the questions you ask before keeping a custom type, and give the title of the Mike Acton CppCon 2014 talk exactly as that reference lists it.",
+      "files": [
+        "references/data-over-abstractions.md"
+      ],
+      "expected_output": "States the principle that 100 functions on one data structure beat 10 functions on 10 structures, credits it to Alan Perlis (Epigrams in Programming, ACM SIGPLAN, September 1982), asks whether the type could be a map with well-known keys, a simple tuple or record, or needs custom behavior, and quotes the talk title as 'Data-Oriented Design and C++'.",
+      "assertions": [
+        "States the principle that it is better to have 100 functions operate on one data structure than 10 functions on 10 data structures.",
+        "Credits the principle to Alan Perlis (Epigrams in Programming, no. 9, ACM SIGPLAN, 1982).",
+        "Asks whether the type could be a map or dict with well-known keys, a simple tuple or record, or needs custom behavior rather than just data.",
+        "Gives the Mike Acton talk title as CppCon 2014: Mike Acton \"Data-Oriented Design and C++\" (not just \"Data-Oriented Design\").",
+        "Does not propose deleting a record or type that enforces a validated invariant."
+      ]
+    },
+    {
+      "id": "merge-unknown-invariant-and-displacement",
+      "prompt": "Explicit reducing-entropy pass on our internal pricing package (no public API, everything is imported only inside this repo). Two candidates. (1) shipping/rounding.py has round_fee() and billing/rounding.py has round_charge(); the bodies are character-for-character identical today, but nobody knows whether shipping and billing are meant to round the same way, there are no tests for either, and the owners are unreachable. (2) Delete the 90-line tax_rules.py by moving the rules into a new 140-line tax_rules.yaml read by a new YAML-loading dependency. Give a keep-or-delete verdict for each.",
+      "files": [
+        "references/simplicity-vs-easy.md"
+      ],
+      "expected_output": "Keeps both round_fee and round_charge separate for now because the invariant evidence is unknown (step-4 Unknown row), listing the merge as a hypothesis until tests or the owners confirm, and rejects deleting tax_rules.py into YAML because the complexity only moves into config and a new dependency (step 5) and the after count is higher.",
+      "assertions": [
+        "Keeps round_fee and round_charge as two separate functions and does not merge them, because identical code does not show that the two rules are the same and the invariant evidence is unknown.",
+        "Lists the round_fee and round_charge merge as a hypothesis to confirm with tests or the owners, instead of silently dropping it or executing it.",
+        "Rejects the tax_rules.py to YAML move as a reduction: the complexity moves into config and a new dependency, so the moved lines must be counted or the candidate dropped.",
+        "Notes that the YAML plan raises the total (90 lines replaced by 140 lines plus a new dependency) and so is not a deletion win.",
+        "Does not claim a measured after count; any total is labelled projected or pending."
+      ]
+    },
+    {
+      "id": "adding-reference-lens",
+      "prompt": "I maintain the reducing-entropy skill. Draft a new reference file for it called react-hooks.md with advice like 'React components should use hooks instead of classes', plus a second one called clean-code.md that says 'Write clean code and think before you code'. Follow the skill's own rules for adding references.",
+      "files": [
+        "references/adding-reference-mindsets.md"
+      ],
+      "expected_output": "Declines both: react-hooks.md is technology-specific advice and clean-code.md is a vague platitude with no actionable insight; offers the lens template (frontmatter description starting 'Use when', short decision prompts with a counter-case, External References with primary sources) for a real decision lens instead.",
+      "assertions": [
+        "Declines the React hooks reference as technology-specific advice that belongs in project docs or a technology skill.",
+        "Declines the clean-code reference as a vague platitude with no actionable insight.",
+        "Describes the template for a valid lens as adding-reference-mindsets.md states it: a frontmatter description starting with 'Use when', a few short questions or checks including a counter-case, and an External References list of primary sources.",
+        "Does not write either file as asked."
       ]
     }
   ]

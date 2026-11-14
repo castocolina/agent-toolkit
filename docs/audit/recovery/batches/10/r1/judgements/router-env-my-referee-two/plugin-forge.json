@@ -1,0 +1,113 @@
+{
+  "skill": "plugin-forge",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 17,
+      "evidence": "No .claude-plugin/marketplace.json yet: create it first with {\"name\": \"<kebab-name>\", \"owner\": {\"name\": \"<maintainer>\"}, \"plugins\": []} (all three keys are required).",
+      "fix": "Keep the required-keys fact; move the one-line JSON literal to references/marketplace-schema.md (users ask for the minimal file by name) and point step 1 at it. Do not delete it, and record the move in docs/audit/recovery/plugin-forge/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 15,
+      "evidence": "Workflow step 1 is one bullet list that both classifies source (standard, other local, remote, npm, archive, command) and decides the action (create the manifest, dry-run, hand-write, run the script).",
+      "fix": "Split the classification into a short decision table before the action bullets so the first branch an agent hits is the source type, then the single action for that type."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/plugin-forge/references/plugin-structure.md",
+      "line": 31,
+      "evidence": "Unknown top-level keys are stripped with a validate warning; an unknown key inside userConfig, channels, lspServers or monitors stops the plugin from loading.",
+      "fix": "Add the why next to that sentence: a warning lets the plugin load with the key dropped, while a key inside those objects fails loading, so a typo there is a hard failure rather than a dropped field."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 24,
+      "evidence": "For a standard-layout scaffold-only or bump-only request, the contract above is enough; do not load the references. Other-local and remote scaffolding still need the step 1 reads.",
+      "fix": "Name the files the skip covers (references/plugin-structure.md, references/marketplace-schema.md, references/workflows.md) so a standard bump does not load any of them."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/plugin-forge/references/workflows.md",
+      "line": 30,
+      "evidence": "Commit, then push the branch or open a pull request the way the repository releases (protected default branch, release branch, PR review).",
+      "fix": "Give one default, a pull request against the repository's default branch, and keep the escape hatch that an unprotected branch the user named may be pushed directly."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/plugin-forge/evals/evals.json",
+      "line": 1,
+      "evidence": "Nine evals, all precise and none casual, and several assert phrases the skill states (\"Says none of the three can be used\", \"Names references/marketplace-schema.md\") rather than an observable result.",
+      "fix": "Add two casual phrasings (for example \"my plugin update says already at the latest version, wat do i do\") and rewrite the brittle assertions to check the outcome (reserved names refused, remote source edited by hand) instead of a quoted sentence."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/plugin-forge/evals/trigger-queries.json",
+      "line": 12,
+      "evidence": "The last ten should-not-trigger queries are terse (\"Create VS Code extension manifest and package layout.\") while the eleven should-trigger queries carry paths and backstory.",
+      "fix": "Rewrite four negatives as near-misses with the same context density, such as a Helm chart repo install, an npm library version bump with a changelog, and a standalone SKILL.md the user says not to package."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 10,
+      "evidence": "It rejects names claude plugin validate treats as Anthropic's own (exact claude, anthropic, anthropics, claude-code, claude-mods, prefixes claude-, anthropic-, anthropics-, cc-plugin-, or official beside claude/anthropic; the live rules, which ignore case and also warn on these words elsewhere in a name, are the name table at https://code.claude.com/docs/en/plugins/manifest-reference#name, checked 2026-11-13).",
+      "fix": "Add one clause that the script's check is case-sensitive and does not warn on those words elsewhere in a name (mcp-for-claude passes), and that claude plugin init and claude plugin tag also refuse an erroring name, matching the live table the sentence already cites."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 21,
+      "evidence": "A version that does not change keeps hosted users on their cached copy ... Bump every release, or omit version from both files so the commit SHA becomes the version.",
+      "fix": "Qualify the SHA fallback: it holds for github, url, git-subdir and git-hosted relative paths (shortened to 12 characters); an npm source and a non-git local directory resolve to unknown, so omitting version there does not produce a commit SHA."
+    }
+  ]
+}

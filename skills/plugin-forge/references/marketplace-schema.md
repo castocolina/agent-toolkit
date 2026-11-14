@@ -1,11 +1,11 @@
 # Marketplace Schema Reference
 
-Source: https://code.claude.com/docs/en/plugins/marketplace-reference (checked 2026-11-04). The minimal file and the version, name and relative-path rules are in SKILL.md; this file covers the rest.
+Source: https://code.claude.com/docs/en/plugins/marketplace-reference (checked 2026-11-13). The minimal file and the version, name and relative-path rules are in SKILL.md; this file covers the rest.
 
 ## Top-level fields
 
 - Required: `name`, `owner` (`owner.name` required; `email`, `url` optional), `plugins`.
-- `name`: letters, digits, `.`, `_`, `-`, starting with a letter or digit. Reserved and refused: official names such as `claude-plugins-official` or `anthropic-plugins`, look-alikes such as `official-claude-plugins`, names starting with `claudeai-`, and `npm`, `github`, `gh`, `inline`, `builtin`. Pick a name other authors are unlikely to use; a user can register only one marketplace per name.
+- `name`: letters, digits, `.`, `_`, `-`, starting with a letter or digit. Reserved and refused, by example: official names such as `claude-plugins-official` or `anthropic-plugins`, look-alikes such as `official-claude-plugins`, names starting with `claudeai-`, and tool and source names such as `npm`, `pip`, `github`, `gh`, `inline`, `builtin`, `skills-dir`, `synced`. The list is longer (community and directory names, JavaScript member names, another spelling of a reserved name), so read the live Reserved names section at https://code.claude.com/docs/en/plugins/marketplace-reference#reserved-names (checked 2026-11-13) before settling on a name, and run `claude plugin validate`. Pick a name other authors are unlikely to use; a user can register only one marketplace per name.
 - Optional: `description` (validate warns when missing), `version`, `metadata.pluginRoot`, `forceRemoveDeletedPlugins`, `renames` (old plugin name -> new name, or `null` for a removed plugin).
 - Unknown keys are ignored at load time, so a typo fails silently; `claude plugin validate` reports them as warnings.
 
