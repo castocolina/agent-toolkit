@@ -1,0 +1,68 @@
+{
+  "skill": "explain-pr-changes",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 10,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 382,
+      "evidence": "\u201cOnce the body is written, create or update the PR as phase 5 specifies, passing the title from `$AD/title.txt` in the same call\u201d repeats phase 5's title-file requirement; final-message ordering is likewise restated in phases 2 and 6.",
+      "fix": "Keep each invariant's complete wording at its owning phase and use short cross-references elsewhere. Record the consolidation in docs/audit/recovery/explain-pr-changes/record.md without dropping any distinct requirement or attribution."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 229,
+      "evidence": "The command is 388 lines. Templates and recovery recipes are already split into skills/pr-diagrams/references/pr-body.md, but the command still embeds lengthy state-persistence and failure-message procedures throughout phases 2\u20136.",
+      "fix": "Move the detailed shell-state bootstrap and repeated failure-message recipes into a dedicated section of skills/pr-diagrams/references/pr-body.md, explicitly loaded when executing the phased workflow. Keep phase ordering, safety gates and routing in the command, and record the moves."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/explain-pr-changes.md",
+      "line": 297,
+      "evidence": "\u201cAppend `MODE` to `$AD/state.env` (`printf 'MODE=%q\\n'`).\u201d The shown printf supplies no value; Bash therefore formats an empty string, so following it persists an empty MODE rather than the selected attach or branch mode.",
+      "fix": "Show the complete persistence command: `printf 'MODE=%q\\n' \"$MODE\" >> \"$AD/state.env\"`. Check that sourcing state.env in the next Bash call restores the selected mode."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/pr-diagrams/references/pr-body.md",
+      "line": 33,
+      "evidence": "The required none-mode filter matches `!\\[[^]]*\\](\\[[^]]*\\])?` without excluding inline images. With `[logo]: https://github.com/user-attachments/assets/example` and `![logo](https://static.example.com/logo.png)`, its final awk pass removes `![logo]` because the label is in att, corrupting an ordinary-host image that section 1.3 requires preserving.",
+      "fix": "Make the reference-image pass distinguish inline images followed by `(` from reference-style or shortcut images, preserving inline images untouched after the inline-image filter. Verify this mixed-definition case preserves the complete ordinary-host image while removing actual diagram references."
+    }
+  ]
+}

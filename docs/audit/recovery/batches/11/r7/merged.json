@@ -1,0 +1,365 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "c4-architecture",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.0,
+        "router-env-my-referee-two": 91.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/c4-architecture/record.md",
+          "line": null,
+          "evidence": "The dbff837f digest states \"removed units (334, showing 40)\"; its omitted removal items cannot be individually reconciled against the recovery record.",
+          "fix": "Supply an untruncated digest and reconcile every omitted para item with its current destination or a valid, substantively justified recovery-record row. Preserve recovered examples in references/."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/c4-architecture/references/c4-syntax.md",
+          "line": 230,
+          "evidence": "The frontend example declares `Container(views, \"Views\", \"Vue Router pages\", \"Screens that show the workout\")` outside `Container_Boundary(workout, \"Workout Feature\")`, although its introduction says these are components of one frontend container. Vue Router pages are not independently deployable containers, contradicting SKILL.md step 5.",
+          "fix": "Keep the frontend template in this reference, but make the boundary represent the deployable frontend application and model Views, useWorkout, useTimer and WorkoutRepository as components inside it. Preserve their responsibilities and relationships, render the corrected example, and record the correction."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/c4-architecture/references/advanced-patterns.md",
+          "line": 41,
+          "evidence": "The worked Order System example uses `Rel(orderApi, orderPlaced, \"Publishes\", \"AMQP\")` and `Rel(orderWorker, orderPlaced, \"Consumes\", \"AMQP\")`. These omit what is sent or requested, contradicting SKILL.md step 5's requirement for \"a specific verb plus what is requested or sent\".",
+          "fix": "Retain the example and update its labels to name the actual payload, such as \"Publishes new order jobs to\" and \"Consumes new order jobs from\"; likewise make its database label identify order data. Check the other worked examples against the same model-validation rule and record each correction."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest cut list: removed units (334, showing 40) at dbff837f, with no per-item rows for the 294 unshown units",
+          "fix": "Expand the digest or add a record row for each unshown para:<id> in docs/audit/recovery/c4-architecture/record.md; the 40 shown units are each explained by a section row."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 29,
+          "evidence": "Step 3 says only 'Read advanced patterns for the multi-system layout', while the References section also gates that file on event-driven flows, deployment views, a landscape, a failure-path dynamic diagram and the layered Order API example.",
+          "fix": "At the workflow step that needs each of those, add the same scenario trigger already used in References (read advanced-patterns.md for a deployment view, a failure path, a landscape or the Order API component example; do not load it for a single-system context or container task)."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 41,
+          "evidence": "Step 5 lists three render paths (installed mmdc 11.17.1 or newer, npx @mermaid-js/mermaid-cli@11.17.1, or a hand check) and then says 'Any mermaid-cli 11 or newer works' while also saying the 11.17.1 text-wrap threshold is not verified.",
+          "fix": "Make 11.17.1 the one default command, with the hand check as the only escape hatch when no CLI, network or browser is available; drop the 'any mermaid-cli 11 or newer' alternative or state it fails the wrap check."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/c4-architecture/evals/evals.json",
+          "line": 1,
+          "evidence": "14 evals have verifiable assertions and trigger-queries.json has 10 should-trigger and 10 should-not-trigger queries, but no assertion checks the step 5 render loop (mmdc exit 0, or the stated hand-check fallback) for a diagram the skill itself generates.",
+          "fix": "Add one assertion to context-container-commerce or element-fields-and-key that the generated file was rendered with mmdc and exited 0, or that the answer says it was not rendered and compared every block with references/c4-syntax.md."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/c4-architecture/references/c4-syntax.md",
+          "line": 69,
+          "evidence": "Styling and layout says 'Since Mermaid 11.17.1 element text wraps by default' and SKILL.md step 5 repeats that threshold, while the same paragraph says 'the 11.17.1 version itself is not verified' because the disk has no changelog.",
+          "fix": "Replace the unverified 11.17.1 threshold with the instruction to check the installed renderer's wrapping (the c4 wrap option already cited from mermaid 12.3.0 dist/config.type.d.ts), or add the vendor changelog URL and the date it was checked."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/c4-architecture/README.md",
+          "line": 17,
+          "evidence": "When to Use says 'Show one request or event flow as a numbered dynamic view', while SKILL.md NEVER says Mermaid numbers C4Dynamic labels itself and 'NEVER number labels in C4Dynamic'.",
+          "fix": "Change the README line to 'a dynamic view whose relationships are written in statement order, so Mermaid numbers them', keeping the Credits section unchanged."
+        }
+      ]
+    },
+    {
+      "name": "compose-email",
+      "percent": 86.8,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 88.0,
+        "router-env-my-referee-two": 85.6
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 30,
+          "evidence": "Peer: under 150 words, jargon kept. Stakeholder and manager: business effect first, jargon translated.",
+          "fix": "Keep the audience-specific decisions that materially change the draft, but condense generic audience advice the model reliably supplies and record any removal in docs/audit/recovery/compose-email/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "commands/compose-email.md",
+          "line": null,
+          "evidence": "para:8401c1ce: the three context, existing-draft and no-argument invocation examples were removed; record row s008 drops them as stale because they used /soft-skills:draft-email.",
+          "fix": "Restore the three example invocation forms with the current command name, in a bundled skill reference or the command where needed, or add a valid row for each removal to docs/audit/recovery/compose-email/record.md."
+        },
+        {
+          "id": "D1-3",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": null,
+          "evidence": "The dbff837f digest says 'removed units (61, showing 40)', leaving 21 removed units unavailable for review.",
+          "fix": "Provide the complete digest and check the remaining units against the current content and recovery record; restore or record any unexplained removals."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 19,
+          "evidence": "Pick the strategy by underlying purpose, not audience; the subsequent purpose rules mostly prescribe familiar email structures.",
+          "fix": "Add a concise decision principle for resolving ambiguous or conflicting asks and preserving the sender's intent, grounded in a realistic communication failure, rather than adding more generic email steps."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 3,
+          "evidence": "argument-hint: [context or paste existing draft]",
+          "fix": "argument-hint: \"[context or paste existing draft]\" \u2014 quote the hint so YAML parses it as the command's autocomplete text rather than a sequence."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 38,
+          "evidence": "Body: bullets only for 3-5 parallel points (never more)",
+          "fix": "Treat the bullet count as a flexible default: allow shorter or longer lists when they improve clarity, while preserving the user's explicit format instructions."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 23,
+          "evidence": "Request/approval: the ask and the options in the first sentence; the extension example at lines 58-60 puts the scope-cut option in a later paragraph.",
+          "fix": "Resolve the request branch consistently: either allow options immediately after the opening ask and update the rule, or revise the example so both options appear in its first sentence."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 18,
+          "evidence": "What = the decision or impact (1-2 sentences), Why = the minimum context needed to act (2-3 sentences), How = the ask, owner and deadline",
+          "fix": "Keep the purpose decision tree, the never-invent and never-send rules, and the disclosure and date gotchas; move the sentence-count and word-count defaults the model already applies to a skill this plugin bundles, loaded only when the user gives no length limit, and record the move."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 1,
+          "evidence": "digest cut list: removed units (61, showing 40) at dbff837f",
+          "fix": "The shown para rows are explained by sections.json and record.md; list the 21 unshown para ids in the next digest so each can be matched to a record row, and do not drop any further unit."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 16,
+          "evidence": "Purpose: choose from the list below. ... use Escalation only when impact, uncertainty and a mitigation are all present; otherwise Status ... and FYI ... Anything else uses FYI.",
+          "fix": "Keep the purpose decision tree as the thinking step, then name one default for a message that fits none of the five (for example treat it as FYI and say so) instead of the second 'otherwise FYI' clause that restates the same choice."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 29,
+          "evidence": "Body: bullets only for 3-5 parallel points (never more), bold the one key fact ... keep paragraphs to 2-3 sentences; a wall of text hides the ask.",
+          "fix": "Keep the non-obvious NEVER items (proposed dates, disclosure, unflagged placeholders, unasked CC, disputed assertions). Move this generic layout bullet into the same bundled skill reference as the length defaults, and record the move."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 2,
+          "evidence": "Use for status updates, approval requests, escalations, follow-ups, or when the user only asks to make a message shorter, clearer or less defensive, even without the word email. ... Not for casual chat replies",
+          "fix": "Draft or rewrite a professional email (subject plus What-Why-How body) to a peer, stakeholder, manager or leadership. Use when the user wants a status update, approval request, escalation, follow-up, or to make a message shorter, clearer or less defensive, even without the word email. Not for casual chat replies, and not for sending mail."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 16,
+          "evidence": "Default caps by purpose: Request, Escalation and Follow-up use the What 1-2 and Why 2-3 sentence caps (step 5); Status and FYI-type drafts ... follow the user's voice inside the 150-word default ... The What and Why sentence caps are flexible defaults and also apply to a draft the user gave a length limit, unless the user's own limit or format instruction replaces them.",
+          "fix": "State one default: honor an explicit user length or format limit, otherwise use the purpose sentence caps and the 150-word cap. Delete the sentence that both applies the caps to a user-limited draft and says the user's limit replaces them."
+        },
+        {
+          "id": "D6-2",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 18,
+          "evidence": "The subject length, bullet counts, paragraph lengths and sentence caps in this step and in Gotchas are defaults: an explicit user instruction about format or length takes precedence.",
+          "fix": "Keep the precedence rule once, in step 5, and point step 2 and the Gotchas subject and body bullets at it instead of restating which caps yield."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "commands/evals/compose-email.json",
+          "line": 5,
+          "evidence": "Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing.",
+          "fix": "Add one edge-case scenario whose prompt does not tell the agent to invent a missing value: a reply to a received email that has no date, asserting that any deadline is a labelled placeholder or proposal and that no date is invented."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 14,
+          "evidence": "Blocking: no topic AND no source draft AND no received message: ask once and stop only then. ... Not blocking: a missing recipient name ... When the request or source gives a deadline ... write that date",
+          "fix": "Name the outcome for a topic with no recipient: draft with [recipient] and do not ask. The current blocking test only resolves the empty case, so a recipient-only argument is both 'not blocking' and 'nothing at all is known'."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 16,
+          "evidence": "Leadership: put the decision or approval request first when one exists; otherwise lead with the informational change ... Keep the five-sentence default: at most 5 sentences (a mixed-audience technical paragraph does not count toward the cap).",
+          "fix": "Say whether the leadership five-sentence cap binds a mixed audience that includes leadership, and whether the technical paragraph is exempt only then; the two branches currently do not meet."
+        }
+      ]
+    },
+    {
+      "name": "explain-pr-changes",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 94.4,
+        "router-env-my-referee-two": 89.6
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 308,
+          "evidence": "The command exceeds 200 lines despite splitting templates and assembly implementations into a bundled skill. Detailed attachment and recovery instructions remain under '### Phase 5: PR write', alongside the reference's 'Branch publish and attach recovery' recipe.",
+          "fix": "Move the detailed attachment-body construction and create/edit/recovery recipes into skills/pr-diagrams/references/pr-body.md. Keep the phase ordering, final size gate, terminal-failure invariant, and explicit conditional reference-loading instruction in the command; record the moves in docs/audit/recovery/explain-pr-changes/record.md."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/pr-diagrams/references/pr-body.md",
+          "line": 34,
+          "evidence": "The none-mode filter uses 'while (match(rest, /!\\[[^]]*\\](\\[[^]]*\\])?/))' without distinguishing an inline image from a shortcut reference. Given '[logo]: https://github.com/user-attachments/assets/example' and '![logo](https://static.example.com/logo.png)', the sed stage preserves the ordinary-host image, but the final awk removes '![logo]' because its alt text matches the diagram reference label, leaving the bare '(https://static.example.com/logo.png)'. This contradicts section 1.3's 'Never ... strip it' rule for ordinary images.",
+          "fix": "Update the final awk pass to recognize and preserve complete inline-image spans before resolving reference-style or shortcut images; resolve shortcut labels only when the image is not followed by an inline destination. Add this label-collision scenario with an assertion that the ordinary-host image remains byte-for-byte intact to commands/evals/explain-pr-changes.json."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 335,
+          "evidence": "Phase 4 restates the script's capability contract (exit 0 prints attach or branch; exit 2 or other stdout is terminal; old gh prints branch) and then repeats the same 2.101 sort -V check the script already ran.",
+          "fix": "Keep only the command-specific outcome (when to skip render, the Mermaid fallback, and the warning text) and point the probe rules at skills/pr-diagrams/SKILL.md, which already states capability always exits 0 and that gh older than 2.101 selects branch."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "commands/explain-pr-changes.md",
+          "line": 335,
+          "evidence": "Exit 2, any other non-zero exit, or exit 0 with any other stdout stops the run before render as a terminal failure ... names the failing pr-diagrams.sh capability call. The bundled script's own help says capability prints attach or branch and always exits 0, and cmd_capability returns 0 after a failed, timed-out, or unparsable gh --version probe with stdout branch.",
+          "fix": "Follow the script: treat exit 0 with stdout branch as branch mode (including a failed probe), and reserve the terminal stop for the cases the script actually fails, exit 2 from a stray argument or an invalid PR_DIAGRAMS_MODE."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 2,
+          "evidence": "argument-hint lists only --diagrams=none|mermaid|drawio, not the bare aliases the body treats as the only recognized option tokens.",
+          "fix": "argument-hint: \"[--diagrams=none|mermaid|drawio|--drawio|--mermaid|--no-diagrams] [--reuse-from=<PR>] [--base=<branch>] [Close-args]\""
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 335,
+          "evidence": "Only in attach mode, run gh --version and compare the printed version with 2.101 using sort -V ... the check runs before rendering, even though capability already selected attach only when gh is at least 2.101.",
+          "fix": "Drop the second gh --version comparison in attach mode and trust the capability result the command just stored in MODE."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 335,
+          "evidence": "A version older than 2.101, for example gh version 2.100.0, fails the check, restates a comparison the bundled capability probe already performs and documents.",
+          "fix": "Delete the worked example of the version comparison and record the removal; the mode decision stays in pr-diagrams.sh."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 328,
+          "evidence": "Because $AD and the pointer file do not exist yet at this point, the phase 6 cleanup is skipped and nothing needs removing; \"nothing else runs\" refers to reads and PR writes.",
+          "fix": "State the phase-2 stop once: quote the tool error and skip cleanup because no scratch directory exists. Do not re-explain the same sentence."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

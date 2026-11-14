@@ -1,0 +1,49 @@
+{
+  "skill": "c4-architecture",
+  "mode": "output",
+  "pass_rate": 0.8519,
+  "passed": 46,
+  "total": 54,
+  "failures": [
+    {
+      "eval": "context-container-commerce",
+      "assertion": "Writes the context view to a file under docs/architecture/ (such as c4-context.md) that contains a C4Context block",
+      "evidence": "The output calls `docs/architecture/c4-context.md` a proposed documentation file and says \u201cAfter saving the files\u201d, so it does not claim the file was written."
+    },
+    {
+      "eval": "context-container-commerce",
+      "assertion": "Writes the container view to a separate file under docs/architecture/ (such as c4-containers.md) that contains a C4Container block",
+      "evidence": "The output presents `docs/architecture/c4-containers.md` among \u201cthe proposed documentation files\u201d and refers to saving the files afterward."
+    },
+    {
+      "eval": "context-container-commerce",
+      "assertion": "Each written file contains a one-line prose key under its diagram that explains the notation, and uses no Legend macro",
+      "evidence": "The proposed keys span multiple source lines, as in \u201c**Key:** Person = human user; Software System = system in scope;\u201d followed by \u201cExternal System = separately operated dependency.\u201d"
+    },
+    {
+      "eval": "element-fields-and-key",
+      "assertion": "Every Container and ContainerDb has four fields: a specific name, a technology (Vue, Django, MySQL) and a description of what it is responsible for, none left empty; a name the prompt itself gives (for example \"web app\", \"API\" or \"MySQL database\") is accepted, a bare placeholder such as \"Service\" is not",
+      "evidence": "The database element is named only \"Database\" in `ContainerDb(db, \"Database\", \"MySQL\", \"Stores CRM data.\")`."
+    },
+    {
+      "eval": "element-fields-and-key",
+      "assertion": "Writes a one-line key in prose under the diagram that explains the notation (element types, arrow meaning or colors), and does not use a Legend macro",
+      "evidence": "The key spans three source lines: \"**Key:** Boxes represent containers; the database-shaped box represents a\\ndatabase container. The boundary groups containers in the CRM system.\\nDefault colors carry no additional meaning.\""
+    },
+    {
+      "eval": "replicas-in-one-node-label",
+      "assertion": "Contains the api Container exactly once and the PostgreSQL database once, with one-way Rel lines that each have a verb label and a technology",
+      "evidence": "The one-way relationship has the verb label \u201cQueries reporting data from\u201d but specifies its technology as \u201cunknown (ask)\u201d rather than naming a technology."
+    },
+    {
+      "eval": "deployment-version-labels",
+      "assertion": "Says, once and for the labelled technologies as a group (not one statement per technology), that no versions were provided, instead of presenting any label version as fact",
+      "evidence": "The output says \"Its cluster name and Kubernetes version are unknown,\" but does not state that no versions were provided for the labelled technologies as a group."
+    },
+    {
+      "eval": "split-oversized-view",
+      "assertion": "Splits the views by bounded context (for example orders, catalog, billing, shipping and identity), each view holding one context's containers with its direct dependencies",
+      "evidence": "The output combines contexts in views titled \"orders and catalog\" and \"billing and shipping\" and states that \"relationships are omitted because none were provided.\""
+    }
+  ]
+}

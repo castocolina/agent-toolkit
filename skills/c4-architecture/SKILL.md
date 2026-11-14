@@ -1,6 +1,6 @@
 ---
 name: c4-architecture
-description: "Generate architecture documentation as C4 model Mermaid diagrams (context, container, component, dynamic, deployment) from a description or from repository evidence such as docker-compose, Kubernetes manifests and package files. Use when users ask to map or document a software system, its deployable applications, data stores, external actors, team boundaries, request flows or production infrastructure, even without naming C4. Not for ER diagrams, plain flowcharts or sequence diagrams, draw.io or cloud-icon diagrams, explaining C4 theory without a diagram, reviewing existing C4 diagrams without regenerating them, implementation work, or ADR prose."
+description: "Generate architecture documentation as C4 model Mermaid diagrams (context, container, component, dynamic, deployment) from a description or from repository evidence such as docker-compose, Kubernetes manifests and package files. Use when users ask to map or document a software system, its deployable applications, data stores, external actors, team boundaries, request flows or production infrastructure, even without naming C4. Not for ER diagrams, plain flowcharts or sequence diagrams, draw.io or cloud-icon diagrams, explaining C4 theory without a diagram, reviewing existing C4 diagrams without regenerating them, implementation work, or ADR prose. Also use to fix broken C4 diagrams or translate them for a renderer without C4 support."
 ---
 
 # C4 Architecture Documentation
@@ -15,7 +15,7 @@ Default: Context + Container. Overrides, in this order:
 - Executives: Context only. DevOps or "production infrastructure": Container + Deployment.
 - Developers or architects naming a container: add its Component view. Naming none: Context + Container, then offer a Component view for the container with the most distinct responsibilities.
 - Several audiences: the union of their views.
-- Only a system-level description (users and "a backend"): Context only, and ask for the facts the Container and Deployment views need.
+- Only a system-level description (users and "a backend"): Context only, and ask for the facts the Container and Deployment views need, including the protocol of each relationship where it matters.
 
 Produce a Component view when the user asks for one and the container is identifiable, or when one container holds distinct responsibilities a reader must see (about five or more modules is a hint, never a gate). If the requested container cannot be identified, say so and ask. Skip the Code level; IDEs generate it. Deployment and Dynamic are supplementary views, not levels.
 
@@ -36,7 +36,7 @@ When repository files are available, reconcile the Compose, package and deployme
 | Replica counts, ingress, load balancers, namespaces, node pools | Deployment view only; replicas go in the node label (`shop-api x3`), not as duplicate containers |
 | Compose and production manifests disagree (a dev-only service, a local database the manifests replace) | Model the manifest for the requested environment, say which one you used, and record the conflict as **Inferred** |
 
-Relationship direction follows the initiator: client to server, producer to topic ("Publishes"), consumer to topic ("Consumes"). Label each relationship with a verb and the evidenced protocol or technology. When there are no files, model only what the user stated.
+Relationship direction follows the initiator: client to server, producer to topic ("Publishes"), consumer to topic ("Consumes"). Label each relationship with a verb and the evidenced protocol or technology. When there are no files, model only what the user stated. When the user gave a relationship but no protocol, write the technology as `unknown (ask)` (never invent one) and list it as an open question to the user.
 
 Under each diagram add an evidence table: element or relationship, source file (or "user statement"), and **Observed** or **Inferred**. Never present an unprovided cloud provider, database, language or deployment as fact; mark it unknown and ask, or state it as an assumption. A local Compose file is not evidence for production hosting.
 
@@ -52,12 +52,14 @@ Default destination `docs/architecture/`: `c4-context.md`, `c4-containers.md`, `
 
 ### 5. Verify until it passes
 
-1. Render every file: `mmdc -i docs/architecture/c4-containers.md -o "$(mktemp -d)/out.md"`. It renders each Mermaid block and exits 1 on a parse error or an undeclared alias. No `mmdc`, or one older than 11: `npx -y -p @mermaid-js/mermaid-cli@11.17.0 mmdc -i <file> -o <tmp>/out.md`, the version the rules here were verified with. No CLI, no network, or no browser for it to launch: check by hand against [syntax reference](references/c4-syntax.md) and tell the user the diagrams were not rendered.
+1. Render every file with mermaid-cli 11.17.1 or newer: `mmdc -i docs/architecture/c4-containers.md -o "$(mktemp -d)/out.md"`. It renders each Mermaid block and exits 1 on a parse error or an undeclared alias. Older versions may not wrap element text; the 11.17.1 threshold is not verified (see [syntax reference](references/c4-syntax.md)), so render once and check the installed renderer's wrapping before relying on it. No `mmdc`, or one older than 11.17.1: `npx -y -p @mermaid-js/mermaid-cli@11.17.1 mmdc -i <file> -o <tmp>/out.md`. Any mermaid-cli 11 or newer works: the rules here were checked on 11.17.0 and on 12.2.0 (https://github.com/mermaid-js/mermaid-cli, checked 2026-11-13). No CLI, no network, or no browser for it to launch: check by hand against [syntax reference](references/c4-syntax.md) and tell the user the diagrams were not rendered. A hand check passes only after every block is compared with that reference (five headers, declared aliases, braces only on boundaries and deployment nodes), and the user is told the files were not rendered.
 2. On failure, fix the reported line, re-render, and repeat until every file exits 0.
 3. Check the model, fix what fails with [common mistakes](references/common-mistakes.md), and go back to step 1:
    - Every container is independently deployable; classes, modules and libraries are components or absent.
    - External systems are one `System_Ext` each, with no internals.
-   - Every relationship is one-way, with a verb and a technology.
+   - Every element has a name, a type, a technology where applicable (every container and component) and a short description; Mermaid accepts the omitted fields without a warning. The macro is the type (Mermaid prints it in the box), so check that every box uses a real C4 macro: `Person`, `System`, `Container`, `Component`, or their `Db`, `Queue` and `_Ext` forms.
+   - Every relationship is one-way, with a specific verb plus what is requested or sent ("Requests account data from", "Publishes order events to"); a bare "Uses" or "Accesses" fails (see [common mistakes](references/common-mistakes.md)). Each also has a technology; `unknown (ask)` passes only for a protocol the user has not supplied, and it is then listed as an open question.
+   - Each diagram has a one-line key under it saying what the notation and any colors mean, because Mermaid draws no legend.
    - Each diagram has a specific title (deployment titles name the environment) and stays under 20 elements, ideally about 15.
    - Names and aliases are identical across views.
    - The evidence table is present, and no NEVER rule is broken.
@@ -95,5 +97,5 @@ Say explicitly that it is a downgrade: the C4 shapes and styling are lost, and t
 ## References
 
 - [syntax reference](references/c4-syntax.md): read for a macro signature, styling or label offsets, layout control, deployment node variants, or a render error the NEVER list does not explain. Simple context or container diagrams do not need it.
-- [advanced patterns](references/advanced-patterns.md): read for several software systems or teams, event-driven flows, deployment views, a system landscape, or a failure-path dynamic diagram. Do not load it for a single-system context or container task.
+- [advanced patterns](references/advanced-patterns.md): read for several software systems or teams, event-driven flows, deployment views, a system landscape, a failure-path dynamic diagram, or a component view that needs the layered Order API example. Do not load it for a single-system context or container task.
 - [common mistakes](references/common-mistakes.md): read when a step 5 model check fails, for the wrong and correct version of that mistake. Do not load it when the checks pass.

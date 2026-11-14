@@ -1,0 +1,374 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "c4-architecture",
+      "percent": 92.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 90.4,
+        "router-env-my-referee-two": 94.4
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/c4-architecture/references/advanced-patterns.md",
+          "line": 200,
+          "evidence": "para:fdbcf945: the former ADR Reference in Diagrams example showed ADR-001, ADR-002 and ADR-003 in comments and element descriptions. Record row s055 says it is text-present, but the current section retains only a short prose instruction and one description fragment, not the reusable diagram example.",
+          "fix": "Restore the ADR-linked Mermaid diagram example in skills/c4-architecture/references/advanced-patterns.md, adapting it to the current relationship and element rules, or add a valid row explaining its removal to docs/audit/recovery/c4-architecture/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": null,
+          "evidence": "The dbff837f digest reports 'removed units (334, showing 40)', so 294 removed units cannot be individually checked from the supplied digest.",
+          "fix": "Provide the complete digest for a full removal check and record or restore any unexplained substantive removals."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 3,
+          "evidence": "The description excludes 'reviewing existing C4 diagrams without regenerating them' but does not mention repairing a broken C4 diagram or translating one for an unsupported renderer, both workflows covered by the skill and its evals.",
+          "fix": "Generate and repair architecture documentation as C4 model Mermaid diagrams: context, container, component, dynamic and deployment views. Use when users ask to map or document a software system, its deployable applications, data stores, external actors, request flows or production infrastructure from a description or repository evidence such as Docker Compose and Kubernetes manifests, even without naming C4. Also use to fix broken C4 diagrams or translate them for a renderer without C4 support. Not for ER diagrams, ordinary flowcharts or sequence diagrams, draw.io or cloud-icon diagrams, C4 theory without a diagram, review-only requests, implementation work, or ADR prose."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 104,
+          "evidence": "The advanced-patterns reference is triggered for several systems, event-driven flows, deployment, landscapes and failure paths, but its 'Components of one container' example has no component-view loading trigger.",
+          "fix": "Add a conditional instruction to read references/advanced-patterns.md when a component-view task needs the layered Order API example, while retaining the existing exclusions for simple context and container tasks."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/c4-architecture/references/common-mistakes.md",
+          "line": 28,
+          "evidence": "The diagram labeled 'CORRECT: Classes as Components' contains Rel(userController, userService, \"Delegates to\") and Rel(userService, userRepo, \"Loads users with\") without technologies, contradicting SKILL.md step 5: 'Every relationship is one-way, with a verb and a technology.'",
+          "fix": "Add the evidenced in-process call technology to the correct example's relationships and audit the other correct examples in this reference for the same contradiction."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 61,
+          "evidence": "The workflow requires 'Every relationship ... with a verb and a technology' while line 39 requires the technology to be evidenced and the sparse-input branch permits modeling only user-stated facts. When a user gives a relationship but no protocol, these instructions do not give a non-invented way to pass verification.",
+          "fix": "Define an explicit unknown-technology representation or a documented exception to the check, and ask for the protocol where useful; do not invent a technology merely to pass validation."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/c4-architecture/references/c4-syntax.md",
+          "line": 73,
+          "evidence": "'Since Mermaid 11.17.1 element text wraps by default' is a version-sensitive behavior claim without a source URL and check date.",
+          "fix": "Cite the official Mermaid documentation or release note for this behavior and the date checked, or instruct the agent to verify the installed renderer's behavior before relying on it."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/c4-architecture/references/c4-syntax.md",
+          "line": 73,
+          "evidence": "Since Mermaid 11.17.1 element text wraps by default; set `c4: { wrap: false }` in the diagram config to turn it off.",
+          "fix": "This is a renderer fact the model will not produce unprompted, so keep it, but name the diagram-config mechanism (a `%%{init: {'c4': {'wrap': false}}}%%` directive, or the mermaid.initialize config) so the line is actionable; record the wording change."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 55,
+          "evidence": "No `mmdc`, or one older than 11: `npx -y -p @mermaid-js/mermaid-cli@11.17.0 mmdc` ... Any mermaid-cli 11 or newer works",
+          "fix": "The render command is fragile and the version floor contradicts the wrap fact: make mermaid-cli 11.17.1 or newer the default command, and say an installed 11.0 through 11.17.0 renders but does not wrap element text."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/c4-architecture/evals/evals.json",
+          "line": 1,
+          "evidence": "14 evals with verifiable assertions and 20 trigger queries (10/10, near-miss negatives), but no assertion checks the step 5 rule that every diagram carries a one-line key, and element-fields-and-key only checks the CRM container diagram.",
+          "fix": "Add one assertion to context-container-commerce and to deployment-production that the written file contains a one-line prose key explaining the notation, and that it uses no Legend macro."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/c4-architecture/references/c4-syntax.md",
+          "line": 73,
+          "evidence": "set `c4: { wrap: false }` in the diagram config to turn it off",
+          "fix": "Show the exact config the agent writes: a `%%{init: {'theme':'base','c4':{'wrap':false}}}%%` line before the diagram header, or the mermaid.initialize JSON, and say which one a markdown file uses."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/c4-architecture/references/c4-syntax.md",
+          "line": 3,
+          "evidence": "Checked against the Mermaid C4 documentation (https://mermaid.js.org/syntax/c4.html) and rendered with mermaid-cli 11.17.",
+          "fix": "Add the date checked next to mermaid-cli 11.17, the same way the 12.2.0 line is dated 2026-11-14."
+        }
+      ]
+    },
+    {
+      "name": "compose-email",
+      "percent": 86.0,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 89.6,
+        "router-env-my-referee-two": 82.4
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 31,
+          "evidence": "\u201cWhat = the decision or impact (1-2 sentences), Why = the minimum context needed to act (2-3 sentences)\u201d and \u201ckeep paragraphs to 2-3 sentences; a wall of text hides the ask\u201d are predominantly activation of familiar writing practices. Weighted by section length, the Arguments and Example Usage sections also contribute substantial activation rather than expert-only knowledge.",
+          "fix": "Keep the recovered formatting rules and example, but strengthen the workflow with task-specific judgment that ordinary email advice misses. For replies containing disputed assertions, explicitly attribute the sender's claim instead of adopting it as fact, then distinguish the user's position from the requested resolution. Consolidate repeated formatting instructions into one authoritative location and record any removed duplicate wording in docs/audit/recovery/compose-email/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/compose-email/record.md",
+          "line": null,
+          "evidence": "The dbff837f digest states \u201cremoved units (61, showing 40)\u201d; 21 removal items are not shown. The supplied items are explained by current content or valid record rows, but the truncated digest prevents a complete item-by-item check.",
+          "fix": "Supply the complete removal digest for commands/compose-email.md at dbff837f, including the remaining 21 items, and check each against the current command and docs/audit/recovery/compose-email/record.md."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 21,
+          "evidence": "The purpose tie-break says \u201cuse Escalation only when impact, uncertainty and a mitigation are all present; otherwise FYI\u201d, but line 24 separately defines \u201cStatus: the delta since the last update, then the risk.\u201d Following the ordered classifier for a routine progress report with no ask, prior unanswered request or escalation conditions leads to FYI, leaving the Status strategy unreachable.",
+          "fix": "Make Status an explicit reachable branch before the final FYI fallback: classify a progress report without a decision request as Status and lead with its delta and risk; reserve FYI for other informational messages. Preserve the existing Request and Follow-up precedence."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "docs/audit/recovery/compose-email/record.md",
+          "line": 4,
+          "evidence": "s005 Step 3: Apply Email Best Practices | removed-to-fit | real | restore-references | reusable-template | subject tag convention (\"5-8 words\", \"[Action Required]\", \"[FYI]\", \"[Decision Needed]\", \"[Due Friday]\") and body limits (3-5 bullets, bold the key fact, 2-3 sentence paragraphs) exist nowhere in current text",
+          "fix": "The restore was not done: those conventions are now in commands/compose-email.md Gotchas and step 5, so rewrite this row to fate redistributed commands/compose-email.md, decision none, reason class moved-to commands/compose-email.md; do not delete the tags or limits"
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "docs/audit/recovery/compose-email/record.md",
+          "line": 6,
+          "evidence": "s004 Step 2: Apply Communication Framework | removed-to-fit | real | restore-references | tested-example | the per-part sentence caps (WHAT 1-2, WHY 2-3 sentences) and \"No throat-clearing (\\\"I hope this email finds you well...\\\")\" are gone",
+          "fix": "The restore was not done: step 5 now states both the sentence caps and the throat-clearing ban, so rewrite this row to fate redistributed commands/compose-email.md, decision none, reason class moved-to commands/compose-email.md; keep both rules"
+        },
+        {
+          "id": "D1-3",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 24,
+          "evidence": "Fresh drafts default to under 150 words unless the facts need more.",
+          "fix": "Move the generic length, scannability and tone advice (150 words, 5-8 word subjects, 2-3 sentence paragraphs, bold one fact) into a skill this plugin bundles and load it only when the user asks for a length or format change; keep the non-obvious rules (proposed-versus-confirmed dates, disclosure, hedging qualifiers, split asks) in the command"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 17,
+          "evidence": "Anything else (announcement, thank-you, introduction) uses FYI: lead with what changes or what is recognised",
+          "fix": "Give thank-you and introduction their own one-line closings instead of routing both through the FYI change-lead, and name the Mindset pattern this short creative command follows"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 30,
+          "evidence": "NEVER write a vague subject such as \"Quick question\", \"Update\" or \"FYI\" alone: the reader cannot triage it and it is skipped or answered late.",
+          "fix": "Keep the Gotchas list; add the non-obvious reason only where it is still generic, for example why an unexpected CC escalates a thread beyond 'wrong audience'"
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 2,
+          "evidence": "Not for casual chat replies; a finished draft can be reformatted for Slack or Teams on request.",
+          "fix": "Draft or rewrite a professional email to a peer, stakeholder, manager or leadership using What-Why-How: subject, ask-first body and a labelled proposal date. Use for status updates, approval requests, escalations, follow-ups, or when the user only asks to make a message shorter, clearer or less defensive, even without the word email. Produces a subject and body to paste; never sends. Not for sending mail, scheduling, or casual chat replies; a finished draft can be reformatted for Slack or Teams on request."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 17,
+          "evidence": "choose from the list below. A status update that needs a decision, or an FYI that carries an ask, is a request",
+          "fix": "Collapse the purpose list and the later tie-break restatement into one ordered decision with a single default (Request when the reader must decide), and leave voice, tone and length as principles once the user sets them"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "commands/evals/compose-email.json",
+          "line": 6,
+          "evidence": "\"id\": \"approval-request-full-context\" ... \"You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would\"",
+          "fix": "Add one verifiable failure scenario whose prompt does not forbid the command's own AskUserQuestion path, covering a blocking gap the current empty-request and word-limit scenarios do not already cover, with assertions that the output stops and invents nothing"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 15,
+          "evidence": "Blocking: no topic, no source draft and no received message: ask once and stop only then.",
+          "fix": "State the three blocking conditions as an explicit or (no topic AND no source draft AND no received message), and say the same question is the fallback when AskUserQuestion is unavailable"
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 45,
+          "evidence": "`/command-compose-email:compose-email <context or pasted draft>`.",
+          "fix": "Keep the Dana Ruiz example; add one short example that follows the received-message branch to a reply, so that branch is not only prose"
+        }
+      ]
+    },
+    {
+      "name": "explain-pr-changes",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 93.6,
+        "router-env-my-referee-two": 90.4
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 186,
+          "evidence": "\"Add no 'Close' line\" repeats the feature-only Close rule from 1.1; the same restriction appears again in 2.6 and phase 3b. Source assembly, push ordering and failure-message rules are similarly restated across the decision sections and execution phases.",
+          "fix": "Keep each invariant at its canonical definition and replace duplicate explanations with precise section references, while preserving the ordered execution checklist. Record each deduplication in docs/audit/recovery/explain-pr-changes/record.md; retain all distinct exceptions and attribution."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 384,
+          "evidence": "\"The detailed templates ... live in the reference\" provides genuine conditional disclosure, but the command still spans 386 lines, exceeding the command profile's 200-line threshold.",
+          "fix": "Move the remaining detailed source-copying, title-normalization and size-reduction recipes from sections 2.4\u20132.8 into skills/pr-diagrams/references/pr-body.md. Keep the mode decisions, safety invariants and ordered phases in the command, with explicit scenario-gated reads, and record the moves without removing attribution."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 284,
+          "evidence": "Phase 3b orders \"3. Size: count and reduce per 2.7\" before \"4. Diagram: decide and author per 2.9\". Section 2.7 explicitly requires a post-diagram recount for feature bodies, but does not resolve that branch for copied or consolidated bodies that initially fit and exceed 65,000 characters after diagram authoring.",
+          "fix": "Add a final size-validation gate for every outgoing body, including diagram and fallback variants, after composition and before each PR body write. If a copied or consolidated body now exceeds 65,000 characters, apply its link-reduction rule, reassess diagram reuse and recount; if the reduced result still exceeds the bound, stop with the named size error and run cleanup."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 331,
+          "evidence": "Phase 4 step 1: \"A valid probe always exits 0 and prints exactly `attach` or `branch` on stdout: exactly `attach` is the `attach` mode and exactly `branch` is the `branch` mode (`capability` also falls back to `branch` itself when `gh` is old or unprobeable, with the reason on stderr; checked 2026-11-14).\"",
+          "fix": "Replace the parenthetical with the probe outcomes the script actually prints: forced `PR_DIAGRAMS_MODE` prints that mode and exits 0; an invalid value is a usage error (exit 2, empty stdout); an unreadable or unparseable `gh --version`, a probe timeout, a failed `gh repo view`, or a non-github.com host prints `branch` and exits 0 with the reason on stderr. Keep the stop for a non-zero exit or any other stdout."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 169,
+          "evidence": "Section 2.2 stops automatic reuse \"When that cannot be established\" and \"A partial merge-commit list is the same stop as no merges\", but the only positive test is the example `git log --merges --oneline \"origin/$base..origin/$head\"`.",
+          "fix": "State the required check as its own ordered step before any source body is fetched: run `git log --merges --oneline \"origin/$base..origin/$head\"` and continue only when every selected `SRC` PR appears as a merge into the current head; otherwise stop and ask for `--reuse-from=<PR>`. Keep the squash/rebase warning as the reason."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 331,
+          "evidence": "The same capability sentence tells the agent a valid probe always exits 0 and that an unprobeable gh falls back to `branch`, which hides the usage-error and empty-stdout stop defined later in the same step.",
+          "fix": "Add a Gotchas bullet: a non-zero `capability` exit, including an invalid `PR_DIAGRAMS_MODE` or a stray argument, is a stop with empty stdout, never a guessed `branch`; only the script's own exit-0 `branch` lines (old, unreadable or unparseable gh, probe timeout, failed repo view, non-github.com host) are the branch fallback. Point it at phase 4 step 1."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 1,
+          "evidence": "The command file is 447 lines. Body templates, the none-mode filter, title assembly and branch-publish recovery are loaded from the bundled pr-diagrams reference, but phases 1-6, the mode rules and the recovery ordering remain inline.",
+          "fix": "Move the phase 4 render probe and the phase 5 attach/publish outcome text into `skills/pr-diagrams/references/pr-body.md` beside \"Branch publish and attach recovery\", and load that section only when phase 4 enters drawio rendering. Leave phases 1-3 and the mode decision in the command."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 169,
+          "evidence": "\"confirm that the assumption holds: the promotion history shows merge commits (for example `git log --merges ...`) and every `SRC` entry is a PR merged into the current head. When that cannot be established, stop\".",
+          "fix": "Make the merge-commit check the default, not an example: one `git log --merges` command, continue only when every `SRC` entry is listed, and stop otherwise. Do not leave the agent to invent another way to \"establish\" the assumption."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "commands/explain-pr-changes.md",
+          "line": 331,
+          "evidence": "Phase 4 says a valid `capability` probe always exits 0, while `skills/pr-diagrams/scripts/pr-diagrams.sh` `usage_err` exits 2 with empty stdout for a stray argument or an invalid `PR_DIAGRAMS_MODE` (`cmd_capability`, usage line: \"print attach or branch, always exit 0\").",
+          "fix": "In phase 4 step 1, delete \"always exits 0\". Say exit 0 with stdout `attach` or `branch` selects that mode, and exit 2 or any other non-zero exit with empty stdout stops the run naming `pr-diagrams.sh capability`. Align the script usage line the same way so the command and the script name one outcome."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 298,
+          "evidence": "Phase 2 says the final message for a phase 2 terminal failure quotes git's stderr and \"Nothing else runs\", while section 3 says cleanup \"runs on every success and every failure path, after `$AD` exists\" and `$AD` is created only in phase 3.",
+          "fix": "Add one sentence to the phase 2 stop: because `$AD` and the pointer file do not exist yet, phase 6 cleanup is skipped and the early-failure bootstrap removes nothing. Keep \"nothing else runs\" for reads and PR writes only."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

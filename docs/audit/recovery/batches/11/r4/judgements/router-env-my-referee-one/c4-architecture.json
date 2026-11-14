@@ -1,0 +1,95 @@
+{
+  "skill": "c4-architecture",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 13,
+    "D5": 13,
+    "D6": 15,
+    "D7": 15,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 113,
+  "max_total": 125,
+  "percent": 90.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "skills/c4-architecture/references/advanced-patterns.md",
+      "line": 200,
+      "evidence": "para:fdbcf945: the former ADR Reference in Diagrams example showed ADR-001, ADR-002 and ADR-003 in comments and element descriptions. Record row s055 says it is text-present, but the current section retains only a short prose instruction and one description fragment, not the reusable diagram example.",
+      "fix": "Restore the ADR-linked Mermaid diagram example in skills/c4-architecture/references/advanced-patterns.md, adapting it to the current relationship and element rules, or add a valid row explaining its removal to docs/audit/recovery/c4-architecture/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": null,
+      "evidence": "The dbff837f digest reports 'removed units (334, showing 40)', so 294 removed units cannot be individually checked from the supplied digest.",
+      "fix": "Provide the complete digest for a full removal check and record or restore any unexplained substantive removals."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": 3,
+      "evidence": "The description excludes 'reviewing existing C4 diagrams without regenerating them' but does not mention repairing a broken C4 diagram or translating one for an unsupported renderer, both workflows covered by the skill and its evals.",
+      "fix": "Generate and repair architecture documentation as C4 model Mermaid diagrams: context, container, component, dynamic and deployment views. Use when users ask to map or document a software system, its deployable applications, data stores, external actors, request flows or production infrastructure from a description or repository evidence such as Docker Compose and Kubernetes manifests, even without naming C4. Also use to fix broken C4 diagrams or translate them for a renderer without C4 support. Not for ER diagrams, ordinary flowcharts or sequence diagrams, draw.io or cloud-icon diagrams, C4 theory without a diagram, review-only requests, implementation work, or ADR prose."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": 104,
+      "evidence": "The advanced-patterns reference is triggered for several systems, event-driven flows, deployment, landscapes and failure paths, but its 'Components of one container' example has no component-view loading trigger.",
+      "fix": "Add a conditional instruction to read references/advanced-patterns.md when a component-view task needs the layered Order API example, while retaining the existing exclusions for simple context and container tasks."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/c4-architecture/references/common-mistakes.md",
+      "line": 28,
+      "evidence": "The diagram labeled 'CORRECT: Classes as Components' contains Rel(userController, userService, \"Delegates to\") and Rel(userService, userRepo, \"Loads users with\") without technologies, contradicting SKILL.md step 5: 'Every relationship is one-way, with a verb and a technology.'",
+      "fix": "Add the evidenced in-process call technology to the correct example's relationships and audit the other correct examples in this reference for the same contradiction."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": 61,
+      "evidence": "The workflow requires 'Every relationship ... with a verb and a technology' while line 39 requires the technology to be evidenced and the sparse-input branch permits modeling only user-stated facts. When a user gives a relationship but no protocol, these instructions do not give a non-invented way to pass verification.",
+      "fix": "Define an explicit unknown-technology representation or a documented exception to the check, and ask for the protocol where useful; do not invent a technology merely to pass validation."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/c4-architecture/references/c4-syntax.md",
+      "line": 73,
+      "evidence": "'Since Mermaid 11.17.1 element text wraps by default' is a version-sensitive behavior claim without a source URL and check date.",
+      "fix": "Cite the official Mermaid documentation or release note for this behavior and the date checked, or instruct the agent to verify the installed renderer's behavior before relying on it."
+    }
+  ]
+}

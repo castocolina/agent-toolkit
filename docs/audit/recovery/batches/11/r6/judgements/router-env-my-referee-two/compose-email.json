@@ -1,0 +1,113 @@
+{
+  "skill": "compose-email",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 13,
+    "D2": 13,
+    "D3": 13,
+    "D4": 14,
+    "D5": 15,
+    "D6": 11,
+    "D7": 12,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 102,
+  "max_total": 125,
+  "percent": 81.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 23,
+      "evidence": "Body: bullets only for 3-5 parallel points (never more), bold the one key fact (the decision, the date or the ask), keep paragraphs to 2-3 sentences; a wall of text hides the ask.",
+      "fix": "Keep the non-obvious rules (placeholder flagging, disclosure, proposed-versus-confirmed dates, disputed-claim attribution). Move the generic layout advice (3-5 bullets, bold one fact, 2-3 sentence paragraphs) into skills/professional-communication, which command-compose-email's plugin can bundle, and load that file only when formatting a long body; record the move in docs/audit/recovery/compose-email/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "docs/audit/recovery/compose-email/record.md",
+      "line": 6,
+      "evidence": "para:8c54ec8b commands/compose-email.md: - FYI: what changes, then \"No response needed\"; never invent an ask. Record row para:8c54ec8b is fate not-lost, decision none, reason class text-present, but the current FYI bullet no longer states that lead and closing.",
+      "fix": "Restore the FYI lead and closing into commands/compose-email.md (\"lead with what changes, then No response needed; never invent an ask\"), or replace the not-lost row with a valid removal row in docs/audit/recovery/compose-email/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 16,
+      "evidence": "(c) Purpose: choose from the list below. ... Tie-breaks: if the reader must decide or approve, it is a Request even when it also reports status; if a prior unanswered ask exists, Follow-up wins ... otherwise Status ... and FYI for other informational messages ... Anything else (announcement, thank-you, introduction) uses FYI.",
+      "fix": "Keep the purpose order, but state one default and one escape: classify as Request when a decision is required, Follow-up when a prior ask is unanswered, Escalation only when impact, uncertainty and mitigation are all present, else FYI; name Status, thank-you, announcement and introduction as FYI variants rather than a second classification pass."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 22,
+      "evidence": "NEVER write a vague subject such as \"Quick question\", \"Update\" or \"FYI\" alone: the reader cannot triage it and it is skipped or answered late.",
+      "fix": "Keep the Gotchas that defy assumptions (proposed dates read as commitments, unflagged placeholders get sent, internal links leak). Drop or fold the obvious triage warning into the subject rule in step 5 and record that removal."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 2,
+      "evidence": "description: Draft or rewrite a professional email to a peer, stakeholder, manager or leadership using What-Why-How. Use for status updates, approval requests, escalations, follow-ups, or when the user only asks to make a message shorter, clearer or less defensive, even without the word email. Produces a subject and body to paste; never sends. Not for casual chat replies; a finished draft can be reformatted for Slack or Teams on request.",
+      "fix": "Draft or rewrite a professional email (subject plus What-Why-How body) to a peer, stakeholder, manager or leadership: status updates, approval requests, escalations, follow-ups, deadline extensions and replies to a received message. Use when the user only asks to make a message shorter, clearer or less defensive, even without the word email. Produces text to paste and never sends. Not for casual chat replies, and not for sending mail; reformat a finished draft for Slack or Teams only on request."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 16,
+      "evidence": "choose from the list below. A status update that needs a decision, or an FYI that carries an ask, is a request ... Tie-breaks: ... Anything else (announcement, thank-you, introduction) uses FYI. ... Audience only adjusts length and order, never the strategy. Leadership: ... Peer: ... Stakeholder and manager: ...",
+      "fix": "Replace the equal-weight purpose list and audience menu with the default in D2-1, and give audience one default (write for the least technical reader, decision first) with Leadership's 5-sentence cap and the peer 150-word cap as the only named exceptions."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "commands/evals/compose-email.json",
+      "line": 1,
+      "evidence": "Eleven scenarios cover the main path and failure paths (empty request, word-limit overflow, send refusal), but no edge case is verifiable: subject-tags-and-body-limits asserts both a 5-8 word subject and an action tag, while step 5 says an explicit format instruction wins and the scenario gives none.",
+      "fix": "Add one edge-case scenario whose assertions match the written branches: a user-stated format override (for example \"subject under 4 words, no action tag\") must be obeyed while facts, disclosure and proposed-versus-confirmed dates stay mandatory, and assert the resulting subject length and the absence of a tag."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 15,
+      "evidence": "Blocking: no topic AND no source draft AND no received message: ask once and stop only then. ... Not blocking: a missing recipient name ... When the request or source gives a deadline ... write that date ... Ask only for blocking gaps",
+      "fix": "Name the missing-topic branch as blocking even when a recipient is known: ask once for the topic or facts and the desired outcome, reuse the known recipient, invent nothing, and stop. Keep the empty-everything question as the separate branch."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 19,
+      "evidence": "The 5-8 word subject rule applies to every draft. ... The subject length, bullet counts, paragraph lengths and sentence caps in this step and in Gotchas are defaults: an explicit user instruction about format or length takes precedence.",
+      "fix": "State the resolution in one place: the 5-8 word subject, action tag, bullet count and sentence caps are defaults, and any explicit user format or length instruction replaces them; keep factual accuracy, disclosure and proposed-versus-confirmed dates mandatory. Point the subject-tags eval at a scenario that does not override the default."
+    }
+  ]
+}

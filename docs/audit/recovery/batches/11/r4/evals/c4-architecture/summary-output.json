@@ -1,0 +1,39 @@
+{
+  "skill": "c4-architecture",
+  "mode": "output",
+  "pass_rate": 0.8846,
+  "passed": 46,
+  "total": 52,
+  "failures": [
+    {
+      "eval": "element-fields-and-key",
+      "assertion": "Every Container and ContainerDb has four fields: a specific name, a technology (Vue, Django, MySQL) and a description of what it is responsible for, none left empty or generic such as \"Service\" or \"Database\"",
+      "evidence": "The element names \"Web app\" and \"API\" are generic rather than specific names."
+    },
+    {
+      "eval": "element-fields-and-key",
+      "assertion": "Does not leave a relationship without a technology or label it with a single word such as \"Uses\" or \"Accesses\"",
+      "evidence": "The relationship `Rel(web, api, \"Calls\", \"Protocol unknown\")` has a single-word label and no specified technology."
+    },
+    {
+      "eval": "generic-relationship-labels",
+      "assertion": "Each Rel carries a technology (for example HTTPS, JSON/HTTPS, SQL)",
+      "evidence": "Each relationship specifies \"Protocol unknown\" rather than a technology."
+    },
+    {
+      "eval": "deployment-version-labels",
+      "assertion": "Says that the versions in labels come from the user's manifests or Dockerfile and that none was provided, instead of presenting them as fact",
+      "evidence": "The output says \"Kubernetes version not provided\" and identifies the image tag as observed, but does not explicitly say that no Node.js version was provided."
+    },
+    {
+      "eval": "split-oversized-view",
+      "assertion": "Does not put all of the more than 20 containers into one C4Container block; produces several C4Container views, each in its own file under docs/architecture/",
+      "evidence": "The output says it would use \u201csix domain diagrams in one file\u201d at \u201cdocs/architecture/c4-containers.md\u201d."
+    },
+    {
+      "eval": "split-oversized-view",
+      "assertion": "Splits the views by bounded context (for example orders, catalog, billing, shipping and identity), each view holding one context's containers with its direct dependencies",
+      "evidence": "The output groups containers by domain but states, \u201cNo relationships are shown because the statement does not specify calls, message producers or consumers, or protocols.\u201d"
+    }
+  ]
+}

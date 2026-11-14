@@ -1,0 +1,86 @@
+{
+  "skill": "explain-pr-changes",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 14,
+    "D5": 10,
+    "D6": 13,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 293,
+      "evidence": "Phase 2's terminal-versus-recoverable final-message rules, and the same warning order restated in phase 5 and phase 6, stay in a 462-line command after the body templates, assembly code and diagram filter were already split to skills/pr-diagrams/references/pr-body.md.",
+      "fix": "Move the final-message ordering (terminal failures begin with the tool stderr or named guard error; recoverable fallbacks begin with one warning line, then the outcome) into skills/pr-diagrams/references/pr-body.md and leave one sentence in phases 2 and 6 that says when to load that section."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 330,
+      "evidence": "Phase 3 step 5 says reviewers are read only on a reuse path, while phase 5 says 'On success, do not run a second gh pr edit of the title or body' and 'A feature PR has no reviewer list, so it has no second gh pr edit.' The no-second-edit rule is already stated, and the feature-PR sentence adds nothing the model would miss.",
+      "fix": "Keep the phase 3 reuse-path condition and the phase 5 rule that a successful create is not followed by a title or body edit. Delete the feature-PR sentence and add a row for it to docs/audit/recovery/explain-pr-changes/record.md."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/explain-pr-changes.md",
+      "line": 383,
+      "evidence": "Phase 4 says the mode is attach only when capability printed exactly attach and exited 0, and that empty output, any other output or a non-zero exit means branch. skills/pr-diagrams/scripts/pr-diagrams.sh cmd_capability always prints attach or branch and returns 0 for a valid probe, including when PR_DIAGRAMS_MODE is unset, and its help text says capability always exits 0. A non-zero exit is a usage error with empty stdout, so the branch fallback never matches a real capability result.",
+      "fix": "Treat stdout of exactly attach as attach and exactly branch as branch. If capability exits non-zero, stop before render and quote its stderr, the same way a failed related read stops, instead of calling that result branch mode."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 128,
+      "evidence": "The head == base guard says to derive <short-slug> from the head name or the latest commit subject, with no default and no character rule, then run git switch -c \"pr/<short-slug>\". A subject can contain spaces, slashes or quotes, so the branch name is a guess on a step that creates a branch.",
+      "fix": "Default to a slug of the latest commit subject: lowercase, drop characters outside a-z, 0-9 and hyphens, collapse repeated hyphens, and cut at 40 characters. Use the head name only when the subject slug is empty."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 198,
+      "evidence": "Section 2.2 says squash or rebase merges can pick an older cycle's PRs as sources, then stops unless every SRC entry is confirmed by git log --merges, but it never says how to tell a squash or rebase merge from a merge commit before that list is checked.",
+      "fix": "Add one Gotchas line: a squash or rebase merge has no merge commit, so git log --merges can list an older cycle's merges while the current cycle is absent; that partial list is the same stop as no merges."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 2,
+      "evidence": "The description names the write action, the trigger phrases and the read-only neighbour, but it does not name the accepted argument tokens --diagrams, --reuse-from, --base or the bare aliases.",
+      "fix": "Create or update the GitHub pull request for the current branch from its committed diff: summary, changeset triage, optional Mermaid or draw.io diagram, promotion-branch bodies reused from merged PRs, and reviewers. Use when asked to open, write, refresh or describe a pull request, \"explain PR changes\", \"open or refresh the PR summary\", \"promote develop to main\", or \"reuse merged PR bodies\", including with --diagrams=none|mermaid|drawio, --drawio, --mermaid, --no-diagrams, --reuse-from=<PR> or --base=<branch>. Pushes feature branches and writes PRs. Not for a read-only explanation of a diff (use explain-changes-mental-model)."
+    }
+  ]
+}

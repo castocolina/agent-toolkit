@@ -278,14 +278,11 @@
     },
     {
       "id": "capability-probe-fails",
-      "prompt": "Scenario: feature head `feature/diagrams`, base `main`, `--diagrams=drawio`. The script exists, render succeeds (render-ok.json), the diff warrants a diagram, no open PR exists. `pr-diagrams.sh capability` prints NOTHING on stdout and exits 1. `gh pr create` prints `https://github.com/acme/widgets/pull/42`, and `pr-diagrams.sh publish 42 /tmp/explain-pr-changes.Ab12Cd/diagram.drawio.png` succeeds and prints `{\"png\":\"/tmp/explain-pr-changes.Ab12Cd/diagram.drawio.png\",\"url\":\"https://github.com/acme/widgets/blob/pr-diagrams/42/diagram.drawio.png?raw=true\"}`. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
-      "files": [
-        "render-ok.json"
-      ],
+      "prompt": "Scenario: feature head `feature/diagrams`, base `main`, `--diagrams=drawio`. The script exists, the diff warrants a diagram, no open PR exists. `pr-diagrams.sh capability` prints NOTHING on stdout, prints `pr-diagrams: capability probe failed: cannot read gh version` on stderr and exits 1. Show the exact ordered commands and the final user-facing message. The script `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` exists. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. The scratch directory is $AD=/tmp/explain-pr-changes.Ab12Cd (write this literal path). Repository origin: git@github.com:acme/widgets.git, so REPO=acme/widgets (write the literal owner/repo, never <REPO> or OWNER/REPO). End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
       "assertions": [
-        "The empty output with a non-zero exit is treated as 'branch' mode, not 'attach'",
-        "'pr-diagrams.sh render' still runs on '/tmp/explain-pr-changes.Ab12Cd/diagram.drawio'",
-        "The PR is created without '--attach' and 'pr-diagrams.sh publish 42' is used afterwards"
+        "The run stops at the failed probe: the empty stdout with a non-zero exit is not treated as 'branch' mode or as 'attach' mode, and no mode is guessed",
+        "The final message is a terminal error that names the failing 'pr-diagrams.sh capability' call and quotes its stderr 'pr-diagrams: capability probe failed: cannot read gh version'",
+        "No 'pr-diagrams.sh render' call, no 'gh pr create', no 'gh pr edit' and no 'pr-diagrams.sh publish' call is made after the failed probe"
       ]
     },
     {

@@ -25,8 +25,8 @@ C4Component
     Component(userService, "UserService", "Spring Bean", "Business logic")
     Component(userRepo, "UserRepository", "Spring Data JPA", "Data access")
   }
-  Rel(userController, userService, "Delegates to")
-  Rel(userService, userRepo, "Loads users with")
+  Rel(userController, userService, "Delegates to", "in-process call")
+  Rel(userService, userRepo, "Loads users with", "in-process call")
   Rel(userRepo, db, "Queries", "JDBC")
 ```
 
@@ -57,8 +57,8 @@ C4Component
     Component(controllerB, "Invoice Controller", "Spring MVC", "Invoice endpoints")
     Component(utilsB, "Shared Utils", "Java library", "Bundled copy")
   }
-  Rel(controllerA, utilsA, "Formats amounts with")
-  Rel(controllerB, utilsB, "Formats amounts with")
+  Rel(controllerA, utilsA, "Formats amounts with", "in-process call")
+  Rel(controllerB, utilsB, "Formats amounts with", "in-process call")
 ```
 
 ## One broker box for every message
@@ -134,6 +134,26 @@ Rel(frontend, api, "Fetches products, submits orders", "JSON/HTTPS")   CORRECT
 Rel(orderSvc, paymentSvc, "Requests payment authorization", "gRPC")   CORRECT
 ```
 
+## Generic relationship labels
+
+A single word such as "Uses" or "Accesses" says nothing the arrow does not already show. Name what is asked or sent and the technology (c4model.com, Notation: "ideally avoiding single words like Uses", https://c4model.com/diagrams/notation, checked 2026-11-13).
+
+```
+Rel(orderSvc, paymentSvc, "Uses")                                      WRONG
+Rel(web, api, "Accesses", "HTTPS")                                     WRONG
+Rel(orderSvc, paymentSvc, "Requests payment authorization", "gRPC")   CORRECT
+Rel(web, api, "Fetches products, submits orders", "JSON/HTTPS")       CORRECT
+```
+
+## Missing descriptions
+
+Mermaid renders `Container(svc, "Service", "Java")` without a word of complaint, so the omission survives the render check. Every element needs a name, a type (the macro), a technology on each container and component, and a short description of what it is responsible for (c4model.com, Notation: "Every element should have a short description", https://c4model.com/diagrams/notation, checked 2026-11-13).
+
+```
+Container(svc, "Service", "Java")                                                                    WRONG: no description, generic name
+Container(orderSvc, "Order Service", "Java, Spring Boot", "Creates orders and tracks their status")  CORRECT
+```
+
 ## Infrastructure in a container view
 
 ```mermaid
@@ -152,7 +172,7 @@ The container view keeps one `Container(api)` and one `ContainerDb(db)`. Instanc
 
 ## Too many elements
 
-"If a diagram with a dozen boxes is hard to understand, don't draw a diagram with a dozen boxes!" (Simon Brown). When a view exceeds the SKILL.md budget, split it by bounded context, or draw one service with its direct dependencies per diagram.
+"If a diagram with a dozen boxes is hard to understand, don't draw a diagram with a dozen boxes!" (Simon Brown, https://dev.to/simonbrown/diagramming-distributed-architectures-with-the-c4-model-51cm, checked 2026-11-13). When a view exceeds the SKILL.md budget, split it by bounded context, or draw one service with its direct dependencies per diagram.
 
 ## Inconsistent names across views
 
@@ -161,6 +181,16 @@ The container view keeps one `Container(api)` and one `ContainerDb(db)`. Instanc
 ## Colors without a key
 
 Mermaid C4 renders no legend (see c4-syntax.md, Not supported). If `UpdateElementStyle` colors carry meaning, explain them in a line of prose under the diagram.
+
+## Diagram without a key
+
+c4model.com, Notation: "Every diagram should have a key/legend explaining the notation", and colour coding stays consistent within and across diagrams (https://c4model.com/diagrams/notation, checked 2026-11-13). Mermaid has no `Legend`, so the key is one line of prose under each diagram:
+
+```
+Key: rectangles are containers, cylinders are databases, grey boxes are external systems; each arrow is one-way and reads "initiator, action, technology".
+```
+
+If `UpdateElementStyle` colors are used, the same color means the same element type in every view, and the key line names them.
 
 ## Deployment view without an environment
 

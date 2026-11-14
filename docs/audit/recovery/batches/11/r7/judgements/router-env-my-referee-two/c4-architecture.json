@@ -1,0 +1,86 @@
+{
+  "skill": "c4-architecture",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 13,
+    "D7": 11,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest cut list: removed units (334, showing 40) at dbff837f, with no per-item rows for the 294 unshown units",
+      "fix": "Expand the digest or add a record row for each unshown para:<id> in docs/audit/recovery/c4-architecture/record.md; the 40 shown units are each explained by a section row."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": 29,
+      "evidence": "Step 3 says only 'Read advanced patterns for the multi-system layout', while the References section also gates that file on event-driven flows, deployment views, a landscape, a failure-path dynamic diagram and the layered Order API example.",
+      "fix": "At the workflow step that needs each of those, add the same scenario trigger already used in References (read advanced-patterns.md for a deployment view, a failure path, a landscape or the Order API component example; do not load it for a single-system context or container task)."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": 41,
+      "evidence": "Step 5 lists three render paths (installed mmdc 11.17.1 or newer, npx @mermaid-js/mermaid-cli@11.17.1, or a hand check) and then says 'Any mermaid-cli 11 or newer works' while also saying the 11.17.1 text-wrap threshold is not verified.",
+      "fix": "Make 11.17.1 the one default command, with the hand check as the only escape hatch when no CLI, network or browser is available; drop the 'any mermaid-cli 11 or newer' alternative or state it fails the wrap check."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/c4-architecture/evals/evals.json",
+      "line": 1,
+      "evidence": "14 evals have verifiable assertions and trigger-queries.json has 10 should-trigger and 10 should-not-trigger queries, but no assertion checks the step 5 render loop (mmdc exit 0, or the stated hand-check fallback) for a diagram the skill itself generates.",
+      "fix": "Add one assertion to context-container-commerce or element-fields-and-key that the generated file was rendered with mmdc and exited 0, or that the answer says it was not rendered and compared every block with references/c4-syntax.md."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/c4-architecture/references/c4-syntax.md",
+      "line": 69,
+      "evidence": "Styling and layout says 'Since Mermaid 11.17.1 element text wraps by default' and SKILL.md step 5 repeats that threshold, while the same paragraph says 'the 11.17.1 version itself is not verified' because the disk has no changelog.",
+      "fix": "Replace the unverified 11.17.1 threshold with the instruction to check the installed renderer's wrapping (the c4 wrap option already cited from mermaid 12.3.0 dist/config.type.d.ts), or add the vendor changelog URL and the date it was checked."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/c4-architecture/README.md",
+      "line": 17,
+      "evidence": "When to Use says 'Show one request or event flow as a numbered dynamic view', while SKILL.md NEVER says Mermaid numbers C4Dynamic labels itself and 'NEVER number labels in C4Dynamic'.",
+      "fix": "Change the README line to 'a dynamic view whose relationships are written in statement order, so Mermaid numbers them', keeping the Credits section unchanged."
+    }
+  ]
+}

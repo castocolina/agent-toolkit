@@ -1,0 +1,29 @@
+{
+  "skill": "explain-pr-changes",
+  "mode": "output",
+  "pass_rate": 0.9856,
+  "passed": 273,
+  "total": 277,
+  "failures": [
+    {
+      "eval": "size-consolidated-over-limit",
+      "assertion": "The run continues and the body passed to gh pr create is at most 65,000 characters",
+      "evidence": "The output says \"Phase 5 edits the existing PR\" and shows `gh pr edit`, not `gh pr create`."
+    },
+    {
+      "eval": "script-resolution-order",
+      "assertion": "A mermaid or none-mode feature PR makes no pr-diagrams.sh call at all and parses REPO inline from the origin URL instead",
+      "evidence": "The output limits this behavior: \u201cA **mermaid or none-mode feature PR without `--reuse-from`** makes no `pr-diagrams.sh` call.\u201d"
+    },
+    {
+      "eval": "mermaid-rules-paths",
+      "assertion": "The Mermaid authoring rules are read from the literal '${CLAUDE_PLUGIN_ROOT}/skills/mermaid-diagrams/references/authoring-rules.md' first, before the Mermaid block is written",
+      "evidence": "The output says that if the first path contains the literal `${CLAUDE_PLUGIN_ROOT}`, \u201cit was not substituted and is skipped.\u201d"
+    },
+    {
+      "eval": "adversarial-title-as-data",
+      "assertion": "The title is extracted with 'jq -r .title' from \"$AD/source-41.json\" into a shell variable and expanded only as quoted data; it is never substituted into shell source or an unquoted heredoc",
+      "evidence": "The output has the unquoted expansions `[[ $title =~ ... ]]` and `stripped=$title`, although both occur in shell contexts that do not perform word splitting or pathname expansion."
+    }
+  ]
+}

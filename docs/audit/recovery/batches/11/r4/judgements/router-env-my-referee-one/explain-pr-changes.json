@@ -1,0 +1,59 @@
+{
+  "skill": "explain-pr-changes",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 10,
+    "D6": 15,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 186,
+      "evidence": "\"Add no 'Close' line\" repeats the feature-only Close rule from 1.1; the same restriction appears again in 2.6 and phase 3b. Source assembly, push ordering and failure-message rules are similarly restated across the decision sections and execution phases.",
+      "fix": "Keep each invariant at its canonical definition and replace duplicate explanations with precise section references, while preserving the ordered execution checklist. Record each deduplication in docs/audit/recovery/explain-pr-changes/record.md; retain all distinct exceptions and attribution."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 384,
+      "evidence": "\"The detailed templates ... live in the reference\" provides genuine conditional disclosure, but the command still spans 386 lines, exceeding the command profile's 200-line threshold.",
+      "fix": "Move the remaining detailed source-copying, title-normalization and size-reduction recipes from sections 2.4\u20132.8 into skills/pr-diagrams/references/pr-body.md. Keep the mode decisions, safety invariants and ordered phases in the command, with explicit scenario-gated reads, and record the moves without removing attribution."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 284,
+      "evidence": "Phase 3b orders \"3. Size: count and reduce per 2.7\" before \"4. Diagram: decide and author per 2.9\". Section 2.7 explicitly requires a post-diagram recount for feature bodies, but does not resolve that branch for copied or consolidated bodies that initially fit and exceed 65,000 characters after diagram authoring.",
+      "fix": "Add a final size-validation gate for every outgoing body, including diagram and fallback variants, after composition and before each PR body write. If a copied or consolidated body now exceeds 65,000 characters, apply its link-reduction rule, reassess diagram reuse and recount; if the reduced result still exceeds the bound, stop with the named size error and run cleanup."
+    }
+  ]
+}
