@@ -24,7 +24,7 @@ Use this skill when:
 2. **Extracts** business context, constraints, edge cases, and gotchas
 3. **Generates** a structured markdown document with all integration details
 4. **Saves** to `.claude/docs/ai/<feature-name>/api-handoff.md`
-5. **Versions** subsequent updates (v2, v3, etc.) for iteration tracking
+5. **Versions** subsequent updates only when the repository's existing convention does (for example v2, v3)
 
 ### Workflow
 
@@ -32,7 +32,7 @@ Use this skill when:
 Backend Code → Skill Analysis → Handoff Document → Frontend Implementation
 ```
 
-The skill operates in "no-chat" mode: it produces only the handoff document without discussion or explanation.
+The skill writes the handoff to a file and confirms the path briefly in chat; it answers questions normally rather than suppressing chat.
 
 ## Key Features
 
@@ -48,15 +48,16 @@ The skill operates in "no-chat" mode: it produces only the handoff document with
 
 ### Smart Shortcuts
 
-For simple CRUD APIs with obvious validation and no complex business logic, the skill can skip the full template and provide just:
+For simple CRUD APIs with obvious validation and no complex business logic, the skill can skip the full template and use the compact format:
 - Endpoint + method
 - Example request/response JSON
+- Every confirmed auth, status, error and constraint fact, with unknowns marked TBD
 
-Frontend can infer the rest.
+The compact format never asks the reader to infer the rest.
 
 ### Version Management
 
-Automatically increments iteration suffixes (`-v2`, `-v3`) when regenerating documentation after feedback or changes.
+When regenerating documentation after feedback or changes, increments an iteration suffix (for example `-v2`, `-v3`) only if the existing files already use such a convention; otherwise it updates the file in place.
 
 ## Usage Examples
 
@@ -91,7 +92,7 @@ Skill Output: Creates minimal handoff with:
 ```
 User: "Frontend asked about pagination. Update the handoff."
 
-Skill Output: Creates `.claude/docs/ai/user-list/api-handoff-v2.md` with:
+Skill Output: Updates `.claude/docs/ai/user-list/api-handoff.md` (or writes `api-handoff-v2.md` when the repository already versions its handoffs) with:
 - Updated pagination parameters
 - Response shape with page metadata
 - Sorting options
@@ -153,7 +154,7 @@ The generated handoff follows this structure:
 ### For Frontend Developers
 
 1. **Trust the doc**: All necessary context should be in the handoff
-2. **Flag gaps**: If something is unclear, request v2 with specifics
+2. **Flag gaps**: If something is unclear, request an updated handoff with specifics
 3. **Use test scenarios**: Convert to frontend test cases or acceptance criteria
 4. **Validate types**: Use provided TypeScript interfaces for type safety
 
@@ -164,7 +165,7 @@ Documents are saved to:
 .claude/docs/ai/<feature-name>/api-handoff.md
 ```
 
-Subsequent versions:
+Subsequent versions, only when the repository already versions its handoffs:
 ```
 .claude/docs/ai/<feature-name>/api-handoff-v2.md
 .claude/docs/ai/<feature-name>/api-handoff-v3.md
@@ -213,7 +214,7 @@ Domain terms: "Submitter" (employee), "Approver" (manager), "Reimbursable" (appr
     "approvedAt": "2026-01-18T10:30:00Z"
   }
   ```
-- **Response** (error): 403 if not manager, 404 if expense not found, 422 if already approved
+- **Response** (error): 403 if not manager, 404 if expense not found, 409 if already approved (illustrative; 409 Conflict is the code for a state conflict per RFC 9110 section 15.5.10, checked 2026-11-15, https://www.rfc-editor.org/rfc/rfc9110#section-15.5.10)
 - **Notes**: Can only approve once. Action is permanent (no undo).
 
 ## Data Models / DTOs
@@ -252,14 +253,12 @@ interface ExpenseDto {
 1. **Happy path**: Manager approves pending expense → 200 with updated status
 2. **Validation error**: Empty decision → 422 with validation message
 3. **Permission denied**: Non-manager attempts approval → 403
-4. **Already approved**: Approve same expense twice → 422 conflict
+4. **Already approved**: Approve same expense twice → 409 conflict
 ```
 
 ## Related Skills
 
 - **frontend-to-backend-requirements**: Documents frontend data needs for backend developers (reverse direction)
-- **code-reviewer**: Can review the generated handoff for completeness
-- **dev-spec**: Creates full development specs that may include API design
 
 ## Tips
 
@@ -267,7 +266,7 @@ interface ExpenseDto {
 2. **Link from PRs**: Reference handoff doc in backend PR descriptions
 3. **Version control**: Commit handoff docs to git for team visibility
 4. **Frontend feedback loop**: If frontend has questions, it means the handoff missed something—update it
-5. **Use as spec**: Can also generate handoff BEFORE implementation as API specification
+5. **Document what exists**: Generate the handoff from implemented handlers; it is not for designing an API that is not built yet
 
 ## Invocation
 
@@ -280,3 +279,9 @@ interface ExpenseDto {
 "Document the new authentication API for frontend"
 "Generate frontend handoff for expense approval feature"
 ```
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+Documentation owners credited (official pages listed in `docs/audit/upstream-sources.json`, checked 2026-11-15): IETF (RFC 9110, RFC 9111, RFC 6585, RFC 3339).

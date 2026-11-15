@@ -1,0 +1,104 @@
+{
+  "skill": "backend-to-frontend-handoff-docs",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 12,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 12,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 113,
+  "max_total": 125,
+  "percent": 90.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "line": 14,
+      "evidence": "Read serializers rather than copying DTO property names from memory.",
+      "fix": "Keep the serializer-versus-DTO rule (the model does not reliably do it); the only redundant token is 'from memory', which the model already treats as unreliable. Leave the rest of Trace before drafting as the domain sequence."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "line": 42,
+      "evidence": "Check every documented claim against the traced source.",
+      "fix": "Turn Final verification into a checkbox the agent marks per endpoint (omission/null, auth, each error, retry and transition, pagination, cache), so a multi-endpoint handoff cannot skip a claim."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "line": 32,
+      "evidence": "NEVER infer retry safety for mutations without implementation evidence. NEVER suggest optimistic UI for irreversible transitions without reconciliation. NEVER equate omitted and null fields without checking serializer semantics.",
+      "fix": "Add a short Gotchas list of environment facts the contract decisions do not cover: a 404 may hide a forbidden resource (RFC 9110), a 2xx timeout can still mean the mutation committed, and a message string is not a stable discriminator."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "line": 38,
+      "evidence": "if the repository has no `.claude/`, use `docs/handoffs/<feature>/api-handoff.md`.",
+      "fix": "Keep both destinations but state the check: look for a `.claude/` directory first and write there; use `docs/handoffs/` only when it is absent."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/backend-to-frontend-handoff-docs/evals/evals.json",
+      "line": 1,
+      "evidence": "\"expected_output\": \"A concise integration handoff that accurately documents business intent, endpoint contract, auth, validation, errors, finality, and useful frontend test cases.\"",
+      "fix": "Add one eval whose prompt supplies both an omitted field and a null field with different meanings, and assert the handoff records them as different; the three current cases never exercise omission-versus-null, retry or pagination."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/backend-to-frontend-handoff-docs/evals/trigger-queries.json",
+      "line": 8,
+      "evidence": "\"query\": \"Write the endpoint documentation the frontend team needs after the backend release.\", \"should_trigger\": true",
+      "fix": "Replace one generic should-trigger query with a prompt that never says handoff, contract or documentation, so the description's unnamed-domain case is actually tested."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "line": 38,
+      "evidence": "For updates, increment a version only if the existing convention does so; inspect existing files first.",
+      "fix": "Name the files to inspect and the default: if `api-handoff.md` is the only file, edit it in place; write `api-handoff-v2.md` only when a versioned sibling already exists."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/backend-to-frontend-handoff-docs/references/api-handoff-template.md",
+      "line": 16,
+      "evidence": "Document the status code the handler actually returns for each failure. RFC 9110 names 422 Unprocessable Content ... and 409 Conflict",
+      "fix": "Move the RFC 422/409 reminder into the Errors bullet as a parenthetical, and keep the rule that the handler's actual status wins, so the note cannot be read as prescribing 422 or 409."
+    }
+  ]
+}

@@ -6,7 +6,7 @@ Based on https://x.com/mattpocockuk/status/2012906065856270504 (Matt Pocock's Pr
 
 ## Purpose
 
-Over time, agent instruction files like `CLAUDE.md`, `AGENTS.md`, or `COPILOT.md` tend to grow into unwieldy documents containing hundreds of lines of mixed instructions. This creates several problems:
+Over time, agent instruction files like `CLAUDE.md`, `AGENTS.md`, or `.github/copilot-instructions.md` tend to grow into unwieldy documents containing hundreds of lines of mixed instructions. This creates several problems:
 
 - **Context waste**: Every task loads the entire file, even when most instructions are irrelevant
 - **Maintenance burden**: Finding and updating specific instructions becomes difficult
@@ -28,7 +28,7 @@ Use this skill when you need to clean up agent instruction files. Common trigger
 
 **Good candidates for refactoring:**
 
-- Root agent files exceeding 50-100 lines
+- Root agent files that have grown long (the Claude Code docs target under 200 lines per `CLAUDE.md`: https://code.claude.com/docs/en/memory, checked 2026-11-15)
 - Files mixing multiple unrelated topics (testing, code style, architecture, etc.)
 - Documents that have grown organically without structure
 - Files containing contradictory or redundant instructions
@@ -55,7 +55,7 @@ Extracts only what truly belongs in the root file - information that applies to 
 
 ### Phase 3: Group the Rest
 
-Organizes remaining instructions into logical categories like:
+Organizes remaining instructions into focused topic files, keeping each rule's source scope and exceptions and creating only the topics the file actually contains. For example:
 
 - `typescript.md` - Type patterns, strict mode rules
 - `testing.md` - Test frameworks, coverage, mocking
@@ -69,7 +69,7 @@ Generates the new file hierarchy with properly linked documentation:
 
 ```
 project-root/
-├── CLAUDE.md              # Minimal root with links
+├── CLAUDE.md              # Minimal root with read conditions
 └── .claude/               # Categorized instructions
     ├── typescript.md
     ├── testing.md
@@ -79,20 +79,20 @@ project-root/
 
 ### Phase 5: Flag for Deletion
 
-Identifies instructions that should be removed entirely:
+Reports only rules proven redundant, obsolete or non-actionable, for your review. A project-specific safety override is never deleted as a presumed default:
 
-- **Redundant**: "Use TypeScript" in a TypeScript project
+- **Redundant**: The same rule stated twice with the same scope
 - **Too vague**: "Write clean code" without specifics
 - **Overly obvious**: "Don't introduce bugs"
-- **Default behavior**: "Use descriptive variable names"
+- **Presumed default**: "Use descriptive variable names" is reported for review, and kept if the project relies on it
 - **Outdated**: References to deprecated APIs
 
 ## Key Features
 
 - **Contradiction detection**: Surfaces conflicting instructions before restructuring
 - **Intelligent categorization**: Groups related instructions into logical files
-- **Root file minimization**: Targets under 50 lines for the main file
-- **Deletion recommendations**: Identifies instructions wasting context tokens
+- **Root file minimization**: Keeps only universal rules in the main file; universal constraints stay even when the result is longer than a suggested length
+- **Removal report**: Lists only rules proven redundant, obsolete or non-actionable, for your review
 - **Template-driven output**: Consistent structure across all generated files
 - **Link verification**: Ensures all references between files are valid
 
@@ -128,7 +128,7 @@ agent instructions...
 
 After running the skill, you get:
 
-**Minimal root file (~50 lines or less):**
+**Minimal root file (universal rules only, with read conditions):**
 ```markdown
 # Project Name
 
@@ -142,41 +142,31 @@ One-sentence description of the project.
 
 ## Detailed Instructions
 
-- [TypeScript Conventions](.claude/typescript.md)
-- [Testing Guidelines](.claude/testing.md)
-- [Code Style](.claude/code-style.md)
+- Read [TypeScript Conventions](.claude/typescript.md) before editing TypeScript code.
+- Read [Testing Guidelines](.claude/testing.md) before changing or writing tests.
+- Read [Code Style](.claude/code-style.md) before changing formatting or naming.
 ```
 
-**Organized linked files with consistent structure:**
+**Organized linked files with only actionable rules, their scope and exceptions:**
 ```markdown
 # Testing Guidelines
 
-## Overview
-Brief context for when these guidelines apply.
+Applies when: changing or writing tests. Exception: scripts/ has its own rules.
 
 ## Rules
 
-### Unit Tests
 - Specific, actionable instruction
 - Another specific instruction
-
-## Examples
-
-### Good
-[code example]
-
-### Avoid
-[code example]
 ```
 
 **Deletion report:**
 ```markdown
-## Flagged for Deletion
+## Flagged for Review
 
 | Instruction | Reason |
 |-------------|--------|
 | "Write clean, maintainable code" | Too vague to be actionable |
-| "Use TypeScript" | Redundant - project is already TS |
+| "Run tests before committing" (also in .claude/testing.md) | Redundant - same rule and scope stated twice |
 ```
 
 ## Best Practices
@@ -190,9 +180,9 @@ Brief context for when these guidelines apply.
 ### During Refactoring
 
 1. **Resolve contradictions first** - Do not proceed until conflicts are addressed
-2. **Be aggressive about root minimization** - When in doubt, move it out
-3. **Aim for 3-8 linked files** - Not too granular, not too broad
-4. **Delete liberally** - Vague instructions waste tokens without providing value
+2. **Keep the root to universal rules** - Move out what is not needed for nearly every task, but keep safety constraints in the root
+3. **Let the topics decide the file count** - Not too granular, not too broad; a concise guide may need no split
+4. **Remove only what is proven** - Redundant, obsolete or non-actionable rules; never delete a project-specific safety override as a presumed default
 
 ### After Refactoring
 
@@ -206,21 +196,27 @@ Brief context for when these guidelines apply.
 |-------|-----|---------|
 | Keeping everything in root | Bloated, hard to maintain | Split into linked files |
 | Too many categories | Fragmentation, navigation overhead | Consolidate related topics |
-| Vague instructions | Wastes tokens, no value | Be specific or delete |
-| Duplicating defaults | Agent already knows | Only override when needed |
+| Vague instructions | Wastes tokens, no value | Be specific, or flag for review |
+| Deleting overrides as presumed defaults | A project-specific rule may be essential even if another environment treats it as default | Verify before pruning |
 | Deep nesting | Hard to navigate | Flat structure with links |
 
 ## Verification Checklist
 
 After refactoring, verify:
 
-- [ ] Root file is under 50 lines
-- [ ] Root contains ONLY universal information
-- [ ] All links to sub-files work correctly
+- [ ] Root contains ONLY universal information (preserved universal constraints may exceed a suggested length)
+- [ ] All links to sub-files work correctly and say when to read them
+- [ ] No conditional topic file sits in `.claude/rules/` without `paths:` frontmatter (it would load at launch)
 - [ ] No contradictions remain between files
 - [ ] Every instruction is specific and actionable
 - [ ] No instructions were lost (unless intentionally deleted)
 - [ ] Each linked file is self-contained for its topic
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+Prompt text: https://www.aihero.dev/a-complete-guide-to-agents-md (Matt Pocock). Platform facts: Anthropic, [How Claude remembers your project](https://code.claude.com/docs/en/memory); GitHub, [Support for different types of custom instructions](https://docs.github.com/en/copilot/reference/custom-instructions-support).
 
 ## License
 

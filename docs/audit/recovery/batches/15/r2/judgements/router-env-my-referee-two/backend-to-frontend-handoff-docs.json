@@ -1,0 +1,95 @@
+{
+  "skill": "backend-to-frontend-handoff-docs",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 13,
+    "D6": 13,
+    "D7": 11,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 108,
+  "max_total": 125,
+  "percent": 86.4,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/backend-to-frontend-handoff-docs/README.md",
+      "line": 44,
+      "evidence": "README Smart Shortcuts still says the skill can skip the full template and use the compact format (endpoint, method, example JSON, plus confirmed facts), while SKILL.md line 38 requires every simple CRUD endpoint to include every confirmed integration fact and to read the full template.",
+      "fix": "Rewrite the Smart Shortcuts section so it matches SKILL.md: a simple endpoint still uses references/api-handoff-template.md and still records every confirmed auth, status, error and constraint fact, omitting only sections the code shows are inapplicable. Record the wording change in docs/audit/recovery/backend-to-frontend-handoff-docs/record.md."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "line": 38,
+      "evidence": "Read [the compact template](references/api-handoff-template.md) when drafting.",
+      "fix": "Gate the one optional reference by scenario: read references/api-handoff-template.md when writing or revising the handoff file, and do not load it when only answering a question about an existing handoff."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "line": 36,
+      "evidence": "Use `.claude/docs/ai/<feature>/api-handoff.md`; if the repository has no `.claude/`, use `docs/handoffs/<feature>/api-handoff.md`. Honor an explicitly requested destination.",
+      "fix": "Make the destination a single default with one escape: write `.claude/docs/ai/<feature>/api-handoff.md` unless the user names another path; use `docs/handoffs/<feature>/api-handoff.md` only when the repository has no `.claude/` directory."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/backend-to-frontend-handoff-docs/evals/evals.json",
+      "line": 1,
+      "evidence": "Four prompts cover simple, unknown, and traced contracts, but none asserts the no-source unverified label, the version-in-place rule, or the pagination and retry branches.",
+      "fix": "Add one eval whose prompt supplies no source and must label the handoff unverified, and one that asks to update an existing api-handoff.md and must edit it in place rather than invent api-handoff-v2.md, with countable assertions for those outcomes."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/backend-to-frontend-handoff-docs/references/api-handoff-template.md",
+      "line": 22,
+      "evidence": "Rate limits (only when the code or contract defines them): the limit, the 429 Too Many Requests response and whether it carries Retry-After",
+      "fix": "Replace the hardcoded 429 with an evidence rule: document the status the handler returns when the limit is exceeded, and record Retry-After only when that response includes it."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "line": 12,
+      "evidence": "For every endpoint, follow this sequence and resolve discrepancies before writing",
+      "fix": "Before step 1, add the decision the sequence does not state: if the request names no endpoint and no source is accessible, stop after the unverified prompt-grounded handoff and do not invent routes to trace."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+      "line": 31,
+      "evidence": "An error message string is not a stable discriminator. Branch on a serialized code or field, and say when none exists.",
+      "fix": "Add the missing client-visible landmine: NEVER document a display label, rate limit, or cache validator the backend does not define, because the template's enum, rate-limit, and cache slots invite the model to fill them."
+    }
+  ]
+}

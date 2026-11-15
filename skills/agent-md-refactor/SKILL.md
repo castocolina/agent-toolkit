@@ -1,6 +1,6 @@
 ---
 name: agent-md-refactor
-description: Refactor existing bloated, conflicting, or repetitive AGENTS.md, CLAUDE.md, COPILOT.md, and similar coding-agent instruction files into a minimal root plus focused, conditionally loaded topic documents. Use when instructions are too long, inconsistent, hard to maintain, or need progressive disclosure, even when asked to clean up agent config. Not for READMEs, general developer documentation, or creating a new instruction system from scratch.
+description: Refactor existing bloated, conflicting, or repetitive AGENTS.md, CLAUDE.md, .github/copilot-instructions.md, and similar coding-agent instruction files into a minimal root plus focused, conditionally loaded topic documents. Use when instructions are too long, inconsistent, hard to maintain, or need progressive disclosure, even when asked to clean up agent config. Not for READMEs, general developer documentation, or creating a new instruction system from scratch.
 license: MIT
 ---
 
@@ -14,9 +14,9 @@ If instruction files or repository evidence are unavailable, do not stop at a re
 
 1. Read every relevant instruction file, including scoped/ancestor files. Inventory each rule with source file, directory scope, exceptions, and precedence.
 2. Identify contradictions and ask for a decision when precedence cannot be derived from existing instructions. Do not silently choose a preferred rule.
-3. Keep in the root only instructions that truly apply to nearly every task: project identity, critical overrides/safety constraints, and essential commands. Preserve universal constraints even if the result exceeds a suggested length. A concise guide may need no split.
+3. Keep in the root only instructions that truly apply to nearly every task: project identity, critical overrides/safety constraints, essential commands, and the package manager only when it is not the plain npm default. Keep an explicit npm instruction when it is a project-specific choice or override (for example a pinned registry or a script name); an explicit package-manager instruction stays a project constraint until its redundancy or obsolescence is demonstrated against its purpose and the supported workflows; evidence that npm merely works does not justify dropping it. Preserve universal constraints even if the result exceeds a suggested length. A concise guide may need no split.
 4. Group remaining actionable rules by topic while preserving their source scope and exceptions. Create focused files under `.claude/` by default; use `docs/agent-instructions/` only if the repository has no `.claude/` directory. Avoid unnecessary file counts and generic template scaffolding.
-5. Add links with explicit read conditions, e.g. “Read `.claude/testing.md` before changing or writing tests.” Plain Markdown links are not automatic imports: confirm the target harness follows links when applicable. Claude Code auto-loads the root instruction file; linked files require the agent to follow the stated condition.
+5. Add links with explicit read conditions, e.g. “Read `.claude/testing.md` before changing or writing tests.” Plain Markdown links are not automatic imports: confirm the target harness follows links when applicable. Claude Code loads CLAUDE.md; it reads AGENTS.md only when no applicable CLAUDE.md or CLAUDE.local.md exists (see `references/harness-loading.md`, https://code.claude.com/docs/en/memory, checked 2026-11-15), so verify the applicable live loading rules before moving instructions; linked files require the agent to follow the stated condition. Before choosing where a topic file lives (`.claude/rules/`, `@path` imports, AGENTS.md versus CLAUDE.md, Copilot files), read `references/harness-loading.md`.
 6. Remove only rules proven redundant, obsolete, or non-actionable. Do not delete project-specific safety overrides as presumed defaults.
 7. Verify every moved rule against the inventory (source, scope, precedence, exception), check every Markdown link resolves to an existing target, and confirm the target harness will load conditional guidance when relevant. Identify obsolete commands or instructions for review/removal only when repository evidence shows they are obsolete; do not guess replacements. Report removed rules and unresolved decisions.
 
@@ -25,7 +25,7 @@ If instruction files or repository evidence are unavailable, do not stop at a re
 - Flattening a directory-specific exception into global guidance changes behavior in other directories.
 - A project-specific safety override may be essential even if another environment treats it as default; verify before pruning.
 - Moving text without preserving precedence can reverse which instruction wins.
-- Claude Code does not automatically load arbitrary files under `.claude/`; links must say when the agent must read them.
+- Claude Code does not automatically load arbitrary files under `.claude/`; links must say when the agent must read them. The exception is `.claude/rules/`: a file there without `paths:` frontmatter loads at launch, so a conditional topic file must not go in `.claude/rules/` unless it carries `paths:` frontmatter.
 
 ## Templates
 
