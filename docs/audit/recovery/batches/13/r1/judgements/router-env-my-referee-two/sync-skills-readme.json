@@ -1,0 +1,86 @@
+{
+  "skill": "sync-skills-readme",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 13,
+    "D3": 15,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 12,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 41,
+      "evidence": "\"Escape `|` as `\\|`.\"",
+      "fix": "Move the pipe-escape reminder into the skill this command's plugin bundles (it is ordinary markdown the model produces unprompted); record the move. Do not delete the repo-specific gotchas."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 9,
+      "evidence": "\"## Workflow\" is six numbered steps with no thinking prompt before categorizing or summarizing.",
+      "fix": "Before step 2, add one question the agent must answer: does the first matching keyword name what the skill does, or only a word in its description? Keep the mechanical first-match rule as the default."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 2,
+      "evidence": "description: \"Regenerate the \"Available Skills\" table in the root README.md from each skills/*/SKILL.md name and description. Use after adding, removing, renaming or re-describing a skill, when the skills list or table in the README is stale or missing an entry, or when asked to update or sync the README skill list, even without the word \"table\". Not for editing any other README section or for a skill's own README.md.\"",
+      "fix": "Regenerate the Available Skills table in the root README.md from each skills/*/SKILL.md name and description. Use after adding, removing, renaming or re-describing a skill, when the skills list or table in the README is stale or missing an entry, or when asked to update or sync the README skill list, even without the word table. Not for editing any other README section, for a skill's own README.md, or for syncing a git branch."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "commands/evals/sync-skills-readme.json",
+      "line": 1,
+      "evidence": "Seven scenarios cover the rewrite, sort order, missing SKILL.md, missing description, a long description, a missing heading and the report. None asserts the backup-then-diff restore.",
+      "fix": "Add a scenario where the diff shows a change outside the table, with assertions that the recorded backup is copied back over README.md and the failure is reported."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-skills-readme.md",
+      "line": 37,
+      "evidence": "\"On a mismatch, restore with `cp <recorded-path> README.md` and report the failure.\"",
+      "fix": "Name the failure text and the next action: restore, then stop and print `\u274c Table diff changed lines outside the Available Skills table; README.md restored from <path>` (or `\u274c Row count <n> does not equal valid skills <n>`). Do not continue to step 6."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 35,
+      "evidence": "\"the new row count must equal the number of valid skills.\"",
+      "fix": "Define the count as `grep -c '^|' README.md` rows under the heading minus the header and delimiter, compared with the valid-skill count from step 1."
+    }
+  ]
+}

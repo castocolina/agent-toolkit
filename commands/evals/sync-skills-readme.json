@@ -77,6 +77,19 @@
       ]
     },
     {
+      "id": "diff-outside-table-restores",
+      "prompt": "Scenario: README.md is the file readme-skills-before.md and `skills/` holds `alpha-test` (skill-alpha.SKILL.md). The backup step printed the recorded path /tmp/tmp.Xk3j9a. After the table was replaced, `diff /tmp/tmp.Xk3j9a README.md` shows a changed line in the Installation section as well as the table rows. Show the commands you run next and the final message. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "files": [
+        "readme-skills-before.md",
+        "skill-alpha.SKILL.md"
+      ],
+      "assertions": [
+        "The recorded backup is copied back over README.md with `cp /tmp/tmp.Xk3j9a README.md` (the literal recorded path, not `$backup`)",
+        "The failure line `❌ Table diff changed lines outside the Available Skills table; README.md restored from /tmp/tmp.Xk3j9a` is printed",
+        "Step 6 is not run: the final message has no `✅ README.md updated` report and no total-skills or categories summary"
+      ]
+    },
+    {
       "id": "report-summary",
       "prompt": "Scenario: `skills/` holds `alpha-test` and `zeta-docs` (fixtures skill-alpha.SKILL.md and skill-zeta.SKILL.md), and README.md was updated. Show the final user-facing message. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
       "files": [
