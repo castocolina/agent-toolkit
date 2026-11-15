@@ -17,7 +17,11 @@ t() {
 # URL-encoded source, IDAT, IEND. Modes: ok, trunc (cut mid-file), nodata (no zTXt),
 # noidat (CRC-valid but no image data), notdrawio (embedded XML is not a draw.io document),
 # zerodim (IHDR width 0), zlibjunk (CRC-valid IDAT whose data is not a zlib stream),
-# shortidat (a valid zlib stream that inflates to fewer bytes than the IHDR calls for).
+# shortidat (a valid zlib stream that inflates to fewer bytes than the IHDR calls for),
+# filterbyte (CRC-valid 1x1 RGB PNG of the right inflated length whose scanline starts with filter byte 5),
+# ihdrpair (bit depth 4 with color type 2, not a valid pair), ihdrcomp (compression method 1),
+# ihdrfmeth (filter method 1), ihdrinterlace (interlace method 2); the four ihdr* fixtures are CRC-valid with
+# otherwise good chunks, so only the IHDR field they name is wrong. Their names avoid "bad", which the stub fails on.
 write_png_maker() {
   cat > "$1/mkpng.py" << 'EOF'
 import struct, sys, urllib.parse, zlib
@@ -26,13 +30,16 @@ def chunk(kind, data):
     return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data))
 body = "<svg/>" if mode == "notdrawio" else open(src, encoding="utf-8").read()
 xml = urllib.parse.quote(body, safe="").encode()
-png = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 0 if mode == "zerodim" else 1, 1, 8, 2, 0, 0, 0))
+depth, ctype, comp, fmeth, interlace = {"ihdrpair": (4, 2, 0, 0, 0), "ihdrcomp": (8, 2, 1, 0, 0), "ihdrfmeth": (8, 2, 0, 1, 0), "ihdrinterlace": (8, 2, 0, 0, 2)}.get(mode, (8, 2, 0, 0, 0))
+png = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 0 if mode == "zerodim" else 1, 1, depth, ctype, comp, fmeth, interlace))
 if mode != "nodata":
     png += chunk(b"zTXt", b"mxGraphModel\0\0" + zlib.compress(xml))
 if mode == "zlibjunk":
     png += chunk(b"IDAT", b"this is not zlib data")
 elif mode == "shortidat":
     png += chunk(b"IDAT", zlib.compress(b"\0\0"))
+elif mode == "filterbyte":
+    png += chunk(b"IDAT", zlib.compress(b"\x05\0\0\0"))
 elif mode != "noidat":
     png += chunk(b"IDAT", zlib.compress(b"\0\0\0\0"))
 png += chunk(b"IEND", b"")
@@ -70,6 +77,11 @@ case "$src" in
   *zerodim*) exec python3 "$ROOT/mkpng.py" "$out" zerodim "$src" ;;
   *zlibjunk*) exec python3 "$ROOT/mkpng.py" "$out" zlibjunk "$src" ;;
   *shortidat*) exec python3 "$ROOT/mkpng.py" "$out" shortidat "$src" ;;
+  *filterbyte*) exec python3 "$ROOT/mkpng.py" "$out" filterbyte "$src" ;;
+  *ihdrpair*) exec python3 "$ROOT/mkpng.py" "$out" ihdrpair "$src" ;;
+  *ihdrcomp*) exec python3 "$ROOT/mkpng.py" "$out" ihdrcomp "$src" ;;
+  *ihdrfmeth*) exec python3 "$ROOT/mkpng.py" "$out" ihdrfmeth "$src" ;;
+  *ihdrinterlace*) exec python3 "$ROOT/mkpng.py" "$out" ihdrinterlace "$src" ;;
   *slow*) sleep 10 ;;
 esac
 python3 "$ROOT/mkpng.py" "$out" ok "$src"
@@ -212,7 +224,7 @@ EOF
 
 test_broken_png_is_a_failure_and_keeps_previous_png() {
   local name
-  for name in trunc nodata noidat notdrawio zerodim zlibjunk shortidat; do
+  for name in trunc nodata noidat notdrawio zerodim zlibjunk shortidat filterbyte ihdrpair ihdrcomp ihdrfmeth ihdrinterlace; do
     setup
     # valid source XML: each fixture would pass in ok mode without its targeted PNG corruption
     cp "$ROOT/work/flow.drawio" "$ROOT/work/$name.drawio"
@@ -224,6 +236,23 @@ test_broken_png_is_a_failure_and_keeps_previous_png() {
     check "continues[$name]" "$(exists "$ROOT/work/flow.drawio.png")" yes
     check "no_temp_left[$name]" "$(find "$ROOT/work" -name '.drawio-export.*' | wc -l | tr -d ' ')" 0
   done
+}
+
+test_dash_leading_input_after_double_dash_is_not_an_option() {
+  local mode
+  for mode in file dark; do
+    setup
+    cp "$ROOT/work/flow.drawio" "$ROOT/work/-diagram.drawio"
+    DRAWIO_BACKGROUND=$mode run -- -diagram.drawio
+    check "exit[$mode]" "$CODE" 0
+    check "png_written[$mode]" "$(head -c 4 "$ROOT/work/-diagram.drawio.png" | tail -c 3)" PNG
+    check "json[$mode]" "$(cat "$ROOT/out")" '[{"drawio":"-diagram.drawio","png":"-diagram.drawio.png","ok":true}]'
+    check "no_temp_left[$mode]" "$(find "$ROOT/work" -name '.drawio-export.*' | wc -l | tr -d ' ')" 0
+  done
+  setup
+  run -- -missing.drawio
+  check missing_exit "$CODE" 1
+  check missing_reports "$(grep -c -- '-missing.drawio: no such file' "$ROOT/err")" 1
 }
 
 test_unreplaceable_destination_is_a_per_file_failure() {

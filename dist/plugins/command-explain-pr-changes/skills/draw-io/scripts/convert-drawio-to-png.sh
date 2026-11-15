@@ -112,7 +112,8 @@ tree.write(dst, encoding="unicode")
 # Accepts only a complete PNG (CRC-checked chunks; a 13-byte IHDR first with nonzero
 # size; at least one IDAT; an empty IEND last) whose IDAT stream is a complete zlib
 # stream that inflates to exactly the size the IHDR dimensions, bit depth, color type
-# and interlace method call for, and whose zTXt "mxGraphModel" chunk
+# and interlace method call for (IHDR bit depth and color type a valid pair, compression
+# and filter method 0, interlace 0 or 1, every scanline filter byte 0 to 4), and whose zTXt "mxGraphModel" chunk
 # (drawio -e) decodes to a draw.io document: <mxfile> with a <diagram>, or <mxGraphModel>.
 # python3 is already required by this script (the JSON result and the background
 # rewrite), so there is no weaker fallback check.
@@ -139,21 +140,32 @@ if len(b) < 33 or b[8:16] != b"\x00\x00\x00\x0dIHDR" or 0 in struct.unpack(">II"
     sys.exit(1)
 if b"IDAT" not in kinds or kinds[-1] != b"IEND" or b[-12:-8] != b"\x00\x00\x00\x00" or not xml:
     sys.exit(1)
-width, height, depth, ctype, _, _, interlace = struct.unpack(">IIBBBBB", b[16:29])
+width, height, depth, ctype, compression, fmethod, interlace = struct.unpack(">IIBBBBB", b[16:29])
+if depth not in {0: (1, 2, 4, 8, 16), 2: (8, 16), 3: (1, 2, 4, 8), 4: (8, 16), 6: (8, 16)}.get(ctype, ()):
+    sys.exit(1)  # unknown color type, or a bit depth that color type does not allow
+if compression != 0 or fmethod != 0 or interlace not in (0, 1):
+    sys.exit(1)
 bits = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}[ctype] * depth
 if interlace == 0:
     passes = [(0, 0, 1, 1)]
 else:  # Adam7: (x start, y start, x step, y step)
     passes = [(0, 0, 8, 8), (4, 0, 8, 8), (0, 4, 4, 8), (2, 0, 4, 4), (0, 2, 2, 4), (1, 0, 2, 2), (0, 1, 1, 2)]
-want = 0
+want, rows = 0, []  # rows: (scanline length including its filter byte, scanline count) per pass
 for x0, y0, dx, dy in passes:
     w, h = (width - x0 + dx - 1) // dx, (height - y0 + dy - 1) // dy
     if w > 0 and h > 0:
-        want += h * (1 + (w * bits + 7) // 8)
+        rows.append((1 + (w * bits + 7) // 8, h))
+        want += h * rows[-1][0]
 z = zlib.decompressobj()
 raw = z.decompress(idat, want + 1)  # capped, so a decompression bomb cannot fill memory
 if len(raw) != want or not z.eof or z.unused_data:
     sys.exit(1)
+pos = 0
+for step, h in rows:  # every scanline starts with a filter type byte, 0 to 4
+    for _ in range(h):
+        if raw[pos] > 4:
+            sys.exit(1)
+        pos += step
 doc = ET.fromstring(xml)
 sys.exit(not (doc.tag == "mxGraphModel" or (doc.tag == "mxfile" and doc.find("diagram") is not None)))
 '
@@ -164,19 +176,22 @@ results=() # drawio, png, ok triplets; serialized by json.dumps at the end
 for drawio in "${files[@]}"; do
   png="${drawio%.drawio}.drawio.png"
   echo "Converting $drawio to $png..." >&2
+  # A name after -- may start with a dash: ./ keeps it from being read as an option by dirname, mv and drawio.
+  inp="$drawio" outp="$png"
+  case "$drawio" in -*) inp="./$drawio" outp="./$png" ;; esac
   ok=false
   work=""
-  if [ ! -f "$drawio" ]; then
+  if [ ! -f "$inp" ]; then
     echo "✗ $drawio: no such file" >&2
-  elif ! work=$(mktemp -d "$(dirname "$png")/.drawio-export.XXXXXX"); then
+  elif ! work=$(mktemp -d "$(dirname "$outp")/.drawio-export.XXXXXX"); then
     echo "✗ cannot create a temp directory next to $png" >&2
   else
     TMPS+=("$work")
-    src="$drawio"
+    src="$inp"
     rc=0
     if [ -n "$bg" ]; then
       src="$work/src.drawio"
-      python3 -c "$SET_BG_PY" "$drawio" "$src" "$bg" || rc=$?
+      python3 -c "$SET_BG_PY" "$inp" "$src" "$bg" || rc=$?
     fi
     # --disable-update: the AppImage build can hang an export while it auto-updates.
     [ "$rc" -ne 0 ] || "${bounded[@]}" drawio --disable-update -x -f png -e -s 2 "${extra[@]}" -o "$work/out.png" "$src" >&2 || rc=$?
@@ -189,12 +204,12 @@ for drawio in "${files[@]}"; do
       echo "✗ drawio PNG export failed for $drawio" >&2
     elif ! python3 -c "$CHECK_PNG_PY" "$work/out.png" 2> /dev/null; then
       echo "✗ $drawio output is not a PNG with embedded draw.io data" >&2
-    elif [ -d "$png" ] || ! mv -f "$work/out.png" "$png"; then
+    elif [ -d "$outp" ] || ! mv -f "$work/out.png" "$outp"; then
       # A directory at $png would make mv move the file into it; set -e would end the run on a failed mv.
       echo "✗ $drawio: cannot replace $png (kept as it was)" >&2
     else
       ok=true
-      generated+=("$png")
+      generated+=("$outp")
       echo "✓ Generated $png" >&2
     fi
     rm -rf "$work"

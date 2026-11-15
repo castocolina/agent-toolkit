@@ -174,6 +174,20 @@ class CheckStalenessTests(unittest.TestCase):
             self.assertEqual(len(data["issues"]), 1, data["issues"])
             self.assertTrue(data["issues"][0].startswith("Baseline ancestry diverged"), data["issues"])
 
+    def test_missing_timestamp_does_not_hide_a_diverged_baseline(self):
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as notes:
+            root = Path(tmp)
+            env = {**GIT_ENV, "HOME": str(root)}
+            baseline = self._repo_with_commit(root)
+            subprocess.run(["git", "checkout", "--orphan", "other"], cwd=root, check=True, capture_output=True, env=env)
+            subprocess.run(["git", "-c", "user.email=t@example.com", "-c", "user.name=T", "-c", "commit.gpgsign=false",
+                            "-c", "core.hooksPath=/dev/null", "commit", "-m", "other root"], cwd=root, check=True, capture_output=True, env=env)
+            data = self._unknown_issues(root, notes, None, baseline)
+            self.assertTrue(data["baseline_ancestry_diverged"])
+            self.assertEqual(len(data["issues"]), 2, data["issues"])
+            self.assertTrue(data["issues"][0].startswith("Missing timestamp"), data["issues"])
+            self.assertTrue(data["issues"][1].startswith("Baseline ancestry diverged"), data["issues"])
+
     def test_help_documents_exit_codes(self):
         result = subprocess.run(["python3", str(SCRIPT), "--help"], text=True, capture_output=True)
         self.assertEqual(result.returncode, 0)

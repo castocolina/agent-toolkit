@@ -297,6 +297,9 @@ def check_staleness(handoff_path: str) -> dict:
                 issues.append("Missing baseline: no 'Baseline commit:' line in the handoff")
             elif changed_files is None:
                 issues.append(f"Git comparison failed: baseline {metadata['baseline_commit']} could not be compared with HEAD (commit not found, or git diff/status failed)")
+            # Other missing metadata must not hide a divergence the git comparison did find.
+            if ancestry_diverged and changed_files is not None:
+                issues.append("Baseline ancestry diverged; verify rollback/divergence and review changed files")
             result["issues"] = issues
             return result
 

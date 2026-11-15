@@ -39,18 +39,37 @@ check json_flag_candidates "$(python3 -c 'import json,sys; print(json.load(sys.s
 (cd "$ROOT/work" && PATH="$ROOT/bin:/usr/bin:/bin" TAZE_LOG="$ROOT/argv" TAZE_OUT='{"a":1}' "$BASH" "$SCRIPT" -w) >"$ROOT/write.out" 2>&1; rc=$?
 check write_short_args "$(cat "$ROOT/argv")" '-w'
 check write_keeps_text "$(python3 -c 'import json,sys; d=json.load(sys.stdin); print("candidates" in d, "output" in d)' < "$ROOT/write.out")" 'False True'
-for combo in -i --interactive; do
+for combo in -i -I -u --install --update --interactive; do
 : > "$ROOT/argv"
 (cd "$ROOT/work" && PATH="$ROOT/bin:/usr/bin:/bin" TAZE_LOG="$ROOT/argv" TAZE_OUT='{"a":1}' "$BASH" "$SCRIPT" "$combo") >"$ROOT/write$combo.out" 2>&1; rc=$?
 check "write_interactive_${combo}_args" "$(cat "$ROOT/argv")" "$combo"
 check "write_interactive_${combo}_keeps_text" "$(python3 -c 'import json,sys; d=json.load(sys.stdin); print("candidates" in d, "output" in d)' < "$ROOT/write$combo.out")" 'False True'
 done
+: > "$ROOT/argv"
+(cd "$ROOT/work" && PATH="$ROOT/bin:/usr/bin:/bin" TAZE_LOG="$ROOT/argv" TAZE_OUT='{"a":1}' "$BASH" "$SCRIPT" -u --json) >"$ROOT/update-json.out" 2>&1; rc=$?
+check update_json_args "$(cat "$ROOT/argv")" '-u --json'
+check update_json_keeps_text "$(python3 -c 'import json,sys; d=json.load(sys.stdin); print("candidates" in d, "output" in d)' < "$ROOT/update-json.out")" 'False True'
 for combo in -rw -wr; do
 : > "$ROOT/argv"
 (cd "$ROOT/work" && PATH="$ROOT/bin:/usr/bin:/bin" TAZE_LOG="$ROOT/argv" TAZE_OUT='{"a":1}' "$BASH" "$SCRIPT" "$combo") >"$ROOT/write$combo.out" 2>&1; rc=$?
 check "write_cluster_${combo}_args" "$(cat "$ROOT/argv")" "$combo"
 check "write_cluster_${combo}_keeps_text" "$(python3 -c 'import json,sys; d=json.load(sys.stdin); print("candidates" in d, "output" in d)' < "$ROOT/write$combo.out")" 'False True'
 done
+for combo in --write=true --update=true --install=true --interactive=true; do
+: > "$ROOT/argv"
+(cd "$ROOT/work" && PATH="$ROOT/bin:/usr/bin:/bin" TAZE_LOG="$ROOT/argv" TAZE_OUT='{"a":1}' "$BASH" "$SCRIPT" "$combo") >"$ROOT/write$combo.out" 2>&1; rc=$?
+check "write_equals_${combo}_rc" "$rc" 0
+check "write_equals_${combo}_args" "$(cat "$ROOT/argv")" "$combo"
+check "write_equals_${combo}_keeps_text" "$(python3 -c 'import json,sys; d=json.load(sys.stdin); print("candidates" in d, "output" in d)' < "$ROOT/write$combo.out")" 'False True'
+done
+for combo in --global --global=true -g -rg -gr; do
+: > "$ROOT/argv"
+(cd "$ROOT/work" && PATH="$ROOT/bin:/usr/bin:/bin" TAZE_LOG="$ROOT/argv" TAZE_OUT='{"a":1}' "$BASH" "$SCRIPT" "$combo") >"$ROOT/global$combo.out" 2>"$ROOT/global$combo.err"; rc=$?
+check "global_${combo}_rc" "$rc" 2
+check "global_${combo}_taze_not_run" "$(cat "$ROOT/argv")" ""
+check "global_${combo}_json" "$(python3 -c 'import json,sys; d=json.load(sys.stdin); print(d["status"], "out of scope" in d["diagnostic"])' < "$ROOT/global$combo.out")" 'error True'
+done
+check help_documents_global "$(PATH="$ROOT/bin:/usr/bin:/bin" "$BASH" "$SCRIPT" --help 2>&1 | grep -c '^Rejected: --global')" 1
 (cd "$ROOT/work" && PATH="$ROOT/bin" TAZE_LOG="$ROOT/argv" "$BASH" "$SCRIPT") >"$ROOT/no-python.out" 2>"$ROOT/no-python.err"; rc=$?
 check missing_python_rc "$rc" 3; check missing_python_json "$(grep -Foc '"diagnostic":"python3 is not installed"' "$ROOT/no-python.out")" 1
 python3 -c 'import json,sys; json.load(sys.stdin)' < "$ROOT/no-python.out"; check missing_python_valid_json "$?" 0
