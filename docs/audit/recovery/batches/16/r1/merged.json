@@ -1,0 +1,383 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "draw-io",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 92.8,
+        "router-env-my-referee-two": 91.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest dbff837f: removed units (325, showing 40).",
+          "fix": "Provide the complete removal digest so the remaining units can be checked against current destinations and docs/audit/recovery/draw-io/record.md."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/draw-io/scripts/find_aws_icon.py",
+          "line": 23,
+          "evidence": "Every icon starting with group_ gets shape=mxgraph.aws4.group; references/aws-icons.md says the Auto Scaling group uses shape=mxgraph.aws4.groupCenter.",
+          "fix": "Return the palette-correct groupCenter style for group_auto_scaling_group, add a script test for that branch, and keep the catalog and SKILL.md lookup guidance consistent."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 20,
+          "evidence": "The compressed-input command writes to the fixed path in.tmp.drawio before moving it over the original.",
+          "fix": "Create a unique temporary file beside the input, refuse collisions, validate the decoded output, and clean up only the temporary file created by this run before replacing the original."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 20,
+          "evidence": "The decode command requires `timeout 120`, while the export instructions also support macOS `gtimeout`.",
+          "fix": "Select timeout or gtimeout for decoding as the export script does, and explain the missing-tool fallback without changing the original file."
+        },
+        {
+          "id": "D8-4",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 141,
+          "evidence": "For any named or CJK font, the prescribed check is `fc-list | grep -i \"Noto Sans JP\"`.",
+          "fix": "Check the font actually selected for the diagram, and provide a platform-appropriate fallback when fontconfig is unavailable."
+        },
+        {
+          "id": "D8-5",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 28,
+          "evidence": "The workflow says to export and visually inspect a PNG and to 'Stop only when every item passes', even for XML-only requests or when drawio is unavailable.",
+          "fix": "Make export and visual inspection conditional on the requested deliverable and available tooling; for XML-only or unavailable-export cases, validate what is possible and disclose that rendering was not checked."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 173,
+          "evidence": "Add a legend when more than one line style appears is a generic diagramming habit the model already applies.",
+          "fix": "Drop that sentence from references/layout-guidelines.md section 2 and add a row to docs/audit/recovery/draw-io/record.md; keep the dashed/solid/dotted style fragments and the accessibility second-cue rule."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 68,
+          "evidence": "The Arrows table never says which side is exitX=0 versus exitX=1, so the agent still guesses the gutter route.",
+          "fix": "Add one sentence under the Arrows table: exitX=0 is the left edge, 1 the right, exitY=0 the top, 1 the bottom; pick the side that faces the other end."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 193,
+          "evidence": "Gotchas never says an mxCell id must be unique, so a copied skeleton silently breaks source and target.",
+          "fix": "Add a Gotchas item: NEVER reuse an mxCell id, because source and target bind to the first cell with that id and the edge attaches to the wrong node."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/draw-io/references/aws-icons.md",
+          "line": 673,
+          "evidence": "Section 5 only says to use the search script, with no scenario and no file to skip.",
+          "fix": "Replace that section with: run scripts/find_aws_icon.py first; read this file only when it exits 1 or the Service line is marked [unverified]; do not load it for a non-AWS diagram."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 180,
+          "evidence": "pre-commit language is a menu: use unsupported on 4.4.0 or newer and keep system for older versions, with no way to tell which is installed.",
+          "fix": "Default the hook to language: unsupported, and say to use system only when pre-commit --version prints below 4.4.0."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/draw-io/evals/evals.json",
+          "line": 1,
+          "evidence": "Six prompts cover creation, AWS icons, grouping and compressed XML, but none asserts the page-versus-container ancestor rule or the three hang causes.",
+          "fix": "Add one eval whose connector spans two containers and must keep parent=\"1\", and one whose drawio --version hangs and must follow the three causes in Export."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 128,
+          "evidence": "The vendor default is named but the sentence says it is not reproduced, so the agent cannot apply it.",
+          "fix": "Put the fragment in the instruction: style ends with labelBackgroundColor=default;defaultLabelBackgroundColor=page; so the label background follows the page."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/draw-io/references/aws-icons.md",
+          "line": 3,
+          "evidence": "The catalog says 92 names are in neither source and 84 of them are marked [unverified], but the file marks 85 rows.",
+          "fix": "Recount the [unverified] rows against the palette check and correct 84 or 92 so the intro matches the table."
+        }
+      ]
+    },
+    {
+      "name": "session-handoff",
+      "percent": 96.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.0,
+        "router-env-my-referee-two": 96.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest at dbff837f: \"removed units (218, showing 40)\"; the remaining 178 items are not individually visible in the digest.",
+          "fix": "Supply the complete digest so every removed unit can be checked against the current files and docs/audit/recovery/session-handoff/record.md."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": 54,
+          "evidence": "\"SLIGHTLY_STALE (0) | Read the listed commits and changed files, then resume\"; the default staleness report prints a changed-file count but no changed-file list, and lists at most five recent commits.",
+          "fix": "Provide commands to inspect the complete baseline-to-HEAD commit range and changed files, including the working tree, or change the script to print those lists and document any truncation."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": 59,
+          "evidence": "\"UNKNOWN by cause (the report's Issues line says which)\"; check_staleness.py instead groups missing timestamp, missing baseline, and failed git comparison into the same issue message, but the workflow has no recovery branch for a missing timestamp or failed comparison with a baseline present.",
+          "fix": "Distinguish missing timestamp, missing baseline and git comparison failure in the report, and add a recovery branch that verifies the timestamp and git operations or checks relevant files and assumptions manually before resuming."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/session-handoff/references/handoff-template.md",
+          "line": 32,
+          "evidence": "## Current State Summary\n\n[One paragraph: What was being worked on, current status, and where things left off]",
+          "fix": "Keep the template in references/handoff-template.md (users and the scaffold need the section structure). Replace the generic placeholders the model writes unprompted (this line, Architecture Overview, Key Patterns, Tasks Finished, Decisions, Blockers, Assumptions, Potential Gotchas, Environment) with one domain example each, matching the weak-versus-strong Important Context example in SKILL.md, and record the placeholder wording in docs/audit/recovery/session-handoff/record.md."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/session-handoff/evals/evals.json",
+          "line": 1,
+          "evidence": "\"expected_output\": \"Proposed session-handoff workflow and populated handoff content, with scaffold, validation, state, decisions, and concrete next steps.\"",
+          "fix": "Add an edge eval whose prompt is a subdirectory or a copied worktree handoff, asserting the agent runs create_handoff.py from the project root and checks that the handoff Project: line equals git rev-parse --show-toplevel before trusting staleness."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": 65,
+          "evidence": "UNKNOWN by cause (the report's Issues line says which):",
+          "fix": "Replace that clause with: the report's Issues line says which of the three causes below applies; when it does not, the counts are still unusable and the cause is the script's baseline_ancestry_diverged field (--json) or a failed git diff of the recorded baseline against HEAD. Do not tell the agent the Issues line names the cause for the ancestor case."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": 44,
+          "evidence": "The score starts at 100 and loses 30 for any TODO left, 10 per missing or incomplete required section, 20 for any secret, 5 per missing referenced file (max 20) and 2 per missing recommended section",
+          "fix": "Add one sentence after that list: a secret forces BLOCKED even when the arithmetic is 70 or more, and one incomplete required section forces NEEDS_WORK even when the arithmetic is 90, so report the verdict, not the number alone."
+        }
+      ]
+    },
+    {
+      "name": "web-to-markdown",
+      "percent": 86.8,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 88.8,
+        "router-env-my-referee-two": 84.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest at dbff837f: \"removed units (42, showing 40)\".",
+          "fix": "Review the two omitted digest items against the current files and docs/audit/recovery/web-to-markdown/record.md; restore any unexplained substantive content or add a valid record row for each."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 22,
+          "evidence": "\"If content is missing, choose a selector known to contain the article\"",
+          "fix": "Add a compact decision procedure distinguishing navigation failure, late rendering, wrong extraction and authentication, including how to establish that a selector actually contains the requested content."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 28,
+          "evidence": "\"Never reuse the user's daily browser profile\" and \"Use --interactive only when an attached human-controlled terminal is available\" lack explicit failure explanations.",
+          "fix": "Explain that an active daily profile can expose credentials or conflict with the browser, and that interactive mode otherwise blocks awaiting a human; retain the dedicated-profile and approval safeguards."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/evals/trigger-queries.json",
+          "line": 35,
+          "evidence": "\"Use skill web-to-markdown extract clean Markdown\" is labeled should_trigger true, but the invocation gate requires \"use the skill\" or \"use a skill\".",
+          "fix": "Label this near-miss false or explicitly revise the gate and description to accept it; add realistic contextual trigger queries and boundary cases for batch output, missing CLI and authentication."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 21,
+          "evidence": "\"Run `web2md '<url>' --print`\" after only checking the URL scheme.",
+          "fix": "Pass the URL and output path as separate arguments without shell interpolation, or shell-escape them correctly; an HTTP URL may itself contain a single quote and shell metacharacters."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 22,
+          "evidence": "\"Validate the extracted result ... If content is missing\" precedes the network timeout fallback, and the text says both \"then add --wait-for 'main'\" and \"Retry once\".",
+          "fix": "Handle a navigation timeout even when no result exists; specify a single bounded retry using the appropriate readiness controls, adding a selector only when known, then report failure if that retry does not produce valid content."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 19,
+          "evidence": "\"Default to printing Markdown\" but \"For batches, run one command per URL into the requested output directory.\"",
+          "fix": "Specify that a batch without an output directory prints each result separately with its source URL, or explicitly ask for a directory before writing files."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 13,
+          "evidence": "dbff837f digest is cut (removed units (42, showing 40)); sections.json maps every shown dbff837f para id to a record row, and the 5ac41b9a digest's four removed units each have an intended-change row",
+          "fix": "Regenerate the dbff837f digest without the cut and confirm each remaining unit is listed in sections.json units for a row in docs/audit/recovery/web-to-markdown/record.md. Add a row, or restore the content, for any unit that has neither."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 19,
+          "evidence": "Retry once with the most relevant readiness control; if main content remains absent, report the extraction blocker.",
+          "fix": "Before the retry, ask: is the DOM present but the article late (bounded --wait-ms), is a known container missing (--wait-for), or do live connections keep the default networkidle2 from settling (--wait-until domcontentloaded --wait-ms 2000, then --wait-for 'main')? One sentence, so the choice is a diagnosis rather than a menu."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 3,
+          "evidence": "Use only when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown'.",
+          "fix": "Convert http(s) webpage URLs, including JS-rendered pages, to clean Markdown with the locally installed web2md CLI (Puppeteer, Chromium, Readability, Turndown). Use when the user asks to convert, archive or save a webpage, article or docs URL as Markdown, even if they only say 'save this page' or 'turn this URL into markdown', and also when they say 'use the skill web-to-markdown' or 'use a skill web-to-markdown'. Not for local HTML, PDFs, summaries, or general browser automation."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 19,
+          "evidence": "If content is missing, choose a selector known to contain the article using --wait-for '<selector>'; if DOM is present but content renders later, use a bounded --wait-ms.",
+          "fix": "Make the default path one command: retry once with --wait-until domcontentloaded --wait-ms 2000 --wait-for 'main', and change the selector only when the page has no main element. Keep the live-connection explanation and the pointer to web2md --help."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/evals/evals.json",
+          "line": 1,
+          "evidence": "\"assertions\":[\"Recognizes explicit invocation\",\"Uses web2md URL with --out ./guide.md\",\"Includes non-empty output validation\"]",
+          "fix": "Rewrite assertions so a grader can check them from the run: the command is web2md 'https://example.com/guide' --out ./guide.md, the result is checked for the page title and main content rather than only a non-empty file, and login, consent or navigation-only output is rejected. Add one eval for a missing web2md (point at the Installation section of https://github.com/leonardocouy/web2md, invent no path) and one for a login wall (--interactive only with an attached terminal, otherwise a dedicated --user-data-dir or a reported blocker)."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/web-to-markdown/evals/trigger-queries.json",
+          "line": 9,
+          "evidence": "{\"query\":\"Use skill web-to-markdown extract clean Markdown\",\"should_trigger\":true}",
+          "fix": "Replace the two abbreviated positives with full realistic prompts that still name the skill, and add near-miss negatives: a request to summarize a URL with WebFetch, and a request to drive a page with Playwright, neither using the invocation phrase."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 19,
+          "evidence": "confirm the requested page title and substantive main content are present, and reject login, consent, error, or navigation-only output.",
+          "fix": "Add a short check the agent can apply: frontmatter title matches the requested page, the body has article text beyond the title and nav, and a login form, cookie banner, error status or link list with no article is a failed extraction. Then follow the existing retry-once path."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/web-to-markdown/README.md",
+          "line": 169,
+          "evidence": "- `--no-sandbox`: Disable sandbox (sometimes required in containers/CI)",
+          "fix": "Change the README bullet to match SKILL.md: never pass --no-sandbox unless the user explicitly authorizes an isolated environment where Chromium's sandbox is unavailable. Leave the Credits section unchanged."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

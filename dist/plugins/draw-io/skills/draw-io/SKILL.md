@@ -14,15 +14,30 @@ The scripts are in this skill's `scripts/` directory: `S=${CLAUDE_SKILL_DIR}/scr
 1. **Settle the brief.**
    - New diagram: before writing XML, ask (or infer and state): Which medium: slide, document/README/PR, or a file to keep editing? Which page background? Which font, and is it installed where `drawio` runs (Fonts and text)? If the answer to "can a reader say the point in one sentence?" is no, split the diagram (Staging).
    - Edit of an existing diagram: keep its cell ids, styles, canvas and background; ask only about the change requested.
-2. **Open the input.** If `<diagram>` holds base64 text instead of an `<mxGraphModel>` (often `compressed="true"`), decode it to a temp file, check that it parses and has an `<mxGraphModel>`, and only then move it over the original (same name, so the PNG name stays `in.drawio.png`):
+2. **Open the input.** If `<diagram>` holds base64 text instead of an `<mxGraphModel>` (often `compressed="true"`), decode it to a new unique temp file beside the input, check that the output is non-empty, starts with `<mxfile` or `<mxGraphModel`, parses, has as many `<diagram>` elements as the original (a multi-page file keeps every page) and that every one of them holds a parsed `<mxGraphModel>`, and only then move it over the original (same name, so the PNG name stays `in.drawio.png`). `mktemp` creates a file that did not exist, so the command never overwrites another path, and on failure it removes only that file:
 
    ```sh
-   timeout 120 drawio --disable-update -x -f xml -u -o in.tmp.drawio in.drawio \
-     && python3 -c 'import sys,xml.etree.ElementTree as E; sys.exit(E.parse(sys.argv[1]).find(".//mxGraphModel") is None)' in.tmp.drawio \
-     && mv in.tmp.drawio in.drawio
+   src=in.drawio
+   tmp=$(mktemp "$(dirname "$src")/.decode.XXXXXX") || exit 1
+   if timeout 120 drawio --disable-update -x -f xml -u -o "$tmp" "$src" \
+     && [ -s "$tmp" ] \
+     && python3 -c '
+import sys, xml.etree.ElementTree as E
+new, old = sys.argv[1:3]
+text = open(new, encoding="utf-8").read().lstrip()
+root = E.parse(new).getroot()
+want = len(E.parse(old).getroot().findall(".//diagram")) or 1
+pages = root.findall(".//diagram") if root.tag == "mxfile" else [root]
+ok = (text.startswith(("<mxfile", "<mxGraphModel")) and len(pages) == want
+      and all(p.tag == "mxGraphModel" or p.find("mxGraphModel") is not None for p in pages))
+sys.exit(not ok)' "$tmp" "$src"; then
+     mv "$tmp" "$src"
+   else
+     rm -f "$tmp"; echo "could not decode $src" >&2; exit 1
+   fi
    ```
 
-   If that chain fails, delete `in.tmp.drawio`, leave `in.drawio` as it was, and tell the user the file could not be decoded.
+   If that command fails it has already removed its own temp file (it never touches any other file) and left `in.drawio` as it was (this includes a decode whose page count or page content does not match the original); tell the user the file could not be decoded.
 3. **Write the skeleton**, then **containers before children**, then **edges last** (sections below).
 4. **Export** with `convert-drawio-to-png.sh`.
 5. **Look at the PNG** (open it as an image), walk the Checklist, fix the XML, re-export. Stop only when every item passes.
@@ -110,6 +125,7 @@ Worked example: an `ECS service` at page `(240,190)` inside `subnet` at page `(2
 ```
 
 - Keep at least 30px between every child and the container edge, measured inside the parent (`30 <= y` and `y + height <= container height - 30`), more with `rounded=1` or a thick stroke.
+- Margin alone does not group: a label inset 30px from a frame but still `parent="1"` drags alone. A bad example and its fix are in `references/layout-guidelines.md`, section 4.
 - `verticalAlign=top` puts the container title at the top; start children below it.
 - AWS groups: `shape=mxgraph.aws4.group` with a `grIcon`, and the services still use that cell as `parent`.
 
@@ -119,6 +135,7 @@ Worked example: an `ECS service` at page `(240,190)` inside `subnet` at page `(2
 - Set the edge `parent` to the lowest common ancestor of its ends: the page (`1`) when they sit in different containers. Waypoints (`<Array as="points">`) use that parent's coordinates.
 - Move a label off its line with `<mxPoint x="0" y="-20" as="offset"/>` inside the edge geometry (negative y is above a horizontal edge). Keep labels in the gutter, 20px or more from lines, boxes and other text.
 - Edge labels have an opaque white label background by default. On a colored container or a dark page add `labelBackgroundColor=none` (or the page color).
+- Another option is the vendor default, `labelBackgroundColor=default;defaultLabelBackgroundColor=page`, which the vendor reference puts on every edge so the label background follows the page (vendor default, not reproduced here; [xml-reference.md](https://github.com/jgraph/drawio-mcp/blob/main/shared/xml-reference.md), checked 2026-11-15).
 - A `text;` cell does not take `exitX`/`exitY`. Connect to it with explicit points:
 
 ```xml
@@ -150,12 +167,12 @@ DRAWIO_BACKGROUND=transparent bash "$S/convert-drawio-to-png.sh" slides/fig.draw
 
 - Needs the `drawio` CLI (draw.io desktop) on `PATH`. Output: 2x PNG with the diagram embedded, written to a temp file and moved over `NAME.drawio.png` only after it parses as a complete PNG whose embedded draw.io XML decodes. A failed, truncated, data-less or timed-out export keeps the previous PNG and the run goes on to the next file.
 - `DRAWIO_TIMEOUT` (seconds, default 120) bounds each `drawio` call through `timeout(1)` (or `gtimeout` from Homebrew coreutils); raise it for a very large diagram. Without `timeout(1)` the script stops before running drawio and names the fix (GNU coreutils); `DRAWIO_TIMEOUT=0` runs unbounded.
-- stdout is JSON, `[{"drawio":"docs/arch.drawio","png":"docs/arch.drawio.png","ok":true}]`; status goes to stderr. Exit 0 all exported, 1 any failure (including a missing `drawio`), 2 usage error. `--help` prints usage.
+- stdout is JSON, `[{"drawio":"docs/arch.drawio","png":"docs/arch.drawio.png","ok":true}]`; status goes to stderr. Exit 0 all exported, 1 any failure, 2 usage error. A failed preflight (no `drawio` on `PATH`, or no `timeout`/`gtimeout` while `DRAWIO_TIMEOUT` is not 0) prints one failure object instead of the array, `{"ok":false,"error":"drawio not found"}` or `{"ok":false,"error":"timeout not found"}`, with the human message on stderr and exit 1. `--help` prints usage.
 - `light`, `dark` and `#rrggbb` set `background` on every page of a parsed temp copy; the `.drawio` itself is untouched. A compressed page fails with "decode it first" (step 2).
 - No `drawio` available: hand over the `.drawio` and say the PNG still needs exporting. Never fake a PNG.
 - `Error: Export failed: NAME` from drawio means the XML does not parse; check it with `python3 -c 'import sys,xml.dom.minidom as m; m.parse(sys.argv[1])' NAME.drawio`.
 - Running `drawio` by hand: add `--disable-update` and a `timeout`; the AppImage build can hang an export while it auto-updates (the script already passes it).
-- A `drawio` call that hangs (even `drawio --version`) has one of three causes: (1) an instance left hung by an earlier run (e.g. a timed-out test) takes over every new call, so list it with `pgrep -af '[d]rawio'` (the bracket keeps the pattern from matching its own shell), kill only PIDs your own run started (`kill -9` if SIGTERM is ignored) and retry; `drawio --disable-update --version` then returns in about a second; (2) an auto-update, when the binary's mtime just changed (`ls -la --time-style=full-iso "$(command -v drawio)"`): wait for it to finish; (3) on a Linux Wayland session Electron can stall right after its Wayland setup with no output, so retry under XWayland with `env -u WAYLAND_DISPLAY drawio ...` (returns in about a second when this is the cause).
+- A `drawio` call that hangs (even `drawio --version`) has one of three causes: (1) an instance left hung by an earlier run (e.g. a timed-out test) takes over every new call, so list it with `pgrep -af '[d]rawio'` (the bracket keeps the pattern from matching its own shell), kill only PIDs your own run started (`kill -9` if SIGTERM is ignored) and retry; `drawio --disable-update --version` then returns in about a second; (2) an auto-update, when the binary's mtime just changed (`ls -la --time-style=full-iso "$(command -v drawio)"`): wait for it to finish; (3) on a Linux Wayland session Electron can stall right after its Wayland setup with no output, so retry under XWayland with `env -u WAYLAND_DISPLAY drawio ...` (may help; if drawio then exits at once, drop it, because it needs a reachable X server; checked 2026-11-15 with drawio 32.6.1, where it exited 1 with "Failed to initialize Wayland platform" in one shell).
 
 Regenerate PNGs on commit with a pre-commit hook. Copy the script into the repository (a hook needs a stable path) and pass `--stage`, which runs one `git add` for all generated PNGs:
 
@@ -172,13 +189,18 @@ repos:
 
 Run one file with `pre-commit run convert-drawio-to-png --files assets/arch.drawio` (prefix `mise exec --` when the project pins pre-commit with mise).
 
+`language: system` still works. The pre-commit documentation now shows `language: unsupported` for the same hook (added in pre-commit 4.4.0, 2025-11-08; `system` stays as an alias that will be removed in a future version): use `unsupported` on 4.4.0 or newer and keep `system` for older versions (https://pre-commit.com, checked 2026-11-15).
+
 ## AWS icons
 
 Run `python3 "$S/find_aws_icon.py" <service>` and copy its `Style:` line (`--json` gives `[{name, icon, kind, style}]`; exit 1 means no match). Several rows can match: pick the service icon (`Amazon DynamoDB`), not a sub-resource (`DynamoDB Table`), unless the diagram is about that resource. Use the official name with its prefix (`Amazon S3`, `AWS Lambda`) and only `mxgraph.aws4.*` icons.
 
+The catalog is not proof that a name renders (recounted 2026-11-15: 84 of its 463 distinct icon ids are in neither the draw.io AWS4 palette nor the vendor shape index, for example `ebs`, `efs`, `iam`, `elb`). A `Service:` line marked `[unverified]` is one of them: do not paste its `Style:` line as is; look the icon up live first, in the vendor shape index ([search-index.json](https://github.com/jgraph/drawio-mcp/blob/main/shape-search/search-index.json)) or in draw.io's shape search. Subnets: there is no `group_public_subnet` or `group_private_subnet`; a subnet is `shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_security_group;grStroke=0;` plus `strokeColor=#7AA116;fillColor=#F2F6E8;` (public) or `strokeColor=#00A4A6;fillColor=#E6F6F7;` (private), and the VPC group icon is `group_vpc2` (checked 2026-11-15 against [Sidebar-AWS4.js](https://github.com/jgraph/drawio/blob/dev/src/main/webapp/js/diagramly/sidebar/Sidebar-AWS4.js), lines 265-299). The Auto Scaling group is the one group that uses `shape=mxgraph.aws4.groupCenter` instead of `group`; the script's `Style:` line already has it. The other group names are in `references/aws-icons.md` section 4.
+
 ## Load only when needed
 
 - `references/layout-guidelines.md`: read when drawing an AWS architecture (group nesting order) or a diagram with several flow types (line-style meaning, placement direction). Not needed for a single fix.
+- `references/layout-guidelines.md`, section 2.1 (Accessibility): also read it when the user asks for an accessible or color-blind-safe diagram, where meaning must not rest on color alone.
 - `references/aws-icons.md`: read only when `find_aws_icon.py` finds nothing, to browse a category or the product-icon style. Do NOT load it for a non-AWS diagram, or to look up a service the script finds.
 
 ## Gotchas

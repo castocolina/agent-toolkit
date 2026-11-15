@@ -1,0 +1,113 @@
+{
+  "skill": "draw-io",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 14,
+    "D3": 14,
+    "D4": 14,
+    "D5": 13,
+    "D6": 14,
+    "D7": 13,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 192,
+      "evidence": "Load only when needed says read references/layout-guidelines.md, section 2 (Accessibility) for an accessible or color-blind-safe diagram, but that file's section 2 is Line meaning and the accessibility rule is an unheaded paragraph under it.",
+      "fix": "In SKILL.md, point the accessibility read at the Accessibility paragraph under references/layout-guidelines.md section 2 (Line meaning), or give that paragraph its own heading ## 2.1 Accessibility and keep the pointer. The rule itself stays."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "line": 3,
+      "evidence": "Catalog status says 470 distinct mxgraph.aws4.* names, 378 in the palette or shape index and 92 in neither, of which 84 are marked [unverified] and eight were group names. The file has 470 icon rows but only 463 distinct ids: mxgraph.aws4.network_firewall, saml_token, api_gateway, qldb, database and generic_database each appear twice, and one of the two qldb rows is itself marked [unverified].",
+      "fix": "Recount against the current rows and rewrite the sentence so rows, distinct ids and marked rows agree (470 rows, 463 distinct ids, 84 marked rows). Keep the source URLs and the checked date 2026-11-15."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/draw-io/references/aws-icons.md",
+      "line": 683,
+      "evidence": "Section 6 cites awsicons.dev and github.com/m-radzikowski/diagrams-aws-icons beside the vendor sources, and nothing in SKILL.md or the catalog says when either is the lookup to use.",
+      "fix": "Delete both links and add a row for each to docs/audit/recovery/draw-io/record.md, or name the case that sends the agent to each one (for example only when the vendor shape index and draw.io shape search both miss)."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 49,
+      "evidence": "Cells 0 and 1 are required: 1 is the default layer and the parent of every top-level cell. Write it uncompressed so it diffs and edits as text.",
+      "fix": "Keep the requirement that cells 0 and 1 exist. Move the definition of the default layer to references/layout-guidelines.md; the model produces that definition unprompted, and the record row goes in docs/audit/recovery/draw-io/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 167,
+      "evidence": "The pre-commit block and the pre-commit 4.4.0 language note sit in the main file after the export procedure, so the Tool pattern's decision tables are followed by repo-setup prose.",
+      "fix": "Move the hook YAML and the system-versus-unsupported note into README.md Installation, and leave SKILL.md with one line: copy the script into the repo and pass --stage. Record the move in docs/audit/recovery/draw-io/record.md."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 178,
+      "evidence": "A Service: line marked [unverified] is one of them: do not paste its Style: line as is. The same warning is the catalog status paragraph and the script's printed mark, and the body never says what a wrong paste produces.",
+      "fix": "Keep the rule once, in Gotchas, and say why: an unverified mxgraph.aws4 name renders as a blank shape. Point the AWS icons section at that item instead of restating it."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 3,
+      "evidence": "Not for Mermaid, Excalidraw, Graphviz/DOT, PlantUML, general slide styling, OCR, or generic image editing.",
+      "fix": "Create and edit uncompressed draw.io (.drawio, mxGraph XML) diagrams and export them to editable PNGs. Use for draw.io files, architecture or AWS diagrams with mxgraph.aws4 icons, container and connector layout fixes, and diagram figures for Quarto or reveal.js slides, including requests for an editable architecture diagram that do not name draw.io. Keywords include .drawio, .drawio.png, mxCell, mxGeometry, mxgraph.aws4. Not for Mermaid, Excalidraw, Graphviz/DOT, PlantUML, or general slide styling."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 141,
+      "evidence": "Another option is the vendor default, labelBackgroundColor=default;defaultLabelBackgroundColor=page, which the vendor reference puts on every edge so the label background follows the page.",
+      "fix": "Make labelBackgroundColor=none the one default for a colored container or a dark page, and drop the vendor-default alternative (record it in docs/audit/recovery/draw-io/record.md) or name the single case where the page-following form is required."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/draw-io/evals/evals.json",
+      "line": 1,
+      "evidence": "casual-api-map asserts edge cells come after the vertex cells in the file, but the prompt never asks for paint order and the fixture-free case has no overlapping shapes, so the assertion passes on an ordering the picture does not need.",
+      "fix": "Drop that assertion from casual-api-map; layout-overlap-fix and refactor-eleven-components already check edge order on fixtures where the order matters. Add one edge prompt whose input is a .drawio with a straight edge crossing a box, and assert the rerouted edge uses edgeStyle=orthogonalEdgeStyle and no longer spans that box."
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 #!/bin/bash
 # Convert .drawio files to .drawio.png (2x, diagram embedded).
-# Status lines go to stderr; stdout is one JSON array, one object per input.
+# Status lines go to stderr; stdout is one JSON array, one object per input
+# (a failed preflight prints one {"ok":false,"error":...} object instead).
 set -e
 
 usage() {
@@ -9,8 +10,9 @@ Usage: convert-drawio-to-png.sh [--stage] [--] FILE.drawio...
 
 Writes FILE.drawio.png next to each input (2x scale, diagram embedded with -e).
 Each export goes to a temp file and replaces the PNG only after it parses as a
-complete PNG with decodable embedded draw.io XML; a failed, truncated or timed-out
-export leaves the previous PNG as it was and the run continues with the next file.
+complete PNG (image data inflated and size-checked) with decodable embedded draw.io XML;
+a failed, truncated, timed-out or unreplaceable export (for example a directory at the
+PNG path) leaves the previous PNG as it was and the run continues with the next file.
 
   --stage     git add the generated PNGs (for a pre-commit hook). Off by default.
   -h, --help  Show this help.
@@ -26,7 +28,10 @@ DRAWIO_TIMEOUT (default 120): seconds allowed per drawio call. Needs timeout(1)
   or gtimeout (Homebrew coreutils); with neither, the script stops before running drawio. 0 runs drawio unbounded.
 
 Stdout: [{"drawio":"a.drawio","png":"a.drawio.png","ok":true}, ...]
-Exit: 0 all exported, 1 any export (or --stage) failed, 2 usage error.
+  A failed preflight (no drawio on PATH, or no timeout utility while DRAWIO_TIMEOUT is not 0)
+  prints one failure object instead, with the human message on stderr:
+  {"ok":false,"error":"drawio not found"} or {"ok":false,"error":"timeout not found"}
+Exit: 0 all exported, 1 any export (or --stage) failed or a preflight failed, 2 usage error.
 EOF
 }
 
@@ -67,14 +72,20 @@ if ! [[ "$timeout_s" =~ ^[0-9]+$ ]]; then
   exit 2
 fi
 
-command -v drawio > /dev/null 2>&1 || { echo "drawio CLI not found on PATH" >&2; exit 1; }
+# Preflight failure: the human message on stderr, one failure object on stdout, exit 1.
+# $1 is the stderr message, $2 the short JSON error text (no quotes or backslashes).
+preflight_fail() {
+  echo "$1" >&2
+  printf '{"ok":false,"error":"%s"}\n' "$2"
+  exit 1
+}
+
+command -v drawio > /dev/null 2>&1 || preflight_fail "drawio CLI not found on PATH" "drawio not found"
 bounded=()
 if [ "$timeout_s" != 0 ]; then
   # gtimeout is GNU timeout as installed by Homebrew coreutils on macOS.
-  tbin=$(command -v timeout || command -v gtimeout) || {
-    echo "timeout(1) not found (nor gtimeout): install GNU coreutils (macOS: brew install coreutils), or set DRAWIO_TIMEOUT=0 to run drawio unbounded" >&2
-    exit 1
-  }
+  tbin=$(command -v timeout || command -v gtimeout) ||
+    preflight_fail "timeout(1) not found (nor gtimeout): install GNU coreutils (macOS: brew install coreutils), or set DRAWIO_TIMEOUT=0 to run drawio unbounded" "timeout not found"
   bounded=("$tbin" -k 5 "$timeout_s")
 fi
 
@@ -99,14 +110,18 @@ for m in models:
 tree.write(dst, encoding="unicode")
 '
 # Accepts only a complete PNG (CRC-checked chunks; a 13-byte IHDR first with nonzero
-# size; at least one IDAT; an empty IEND last) whose zTXt "mxGraphModel" chunk
+# size; at least one IDAT; an empty IEND last) whose IDAT stream is a complete zlib
+# stream that inflates to exactly the size the IHDR dimensions, bit depth, color type
+# and interlace method call for, and whose zTXt "mxGraphModel" chunk
 # (drawio -e) decodes to a draw.io document: <mxfile> with a <diagram>, or <mxGraphModel>.
+# python3 is already required by this script (the JSON result and the background
+# rewrite), so there is no weaker fallback check.
 CHECK_PNG_PY='
 import struct, sys, urllib.parse, zlib, xml.etree.ElementTree as ET
 b = open(sys.argv[1], "rb").read()
 if b[:8] != b"\x89PNG\r\n\x1a\n":
     sys.exit(1)
-i, kinds, xml = 8, [], None
+i, kinds, xml, idat = 8, [], None, b""
 while i < len(b):
     if i + 12 > len(b):
         sys.exit(1)
@@ -115,12 +130,29 @@ while i < len(b):
     if len(data) != n or len(crc) != 4 or struct.unpack(">I", crc)[0] != zlib.crc32(kind + data):
         sys.exit(1)
     kinds.append(kind)
+    if kind == b"IDAT":
+        idat += data
     if kind == b"zTXt" and data.startswith(b"mxGraphModel\0\0"):
         xml = urllib.parse.unquote(zlib.decompress(data[14:]).decode("utf-8"))
     i += 12 + n
 if len(b) < 33 or b[8:16] != b"\x00\x00\x00\x0dIHDR" or 0 in struct.unpack(">II", b[16:24]):
     sys.exit(1)
 if b"IDAT" not in kinds or kinds[-1] != b"IEND" or b[-12:-8] != b"\x00\x00\x00\x00" or not xml:
+    sys.exit(1)
+width, height, depth, ctype, _, _, interlace = struct.unpack(">IIBBBBB", b[16:29])
+bits = {0: 1, 2: 3, 3: 1, 4: 2, 6: 4}[ctype] * depth
+if interlace == 0:
+    passes = [(0, 0, 1, 1)]
+else:  # Adam7: (x start, y start, x step, y step)
+    passes = [(0, 0, 8, 8), (4, 0, 8, 8), (0, 4, 4, 8), (2, 0, 4, 4), (0, 2, 2, 4), (1, 0, 2, 2), (0, 1, 1, 2)]
+want = 0
+for x0, y0, dx, dy in passes:
+    w, h = (width - x0 + dx - 1) // dx, (height - y0 + dy - 1) // dy
+    if w > 0 and h > 0:
+        want += h * (1 + (w * bits + 7) // 8)
+z = zlib.decompressobj()
+raw = z.decompress(idat, want + 1)  # capped, so a decompression bomb cannot fill memory
+if len(raw) != want or not z.eof or z.unused_data:
     sys.exit(1)
 doc = ET.fromstring(xml)
 sys.exit(not (doc.tag == "mxGraphModel" or (doc.tag == "mxfile" and doc.find("diagram") is not None)))
@@ -157,8 +189,10 @@ for drawio in "${files[@]}"; do
       echo "✗ drawio PNG export failed for $drawio" >&2
     elif ! python3 -c "$CHECK_PNG_PY" "$work/out.png" 2> /dev/null; then
       echo "✗ $drawio output is not a PNG with embedded draw.io data" >&2
+    elif [ -d "$png" ] || ! mv -f "$work/out.png" "$png"; then
+      # A directory at $png would make mv move the file into it; set -e would end the run on a failed mv.
+      echo "✗ $drawio: cannot replace $png (kept as it was)" >&2
     else
-      mv -f "$work/out.png" "$png"
       ok=true
       generated+=("$png")
       echo "✓ Generated $png" >&2

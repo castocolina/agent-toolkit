@@ -1,0 +1,34 @@
+{
+  "skill": "session-handoff",
+  "mode": "output",
+  "pass_rate": 0.7059,
+  "passed": 12,
+  "total": 17,
+  "failures": [
+    {
+      "eval": "resume-unknown-staleness",
+      "assertion": "Says the level is UNKNOWN (exit 2) because the baseline commit is not an ancestor of HEAD, so the 1-commit / 3-files counts cannot be trusted and the handoff is not treated as fresh.",
+      "evidence": "The output says \u201cthe report is **UNKNOWN**, not fresh\u201d and that the counts \u201cdo not establish what changed across the divergence,\u201d but does not mention exit 2."
+    },
+    {
+      "eval": "resume-unknown-staleness",
+      "assertion": "Flags that the handoff's assumption \"Branch feat/invoices-v2 was not rebased\" is contradicted by the squash/rebase commit in the report, and re-checks the staging-contract assumption.",
+      "evidence": "The output says \u201cThe reported squash/rebase is consistent with that warning\u201d and calls for verifying the staging contract, but does not flag the contradiction of the handoff\u2019s no-rebase assumption."
+    },
+    {
+      "eval": "validate-blocked",
+      "assertion": "Replaces the postgres connection string containing the password with a variable name only (for example a DATABASE_URL-style name) and does not repeat the password Tr0ub4dor-3 in its reply.",
+      "evidence": "The output suggests \u201cuse a variable name such as `$DATABASE_URL`\u201d but states, \u201cI haven\u2019t modified or validated the file.\u201d"
+    },
+    {
+      "eval": "validate-blocked",
+      "assertion": "Replaces or deletes the `[TODO: Second priority]` placeholder so Immediate Next Steps is complete.",
+      "evidence": "The output says to \u201cComplete or remove the TODO\u201d but also says, \u201cI haven\u2019t modified or validated the file.\u201d"
+    },
+    {
+      "eval": "validate-blocked",
+      "assertion": "Re-runs `scripts/validate_handoff.py` on the file and finalizes only when the verdict is READY (exit 0).",
+      "evidence": "The output provides a validation command but states, \u201cI haven\u2019t modified or validated the file,\u201d and does not specify READY (exit 0) as the condition for finalizing."
+    }
+  ]
+}

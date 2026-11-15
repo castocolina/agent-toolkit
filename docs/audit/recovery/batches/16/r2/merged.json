@@ -1,0 +1,437 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "draw-io",
+      "percent": 94.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 95.2,
+        "router-env-my-referee-two": 94.4
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/draw-io/SKILL.md",
+          "line": null,
+          "evidence": "para:1c4cf640: XML showing a label inset 30px from a frame but still parented to the page. The s043 record explains replacement of the good example, not removal of this distinct bad example.",
+          "fix": "Restore the inset-but-ungrouped XML example in skills/draw-io/references/layout-guidelines.md, or add a valid item-specific explanation to docs/audit/recovery/draw-io/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": null,
+          "evidence": "The dbff837f digest reports 325 removed units but shows only 40.",
+          "fix": "Provide the complete digest so the remaining removals can be judged against the current files and recovery record."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+          "line": 137,
+          "evidence": "The PNG validator checks for an IDAT chunk and its CRC but does not decompress or validate its image data, although it claims to accept only a complete PNG.",
+          "fix": "Validate the PNG image stream and structure with a suitable decoder before replacing the previous output, and add a regression test using CRC-valid but invalid IDAT data."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+          "line": 182,
+          "evidence": "Under set -e, a failed `mv -f \"$work/out.png\" \"$png\"` exits the script immediately instead of recording the failure, continuing to the next input and emitting the documented JSON results.",
+          "fix": "Handle a failed move as a per-file failure, retain the previous output, continue processing and emit its JSON result; add a test where the destination cannot be replaced."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": null,
+          "evidence": "removed units (325, showing 40) at dbff837f, plus removed units (97, showing 40) at 5ac41b9a",
+          "fix": "No single unit is unexplained: each listed para and both file changes has an allowed record row, or sits in a sections.json unit list under a section id that has one. Treat the two cut lists as the sample they are; do not restore from the sample alone."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/draw-io/references/aws-icons.md",
+          "line": 7,
+          "evidence": "| Prefix | Example | Amazon | AWS | Elastic |",
+          "fix": "The prefix examples are activation, not a procedure. Keep the official-name rule and move the three-row prefix table to the end of references/aws-icons.md, or record the removal in docs/audit/recovery/draw-io/record.md."
+        },
+        {
+          "id": "D1-3",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/draw-io/references/aws-icons.md",
+          "line": 34,
+          "evidence": "- Specify service names in snake_case",
+          "fix": "Snake_case is the icon id, not the service name the next section prints (Amazon EC2). Move the note next to the resIcon column as 'icon ids are snake_case' or record the removal."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 183,
+          "evidence": "- `references/layout-guidelines.md`: read when drawing an AWS architecture (group nesting order) or a diagram with several flow types (line-style meaning, placement direction). Not needed for a single fix.\n- `references/layout-guidelines.md`, section 2 (Accessibility): also read it when the user asks for an accessible or color-blind-safe diagram",
+          "fix": "Fold the second bullet into the first: read references/layout-guidelines.md for AWS nesting, several flow types, or an accessible/color-blind-safe diagram; do not load it for a single fix."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/draw-io/evals/trigger-queries.json",
+          "line": 5,
+          "evidence": "{\"query\":\"Export my architecture diagram as a PNG but keep its dark background.\",\"should_trigger\":true}",
+          "fix": "Name the source format in that query (a .drawio or draw.io file) so it cannot pass by matching any diagram PNG export."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 174,
+          "evidence": "The catalog is not proof that a name renders (checked 2026-11-15: 92 of its 470 names are in neither the draw.io AWS4 palette nor the vendor shape index",
+          "fix": "The catalog has 470 rows but 457 distinct mxgraph.aws4 names, and references/aws-icons.md line 3 repeats 470 distinct, 378 in a source, 92 in neither, and 84 of those 92 marked. Reconcile both sentences with the row count and the 84 [unverified] marks, and cite docs/audit/recovery/draw-io/aws-icon-name-check.md."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 169,
+          "evidence": "Run `python3 \"$S/find_aws_icon.py\" <service>` and copy its `Style:` line",
+          "fix": "Before copying a Style line, read the Service line: if it ends in [unverified], do not paste it; look the icon up live, as the next paragraph already requires."
+        }
+      ]
+    },
+    {
+      "name": "session-handoff",
+      "percent": 92.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 92.8,
+        "router-env-my-referee-two": 92.0
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest at dbff837f: removed units (218, showing 40).",
+          "fix": "Review the full removal list against the current files and docs/audit/recovery/session-handoff/record.md; restore or record any unexplained units."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": 3,
+          "evidence": "The description says it can \"validate\" handoffs, but its use-when examples do not include a request to validate an existing draft or check whether it is complete.",
+          "fix": "Create, validate, and resume project-session handoff documents in .claude/handoffs/ using bundled Python scaffolding, secret checks, and staleness reports. Use when the user asks to pause coding, save session state, transfer work to another agent, validate or check an existing handoff, load a handoff, or resume a handoff chain. Suggest a handoff at major milestones or near context limits. Not for ordinary status emails, ADRs, commit messages, PR descriptions, or updates to persistent harness memory."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/session-handoff/evals/evals.json",
+          "line": 21,
+          "evidence": "The resume-chain assertion requires \"python3 scripts/list_handoffs.py\" and \"python3 scripts/check_staleness.py <handoff-file>\", while SKILL.md requires installed skill-directory paths from the project root.",
+          "fix": "Accept commands using the resolved skill directory, such as python3 \"$SKILL_DIR/scripts/list_handoffs.py\", and verify that the project root remains the working directory."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": 53,
+          "evidence": "The FRESH branch says \"Resume\", but check_staleness.py assigns FRESH when there are up to five changed files and five commits; the later working-tree check does not reveal already committed changes.",
+          "fix": "Before acting on a FRESH handoff, inspect baseline-to-HEAD and working-tree changes touching cited files and the first next step, or explicitly verify those files against the handoff; do not treat a FRESH score as proof that they are unchanged."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": 12,
+          "evidence": "The mode table routes creation and resumption but provides no action for a user who asks only to validate an existing handoff, despite validation being a stated capability.",
+          "fix": "Add a validation-only route that selects the specified handoff, runs validate_handoff.py, reports its verdict and warnings without exposing secrets, and asks before modifying the document."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": 48,
+          "evidence": "RESUME begins with \"List\" and immediately proceeds to check a handoff file, without specifying what to do when the list is empty or contains multiple plausible candidates.",
+          "fix": "If no handoffs are found, report that and ask for a path or offer to create one; if the intended handoff is ambiguous, ask the user to choose before checking staleness."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": 14,
+          "evidence": "A handoff is a markdown file in `<project>/.claude/handoffs/` named `YYYY-MM-DD-HHMMSS-<slug>.md` that lets a fresh agent continue without rediscovering context.",
+          "fix": "Drop the opening definition sentence (the model already knows a handoff file is a context transfer) and keep the filename rule, the `$SKILL_DIR` invocation rule and the `--help`/`--json` contract; record the sentence in docs/audit/recovery/session-handoff/record.md."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": 74,
+          "evidence": "The scanner only matches quoted assignments (`api_key = \"...\"`), any `scheme://user:password@` URL ... Unquoted assignments pass as clean, so check them by hand",
+          "fix": "Add the two scanner misses the agent will not infer: (1) a URL password containing `/` is not flagged (`user:p/ass@host` never reaches `@`); (2) Slack `xox[baprs]-` requires a hyphen immediately after the prefix, so a real `xoxc-` token is not flagged. Keep the existing unquoted-assignment warning."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/session-handoff/references/handoff-template.md",
+          "line": 5,
+          "evidence": "## Table of Contents",
+          "fix": "Delete the Table of Contents (lines 5-25). The template is one short file loaded only when a section's purpose is unclear; the heading list adds a second copy of headings the agent is about to read. Record the removal."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": 55,
+          "evidence": "`git cat-file -e '<baseline>^{commit}'` checks the commit exists; if it is gone (a different clone, a pruned or rewritten history), find the old tip with `git reflog` or ask the user.",
+          "fix": "Split the two causes the skill already names: a different clone has no reflog for that commit, so ask the user for the old tip; use `git reflog` only when this checkout's history was pruned or rewritten. Apply the same split to the Baseline ancestry diverged bullet."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/session-handoff/evals/evals.json",
+          "line": 5,
+          "evidence": "\"assertions\":[\"Includes a command using `scripts/create_handoff.py` with a task slug.\"",
+          "fix": "Change the four command assertions that require a bare `scripts/<name>.py` path so they accept `python3 \"$SKILL_DIR/scripts/<name>.py\"`, the form SKILL.md line 14 says is the one that resolves. Keep asserting the script name, slug, and validate-until-READY behavior."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/session-handoff/evals/trigger-queries.json",
+          "line": 14,
+          "evidence": "{\"query\":\"Fix typo in handoff documentation\",\"should_trigger\":false}",
+          "fix": "Replace that negative with a near-miss that shares the domain but is out of scope, for example editing the handoff template inside this repository rather than saving a coding session. Keep the other negatives."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": 38,
+          "evidence": "So missing files and deleted recommended headings alone can reach NEEDS_WORK: 4 missing files plus all 6 headings deleted scores 68.",
+          "fix": "State the interaction the arithmetic hides: a missing required section is also a missing recommended section, so the penalties stack (one required heading gone is -10 and -2). Note that files_missing in --json is capped at 5, so a longer missing list is not the full penalty set."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": 68,
+          "evidence": "Referenced files resolve against the project root and the handoff's directory only.",
+          "fix": "Say that a chain link written as `./<file>.md` is stored with the `./` and reported missing even when the predecessor sits in the handoff directory (validate_handoff.py extract_file_references; test_deleted_predecessor_link_is_reported_by_validation_and_staleness). Tell the agent to strip a leading `./` before treating the warning as a real missing file."
+        }
+      ]
+    },
+    {
+      "name": "web-to-markdown",
+      "percent": 87.2,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 92.8,
+        "router-env-my-referee-two": 81.6
+      },
+      "missing_judges": [],
+      "disagreement": true,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/web-to-markdown/record.md",
+          "line": null,
+          "evidence": "Previous-version digest at dbff837f: \"removed units (42, showing 40)\".",
+          "fix": "Obtain and review the complete digest, including the two omitted units, against the current files and recovery record; restore or record any unexplained removal."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 27,
+          "evidence": "\"Never reuse the user's daily browser profile\" and \"Use --interactive only when an attached human-controlled terminal is available\" give alternatives but do not explain the underlying failure modes.",
+          "fix": "Explain that profile reuse risks exposing or corrupting the user's session and that interactive mode otherwise blocks waiting for human input."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/evals/evals.json",
+          "line": 27,
+          "evidence": "The heavy-app assertion says \"Then adds --wait-for 'main'\" although the procedure permits that selector only when it is known to exist; the implicit-gate case expects a loaded skill to request the phrase for a prompt that should not trigger it.",
+          "fix": "Make the selector assertion conditional on known page structure, and test implicit requests as non-trigger cases rather than requiring the unloaded skill to respond. Add a malformed-scheme or authentication-blocker output case with observable assertions."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/evals/trigger-queries.json",
+          "line": 35,
+          "evidence": "\"Use skill web-to-markdown extract clean Markdown\" is labeled true, but it lacks either exact invocation phrase required by the description and gate.",
+          "fix": "Label this near-miss false or explicitly revise the invocation policy and description to accept that phrasing; add realistic contextual variants around the chosen boundary."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 21,
+          "evidence": "\"under the default --wait-until networkidle2 an app with live connections never settles\" overgeneralizes: networkidle2 can settle with up to two active connections.",
+          "fix": "Say that persistent activity can prevent networkidle2 from settling when it exceeds the idle threshold; retain the bounded timeout retry."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 21,
+          "evidence": "\"confirm the requested page title and substantive main content are present\" rejects otherwise usable pages whose title is absent or not part of the extracted content.",
+          "fix": "Validate substantive content and identity using the title when available, with another page-identity check when it is not; report genuinely ambiguous results instead of automatically rejecting them."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/README.md",
+          "line": 1,
+          "evidence": "The first digest is cut (42 removed units, showing 40) and the record covers the SKILL.md workflow, not this README: Purpose, When to Use, How It Works, Key Features, Usage Examples, Advanced Options, Technical Details, Troubleshooting and Version restate the procedure and flags already in SKILL.md and web2md --help.",
+          "fix": "Keep Credits and the install and frontmatter corrections. For each remaining README section the model reliably produces from SKILL.md, record a row in docs/audit/recovery/web-to-markdown/record.md; move only the command recipes a user asks for by name into references/."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 16,
+          "evidence": "Procedure is five ordered CLI steps with no thinking checkpoint: it never says what to ask before choosing print versus --out, a selector, or a retry.",
+          "fix": "Before step 4, add: ask whether the user wants the article body or a summary (always the body), whether a file was requested (otherwise --print), and whether a selector is already known (otherwise do not invent --wait-for)."
+        },
+        {
+          "id": "D2-2",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 10,
+          "evidence": "The body is a short tool procedure (gate, five steps, six gotchas) but has no decision tree for the distinct paths: missing CLI, navigation timeout, login wall, and bad extraction.",
+          "fix": "Keep the tool pattern and add a four-row branch table under Procedure: missing web2md stops at step 3; timeout uses the one retry in step 5; login uses the interactive bullet; bad extraction reports the blocker."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/web-to-markdown/README.md",
+          "line": 155,
+          "evidence": "--no-sandbox: Disable sandbox (sometimes required in containers/CI) contradicts SKILL.md, which allows the flag only when the user explicitly authorizes an isolated environment.",
+          "fix": "Change that README bullet to: use --no-sandbox only when the user explicitly authorizes an isolated environment where Chromium's sandbox is unavailable, because the page runs untrusted JavaScript."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 3,
+          "evidence": "Use only when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown'. The description refuses every request that does not name the skill, so it has no WHEN for the user's task.",
+          "fix": "Convert http(s) webpage URLs, including JS-rendered pages, to clean Markdown with the locally installed web2md CLI (Puppeteer, Chromium, Readability, Turndown). Use when the user asks to convert, archive or save a webpage or article URL as Markdown, even if they do not name the tool. Not for local HTML, PDFs, summaries, or general browser automation."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/web-to-markdown/README.md",
+          "line": 136,
+          "evidence": "Advanced Wait Strategies runs --wait-until domcontentloaded --wait-for 'main' on the first try, while SKILL.md retries once only after a networkidle2 timeout and adds --wait-for 'main' only when a main element exists.",
+          "fix": "Rewrite that example to the step-5 sequence: first web2md '<url>' --print, then one retry with --wait-until domcontentloaded --wait-ms 2000, adding --wait-for 'main' only when the page has a main element."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 19,
+          "evidence": "Step 4 offers two equal URL-quoting methods (wrap in single quotes and write each ' as '\\'', or reject characters outside a conservative set) and two equal output forms, with no default.",
+          "fix": "Default to one quoted argument per URL, with each embedded single quote written as '\\''. Reject the URL only when it also contains a newline or a null byte. Default to --print unless the user named a file or directory."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/evals/trigger-queries.json",
+          "line": 35,
+          "evidence": "Nine of ten should-trigger queries name the skill ('Use skill web-to-markdown extract clean Markdown'); the tenth still says 'Use a skill'. Negatives such as 'Convert URL with WebFetch, no skill' are easy, not near-misses.",
+          "fix": "Replace eight should-trigger queries with prompts that ask to save or archive an http(s) article and never name the skill, and replace weak negatives with near-misses: local HTML, a PDF, a summary of a URL, and a request to drive the browser without converting."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/web-to-markdown/evals/evals.json",
+          "line": 4,
+          "evidence": "Four evals use realistic prompts and checkable assertions, but none covers a missing web2md binary, a login wall, or a URL that contains a quote.",
+          "fix": "Add three cases: command not found must point at the Installation section and invent no path; a login wall must not launch --interactive without a terminal; a URL containing a single quote must be passed as one quoted argument."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 20,
+          "evidence": "If content is missing, choose a selector known to contain the article using --wait-for. The step gives no way to learn that selector, and the heavy-app eval requires --wait-for 'main' even when no main element is known.",
+          "fix": "On missing content, rerun once with --wait-until domcontentloaded --wait-ms 2000. Add --wait-for only for a selector the user named or that the prior result shows; use 'main' only when that result contains a main element. Otherwise report the extraction failure."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/web-to-markdown/README.md",
+          "line": 180,
+          "evidence": "Troubleshooting says to try --wait-until networkidle2 when page content is incomplete, but SKILL.md step 5 says that default never settles on an app with live connections and times out at --timeout-ms 45000.",
+          "fix": "Replace that bullet with the one bounded retry from SKILL.md step 5, and point at web2md --help for the live --wait-until and --timeout-ms defaults."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

@@ -132,11 +132,55 @@ class CheckStalenessTests(unittest.TestCase):
             self.assertEqual(data["staleness_level"], "SLIGHTLY_STALE")
             self.assertEqual(result.returncode, 0)
 
+    def _unknown_issues(self, root, notes, created, baseline):
+        lines = [f"Project: {root}", "Branch: main"]
+        if created:
+            lines.insert(0, f"Created: {created}")
+        if baseline:
+            lines.append(f"Baseline commit: {baseline}")
+        handoff = Path(notes) / "handoff.md"  # outside the repo so it is not a status record
+        handoff.write_text("\n".join(lines) + "\n")
+        result = subprocess.run(["python3", str(SCRIPT), "--json", str(handoff)], text=True, capture_output=True)
+        data = json.loads(result.stdout)
+        self.assertEqual(result.returncode, 2, result.stdout)
+        self.assertEqual(data["staleness_level"], "UNKNOWN")
+        return data
+
+    def test_unknown_issues_line_names_each_cause(self):
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as notes:
+            root = Path(tmp)
+            env = {**GIT_ENV, "HOME": str(root)}
+            baseline = self._repo_with_commit(root)
+
+            data = self._unknown_issues(root, notes, None, baseline)
+            self.assertEqual(len(data["issues"]), 1, data["issues"])
+            self.assertTrue(data["issues"][0].startswith("Missing timestamp"), data["issues"])
+
+            data = self._unknown_issues(root, notes, now, None)
+            self.assertEqual(len(data["issues"]), 1, data["issues"])
+            self.assertTrue(data["issues"][0].startswith("Missing baseline"), data["issues"])
+
+            data = self._unknown_issues(root, notes, now, "deadbeef" * 5)
+            self.assertEqual(len(data["issues"]), 1, data["issues"])
+            self.assertTrue(data["issues"][0].startswith("Git comparison failed"), data["issues"])
+
+            # An orphan root commit makes the old baseline a real commit that is not an ancestor of HEAD.
+            subprocess.run(["git", "checkout", "--orphan", "other"], cwd=root, check=True, capture_output=True, env=env)
+            subprocess.run(["git", "-c", "user.email=t@example.com", "-c", "user.name=T", "-c", "commit.gpgsign=false",
+                            "-c", "core.hooksPath=/dev/null", "commit", "-m", "other root"], cwd=root, check=True, capture_output=True, env=env)
+            data = self._unknown_issues(root, notes, now, baseline)
+            self.assertTrue(data["baseline_ancestry_diverged"])
+            self.assertEqual(len(data["issues"]), 1, data["issues"])
+            self.assertTrue(data["issues"][0].startswith("Baseline ancestry diverged"), data["issues"])
+
     def test_help_documents_exit_codes(self):
         result = subprocess.run(["python3", str(SCRIPT), "--help"], text=True, capture_output=True)
         self.assertEqual(result.returncode, 0)
         self.assertIn("exit codes:", result.stdout)
         self.assertIn("--json", result.stdout)
+        self.assertIn("Missing timestamp", result.stdout)
+        self.assertIn("git log --oneline <baseline>..HEAD", result.stdout)
 
 
 if __name__ == "__main__":

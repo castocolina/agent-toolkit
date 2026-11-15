@@ -48,14 +48,7 @@ This approach handles modern single-page applications and JavaScript-rendered co
 
 ## Prerequisites
 
-The `web2md` CLI tool must be installed. The skill will check for it and provide installation instructions if needed:
-
-```bash
-cd ~/workspace/softaworks/projects/web2md
-npm install
-npm run build
-npm link
-```
+The `web2md` CLI tool must be installed. The skill checks for it and, if it is missing, points to the install instructions. Follow the Installation section of https://github.com/leonardocouy/web2md (package `@leoflores/web2md`, Node.js >= 20; checked 2026-11-15) with the package manager you prefer.
 
 ## Usage Examples
 
@@ -166,7 +159,7 @@ The skill supports various options to handle tricky pages:
 
 The generated Markdown includes:
 
-- **YAML Frontmatter** (optional): Title, author, publication date, URL, excerpt
+- **YAML Frontmatter** (on by default; `--no-frontmatter` omits it): `title`, `url`, `fetched_at`, `site_name`, `byline`, `lang`, `excerpt` (the last four only when present; checked 2026-11-15, source: src/lib/frontmatter.ts of https://github.com/leonardocouy/web2md)
 - **Main Content**: Article text with preserved formatting
 - **Clean Links**: Properly formatted Markdown links
 - **Images**: Preserved with alt text and captions where available
@@ -202,3 +195,9 @@ Current version: 0.1.0
 ## Related Tools
 
 For simpler use cases without JavaScript, consider using Claude Code's built-in `WebFetch` tool instead.
+
+## Credits
+
+Adapted from the `claude/web-to-markdown` skill of [leonardocouy/web2md](https://github.com/leonardocouy/web2md) (MIT) by Leonardo Flores (@leonardocouy), through [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit). The `web2md` CLI it drives is that repository's tool, published as `@leoflores/web2md`.
+
+Documentation owners credited (official pages listed in `docs/audit/upstream-sources.json`, checked 2026-11-15): Puppeteer (navigation wait events, sandbox troubleshooting), Anthropic (Claude Code tools reference).

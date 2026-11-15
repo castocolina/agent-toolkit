@@ -48,3 +48,7 @@ draw-io/
 ## References
 
 - [draw.io documentation](https://www.drawio.com/doc/)
+
+## Sources
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit/tree/main/skills/draw-io) by @leonardocouy; this version is rewritten. Facts were checked on 2026-11-15 against the draw.io (JGraph) desktop CLI (`drawio --help`, 32.6.1) and the draw.io source and shape index ([Sidebar-AWS4.js](https://github.com/jgraph/drawio/blob/dev/src/main/webapp/js/diagramly/sidebar/Sidebar-AWS4.js), [mxAWS4.js](https://github.com/jgraph/drawio/blob/dev/src/main/webapp/shapes/mxAWS4.js), [drawio-mcp shape index and XML reference](https://github.com/jgraph/drawio-mcp)), the [Quarto reveal.js reference](https://quarto.org/docs/reference/formats/presentations/revealjs.html) (Quarto), [pre-commit](https://pre-commit.com/) (pre-commit) and Amazon Web Services documentation (Amazon Web Services).

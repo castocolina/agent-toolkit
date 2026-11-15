@@ -1,5 +1,9 @@
 # AWS Icons and Service Names
 
+Catalog status (checked 2026-11-15): this file is a convenience copy, not proof that a name renders. Recounted 2026-11-15 from the tables: 470 rows carry 463 distinct `mxgraph.aws4.*` icon ids; 379 of them appear in the draw.io AWS4 palette ([Sidebar-AWS4.js](https://github.com/jgraph/drawio/blob/dev/src/main/webapp/js/diagramly/sidebar/Sidebar-AWS4.js)) or in the vendor shape index ([jgraph/drawio-mcp `shape-search/search-index.json`](https://github.com/jgraph/drawio-mcp/blob/main/shape-search/search-index.json)); 84 appear in neither (for example `ebs`, `efs`, `iam`, `elb`, `laptop`, `qldb`, `msk`, `opensearch`). Every one of those 84 ids is marked `[unverified]` (85 rows carry the mark, one id has two rows), and no unmarked id is missing from both sources; an earlier count of 92 included eight group names, now corrected in section 4. `find_aws_icon.py` prints the mark in its `Service:` line. Treat an unverified name as stale until a lookup confirms it.
+
+Look an icon up live before relying on a name: search the vendor shape index (it holds the current icon names and titles) or use draw.io's own shape search, and never guess an `mxgraph.*` name. AWS renames services often, and the official icon and service names are at [AWS Architecture Icons](https://aws.amazon.com/architecture/icons/).
+
 ## 1. Service Naming Rules
 
 | Prefix | Example |
@@ -78,7 +82,7 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | Container 1 | mxgraph.aws4.container_1 |
 | Container 2 | mxgraph.aws4.container_2 |
 | Container 3 | mxgraph.aws4.container_3 |
-| AWS App2Container | mxgraph.aws4.app2container |
+| AWS App2Container [unverified] | mxgraph.aws4.app2container |
 | Red Hat OpenShift on AWS | mxgraph.aws4.red_hat_openshift |
 
 ### 3.3. Storage
@@ -92,10 +96,10 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | S3 Glacier | mxgraph.aws4.glacier |
 | S3 Glacier Archive | mxgraph.aws4.archive |
 | S3 Glacier Vault | mxgraph.aws4.vault |
-| Amazon EBS | mxgraph.aws4.ebs |
+| Amazon EBS [unverified] | mxgraph.aws4.ebs |
 | EBS Volume | mxgraph.aws4.volume |
 | EBS Snapshot | mxgraph.aws4.snapshot |
-| Amazon EFS | mxgraph.aws4.efs |
+| Amazon EFS [unverified] | mxgraph.aws4.efs |
 | EFS File System | mxgraph.aws4.file_system |
 | Amazon FSx | mxgraph.aws4.fsx |
 | FSx for Lustre | mxgraph.aws4.fsx_for_lustre |
@@ -107,8 +111,8 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | Volume Gateway | mxgraph.aws4.volume_gateway |
 | Tape Gateway | mxgraph.aws4.tape_gateway |
 | AWS Backup | mxgraph.aws4.backup |
-| AWS Elastic Disaster Recovery | mxgraph.aws4.elastic_disaster_recovery |
-| AWS Snow Family | mxgraph.aws4.snow_family |
+| AWS Elastic Disaster Recovery [unverified] | mxgraph.aws4.elastic_disaster_recovery |
+| AWS Snow Family [unverified] | mxgraph.aws4.snow_family |
 
 ### 3.4. Database
 
@@ -125,13 +129,13 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | RDS Oracle (Alt) | mxgraph.aws4.oracle_db_instance_alternate |
 | RDS SQL Server | mxgraph.aws4.ms_sql_instance |
 | RDS SQL Server (Alt) | mxgraph.aws4.ms_sql_instance_alternate |
-| RDS MariaDB | mxgraph.aws4.mariadb_instance |
+| RDS MariaDB [unverified] | mxgraph.aws4.mariadb_instance |
 | RDS SQL Primary | mxgraph.aws4.sql_primary |
 | RDS SQL Replica | mxgraph.aws4.sql_replica |
 | RDS PIOP | mxgraph.aws4.piop |
 | Amazon Aurora | mxgraph.aws4.aurora |
-| Aurora MySQL | mxgraph.aws4.aurora_mysql_instance |
-| Aurora PostgreSQL | mxgraph.aws4.aurora_postgresql_instance |
+| Aurora MySQL [unverified] | mxgraph.aws4.aurora_mysql_instance |
+| Aurora PostgreSQL [unverified] | mxgraph.aws4.aurora_postgresql_instance |
 | Amazon DynamoDB | mxgraph.aws4.dynamodb |
 | DynamoDB Table | mxgraph.aws4.table |
 | DynamoDB Item | mxgraph.aws4.item |
@@ -147,11 +151,11 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | Redshift Dense Compute Node | mxgraph.aws4.dense_compute_node |
 | Redshift Dense Storage Node | mxgraph.aws4.dense_storage_node |
 | Amazon Neptune | mxgraph.aws4.neptune |
-| Amazon DocumentDB | mxgraph.aws4.documentdb |
+| Amazon DocumentDB [unverified] | mxgraph.aws4.documentdb |
 | Amazon Timestream | mxgraph.aws4.timestream |
-| Amazon MemoryDB | mxgraph.aws4.memorydb |
+| Amazon MemoryDB [unverified] | mxgraph.aws4.memorydb |
 | Amazon Keyspaces | mxgraph.aws4.keyspaces |
-| Amazon QLDB | mxgraph.aws4.qldb |
+| Amazon QLDB (legacy: end of support 2025-07-31, prefer Aurora PostgreSQL for new diagrams) [unverified] | mxgraph.aws4.qldb |
 | Generic Database | mxgraph.aws4.database |
 
 ### 3.5. Networking
@@ -183,7 +187,7 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | Network Load Balancer | mxgraph.aws4.network_load_balancer |
 | Gateway Load Balancer | mxgraph.aws4.gateway_load_balancer |
 | Classic Load Balancer | mxgraph.aws4.classic_load_balancer |
-| ELB (legacy) | mxgraph.aws4.elb |
+| ELB (legacy) [unverified] | mxgraph.aws4.elb |
 | Amazon API Gateway | mxgraph.aws4.api_gateway |
 | API Gateway Endpoint | mxgraph.aws4.endpoint |
 | AWS Direct Connect | mxgraph.aws4.direct_connect |
@@ -204,10 +208,10 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | Service | resIcon |
 |----------|---------|
 | AWS IAM | mxgraph.aws4.identity_and_access_management |
-| IAM (abbreviated) | mxgraph.aws4.iam |
+| IAM (abbreviated) [unverified] | mxgraph.aws4.iam |
 | IAM Role | mxgraph.aws4.role |
 | IAM Permissions | mxgraph.aws4.permissions |
-| IAM Identity Center | mxgraph.aws4.iam_identity_center |
+| IAM Identity Center [unverified] | mxgraph.aws4.iam_identity_center |
 | Amazon Cognito | mxgraph.aws4.cognito |
 | AWS WAF | mxgraph.aws4.waf |
 | AWS Shield | mxgraph.aws4.shield |
@@ -227,7 +231,7 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | AWS CloudHSM | mxgraph.aws4.cloudhsm |
 | Amazon Detective | mxgraph.aws4.detective |
 | AWS Network Firewall | mxgraph.aws4.network_firewall |
-| AWS Private CA | mxgraph.aws4.private_ca |
+| AWS Private CA [unverified] | mxgraph.aws4.private_ca |
 | AWS Security Lake | mxgraph.aws4.security_lake |
 | AWS Signer | mxgraph.aws4.signer |
 | Amazon Verified Permissions | mxgraph.aws4.verified_permissions |
@@ -243,7 +247,7 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | AWS Glue | mxgraph.aws4.glue |
 | AWS Glue DataBrew | mxgraph.aws4.glue_databrew |
 | AWS Glue Elastic Views | mxgraph.aws4.glue_elastic_views |
-| AWS Glue Data Catalog | mxgraph.aws4.data_catalog |
+| AWS Glue Data Catalog [unverified] | mxgraph.aws4.data_catalog |
 | AWS Glue Crawler | mxgraph.aws4.crawler |
 | Amazon Kinesis | mxgraph.aws4.kinesis |
 | Kinesis Data Streams | mxgraph.aws4.kinesis_data_streams |
@@ -257,19 +261,19 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | EMR Engine MapR M7 | mxgraph.aws4.emr_engine_mapr_m7 |
 | EMR HDFS Cluster | mxgraph.aws4.hdfs_cluster |
 | EMR Cluster | mxgraph.aws4.cluster |
-| Amazon OpenSearch | mxgraph.aws4.opensearch |
+| Amazon OpenSearch [unverified] | mxgraph.aws4.opensearch |
 | Elasticsearch (legacy) | mxgraph.aws4.elasticsearch_service |
 | Amazon QuickSight | mxgraph.aws4.quicksight |
 | AWS Data Pipeline | mxgraph.aws4.data_pipeline |
-| Amazon MSK | mxgraph.aws4.msk |
+| Amazon MSK [unverified] | mxgraph.aws4.msk |
 | AWS Lake Formation | mxgraph.aws4.lake_formation |
 | AWS Data Exchange | mxgraph.aws4.data_exchange |
 | Amazon DataZone | mxgraph.aws4.datazone |
 | AWS Clean Rooms | mxgraph.aws4.clean_rooms |
 | AWS Entity Resolution | mxgraph.aws4.entity_resolution |
 | Amazon FinSpace | mxgraph.aws4.finspace |
-| Amazon Managed Grafana | mxgraph.aws4.managed_grafana |
-| Amazon Managed Prometheus | mxgraph.aws4.managed_prometheus |
+| Amazon Managed Grafana [unverified] | mxgraph.aws4.managed_grafana |
+| Amazon Managed Prometheus [unverified] | mxgraph.aws4.managed_prometheus |
 
 ### 3.8. Machine Learning & AI
 
@@ -280,9 +284,9 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | SageMaker Model | mxgraph.aws4.sagemaker_model |
 | SageMaker Ground Truth | mxgraph.aws4.sagemaker_ground_truth |
 | Amazon Bedrock | mxgraph.aws4.bedrock |
-| Amazon Q | mxgraph.aws4.amazon_q |
-| Amazon Q Business | mxgraph.aws4.q_business |
-| Amazon Q Developer | mxgraph.aws4.q_developer |
+| Amazon Q [unverified] | mxgraph.aws4.amazon_q |
+| Amazon Q Business [unverified] | mxgraph.aws4.q_business |
+| Amazon Q Developer [unverified] | mxgraph.aws4.q_developer |
 | Amazon Lex | mxgraph.aws4.lex |
 | Amazon Polly | mxgraph.aws4.polly |
 | Amazon Rekognition | mxgraph.aws4.rekognition |
@@ -293,11 +297,11 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | Amazon Personalize | mxgraph.aws4.personalize |
 | Amazon Forecast | mxgraph.aws4.forecast |
 | Amazon Kendra | mxgraph.aws4.kendra |
-| Amazon CodeWhisperer | mxgraph.aws4.codewhisperer |
+| Amazon CodeWhisperer (legacy: part of Amazon Q Developer since 2024-04-30) | mxgraph.aws4.codewhisperer |
 | Amazon CodeGuru | mxgraph.aws4.codeguru |
-| CodeGuru Reviewer | mxgraph.aws4.codeguru_reviewer |
-| CodeGuru Profiler | mxgraph.aws4.codeguru_profiler |
-| Amazon Lookout | mxgraph.aws4.lookout |
+| CodeGuru Reviewer [unverified] | mxgraph.aws4.codeguru_reviewer |
+| CodeGuru Profiler [unverified] | mxgraph.aws4.codeguru_profiler |
+| Amazon Lookout [unverified] | mxgraph.aws4.lookout |
 | Lookout for Vision | mxgraph.aws4.lookout_for_vision |
 | Lookout for Equipment | mxgraph.aws4.lookout_for_equipment |
 | Lookout for Metrics | mxgraph.aws4.lookout_for_metrics |
@@ -310,9 +314,9 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | Amazon HealthLake | mxgraph.aws4.healthlake |
 | Amazon Monitron | mxgraph.aws4.monitron |
 | Amazon Omics | mxgraph.aws4.omics |
-| Apache MXNet on AWS | mxgraph.aws4.apache_mxnet |
-| TensorFlow on AWS | mxgraph.aws4.tensorflow |
-| PyTorch on AWS | mxgraph.aws4.pytorch |
+| Apache MXNet on AWS [unverified] | mxgraph.aws4.apache_mxnet |
+| TensorFlow on AWS [unverified] | mxgraph.aws4.tensorflow |
+| PyTorch on AWS [unverified] | mxgraph.aws4.pytorch |
 | Deep Learning AMIs | mxgraph.aws4.deep_learning_amis |
 | Deep Learning Containers | mxgraph.aws4.deep_learning_containers |
 | Machine Learning (generic) | mxgraph.aws4.machine_learning |
@@ -329,18 +333,18 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | SQS Queue | mxgraph.aws4.queue |
 | SQS Message | mxgraph.aws4.message |
 | Amazon EventBridge | mxgraph.aws4.eventbridge |
-| EventBridge Event Bus | mxgraph.aws4.event_bus |
+| EventBridge Event Bus [unverified] | mxgraph.aws4.event_bus |
 | EventBridge Rule | mxgraph.aws4.rule |
-| EventBridge Schema Registry | mxgraph.aws4.schema_registry |
+| EventBridge Schema Registry [unverified] | mxgraph.aws4.schema_registry |
 | EventBridge Pipes | mxgraph.aws4.eventbridge_pipes |
 | EventBridge Scheduler | mxgraph.aws4.eventbridge_scheduler |
 | AWS Step Functions | mxgraph.aws4.step_functions |
-| Step Functions Workflow | mxgraph.aws4.workflow |
+| Step Functions Workflow [unverified] | mxgraph.aws4.workflow |
 | Amazon AppFlow | mxgraph.aws4.appflow |
 | Amazon MQ | mxgraph.aws4.mq |
 | AWS AppSync | mxgraph.aws4.appsync |
-| AWS Express Workflows | mxgraph.aws4.express_workflows |
-| Amazon Managed Workflows for Apache Airflow | mxgraph.aws4.managed_workflows_apache_airflow |
+| AWS Express Workflows [unverified] | mxgraph.aws4.express_workflows |
+| Amazon Managed Workflows for Apache Airflow [unverified] | mxgraph.aws4.managed_workflows_apache_airflow |
 
 ### 3.10. Management & Governance
 
@@ -371,9 +375,9 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | AWS Control Tower | mxgraph.aws4.control_tower |
 | AWS License Manager | mxgraph.aws4.license_manager |
 | AWS Resource Explorer | mxgraph.aws4.resource_explorer |
-| AWS Well-Architected | mxgraph.aws4.well_architected |
+| AWS Well-Architected [unverified] | mxgraph.aws4.well_architected |
 | AWS OpsWorks | mxgraph.aws4.opsworks |
-| AWS Launch Wizard | mxgraph.aws4.launch_wizard |
+| AWS Launch Wizard [unverified] | mxgraph.aws4.launch_wizard |
 | AWS Management Console | mxgraph.aws4.management_console |
 | AWS Personal Health Dashboard | mxgraph.aws4.personal_health_dashboard |
 | AWS Proton | mxgraph.aws4.proton |
@@ -396,13 +400,13 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | AWS Cloud9 | mxgraph.aws4.cloud9 |
 | AWS X-Ray | mxgraph.aws4.xray |
 | AWS CLI | mxgraph.aws4.command_line_interface |
-| AWS SDK | mxgraph.aws4.sdk |
+| AWS SDK [unverified] | mxgraph.aws4.sdk |
 | AWS CloudShell | mxgraph.aws4.cloudshell |
 | AWS CDK | mxgraph.aws4.cloud_development_kit |
 | AWS Application Composer | mxgraph.aws4.application_composer |
-| AWS Fault Injection Service | mxgraph.aws4.fault_injection_service |
+| AWS Fault Injection Service [unverified] | mxgraph.aws4.fault_injection_service |
 | AWS Tools and SDKs | mxgraph.aws4.tools_and_sdks |
-| AWS SAM | mxgraph.aws4.serverless_application_model |
+| AWS SAM [unverified] | mxgraph.aws4.serverless_application_model |
 
 ### 3.12. Front-end Web & Mobile
 
@@ -422,9 +426,9 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | Amazon Pinpoint | mxgraph.aws4.pinpoint |
 | Amazon SES | mxgraph.aws4.simple_email_service |
 | Amazon Connect | mxgraph.aws4.connect |
-| Amazon Connect Customer Profiles | mxgraph.aws4.connect_customer_profiles |
-| Amazon Connect Wisdom | mxgraph.aws4.connect_wisdom |
-| Amazon Connect Voice ID | mxgraph.aws4.connect_voice_id |
+| Amazon Connect Customer Profiles [unverified] | mxgraph.aws4.connect_customer_profiles |
+| Amazon Connect Wisdom [unverified] | mxgraph.aws4.connect_wisdom |
+| Amazon Connect Voice ID [unverified] | mxgraph.aws4.connect_voice_id |
 
 ### 3.14. Business Applications
 
@@ -442,8 +446,8 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | Service | resIcon |
 |----------|---------|
 | Amazon WorkSpaces | mxgraph.aws4.workspaces |
-| Amazon WorkSpaces Web | mxgraph.aws4.workspaces_web |
-| Amazon AppStream 2.0 | mxgraph.aws4.appstream |
+| Amazon WorkSpaces Web [unverified] | mxgraph.aws4.workspaces_web |
+| Amazon AppStream 2.0 [unverified] | mxgraph.aws4.appstream |
 | AppStream 2.0 (v2) | mxgraph.aws4.appstream_20 |
 | Amazon WorkDocs | mxgraph.aws4.workdocs |
 | Amazon WorkLink | mxgraph.aws4.worklink |
@@ -457,26 +461,26 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | IoT MQTT Protocol | mxgraph.aws4.mqtt_protocol |
 | IoT HTTP Protocol | mxgraph.aws4.http_protocol |
 | IoT HTTP2 Protocol | mxgraph.aws4.http2_protocol |
-| IoT Rule | mxgraph.aws4.iot_rule |
-| IoT Action | mxgraph.aws4.iot_action |
-| IoT Topic | mxgraph.aws4.iot_topic |
-| IoT Shadow | mxgraph.aws4.iot_shadow |
+| IoT Rule [unverified] | mxgraph.aws4.iot_rule |
+| IoT Action [unverified] | mxgraph.aws4.iot_action |
+| IoT Topic [unverified] | mxgraph.aws4.iot_topic |
+| IoT Shadow [unverified] | mxgraph.aws4.iot_shadow |
 | IoT Certificate | mxgraph.aws4.iot_certificate |
-| IoT Policy | mxgraph.aws4.iot_policy |
-| IoT Hardware Board | mxgraph.aws4.iot_hardware_board |
+| IoT Policy [unverified] | mxgraph.aws4.iot_policy |
+| IoT Hardware Board [unverified] | mxgraph.aws4.iot_hardware_board |
 | IoT Sensor | mxgraph.aws4.sensor |
 | IoT Servo | mxgraph.aws4.servo |
 | IoT Actuator | mxgraph.aws4.actuator |
 | IoT Reported State | mxgraph.aws4.reported_state |
 | IoT Desired State | mxgraph.aws4.desired_state |
-| AWS IoT Greengrass | mxgraph.aws4.iot_greengrass |
-| IoT Greengrass Connector | mxgraph.aws4.greengrass_connector |
+| AWS IoT Greengrass [unverified] | mxgraph.aws4.iot_greengrass |
+| IoT Greengrass Connector [unverified] | mxgraph.aws4.greengrass_connector |
 | AWS IoT Analytics | mxgraph.aws4.iot_analytics |
 | IoT Analytics Channel | mxgraph.aws4.iot_analytics_channel |
 | IoT Analytics Pipeline | mxgraph.aws4.iot_analytics_pipeline |
 | IoT Analytics Data Store | mxgraph.aws4.iot_analytics_data_store |
-| IoT Analytics Data Set | mxgraph.aws4.iot_analytics_data_set |
-| IoT Analytics Notebook | mxgraph.aws4.iot_analytics_notebook |
+| IoT Analytics Data Set [unverified] | mxgraph.aws4.iot_analytics_data_set |
+| IoT Analytics Notebook [unverified] | mxgraph.aws4.iot_analytics_notebook |
 | AWS IoT Device Defender | mxgraph.aws4.iot_device_defender |
 | AWS IoT Device Management | mxgraph.aws4.iot_device_management |
 | AWS IoT Events | mxgraph.aws4.iot_events |
@@ -496,37 +500,37 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | AWS DMS | mxgraph.aws4.database_migration_service |
 | DMS Database Migration Workflow | mxgraph.aws4.database_migration_workflow_job |
 | AWS Snowball | mxgraph.aws4.snowball |
-| Snowball Import Export | mxgraph.aws4.snowball_import_export |
+| Snowball Import Export [unverified] | mxgraph.aws4.snowball_import_export |
 | AWS Snowcone | mxgraph.aws4.snowcone |
 | AWS Snowmobile | mxgraph.aws4.snowmobile |
 | AWS Transfer Family | mxgraph.aws4.transfer_family |
 | AWS Migration Hub | mxgraph.aws4.migration_hub |
-| Migration Hub Orchestrator | mxgraph.aws4.migration_hub_orchestrator |
-| Migration Hub Refactor Spaces | mxgraph.aws4.migration_hub_refactor_spaces |
-| AWS Application Migration | mxgraph.aws4.application_migration_service |
+| Migration Hub Orchestrator [unverified] | mxgraph.aws4.migration_hub_orchestrator |
+| Migration Hub Refactor Spaces [unverified] | mxgraph.aws4.migration_hub_refactor_spaces |
+| AWS Application Migration [unverified] | mxgraph.aws4.application_migration_service |
 | AWS Application Discovery Service | mxgraph.aws4.application_discovery_service |
 | AWS DataSync | mxgraph.aws4.datasync |
-| DataSync Agent | mxgraph.aws4.datasync_agent |
+| DataSync Agent [unverified] | mxgraph.aws4.datasync_agent |
 | AWS Mainframe Modernization | mxgraph.aws4.mainframe_modernization |
 
 ### 3.18. Media Services
 
 | Service | resIcon |
 |----------|---------|
-| AWS Elemental MediaConvert | mxgraph.aws4.mediaconvert |
-| AWS Elemental MediaLive | mxgraph.aws4.medialive |
-| AWS Elemental MediaPackage | mxgraph.aws4.mediapackage |
-| AWS Elemental MediaStore | mxgraph.aws4.mediastore |
-| AWS Elemental MediaTailor | mxgraph.aws4.mediatailor |
-| AWS Elemental MediaConnect | mxgraph.aws4.mediaconnect |
-| AWS Elemental Appliances | mxgraph.aws4.elemental_appliances |
+| AWS Elemental MediaConvert [unverified] | mxgraph.aws4.mediaconvert |
+| AWS Elemental MediaLive [unverified] | mxgraph.aws4.medialive |
+| AWS Elemental MediaPackage [unverified] | mxgraph.aws4.mediapackage |
+| AWS Elemental MediaStore [unverified] | mxgraph.aws4.mediastore |
+| AWS Elemental MediaTailor [unverified] | mxgraph.aws4.mediatailor |
+| AWS Elemental MediaConnect [unverified] | mxgraph.aws4.mediaconnect |
+| AWS Elemental Appliances [unverified] | mxgraph.aws4.elemental_appliances |
 | AWS Elemental Link | mxgraph.aws4.elemental_link |
-| AWS Elemental Server | mxgraph.aws4.elemental_server |
-| AWS Elemental Conductor | mxgraph.aws4.elemental_conductor |
-| AWS Elemental Delta | mxgraph.aws4.elemental_delta |
-| AWS Elemental Live | mxgraph.aws4.elemental_live |
+| AWS Elemental Server [unverified] | mxgraph.aws4.elemental_server |
+| AWS Elemental Conductor [unverified] | mxgraph.aws4.elemental_conductor |
+| AWS Elemental Delta [unverified] | mxgraph.aws4.elemental_delta |
+| AWS Elemental Live [unverified] | mxgraph.aws4.elemental_live |
 | Amazon Elastic Transcoder | mxgraph.aws4.elastic_transcoder |
-| Amazon Interactive Video Service | mxgraph.aws4.ivs |
+| Amazon Interactive Video Service [unverified] | mxgraph.aws4.ivs |
 | Amazon Nimble Studio | mxgraph.aws4.nimble_studio |
 | AWS Deadline Cloud | mxgraph.aws4.deadline_cloud |
 
@@ -548,7 +552,7 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | AWS Cost and Usage Report | mxgraph.aws4.cost_and_usage_report |
 | Reserved Instance Reporting | mxgraph.aws4.reserved_instance_reporting |
 | Savings Plans | mxgraph.aws4.savings_plans |
-| AWS Billing Conductor | mxgraph.aws4.billing_conductor |
+| AWS Billing Conductor [unverified] | mxgraph.aws4.billing_conductor |
 | AWS Application Cost Profiler | mxgraph.aws4.application_cost_profiler |
 
 ### 3.21. Blockchain
@@ -556,7 +560,7 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | Service | resIcon |
 |----------|---------|
 | Amazon Managed Blockchain | mxgraph.aws4.managed_blockchain |
-| Amazon QLDB | mxgraph.aws4.qldb |
+| Amazon QLDB (legacy: end of support 2025-07-31, prefer Aurora PostgreSQL for new diagrams) [unverified] | mxgraph.aws4.qldb |
 
 ### 3.22. Quantum Technologies
 
@@ -575,10 +579,10 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | Service | resIcon |
 |----------|---------|
 | AWS RoboMaker | mxgraph.aws4.robomaker |
-| RoboMaker Simulation | mxgraph.aws4.robomaker_simulation |
-| RoboMaker Development Environment | mxgraph.aws4.robomaker_development_environment |
-| RoboMaker Fleet Management | mxgraph.aws4.robomaker_fleet_management |
-| RoboMaker Cloud Extension | mxgraph.aws4.robomaker_cloud_extension |
+| RoboMaker Simulation [unverified] | mxgraph.aws4.robomaker_simulation |
+| RoboMaker Development Environment [unverified] | mxgraph.aws4.robomaker_development_environment |
+| RoboMaker Fleet Management [unverified] | mxgraph.aws4.robomaker_fleet_management |
+| RoboMaker Cloud Extension [unverified] | mxgraph.aws4.robomaker_cloud_extension |
 
 ### 3.25. General/Generic Icons
 
@@ -588,29 +592,29 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 | User | mxgraph.aws4.user |
 | Client | mxgraph.aws4.client |
 | Internet | mxgraph.aws4.internet |
-| Internet (v2) | mxgraph.aws4.internet_2 |
+| Internet (v2) [unverified] | mxgraph.aws4.internet_2 |
 | Mobile Client | mxgraph.aws4.mobile_client |
 | Mobile | mxgraph.aws4.mobile |
 | Desktop | mxgraph.aws4.illustration_desktop |
-| Laptop | mxgraph.aws4.laptop |
-| Tablet | mxgraph.aws4.tablet |
-| Browser | mxgraph.aws4.browser |
+| Laptop [unverified] | mxgraph.aws4.laptop |
+| Tablet [unverified] | mxgraph.aws4.tablet |
+| Browser [unverified] | mxgraph.aws4.browser |
 | Traditional Server | mxgraph.aws4.traditional_server |
 | Generic Database | mxgraph.aws4.generic_database |
 | Generic Firewall | mxgraph.aws4.generic_firewall |
 | General | mxgraph.aws4.general |
 | AWS Cloud | mxgraph.aws4.aws_cloud |
-| Data Center | mxgraph.aws4.data_center |
+| Data Center [unverified] | mxgraph.aws4.data_center |
 | Corporate Data Center | mxgraph.aws4.corporate_data_center |
-| On-Premises | mxgraph.aws4.on_premises |
+| On-Premises [unverified] | mxgraph.aws4.on_premises |
 | Folder | mxgraph.aws4.folder |
 | Forums | mxgraph.aws4.forums |
 | Office Building | mxgraph.aws4.office_building |
 | SAML Token | mxgraph.aws4.saml_token |
 | SSL Padlock | mxgraph.aws4.ssl_padlock |
 | Tape Storage | mxgraph.aws4.tape_storage |
-| Toolkit | mxgraph.aws4.toolkit |
-| Generic SDK | mxgraph.aws4.generic_sdk |
+| Toolkit [unverified] | mxgraph.aws4.toolkit |
+| Generic SDK [unverified] | mxgraph.aws4.generic_sdk |
 | Disk | mxgraph.aws4.disk |
 | External SDK | mxgraph.aws4.external_sdk |
 
@@ -622,6 +626,8 @@ shape=mxgraph.aws4.productIcon;prIcon=mxgraph.aws4.{service_name};
 shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.{group_name};
 ```
 
+The one exception is `group_auto_scaling_group`, which uses `shape=mxgraph.aws4.groupCenter` (checked 2026-11-15, [Sidebar-AWS4.js](https://github.com/jgraph/drawio/blob/dev/src/main/webapp/js/diagramly/sidebar/Sidebar-AWS4.js), line 275); `find_aws_icon.py` prints the right `Style:` for every group icon.
+
 ### 4.2. Group Icons
 
 | Description | grIcon |
@@ -629,21 +635,18 @@ shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.{group_name};
 | AWS Cloud | mxgraph.aws4.group_aws_cloud |
 | AWS Cloud (Alt) | mxgraph.aws4.group_aws_cloud_alt |
 | Region | mxgraph.aws4.group_region |
-| VPC | mxgraph.aws4.group_vpc |
-| Availability Zone | mxgraph.aws4.group_availability_zone |
-| Security Group | mxgraph.aws4.group_security_group |
-| Public Subnet | mxgraph.aws4.group_public_subnet |
-| Private Subnet | mxgraph.aws4.group_private_subnet |
-| AWS Account | mxgraph.aws4.group_aws_account |
+| VPC | mxgraph.aws4.group_vpc2 |
+| Security Group (icon only, see 4.3) | mxgraph.aws4.group_security_group |
+| AWS Account | mxgraph.aws4.group_account |
 | Corporate Data Center | mxgraph.aws4.group_corporate_data_center |
 | EC2 Instance Contents | mxgraph.aws4.group_ec2_instance_contents |
-| Elastic Beanstalk Container | mxgraph.aws4.group_elastic_beanstalk_container |
-| Auto Scaling | mxgraph.aws4.group_auto_scaling |
+| Elastic Beanstalk Container | mxgraph.aws4.group_elastic_beanstalk |
+| Auto Scaling | mxgraph.aws4.group_auto_scaling_group |
 | Spot Fleet | mxgraph.aws4.group_spot_fleet |
-| AWS Step Functions Workflow | mxgraph.aws4.group_step_functions_workflow |
-| Generic Group | mxgraph.aws4.group_generic |
+| AWS Step Functions Workflow | mxgraph.aws4.group_aws_step_functions_workflow |
 | AWS IoT Greengrass Deployment | mxgraph.aws4.group_iot_greengrass_deployment |
-| Server Contents | mxgraph.aws4.group_server_contents |
+
+Corrected 2026-11-15 against the palette ([Sidebar-AWS4.js](https://github.com/jgraph/drawio/blob/dev/src/main/webapp/js/diagramly/sidebar/Sidebar-AWS4.js), lines 265-299). The earlier catalog listed eight names that exist in neither the palette nor the shape index: `group_public_subnet`, `group_private_subnet`, `group_aws_account`, `group_auto_scaling`, `group_generic`, `group_elastic_beanstalk_container`, `group_server_contents`, `group_step_functions_workflow`. `group_vpc2` is the palette's VPC. `group_generic` and `group_server_contents` have no palette equivalent (the palette's "Server contents" group uses `group_on_premise`); look them up in the shape index before use. Availability Zone and Security group are not icon groups: they are plain dashed or solid rectangles (4.3). The Auto Scaling group uses `shape=mxgraph.aws4.groupCenter` in the palette, not `group`.
 
 ### 4.3. Example
 
@@ -652,17 +655,22 @@ shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.{group_name};
 <mxCell style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_cloud;..." />
 
 <!-- VPC -->
-<mxCell style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc;..." />
+<mxCell style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc2;..." />
 
-<!-- Availability Zone -->
-<mxCell style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_availability_zone;..." />
+<!-- Availability Zone: a plain dashed rectangle, no grIcon -->
+<mxCell style="fillColor=none;strokeColor=#147EBA;dashed=1;..." />
 
-<!-- Public Subnet -->
-<mxCell style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_public_subnet;fillColor=#E9F3E6;..." />
+<!-- Security group: a plain rectangle, no grIcon -->
+<mxCell style="fillColor=none;strokeColor=#DD3522;..." />
 
-<!-- Private Subnet -->
-<mxCell style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_private_subnet;fillColor=#E6F2F8;..." />
+<!-- Public subnet: the security-group icon without its outline, green -->
+<mxCell style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_security_group;grStroke=0;strokeColor=#7AA116;fillColor=#F2F6E8;..." />
+
+<!-- Private subnet: same shape, teal -->
+<mxCell style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_security_group;grStroke=0;strokeColor=#00A4A6;fillColor=#E6F6F7;..." />
 ```
+
+The two subnet recipes have no row in the table above, so `find_aws_icon.py subnet` finds nothing: copy them from here (checked 2026-11-15 against the palette lines above).
 
 ## 5. Icon Search Script
 
@@ -675,3 +683,4 @@ Use [scripts/find_aws_icon.py](../scripts/find_aws_icon.py) to search efficientl
 - [jgraph/drawio GitHub](https://github.com/jgraph/drawio)
 - [awsicons.dev](https://awsicons.dev/)
 - [diagrams-aws-icons](https://github.com/m-radzikowski/diagrams-aws-icons)
+- Legacy service rows (checked 2026-11-15): Amazon CodeWhisperer became part of Amazon Q Developer on 2024-04-30 ([Amazon Web Services documentation, service rename](https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/service-rename.html)); Amazon QLDB end of support was 2025-07-31 ([Amazon Web Services Prescriptive Guidance, modern data-centric use cases](https://docs.aws.amazon.com/pdfs/prescriptive-guidance/latest/modern-data-centric-use-cases/modern-data-centric-use-cases.pdf); [migration from Amazon QLDB](https://aws.amazon.com/jp/blogs/news/migration-from-amazon-qldb/))

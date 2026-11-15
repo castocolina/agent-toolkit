@@ -1,0 +1,86 @@
+{
+  "skill": "session-handoff",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 13,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": null,
+      "evidence": "Previous-version digest at dbff837f: removed units (218, showing 40).",
+      "fix": "Review the full removal list against the current files and docs/audit/recovery/session-handoff/record.md; restore or record any unexplained units."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 3,
+      "evidence": "The description says it can \"validate\" handoffs, but its use-when examples do not include a request to validate an existing draft or check whether it is complete.",
+      "fix": "Create, validate, and resume project-session handoff documents in .claude/handoffs/ using bundled Python scaffolding, secret checks, and staleness reports. Use when the user asks to pause coding, save session state, transfer work to another agent, validate or check an existing handoff, load a handoff, or resume a handoff chain. Suggest a handoff at major milestones or near context limits. Not for ordinary status emails, ADRs, commit messages, PR descriptions, or updates to persistent harness memory."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/session-handoff/evals/evals.json",
+      "line": 21,
+      "evidence": "The resume-chain assertion requires \"python3 scripts/list_handoffs.py\" and \"python3 scripts/check_staleness.py <handoff-file>\", while SKILL.md requires installed skill-directory paths from the project root.",
+      "fix": "Accept commands using the resolved skill directory, such as python3 \"$SKILL_DIR/scripts/list_handoffs.py\", and verify that the project root remains the working directory."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 53,
+      "evidence": "The FRESH branch says \"Resume\", but check_staleness.py assigns FRESH when there are up to five changed files and five commits; the later working-tree check does not reveal already committed changes.",
+      "fix": "Before acting on a FRESH handoff, inspect baseline-to-HEAD and working-tree changes touching cited files and the first next step, or explicitly verify those files against the handoff; do not treat a FRESH score as proof that they are unchanged."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 12,
+      "evidence": "The mode table routes creation and resumption but provides no action for a user who asks only to validate an existing handoff, despite validation being a stated capability.",
+      "fix": "Add a validation-only route that selects the specified handoff, runs validate_handoff.py, reports its verdict and warnings without exposing secrets, and asks before modifying the document."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 48,
+      "evidence": "RESUME begins with \"List\" and immediately proceeds to check a handoff file, without specifying what to do when the list is empty or contains multiple plausible candidates.",
+      "fix": "If no handoffs are found, report that and ask for a path or offer to create one; if the intended handoff is ambiguous, ask the user to choose before checking staleness."
+    }
+  ]
+}

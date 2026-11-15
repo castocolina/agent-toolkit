@@ -22,13 +22,35 @@
       ]
     },
     {
+      "id": "heavy-app-never-idle",
+      "prompt": "Use the skill web-to-markdown for https://app.example.com/dashboard and print the Markdown. The app keeps live connections open, so the default run ends in a navigation timeout and never finishes loading.",
+      "expected_output": "Retry once with the heavy-app readiness recipe: domcontentloaded plus a short wait, adding a selector wait only for a known selector; never an unbounded wait or the sandbox flag.",
+      "assertions": [
+        "Retries once with --wait-until domcontentloaded and --wait-ms 2000",
+        "Adds --wait-for 'main' only when the earlier result contains a main element, or another selector the user named or the result shows; with no known selector it does not invent one and reports the extraction failure if the retry gives no content",
+        "Explains that persistent network activity beyond the idle threshold can keep the default networkidle2 from settling, without claiming it never settles",
+        "Does not wait indefinitely and does not use --no-sandbox"
+      ]
+    },
+    {
       "id": "implicit-gate",
       "prompt": "Convert https://example.com/article to Markdown using whichever browser tool is easiest.",
-      "expected_output": "Hard gate forbids using skill without explicit invocation; request required phrase.",
+      "expected_output": "Non-trigger: the request lacks the explicit phrase, so the skill is not loaded and does not respond.",
+      "assertions": [
+        "The skill web-to-markdown is not invoked and produces no response",
+        "web2md is not run by the skill",
+        "The skill does not pick or recommend a browser stack"
+      ]
+    },
+    {
+      "id": "malformed-scheme",
+      "prompt": "Use the skill web-to-markdown to convert ftp://example.com/docs/guide.html and print the Markdown.",
+      "expected_output": "Reject the non-http(s) scheme before running the CLI and report it; do not guess a replacement URL.",
       "assertions": [
         "Does not run web2md",
-        "Requests phrase use the skill web-to-markdown",
-        "Does not select alternative browser stack under skill"
+        "Reports that only http:// and https:// URLs are accepted and names the ftp:// scheme as the problem",
+        "Does not rewrite the URL to https:// or guess another address",
+        "Asks the user for an http(s) URL"
       ]
     }
   ]

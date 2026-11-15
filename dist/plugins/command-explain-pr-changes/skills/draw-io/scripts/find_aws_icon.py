@@ -14,6 +14,10 @@ from pathlib import Path
 TABLE = Path(__file__).resolve().parent.parent / "references" / "aws-icons.md"
 # | Amazon EC2 | mxgraph.aws4.ec2 |
 ROW_RE = re.compile(r"\|\s*([^|]+?)\s*\|\s*(mxgraph\.aws4\.[a-z0-9_]+)\s*\|")
+# The palette draws the Auto Scaling group with shape groupCenter, every other group with shape group
+# (checked 2026-11-15, Sidebar-AWS4.js lines 265-299:
+# https://github.com/jgraph/drawio/blob/dev/src/main/webapp/js/diagramly/sidebar/Sidebar-AWS4.js).
+GROUP_CENTER_ICONS = {"mxgraph.aws4.group_auto_scaling_group"}
 
 
 def load_icon_data(table: Path = TABLE) -> list[dict[str, str]]:
@@ -22,8 +26,9 @@ def load_icon_data(table: Path = TABLE) -> list[dict[str, str]]:
     for name, icon in ROW_RE.findall(table.read_text(encoding="utf-8")):
         kind = "group" if icon.rsplit(".", 1)[-1].startswith("group_") else "resourceIcon"
         attribute = "grIcon" if kind == "group" else "resIcon"
+        shape = "groupCenter" if icon in GROUP_CENTER_ICONS else kind
         icons.append({"name": name.strip(), "icon": icon, "kind": kind,
-                      "style": f"shape=mxgraph.aws4.{kind};{attribute}={icon};"})
+                      "style": f"shape=mxgraph.aws4.{shape};{attribute}={icon};"})
     return icons
 
 

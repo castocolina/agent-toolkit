@@ -1,0 +1,131 @@
+{
+  "skill": "web-to-markdown",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 13,
+    "D3": 13,
+    "D4": 12,
+    "D5": 14,
+    "D6": 13,
+    "D7": 11,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 102,
+  "max_total": 125,
+  "percent": 81.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 22,
+      "evidence": "The output starts with YAML frontmatter by default; `--no-frontmatter` omits it. See `web2md --help` for supported options.",
+      "fix": "Keep the frontmatter default and the `--print`/`--out` commands in Procedure step 4. Move the generic flag catalog the model can read from `web2md --help` (and README Advanced Options) out of the always-loaded path; record that move in docs/audit/recovery/web-to-markdown/record.md. Do not shorten the Credits section."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/web-to-markdown/record.md",
+      "line": 1,
+      "evidence": "removed units (42, showing 40) at dbff837f and removed units (5, showing 5) at 5ac41b9a6037dd7a1c3da2f7816975da7b22d717",
+      "fix": "Add one record row per omitted digest unit, or state in the record that the two cut lists are the undisplayed tail of units already covered by the section rows. Do not drop the shown procedures."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 18,
+      "evidence": "Before step 4, think it through: what the user wants (the article body, not a summary), whether they asked for a file or directory (otherwise use `--print`), and whether a selector is known",
+      "fix": "Keep this checkpoint and fold the destination and selector questions into the matching numbered steps so the Tool pattern stays one sequence: scheme, destination, CLI, command, one retry."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 28,
+      "evidence": "A trailing slash on `--out` selects directory auto-naming. `--user-data-dir` persists session data; remove it only with user approval.",
+      "fix": "Keep the sandbox, daily-profile, and `--interactive` gotchas. Add the non-obvious why: an existing directory without a trailing slash also auto-names, and deleting `--user-data-dir` drops the persisted login the next run needs."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 3,
+      "evidence": "Use only when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown'.",
+      "fix": "Convert http(s) webpage URLs to clean Markdown with the local web2md CLI (Puppeteer, Chromium, Readability, Turndown), including JS-rendered pages, login walls, and batches. Use when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown', or asks to archive, save, print, or batch-convert a webpage to Markdown or .md, even without naming web2md. Not for local HTML, PDFs, summaries, or general browser automation."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 119,
+      "evidence": "## Advanced Options",
+      "fix": "Keep Advanced Options in README.md. At Procedure step 4, add one conditional load: read README.md Advanced Options only when `web2md --help` is unavailable; do not load it for an ordinary conversion."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 11,
+      "evidence": "Otherwise stop and ask them to repeat the request with that phrase.",
+      "fix": "Keep the exact-phrase gate. After the user repeats it, do not ask again about destination or selector when the request already names a file, directory, or `--print`."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/evals.json",
+      "line": 1,
+      "evidence": "\"assertions\":[\"Recognizes explicit invocation\",\"Uses web2md URL with --out ./guide.md\",\"Includes non-empty output validation\"]",
+      "fix": "Keep the five prompts. Add assertions that quote the required command shape and the rejection or retry outcome, and add evals for a missing `web2md` binary and for `--interactive` without an attached terminal. Add no evals/files content: this skill takes URLs, not fixtures."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/web-to-markdown/evals/trigger-queries.json",
+      "line": 16,
+      "evidence": "{\"query\":\"Use web-to-markdown idea but do not invoke skill\",\"should_trigger\":false}",
+      "fix": "Replace slogan negatives with near-misses a user would type: a bare 'convert this URL to markdown' without the exact phrase, a Playwright request, and a summary-only request. Keep the ten should-trigger queries."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 22,
+      "evidence": "an http(s) URL can contain a single quote or shell metacharacters, so pass one quoted argument per URL, wrap the URL in single quotes and write each `'` inside it as `'\\''`.",
+      "fix": "Show one worked command for a URL that contains an apostrophe, such as web2md 'https://example.com/o'\\''brien' --print, and say to copy the CLI's stderr blocker when web2md is missing or Chrome is not found."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 134,
+      "evidence": "`--no-sandbox`: Disable sandbox (sometimes required in containers/CI)",
+      "fix": "In README Advanced Options, point `--no-sandbox` at the SKILL.md rule: use it only when the user explicitly authorizes an isolated environment where the sandbox is unavailable. Do not remove the Credits section."
+    }
+  ]
+}

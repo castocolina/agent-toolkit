@@ -1,0 +1,131 @@
+{
+  "skill": "web-to-markdown",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 13,
+    "D4": 12,
+    "D5": 14,
+    "D6": 12,
+    "D7": 10,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 103,
+  "max_total": 125,
+  "percent": 82.4,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 22,
+      "evidence": "The output starts with YAML frontmatter by default; `--no-frontmatter` omits it.",
+      "fix": "This field list exists only because the recovery record required a fact update, and the agent does not need the default to convert a page. Drop the sentence and add a drop row for para:6450f71b's frontmatter clause to docs/audit/recovery/web-to-markdown/record.md (fate removed-on-merit, value low, decision drop, reason class out-of-scope), or tie it to the purpose by saying to pass `--no-frontmatter` only when the user asks for body-only Markdown."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 24,
+      "evidence": "If content is missing, rerun once with `--wait-until domcontentloaded --wait-ms 2000`, adding `--wait-for '<selector>'` only for a selector the user named or that the earlier result shows (`main` only when that result contains a `main` element); with no known selector, do not invent one and report the extraction failure.",
+      "fix": "Before step 4, add the thinking checkpoint: ask whether the page is a static article (default wait), a live-connection app (expect networkidle2 to time out), or behind a login (interactive or a dedicated profile), and whether any selector is already known. Keep the existing one-retry rule as the action that follows that choice."
+    },
+    {
+      "id": "D2-2",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 1,
+      "evidence": "The body is a 36-line gate, numbered procedure and gotcha list for one CLI, with no decision tree or code examples.",
+      "fix": "Keep the Tool pattern but add one small branch table: static page uses `--print` or `--out`; live connections use the one domcontentloaded retry; login uses `--interactive` only with an attached terminal, otherwise a dedicated `--user-data-dir`. Do not grow it toward the 300-line heuristic."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 34,
+      "evidence": "A trailing slash on `--out` selects directory auto-naming. `--user-data-dir` persists session data; remove it only with user approval.",
+      "fix": "Fold the trailing-slash fact into step 4, where the command is built, and give the profile fact its failure: deleting `--user-data-dir` drops the saved login, so the next run hits the wall again. Leave the four reasoned NEVER items as they are."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 3,
+      "evidence": "Use only when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown'.",
+      "fix": "Convert http(s) webpage URLs, including JS-rendered pages, to clean Markdown with the locally installed web2md CLI (Puppeteer, Chromium, Readability, Turndown). Use when the user asks to convert, archive or save a webpage or article URL as Markdown and explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown', including login-walled pages and batches. Not for local HTML, PDFs, summaries, or general browser automation."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 18,
+      "evidence": "point the user to the Installation section of https://github.com/leonardocouy/web2md",
+      "fix": "Keep the body self-contained. The install pointer is an external prerequisite page, not a bundled reference, so no loading trigger is needed; do not add a references/ file just to gate it."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 157,
+      "evidence": "- Try `--wait-until networkidle2` (waits for network to settle)",
+      "fix": "In SKILL.md step 5, state the default escape hatch once: a navigation timeout means leave networkidle2, not add another wait on it. Change the README Troubleshooting bullet so an incomplete JS-heavy page is retried with `--wait-until domcontentloaded` and a bounded `--wait-ms`, and reserve networkidle2 for a page that has not been waited on yet. Keep the Credits section unchanged."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/trigger-queries.json",
+      "line": 11,
+      "evidence": "\"query\": \"Convert URL with WebFetch, no skill\", \"should_trigger\": false",
+      "fix": "Replace the terse and meta negatives (lines 11-13, 15-17, 19) with realistic near-misses a user would type, such as fetching a URL with WebFetch, curling HTML, summarizing an article, and converting a local HTML file, each with a file path or a reason. Keep the two explicit near-misses that name the skill for a local HTML file and a PDF. Add one casual and one precise should-trigger query that converts a JS-rendered article without pasting the invocation phrase verbatim."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/evals.json",
+      "line": 1,
+      "evidence": "\"assertions\": [\"Recognizes explicit invocation\", \"Uses web2md URL with --out ./guide.md\", \"Includes non-empty output validation\"]",
+      "fix": "Rewrite each assertion so a grader can see it in the command or the reply: the ftp case must not run web2md and must name the rejected scheme; the heavy-app case must show exactly one retry containing both `--wait-until domcontentloaded` and `--wait-ms 2000`, and must not contain `--no-sandbox`. Add one case where `command -v web2md` fails and the expected reply points at the Installation section without inventing a path."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 24,
+      "evidence": "If content is missing, rerun once with `--wait-until domcontentloaded --wait-ms 2000`",
+      "fix": "Split the validation branches: a navigation timeout or empty result gets the one domcontentloaded retry with no selector; a result that is only login, consent, error or navigation chrome is not a wait failure, so report that blocker or use the interactive path; an ambiguous but plausible body is reported, not rejected. State that the retry replaces the wait flags rather than stacking on networkidle2."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 18,
+      "evidence": "Check `command -v web2md`. If missing, point the user to the Installation section",
+      "fix": "Name the two CLI failures separately: command not found points to the Installation section and stops; a Chrome-not-found error from the CLI is reported back with the tool's own `--chrome-path` hint, not treated as a missing package. Read `web2md --help` for the live wording."
+    }
+  ]
+}

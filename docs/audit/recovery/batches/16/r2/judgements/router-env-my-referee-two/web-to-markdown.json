@@ -1,0 +1,131 @@
+{
+  "skill": "web-to-markdown",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 12,
+    "D3": 13,
+    "D4": 11,
+    "D5": 14,
+    "D6": 12,
+    "D7": 11,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 102,
+  "max_total": 125,
+  "percent": 81.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 1,
+      "evidence": "The first digest is cut (42 removed units, showing 40) and the record covers the SKILL.md workflow, not this README: Purpose, When to Use, How It Works, Key Features, Usage Examples, Advanced Options, Technical Details, Troubleshooting and Version restate the procedure and flags already in SKILL.md and web2md --help.",
+      "fix": "Keep Credits and the install and frontmatter corrections. For each remaining README section the model reliably produces from SKILL.md, record a row in docs/audit/recovery/web-to-markdown/record.md; move only the command recipes a user asks for by name into references/."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 16,
+      "evidence": "Procedure is five ordered CLI steps with no thinking checkpoint: it never says what to ask before choosing print versus --out, a selector, or a retry.",
+      "fix": "Before step 4, add: ask whether the user wants the article body or a summary (always the body), whether a file was requested (otherwise --print), and whether a selector is already known (otherwise do not invent --wait-for)."
+    },
+    {
+      "id": "D2-2",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 10,
+      "evidence": "The body is a short tool procedure (gate, five steps, six gotchas) but has no decision tree for the distinct paths: missing CLI, navigation timeout, login wall, and bad extraction.",
+      "fix": "Keep the tool pattern and add a four-row branch table under Procedure: missing web2md stops at step 3; timeout uses the one retry in step 5; login uses the interactive bullet; bad extraction reports the blocker."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 155,
+      "evidence": "--no-sandbox: Disable sandbox (sometimes required in containers/CI) contradicts SKILL.md, which allows the flag only when the user explicitly authorizes an isolated environment.",
+      "fix": "Change that README bullet to: use --no-sandbox only when the user explicitly authorizes an isolated environment where Chromium's sandbox is unavailable, because the page runs untrusted JavaScript."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 3,
+      "evidence": "Use only when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown'. The description refuses every request that does not name the skill, so it has no WHEN for the user's task.",
+      "fix": "Convert http(s) webpage URLs, including JS-rendered pages, to clean Markdown with the locally installed web2md CLI (Puppeteer, Chromium, Readability, Turndown). Use when the user asks to convert, archive or save a webpage or article URL as Markdown, even if they do not name the tool. Not for local HTML, PDFs, summaries, or general browser automation."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 136,
+      "evidence": "Advanced Wait Strategies runs --wait-until domcontentloaded --wait-for 'main' on the first try, while SKILL.md retries once only after a networkidle2 timeout and adds --wait-for 'main' only when a main element exists.",
+      "fix": "Rewrite that example to the step-5 sequence: first web2md '<url>' --print, then one retry with --wait-until domcontentloaded --wait-ms 2000, adding --wait-for 'main' only when the page has a main element."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 19,
+      "evidence": "Step 4 offers two equal URL-quoting methods (wrap in single quotes and write each ' as '\\'', or reject characters outside a conservative set) and two equal output forms, with no default.",
+      "fix": "Default to one quoted argument per URL, with each embedded single quote written as '\\''. Reject the URL only when it also contains a newline or a null byte. Default to --print unless the user named a file or directory."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/trigger-queries.json",
+      "line": 35,
+      "evidence": "Nine of ten should-trigger queries name the skill ('Use skill web-to-markdown extract clean Markdown'); the tenth still says 'Use a skill'. Negatives such as 'Convert URL with WebFetch, no skill' are easy, not near-misses.",
+      "fix": "Replace eight should-trigger queries with prompts that ask to save or archive an http(s) article and never name the skill, and replace weak negatives with near-misses: local HTML, a PDF, a summary of a URL, and a request to drive the browser without converting."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/web-to-markdown/evals/evals.json",
+      "line": 4,
+      "evidence": "Four evals use realistic prompts and checkable assertions, but none covers a missing web2md binary, a login wall, or a URL that contains a quote.",
+      "fix": "Add three cases: command not found must point at the Installation section and invent no path; a login wall must not launch --interactive without a terminal; a URL containing a single quote must be passed as one quoted argument."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 20,
+      "evidence": "If content is missing, choose a selector known to contain the article using --wait-for. The step gives no way to learn that selector, and the heavy-app eval requires --wait-for 'main' even when no main element is known.",
+      "fix": "On missing content, rerun once with --wait-until domcontentloaded --wait-ms 2000. Add --wait-for only for a selector the user named or that the prior result shows; use 'main' only when that result contains a main element. Otherwise report the extraction failure."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 180,
+      "evidence": "Troubleshooting says to try --wait-until networkidle2 when page content is incomplete, but SKILL.md step 5 says that default never settles on an app with live connections and times out at --timeout-ms 45000.",
+      "fix": "Replace that bullet with the one bounded retry from SKILL.md step 5, and point at web2md --help for the live --wait-until and --timeout-ms defaults."
+    }
+  ]
+}

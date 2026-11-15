@@ -1,0 +1,59 @@
+{
+  "skill": "session-handoff",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": null,
+      "evidence": "The dbff837f digest reports \"removed units (218, showing 40)\"; the remaining 178 units are not individually available for review.",
+      "fix": "Provide the complete previous-version digest so every removed unit can be checked against the current files and docs/audit/recovery/session-handoff/record.md."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/session-handoff/evals/evals.json",
+      "line": 19,
+      "evidence": "The resume-chain assertion requires \"python3 scripts/list_handoffs.py\" and \"python3 scripts/check_staleness.py <handoff-file>\", although SKILL.md instructs agents to execute scripts through \"$SKILL_DIR/scripts/\" from the project root.",
+      "fix": "Accept commands using the resolved skill directory and check that they run from the project root, rather than requiring bare paths that may not exist there."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 50,
+      "evidence": "When project paths differ, the workflow says to run a baseline comparison and \"then continue with step 3\" without checking that the baseline exists and is an ancestor in the current checkout or assigning a staleness level for step 4.",
+      "fix": "For a different checkout, verify the baseline commit and ancestry in the current checkout before comparing; on missing or diverged history apply the corresponding UNKNOWN recovery, and otherwise explicitly assess staleness and run the resume checklist when it is not demonstrably FRESH."
+    }
+  ]
+}

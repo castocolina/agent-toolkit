@@ -1,0 +1,68 @@
+{
+  "skill": "session-handoff",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "line": 32,
+      "evidence": "## Current State Summary\n\n[One paragraph: What was being worked on, current status, and where things left off]",
+      "fix": "Keep the template in references/handoff-template.md (users and the scaffold need the section structure). Replace the generic placeholders the model writes unprompted (this line, Architecture Overview, Key Patterns, Tasks Finished, Decisions, Blockers, Assumptions, Potential Gotchas, Environment) with one domain example each, matching the weak-versus-strong Important Context example in SKILL.md, and record the placeholder wording in docs/audit/recovery/session-handoff/record.md."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/session-handoff/evals/evals.json",
+      "line": 1,
+      "evidence": "\"expected_output\": \"Proposed session-handoff workflow and populated handoff content, with scaffold, validation, state, decisions, and concrete next steps.\"",
+      "fix": "Add an edge eval whose prompt is a subdirectory or a copied worktree handoff, asserting the agent runs create_handoff.py from the project root and checks that the handoff Project: line equals git rev-parse --show-toplevel before trusting staleness."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 65,
+      "evidence": "UNKNOWN by cause (the report's Issues line says which):",
+      "fix": "Replace that clause with: the report's Issues line says which of the three causes below applies; when it does not, the counts are still unusable and the cause is the script's baseline_ancestry_diverged field (--json) or a failed git diff of the recorded baseline against HEAD. Do not tell the agent the Issues line names the cause for the ancestor case."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 44,
+      "evidence": "The score starts at 100 and loses 30 for any TODO left, 10 per missing or incomplete required section, 20 for any secret, 5 per missing referenced file (max 20) and 2 per missing recommended section",
+      "fix": "Add one sentence after that list: a secret forces BLOCKED even when the arithmetic is 70 or more, and one incomplete required section forces NEEDS_WORK even when the arithmetic is 90, so report the verdict, not the number alone."
+    }
+  ]
+}

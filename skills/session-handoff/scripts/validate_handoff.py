@@ -29,9 +29,14 @@ SECRET_PATTERNS = [
     # Any scheme://user:password@ (redis, amqp, mongodb+srv, ...); skips user@ and <pw>/$VAR/*** placeholders.
     (r'[a-z][a-z0-9+.\-]*://[^/\s:@]*:(?![<$*])[^@\s/]+@', "URL with embedded password"),
     (r'Bearer\s+[a-zA-Z0-9_\-\.]{20,}', "Bearer token"),  # 20+: prose "Bearer token" is not a credential
-    (r'ghp_[a-zA-Z0-9]{36}', "GitHub personal access token"),
-    (r'sk-[a-zA-Z0-9]{48}', "OpenAI API key"),
-    (r'xox[baprs]-[a-zA-Z0-9-]+', "Slack token"),
+    # Prefix families, no fixed lengths: GitHub documents the prefixes but warns against assuming token lengths
+    # (https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github, checked 2026-11-15).
+    # The lookbehind keeps words that merely end in the prefix ("risk-...", "flask_...") from matching.
+    (r'(?<![a-z0-9])(?:github_pat_|gh[pousr]_)[a-z0-9_]{20,}', "GitHub token"),
+    # sk-, sk-proj- and sk-ant-api03- contain "-" and "_"; no official key format found, so no length is claimed.
+    (r'(?<![a-z0-9])sk-[a-z0-9_-]{20,}', "OpenAI-style API key"),
+    # https://docs.slack.dev/authentication/tokens, checked 2026-11-15 (xoxa-, xoxr- and xoxs- kept from the old pattern).
+    (r'(?<![a-z0-9])(?:xox[baprs]-|xapp-|xwfp-|xoxe\.xapp-)[a-z0-9-]+', "Slack token"),
 ]
 
 # Required sections for a complete handoff
