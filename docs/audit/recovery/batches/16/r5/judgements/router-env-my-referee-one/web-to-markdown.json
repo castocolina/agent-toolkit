@@ -1,0 +1,59 @@
+{
+  "skill": "web-to-markdown",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": null,
+      "evidence": "The dbff837f digest says \"removed units (42, showing 40)\"; two removed units are not individually visible in the prompt.",
+      "fix": "Provide the complete digest so each omitted removal can be checked against the current files and docs/audit/recovery/web-to-markdown/record.md."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 18,
+      "evidence": "\"When `web2md` is missing ... copy the CLI's stderr blocker message into the report and stop.\" The preceding `command -v web2md` check can fail without producing a CLI stderr message.",
+      "fix": "When the lookup fails, report that web2md was not found and include stderr only if available; reserve copying CLI stderr for a CLI invocation that actually produced it."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 21,
+      "evidence": "\"a directory path means one file per URL\" relies on title-based auto-naming, so two pages with the same title can resolve to the same output path and overwrite one another.",
+      "fix": "For batch directory output, detect or prevent filename collisions before writing each result; choose distinct confirmed paths or ask the user how to resolve a collision, and validate every resulting file."
+    }
+  ]
+}

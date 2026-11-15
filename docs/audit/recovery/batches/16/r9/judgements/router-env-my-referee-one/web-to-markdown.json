@@ -1,0 +1,77 @@
+{
+  "skill": "web-to-markdown",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 22,
+      "evidence": "Step 5 repeats step 3's instructions: \"when web2md is not installed there is no stderr to copy (step 3)\" and again describes copying blocker stderr and limiting --chrome-path advice to browser-discovery failures.",
+      "fix": "Keep the complete missing-binary and running-binary blocker rules in step 3. In step 5, replace the repeated explanation with a reference to step 3, preserving the distinct navigation-timeout retry rule. Record the consolidation in docs/audit/recovery/web-to-markdown/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/web-to-markdown/record.md",
+      "line": null,
+      "evidence": "The dbff837f digest states \"removed units (47, showing 40)\". Its undisplayed items cannot be checked individually from the supplied digest, notwithstanding the record's assertion that section rows cover the tail.",
+      "fix": "Supply the complete previous-version digest so all 47 items can be compared with the current files and the existing recovery rows; add rows or restore content wherever that complete comparison reveals unexplained losses."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/evals.json",
+      "line": 14,
+      "evidence": "The assertion requires \"a heading plus several sentences of body\", whereas SKILL.md step 5 explicitly says \"a legitimately short page passes\".",
+      "fix": "Make the assertion require matching identity and the page's own substantive content without a minimum sentence count. Add a short-page case that must pass without retrying, alongside an uncertain thin-extraction case that receives exactly one retry."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 21,
+      "evidence": "File output uses the predictable path \"./page.md.web2md-tmp\", and step 5 says to remove \"the temporary file this run created\" on failure. There is no check that this temporary path did not already exist.",
+      "fix": "Reserve a unique temporary file in the destination directory, for example with mktemp, and pass that path as a quoted --out argument. Retain ownership of that exact temporary file through validation and cleanup; never overwrite or delete a pre-existing staging file. Preserve the existing final-destination overwrite authorization."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 142,
+      "evidence": "The Advanced Wait Strategies request names no output destination, but its example executes \"web2md 'https://app.example.com/dashboard' --wait-until domcontentloaded --wait-for 'main' --out ./dashboard.md\". This contradicts the procedure's default to --print unless the user requests files.",
+      "fix": "Keep this selector-wait example but use --print, matching its stated user request. Alternatively, explicitly add a dashboard.md destination to that example request and explain staged publication under step 5. Record the corrected example in docs/audit/recovery/web-to-markdown/record.md."
+    }
+  ]
+}

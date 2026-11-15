@@ -1,0 +1,151 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "web-to-markdown",
+      "percent": 89.6,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 94.4,
+        "router-env-my-referee-two": 84.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 18,
+          "evidence": "Step 3 explains that a missing binary has no CLI stderr and that --chrome-path applies only to browser-discovery failures; step 5 repeats both rules: 'when web2md is not installed there is no stderr to copy (step 3)'.",
+          "fix": "Keep missing-binary detection and installation reporting in step 3, and running-binary blocker classification and retry reporting in step 5. Replace duplicated explanations with cross-references while preserving every distinct rule, and record the redistribution in docs/audit/recovery/web-to-markdown/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/web-to-markdown/record.md",
+          "line": null,
+          "evidence": "The dbff837f digest says 'removed units (47, showing 40)'; seven removal items are not displayed. The record's statement that undisplayed tails are covered does not expose their individual digest entries for verification.",
+          "fix": "Supply the complete dbff837f removal digest so each omitted item can be checked against the current content, sections.json and record.md. Preserve the existing recovery rows."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/evals/evals.json",
+          "line": 14,
+          "evidence": "The assertion requires 'a heading plus several sentences of body', whereas SKILL.md step 5 explicitly accepts 'a legitimately short page'. No eval exercises that short-page exception.",
+          "fix": "Align the assertion with identity plus the page's own substantive content rather than a sentence minimum. Add a short but complete page case that must pass and a thin, incomplete extraction case that must enter the bounded retry path."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/web-to-markdown/README.md",
+          "line": 65,
+          "evidence": "The Basic Conversion example says 'This will run: web2md ... --out ./article.md', directly publishing the requested file. SKILL.md step 4 requires a temporary path, 'never the final path', and step 5 requires validation before publication. Other README file examples likewise write directly to their destinations.",
+          "fix": "Update the README file-output examples to show extraction into a temporary staging path, validation, and publication only after any required overwrite authorization. Retain the conversion scenarios and commands as staged equivalents, and record the changes in docs/audit/recovery/web-to-markdown/record.md."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 21,
+          "evidence": "Directory output says 'Use a trailing slash for an auto-named output directory', while step 5 requires every file attempt to use 'a temporary path in the destination's directory'. The directory branch does not explain how to preserve title-based naming without letting the CLI publish or overwrite the final file before validation.",
+          "fix": "Specify the directory-output staging branch: extract into a unique staging directory inside the destination, obtain the generated filename there, validate the staged file, resolve destination collisions and overwrite authorization, then publish it. Apply the same staging location to the single bounded retry and clean up only artifacts created by this run."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 16,
+          "evidence": "Check `command -v web2md`. If missing, point the user to the Installation section",
+          "fix": "Keep the blocked-prerequisite rule and the 'do not invent an install path' constraint; the `command -v` check itself is generic and can stay one clause."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/README.md",
+          "line": 118,
+          "evidence": "use the skill web-to-markdown to convert https://app.example.com/dashboard Wait for the main selector to appear ... web2md 'https://app.example.com/dashboard' --wait-until domcontentloaded --wait-for 'main' --out ./dashboard.md",
+          "fix": "Rewrite the Advanced Wait Strategies example so a user-named selector is applied on the initial command, and so a selector-less heavy app is the one case that retries once with --wait-until domcontentloaded --wait-ms 2000 and adds --wait-for only when the user named a selector or the prior result shows one. Keep the example in README.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 22,
+          "evidence": "Validate each result in either mode. Identity: the page is the requested one",
+          "fix": "Split step 5 into ordered branches the agent can follow: identity check, content pass/fail, failure class, then the single allowed retry or the blocker report. Keep the existing rules; do not add new ones."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 3,
+          "evidence": "Use only when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown'; never for implicit requests.",
+          "fix": "Convert http(s) webpage URLs, including JavaScript-rendered pages and batches, to clean Markdown with the locally installed web2md CLI (Puppeteer, Chromium, Readability, Turndown). Use when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown', or asks to archive, extract or save a webpage as Markdown, notes or a file, including a JS-rendered or login-walled page, even without naming web2md. Not for local HTML, PDFs, summaries, or general browser automation, and not when the user says not to use this skill."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 20,
+          "evidence": "Run `web2md '<url>' --print` for stdout (the default unless the user named a file or directory) or, for a file, `web2md '<url>' --out ./page.md.web2md-tmp`",
+          "fix": "Keep the exact command, quoting and temporary-path rules. After the command, state the default for an ordinary page: no extra wait flags, because web2md already defaults to networkidle2; add --wait-until, --wait-ms or --wait-for only when the user supplies them or step 5's single retry applies."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/evals/evals.json",
+          "line": 1,
+          "evidence": "\"expected_output\": \"Honor explicit gate, validate URL, check CLI, convert, verify file.\"",
+          "fix": "Add at least one eval for a directory of several URLs whose titles collide, with an assertion that the agent detects the shared auto-named path before writing and asks how to resolve it. Add assertions that the explicit-convert case checks the scheme and reports the published path only after validation."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/web-to-markdown/evals/trigger-queries.json",
+          "line": 14,
+          "evidence": "{\"query\": \"Use the skill web-to-markdown to convert ./saved/page.html on my disk\", \"should_trigger\": false}",
+          "fix": "Change that query to should_trigger true: the description's WHEN is the explicit invocation phrase, and the body refuses local HTML only after loading. Keep the other near-miss negatives."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 22,
+          "evidence": "keep a result that carries the page's own substantive content (a heading and its body; a legitimately short page is fine ... When validation fails ... A timeout, or a present DOM with a thin body, gets one bounded retry",
+          "fix": "Define the three outcomes in step 5 before the retry rule: pass when identity matches and the page's own content is present, including a legitimately short page; fail when the output is login, consent, error or navigation-only; uncertain when a short or thin body cannot be told from an incomplete extraction. Retry the uncertain case once. Do not both keep and retry the same thin body."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/README.md",
+          "line": 74,
+          "evidence": "mkdir -p ./tmp/web2md-profile web2md 'https://example.com/protected-article' --interactive --user-data-dir ./tmp/web2md-profile --out ./output/",
+          "fix": "In the Interactive Mode example, state the SKILL.md condition first: run --interactive only when an attached human-controlled terminal is available; otherwise authenticate the dedicated profile externally and retry with --print. Keep the command as the attached-terminal path."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

@@ -1,0 +1,104 @@
+{
+  "skill": "web-to-markdown",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 13,
+    "D3": 14,
+    "D4": 11,
+    "D5": 14,
+    "D6": 12,
+    "D7": 11,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 102,
+  "max_total": 125,
+  "percent": 81.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 30,
+      "evidence": "\"web2md --help shows the live defaults (checked 2026-11-15: https://github.com/leonardocouy/web2md src/cli.ts, https://pptr.dev/api/puppeteer.puppeteerlifecycleevent).\" The same date, repository and lifecycle URL are restated in README.md Prerequisites, Auto-Named Output, Batch Conversion, Advanced Options, Output Format and Troubleshooting.",
+      "fix": "Keep one live read, `web2md --help`, in SKILL.md step 5. Move the dated source URLs to the Credits section of skills/web-to-markdown/README.md and leave the other README sections pointing at that one place; do not delete the Credits attribution."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 3,
+      "evidence": "\"Use only when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown'; never for implicit requests.\" The description has WHAT, keywords and a not-for boundary, but its WHEN is only the literal invocation phrase.",
+      "fix": "Convert http(s) webpage URLs to clean Markdown with the locally installed web2md CLI (Puppeteer, Chromium, Readability, Turndown), including JS-rendered pages, login walls and batches. Use when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown' and wants a page saved, printed, archived or batch-converted to Markdown, including a page that only renders after JavaScript. Never for implicit requests. Not for local HTML, PDFs, summaries, or general browser automation."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 30,
+      "evidence": "\"report an ambiguous result (for example a title that differs from the user's wording but a plausible body) instead of rejecting it automatically\" and \"when you cannot tell a short page from an incomplete extraction say so instead of guessing\" sit next to a rigid pass rule, so the agent must judge quality with no worked accept and reject examples.",
+      "fix": "After the content rule in step 5, add two worked outcomes and keep the existing rules: accept a three-paragraph article whose title differs from the user's wording and say why it is ambiguous but kept; reject a page whose only text is navigation links even though it has a heading. Leave the login, consent and error rejection as written."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/evals.json",
+      "line": 7,
+      "evidence": "\"Applies the pass rule before keeping the result: a heading plus several sentences of body that is not a login, consent, error or navigation-only page\" quotes a pass rule SKILL.md step 5 no longer states; step 5 now accepts a legitimately short page and says to report, not reject, an ambiguous result.",
+      "fix": "Rewrite that assertion to the current step 5 rule: keep a result with the page's own substantive content, accept a legitimately short page, report an ambiguous title-versus-body result instead of rejecting it, and reject login, consent, error and navigation-only output. Leave the other assertions as they are."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/web-to-markdown/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "Nine of the ten should-trigger queries already contain 'use the skill web-to-markdown' or 'use a skill web-to-markdown', so they pass for any description that copies the phrase; only two bury the phrase in realistic context.",
+      "fix": "Replace six of the terse positives with realistic prompts that still contain the required phrase but add a file path, a login wall, a batch, or a JavaScript-only page, and keep the near-miss negatives that name web2md, WebFetch, local HTML and PDFs."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 30,
+      "evidence": "Step 5 says \"In file mode, write the first attempt and any retry to a temporary path in the destination's directory\" and then \"move it over the destination only with the user's overwrite authorization when the destination exists\", while step 4 says the file form is \"web2md '<url>' --out ./page.md\". web2md writes the final path itself, and nothing says how to stop it writing there.",
+      "fix": "In step 4, say that file mode passes `--out` a temporary path in the destination directory (for example `./page.md.web2md-tmp`), never the final path, on both the first run and the step 5 retry. In step 5, validate that temporary file, then move it onto the destination, asking first only when the destination already exists, and on failure delete only the temporary file this run created. Do not claim a web2md flag the CLI does not have."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 26,
+      "evidence": "\"With directory output, page titles can repeat, so two pages may resolve to the same auto-named path ... detect collisions before writing, or write each result to its own distinct path derived from the URL host and path\". The CLI names and writes the file, so the collision exists only after the first write.",
+      "fix": "Tell the agent to run each URL, read the `Saved:` path from stderr, and stop the batch when a later URL names a path already saved in this batch. Then ask whether to rerun the later URL to a distinct `--out` file derived from the URL host and path or to leave the first file, and validate every published file. Do not tell the agent to detect the title collision before the CLI writes."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 21,
+      "evidence": "\"Before step 4, think it through: what the user wants (the article body, not a summary), whether they asked for a file or directory (otherwise use --print), and whether a selector is known\" is the only thinking checkpoint, and it omits the output-collision and login-wall branches the procedure later hits.",
+      "fix": "Extend that checkpoint, before step 4, with two questions: if several URLs share one output file, will the user get separate files or one combined file, and is a login or consent wall already known so `--interactive` or a dedicated profile must be decided before launching. Keep the three questions already there."
+    }
+  ]
+}

@@ -7,8 +7,12 @@
       "expected_output": "Honor explicit gate, validate URL, check CLI, convert, verify file.",
       "assertions": [
         "Recognizes explicit invocation",
-        "Uses web2md URL with --out ./guide.md",
-        "Includes non-empty output validation"
+        "Checks `command -v web2md` before converting",
+        "Runs the command shape web2md 'https://example.com/guide' --out with a unique mktemp-reserved temporary file beside the requested ./guide.md (not the final path), with the URL and the output path as separate quoted arguments and no string interpolation, then validates the temporary file and publishes it as ./guide.md",
+        "Validates the saved file: it is non-empty and holds substantive main content of the requested page, not only navigation",
+        "Confirms page identity: the title matches when one is available, otherwise the URL's host and the visible heading are checked",
+        "Applies the pass rule before keeping the result: a heading plus several sentences of body that is not a login, consent, error or navigation-only page; rejects login, consent, error and navigation-only output instead of reporting it as the page",
+        "Reports the saved path"
       ]
     },
     {
@@ -18,6 +22,7 @@
       "assertions": [
         "Uses web2md with --print",
         "Uses --wait-for main",
+        "Applies the user's --wait-for main to the initial command, not only to a retry",
         "Does not save unrequested file"
       ]
     },
@@ -26,20 +31,22 @@
       "prompt": "Use the skill web-to-markdown for https://app.example.com/dashboard and print the Markdown. The app keeps live connections open, so the default run ends in a navigation timeout and never finishes loading.",
       "expected_output": "Retry once with the heavy-app readiness recipe: domcontentloaded plus a short wait, adding a selector wait only for a known selector; never an unbounded wait or the sandbox flag.",
       "assertions": [
-        "Retries once with --wait-until domcontentloaded and --wait-ms 2000",
+        "Classifies the failure as a navigation timeout, which gets the one retry",
+        "Retries once with --wait-until domcontentloaded and --wait-ms 2000, as the single retry for the navigation timeout",
         "Adds --wait-for 'main' only when the earlier result contains a main element, or another selector the user named or the result shows; with no known selector it does not invent one and reports the extraction failure if the retry gives no content",
         "Explains that persistent network activity beyond the idle threshold can keep the default networkidle2 from settling, without claiming it never settles",
-        "Does not wait indefinitely and does not use --no-sandbox"
+        "Does not wait indefinitely and does not use --no-sandbox",
+        "If the retry also fails to produce valid content, reports the extraction failure and its blocker instead of retrying again"
       ]
     },
     {
       "id": "implicit-gate",
-      "prompt": "Convert https://example.com/article to Markdown using whichever browser tool is easiest.",
-      "expected_output": "Non-trigger: the request lacks the explicit phrase, so the skill is not loaded and does not respond.",
+      "prompt": "Convert https://example.com/article to Markdown with the web2md CLI.",
+      "expected_output": "The request names the conversion this skill performs but lacks the explicit invocation phrase: stop and ask the user to repeat the request with the phrase.",
       "assertions": [
-        "The skill web-to-markdown is not invoked and produces no response",
-        "web2md is not run by the skill",
-        "The skill does not pick or recommend a browser stack"
+        "Does not run web2md and does not convert the page",
+        "Asks the user to repeat the request with `use the skill web-to-markdown` or `use a skill web-to-markdown`",
+        "Does not pick or recommend another browser stack"
       ]
     },
     {
@@ -51,6 +58,70 @@
         "Reports that only http:// and https:// URLs are accepted and names the ftp:// scheme as the problem",
         "Does not rewrite the URL to https:// or guess another address",
         "Asks the user for an http(s) URL"
+      ]
+    },
+    {
+      "id": "missing-binary",
+      "prompt": "Use the skill web-to-markdown to print https://example.com/docs as Markdown. In this environment `command -v web2md` prints nothing and the shell reports `web2md: command not found`.",
+      "expected_output": "Report the CLI blocker and stop; do not invent an install path, repository or another browser stack.",
+      "assertions": [
+        "Checks `command -v web2md` and finds the binary missing",
+        "Reports the prerequisite as blocked, notes that there is no CLI stderr to copy because the binary does not run, and points to the Installation section of https://github.com/leonardocouy/web2md",
+        "Stops without converting the page",
+        "Does not invent an install command, install path or repository",
+        "Does not fall back to curl, Playwright, WebFetch or another browser automation stack"
+      ]
+    },
+    {
+      "id": "chrome-not-found",
+      "prompt": "Use the skill web-to-markdown to print https://example.com/docs as Markdown. `command -v web2md` finds the binary, but running it exits with an error on stderr saying Chrome was not found.",
+      "expected_output": "Copy the CLI's stderr blocker into the report, tell the user to pass --chrome-path, and stop.",
+      "assertions": [
+        "Copies the CLI's stderr message about Chrome not being found into the report",
+        "Tells the user to pass --chrome-path with the location of their Chrome or Chromium",
+        "Stops without retrying and without another browser automation stack"
+      ]
+    },
+    {
+      "id": "interactive-no-terminal",
+      "prompt": "Use the skill web-to-markdown to print https://members.example.com/report. The page needs a login, so run it with --interactive. This session has no attached terminal and no human at the keyboard.",
+      "expected_output": "Refuse --interactive without an attached human-controlled terminal, explain it blocks waiting for human input, and offer --print with a dedicated profile.",
+      "assertions": [
+        "Does not launch web2md with --interactive",
+        "Explains that --interactive blocks waiting for human input and no attached human-controlled terminal is available",
+        "Offers the non-interactive route: authenticate a dedicated profile externally and retry with web2md 'https://members.example.com/report' --print, or report the authentication blocker",
+        "Does not reuse the user's daily browser profile and does not use --no-sandbox"
+      ]
+    },
+    {
+      "id": "apostrophe-url",
+      "prompt": "Use the skill web-to-markdown to print https://example.com/o'brien as Markdown.",
+      "expected_output": "Pass the URL as one single-quoted argument with the inner apostrophe written as '\\'' and run with --print.",
+      "assertions": [
+        "Runs web2md 'https://example.com/o'\\''brien' --print with the inner single quote written as '\\''",
+        "Does not build the command by string interpolation and does not reject the URL, since it contains no newline or null byte"
+      ]
+    },
+    {
+      "id": "several-urls-one-file",
+      "prompt": "Use the skill web-to-markdown to convert https://example.com/a, https://example.com/b and https://example.com/c and save them to ./all.md.",
+      "expected_output": "Ask before writing: separate files into a directory, or combine into the one file (with order and separator); never write the same path three times without confirmed overwrite behavior.",
+      "assertions": [
+        "Asks the user before running whether to write separate files into a directory or to combine the results into ./all.md",
+        "If combining, asks in what order and with what separator between the results",
+        "Does not run web2md three times with --out ./all.md without confirmed overwrite behavior",
+        "Notes that a directory path means one file per URL"
+      ]
+    },
+    {
+      "id": "login-or-consent-wall",
+      "prompt": "Use the skill web-to-markdown to print https://news.example.com/story. The run succeeds, but the extracted Markdown is only a 'Sign in to continue' form and a cookie consent notice with no article text.",
+      "expected_output": "Classify the failure as a login or consent wall: no retry, report the blocker, and offer the dedicated-profile path only if the user wants it.",
+      "assertions": [
+        "Rejects the output as a login or consent page instead of reporting it as the article",
+        "Does not rerun with --wait-until domcontentloaded or any other wait, because waiting does not help a login or consent wall",
+        "Reports the login or consent wall as a blocker",
+        "Points to the dedicated --user-data-dir path only if the user wants it, and does not reuse the user's daily browser profile or use --no-sandbox"
       ]
     }
   ]

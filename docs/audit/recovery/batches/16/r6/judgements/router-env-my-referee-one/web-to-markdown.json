@@ -1,0 +1,77 @@
+{
+  "skill": "web-to-markdown",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": null,
+      "evidence": "Previous-version digest dbff837f: \"removed units (47, showing 40)\".",
+      "fix": "Review the seven undisplayed removal items against the current files and docs/audit/recovery/web-to-markdown/record.md; restore unexplained substantive content or add valid item-specific or section-specific record rows."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/web-to-markdown/evals/evals.json",
+      "line": 2,
+      "evidence": "The output evals cover several URLs targeting one file, but not two different pages resolving to the same auto-named path.",
+      "fix": "Add a batch eval with duplicate page titles and assert that neither result overwrites the other and that the resulting files are validated."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 22,
+      "evidence": "\"rerun once with `--wait-until domcontentloaded --wait-ms 2000`\" conflicts with \"with no known selector, do not invent one and report the extraction failure.\"",
+      "fix": "Clarify that a timeout or thin result gets the single bounded retry without `--wait-for` when no selector is known; report failure only if that retry fails."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 22,
+      "evidence": "\"Keep a result only when it passes: a heading plus several sentences of body\" rejects a legitimate short article or page whose substantive content has fewer sentences.",
+      "fix": "Use page identity and task-appropriate substantive content as the pass criteria rather than requiring several sentences; report uncertainty when a short result cannot be distinguished from an incomplete extraction."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 21,
+      "evidence": "\"Run ... `--out ./page.md`\" precedes validation, while step 5 says \"Keep a result only when it passes\" without a safe publication or cleanup procedure.",
+      "fix": "Write file-mode results and retries to distinct temporary paths, validate them, then publish to the requested destination with overwrite authorization; on failure retain or remove temporary files according to user approval and report that no validated output was published."
+    }
+  ]
+}

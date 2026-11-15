@@ -1,0 +1,113 @@
+{
+  "skill": "web-to-markdown",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 14,
+    "D4": 13,
+    "D5": 15,
+    "D6": 13,
+    "D7": 11,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 106,
+  "max_total": 125,
+  "percent": 84.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 16,
+      "evidence": "Check `command -v web2md`. If missing, point the user to the Installation section",
+      "fix": "Keep the blocked-prerequisite rule and the 'do not invent an install path' constraint; the `command -v` check itself is generic and can stay one clause."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 118,
+      "evidence": "use the skill web-to-markdown to convert https://app.example.com/dashboard Wait for the main selector to appear ... web2md 'https://app.example.com/dashboard' --wait-until domcontentloaded --wait-for 'main' --out ./dashboard.md",
+      "fix": "Rewrite the Advanced Wait Strategies example so a user-named selector is applied on the initial command, and so a selector-less heavy app is the one case that retries once with --wait-until domcontentloaded --wait-ms 2000 and adds --wait-for only when the user named a selector or the prior result shows one. Keep the example in README.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 22,
+      "evidence": "Validate each result in either mode. Identity: the page is the requested one",
+      "fix": "Split step 5 into ordered branches the agent can follow: identity check, content pass/fail, failure class, then the single allowed retry or the blocker report. Keep the existing rules; do not add new ones."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 3,
+      "evidence": "Use only when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown'; never for implicit requests.",
+      "fix": "Convert http(s) webpage URLs, including JavaScript-rendered pages and batches, to clean Markdown with the locally installed web2md CLI (Puppeteer, Chromium, Readability, Turndown). Use when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown', or asks to archive, extract or save a webpage as Markdown, notes or a file, including a JS-rendered or login-walled page, even without naming web2md. Not for local HTML, PDFs, summaries, or general browser automation, and not when the user says not to use this skill."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 20,
+      "evidence": "Run `web2md '<url>' --print` for stdout (the default unless the user named a file or directory) or, for a file, `web2md '<url>' --out ./page.md.web2md-tmp`",
+      "fix": "Keep the exact command, quoting and temporary-path rules. After the command, state the default for an ordinary page: no extra wait flags, because web2md already defaults to networkidle2; add --wait-until, --wait-ms or --wait-for only when the user supplies them or step 5's single retry applies."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/evals.json",
+      "line": 1,
+      "evidence": "\"expected_output\": \"Honor explicit gate, validate URL, check CLI, convert, verify file.\"",
+      "fix": "Add at least one eval for a directory of several URLs whose titles collide, with an assertion that the agent detects the shared auto-named path before writing and asks how to resolve it. Add assertions that the explicit-convert case checks the scheme and reports the published path only after validation."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/web-to-markdown/evals/trigger-queries.json",
+      "line": 14,
+      "evidence": "{\"query\": \"Use the skill web-to-markdown to convert ./saved/page.html on my disk\", \"should_trigger\": false}",
+      "fix": "Change that query to should_trigger true: the description's WHEN is the explicit invocation phrase, and the body refuses local HTML only after loading. Keep the other near-miss negatives."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 22,
+      "evidence": "keep a result that carries the page's own substantive content (a heading and its body; a legitimately short page is fine ... When validation fails ... A timeout, or a present DOM with a thin body, gets one bounded retry",
+      "fix": "Define the three outcomes in step 5 before the retry rule: pass when identity matches and the page's own content is present, including a legitimately short page; fail when the output is login, consent, error or navigation-only; uncertain when a short or thin body cannot be told from an incomplete extraction. Retry the uncertain case once. Do not both keep and retry the same thin body."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 74,
+      "evidence": "mkdir -p ./tmp/web2md-profile web2md 'https://example.com/protected-article' --interactive --user-data-dir ./tmp/web2md-profile --out ./output/",
+      "fix": "In the Interactive Mode example, state the SKILL.md condition first: run --interactive only when an attached human-controlled terminal is available; otherwise authenticate the dedicated profile externally and retry with --print. Keep the command as the attached-terminal path."
+    }
+  ]
+}

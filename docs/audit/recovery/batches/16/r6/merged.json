@@ -1,0 +1,169 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "web-to-markdown",
+      "percent": 88.0,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 93.6,
+        "router-env-my-referee-two": 82.4
+      },
+      "missing_judges": [],
+      "disagreement": true,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest dbff837f: \"removed units (47, showing 40)\".",
+          "fix": "Review the seven undisplayed removal items against the current files and docs/audit/recovery/web-to-markdown/record.md; restore unexplained substantive content or add valid item-specific or section-specific record rows."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/web-to-markdown/evals/evals.json",
+          "line": 2,
+          "evidence": "The output evals cover several URLs targeting one file, but not two different pages resolving to the same auto-named path.",
+          "fix": "Add a batch eval with duplicate page titles and assert that neither result overwrites the other and that the resulting files are validated."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 22,
+          "evidence": "\"rerun once with `--wait-until domcontentloaded --wait-ms 2000`\" conflicts with \"with no known selector, do not invent one and report the extraction failure.\"",
+          "fix": "Clarify that a timeout or thin result gets the single bounded retry without `--wait-for` when no selector is known; report failure only if that retry fails."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 22,
+          "evidence": "\"Keep a result only when it passes: a heading plus several sentences of body\" rejects a legitimate short article or page whose substantive content has fewer sentences.",
+          "fix": "Use page identity and task-appropriate substantive content as the pass criteria rather than requiring several sentences; report uncertainty when a short result cannot be distinguished from an incomplete extraction."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 21,
+          "evidence": "\"Run ... `--out ./page.md`\" precedes validation, while step 5 says \"Keep a result only when it passes\" without a safe publication or cleanup procedure.",
+          "fix": "Write file-mode results and retries to distinct temporary paths, validate them, then publish to the requested destination with overwrite authorization; on failure retain or remove temporary files according to user approval and report that no validated output was published."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 19,
+          "evidence": "The digest at dbff837f lists 47 removed units and shows 40; the digest at 5ac41b9a lists 10 and shows 10. record.md s018 round-5 note says both tails are already covered by section rows, but the shown dbff837f units include para:da7084d3, para:a3e4a7f0, para:66484726, para:b88d6f15, para:9aebc259, para:8f79c412, para:8e887b70, para:35730ad0, para:5086e48b, para:9069bfea, para:237767bd, para:8eef2779, para:66cc8203, para:03badd4c, para:75275fd9, para:4c2156d8, para:290277fb, para:ab3bfb2c, para:14a34fe3, para:e62e95ad, para:1007779d, para:264c82f0, para:d07b274a, para:32893535, para:077eb6d1, para:fa7ee631, para:133708b8, para:beafa9fe, para:29076c8e, para:5bd8d522, para:9efd5009 and para:6d06aa95, and sections.json maps those ids only to s018-s025, whose rows do not name them. The seven unshown dbff837f units and every 5ac41b9a unit are likewise unnamed.",
+          "fix": "Add one record.md row per unnamed digest unit (para:<id> or a section-id row whose sections.json units list that id), each with an allowed (fate, value, decision) combination, so the cut lists are explained item by item."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 17,
+          "evidence": "Check `command -v web2md`. If missing, point the user to the Installation section",
+          "fix": "The model already checks PATH and follows an install doc; keep only the non-obvious rule (do not invent a path or repository; there is no stderr until the binary runs) and move the generic check into README.md, recording the move."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 16,
+          "evidence": "Procedure steps 2, 4 and 5 are each one dense paragraph covering destination choice, quoting, collisions, failure classes and the single retry.",
+          "fix": "Split each decision into a short branch the agent can follow: destination (print, one file, directory), quoting, collision, then failure class (timeout, thin body, login/consent) mapped to retry or stop. That is the Tool pattern this CLI task needs."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 28,
+          "evidence": "Browser safety and gotchas cover sandbox, profile, interactive and untrusted page text, but not the CLI facts that defeat a reasonable retry: Readability can fall back to the whole body, and --wait-for is capped at the lower of --timeout-ms and 30s.",
+          "fix": "Add those two gotchas with why: a body-fallback page can look non-empty yet fail the heading-plus-several-sentences rule, and raising --timeout-ms does not extend a selector wait past 30s, so report that cap instead of retrying."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 3,
+          "evidence": "Use only when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown'; never for implicit requests.",
+          "fix": "Convert http(s) webpage URLs to clean Markdown with the locally installed web2md CLI (Puppeteer, Chromium, Readability, Turndown), including JS-rendered pages, login or consent walls, and batches. Use when the user asks to save, archive or print a page as Markdown, even if they do not name web2md, and also when they say 'use the skill web-to-markdown' or 'use a skill web-to-markdown'. Not for local HTML, PDFs, summaries, or general browser automation."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 24,
+          "evidence": "See `web2md --help` for supported options. The body still inlines every flag recipe, quoting rule and failure class in steps 4 and 5.",
+          "fix": "Keep the decision tree in SKILL.md and move the quoting example, collision rule and retry recipe to references/web2md-options.md, with a step-4 trigger: read it when a URL contains a quote, several URLs share one path, or the first extraction fails. Do not load it for a single clean URL printed to stdout."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 19,
+          "evidence": "an http(s) URL can contain a single quote or shell metacharacters, so pass one quoted argument per URL, wrap the URL in single quotes and write each ' inside it as '\\''",
+          "fix": "Fragile shell quoting should be one exact argv form, not a recipe the agent rebuilds. State the default as a single argv array (no shell), and give one escape hatch: if the harness requires a shell, use the worked example `web2md 'https://example.com/o'\\''brien' --print`."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/evals/evals.json",
+          "line": 1,
+          "evidence": "11 evals assert behaviors in prose ('Recognizes explicit invocation', 'Retries once with --wait-until domcontentloaded') with no input files and no mechanically checkable expected command or output file.",
+          "fix": "Add evals/files/ fixtures for a thin body, a login wall and a navigation timeout, and assert the exact argv and the pass/fail classification against those fixtures."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/web-to-markdown/evals/trigger-queries.json",
+          "line": 1,
+          "evidence": "10 should-trigger queries all contain the phrase 'use the skill web-to-markdown' or 'use a skill web-to-markdown'; none describes the task without naming the skill.",
+          "fix": "Replace half of the positives with realistic prompts that ask to archive or print a JS-rendered page as Markdown without naming the skill, and keep the near-miss negatives (WebFetch, local HTML, PDF, summary)."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/SKILL.md",
+          "line": 19,
+          "evidence": "Step 4 says 'Reject a URL only when it contains a newline or a null byte' after telling the agent to wrap the URL in single quotes, so a URL that is already rejected can still be interpolated.",
+          "fix": "Put the newline and null-byte check first and stop; only then quote. Add the missing branch: a non-zero exit that is not Chrome-not-found and not a navigation timeout (for example an HTTP error page that still returns a body) is reported with stderr and not retried."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/web-to-markdown/README.md",
+          "line": 73,
+          "evidence": "This will run: web2md 'https://example.com/protected-article' --interactive --user-data-dir ./tmp/web2md-profile --out ./output/",
+          "fix": "The README example launches --interactive with no terminal check, which contradicts SKILL.md. Prefix it with the same gate: only when an attached human-controlled terminal exists; otherwise authenticate the dedicated profile externally and retry with --print."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

@@ -1,0 +1,44 @@
+{
+  "skill": "web-to-markdown",
+  "mode": "output",
+  "pass_rate": 0.8478,
+  "passed": 39,
+  "total": 46,
+  "failures": [
+    {
+      "eval": "explicit-convert",
+      "assertion": "Confirms page identity: the title matches when one is available, otherwise the URL's host and the visible heading are checked",
+      "evidence": "The output asks for \u201cthe requested page\u2019s heading and substantive body\u201d but does not specify a title match or a host-and-heading fallback."
+    },
+    {
+      "eval": "explicit-convert",
+      "assertion": "Applies the pass rule before keeping the result: a heading plus several sentences of body that is not a login, consent, error or navigation-only page; rejects login, consent, error and navigation-only output instead of reporting it as the page",
+      "evidence": "The output requires \u201cthe requested page\u2019s heading and substantive body\u201d but does not specify several sentences of body as a pass condition."
+    },
+    {
+      "eval": "heavy-app-never-idle",
+      "assertion": "Explains that persistent network activity beyond the idle threshold can keep the default networkidle2 from settling, without claiming it never settles",
+      "evidence": "The output says to retry \u201cwithout waiting for network idle\u201d but does not explain persistent network activity or the idle threshold."
+    },
+    {
+      "eval": "heavy-app-never-idle",
+      "assertion": "If the retry also fails to produce valid content, reports the extraction failure and its blocker instead of retrying again",
+      "evidence": "The output says, \u201cIf the retry fails, report the extraction failure rather than retrying again,\u201d but does not say to report the blocker."
+    },
+    {
+      "eval": "missing-binary",
+      "assertion": "Stops without converting the page",
+      "evidence": "Instead of stopping at the blocker, the output says, \"Then print the page as Markdown,\" and provides a conversion command."
+    },
+    {
+      "eval": "chrome-not-found",
+      "assertion": "Copies the CLI's stderr message about Chrome not being found into the report",
+      "evidence": "The output says, \"The exact stderr text was not supplied, so I can\u2019t reproduce it verbatim.\""
+    },
+    {
+      "eval": "several-urls-one-file",
+      "assertion": "Notes that a directory path means one file per URL",
+      "evidence": "The output says, \u201cWrite separate files: please specify an output directory,\u201d but does not explicitly say there will be one file per URL."
+    }
+  ]
+}
