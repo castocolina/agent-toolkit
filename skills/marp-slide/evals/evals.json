@@ -65,6 +65,150 @@
         "One slide holds both `photos/before.png` and `photos/after.png` as `bg` images side by side: either both unmarked (full-width split) or sharing one `left`/`right` region; it never marks one image `left` and the other `right`.",
         "The PDF export command includes `--pdf` and `--allow-local-files`, with the reason that local photos are otherwise blank."
       ]
+    },
+    {
+      "id": "fragmented-lists",
+      "prompt": "In my deck.md I want the three agenda points and the numbered rollout steps on slide 3 to appear one at a time when I present from the HTML file. Show me how to write the list markers.",
+      "files": [
+        "references/marp-syntax.md"
+      ],
+      "expected_output": "Uses `*` markers for the bullet list and `)` after the digit (`1)`) for the ordered list, and says only the HTML presenter steps through them.",
+      "assertions": [
+        "Writes the agenda bullets with the `*` marker, not `-`.",
+        "Writes the rollout steps as an ordered list with `1)` style markers, not `1.`.",
+        "Says the items reveal one at a time only in the HTML presenter and that PDF and PPTX show every item at once."
+      ]
+    },
+    {
+      "id": "live-preview-agent-shell",
+      "prompt": "I'm editing deck.md and want to see it refresh live in a browser while we work on it. You run the commands in your own shell. Use Marp CLI.",
+      "files": [
+        "references/export.md"
+      ],
+      "expected_output": "Names `--watch` or `--server` (with `--no-stdin`), warns that they never exit and would block the agent shell, and runs or hands over the command in the background or for the user to start.",
+      "assertions": [
+        "Names `--watch` (`-w`) or `--server` (`-s`) as the live-refresh option.",
+        "Warns that these commands never exit and would block an agent shell if run in the foreground, so it starts it in the background or gives the user the command to run.",
+        "Keeps `--no-stdin` on the command."
+      ]
+    },
+    {
+      "id": "cli-theme-and-image-flags",
+      "prompt": "Without editing the deck's frontmatter, render deck.md with the built-in gaia theme, and also give me a double-resolution JPEG of just the title slide. Give the exact marp commands.",
+      "files": [
+        "references/export.md"
+      ],
+      "expected_output": "Uses `--theme gaia` and `--image jpeg --image-scale 2` (not `--images`, which writes every slide).",
+      "assertions": [
+        "Uses `--theme gaia` on the command line rather than editing the `theme:` directive.",
+        "Uses `--image jpeg` (singular, first slide only) with `--image-scale 2` for the title-slide JPEG.",
+        "Says the image conversion needs Chrome, Edge or Firefox."
+      ]
+    },
+    {
+      "id": "vscode-custom-theme-export",
+      "prompt": "I use VS Code with the Marp extension. My theme is in themes/acme.css. How do I make the preview use it, and how do I export the deck to PPTX from the editor?",
+      "files": [
+        "references/vscode.md"
+      ],
+      "expected_output": "Registers the theme with `markdown.marp.themes`, exports through the Marp toolbar quick pick \"Export slide deck...\", and never suggests the deprecated `markdown.marp.enableHtml`.",
+      "assertions": [
+        "Adds `themes/acme.css` to the `markdown.marp.themes` setting.",
+        "Exports through the toolbar quick pick \"Export slide deck...\" (command `markdown.marp.export`) and chooses PPTX.",
+        "If it mentions enabling HTML, uses `markdown.marp.html` and never `markdown.marp.enableHtml`.",
+        "Says `marp: true` must be in the frontmatter for the preview, and that PPTX export needs Chrome, Chromium, Edge or Firefox."
+      ]
+    },
+    {
+      "id": "two-column-layout",
+      "prompt": "Slide 4 of my deck needs a pros column on the left and a cons column on the right, side by side. I render with plain `marp deck.md -o deck.html` and cannot use --html.",
+      "files": [
+        "references/theme-css-guide.md"
+      ],
+      "expected_output": "A `div` with a class wrapping two inner divs, with the grid or flex rule in the deck's `<style>` block, and no `style=` attribute.",
+      "assertions": [
+        "Uses `<div class=\"...\">` wrappers and puts the layout rule in the deck's `<style>` block.",
+        "Uses no `style=\"...\"` attribute and does not tell the user to add `--html`.",
+        "Leaves blank lines inside the divs so the Markdown lists still render."
+      ]
+    },
+    {
+      "id": "bespoke-progress-transition",
+      "prompt": "For the HTML version of my deck, I want a progress bar across the top and a fade between slides. Will that also appear in the PDF? Give the command and the directive.",
+      "files": [
+        "references/export.md"
+      ],
+      "expected_output": "Uses `--bespoke.progress` and the `transition: fade` directive, and says both apply only to the HTML output.",
+      "assertions": [
+        "Uses `--bespoke.progress` for the progress bar rather than hand-written CSS with `--paginate`-style variables.",
+        "Uses the `transition: fade` directive (or `--bespoke.transition` for the switch) and does not claim Marp has no animation support.",
+        "Says neither appears in the PDF, because they belong to the HTML presenter."
+      ]
+    },
+    {
+      "id": "slide-count-by-length",
+      "prompt": "I have a 10-minute slot at the team meeting to present our new onboarding checklist. Make me a Marp deck for it.",
+      "files": [
+        "references/slide-count.md",
+        "assets/template-basic.md"
+      ],
+      "expected_output": "A deck of 10 to 15 slides, with the count presented as a rule of thumb.",
+      "assertions": [
+        "The deck has between 10 and 15 slides.",
+        "States the slide count it chose for the 10-minute slot and calls it a rule of thumb, not a Marp requirement."
+      ]
+    },
+    {
+      "id": "import-theme-preprocessor",
+      "prompt": "I build my Marp theme with Sass and extend the default theme, but the default styles vanish after compiling. What should the first lines of my theme be?",
+      "files": [
+        "references/theme-css-guide.md"
+      ],
+      "expected_output": "Starts with `/* @theme name */` and uses `@import-theme 'default';` because Sass may resolve a plain `@import` while compiling.",
+      "assertions": [
+        "Uses `@import-theme 'default';` instead of `@import 'default';`.",
+        "Explains that a preprocessor may resolve or lose the plain `@import` while compiling.",
+        "Keeps the `/* @theme name */` metadata comment."
+      ]
+    },
+    {
+      "id": "notes-without-browser",
+      "prompt": "This build server has no Chrome, Edge or Firefox and I cannot install one. Can I still export the speaker notes of deck.md and an HTML version? What about the PDF?",
+      "files": [
+        "references/export.md"
+      ],
+      "expected_output": "Says `--notes` and HTML need no browser, while PDF needs one (or the Docker image).",
+      "assertions": [
+        "Says `marp --no-stdin deck.md --notes -o deck.txt` works without a browser.",
+        "Says the HTML output also needs no browser.",
+        "Says the PDF needs Chrome, Edge or Firefox, or the official Docker image."
+      ]
+    },
+    {
+      "id": "math-declare-library",
+      "prompt": "Add an inline formula and a display equation for the quadratic formula to slide 2 of my Marp deck, in the frontmatter too.",
+      "files": [
+        "references/marp-syntax.md"
+      ],
+      "expected_output": "Declares `math: katex` or `math: mathjax` in the frontmatter instead of relying on a default.",
+      "assertions": [
+        "Adds `math: katex` or `math: mathjax` to the frontmatter.",
+        "Uses `$...$` for the inline formula and `$$ ... $$` for the display one.",
+        "Does not state that MathJax is the default library."
+      ]
+    },
+    {
+      "id": "ci-action-versions",
+      "prompt": "Write me a GitHub Actions workflow that builds slides.md to PDF with Marp CLI on every push to main and uploads the PDF.",
+      "files": [
+        "references/export.md"
+      ],
+      "expected_output": "A workflow that does not hardcode `actions/checkout@v4` or `actions/upload-artifact@v4` from memory and tells the user to use each action's current major from its releases page.",
+      "assertions": [
+        "Does not pin `actions/checkout@v4` or `actions/upload-artifact@v4`.",
+        "Tells the user to use the current major version of each action, read from the action's releases page.",
+        "Uses `--no-stdin` and `--allow-local-files` on the PDF command and pins the Marp CLI major (`@4`)."
+      ]
     }
   ]
 }

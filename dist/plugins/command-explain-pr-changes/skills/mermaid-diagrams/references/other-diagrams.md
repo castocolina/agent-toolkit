@@ -62,4 +62,4 @@ gantt
 
 ## Pie (`pie`)
 
-Syntax: `pie showData`, an optional `title`, then `"Label" : value` lines. Quote every label (the documented form; Mermaid 11.17 also accepts unquoted labels, older hosts may not). A negative value is a parse error. Beyond about seven slices, or for values that are not parts of one whole, use a bar chart in a chart tool instead.
+Syntax: `pie showData`, an optional `title`, then `"Label" : value` lines. Quote every label (the documented form; Mermaid 11.17 and 12.3 also accept unquoted labels (tested 2026-11-13), older hosts may not). A negative value is a parse error. Beyond about seven slices, or for values that are not parts of one whole, use a bar chart in a chart tool instead.

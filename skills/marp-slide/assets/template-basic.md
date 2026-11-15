@@ -99,6 +99,10 @@ section.lead {
   border-bottom: 8px solid var(--color-hr);
 }
 
+section.lead.final {
+  border-bottom: none;
+}
+
 section.lead footer {
   display: none;
 }

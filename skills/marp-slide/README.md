@@ -30,7 +30,10 @@ marp-slide/
 │   ├── marp-syntax.md       # Directive scope, built-in themes, fit headings, math
 │   ├── image-patterns.md    # Image layouts and their surprises
 │   ├── theme-css-guide.md   # CSS scoping, template-to-theme recipe, @size
-│   └── export.md            # Marp CLI export commands, browser, CI
+│   ├── theme-snippets.md    # Callout, step, quote, link, table and terminal CSS for business and tech
+│   ├── export.md            # Marp CLI export commands, browser, CI, live preview, HTML presenter options
+│   ├── vscode.md            # Marp for VS Code preview, export, settings
+│   └── slide-count.md       # Slide count by talk length (rule of thumb)
 └── evals/
     ├── evals.json           # Output evals
     ├── trigger-queries.json # Trigger evals
@@ -43,6 +46,13 @@ marp-slide/
 - [Marpit Directives](https://marpit.marp.app/directives)
 - [Marpit Image Syntax](https://marpit.marp.app/image-syntax)
 - [Marp CLI GitHub](https://github.com/marp-team/marp-cli)
+- [Marp for VS Code](https://marketplace.visualstudio.com/items?itemName=marp-team.marp-vscode)
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+Marp tooling and documentation (Marpit, Marp Core, Marp CLI, Marp for VS Code) come from the Marp team. Contrast thresholds follow the W3C WCAG 2.2 "Understanding contrast (minimum)" page. GitHub-hosted runner facts come from GitHub's actions/runner-images readme.
 
 ## License
 
