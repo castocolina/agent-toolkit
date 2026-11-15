@@ -1,0 +1,69 @@
+{
+  "skill": "dependency-updater",
+  "mode": "output",
+  "pass_rate": 0.4545,
+  "passed": 10,
+  "total": 22,
+  "failures": [
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Separates patch/minor updates from major updates in the candidate list",
+      "evidence": "The output says, \u201cI can\u2019t yet identify exact targets or safely propose changes,\u201d and provides no candidate list."
+    },
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Does not write any manifest or lockfile change before the user approves each target version",
+      "evidence": "The output says, \u201cBefore any write, I\u2019ll present a package \u2192 exact target map,\u201d but requires explicit approval only for breaking targets."
+    },
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Does not auto-apply minor or patch updates, noting that even a nominal minor update can break compatibility",
+      "evidence": "The output offers to \u201cupdate the low-risk candidates\u201d without requiring approval for each minor or patch target or noting that minor updates can break compatibility."
+    },
+    {
+      "eval": "python-audit-plan",
+      "assertion": "Updates one approved package at a time with `poetry update <package>` (optionally previewed with --dry-run) rather than a bare `poetry update`",
+      "evidence": "The plan instead instructs updates \u201cFor each approved compatible cohort\u201d using `poetry update <package-1> <package-2>`."
+    },
+    {
+      "eval": "conflicting-node-deps",
+      "assertion": "Starts with the owning manager's explain command (`npm explain <package>`, or `pnpm why <package>` for pnpm) to find which dependency requires the conflicting peer version",
+      "evidence": "The sequence begins with \u201cInspect the project and recent change\u201d and runs `git status --short` before reaching `npm explain <conflicting-package>`."
+    },
+    {
+      "eval": "conflicting-node-deps",
+      "assertion": "Proposes a targeted version change for the named package and verifies it with the owning manager's install, the tests and a lockfile diff review",
+      "evidence": "The output says \u201cProposed package-to-target map: none yet\u201d and defers selecting targets until the conflict is clear."
+    },
+    {
+      "eval": "scoped-taze-write",
+      "assertion": "Uses taze --write with --include naming only react and react-dom, not a bare taze --write",
+      "evidence": "The output says, \u201cThe eventual taze write would include an explicit `--include` restricted to the approved packages,\u201d but gives no `taze --write` command or package list for the flag."
+    },
+    {
+      "eval": "scoped-taze-write",
+      "assertion": "Adds --no-github-actions and --no-node-version, or explains that taze --write can also rewrite GitHub Actions workflows and .nvmrc, .node-version and devEngines",
+      "evidence": "The output mentions \u201cruntime constraints\u201d but provides neither the side-effect flags nor the specified warning."
+    },
+    {
+      "eval": "scoped-taze-write",
+      "assertion": "Recurses with -r only after confirming the workspace scope",
+      "evidence": "The output asks for \u201cconfirmation that the scope is all existing occurrences in the monorepo\u201d but does not provide a command using `-r`."
+    },
+    {
+      "eval": "scoped-taze-write",
+      "assertion": "Compares the resulting manifest diff with the approved targets and runs the owning manager's install rather than another manager's",
+      "evidence": "The output proposes to \u201cprovide a package-to-exact-target map and verify any resolver-generated diff in a disposable worktree\u201d but does not specify a comparison against the approved targets or the owning manager\u2019s install."
+    },
+    {
+      "eval": "unattended-candidate-scan",
+      "assertion": "Checks the taze prerequisite with scripts/check-tool.sh or handles the JSON error it prints when taze is missing",
+      "evidence": "The output says to \"Review the Node workflow and the scan wrapper before executing it\" but does not check the taze prerequisite or handle its missing-tool error."
+    },
+    {
+      "eval": "unattended-candidate-scan",
+      "assertion": "Reports the candidates for approval and does not apply any of them",
+      "evidence": "The output says \"I can\u2019t run the scan or provide its actual candidates without access to the project\" and does not present candidates for approval."
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "skill": "dependency-updater",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 13,
+    "D4": 14,
+    "D5": 13,
+    "D6": 12,
+    "D7": 12,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 104,
+  "max_total": 125,
+  "percent": 83.2,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/dependency-updater/README.md",
+      "line": 1,
+      "evidence": "A previous-version digest cut list (dbff837f: removed units 89, showing 40) was supplied; the shown units are explained by record rows, but the other 49 were not itemized.",
+      "fix": "Re-run the digest with the full unit list, or add a record row for each unlisted para id in docs/audit/recovery/dependency-updater/record.md; do not drop any unit to fit a size target."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/README.md",
+      "line": 43,
+      "evidence": "Supported Languages lists Go `go get -u`, Rust `cargo update`, Ruby `bundle update`, and .NET `dotnet outdated` as the update tools, while SKILL.md and references/managers.md forbid broad upgrade-all commands and use targeted forms.",
+      "fix": "Change those four README cells to the approved-target commands in references/managers.md (`go get module@version` then `go mod tidy`; `cargo update -p crate --precise version`; set the Gemfile constraint then `bundle update --conservative gem`; `dotnet add package PackageName --version approved-version`, with `dotnet outdated` only as optional discovery) and record the wording change."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/dependency-updater/references/python.md",
+      "line": 7,
+      "evidence": "`poetry update <pkg>`, `pipenv update <pkg>`, and `uv lock --upgrade-package <pkg>==<version>` are version-sensitive flags with vendor URLs and a 2026-11-15 date, but docs/audit/upstream-sources.json has no row for Poetry, Pipenv, or uv.",
+      "fix": "Add one unversioned row per tool to docs/audit/upstream-sources.json pointing at the official page already cited (python-poetry.org docs, pipenv.pypa.io commands, docs.astral.sh uv lock); do not remove the commands or the credit."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/dependency-updater/README.md",
+      "line": 81,
+      "evidence": "The Go Fixed cell cites https://go.dev/ref/mod#minimal-version-selection, checked 2026-11-15, but upstream-sources.json has no row for that Go module reference.",
+      "fix": "Add an unversioned dependency-updater row whose source is https://go.dev/ref/mod#minimal-version-selection and whose credit is The Go Authors; keep the sentence."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/dependency-updater/README.md",
+      "line": 228,
+      "evidence": "Emergency Fixes still gives `rm -rf node_modules package-lock.json`, `npm cache clean --force`, and `rm -rf venv` as the recovery recipe for a completely broken install.",
+      "fix": "Keep the destructive commands only as a last step after the SKILL.md diagnose-approve-snapshot gate, and lead with the non-destructive explain/tree command for each ecosystem; record the move if any recipe leaves this section."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/dependency-updater/evals/evals.json",
+      "line": 1,
+      "evidence": "Five realistic evals with verifiable assertions and 10/10 trigger queries exist, and tests/skills/dependency-updater smoke-tests both scripts, but no case covers Go, Cargo, Bundler, Maven, or .NET.",
+      "fix": "Add one eval whose fixture is a go.mod or Cargo.toml and whose assertions check the targeted apply command, the exact-pin rule, and the stop-on-failed-gate rule."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 40,
+      "evidence": "references/node.md, python.md, and managers.md are gated by ecosystem, but the two script bullets say to read and run scripts/check-tool.sh and scripts/run-taze.sh with no condition.",
+      "fix": "Prefix each script bullet with its condition: check-tool.sh only when a prerequisite binary may be absent, and run-taze.sh only for an unattended Node candidate scan."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 12,
+      "evidence": "The six-step procedure and references follow a Tool pattern, but step 2 classifies exact, bounded, or unbounded constraints without a per-manager example of each.",
+      "fix": "Add one line per grammar in references/managers.md and references/python.md showing an exact, a bounded, and an unbounded constraint, and point step 2 at that table."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 3,
+      "evidence": "The description has WHAT, WHEN, a Not-for boundary, and ecosystem names, but it omits the manifest filenames that distinguish this skill from a generic update request.",
+      "fix": "Audit, diagnose, and conservatively update project dependencies and lockfiles for Node (package.json), Python (pyproject.toml, requirements.txt, Pipfile), Go (go.mod), Rust (Cargo.toml), Ruby (Gemfile), Java (pom.xml, build.gradle), and .NET (csproj). Use when asked to update dependencies, find outdated packages, resolve dependency conflicts, or remediate vulnerable packages, even if the user only names a lockfile. Not for runtime upgrades, package publishing, or Renovate configuration."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 23,
+      "evidence": "The NEVER list covers taze writes, lockfile deletion, and cross-manager regeneration, but not the 0.x and prerelease case step 2 only mentions.",
+      "fix": "Add: NEVER treat a 0.x minor or a prerelease bump as backward compatible, because those ranges allow breaking changes; require the same per-target approval as a major."
+    }
+  ]
+}

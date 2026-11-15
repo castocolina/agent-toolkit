@@ -1,0 +1,122 @@
+{
+  "skill": "dependency-updater",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 12,
+    "D7": 13,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 108,
+  "max_total": 125,
+  "percent": 86.4,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": null,
+      "evidence": "The dbff837f digest says \"removed units (88, showing 40)\"; 48 removed units were not supplied for individual review.",
+      "fix": "Provide the complete digest for the omitted units so each can be checked against current content and the recovery record."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 18,
+      "evidence": "\"Scan candidates, inspect release notes and proposed manifest/lockfile diff, then apply only approved target versions.\"",
+      "fix": "Add a plan-then-execute procedure that produces a reviewable package-to-exact-target map before writes, and distinguishes a non-mutating proposal from a resolver-generated diff that may require a disposable worktree."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 22,
+      "evidence": "\"Non-obvious failure modes\" covers resolver ownership and peer constraints, but does not warn that a targeted resolver operation can change unapproved transitive versions.",
+      "fix": "Add a gotcha explaining that targeted updates can also move transitive dependencies, and require reviewing and reporting the complete lockfile diff against the authorized scope."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/dependency-updater/references/node.md",
+      "line": 21,
+      "evidence": "\"Scoped write after approval: taze major --write --include pkg1,pkg2\" followed by \"taze moves a package to the latest version its mode allows, which may differ from the approved target.\"",
+      "fix": "Do not run a floating taze write against the project when only exact targets are approved. Edit the approved versions directly or generate and inspect a proposal in a disposable copy before applying the approved values."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/dependency-updater/evals/evals.json",
+      "line": 4,
+      "evidence": "The output evals contain prompts and assertions but no input project files, including the pnpm monorepo and Poetry lockfile scenarios.",
+      "fix": "Add small representative manifest, lockfile and workspace fixtures, and assertions that compare resulting diffs with the approved package-to-target map."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "tests/skills/dependency-updater/test-run-taze.sh",
+      "line": 21,
+      "evidence": "The success test forwards \"-r --write\" to a shim but does not cover an interactive flag, delegated failure, or structured candidate output.",
+      "fix": "Extend the shim tests to cover non-interactive argument handling, a nonzero taze exit, and candidate JSON decoding without invoking a real package manager."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 34,
+      "evidence": "\"run `scripts/run-taze.sh [-r] [taze arguments]` from the project directory\" uses a skill-relative path as though it were relative to the user's project.",
+      "fix": "Resolve the bundled script from the skill directory and invoke that absolute or otherwise correctly anchored path while setting the working directory to the target project; do the same for project-directory examples in README.md."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/dependency-updater/scripts/run-taze.sh",
+      "line": 32,
+      "evidence": "The script wraps taze stdout as a JSON string in \"output\"; the unattended-candidate-scan eval expects candidates as JSON, but the documented invocation supplies no taze JSON flag.",
+      "fix": "For candidate scans, request the installed taze version's JSON output and parse it into the wrapper's JSON rather than embedding its textual report as a string; document the output shape."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/dependency-updater/README.md",
+      "line": 77,
+      "evidence": "The classification table says \"Fixed | No `^` or `~` prefix | Skip\", while SKILL.md says not to infer pinning from those prefixes across ecosystems.",
+      "fix": "Replace the table's fixed-version criterion with a manager-specific exact-constraint check and retain examples only when labeled with their ecosystem."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/dependency-updater/references/managers.md",
+      "line": 8,
+      "evidence": "\"go list -m -u all\" and \"go get module@version\" are given without a dated official source for these CLI flags and behavior or an instruction to consult the installed tool's help.",
+      "fix": "Add an instruction to consult `go help list`, `go help get`, and `go help mod tidy` for the installed Go version, or cite the official command documentation with the date checked."
+    }
+  ]
+}

@@ -20,7 +20,17 @@ if [ -z "$TOOL_NAME" ]; then
     exit 1
 fi
 
-json_string() { local value=${1//\\/\\\\}; value=${value//\"/\\\"}; printf '%s' "$value"; }
+# Escape backslash, quote and the common control characters; drop the other control bytes (JSON forbids them raw).
+json_string() {
+    local value=${1//\\/\\\\}
+    value=${value//\"/\\\"}
+    value=${value//$'\n'/\\n}
+    value=${value//$'\r'/\\r}
+    value=${value//$'\t'/\\t}
+    value=${value//$'\b'/\\b}
+    value=${value//$'\f'/\\f}
+    printf '%s' "$value" | tr -d '\000-\037'
+}
 if command -v "$TOOL_NAME" >/dev/null 2>&1; then
     printf '{"status":"ok","tool":"%s"}\n' "$(json_string "$TOOL_NAME")"
     "$TOOL_NAME" --version >&2 2>/dev/null || true

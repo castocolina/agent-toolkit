@@ -20,5 +20,8 @@ PATH="$ROOT/bin:$PATH" bash "$SCRIPT" >"$ROOT/usage.out" 2>"$ROOT/usage.err"; rc
 check no_arg_rc "$rc" 1; check usage_json "$(grep -c '^{\"status\":\"error\",\"diagnostic\":\"tool name is required\"}$' "$ROOT/usage.out")" 1
 PATH="$ROOT/bin:$PATH" bash "$SCRIPT" --help >"$ROOT/help.out" 2>"$ROOT/help.err"; rc=$?
 check help_rc "$rc" 0; check help_usage "$(grep -c '^Usage: check-tool.sh' "$ROOT/help.err")" 1
+PATH="$ROOT/bin:$PATH" bash "$SCRIPT" missing-tool $'install a\tb\nc\001d "q" \\x' >"$ROOT/control.out" 2>"$ROOT/control.err"; rc=$?
+check control_rc "$rc" 1
+python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["install"]=="install a\tb\ncd \"q\" \\x", d' < "$ROOT/control.out"; check control_valid_json "$?" 0
 [ "$FAILS" = 0 ] || exit 1
 echo 'PASS test_check_tool_documented_paths'

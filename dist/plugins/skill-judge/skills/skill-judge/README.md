@@ -75,6 +75,7 @@ The skill reads these at run time.
 | `references/rubric.md` | Rubric v5: version, spec commit, dimension table, scoring criteria |
 | `references/verdict.schema.json` | JSON Schema for one verdict line |
 | `references/judge-prompt.md` | Prompt template for judges run by a pipeline, with `{ROOT}`, `{SKILLS}` and `{JUDGE}` placeholders |
+| `references/worked-examples.md` | Examples to draw on when writing the fix for a D2, D3, D4, D5 or D8 finding, plus an exemplar skill per pattern; read only then, and it never sets a score |
 | `references/agentskills/` | Verbatim copies of the Agent Skills docs the rubric cites, pinned by commit in `SOURCE.json` (CC-BY-4.0) |
 
 `evals/` (output evals, trigger queries and eval inputs) is for repository development and is not shipped in `dist/`.
@@ -102,3 +103,13 @@ How can I improve the knowledge delta in my skill?
 ## Prerequisites
 
 None. The skill is self-contained: the rubric and the spec copies it needs ship in `references/`.
+
+## Meta-Question
+
+When a judgment is close, return to one question: would an expert in this domain, looking at this skill, say "yes, this captures knowledge that took me years to learn"? If yes, the skill has real value. If no, it compresses what the model already knows. The best skills are compressed expert brains. This is a mental model, not a scoring rule: the bands in `references/rubric.md` decide the score.
+
+## Credits
+
+Adapted from [shareAI-lab/lab-skills](https://github.com/shareAI-lab/lab-skills) (Apache-2.0) through [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy. The rubric was rederived from the Agent Skills specification, and the pattern examples name skills from [anthropics/skills](https://github.com/anthropics/skills).
+
+Registry credits for this skill: shareAI-lab/lab-skills (Apache-2.0), via softaworks/agent-toolkit; softaworks/agent-toolkit; Anthropic; Agent Skills (agentskills.io); John MacFarlane (pandoc); Artifex (PyMuPDF); PyPI.

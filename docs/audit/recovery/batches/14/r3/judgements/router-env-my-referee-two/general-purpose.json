@@ -1,0 +1,77 @@
+{
+  "skill": "general-purpose",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/general-purpose.md",
+      "line": 38,
+      "evidence": "record row s006 (Outputs, units para:052b1969, para:b5f9ab9c, para:13995122, para:da9fe7d4) is fate removed-to-fit, value real, decision restore-main, but Done and output still omits caller-visible delegation rationale: the row itself says Result, Changes, Validation and Remaining blockers never report who did each subtask and why",
+      "fix": "Restore the caller-visible line into Done and output, as the restore-main row requires: in Result, name who did each subtask directly or via which specialist and why. Do not drop the row."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 14,
+      "evidence": "Process step 2 says \"first find the gates (AGENTS.md, CLAUDE.md, Makefile; else the toolchain's test runner), then run them\": which restates harness and toolchain behavior the model already performs",
+      "fix": "Keep the non-obvious parts (list pre-existing failures, reproduce before fixing, stop only the unreproducible requirement) and move the gate-discovery sentence into a bundled skill the plugin preloads via skills:, recording the move; do not delete it outright"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 20,
+      "evidence": "House rules \"Write code, comments, docs and commit messages in English\" is a generic preference with no environment-specific failure mode, unlike the checkout, context and index gotchas",
+      "fix": "Replace it with the failure it prevents (for example a mixed-language commit message that breaks the project's changelog parser) or move the language rule into the plugin's shared conventions skill and record the move"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "agents/general-purpose.md",
+      "line": 16,
+      "evidence": "\"do each bounded subtask directly when your tools and scope allow, even if a specialist matches; delegate only when its domain rules or tools add something you lack\" leaves the implement-versus-delegate choice as a judgment with no default example",
+      "fix": "Add one default: implement a local edit yourself; delegate only when the specialist's tool list or domain rule is required, naming that missing capability in the reason"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "agents/general-purpose.md",
+      "line": 18,
+      "evidence": "Step 5 \"try one documented setup fix, else mark unverified\" never says what to do when the setup fix itself fails or which document counts as the setup source",
+      "fix": "Name the source (the project's documented setup command only) and, if that command fails, record the command and error under Validation and mark the work unverified without a second attempt"
+    }
+  ]
+}
