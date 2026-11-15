@@ -101,11 +101,12 @@
       "files": [
         "evals/files/architecture.excalidraw.json"
       ],
-      "expected_output": "Recognises that the new label is substantially longer and multiline, so `--relabel` (which leaves the box and text sizes alone) would overflow the box; routes the change to the isolated worker with the layout check instead of the direct `edit --relabel` command, then verifies with `check` and `diff --strict` before replacing the original, and reports in prose.",
+      "expected_output": "Recognises that the new label is substantially longer and multiline, so `--relabel` (which leaves the box and text sizes alone) would overflow the box; routes the change to the isolated worker with the layout check instead of the direct `edit --relabel` command, then verifies with `check` and `diff --strict` on the separate output file before publishing it, leaves the input file unchanged, and reports in prose.",
       "assertions": [
         "Does not use `scene.py edit --relabel` as the whole change for this long multiline label, and explains that it leaves width, height and position unchanged so the text would overflow the box",
         "Sends the change to the isolated worker (or stops to ask for an isolated session) with the worker contract, rather than editing the scene by hand in the main context",
-        "Has the worker resize or re-lay out the box and its bound text so the label fits, then run `scene.py check` and `scene.py diff --strict` with the allowed ids before replacing the original",
+        "When an isolated worker is available, has the worker resize or re-lay out the box and its bound text so the label fits, then run `scene.py check` and `scene.py diff --strict` with the allowed ids on the separate output file before publishing it; when none is available, the documented stop that asks for an isolated session is accepted instead",
+        "The input architecture.excalidraw.json remains unchanged (the new label is written only to the new file)",
         "Reports the result as a text summary and does not print scene JSON"
       ]
     },

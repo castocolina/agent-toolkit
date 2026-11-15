@@ -21,6 +21,8 @@ plugin-name/
 
 A `CLAUDE.md` at the plugin root is not loaded as context (`claude plugin validate` warns); put instructions in a skill.
 
+`hooks/hooks.json` must wrap the event map in a top-level `"hooks"` key (a file holding only the bare event map fails to load; the plugin example at https://code.claude.com/docs/en/hooks shows the `"hooks"` wrapper, checked 2026-11-14); the current hook events are listed at https://code.claude.com/docs/en/hooks#hook-events.
+
 ## Component names
 
 Every component is namespaced under the `plugin.json` `name`:

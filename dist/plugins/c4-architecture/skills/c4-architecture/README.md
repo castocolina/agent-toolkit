@@ -24,7 +24,7 @@ cp -r skills/c4-architecture ~/.claude/skills/
 
 **claude.ai:** add the skill to project knowledge, or paste the contents of `SKILL.md` into the conversation.
 
-Rendering checks use mermaid-cli (`mmdc`) 11 or newer when it is installed (the rules were checked on 11.17.0 and on 12.2.0, 2026-11-13), or `npx -y -p @mermaid-js/mermaid-cli@11.17.1 mmdc` with network access.
+Rendering checks use the installed mermaid-cli (`mmdc`) only when it is 11.17.1 or newer (checked 2026-11-13); an older install may render, but its element-text wrapping is unverified, so check that renderer's wrapping or use the pinned `npx -y -p @mermaid-js/mermaid-cli@11.17.1 mmdc` with network access.
 
 ## What It Does
 

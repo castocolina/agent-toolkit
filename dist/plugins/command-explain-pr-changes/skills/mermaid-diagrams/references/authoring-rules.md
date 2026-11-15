@@ -131,7 +131,7 @@ flowchart TD
     Check -->|No| NotFound["Return -1: not found"]
     NotFound --> End(["End"])
 
-    Check -->|Yes| CalcMid["mid = low + (high - low) / 2"]
+    Check -->|Yes| CalcMid["mid = low + floor((high - low) / 2)"]
     CalcMid --> Compare{"array[mid] == target?"}
 
     Compare -->|Yes| Found["Return mid: found"]
