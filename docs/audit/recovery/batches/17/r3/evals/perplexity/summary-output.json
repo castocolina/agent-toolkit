@@ -1,0 +1,44 @@
+{
+  "skill": "perplexity",
+  "mode": "output",
+  "pass_rate": 0.6818,
+  "passed": 15,
+  "total": 22,
+  "failures": [
+    {
+      "eval": "current-search",
+      "assertion": "Selects Perplexity Search",
+      "evidence": "The output says, \u201cno web tool is available,\u201d and provides Google search links instead."
+    },
+    {
+      "eval": "current-search",
+      "assertion": "Uses `max_results: 3` and `max_tokens_per_page: 512`",
+      "evidence": "The output says \u201cno web tool is available\u201d and specifies neither search parameter."
+    },
+    {
+      "eval": "current-search",
+      "assertion": "Provides URLs with publication or update dates and checks each cited page supports its linked claim",
+      "evidence": "The output labels its URLs \u201csearch links, not verified articles\u201d and provides no dates or page-level checks."
+    },
+    {
+      "eval": "ask-explain",
+      "assertion": "Selects Perplexity Ask",
+      "evidence": "The output states, \u201cPerplexity and WebSearch are not available here,\u201d and describes the proposed request as an \u201cillustrative call,\u201d not an executed one."
+    },
+    {
+      "eval": "stale-snippet-unverified",
+      "assertion": "Notes that the snippet is dated 2022-10-14 and may be stale, instead of stating that PostgreSQL 15 is the current stable major version",
+      "evidence": "The output says only \u201c[2022 search snippet](https://example.com/blog/postgres-15-released)\u201d and \u201cthe snippet may be stale,\u201d without giving the October 14 date."
+    },
+    {
+      "eval": "stale-snippet-unverified",
+      "assertion": "Reports the verification limit: the cited page could not be opened and no later or primary source is in the result set",
+      "evidence": "The output says \u201cthe page couldn\u2019t be opened,\u201d but does not state that the result set contains no later or primary source."
+    },
+    {
+      "eval": "deep-report-no-research-tool",
+      "assertion": "If /research is not configured, uses bounded perplexity_search calls (max_results 3, max_tokens_per_page 512) split per subquestion instead",
+      "evidence": "The output says \u201cI would run separate bounded searches\u201d but does not make any `perplexity_search` calls."
+    }
+  ]
+}

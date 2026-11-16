@@ -39,6 +39,7 @@ Every type starts with a name, a one-sentence description of what it does and fo
 ## Config (dotfiles, `~/.config`, script folders)
 
 - Audience is a confused future-you. Put `> Last reviewed: YYYY-MM-DD` under the title.
+- When reviewing a README that has a `> Last reviewed:` line, update the date after the check.
 - "What's Here" is a path-to-purpose table; give a subdirectory its own paragraph only when it is complex.
 - "How to Extend" is one numbered recipe per kind of addition (a new shell function, a new editor plugin).
 - Gotchas record load order, files generated or managed by another tool that must not be edited by hand, and machine-specific overrides.

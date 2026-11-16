@@ -78,6 +78,108 @@
         "Stores the selected message ID and derives the selected message from messages during render, or compares a stored previous threadId during render",
         "Explains the flash: the Effect runs only after the panel has already rendered with the stale selection"
       ]
+    },
+    {
+      "id": "usememo-measure-steps",
+      "prompt": "Our ProductTable runs visibleRows = rows.filter(matchesFilters) on every render and the page feels sluggish while typing in the filter box. My teammate wants useMemo on it right away. How do I decide, and what exactly should I do?",
+      "expected_output": "Do not add useMemo on a guess: wrap the filter in console.time and console.timeEnd, check whether it adds up to about 1ms or more per interaction, and test on a throttled CPU in a production build. Memoize only if it does; useMemo will not make the first render faster. Never move the calculation into state and an Effect.",
+      "assertions": [
+        "Says to measure first with console.time (and console.timeEnd) around the calculation before adding useMemo",
+        "Gives about 1ms or more per interaction as the point where memoizing may make sense",
+        "Says to test on a throttled CPU in a production build, not on a fast machine in development",
+        "Says useMemo does not speed up the first render, only re-renders whose dependencies did not change",
+        "Keeps the calculation in render and does not copy it into state updated by an Effect"
+      ]
+    },
+    {
+      "id": "ssr-init-guard",
+      "prompt": "In our server-rendered Next-style app we call initAnalytics() at the top level of src/app-entry.ts so it runs once per page load, but the server build now crashes with \"window is not defined\". Someone suggested moving it into a useEffect with [] in a leaf component instead. What is the right fix?",
+      "expected_output": "Top-level module code runs on import, on the server too. Guard the browser-only call with typeof window !== 'undefined' and keep it in the app entry module; a leaf component's Effect is the wrong place for an app-wide once-per-load setup. If initAnalytics can fail or is async, do not mark it done before it succeeds (cache the promise, clear it on failure).",
+      "assertions": [
+        "Explains that top-level module code runs on import, including on the server in a server-rendered app, where window does not exist",
+        "Guards the call with typeof window !== 'undefined'",
+        "Keeps the initialization in the app entry module rather than in a leaf component",
+        "Says that if the initialization is async or can fail, a done flag must not be set before it succeeds (or a cached promise is cleared on failure)"
+      ]
+    },
+    {
+      "id": "shared-handler-function",
+      "prompt": "We show a toast \"Added to cart\" from both the Buy Now button and the Checkout button. A dev wrote an Effect that watches product.isInCart and calls showNotification. The toast now pops up every time the page reloads with an item already in the cart. What should we do?",
+      "expected_output": "Delete the Effect: it runs because of a flag, not because of a click, so it also fires on reload. Put the shared logic (add to cart and show the notification) in one function and call it from both click handlers.",
+      "assertions": [
+        "Removes the Effect that watches product.isInCart",
+        "Extracts one function holding the shared logic that both click handlers call",
+        "Explains that the Effect also fires on reload whenever the item is already in the cart, without any click"
+      ]
+    },
+    {
+      "id": "overlapping-id-selection",
+      "prompt": "We store selectedMessageId and derive the message from the list. Inbox A and inbox B both contain a message with id \"m7\" (ids are only unique per inbox). Switching from A to B while m7 is selected keeps m7 selected in B, and switching back to A later shows it selected again. The user wants the selection cleared on every inbox switch, but the sort-order dropdown in the same panel must keep its value. What do we change?",
+      "expected_output": "Storing and deriving by ID is right for keeping a selection across list updates, but it cannot reset on identity change when two identities share an ID. Move the selection into a child and key that child by inboxId, or compare a stored previous inboxId during render and reset the selection there. Do not key the whole panel, and do not add an Effect that calls setSelected(null).",
+      "assertions": [
+        "Says that deriving from a stored ID does not reset when two inboxes share the same message ID, and that this is why m7 stays selected",
+        "Resets the selection by keying the selection-owning child with inboxId, or by comparing a stored previous inboxId during render and resetting the selection there",
+        "Does not put key={inboxId} on the whole panel, because the sort-order dropdown would reset",
+        "Does not add an Effect that calls setSelected(null) or setSelectedMessageId(null) after inboxId changes"
+      ]
+    },
+    {
+      "id": "widget-test-plan",
+      "prompt": "I have two Effects around a third-party map widget: one creates the map and its cleanup calls map.remove(), the other calls map.setZoom(zoom) when the zoom prop changes. How do I test them? Someone suggested copying our fetch race test with a deferred promise.",
+      "expected_output": "A deferred-promise race test does not apply: there is no request. Render inside StrictMode, rerender with a new zoom and assert setZoom is called on the existing instance (the map is not recreated), assert exactly one live map instance after the setup-cleanup-setup replay (remove called once for the replayed setup), then unmount and assert remove ran once per setup.",
+      "assertions": [
+        "Says the out-of-order deferred-promise test is for async requests and does not fit this widget Effect",
+        "Renders inside StrictMode and asserts one live map instance after the replay, with remove called once for the first setup",
+        "Rerenders with a new zoom and asserts setZoom receives the new value on the same instance, with no new map created",
+        "Unmounts and asserts cleanup ran once per setup"
+      ]
+    },
+    {
+      "id": "subscription-keyed-test-plan",
+      "prompt": "My ChatRoom component runs useEffect(() => { const conn = createConnection(roomId); conn.connect(); return () => conn.disconnect(); }, [roomId]). How do I test it? I was going to copy our map widget test that asserts the prop change reaches the existing instance.",
+      "expected_output": "The widget assertion does not fit: the connection is keyed by roomId, so a new roomId must replace the connection, not update the existing one. Render inside StrictMode and assert exactly one live connection after the setup-cleanup-setup replay; rerender with a new roomId and assert the old connection was disconnected and exactly one new connection for the new room is live; unmount and assert disconnect ran once per setup.",
+      "assertions": [
+        "Says the widget test (prop change reaches the existing instance) does not fit a subscription keyed by roomId, which must be replaced on change",
+        "Renders inside StrictMode and asserts exactly one live connection after the setup-cleanup-setup replay",
+        "Rerenders with a new roomId and asserts the old connection was cleaned up and exactly one new connection for the new room is live",
+        "Unmounts and asserts cleanup ran once per setup"
+      ]
+    },
+    {
+      "id": "analytics-replay",
+      "prompt": "Our page-view tracker is useEffect(() => { track('page_view', { path }); }, [path]). In development every page view is logged twice. Someone says to return a cleanup that sends an 'un_view' event so it is symmetric. What is the right way to treat this?",
+      "expected_output": "A page view has no undo, so do not invent a cleanup that sends a compensating event. The double log is the expected Strict Mode development replay (setup runs twice in development) and production runs it once per path change; keep the Effect, keep Strict Mode on, and add no useRef already-ran flag.",
+      "assertions": [
+        "Explains that Strict Mode runs setup twice in development, so the double log is the expected replay",
+        "Does not add a cleanup that sends an un_view or other compensating event",
+        "Does not add a useRef already-ran flag and does not disable Strict Mode",
+        "Distinguishes this from a reversible resource (listener, connection, instance), where cleanup must undo exactly that setup"
+      ]
+    },
+    {
+      "id": "analytics-replay-test",
+      "prompt": "How do I test the page-view Effect useEffect(() => { track('page_view', { path }); }, [path]) with a mocked track? My widget Effect test asserts one live instance after the Strict Mode replay, and I assumed the same would apply here.",
+      "expected_output": "The widget assertion (one live instance after setup, cleanup, setup) does not fit: a page view has no undo. Render in a development build with StrictMode enabled at the root and expect the replay, that is two track calls on mount (a single call when a configuration does not enable the initial replay); rerender with a new path and expect one more call; assert there is no cleanup that sends a compensating event; no ref guard to hide the second call.",
+      "assertions": [
+        "Renders in a development build with StrictMode enabled at the root and expects the replay, that is two track calls on mount, instead of asserting a single call, and expects a single call when a configuration does not enable the initial replay",
+        "Rerenders with a new path and expects one additional track call for the new path",
+        "Asserts that no compensating event (such as un_view) is sent from cleanup, and does not invent one to make the test pass",
+        "Does not add a useRef already-ran flag or disable StrictMode to get a single call"
+      ]
+    },
+    {
+      "id": "fetch-hook-a-b-a",
+      "prompt": "evals/files/useJson.ts tags the retained result with its url. A user opens /api/a, then clicks to /api/b, then clicks back to /api/a before b has answered, and sees the first /api/a data as current while the new /api/a request is still pending. Why does that happen and how do I fix the hook and test it?",
+      "files": [
+        "evals/files/useJson.ts"
+      ],
+      "expected_output": "The stored result is keyed only by the url, so when the url returns to A the old A result matches again and is returned as current. Give each request an identity that changes on every url change (a generation counter or id bumped during render and stored with the result), or reset the hook state at a keyed boundary, so only the newest request's result matches. Test A to B to A: resolve A, switch to B, switch back to A without resolving anything, assert loading and not A's old data, then resolve the new A request and assert its data.",
+      "assertions": [
+        "Explains that the result is matched by url alone, so returning to /api/a makes the earlier /api/a result look current again",
+        "Fixes it with a request-generation identity (counter or id stored with the result and compared in render), or by resetting at a keyed boundary, not by only adding more checks inside the Effect",
+        "Keeps the ignore flag and abort cleanup that stop obsolete responses from writing",
+        "Adds an A to B to A test: resolve A, switch to B, switch back to A with nothing resolved, assert loading instead of A's old data, then resolve the new A request"
+      ]
     }
   ]
 }

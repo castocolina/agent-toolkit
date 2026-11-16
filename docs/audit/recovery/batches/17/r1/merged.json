@@ -1,0 +1,464 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "crafting-effective-readmes",
+      "percent": 93.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 93.6,
+        "router-env-my-referee-two": 92.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/crafting-effective-readmes/record.md",
+          "line": null,
+          "evidence": "The dbff837f digest reports \"removed units (118, showing 40)\"; the remaining items are not available for individual review.",
+          "fix": "Provide the complete digest so every removed unit can be checked against the current files and recovery record."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/crafting-effective-readmes/evals/evals.json",
+          "line": null,
+          "evidence": "The monorepo-package-install eval requires an install of \"the published package name `@acme/fmt`\", but the supplied package manifest does not establish that a release exists in the intended registry.",
+          "fix": "Add a registry-availability fixture or explicit user-provided publication evidence, or change the assertion to require the derived install name while labeling publication unverified."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/crafting-effective-readmes/SKILL.md",
+          "line": 20,
+          "evidence": "\"Run the documented first-use path verbatim in a clean environment\" applies even to audit requests and does not guard against destructive or network-affecting README commands; a fresh clone or virtualenv alone does not isolate those effects.",
+          "fix": "Inspect commands before execution, respect read-only and user-imposed constraints, and require an appropriately isolated environment and authorization for commands with external or destructive effects; otherwise use the existing static-verification fallback."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/crafting-effective-readmes/SKILL.md",
+          "line": 29,
+          "evidence": "\"PyPI does not resolve relative links or image paths\" is a vendor-rendering behavior stated without an official source and check date.",
+          "fix": "Add the official PyPI documentation URL and the date checked, or instruct the agent to verify current PyPI rendering before applying the rule."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/crafting-effective-readmes/SKILL.md",
+          "line": 29,
+          "evidence": "\"setuptools infers it from `readme = \\\"README.md\\\"`; a `setup.py` needs `long_description_content_type`\" states version-sensitive packaging behavior without a source and check date.",
+          "fix": "Cite the relevant official packaging or setuptools documentation with a check date, or direct the agent to verify the installed build backend's behavior."
+        },
+        {
+          "id": "D8-4",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/crafting-effective-readmes/SKILL.md",
+          "line": 30,
+          "evidence": "The anchor-slug rule gives a dated GitLab source but also asserts GitHub's punctuation and duplicate-heading behavior without a corresponding GitHub source.",
+          "fix": "Add an official GitHub source and check date for GitHub's anchor behavior, or instruct the agent to verify anchors on the target renderer."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/crafting-effective-readmes/SKILL.md",
+          "line": 9,
+          "evidence": "Workflow steps 3 and 5 restate edit-size and delivery choices a capable model already makes once steps 1, 2 and 4 have settled the reader and the evidence.",
+          "fix": "Keep the non-obvious parts (mixed update-and-audit runs the audit first; placeholders instead of invented facts; full README, changed sections, or one line per stale claim). Move the generic 'rewrite if first success changes, otherwise edit the touched section' wording into references/section-checklist.md and record the move in docs/audit/recovery/crafting-effective-readmes/record.md; do not delete it."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/crafting-effective-readmes/SKILL.md",
+          "line": 25,
+          "evidence": "Gotchas cover monorepo installs, generated regions, registry rendering, anchors and badges, but not the crate-name case: a hyphenated Cargo package name is snake_case as a Rust identifier and often snake_case as the default binary, so a README can document the wrong command.",
+          "fix": "Add one Gotchas bullet: Cargo turns hyphens in the package name into underscores for the library path and the default binary name, so check [[bin]] name and the published command rather than copying the crate name; keep the existing install-name bullet."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/crafting-effective-readmes/SKILL.md",
+          "line": 42,
+          "evidence": "Routing says a template loads on top of the checklist for the chosen type, but does not say to skip the other three templates, so a create run can load all four.",
+          "fix": "After the routing sentence, add: load only the template for the type chosen in step 2; do not load the other templates in templates/."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/crafting-effective-readmes/templates/oss.md",
+          "line": 13,
+          "evidence": "The OSS template offers three shields.io badge URLs as equal starting lines, while SKILL.md treats every badge as a claim that must match a real workflow, package or LICENSE.",
+          "fix": "Make the default 'no badge unless the matching file or published package was confirmed', and keep the three URL shapes as the forms to use only after that check."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/crafting-effective-readmes/evals/trigger-queries.json",
+          "line": 1,
+          "evidence": "Eleven should-trigger queries and ten should-not-trigger queries, but the negatives are mostly distant (changelog, C4 diagram, docstrings, Fedora script) rather than near-miss README work such as a CONTRIBUTING.md or a docs-site install page.",
+          "fix": "Replace three easy negatives with near-misses that share README vocabulary but stay outside the description's exclusions, for example a CONTRIBUTING.md, a docs-site getting-started page, and a release-notes file, and keep the existing counts."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/crafting-effective-readmes/SKILL.md",
+          "line": 17,
+          "evidence": "Validation step 1 says to run the first-use path in a fresh clone, virtualenv or container, but gives no way to do that when the environment has no container runtime or network, beyond the later static label.",
+          "fix": "Add the fallback in step 2's place: if a clean clone or container cannot be started, run the static manifest and CI check immediately and label each claim static or unverified, and never claim executed."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/crafting-effective-readmes/templates/internal.md",
+          "line": 27,
+          "evidence": "The environment-variables example uses DATABASE_URL and API_KEY as row labels, which a model can copy as if those were the project's real variables.",
+          "fix": "Rename the sample rows to <VARIABLE_NAME> and keep the instruction that the value column is a vault path, never a real secret."
+        }
+      ]
+    },
+    {
+      "name": "perplexity",
+      "percent": 88.0,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 95.2,
+        "router-env-my-referee-two": 80.8
+      },
+      "missing_judges": [],
+      "disagreement": true,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/perplexity/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest at dbff837f: \"removed units (52, showing 40)\"; 12 removed units are not shown.",
+          "fix": "Regenerate the complete digest and review the omitted units against current files and docs/audit/recovery/perplexity/record.md; restore unexplained substantive content or record a valid reason for each removal."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/perplexity/SKILL.md",
+          "line": 29,
+          "evidence": "\"Attribute claims to the sources actually inspected\" does not specify what to do when an Ask response provides citations that cannot be inspected or do not support its claims.",
+          "fix": "Add a concise gotcha: never present an unverified citation as support; inspect an available primary source or explicitly qualify the claim and report the verification limitation."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/perplexity/evals/trigger-queries.json",
+          "line": 3,
+          "evidence": "\"Search recent battery recycling policy reporting and give links.\" The trigger queries cover both positive and negative cases, but most are similarly terse and lack realistic task context.",
+          "fix": "Add varied, context-rich positive and near-miss queries, including a research request embedded in a larger task, while retaining the existing routing boundaries."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/perplexity/SKILL.md",
+          "line": 25,
+          "evidence": "\"the raised ceiling below (5 results, 1024 tokens) is a real increase only in result count\" conflicts with both comparisons: the skill's initial limits are 3/512, so both increase; the stated tool defaults are 10/1024, so the raised ceiling increases neither.",
+          "fix": "Clarify that escalation from the skill's 3/512 starting limits to 5/1024 increases both values, while the ceiling remains below the stated tool default for results and equal to it for tokens per page."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/perplexity/SKILL.md",
+          "line": 7,
+          "evidence": "Route table rows 'Official library/framework documentation | Context7', 'Graphite gt CLI help | Graphite MCP', 'This workspace/project question | Nx MCP', 'Fetch one supplied URL | URL Crawler' restate boundaries the description already carries; the agent knows the obvious neighbor once the description names it.",
+          "fix": "Keep the Perplexity Search, Perplexity Ask and configured /research rows, plus the availability check, in SKILL.md. Move the four neighbor rows into README.md (which already lists them) and add a record row for the move; do not delete them."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/perplexity/SKILL.md",
+          "line": 22,
+          "evidence": "First digest lists 52 removed units (showing 40); each shown para id is covered by a section row (s003, s005, s017-s025) or a para row in docs/audit/recovery/perplexity/record.md, but the cut list itself is reported as one finding.",
+          "fix": "No restore: the omitted twelve are the same class as the shown forty and the record rows already explain them. Keep the cut-list note; do not shorten the Credits section."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/perplexity/SKILL.md",
+          "line": 5,
+          "evidence": "Body opens with the declaration 'Use based on intent, not whether the user says search' and a route table, but never states the question to ask before routing (is the fact current and public, or a library, workspace, gt, or single-URL lookup?).",
+          "fix": "Before the route table, add: 'Before routing, ask: is this a current public fact or sourced explanation, or a library doc, gt command, this workspace, or one supplied URL? Only the first reaches Perplexity.' That is the thinking step the procedure depends on."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/perplexity/SKILL.md",
+          "line": 20,
+          "evidence": "The only NEVER-class rule is 'Do not use mcp__perplexity__perplexity_research ... so its token spend is unbounded'. There is no Gotchas section for the other landmines the body already implies (stale snippets, confidential query terms).",
+          "fix": "Add a short Gotchas list in SKILL.md: snippets can be stale, so open the cited page before attributing a claim; search terms leave the workspace, so ask before sending confidential identifiers. Both reasons are already in the body; name them as gotchas rather than burying them."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/perplexity/SKILL.md",
+          "line": 3,
+          "evidence": "Description names perplexity_search, perplexity_ask, max_results and max_tokens_per_page, and the not-for boundaries, but it does not name the tool the body forbids, so a research-shaped request has no boundary before load.",
+          "fix": "Route external web research to Perplexity MCP: perplexity_search for current facts and links (default max_results 3, max_tokens_per_page 512), perplexity_ask for sourced synthesis. Use for general web information, recent news, comparisons, tutorials, or current-information questions, even when the user never says search. Not for library or framework docs (Context7), Graphite gt CLI help (Graphite MCP), this workspace (Nx MCP), one supplied URL (URL Crawler), repository-local lookup, or deep research (configured /research agent; never perplexity_research)."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/perplexity/SKILL.md",
+          "line": 16,
+          "evidence": "SKILL.md is 24 lines and self-contained, but it never tells the agent when the longer README (call shapes, Ask messages example, decision matrix) is worth loading.",
+          "fix": "Add one line after the route table: 'Read README.md only when you need the TypeScript call shapes or the worked request examples; do not load it for a single route decision.'"
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/perplexity/SKILL.md",
+          "line": 18,
+          "evidence": "Escalate when there are several independent subquestions, an explicit need for coverage across multiple source types, or material disagreement remains after checking primary sources. Those three conditions are listed with equal weight and no order.",
+          "fix": "Give one default: stay on the bounded Search (3 results, 512 tokens) unless the first result set is empty or the sources disagree; only then raise to 5 and 1024, then Ask or WebSearch. Treat several subquestions as a reason to split the query, not as an equal third path."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/perplexity/evals/evals.json",
+          "line": 1,
+          "evidence": "Four evals cover search limits, Ask, the Context7 boundary and empty-search escalation, but none asserts the confidentiality ask-before-send rule or the perplexity_research prohibition as its own case, and assertions such as 'Addresses advisory lock trade-offs' are not mechanically checkable.",
+          "fix": "Add one eval whose prompt includes an unreleased internal identifier and asserts the agent asks before sending it, and one that asks for a deep multi-source report and asserts /research is used only if configured and perplexity_research is never called. Keep the four existing prompts."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/perplexity/evals/trigger-queries.json",
+          "line": 1,
+          "evidence": "Twenty queries, ten should-trigger and ten should-not, with near-misses (Next.js docs, gt stack, this Nx workspace, one supplied URL). All ten positives use search, find, look up, research, latest or explain; none is a current-information question that avoids those words.",
+          "fix": "Replace two positives with intent-only phrasings the description claims to catch, for example 'Are EU AI Act deadlines this year different from last year?' and 'What changed in Postgres 17 advisory locks recently?', so the set tests intent rather than the keyword list."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/perplexity/SKILL.md",
+          "line": 18,
+          "evidence": "If unavailable, use an available appropriate tool; otherwise report the limitation. The sentence names no tool for the case where Perplexity itself is the integration that is missing.",
+          "fix": "State the branch: if perplexity_search and perplexity_ask are both absent, use WebSearch when it is available and say that Perplexity was not configured; if WebSearch is absent too, report that no web tool is available and do not invent results."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/perplexity/README.md",
+          "line": 93,
+          "evidence": "Best Practices item 2 says 'Check alternatives first: Try Context7, Graphite MCP, or Nx MCP before Perplexity', which tells the agent to call unrelated integrations before a general web query. SKILL.md routes those only when the request matches their row.",
+          "fix": "Change README item 2 to: 'Check an alternative only when the request matches its route row (library docs, gt CLI, this workspace, one URL). Do not call Context7, Graphite or Nx before a general web query.'"
+        }
+      ]
+    },
+    {
+      "name": "react-useeffect",
+      "percent": 91.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 92.0,
+        "router-env-my-referee-two": 91.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest: \"removed units (190, showing 40)\".",
+          "fix": "Provide the complete digest so the remaining removals can be checked against the recovery record."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": 14,
+          "evidence": "\"Derived value, or work a user action caused ... Render ... or that event handler\" compresses standard React guidance that a capable model generally knows.",
+          "fix": "Keep this routing rule as brief activation guidance; retain the less obvious reset, subscription and async boundaries."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": 16,
+          "evidence": "\"New identity resets one field ... store the ID and derive the object during render\" does not necessarily reset selection: an ID shared by two identities, or a return to an earlier identity, can restore the old selection.",
+          "fix": "Distinguish preserving selection across list updates from resetting it on identity change. For a true reset, key only the identity-specific child or conditionally adjust the component's own selection during render; include an overlapping-ID example."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": 31,
+          "evidence": "\"Test it ... resolve the old request after the new one ... assert the newest result wins\" is prescribed for every retained Effect, including widgets and subscriptions with no requests.",
+          "fix": "Branch validation by Effect: test out-of-order resolution and stale errors for async requests; for widgets and subscriptions assert the relevant prop synchronization, listener or instance identity, cleanup and Strict Mode replay."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": 17,
+          "evidence": "\"Widget, browser API, connection, analytics on display | useEffect with cleanup that undoes this setup\" implies that an analytics event can always be undone.",
+          "fix": "Require symmetric cleanup when setup creates a reversible resource; for irreversible display analytics, explain the expected development replay and avoid inventing an undo operation."
+        },
+        {
+          "id": "D8-4",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": 19,
+          "evidence": "\"useEffectEvent (stable in React 19.2+)\" gives a version-sensitive minimum without an official source URL and check date in the skill.",
+          "fix": "Add the React 19.2 release post or useEffectEvent reference URL and the date checked beside the version claim, or instruct the agent to verify availability against the installed React version and official documentation."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": 16,
+          "evidence": "Derived value, or work a user action caused (submit, buy, notify parent) | Render (`useMemo` only for measured cost), or that event handler",
+          "fix": "Keep the row as activation: the model already knows derived values and click work do not belong in an Effect, and the non-obvious cases stay in the later rows and NEVER list."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/react-useeffect/references/restored-patterns.md",
+          "line": 35,
+          "evidence": "function buyProduct() { addToCart(product); showNotification(...) } function handleBuyClick() { buyProduct(); } function handleCheckoutClick() { buyProduct(); navigateTo('/checkout'); }",
+          "fix": "The extract-a-function rule is already in SKILL.md line 23 and the smell catalog. Move this generic handler sample to the record as redundant, or replace it with only the reload case the Effect version gets wrong."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": 52,
+          "evidence": "A simple routing question (derived value, event handler, `key`): the table above is enough; load neither file.",
+          "fix": "Name the three optional files in that negative, not only 'neither file': Do NOT load anti-patterns.md, alternatives.md or restored-patterns.md for a plain routing question."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": 31,
+          "evidence": "## 3. NEVER",
+          "fix": "Add one Gotchas heading for the environment facts already stated (Strict Mode setup-cleanup-setup, fetch resolving on 404 and 500, Object.is on getSnapshot) so the landmines are grouped apart from the prohibitions."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": 23,
+          "evidence": "Memoize with `useMemo` only after `console.time` around the calculation shows about 1ms or more per interaction, measured on a throttled CPU in a production build; `useMemo` does not speed up the first render.",
+          "fix": "Leave the threshold in the routing section and move the measuring steps plus the React Compiler note entirely into references/restored-patterns.md, which section 4 already loads for a useMemo decision. Then say Do NOT load alternatives.md or anti-patterns.md for that measurement question."
+        },
+        {
+          "id": "D5-2",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": 52,
+          "evidence": "load neither file",
+          "fix": "The negative trigger names no files, so an agent can still open all three references. Replace it with Do NOT load references/anti-patterns.md, references/alternatives.md or references/restored-patterns.md for a simple routing question."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/react-useeffect/references/alternatives.md",
+          "line": 48,
+          "evidence": "write an adapter that notifies subscribers, for example one `setInterval` poll (choose the interval; clear it when the last subscriber leaves)",
+          "fix": "Give one default interval (for example 1000ms) with an escape hatch to change it, instead of leaving the interval as an open choice."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/react-useeffect/evals/evals.json",
+          "line": 1,
+          "evidence": "\"id\":\"derived-name\" ... \"Computes fullName during render\"",
+          "fix": "Add one eval whose prompt is a subscription or a useEffectEvent non-reactive read, with assertions that the output hoists subscribe or leaves the non-reactive value out of the dependency array. The current nine cover derivation, races, widgets, Strict Mode, init, partial reset, useMemo and shared handlers only."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/react-useeffect/evals/trigger-queries.json",
+          "line": 12,
+          "evidence": "\"query\":\"after I switch accounts in AccountSwitcher.tsx, the old account's name flashes for a split second before the new one shows up. what's causing that?\",\"should_trigger\":true",
+          "fix": "Add one should-not-trigger near-miss that mentions a flash or stale UI with no Effect, subscription or reset, so the symptom keywords in the description are tested against a lookalike."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-useeffect/references/anti-patterns.md",
+          "line": 48,
+          "evidence": "fetchJson<T>(url, controller.signal).then( (data) => { if (!ignore) setResult({ status: 'success', key, data }); }, (error) => { if (!ignore) setResult({ status: 'error', key, error }); }, );",
+          "fix": "The correctness loop step 4 requires every write after an await or in .then, .catch and .finally to check that its run is still current, but useJson awaits response.json() inside fetchJson with no ignore check. Check ignore after both awaits, or document that only the setResult writes need the guard."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/react-useeffect/references/alternatives.md",
+          "line": 48,
+          "evidence": "one `setInterval` poll (choose the interval; clear it when the last subscriber leaves)",
+          "fix": "Show the subscriber-count adapter: start the interval on the first subscriber and clear it when the count hits zero, so the agent does not invent the lifetime."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

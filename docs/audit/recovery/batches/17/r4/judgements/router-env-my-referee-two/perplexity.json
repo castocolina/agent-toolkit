@@ -1,0 +1,113 @@
+{
+  "skill": "perplexity",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 12,
+    "D3": 13,
+    "D4": 14,
+    "D5": 13,
+    "D6": 13,
+    "D7": 11,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 104,
+  "max_total": 125,
+  "percent": 83.2,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 1,
+      "evidence": "removed units (56, showing 40) at dbff837f",
+      "fix": "Restore any of the 56 dropped units the author still wants (into references/ when it is a template or example users ask for; into SKILL.md only when a procedure depends on it) or add a para row for each remaining unit to docs/audit/recovery/perplexity/record.md; the shown sample is already covered by s017-s025 and the later scope-change rows."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 34,
+      "evidence": "A bounded search is sufficient for one factual question or a small number of claims with clear authoritative sources.",
+      "fix": "Before the first call, ask: is the gap one missing public fact (Search at 3/512), a sourced explanation (Ask), or several independent questions (split)? State the answer in one line, then follow the matching bullet."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 48,
+      "evidence": "- Snippets can be stale: open the cited page before attributing a claim to it.",
+      "fix": "Add the condition the eval already uses: when the cited page cannot be opened, qualify the claim as the snippet's statement at its date and say the page was not inspected; never cite it as current support."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 3,
+      "evidence": "Route external web research to Perplexity MCP: perplexity_search for current facts and links",
+      "fix": "Route external web research to Perplexity MCP: perplexity_search for current facts, links and recent tutorials (default max_results 3, max_tokens_per_page 512), perplexity_ask for sourced synthesis. Use for general web information, recent news, comparisons, tutorials, or a current-information question even when the user never says search. Not for library/framework docs (Context7), Graphite gt CLI help (Graphite MCP), this workspace (Nx MCP), one supplied URL (URL Crawler), repository-local lookup, or mcp__perplexity__perplexity_research (use a configured /research agent)."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 28,
+      "evidence": "Read README.md only when you need the call-shape examples; do not load it for a single routing decision.",
+      "fix": "Move the two TypeScript call shapes into references/call-shapes.md and say: read references/call-shapes.md when you are about to call perplexity_search or perplexity_ask; do not load it, or README.md, for a single routing decision. Keep README.md for the repository."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 22,
+      "evidence": "If it is unavailable, use an available appropriate tool, say which substitution was made, and report the limitation if no suitable tool exists.",
+      "fix": "Name the substitute per row: library docs with no Context7, say so and do not use Perplexity; gt help with no Graphite MCP, use the local gt CLI; one URL with no URL Crawler, fetch that URL; only a missing Perplexity tool falls through to the other Perplexity tool, then WebSearch."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/perplexity/evals/trigger-queries.json",
+      "line": 11,
+      "evidence": "{\"query\":\"Search official Next.js docs for route handlers.\",\"should_trigger\":false}",
+      "fix": "Add near-misses a description can misfire on: a casual 'whats the latest on postgres 18' with no tool name; 'search for React hooks documentation'; 'find the gt stack command'; 'look up the build config in this repo'. Drop the redundant official-docs negatives that repeat the same boundary."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 38,
+      "evidence": "The only trigger for raising Search limits to 5 results / 1024 tokens is an empty or inadequate first result set.",
+      "fix": "Define inadequate in one line: fewer than two dated, on-topic sources, or none that states the asked fact. Do not raise limits because a source disagrees or the user asked for coverage; those follow the later bullets."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/perplexity/README.md",
+      "line": 132,
+      "evidence": "- Not checking if specialized tools apply first",
+      "fix": "Delete that pitfall or rewrite it to the route-row rule in Best Practices item 2: check Context7, Graphite, Nx or URL Crawler only when the request matches that row, and do not call them before a general web query. Record the rewrite in docs/audit/recovery/perplexity/record.md."
+    }
+  ]
+}
