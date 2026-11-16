@@ -1,0 +1,428 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "difficult-workplace-conversations",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0,
+        "router-env-my-referee-two": 92.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/difficult-workplace-conversations/record.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: 'removed units (628, showing 40)'. All 40 shown items map, through sections.json units, to record rows with allowed (fate, value, decision) combinations, but the other 588 units could not be checked from the prompt.",
+          "fix": "Re-run the removal check with the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/difficult-workplace-conversations/SKILL.md ...) so every removed unit is checked against its record row, and add a row to docs/audit/recovery/difficult-workplace-conversations/record.md for any unit that has none"
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/difficult-workplace-conversations/SKILL.md",
+          "line": 34,
+          "evidence": "'Read [phrase-bank.md](references/phrase-bank.md) only when the user needs lines to buy time ... Read [preparation-template.md](references/preparation-template.md) only when ...' repeats load triggers that are stated again in Section 5 and in '## Conditional references'",
+          "fix": "Keep the triggers inside the workflow steps (Sections 2 and 5), and cut each matching Conditional references bullet down to its file name plus a pointer to that section, so each trigger is stated once; nothing is lost, because the full trigger text stays in the step"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/difficult-workplace-conversations/SKILL.md",
+          "line": 62,
+          "evidence": "Section 5 is one paragraph ('Sort the user's account into three columns ... record it as disputed'). It has no ordered steps or checkpoint, unlike the numbered procedures in Sections 3 and 4",
+          "fix": "Break Section 5 into numbered steps (sort facts, disputed points and interpretations; open with situation, behavior, impact and a question; name what settles each disputed point; agree impact and next step; record it as disputed in the Section 8 summary) to match the Process pattern the other sections follow"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/difficult-workplace-conversations/evals/evals.json",
+          "line": null,
+          "evidence": "No eval covers the Section 7 branch 'If those channels are absent or all implicated (e.g. a founder harasses in a small firm with no HR)'. Several evals also list skill files such as 'references/facilitation.md' under `files`, which is meant for eval inputs in evals/files/",
+          "fix": "Add an eval such as 'The founder of our 8-person startup keeps making sexual comments to me and there is no HR. What do I do?' with assertions: does not require confrontation or mediation; advises keeping records securely; names independent confidential support; does not present itself as legal advice. Move the reference paths out of `files` (keep only evals/files/ inputs) and test them through assertions instead"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/difficult-workplace-conversations/README.md",
+          "line": 60,
+          "evidence": "'the identity-goal prompt follows the identity conversation in *Difficult Conversations* by Douglas Stone, Bruce Patton, and Sheila Heen' has no row in docs/audit/upstream-sources.json (only the softaworks, Gottman and NHS rows exist)",
+          "fix": "Add an upstream-sources.json row: {\"skill\":\"difficult-workplace-conversations\",\"kind\":\"unversioned\",\"source\":\"Douglas Stone, Bruce Patton, Sheila Heen, Difficult Conversations (book)\",\"ref\":null,\"credit\":\"Stone, Patton, Heen\"}. Keep the credit line as it is"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/difficult-workplace-conversations/references/phrase-bank.md",
+          "line": 39,
+          "evidence": "Buying time lists seven near-duplicate stall lines ('Let me think about that', 'Give me a moment', 'Bear with me', 'Can we slow down') after SKILL.md already states the dated-pause rule.",
+          "fix": "Keep two distinct lines (one for seconds, one that names the reaction) in phrase-bank.md and record the dropped duplicates in docs/audit/recovery/difficult-workplace-conversations/record.md; do not delete the dated-pause rule."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/difficult-workplace-conversations/references/phrase-bank.md",
+          "line": 1,
+          "evidence": "SKILL.md is a clean navigation pattern, but phrase-bank.md and preparation-template.md dump overlapping menus (openings, buying-time lines, full versus extended worksheet) instead of one default per moment.",
+          "fix": "In each reference, mark one default line or block per moment and label the rest as an escape hatch, so the loaded file stays a procedure rather than a menu."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/difficult-workplace-conversations/references/closing-and-followup.md",
+          "line": 54,
+          "evidence": "Check-in success signs ('behavior has changed, the relationship is intact or better, both people feel it is resolved') are generic outcomes, unlike the Gotchas that name why a written summary or an undated 'later' fails.",
+          "fix": "Replace those signs with checkable ones tied to the agreement (owner, date, the 'how we will tell it is done' test) and keep the existing escalation pointer."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/difficult-workplace-conversations/references/preparation-template.md",
+          "line": 158,
+          "evidence": "The full worksheet and the optional extended block both ask for outcome, acceptable minimum, deal breaker, relationship and identity goals, so the agent must choose between two equal forms.",
+          "fix": "Make the full worksheet the default and say to append only the missing extended fields (emotional state, constraints, logistics checklist) when the user wants them written out."
+        },
+        {
+          "id": "D6-2",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/difficult-workplace-conversations/references/phrase-bank.md",
+          "line": 13,
+          "evidence": "Five opening tones are listed as equals, with no default for a topic Sections 3 to 5 do not cover.",
+          "fix": "Default to the purpose-intent-invitation collaborative line and keep Direct, Curious and Clearing-the-air as named exceptions."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/difficult-workplace-conversations/evals/evals.json",
+          "line": 1,
+          "evidence": "Sixteen evals cover the routes, but none asserts the Section 3 evidence, process or authority objection types, and no eval checks the implicated-HR path in Section 7.",
+          "fix": "Add one eval whose prompt is a 'you're not at the next level' or 'it's not my call' reply and asserts the matching response, and one where HR is the harasser that asserts the ethics hotline or skip-level route and forbids informal coaching."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/difficult-workplace-conversations/evals/trigger-queries.json",
+          "line": 13,
+          "evidence": "The negative 'How should I follow up in writing after agreeing on new expectations with a teammate?' shares this skill's follow-up wording, so the boundary with feedback-mastery is untested on the written-summary case.",
+          "fix": "Replace it with a near-miss that names a written recap of a behavior-feedback agreement and should not trigger, and add a should-trigger query for a disputed-facts follow-up note."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/difficult-workplace-conversations/references/phrase-bank.md",
+          "line": 49,
+          "evidence": "'A break after strong emotion needs twenty minutes or more' points at 'the pause line in delivery-scripts.md', which only offers 'twenty minutes or more, or to pick this up tomorrow' and does not itself state the twenty-minute rule.",
+          "fix": "Point the sentence at the source note under the Tears row in delivery-scripts.md, or restate the Gottman twenty-minute figure with its URL and checked date here."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/difficult-workplace-conversations/README.md",
+          "line": 47,
+          "evidence": "Credits name Difficult Conversations by Stone, Patton and Heen for the identity-goal prompt, but docs/audit/upstream-sources.json has no row for that book (only softaworks, Gottman and NHS).",
+          "fix": "Add an upstream-sources.json row for Douglas Stone, Bruce Patton and Sheila Heen, Difficult Conversations; do not shorten or remove the credit."
+        }
+      ]
+    },
+    {
+      "name": "naming-analyzer",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 97.6,
+        "router-env-my-referee-two": 91.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/naming-analyzer/record.md",
+          "line": null,
+          "evidence": "previous-version digest naming-analyzer at dbff837f: 'removed units (139, showing 40)'. The digest is cut, so only 40 of the 139 removed units could be checked. All 40 resolve to valid rows (s001-s032 section rows whose units in sections.json list them, for example s004, s006, s007, s011, s015 and s031 as restore-references with their content now in references/naming-guidelines.md). The other 99 units were not checked.",
+          "fix": "Re-run the removal check on the full digest without the cut (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/naming-analyzer/SKILL.md ...). Then confirm that every one of the 139 para ids maps to a section row in docs/audit/recovery/naming-analyzer/record.md through sections.json, and add a para:<id> row for any id that does not."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 61,
+          "evidence": "## Gotchas: all four items restate rules already in the body. 'Celery's unregistered-task failure is not assumed for RQ' repeats the RQ sentence in Hidden consumers. The polarity item repeats the disableRetry row of the Cases table. 'A symbol rename misses a name read through a string key... as listed under \"String-key and reflective access\"' and 'A generated client... as stated under \"Generated code\"' point back to Hidden consumers.",
+          "fix": "Keep the four items, which serve the review. Put in their place, or add next to them, gotchas the body does not already state. One example: a Pydantic Field(alias=...) changes the serialized key only when the model is dumped with by_alias=True, so an alias without that flag silently renames the wire key."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/naming-analyzer/evals/evals.json",
+          "line": 98,
+          "evidence": "Eval 'convention-split-grouped' (and 'repo-wide-triage') lists \"references/naming-guidelines.md\" in \"files\". That passes the skill's own reference as a user input, so the eval cannot show whether step 2 makes the agent load the Convention splits section on its own.",
+          "fix": "Remove references/naming-guidelines.md from the \"files\" arrays and keep only real user inputs (for example the evals/files/repo-wide/* fixtures). Add an assertion that checks the grouped-finding behavior the reference teaches, so the eval tests the skill's loading trigger."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/naming-analyzer/references/naming-guidelines.md",
+          "line": 12,
+          "evidence": "Issues worth a row restates the obvious list (vague data/info/temp/process, abbreviations, mixed casing, Hungarian) that the Decide table and What not to flag already govern",
+          "fix": "Keep the contract-name rule and the names-in-scope sentence; move the six issue bullets into the sections that already state them (Decide table, Boolean names, Convention splits) and record the move in docs/audit/recovery/naming-analyzer/record.md"
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/naming-analyzer/record.md",
+          "line": 1,
+          "evidence": "previous-version digest at dbff837f lists 139 removed units and shows 40 (cut list)",
+          "fix": "No per-item finding: the shown units resolve to section rows s001-s032 or to para rows (para:d3c78774, para:f35b5a8d, para:32856076, para:155944eb) with allowed (fate, value, decision) combinations; accepted-drop rows stand. Record the other 99 units the same way if a later digest names them."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 12,
+          "evidence": "Workflow step 0 is one dense paragraph that mixes the top-10 cap, the Decide ranking, and the lexical-local search exception",
+          "fix": "Split step 0 into three numbered rules (what to search first, the cap and next-batch line, the lexical-local exception) so the procedure is a sequence rather than one sentence"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 73,
+          "evidence": "The last two Gotchas restate Hidden consumers (string-key search, generated clients) without a new failure mode",
+          "fix": "Keep the Celery/RQ and polarity-flip gotchas; fold the other two back into the String-key and Generated code bullets they repeat, and record the move"
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 29,
+          "evidence": "Read only the section of references/naming-guidelines.md for the case at hand lists six section names but no condition that says when not to load the file",
+          "fix": "Add one line after the section list: Do NOT load references/naming-guidelines.md when the Decide row already keeps the name, the user asked about one identifier, or the row is a contract alias already covered by Hidden consumers"
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/naming-analyzer/references/naming-guidelines.md",
+          "line": 56,
+          "evidence": "Convention fallback tree offers UPPER_SNAKE_CASE for every constant even when step 1 found no project convention, so a Go or JS constant is forced into a form the language does not use",
+          "fix": "Change the constant branch to the language's own constant form (Go MixedCaps, JS/TS const in the named guide's casing) and keep UPPER_SNAKE_CASE only as the Python and Ruby example"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/naming-analyzer/evals/evals.json",
+          "line": 1,
+          "evidence": "created-at-time-basis and temp-dir-persistence assert outcomes the Cases table already states verbatim (created_at_local only if the value stays local; reject cacheDir), and convention-split-grouped passes the guidelines file as the input",
+          "fix": "Rewrite those two prompts so the fixture does not echo the Cases wording, and point convention-split-grouped at a code fixture under evals/files/ instead of references/naming-guidelines.md"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 36,
+          "evidence": "The active row says keep a missing is prefix because it is a convention, not a defect, while Boolean names says to rename a local field when the project's other booleans all carry a prefix",
+          "fix": "Change the Cases row for active to: keep unless the field is local and the project's other booleans all use a prefix, in which case it is Priority 3; point that row at the Boolean names section"
+        }
+      ]
+    },
+    {
+      "name": "qa-test-planner",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8,
+        "router-env-my-referee-two": 91.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/qa-test-planner/record.md",
+          "line": null,
+          "evidence": "previous-version digest qa-test-planner at dbff837f: 'removed units (599, showing 40)'. This is a cut list. Each of the 40 units shown, and both file: items, has a valid row that sections.json maps (restore-references content found in references/, not-lost, superseded-by, intended-change). The other 559 units could not be checked from the digest.",
+          "fix": "Regenerate the digest without the cut, or check the full unit list against sections.json, and add a row to docs/audit/recovery/qa-test-planner/record.md for any unit no section row covers"
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 143,
+          "evidence": "'In every supplied-log reply, end with one line on reading results: exit 0 the `file` path in the JSON line, exit 2 the `missing` flags or bad value, exit 1 the file exists (ask before `--overwrite`), exit 3 an I/O failure'. The supplied log already shows the outcome, so explaining the other exit codes every time does nothing for the user. The line reads as if written to satisfy the script-bug-file eval assertion 'Says how to read the result'.",
+          "fix": "Tie the line to its purpose: 'When the logged exit is not 0, end with the remedy for that exit code', then narrow the eval assertion to match. Or remove the line and record the removal with a row in docs/audit/recovery/qa-test-planner/record.md"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 108,
+          "evidence": "'## 7. Optional scripts: files on disk' takes about 45 of the 161 body lines: two full command examples, a flag table, quoting rules and a five-step 'Reading the result' procedure with sub-steps. It loads on every run, although section 7 itself says the scripts are only for when the user wants a file written. This bends the Process pattern.",
+          "fix": "Move the 'Reading the result' procedure and the second command example to references/scripts.md. In section 7, keep the when-to-use rule, the never-without-a-field-flag rule and the quoting rule, and add: 'Read references/scripts.md when you run a script or a run log is supplied; do NOT load it otherwise'. Record the move as a row in docs/audit/recovery/qa-test-planner/record.md"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 103,
+          "evidence": "'- Failed-case reruns, safe reproduction and the reproduction rate follow section 3b.' This bullet in the Gotchas list is only a cross-reference. It is not a gotcha with a reason.",
+          "fix": "Restate it as a gotcha with its reason, for example: 'NEVER rerun a failed case until it passes and report the pass: the first failure is the evidence, and a retried green hides an intermittent P0 (procedure in section 3b).'"
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 77,
+          "evidence": "The enumeration oracle row puts concrete numbers in the table ('30 alternating requests per input', 'medians within 50 ms'). Line 79 then needs a whole paragraph to say they are placeholders that must never be copied.",
+          "fix": "Write placeholders in the table cell: 'state the sampling plan ([n] alternating requests per input) and the agreed tolerance ([ms] between medians), or Unknown'. Then shorten line 79 to one sentence saying a missing plan is Unknown under Open Questions"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/qa-test-planner/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "There are 23 queries: 14 should_trigger true and 9 false. The guidance is 8-10 of each, so the positives are over-weighted and the negatives (named-but-out-of-scope and unnamed near-misses) are fewer.",
+          "fix": "Replace 4 of the 14 positives with negatives. Good candidates: a named request to fix implementation code ('/qa-test-planner fix the null check in src/checkout/pay.ts'), an unnamed bug triage, an unnamed regression selection, and a named Playwright request. That gives 10 and 10 at about 20 total"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 16,
+          "evidence": "The 'Read first' cell of the plan row packs three conditional clauses into one table cell: 'at once when the request names entry or exit criteria, a risk table, an executive summary, deliverables or a full plan document, or the user asks for a plan example; a plan request that asks for none of these keeps the section 3 shape; references/regression_testing.md only if the plan schedules a regression run'. Following it means parsing nested conditions inside the table.",
+          "fix": "Make the cell 'see the plan bullet below'. Add a bullet under the table: 'Plan: read references/test_plan_template.md when the request names entry/exit criteria, a risk table, an executive summary, deliverables, a full plan document or a plan example; otherwise use the section 3 shape. Read references/regression_testing.md only if the plan schedules a regression run.'"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/qa-test-planner/references/regression_testing.md",
+          "line": 19,
+          "evidence": "A cut list (showing 40 of 599) from the dbff837f digest is one medium finding under the removal rule; the shown templates are restored and the four be9701bf lines are accepted drops, so the only remaining cost is this cut-list report.",
+          "fix": "No content to restore: the shown removed units are covered by record rows, and the four later lines are user-accepted drops. Leave the files as they are."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 35,
+          "evidence": "Section 2 restates the R/K/TC ID convention and the Unknown-and-Open-Questions rule that sections 3, 3b and 8 already enforce.",
+          "fix": "Keep the NEVER-guess sentence in section 2 and point the ID and Unknown rules at the sections that apply them, so the convention is stated once."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/qa-test-planner/references/bug_report_templates.md",
+          "line": 63,
+          "evidence": "The tracking block says 'never guess a version or an assignee' without saying what a guessed version does to the fix.",
+          "fix": "Add the reason already used in SKILL.md section 2: a guessed build or assignee sends the fixer to the wrong change and the wrong person."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 3,
+          "evidence": "The description names plans, cases, suites, a ship-or-block decision, Figma checks and bug reports, and its not-for line, but it does not name the deliverable keywords 'test plan', 'test case', 'regression suite' or 'bug report'.",
+          "fix": "Create manual QA test plans, executable test cases, regression and smoke suites, a ship-or-block release decision, Figma design-validation checklists and structured bug reports (repro rate, environment, Open Questions). Use when the user invokes qa-test-planner by name or /qa-test-planner, including a request that only implies the deliverable once the name is present: a password-reset or checkout test plan, test cases for a flow, a smoke or targeted regression suite, a ship-or-block decision, a Figma frame comparison, or a bug report whose rate or browser is unknown. Not for Cypress, Playwright, unit or API automation, fixing implementation code, or any QA request that does not name this skill."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 16,
+          "evidence": "The plan row says to read references/test_plan_template.md 'at once' when the request names entry or exit criteria, a risk table, an executive summary, deliverables or a full plan, while section 3 tells the agent to write the short shape first and only then read that file.",
+          "fix": "Make the row match section 3: write the section 3 shape first, then read references/test_plan_template.md when the request names those full-plan sections."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 16,
+          "evidence": "A plan request that names none of the listed sections keeps the short shape, but a request that only says 'full plan' and a request that names one section both load the whole template, with no default for which sections to add.",
+          "fix": "Default: a request that says only 'full plan' adds every section of references/test_plan_template.md; a request that names one section adds only that section, and say which you added."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/evals/trigger-queries.json",
+          "line": 1,
+          "evidence": "The file has 23 queries, 13 should-trigger and 10 should-not, and the negatives include real near-misses, but it has no train/validation split.",
+          "fix": "Split the 23 queries into a fixed train file of about 60 percent and a validation file of about 40 percent, keeping should-trigger and should-not proportional in both, and record the split so description changes are checked on the held-out set."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 140,
+          "evidence": "Section 7 step 2.4 says 'run section 8 against the file and edit it to finish what the flags cannot express', while step 1.3 says those edits wait for authorization and step 1.4 says 'run or edit nothing unless the user authorizes it'.",
+          "fix": "In step 2.4, report the section 8 gaps and the proposed edits, then apply them only after the user authorizes the edit, matching steps 1.3 and 1.4."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/qa-test-planner/references/regression_testing.md",
+          "line": 44,
+          "evidence": "The smoke step says that with no catalog and no SMOKE- cases the agent writes the smoke set as Unknown and keeps one Blocked check, while the suite-tiers table still shows a six-case SMOKE-001 through SMOKE-006 example.",
+          "fix": "Add one line under the smoke example: those six IDs are an illustration of shape, and when the requester supplies no catalog and no SMOKE- cases the agent follows the scope step and writes the smoke set as Unknown instead of copying them."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

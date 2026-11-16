@@ -1,0 +1,104 @@
+{
+  "skill": "meme-factory",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 12,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/meme-factory/references/text-memes.md",
+      "line": 29,
+      "evidence": "Aim for three layers in every format: a setup that sets context, a pattern that builds expectation, then a punchline or twist that subverts or amplifies it.",
+      "fix": "Delete that sentence from references/text-memes.md (the same payoff-first rule is already SKILL.md step 4) and add a row for it to docs/audit/recovery/meme-factory/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 72,
+      "evidence": "The digest cut list is 458 removed units, showing 40. The shown units are explained by record rows (section ids whose units list them, or a para: row), but the other 418 were not listed and so were not checked.",
+      "fix": "Re-run the removal digest without the 40-item cap and judge the remaining units against docs/audit/recovery/meme-factory/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 1,
+      "evidence": "SKILL.md is a 75-line Tool pattern (decision table, exact escape table, helper command, gotchas) for a precise URL format, which fits, but the body is far under the pattern's working length and most of the tool lives in references/.",
+      "fix": "Keep the pattern. No content move: the short body is the routing layer the references need."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/meme-factory/references/text-memes.md",
+      "line": 3,
+      "evidence": "Read this with `markdown-memes-guide.md` (greentext, copypasta and ASCII fence rules) when the user asks for a text-only meme",
+      "fix": "In references/text-memes.md line 3, say to read markdown-memes-guide.md only for greentext, copypasta or ASCII, and not for the other twelve formats, which this file already covers."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/meme-factory/evals/trigger-queries.json",
+      "line": 10,
+      "evidence": "\"write a funny caption onto photo.jpg from my desktop, it's the team offsite pic\", should_trigger false, while the description says Not for a caption on a photo with no image URL or template",
+      "fix": "Add two near-miss queries that share the skill's own words but need something else: one asking to caption a photo when an image URL is supplied but the user wants the pixels edited, and one asking for a meme-style diagram of a real incident timeline. Keep the current photo.jpg query."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/meme-factory/evals/evals.json",
+      "line": 1,
+      "evidence": "The text-only-greentext and text-corporate-satire evals assert a fence, bold labels and checkboxes, but not that the sample text from references/text-memes.md was not copied.",
+      "fix": "Add an assertion to both evals that the answer's joke text differs from the samples in references/text-memes.md (the copypasta and the Notice of Emotional Noncompliance)."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/meme-factory/references/blog-posts.md",
+      "line": 218,
+      "evidence": "The Complete post example says every image URL returned HTTP 200, but the emojicore lines are the replacement character U+FFFD (lines 218, 219 and 221), not the emoji the source sample uses.",
+      "fix": "Restore the three emoji lines from the source sample in references/text-memes.md section 11 (walking figure, thinking face, target, sparkles, relieved face) into the Success Metrics block of references/blog-posts.md."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 17,
+      "evidence": "404 means a wrong template ID; 422 means an unknown style or font, or a width or height of 1-9; 415 means a background or style image URL the service cannot fetch",
+      "fix": "Add the two other causes references/image-memes.md already states: 404 is also an empty path segment, and 422 is also template custom with no background parameter."
+    }
+  ]
+}

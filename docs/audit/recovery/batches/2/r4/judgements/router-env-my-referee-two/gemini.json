@@ -1,0 +1,104 @@
+{
+  "skill": "gemini",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 1,
+      "evidence": "previous-version digest for gemini at dbff837f: removed units (218, showing 40)",
+      "fix": "Add one record row for the unshown cut (a section id whose units cover it, or para:<id> rows) to docs/audit/recovery/gemini/record.md; do not restore the 40 shown units, which the section rows already explain."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/gemini/references/model-selection.md",
+      "line": 7,
+      "evidence": "| `gemini-2.5-pro` | No preview access; `auto` and `pro` resolve to it then |",
+      "fix": "Move the alias-resolution fact to a short line the model table does not need, or record dropping it in docs/audit/recovery/gemini/record.md; keep the choose-when rows."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/gemini/SKILL.md",
+      "line": 46,
+      "evidence": "A scope well over 200k tokens: split it by area (one directory or document group per run), run each with the same criteria, verify each run's findings as in step 5, then merge the accepted findings and drop duplicates.",
+      "fix": "Add the merge decision the procedure skips: when two accepted findings conflict, keep both and say they conflict, and mark a finding accepted in one area as unverified for any area that run did not see."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/gemini/SKILL.md",
+      "line": 27,
+      "evidence": "When only proposing, say the command was not run and give no findings.",
+      "fix": "State the reason in Gotchas: a proposed command has no stdout, so any finding written then is invented."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/gemini/references/troubleshooting.md",
+      "line": 1,
+      "evidence": "Read this when a Gemini run produced no output for a long time, or looks hung.",
+      "fix": "In SKILL.md step 4, name the case that must not load it: a run that already returned an exit code needs no read of references/troubleshooting.md."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/gemini/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "{\"query\":\"get Google's big-context model to do a cross-directory architecture review of services/ and shared/\",\"should_trigger\":true}",
+      "fix": "Add near-miss should-not-trigger queries that name Gemini but are out of scope: implementing a change with Gemini, and comparing Gemini model benchmark scores while running the CLI."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 16,
+      "evidence": "Use 900 for a >200k-token scope or a workspace of three or more directories (the cwd plus `--include-directories`).",
+      "fix": "Define the bound when both are true: one directory of >200k tokens uses 900 and must be split per the command-shapes rule; three directories use 900 only when each is within one context, otherwise split first."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/gemini/SKILL.md",
+      "line": 72,
+      "evidence": "Sources for the behavior claims above, all under `https://github.com/google-gemini/gemini-cli/blob/main/docs/`, checked 2026-11-07",
+      "fix": "Point the sandbox gotcha at the vendor page that documents `-s`/`--sandbox` (Docker, Podman, macOS Seatbelt), with the date checked, or tell the agent to confirm those runtimes with `gemini --help` before claiming one started."
+    }
+  ]
+}

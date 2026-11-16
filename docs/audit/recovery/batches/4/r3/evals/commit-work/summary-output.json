@@ -1,0 +1,24 @@
+{
+  "skill": "commit-work",
+  "mode": "output",
+  "pass_rate": 0.9508,
+  "passed": 58,
+  "total": 61,
+  "failures": [
+    {
+      "eval": "apply-check-fails",
+      "assertion": "Reports the `git apply --cached --check` failure (`error: corrupt patch at line 9`) and asks the user, since the hunks cannot be separated safely.",
+      "evidence": "It mentions \"corrupt patch at line 9\" but only asks the user conditionally (\"Only one `@@` hunk holds both changes ... stop and ask\"); otherwise it plans to proceed with a mechanical rebuild, staging and `git commit`."
+    },
+    {
+      "eval": "apply-check-fails",
+      "assertion": "Removes the run directory it created (`rm -rf -- /home/dev/app/.git/commit-work.k3Q9vT`) before replying, or names it as left behind and why.",
+      "evidence": "The `rm -rf -- \"/home/dev/app/.git/commit-work.k3Q9vT\"` appears only as a future step 7, and the reply just states \"Run dir: `/home/dev/app/.git/commit-work.k3Q9vT`\" without saying it is left behind or why."
+    },
+    {
+      "eval": "no-commits-yet",
+      "assertion": "Puts the same `GIT_INDEX_FILE=` prefix on `git add -- src/index.ts README.md`, `git diff --cached`, `git write-tree`, `git commit` and `git show --stat`, and never runs `git add -A`, `git add .` or `git commit -a`.",
+      "evidence": "The main commands are prefixed, but step 7's hook-failure path says \"Re-run `GIT_INDEX_FILE=<run>/index git status` and `git diff --cached`\", which leaves a bare `git diff --cached` that would inspect the real index."
+    }
+  ]
+}

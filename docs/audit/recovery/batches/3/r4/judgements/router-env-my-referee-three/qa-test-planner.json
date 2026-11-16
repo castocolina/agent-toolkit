@@ -1,0 +1,77 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/qa-test-planner/record.md",
+      "line": null,
+      "evidence": "previous-version digest qa-test-planner at dbff837f: 'removed units (599, showing 40)'. All 40 shown items and both file: items are explained by valid record.md rows (through sections.json units) or by content found in references/, but the other 559 units could not be checked.",
+      "fix": "Re-run the removal check with the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/qa-test-planner/SKILL.md ...) or split it so every para: item is listed; for any item that has no row and no current destination, restore it into references/ or add a row to docs/audit/recovery/qa-test-planner/record.md"
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 143,
+      "evidence": "'5. In every supplied-log reply, end with one line on reading results: exit 0 the `file` path in the JSON line, exit 2 the `missing` flags or bad value, exit 1 the file exists...' This repeats steps 2-5 just below it, and it follows the script-bug-file eval assertion 'Says how to read the result...'. It looks written to pass that eval, not for the reviewer reading a log that already shows exit 0.",
+      "fix": "Tie it to the purpose: replace sub-step 1.5 with 'When the user will rerun the script themselves, tell them how to read each exit (steps 2-5 below)', and add a record.md row for the reworded paragraph. Keep steps 2-5 unchanged"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 108,
+      "evidence": "'## 7. Optional scripts: files on disk' takes lines 108-152, about 28% of a Process-pattern body, for a path the skill itself calls optional ('Use the scripts ... only when the user wants a Markdown file written'). The five-level 'Reading the result' protocol is a Tool-pattern block inside a Process skill.",
+      "fix": "Keep the flag table, the three flag rules and the exit-code summary in SKILL.md. Move 'Reading the result, in this order' (lines 136-152) to references/scripts.md and read it from section 7 only when a script is run or a run log is supplied. Record it as a redistributed row in docs/audit/recovery/qa-test-planner/record.md"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/qa-test-planner/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "23 queries: 13 should_trigger true and 10 false. The guide asks for 8-10 of each, so the set leans positive and has fewer near-miss negatives than positives.",
+      "fix": "Add 3 near-miss negatives instead of deleting positives. Examples: 'write a QA test plan template page for our Confluence wiki', 'use test-planner-pro to export cases to TestRail', 'qa: review this Playwright spec for flaky waits'. That gives 13/13, or move 3 positives into a held-out validation file"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/references/test_plan_template.md",
+      "line": 55,
+      "evidence": "'- [ ] The regression tier the plan selected has run (smoke at minimum...)' is added to 'Write the release gate of SKILL.md section 3, step 4, as the checklist below'. But SKILL.md line 40 calls that gate 'this one rule' with three conditions only, so an agent following the plan branch cannot tell whether an unrun smoke tier blocks release.",
+      "fix": "Choose one source. Either add 'and the selected regression tier (smoke at minimum) has run' to the release gate in SKILL.md section 3 step 4, or label the template line 'Plan entry to exit (not part of the release gate)' so the gate keeps its three conditions"
+    }
+  ]
+}

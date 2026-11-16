@@ -1,0 +1,122 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 13,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 28,
+      "evidence": "Never `git add -A` or `git add .`: they sweep in untracked artifacts. Never `git commit -a` or `-am` either: they stage every modified tracked file",
+      "fix": "Keep the never-list (it blocks a real agent shortcut) but drop the clause restating what `git add -A`, `git add .` and `git commit -a` do; the model already knows those flags. Record the shortened wording in docs/audit/recovery/commit-work/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/commit-work/evals/evals.json",
+      "line": 1,
+      "evidence": "The first 40 digest items are reported as `showing 40` of 111 removed units, so the removal check covered only that cut list.",
+      "fix": "Re-run the removal check against the full digest (all 111 para items) rather than the 40-item cut, and add a record row only for any item still unexplained."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 36,
+      "evidence": "a scope naming pre-move paths",
+      "fix": "Name the failure: after a rename, `git status` shows the new path while a scope copied from the old path (for example `auth` after the file moved to `identity`) is what commitlint and reviewers reject. Keep the check; add the reason."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 30,
+      "evidence": "put that same `GIT_INDEX_FILE=` prefix on every git command of steps 3-7, including the re-inspection after a failed commit and `git show --stat`",
+      "fix": "Step 3 names `git show --stat` as a prefixed command, but no workflow step says when to run it (step 7 compares the tree and shows `git diff <tree> HEAD`). Either add the one case that runs it, or drop the mention and record the removal."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 34,
+      "evidence": "If `git diff --quiet` succeeds and no untracked file feeds the check, run it in place. Otherwise the tree is not the commit: export the index with `git checkout-index -a --prefix=<run>/verify/`",
+      "fix": "`git diff --quiet` is true when unstaged tracked edits exist but nothing is staged, so an in-place run then tests the working tree, not the index. Gate the in-place run on `git diff --cached --quiet` failing (there is a staged delta) and `git diff --quiet` succeeding, and name that case."
+    },
+    {
+      "id": "D6-2",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/commit-work/references/commit-message-template.md",
+      "line": 9,
+      "evidence": "None of these: copy the type and scope vocabulary of `git log --format=%s -30`, then check each scope against current paths.",
+      "fix": "Say what the check decides: keep a scope only when it names a current path or directory, otherwise drop the scope or ask. The instruction currently has no outcome."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/commit-work/evals/evals.json",
+      "line": 1,
+      "evidence": "18 output evals and 20 trigger queries (10 should-trigger, 10 should-not) with verifiable assertions, but the prompt's `files` are never checked against the fixtures: whitespace-staged.txt has no `git diff --cached --check` output, and no-commits-yet.txt shows `nothing added to commit but untracked files present` while the prompt says config/settings.json is staged.",
+      "fix": "Add the `git diff --cached --check` trailing-whitespace line at src/report.ts:11 to evals/files/whitespace-staged.txt, and show config/settings.json as staged (not untracked) in evals/files/no-commits-yet.txt, so each assertion is decidable from its fixture."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 34,
+      "evidence": "export the index with `git checkout-index -a --prefix=<run>/verify/` (the trailing slash matters) and run the check there. If it cannot run there (missing dependencies or untracked config), report \"staged version not verified\"",
+      "fix": "`git checkout-index -a` writes only the index's tracked files, so the exported tree has no node_modules, lockfile-installed deps or untracked config and the check cannot run there in a normal project. State the fallback that actually verifies the staged blob (a temporary worktree or a copy of the dependencies into the prefix) and reserve \"staged version not verified\" for when that also fails."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 26,
+      "evidence": "When the user approved a path's staged diff, commit that exact staged version and never restage the whole working-tree file over it: leave it in the real index, or copy it into the temporary index with `git diff --cached --binary -- <path> > <run>/staged.diff` and `GIT_INDEX_FILE=<run>/index git apply --cached <run>/staged.diff`.",
+      "fix": "The capture command has no `GIT_INDEX_FILE` prefix, so in temporary-index mode it reads the real index and can overwrite `<run>/staged.diff` with content the user did not approve. Say the capture always reads the real index and must run before any command writes that file, and give the order."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/commit-work/references/commit-message-template.md",
+      "line": 7,
+      "evidence": "`git config commit.template` (often `.gitmessage`), `.czrc` or `cz.json` (Commitizen; read whichever Commitizen config the repository actually has, since the file name depends on its setup).",
+      "fix": "`.czrc` and `cz.json` are examples, not the full set (facts.md: not re-read from the Commitizen docs). Add the source URL and the date checked, or replace the two names with an instruction to read the Commitizen config the repository points at."
+    }
+  ]
+}

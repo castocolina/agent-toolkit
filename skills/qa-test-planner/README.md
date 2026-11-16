@@ -35,12 +35,26 @@ qa-test-planner/
 ├── SKILL.md                         # Agent instructions
 ├── README.md                        # This file
 ├── references/
-│   ├── test_case_templates.md       # Case format and per-type fields
-│   ├── bug_report_templates.md      # Report format, severity and priority
-│   ├── regression_testing.md        # Suite selection, release decision, run report
-│   └── figma_validation.md          # Design comparison conditions and records
+│   ├── test_plan_template.md        # Full plan sections, exit gates, worked example
+│   ├── test_case_templates.md       # Case format, per-type fields and blocks
+│   ├── test_case_examples.md        # Worked login and mobile UI cases
+│   ├── bug_report_templates.md      # Report format, severity, priority, security template
+│   ├── regression_testing.md        # Suite tiers, selection, release decision, run report
+│   └── figma_validation.md          # Design comparison conditions, records, per-component case
 ├── scripts/
 │   ├── create_bug_report.sh
 │   └── generate_test_cases.sh
 └── evals/                           # Output evals, trigger queries, fixtures
 ```
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+Documentation owners credited (official pages listed in `docs/audit/upstream-sources.json`, checked 2026-11-07): Figma, OWASP Foundation (OWASP Top 10:2025), Stripe (currency minor units).
+
+---
+
+**"Testing shows the presence, not the absence of bugs."** - Edsger Dijkstra
+
+**"Quality is not an act, it is a habit."** - Aristotle

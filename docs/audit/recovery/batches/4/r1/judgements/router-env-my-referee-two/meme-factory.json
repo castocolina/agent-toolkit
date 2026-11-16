@@ -1,0 +1,113 @@
+{
+  "skill": "meme-factory",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 14,
+    "D5": 14,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/meme-factory/references/text-memes.md",
+      "line": 28,
+      "evidence": "Aim for three layers in every format: a setup that sets context, a pattern that builds expectation, then a punchline or twist that subverts or amplifies it.",
+      "fix": "Move this generic setup-pattern-punchline sentence into the recovery record as a drop (generic-model-knowledge). Keep the next sentence, which points at SKILL.md step 4, and keep the format samples."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 42,
+      "evidence": "layout: only `default` or `top` (all text at the top). Any other value is silently ignored.",
+      "fix": "Add one Gotchas bullet: a layout other than default or top returns 200 and is silently ignored, so a bottom-caption request never errors and looks successful. Keep the existing four NEVER bullets."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 3,
+      "evidence": "Build memegen.link image-meme URLs with real template IDs, correctly escaped captions, size and layout options, or a custom background image, and write text-only memes such as greentext and copypasta.",
+      "fix": "Build memegen.link image-meme URLs with real template IDs, correctly escaped captions, size and layout options, or a custom background image, and write text-only memes such as greentext, copypasta, ASCII, chat logs and corporate satire. Use when the user asks for a meme, a reaction or comparison image (drake, \"this is fine\", \"X everywhere\"), a meme URL for Slack, a PR, docs or a social post, captions on an image URL they supply, or a text meme for a blog or docs page (MkDocs, Docusaurus, admonition, collapsible section), even if they never say memegen or template. Not for a caption on a photo with no image URL or template, editing text inside an existing image file, logos or graphic design, slide decks, serious infographics, or turning video into GIFs."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/meme-factory/references/image-memes.md",
+      "line": 81,
+      "evidence": "## Checks and diagnosis",
+      "fix": "Gate this file in SKILL.md step 6 as well as the paragraph after the slash invocation: read references/image-memes.md Checks and diagnosis when curl is not 200, and do not load references/blog-posts.md or references/text-memes.md for a plain image URL."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 45,
+      "evidence": "style: a name from the template's `styles` array, or an image URL to overlay. An overlay also takes `center=<x>,<y>` (position relative to the top-left corner) and `scale=<ratio>` (relative to the background image's dimensions).",
+      "fix": "Default style to omitted. Use a styles-array name only when the user names that look, and an overlay URL with center and scale only when they ask to stamp a second image. Do not invent center or scale."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/meme-factory/evals/evals.json",
+      "line": 4,
+      "evidence": "\"expected_output\": \"A relevant template and complete memegen.link image URL with concise encoded text.\"",
+      "fix": "Add a verifiable assertion to casual-meme and precise-meme that the URL is what scripts/meme_generator.py generate prints for those captions, and that sensitive words were checked before the URL was built. Keep the existing template and extension assertions."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/meme-factory/evals/trigger-queries.json",
+      "line": 2,
+      "evidence": "\"query\": \"mak a meem about bugs everywhere in our 2.3 relase lol\", \"should_trigger\": true",
+      "fix": "Add two near-miss should-not-trigger queries: one that asks only where the distracted-boyfriend image originally came from, and one that asks to edit text inside an existing PNG. Keep the current 11 should-trigger and 9 should-not-trigger queries."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 14,
+      "evidence": "Build the URL from the skill root. Pass one raw caption per template line (as many as `lines`)",
+      "fix": "Before step 5, if the user did not supply one caption per template line, ask for the missing lines or pick a template whose lines match the captions they did give. Do not invent caption text, and do not call generate with a different count."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/meme-factory/references/text-memes.md",
+      "line": 185,
+      "evidence": "emoji glyphs in the Emojicore sample are the Unicode replacement character",
+      "fix": "Replace each U+FFFD in the Emojicore sample with the emoji the tips describe (leaving, coffee, target, sparkles), and keep the vertical stacking. Record the corrupted glyphs as a fact-update in docs/audit/recovery/meme-factory/record.md."
+    }
+  ]
+}

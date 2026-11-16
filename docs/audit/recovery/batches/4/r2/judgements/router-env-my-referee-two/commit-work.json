@@ -1,0 +1,95 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 13,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/references/commit-message-template.md",
+      "line": 30,
+      "evidence": "Message template restates the Conventional Commits skeleton `<type>(<scope>): <summary>` plus a what/why body that step 6 already requires.",
+      "fix": "Keep the skeleton in references/commit-message-template.md (users ask for the template by name); do not delete it. Trim only the duplicate prose if a later edit touches that section, and record any removed sentence in docs/audit/recovery/commit-work/record.md."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 36,
+      "evidence": "Step 6 gates references/commit-message-template.md on repository rules, extra footers, or wanting worked messages, but also says to read it for the step 8 report block, which step 8 then requires for every commit.",
+      "fix": "Move the report-block format inline at step 8 (it is six lines) and keep the reference gated on repository message rules, footers beyond BREAKING CHANGE, and worked messages."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 36,
+      "evidence": "Step 6 says write Conventional Commits 1.0.0 when the repository uses it or has no vocabulary of its own, but does not say how to tell that it uses it, while the reference says to copy `git log --format=%s -30` only when none of the rule files exist.",
+      "fix": "In step 6, name the default: the repository uses Conventional Commits when a commitlint config, a commit.template, or recent `git log --format=%s -30` subjects already use type(scope); otherwise copy that log's vocabulary. Point the conflicting case at the reference's collect-and-ask step."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/commit-work/evals/trigger-queries.json",
+      "line": 6,
+      "evidence": "The should-trigger query \"can you check in the tests for the parser separately from the parser change itself?\" asks for the split the skill's opening rule forbids (implementation and its tests in one commit).",
+      "fix": "Replace that query with a should-trigger that matches the skill, such as splitting formatting from a behavior change, and add a should-not-trigger only if a neighbouring skill owns history rewrites; keep the set near 10/10."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/commit-work/evals/evals.json",
+      "line": 1,
+      "evidence": "Eighteen evals assert command sequences, but none checks the step 4 overlap case: an approved path that already holds a staged diff the user did not approve, where the skill must stop and never run the step 8 git reset.",
+      "fix": "Add one eval whose fixture shows an approved path with an unapproved staged hunk plus other approved files, asserting a stop, no git apply or git add over that path, and no git reset on it."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 36,
+      "evidence": "Step 6's \"or has no vocabulary of its own\" contradicts references/commit-message-template.md, which says that with no rule files you copy `git log --format=%s -30` rather than default to Conventional Commits.",
+      "fix": "Make step 6 defer to the reference whenever commitlint, commit.template, CONTRIBUTING, a PR template, or recent subjects exist, and default to Conventional Commits only when those sources are absent; the reference's collect step already says to ask when two sources conflict."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/references/split-one-file.md",
+      "line": 14,
+      "evidence": "After the first commit, step 6 says `git add -- src/components/Header.js` stages the rest of the file, but a temporary index was built from the old HEAD and still lacks the bugfix commit, so that add would stage the refactor against a stale tree.",
+      "fix": "State the order as a requirement: in temporary-index mode, rebuild with `GIT_INDEX_FILE=<run>/index git read-tree HEAD` (and re-copy any approved staged patches) before `git add -- src/components/Header.js`; only the real-index route may add the rest immediately."
+    }
+  ]
+}

@@ -7,7 +7,9 @@
       "expected_output": "A relevant template and complete memegen.link image URL with concise encoded text.",
       "assertions": [
         "Provides an `https://api.memegen.link/images/` URL ending in `.png`.",
-        "Uses a failure-appropriate template such as `fine` and concise text."
+        "Uses a failure-appropriate template such as `fine` and concise text.",
+        "Follows the SKILL.md escape rules for the captions it wrote: every space is `_`, and any `?`, `%`, `&`, `#` or `/` inside a caption is `~q`, `~p`, `~a`, `~h` or `~s`, with no bare space, no bare `%` and no double-escaping.",
+        "States or shows that the captions were checked for sensitive content (customer names, tokens, internal URLs, incident IDs) before the URL was built, as SKILL.md step 2 requires."
       ]
     },
     {
@@ -16,7 +18,9 @@
       "expected_output": "A drake comparison meme URL with encoded captions and image extension.",
       "assertions": [
         "Uses the `drake` template in a complete memegen.link URL.",
-        "Uses concise captions separated by `/` and ending `.png`."
+        "Uses concise captions separated by `/` and ending `.png`.",
+        "Follows the SKILL.md escape rules for each caption: spaces are `_`, a `?` in a caption is `~q`, a hyphen is `--` and a `&` is `~a`, and the `/` between the two captions is the only bare slash.",
+        "States or shows that the captions were checked for sensitive content before the URL was built, as SKILL.md step 2 requires."
       ]
     },
     {
@@ -57,6 +61,107 @@
         "Uses the template id `db`, not `distracted`.",
         "The URL has three caption path segments after `/images/db/`, one per panel, ending in `.png`.",
         "Spaces in the captions are written as `_`."
+      ]
+    },
+    {
+      "id": "text-corporate-satire",
+      "prompt": "Write a corporate-satire text meme: a fake official notice about meetings that should have been emails. Text only, no image.",
+      "expected_output": "A text-only notice in the corporate / legalese satire format: heading, bold labels, checkbox action items, a numbered consequences list and a footer disclaimer.",
+      "assertions": [
+        "Uses a heading plus bold labels such as Issued to, Date and Reason.",
+        "Has checkbox action items (`- [ ]`) and a list of consequences.",
+        "Ends with an italic footer disclaimer.",
+        "Does not build a memegen image URL."
+      ],
+      "files": [
+        "references/text-memes.md"
+      ]
+    },
+    {
+      "id": "docusaurus-admonition",
+      "prompt": "My blog runs on Docusaurus. Give me a fake 'System Alert' admonition meme about revoked snacks that I can paste into an .md page.",
+      "expected_output": "A Docusaurus admonition built with `:::` fences, not the MkDocs `!!!` syntax.",
+      "assertions": [
+        "Uses a `:::warning` (or `:::danger`, `:::note`, `:::tip`, `:::info`) fence closed with `:::`.",
+        "Does not use the `!!!` MkDocs Material syntax for the Docusaurus page.",
+        "Does not build a memegen image URL."
+      ],
+      "files": [
+        "references/blog-posts.md"
+      ]
+    },
+    {
+      "id": "unavailable-template-two-buttons",
+      "prompt": "Make me a two-buttons meme: 'ship it now', 'write the tests first' and 'me, at 4pm on a Friday'. Give me the image URL.",
+      "expected_output": "Does not use the 404-ing `two-buttons` ID. Uses `ds` (Daily Struggle, the two-buttons meme, 3 lines) or another ID verified in the live catalog, with exactly as many captions as its `lines`.",
+      "assertions": [
+        "Does not output an `/images/two-buttons/` URL as the answer.",
+        "Uses `ds` (or another template ID verified in the live memegen catalog) with exactly as many captions as that template's `lines` (3 for `ds`), and does not claim that no two-buttons template exists."
+      ],
+      "files": [
+        "references/image-memes.md"
+      ]
+    },
+    {
+      "id": "gru-plan-long-id",
+      "prompt": "Gru's plan meme in four steps: write the feature / write the tests / ship it / realise the tests never ran.",
+      "expected_output": "A URL on the working template ID `gru` with four caption segments, not the 404-ing `gru-plan`.",
+      "assertions": [
+        "Uses `/images/gru/`, not `/images/gru-plan/`.",
+        "Has four caption path segments, one per panel, ending in an image extension."
+      ],
+      "files": [
+        "references/image-memes.md"
+      ]
+    },
+    {
+      "id": "background-415",
+      "prompt": "I used the custom template with background=https://intranet.local/screenshots/dashboard.png but memegen returns 415. What is wrong and what do I do?",
+      "expected_output": "Explains that 415 means the service could not fetch the background image (not publicly reachable or not an image), and that it must be hosted at a public URL, with a warning to redact the screenshot first.",
+      "assertions": [
+        "Says 415 means the `background` URL is not publicly reachable or not an image.",
+        "Says the image must be hosted at a public URL, because the service fetches it itself.",
+        "Mentions checking the screenshot for sensitive content before publishing it."
+      ],
+      "files": [
+        "references/image-memes.md"
+      ]
+    },
+    {
+      "id": "no-watermark-parameter",
+      "prompt": "Make a drake meme 'write specs' / 'rely on vibes' as a webp and remove the memegen watermark with watermark=none.",
+      "expected_output": "A drake URL ending in `.webp` that does not carry a `watermark` parameter, and says that parameter does not exist on the public API.",
+      "assertions": [
+        "Builds the URL with `drake` and the `.webp` extension.",
+        "Does not add `watermark=none` to the URL.",
+        "Says the public API has no watermark parameter."
+      ],
+      "files": [
+        "references/image-memes.md"
+      ]
+    },
+    {
+      "id": "slash-invocation",
+      "prompt": "/meme-factory fine \"memory usage at 99%\" \"this is fine\"",
+      "expected_output": "A `fine` meme URL built from the raw captions, with the percent sign written as `~p`, after the captions were checked for sensitive details.",
+      "assertions": [
+        "Uses template `fine` with both captions as separate path segments.",
+        "Writes the percent sign as `~p`, not as a bare `~` or `%`.",
+        "Checks or states that the captions contain nothing sensitive before building the URL."
+      ]
+    },
+    {
+      "id": "blog-post-mix",
+      "prompt": "Draft a short blog section that mixes a greentext about shipping on Friday with one image meme from memegen, so the greentext sets up the joke and the image lands it.",
+      "expected_output": "A fenced greentext followed by a Markdown image whose URL uses a verified template ID and whose alt text describes the picture and the joke.",
+      "assertions": [
+        "The greentext sits inside a fenced `text` block with literal `>` lines.",
+        "The image is a memegen.link URL on a live template ID such as `drake` or `fine`, with an image extension.",
+        "The Markdown image has alt text that describes both the picture and the joke.",
+        "The URL has no `watermark` parameter."
+      ],
+      "files": [
+        "references/blog-posts.md"
       ]
     }
   ]

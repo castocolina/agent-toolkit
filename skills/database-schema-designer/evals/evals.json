@@ -110,6 +110,55 @@
         "Does not rename the old table first (for example `ALTER TABLE products RENAME TO old_products`)",
         "Notes that `order_items.unit_price REAL` has the same money problem and gives its own complete rebuild script or states it as a separate follow-up"
       ]
+    },
+    {
+      "id": "fk-actions-and-junction-table",
+      "prompt": "I have students and courses in Postgres, and a student can enrol in many courses. Show me the enrollments table and tell me which ON DELETE rules to use and which indexes to add.",
+      "files": [],
+      "expected_output": "An enrollments table with foreign keys to both parents, a deliberate ON DELETE on each with a reason, timestamptz enrolled_at, and the PostgreSQL foreign-key indexing rule applied.",
+      "assertions": [
+        "Defines `enrollments` with a primary key and foreign keys to both `students` and `courses`",
+        "Chooses an explicit `ON DELETE` for each foreign key and says why (for example CASCADE for rows that mean nothing without the parent, RESTRICT where a delete is likely an accident)",
+        "Applies the PostgreSQL foreign-key indexing rule: PostgreSQL does not index referencing columns, so it indexes them when parents are deleted or joined from the parent side unless an existing index already starts with those columns (or explains why none is needed); it does not say blindly to index every foreign key",
+        "Uses `TIMESTAMPTZ` for an enrollment time column, not plain `TIMESTAMP`"
+      ]
+    },
+    {
+      "id": "mysql-myisam-foreign-key",
+      "prompt": "Our old MySQL 8 table is ENGINE=MyISAM and I added a FOREIGN KEY on orders.customer_id. Deleting a customer still leaves orders behind and I saw no error. Is the key enforced, and will MySQL warn me about it?",
+      "expected_output": "Explains that MySQL parses and ignores foreign key definitions on MyISAM, tells the user to check SHOW WARNINGS rather than asserting there is never a warning, and moves the table to InnoDB.",
+      "assertions": [
+        "Says MySQL parses and ignores foreign key specifications on storage engines without FK support such as MyISAM, so the key is not enforced",
+        "Does not state flatly that MySQL never warns; it tells the user to run `SHOW WARNINGS` (or check on their server) to see whether a warning is produced",
+        "Recommends converting the table to InnoDB (`ENGINE=InnoDB`) and cleaning up orphaned orders before adding the foreign key"
+      ]
+    },
+    {
+      "id": "mysql-explain-on-writes-and-reading-plans",
+      "prompt": "On MySQL 8.4 I want to see the plan for `UPDATE orders SET status = 'shipped' WHERE customer_id = 123 AND status = 'pending'`, and tell me where to read up on the plan columns. The orders table has 20M rows.",
+      "files": [],
+      "expected_output": "Plain EXPLAIN by default for the write, EXPLAIN ANALYZE only on disposable data or inside a rollback with MySQL 8.4 limits stated as to be confirmed on the server, and a pointer to the MySQL manual for the plan columns.",
+      "assertions": [
+        "Defaults to plain `EXPLAIN` for the `UPDATE` because `EXPLAIN ANALYZE` executes the statement, and allows `EXPLAIN ANALYZE` only on disposable production-like data or inside `BEGIN; ... ROLLBACK;`",
+        "States that MySQL 8.4 does not measure a single-table UPDATE with EXPLAIN ANALYZE and tells the user to run it on their server to see the exact output, instead of promising an exact message",
+        "Points to the engine's own EXPLAIN page for the plan columns (for MySQL https://dev.mysql.com/doc/refman/8.4/en/explain.html) instead of quoting them from memory",
+        "Suggests a composite index with the equality columns first (`customer_id`, `status`) for the WHERE clause"
+      ]
+    },
+    {
+      "id": "sqlite-live-rebuild-with-gate",
+      "prompt": "Our production app uses SQLite 3.45. The table is `orders(id INTEGER PRIMARY KEY, customer_id INTEGER NOT NULL REFERENCES customers(id), total TEXT NOT NULL)`, with an index `orders_customer_idx` on customer_id and a view `order_totals` that reads orders. I need `total` to become INTEGER cents (the text holds values like '12.50'). Write the script I run with the sqlite3 CLI against the live file.",
+      "files": [
+        "references/migrations.md"
+      ],
+      "expected_output": "The 12-step rebuild in the documented order: .bail on, foreign keys off outside the transaction, a gate table whose failed checks abort the script, the view saved and dropped before the table and recreated after the rename, row-count and foreign-key checks before COMMIT, and foreign keys back on after it.",
+      "assertions": [
+        "Says SQLite ALTER TABLE cannot change a column's type and uses a rebuild: create `new_orders`, copy with the cents conversion, drop `orders`, rename `new_orders` to `orders`, and never renames the old table first",
+        "Starts with `.bail on` and runs `PRAGMA foreign_keys = OFF` before `BEGIN` (outside the transaction, because inside one it is ignored), then `PRAGMA foreign_keys = ON` after `COMMIT`",
+        "Drops the `order_totals` view before dropping the table and recreates `orders_customer_idx` and the view after the rename",
+        "Before `COMMIT`, checks that the row counts of the old and new tables match and that `pragma_foreign_key_check` returns no rows, in a way that aborts the script on failure (for example a gate table with `CHECK (ok = 1)` that the checks insert into)",
+        "Converts the text amounts to integer cents with an explicit expression in the `INSERT ... SELECT` (for example `CAST(ROUND(CAST(total AS REAL) * 100) AS INTEGER)`)"
+      ]
     }
   ]
 }

@@ -13,9 +13,9 @@ export function ThemeToggle() {
     () =>
       createTheme({
         ...outerTheme,
-        palette: { ...outerTheme.palette, mode: 'dark' },
+        palette: { ...outerTheme.palette, mode },
       }),
-    [outerTheme],
+    [outerTheme, mode],
   );
 
   return (

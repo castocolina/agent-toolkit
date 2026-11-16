@@ -1,0 +1,24 @@
+{
+  "skill": "mui",
+  "mode": "output",
+  "pass_rate": 0.9302,
+  "passed": 40,
+  "total": 43,
+  "failures": [
+    {
+      "eval": "dialog-v7",
+      "assertion": "`onClose` takes `(event, reason)` and branches on `reason` (`'backdropClick'` or `'escapeKeyDown'`) instead of a separate `onBackdropClick` handler",
+      "evidence": "`handleClose` takes `(_event, reason: 'backdropClick' | 'escapeKeyDown')` but discards it with `void reason;` and branches only on `if (deleting) return;`, so it never branches on `reason`."
+    },
+    {
+      "eval": "dialog-migration",
+      "assertion": "Keeps the dialog controlled through the open prop and an onClose callback, and handles reason === 'backdropClick' and the Escape key",
+      "evidence": "The output keeps `open={open}` and adds `onClose={(_event, reason) => { ... onClose(); }}`, but it never checks `reason`; it only notes in a comment that \"reason is 'backdropClick' or 'escapeKeyDown': both close the dialog\"."
+    },
+    {
+      "eval": "recipe-theme-overrides",
+      "assertion": "Uses `components.MuiButton` with `defaultProps` such as `disableElevation: true` and a `styleOverrides` entry keyed by a slot name such as `root` with `textTransform: 'none'`, and `components.MuiCard` with a 12px radius",
+      "evidence": "`MuiButton` has only `defaultProps: { disableElevation: true }` and no `styleOverrides`, and `textTransform: 'none'` is placed in `typography.button` instead (\"Use `typography.button`, not a `MuiButton` override\"), even though `MuiCard` does set `root: { borderRadius: '12px' }`."
+    }
+  ]
+}

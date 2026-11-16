@@ -1,0 +1,86 @@
+{
+  "skill": "meme-factory",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/meme-factory/record.md",
+      "line": null,
+      "evidence": "Digest for dbff837f reports 'removed units (463, showing 40)'. All 40 shown items resolve: to section or para rows that fixer-rules allows (accepted drops, not-lost, redistributed, intended-change), or to restored content in references/text-memes.md, references/blog-posts.md and references/image-memes.md. The other 423 units could not be checked from the digest.",
+      "fix": "Re-run the removal check with the full digest (no cut) and confirm that each of the 423 unshown units has a valid row in docs/audit/recovery/meme-factory/record.md or is present in a named destination. Restore any unexplained unit into references/, or add a row for it."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 13,
+      "evidence": "Step 4: 'First answer three questions. Who will see it: team Slack, a PR, or a public post? Who is the butt of the joke... Then name the contrast and write the payoff (last line) first, then the setup.'",
+      "fix": "The model already knows this audience and joke-craft advice; it only needs a reminder. Shorten it to one line that keeps the non-obvious parts (never a named teammate or customer; the ~30 and ~20 character limits per line) and leave the rest of the step as it is."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 14,
+      "evidence": "Step 5 is one dense paragraph. It mixes the caption-count decision ('If the count differs, switch to a template ... only when the user named no template; otherwise stop and ask'), the full CLI usage line, the apostrophe quoting rule and the no-Python fallback.",
+      "fix": "Split step 5 into lettered sub-steps: (a) compare the caption count with `lines` and decide whether to switch templates or ask; (b) run the CLI line; (c) quote apostrophes; (d) no Python: go to Hand-built URLs. Keep every rule and only change the layout."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/meme-factory/references/markdown-memes-guide.md",
+      "line": 5,
+      "evidence": "'The 15 named formats with samples and tips, and the Markdown techniques behind them, are in `text-memes.md`.' The greentext fence rule appears both here and in text-memes.md under 'Building blocks', so a named-format request reads two files that partly repeat each other.",
+      "fix": "In text-memes.md, keep a single pointer to the fence rule in markdown-memes-guide.md and drop the restated rule. Or state in SKILL.md step 1 that markdown-memes-guide.md is the only required read for greentext, copypasta and ASCII. Remove nothing else."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/meme-factory/evals/evals.json",
+      "line": 11,
+      "evidence": "'States or shows that the captions were checked for sensitive content ... before the URL was built'. The sensitive-content assertions in casual-meme, precise-meme and slash-invocation pass on boilerplate even when the captions held nothing to redact.",
+      "fix": "Make these checks verifiable: put a sensitive token in the prompt of one of these evals (for example a hostname) and assert that it is missing from the URL, as the sensitive-caption eval already does. Keep the existing assertions."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 20,
+      "evidence": "'Invoked as `/meme-factory <template> <caption>...`: ... check the ID and line count as in step 3, then continue at step 5.' Step 3 only says to pick a template and check that the joke fits. The procedure for a caption count that differs from `lines` (switch only when no template was named, otherwise ask) is in step 5, so this branch points to the wrong step for that check.",
+      "fix": "Change the line to: 'Invoked as `/meme-factory <template> <caption>...`: take the template ID and the raw captions from the arguments, run step 2 on them first, look the ID up in the Templates table or the live catalog (never guess it), then continue at step 5, whose line-count check applies; the user named the template, so ask rather than switch.'"
+    }
+  ]
+}

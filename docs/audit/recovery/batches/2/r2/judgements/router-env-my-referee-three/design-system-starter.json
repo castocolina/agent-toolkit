@@ -1,0 +1,77 @@
+{
+  "skill": "design-system-starter",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/design-system-starter/record.md",
+      "line": null,
+      "evidence": "previous-version digest at dbff837f: \"removed units (479, showing 40)\". The digest lists only 40 of the 479 removed units. All 40 shown map through sections.json to valid record rows (for example s114/s108/s111 restore-references restored in references/component-examples.md, s038-s041 restored in references/token-scales.md, s106/s109/s110 intended-change safety-fix), but the other 439 could not be checked item by item.",
+      "fix": "Regenerate the digest without the cut (or with a higher show limit) and confirm that every remaining para: unit maps to a row in docs/audit/recovery/design-system-starter/record.md through its section id in sections.json. For any unit with no row, restore it (into references/ when it is domain-specific, a template users ask for or a tested example) or add a row for it."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 35,
+      "evidence": "\"6. **Choose the theme mechanism.** Default: semantic CSS custom properties switched by a `data-theme` attribute. Use Tailwind variants or a ThemeProvider only when...\" comes after step 5, where components and their props are derived.",
+      "fix": "The mechanism decides how components consume roles (CSS variables or runtime theme objects). Move the mechanism choice into step 3 (\"Define semantic contracts\") or put it before step 5, so components are not scaffolded against one mechanism and then reworked for another. Keep the text and its reference to references/process-and-tooling.md unchanged."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/design-system-starter/evals/evals.json",
+      "line": null,
+      "evidence": "The description promises \"version and deprecate shared tokens and components\" and SKILL.md step 8 sets a deprecation window and a migration order. None of the 9 output evals asks for a token or prop rename, a deprecation or a release.",
+      "fix": "Add an output eval such as \"We're renaming color.action.primary to color.action.default and Button's variant prop to intent across four apps; how do we ship this?\". Assertions: keeps the old token path as an alias with $deprecated; maps variant to intent with the same default; states removal in the major after next; does not change a token meaning in a minor release; orders migration one consumer per release."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 49,
+      "evidence": "\"Check them side by side under a color-vision-deficiency simulation (Chrome DevTools, Rendering > Emulate vision deficiencies)\": a vendor UI path that changes between releases, with no source URL or date checked at this line.",
+      "fix": "Add the source and a date beside the path, e.g. \"(Chrome DevTools, Rendering > Emulate vision deficiencies; https://developer.chrome.com/docs/devtools/accessibility/reference, checked <date>)\", or tell the agent to look up the current menu path in the installed Chrome's DevTools docs."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/design-system-starter/templates/design-tokens-template.json",
+      "line": 3,
+      "evidence": "\"color.semantic holds the light theme, dark is a second file with the same paths\". No dark value set exists in the template or references, and component-examples.md uses --brand-*-dark variables that nothing defines. The agent must invent every dark value even though the Complete starter requires theme mappings and per-theme contrast rows.",
+      "fix": "Add a short dark value set for the template's semantic paths (text, surface, border, action, focus, feedback) to references/token-scales.md, with its measured contrast rows on the dark surface. Point the template's $description and SKILL.md step 3 at it."
+    }
+  ]
+}

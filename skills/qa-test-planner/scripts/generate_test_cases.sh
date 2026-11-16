@@ -165,7 +165,7 @@ else
     case $PRIORITY_NUM in
         1) PRIORITY="P0 (Critical)" ;; 2) PRIORITY="P1 (High)" ;;
         3) PRIORITY="P2 (Medium)" ;; 4) PRIORITY="P3 (Low)" ;;
-        *) PRIORITY="P2 (Medium)" ;;
+        *) PRIORITY="Untriaged" ;;
     esac
     say "Test type: 1) Functional 2) UI/Visual 3) Integration"
     say "           4) Regression 5) Performance 6) Security"
@@ -174,7 +174,7 @@ else
         1) TEST_TYPE="Functional" ;; 2) TEST_TYPE="UI/Visual" ;;
         3) TEST_TYPE="Integration" ;; 4) TEST_TYPE="Regression" ;;
         5) TEST_TYPE="Performance" ;; 6) TEST_TYPE="Security" ;;
-        *) TEST_TYPE="Functional" ;;
+        *) TEST_TYPE="Unknown" ;;
     esac
     prompt_input "Estimated test time (minutes):" EST_TIME false
     prompt_input "What are you testing? (objective):" OBJECTIVE true
@@ -212,6 +212,9 @@ OPEN_QUESTIONS=""
 ask() { [ -n "$2" ] || OPEN_QUESTIONS+="- $1: Unknown"$'\n'; } # ask <label> <value>
 ask "Estimated time" "$EST_TIME"; ask Requirement "$REQUIREMENT"; ask Risk "$RISK"; ask Preconditions "$PRECONDITIONS"
 ask "Test data" "$TEST_DATA"; ask Cleanup "$CLEANUP"
+# An out-of-range interactive priority or type answer is recorded as a gap, never guessed.
+[ "$PRIORITY" != Untriaged ] || OPEN_QUESTIONS+="- Priority: Untriaged"$'\n'
+[ "$TEST_TYPE" != Unknown ] || OPEN_QUESTIONS+="- Type: Unknown"$'\n'
 
 SAFE_TC_ID="${TC_ID//[^a-zA-Z0-9_-]/}"
 [ -n "$SAFE_TC_ID" ] || fail 2 "the ID has no usable characters"

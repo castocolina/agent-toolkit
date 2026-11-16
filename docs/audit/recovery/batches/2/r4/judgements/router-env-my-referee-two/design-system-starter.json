@@ -1,0 +1,86 @@
+{
+  "skill": "design-system-starter",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/design-system-starter/references/component-specs.md",
+      "line": 15,
+      "evidence": "The component-specs table restates standard form and widget facts the model already produces: native type and autocomplete on Input, a visible label, fieldset and legend for radios, and the APG combobox keyboard map (Arrow keys move, Enter selects, Escape closes).",
+      "fix": "Keep the rows users ask for by name in references/component-specs.md, but cut the textbook APG and native-form sentences the model produces unprompted and record each removal in docs/audit/recovery/design-system-starter/record.md; leave the non-obvious rules (aria-disabled so focus is kept, status not by color alone, native dialog)."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/design-system-starter/SKILL.md",
+      "line": 1,
+      "evidence": "removed units (485, showing 40) in the dbff837f digest",
+      "fix": "No per-item restore: the shown units are covered by record rows or present in the current files. Expand the digest so each removed unit is listed, or add a record row for any unit the cut hides."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/design-system-starter/references/token-scales.md",
+      "line": 89,
+      "evidence": "Letter spacing: tighten large headings and loosen uppercase labels. DTCG dimensions allow only px and rem, so an em tracking value cannot be a token: the values above are em figures (-0.025em, 0.025em) converted at 16 px; define tracking per role when a heading size differs much.",
+      "fix": "Make the default one: tokens store tracking in px, converted from the em figure at a 16px root (-0.4px and 0.4px as written), and define a per-role dimension only when a heading size differs much from that root."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/design-system-starter/evals/evals.json",
+      "line": 1,
+      "evidence": "\"expected_output\": \"A practical starter covering foundational tokens, component hierarchy, accessibility, theme strategy, and documentation.\"",
+      "fix": "Rewrite each expected_output to the concrete artifact the assertions already check (DTCG token file, contrast rows with hex and ratio, component guide with props, defaults and a States line), and add one eval whose prompt is an ARIA how-to or a single-screen review so the description's not-for boundary is graded, not only the trigger queries."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/design-system-starter/references/component-examples.md",
+      "line": 177,
+      "evidence": "const nativeType = Component === 'button' ? { type: 'button' } : null; // a consumer-supplied type still wins via rest",
+      "fix": "Spread the default type after rest, or omit it when rest already has type: return <Component {...rest} {...(Component === 'button' && rest.type == null ? { type: 'button' } : {})} className=\"ds-button\" data-intent={intent} /> so a caller-supplied type=\"submit\" is not overwritten."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/design-system-starter/references/token-scales.md",
+      "line": 178,
+      "evidence": "The steps below use Tailwind CSS v4's own names and values (https://tailwindcss.com/docs/box-shadow, checked 2026-11-07).",
+      "fix": "Stop asserting that the printed shadow steps are Tailwind v4's own names and values. Keep the instruction to read https://tailwindcss.com/docs/box-shadow for the installed major, and label the table as this system's own steps (xs through 2xl) that must not be copied from a v3 table."
+    }
+  ]
+}

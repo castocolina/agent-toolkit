@@ -1,0 +1,104 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 1,
+      "evidence": "dbff837f digest: removed units (306, showing 40); the 40 shown paras all map to sections.json units whose section ids (s001-s002, s009, s013, s022, s027, s029-s030, s033-s035, s038, s040, s042, s046-s051, s053-s054, s056-s058, s060-s061) have allowed record rows",
+      "fix": "No per-item restore. Add one record note that the other 266 unshown units of that digest are covered by the same section rows, so a later judge does not treat the cut list as unexplained."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/references/schema-fundamentals.md",
+      "line": 170,
+      "evidence": "## The N+1 query problem ... An application pattern, not a schema change",
+      "fix": "The description excludes tuning a query without a schema change, and record row s060 already dropped this as out-of-scope. Move the index-on-customer_id point into the FK indexing gotcha if it is not already there, then record the N+1 section as removed-on-merit / out-of-scope; do not delete the bind-parameter warning without that row."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 34,
+      "evidence": "## Gotchas has no NEVER list; the only NEVER is 'Never change what an existing column means in place' and migrations.md 'Never copy once' / 'Never rename the old table first'",
+      "fix": "Add a short NEVER list at the top of Gotchas that points at the existing items (plain FK for a tenant child, in-place meaning change, EXPLAIN ANALYZE on a live write, invented NULL replacement) with the reason already written beside each. Do not invent new warnings."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 28,
+      "evidence": "Workflow step 2 says 'For writes, see the EXPLAIN gotcha' while that gotcha is already in this file, and step 4 names the reference files only by filename",
+      "fix": "Keep the references table as the gate. In step 2 name the in-file gotcha explicitly, and in step 4 say 'read references/schema-fundamentals.md' and 'read references/schema-design-checklist.md' so the load path matches the table."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 23,
+      "evidence": "MySQL NOT NULL example hard-codes `MODIFY phone VARCHAR(32) NOT NULL` while the same paragraph says to copy the full definition from SHOW CREATE TABLE",
+      "fix": "Make the example a copy of a SHOW CREATE line with only nullability changed, and mark VARCHAR(32) as an illustration that must be replaced by the restated definition. Keep the rule that an owner-approved non-NULL default is the only exception."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/evals/evals.json",
+      "line": 1,
+      "evidence": "11 prompts with verifiable assertions and 10/10 trigger queries, but no assertion checks the SQLite 12-step gate table, the MongoDB five-step shape change, or the tenant retrofit's owner decision on bad rows",
+      "fix": "Add one eval whose prompt is a live SQLite rebuild or a live composite-FK retrofit, with assertions for `.bail on`, the `gate` table, `PRAGMA foreign_keys = OFF` outside the transaction, and an owner-confirmed fix of mismatched tenant rows rather than a blind UPDATE."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 76,
+      "evidence": "SQLite rebuild step 2 says 'Every check below inserts into `gate`' but steps 5 and 8 are the only inserts, and the comment says 'a failed check raises an error' without stating that `INSERT INTO gate SELECT 0` is what raises the CHECK",
+      "fix": "Write the two gate inserts in full, `INSERT INTO gate SELECT ((SELECT count(*) FROM x) = (SELECT count(*) FROM new_x));` and `INSERT INTO gate SELECT NOT EXISTS (SELECT 1 FROM pragma_foreign_key_check);`, and say that a 0 violates `CHECK (ok = 1)` and aborts under `.bail on`. Keep the official 12-step order."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 18,
+      "evidence": "For another named engine the skill says its lock and online-DDL behavior is unverified, but workflow step 3 still says to read references/migrations.md before writing DDL on any relational engine",
+      "fix": "In step 3, limit the migrations.md read to PostgreSQL, MySQL and SQLite, and for SQL Server, Oracle or DynamoDB say to apply only the engine-neutral gotchas and to state the lock behavior as unverified."
+    }
+  ]
+}

@@ -273,7 +273,7 @@ ${ACTUAL}
 
 **Console Errors:**
 \`\`\`
-${CONSOLE_ERRORS:-Not provided (whether console errors were observed is unknown)}
+${CONSOLE_ERRORS:-Unknown (whether console errors were observed)}
 \`\`\`
 
 ---
@@ -282,7 +282,7 @@ ${CONSOLE_ERRORS:-Not provided (whether console errors were observed is unknown)
 
 - **Reproduction rate:** ${FREQUENCY:-Unknown}
 - **User Impact:** ${USER_IMPACT:-Unknown}
-- **Workaround:** ${WORKAROUND:-Not provided (availability is unknown)}
+- **Workaround:** ${WORKAROUND:-Unknown (whether a workaround exists)}
 
 ---
 

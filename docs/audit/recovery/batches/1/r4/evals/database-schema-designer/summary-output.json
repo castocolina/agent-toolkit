@@ -1,0 +1,29 @@
+{
+  "skill": "database-schema-designer",
+  "mode": "output",
+  "pass_rate": 0.9355,
+  "passed": 58,
+  "total": 62,
+  "failures": [
+    {
+      "eval": "review-legacy-tenant-schema",
+      "assertion": "Lists the cross-tenant reference before performance findings, and every finding carries its own complete corrected DDL with every statement written in full (never a pointer such as \"same pattern as F7\" or a \"then: ...\" shorthand list), or the exact SQL statement to run when the fix is not a schema change (for example a cleanup or retention job)",
+      "evidence": "F1 comes first, but F6 defers its non-UTC path with \"Stop, and I will issue an expand-contract plan using `AT TIME ZONE :source_zone`\" and F10 only advises \"add a partial index on that predicate\" without writing the DDL."
+    },
+    {
+      "eval": "mysql-explain-on-writes-and-reading-plans",
+      "assertion": "Defaults to plain `EXPLAIN` for the `UPDATE` because `EXPLAIN ANALYZE` executes the statement, and allows `EXPLAIN ANALYZE` only on disposable production-like data or inside `BEGIN; ... ROLLBACK;`",
+      "evidence": "The output defaults to plain EXPLAIN because \"`EXPLAIN ANALYZE` actually runs the statement and would ship real orders\", but it never permits EXPLAIN ANALYZE on disposable data or inside `BEGIN; ... ROLLBACK;` and instead redirects to \"analyze the read side as a `SELECT`\"."
+    },
+    {
+      "eval": "mysql-explain-on-writes-and-reading-plans",
+      "assertion": "Points to the MySQL manual's EXPLAIN pages for the plan columns (for example https://dev.mysql.com/doc/refman/8.4/en/explain.html) and says their meanings vary by server version, instead of asserting version-specific column semantics from memory",
+      "evidence": "It links \"https://dev.mysql.com/doc/refman/8.4/en/explain-output.html\" but never says the meanings vary by server version, and it asserts column semantics in its own table, such as \"`type` | `ref` or `range` | `ALL` (full scan of 20M rows)\"."
+    },
+    {
+      "eval": "sqlite-live-rebuild-with-gate",
+      "assertion": "Converts the text amounts to integer cents with an explicit expression in the `INSERT ... SELECT` (for example `CAST(ROUND(CAST(total AS REAL) * 100) AS INTEGER)`)",
+      "evidence": "The rebuild's copy is a plain `INSERT INTO new_orders (id, customer_id, total_cents) SELECT id, customer_id, total_cents FROM orders;`, and the conversion expression `CAST(round(CAST(total AS REAL) * 100) AS INTEGER)` appears only in the Phase 3 backfill `UPDATE`."
+    }
+  ]
+}

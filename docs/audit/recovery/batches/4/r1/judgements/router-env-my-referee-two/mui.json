@@ -1,0 +1,86 @@
+{
+  "skill": "mui",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/mui/SKILL.md",
+      "line": 74,
+      "evidence": "This file covers every prop or import migration; load nothing for one.",
+      "fix": "Keep the gate, but name the migrations it covers (imports, Grid size, slots/slotProps, onClose) so a slots task is not told to skip the slot recipes; record any sentence you drop in docs/audit/recovery/mui/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/mui/SKILL.md",
+      "line": 19,
+      "evidence": "4. Verify. Run the repo's typecheck script; if it has none, run `npx tsc --noEmit`. Then exercise what the change touches: each breakpoint, keyboard focus, every dialog close path.",
+      "fix": "Keep the typecheck default, and add the ordering an expert uses: read the installed .d.ts before editing, typecheck before the manual pass, and stop the manual pass when the changed prop has no breakpoint, focus or close path."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/mui/SKILL.md",
+      "line": 67,
+      "evidence": "Never spread a resolved `useTheme()` into `createTheme`: `borderRadius` is multiplied again and flipping `palette.mode` does not derive the dark palette.",
+      "fix": "Keep the gotcha, and add the paired failure: a nested theme built once at module scope ignores a runtime mode toggle, so the light and dark buttons render the same palette."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/mui/resources/theme-customization.md",
+      "line": 21,
+      "evidence": "For the stock dark palette write `colorSchemes: { dark: true }` in place of the explicit `dark` object; keep the object when you override colors.",
+      "fix": "Make the stock form the default in the code block and keep the explicit dark object only as the escape hatch for overridden colors."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/mui/evals/trigger-queries.json",
+      "line": 11,
+      "evidence": "\"query\": \"Make plain CSS responsive with media queries.\", \"should_trigger\": false",
+      "fix": "Replace the obvious negatives (plain CSS, React server components, Vite, CSS specificity) with near-misses a description can misfire on: MUI X Data Grid, Joy UI, Base UI, a Radix dialog, and installing @mui/material."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/mui/evals/files/theme-toggle.tsx",
+      "line": 12,
+      "evidence": "createTheme({ ...outerTheme, palette: { ...outerTheme.palette, mode: 'dark' } })",
+      "fix": "The fixture's mode state never reaches the theme, so following the nested-theme recipe still leaves the toggle dark-only; add a branch that drives setMode from useColorScheme when the click must change the rendered scheme, and keep the shared-ThemeOptions build only for a region whose scheme is fixed."
+    }
+  ]
+}

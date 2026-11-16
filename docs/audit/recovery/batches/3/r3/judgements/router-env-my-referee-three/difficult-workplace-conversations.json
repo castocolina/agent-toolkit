@@ -1,0 +1,104 @@
+{
+  "skill": "difficult-workplace-conversations",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/difficult-workplace-conversations/record.md",
+      "line": null,
+      "evidence": "Digest at dbff837f: 'removed units (627, showing 40)'. All 40 shown items are explained by record rows (for example s113 restore-references for para:0d629cf9, s067 drop-pending for para:a1ff1ee0, s086/s087/s089 redistributed to feedback-mastery). The 587 items not shown could not be checked one by one.",
+      "fix": "Re-run the removal check with the full uncut digest, or confirm that every unit listed in sections.json for s001-s124 is covered by its section row in docs/audit/recovery/difficult-workplace-conversations/record.md; restore any uncovered unit into references/ or add a row for it."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/difficult-workplace-conversations/SKILL.md",
+      "line": 65,
+      "evidence": "Section 5: 'Open with the situation, the observable behavior, its impact, and an open question that invites their account' is close to the generic SBI opener the model already produces. Only the three-column sort and the 'name what would settle it' step add expert knowledge.",
+      "fix": "Keep the worked example and the disputed-facts handling. Cut the restated SBI formula down to one clause that points at the example, and record the change in record.md. Do not delete the example."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/difficult-workplace-conversations/SKILL.md",
+      "line": 63,
+      "evidence": "Section 5 'A conflict the user is in' has no ordered steps or checkpoint. Sections 3 and 6, by contrast, give classify-then-respond sequences and gates.",
+      "fix": "Number the Section 5 moves as steps: 1) sort into facts, disputed points and interpretations; 2) open; 3) for each disputed point, name the record that settles it; 4) agree on impact and next step; 5) write the Section 8 summary with the disputed rows marked."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/difficult-workplace-conversations/SKILL.md",
+      "line": 103,
+      "evidence": "The Gotchas are specific and give reasons, but none covers the power-asymmetry trap that Section 1 asks the agent to classify, such as a junior user confronting a manager who controls their rating.",
+      "fix": "Add a gotcha with its reason, for example: '**Never coach a junior user to confront someone who controls their rating or contract without a written record first.** If it goes badly, retaliation is hard to prove without dated notes; send them to Section 7 record keeping before the talk.'"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/difficult-workplace-conversations/SKILL.md",
+      "line": 16,
+      "evidence": "The routing row gives preparation-template.md as 'only for a written worksheet', but Conditional references and Section 2 also load it 'when goals, time and place, or preparation habits need work'. The two load triggers disagree.",
+      "fix": "Change the routing-table Load cell to 'preparation-template.md only for a written worksheet or when goals, time and place, or preparation habits need work' so both triggers match."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/difficult-workplace-conversations/evals/evals.json",
+      "line": null,
+      "evidence": "Several evals list skill files as inputs, for example 'files': ['evals/files/runbook-dispute-notes.md', 'references/facilitation.md'] and 'files': ['references/phrase-bank.md']. These are skill references the agent should load itself, not user-supplied eval inputs under evals/files/.",
+      "fix": "Keep only real user inputs (files under evals/files/) in 'files'. State the expected reference load as an assertion instead, such as 'Loads references/phrase-bank.md and gives one or two lines', so the eval tests the routing."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/difficult-workplace-conversations/SKILL.md",
+      "line": 65,
+      "evidence": "Branch followed: a user in a conflict with their own manager after a blowup goes to Section 5 through the routing table and tie-break. Section 5 gives the same peer-style opening and does not adjust for the power relationship that Section 1 says to classify.",
+      "fix": "Add one line to Section 5: 'If the other person has power over the user (their manager or a skip-level), open by asking for their view first, keep records per Section 7, and if they control the outcome, go to delivery-scripts.md escalation rather than settling disputed facts head-on.'"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/difficult-workplace-conversations/README.md",
+      "line": 58,
+      "evidence": "The Further reading credit 'follows the identity conversation in *Difficult Conversations* by Douglas Stone, Bruce Patton, and Sheila Heen' has no row for this skill in docs/audit/upstream-sources.json. Only softaworks, Gottman and NHS have rows.",
+      "fix": "Add a row to docs/audit/upstream-sources.json: {\"skill\": \"difficult-workplace-conversations\", \"kind\": \"unversioned\", \"source\": \"Douglas Stone, Bruce Patton, Sheila Heen, Difficult Conversations (identity conversation)\", \"ref\": null, \"credit\": \"Stone, Patton, Heen\"}. Keep the credit line unchanged."
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "skill": "meme-factory",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 13,
+    "D4": 15,
+    "D5": 12,
+    "D6": 13,
+    "D7": 12,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 108,
+  "max_total": 125,
+  "percent": 86.4,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/meme-factory/references/text-memes.md",
+      "line": 33,
+      "evidence": "The first digest lists 463 removed units and shows 40; the cut list is one finding.",
+      "fix": "Restore any substantive unit from the unshown remainder into references/ (a template, procedure or tested example) or add a record row for it in docs/audit/recovery/meme-factory/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/meme-factory/references/text-memes.md",
+      "line": 5,
+      "evidence": "Building blocks restates fences, blockquotes, hard breaks and horizontal rules that current models already produce for Markdown.",
+      "fix": "Keep the non-obvious setext trap and the greentext-fence rule in SKILL.md's load path; move the rest of this known-Markdown tutorial to the end of references/text-memes.md only if users ask for the technique by name, and record any deletion."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 10,
+      "evidence": "Step 1 loads markdown-memes-guide.md for every text-only request, then text-memes.md for any of 15 formats, so both files load together with no Do NOT Load gate.",
+      "fix": "Name one file per request: read references/text-memes.md only for a named format, and Do NOT Load references/markdown-memes-guide.md once that file is open; keep the guide for greentext, copypasta and ASCII only."
+    },
+    {
+      "id": "D5-2",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/meme-factory/references/text-memes.md",
+      "line": 167,
+      "evidence": "Format 11's sample renders as replacement boxes (four runs of U+FFFD) instead of the emoji the tips depend on.",
+      "fix": "Restore the original emoji sample (walking away, coffee, target, sparkles) into that fenced block so the format is usable when loaded."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 14,
+      "evidence": "Step 5 tells the agent to compare caption count with lines, but generate accepts any count and the skill names no per-template line source for IDs outside the table.",
+      "fix": "Before generate, run a live check of https://api.memegen.link/templates/<id> (or list-templates) and pass exactly that many captions; have the helper reject a count that does not match a known template's lines."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/meme-factory/evals/evals.json",
+      "line": 1,
+      "evidence": "Several evals name files under references/ that are instructions, not inputs, and evals/files/ does not exist; trigger queries have 12 should-trigger and 10 should-not-trigger.",
+      "fix": "Drop the instruction-file entries from files (or add real inputs under evals/files/), and add near-miss should-not-trigger queries until the split is about 10 and 10."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/meme-factory/references/blog-posts.md",
+      "line": 212,
+      "evidence": "The complete post example's Success Metrics lines are the same replacement characters (U+FFFD) as text-memes.md format 11, so the worked post cannot be copied.",
+      "fix": "Put the original emoji back on those three lines (target, sparkles, the third glyph from the baseline sample) and keep the curl-checked image URLs."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 79,
+      "evidence": "The escape table's worked row says a double quote is written as '' and an apostrophe as ', while _format_text leaves apostrophes raw and the tests pin that.",
+      "fix": "Change the apostrophe cell to ' (left as-is) and add one hand-built example that shows a double quote becoming '' so the table matches the helper."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/meme-factory/references/image-memes.md",
+      "line": 48,
+      "evidence": "Endpoints says the service needs no API key and keeps no state, but does not say whether normal use is rate limited.",
+      "fix": "Add one sourced line: either 'no documented rate limit for normal use' with the memegen README URL and the date checked, or an instruction to read the live docs before assuming unlimited calls."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 83,
+      "evidence": "Gotchas covers double escaping, empty segments, line count, unconfirmed success and watermark, but not the helper's silent acceptance of the wrong number of captions.",
+      "fix": "Add a gotcha: never call generate with fewer or more captions than the template's lines, because the helper will still print a URL and the extra panel is lost or a blank one is invented."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 8,
+      "evidence": "The workflow is a tool procedure with a small audience checklist, not a thinking frame for which joke form fits the channel.",
+      "fix": "Add three lines before step 3: text-only when the channel cannot preview images, image when it can, and name the payoff before picking a template."
+    }
+  ]
+}

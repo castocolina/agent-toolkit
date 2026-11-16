@@ -1,0 +1,320 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "database-schema-designer",
+      "percent": 93.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 90.4,
+        "router-env-my-referee-three": 96.0
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 1,
+          "evidence": "The previous-version digest at dbff837f lists 306 removed units and shows 40 (showing 40 of 306).",
+          "fix": "Record the unlisted para units in docs/audit/recovery/database-schema-designer/record.md, or restore any a user would miss into references/ (or SKILL.md when a procedure depends on it)."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/references/schema-fundamentals.md",
+          "line": 1,
+          "evidence": "Background the user may ask for by name: normal forms, denormalization, key choice, foreign-key actions, junction tables, MongoDB index syntax, reading a MySQL EXPLAIN and a basic do and avoid list. It restates textbook rules in this skill's terms.",
+          "fix": "Keep this file behind its load trigger. Do not copy the 1NF/2NF/3NF table, CHAR/VARCHAR sizing, or the integer-range table back into SKILL.md; delete a textbook block only when the model reliably produces it unprompted, and add a record row."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 35,
+          "evidence": "For another named engine (SQL Server, Oracle, DynamoDB), apply the workflow questions and the engine-neutral gotchas (tenant references, soft-delete uniqueness, money, column meaning). State in an `Assumption:` line that its lock and online-DDL behavior is unverified by this skill.",
+          "fix": "Add a short Gotchas line that SQL Server, Oracle and DynamoDB have no engine-specific procedure here, so the agent must not invent their lock or online-DDL syntax and must say so in the Assumption line."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 3,
+          "evidence": "Design and review SQL and MongoDB schemas - tables or collections, keys, foreign keys, constraints, multi-tenant isolation, soft deletes, timestamp and money types, query-aligned indexes, and staged live migrations (expand-contract, NOT NULL, online DDL) for PostgreSQL, MySQL and SQLite.",
+          "fix": "Design and review SQL and MongoDB schemas: tables or collections, keys, foreign keys, constraints, multi-tenant isolation, soft deletes, timestamp and money types, query-aligned indexes, and staged live migrations (expand-contract, NOT NULL, online DDL) for PostgreSQL, MySQL and SQLite. Use when someone needs a data model, DDL, an ERD-ready table list, an embed-or-reference decision, a schema review, or a safe migration plan, even if they only describe entities and queries or a symptom such as re-signup failing after a soft delete, cross-tenant data leaking, or a migration that locked production. Not for REST or GraphQL API models, ORM classes for an existing schema, data-warehouse dashboards, database deployment, backups or connection pooling, or tuning a query without changing the schema."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 70,
+          "evidence": "`references/schema-fundamentals.md` | The user asks for normalization, denormalization, key choice, foreign-key actions, a junction table, MongoDB index syntax, reading a MySQL EXPLAIN, or a basic-design do and avoid checklist | Tenant isolation, live changes and engine gotchas (those are above)",
+          "fix": "In workflow step 4, say to read references/schema-fundamentals.md only for those named asks, and add: do not load it for a tenant-isolation, live-migration or engine-gotcha answer."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 49,
+          "evidence": "In MongoDB, embed a child only when it is read with its parent, bounded in size, owned by that parent alone, and updated atomically with it. Reference it when it is shared across parents, grows without bound (see the 16 MiB gotcha), is queried on its own, or is updated independently at a high rate.",
+          "fix": "Add one sentence: when the criteria conflict (read with the parent, but shared or unbounded), reference it and keep at most the bounded slice from the 16 MiB gotcha."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/evals/evals.json",
+          "line": 1,
+          "evidence": "evals.json has 12 cases with verifiable assertions, but no recorded with-skill versus without-skill grading, so the file does not show that the skill changes the output.",
+          "fix": "Run the 12 prompts with and without the skill, grade each assertion with quoted evidence, and keep the failing cases next to the instruction they test."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/database-schema-designer/evals/trigger-queries.json",
+          "line": 1,
+          "evidence": "20 queries, 10 should-trigger and 10 should-not, with near-misses such as REST design, Prisma models and query tuning, but no recorded trigger-rate runs.",
+          "fix": "Run each query about three times, record the trigger rate, and replace any query that passes for the wrong reason."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 46,
+          "evidence": "Live data? If any table already holds production data, on a relational engine read `references/migrations.md` before writing DDL; on MongoDB follow the MongoDB gotcha.",
+          "fix": "Name the gotcha in that step: on MongoDB follow the 'MongoDB has no foreign keys' gotcha and its five-step in-place shape change, and do not write SQL DDL."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 79,
+          "evidence": "SQLite `ALTER TABLE` is limited (see the SQLite gotcha in SKILL.md). For any other change, follow the 12-step procedure at https://www.sqlite.org/lang_altertable.html in this order:",
+          "fix": "Retitle the section 'SQLite table rebuild (9 steps)' and point step 2's 'steps 5 and 8' at the row-count check and the foreign-key check by name."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 82,
+          "evidence": "Start the script with `.bail on` (sqlite3 CLI) so the first error stops it. Then run `PRAGMA foreign_keys = OFF;` outside any transaction, because inside one it is silently ignored.",
+          "fix": "Say the same nine steps apply in an application driver, with the driver's transaction and rollback replacing `.bail on`, and that `.bail on` is only for the sqlite3 CLI."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": null,
+          "evidence": "Digest at dbff837f: 'removed units (306, showing 40)'. All 40 items shown are explained by valid record rows or by content now in references/ (s027, s033-s036, s045-s049, s051, s056-s058, para:3c448b59). The other 266 could not be checked.",
+          "fix": "Regenerate the digest without a cut (or check the 266 items not shown against docs/audit/recovery/database-schema-designer/record.md and sections.json). Add a row to record.md for each unit not yet covered, or restore it into references/schema-fundamentals.md when it is domain content."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 33,
+          "evidence": "Workflow step 4 repeats the review report rules ('every finding carries its own complete corrected DDL with every statement written in full, never \"same as F7\" or a \"then: ...\" shorthand list...'). references/schema-design-checklist.md \u00a7 Report format already states them, and the step tells the agent to read that file.",
+          "fix": "Shorten step 4 to 'read references/schema-design-checklist.md and report in its format'. The full wording stays in the checklist's Report format section, so no rule is lost. Record the moved sentence in record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 33,
+          "evidence": "Step 4 'Check before answering' packs three branches into one paragraph: the sketch self-check, the route to schema-fundamentals.md and the audit route with report rules. That weakens the otherwise clean Process structure.",
+          "fix": "Split step 4 into labeled sub-bullets: 'Sketch: confirm entities, ON DELETE, gotcha types, index-per-query'; 'Fundamentals asked: read references/schema-fundamentals.md'; 'Audit or sign-off: read references/schema-design-checklist.md and use its report format'. Keep every condition as it is now."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/database-schema-designer/evals/evals.json",
+          "line": 31,
+          "evidence": "\"files\": [\"references/migrations.md\"]. Several evals list the skill's own reference files as input files. A without-skill baseline run would then receive the skill's content.",
+          "fix": "Keep in 'files' only user inputs under evals/files/ (for example legacy-saas-schema.sql). Drop the references/*.md entries, or move them to a separate key such as 'skill_files_expected_read', so the baseline run stays clean."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 13,
+          "evidence": "'15 is the floor for `ON DELETE SET NULL (cols)` and `UNIQUE NULLS NOT DISTINCT`; for the live supported versions read https://www.postgresql.org/support/versioning/'. The minimum-version fact cites no source: the versioning page covers support lifetimes, not when these features arrived.",
+          "fix": "Cite the PostgreSQL 15 release notes (https://www.postgresql.org/docs/release/15.0/) with the date checked for the SET NULL column list and NULLS NOT DISTINCT. Keep the versioning link for supported versions."
+        }
+      ]
+    },
+    {
+      "name": "mermaid-diagram-specialist",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 96.8,
+        "router-env-my-referee-three": 95.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/mermaid-diagram-specialist/record.md",
+          "line": 22,
+          "evidence": "cut list showing 40 of 143; record row for s020 Error Handling Flow is drop/generic-model-knowledge",
+          "fix": "The cut is recorded. Keep the drop only for syntax the model draws unaided; move any worked flowchart the procedure still depends on into skills/mermaid-diagrams/references/ and record it as redistributed."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 11,
+          "evidence": "The preloaded mermaid-diagrams skill owns every rule: type choice, layout, styling, label syntax and validation.",
+          "fix": "Keep the sentence as the routing pointer; do not restate skill rules the preload already injects."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 34,
+          "evidence": "A clean validator run does not prove GitHub renders it: name any version-specific construct the skill's \"Renderer and host constraints\" section lists.",
+          "fix": "Name one host-specific failure the agent must report (for example architecture-beta edge labels that parse in the CLI but not on GitHub) instead of only pointing at the skill section."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 15,
+          "evidence": "Where the skill would ask which of two equally plausible types to use, do not stop: the caller sees only your reply, so pick the type that answers the stated question more directly and name the other as an assumption.",
+          "fix": "Keep the no-question default; add the tie-break the skill already uses, flowchart only after every other type loses, so two equally direct types do not become a free choice."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: \"removed units (143, showing 40)\". The judge could check only the 40 listed items. Each of them maps to a section row in docs/audit/recovery/mermaid-diagram-specialist/record.md through sections.json, and each row is an allowed combination: not-lost or redistributed rows have decision none, and s020 is removed-to-fit, low, drop, generic-model-knowledge for a generic error-handling flowchart.",
+          "fix": "Have the digest list all 143 removed units, or confirm that each unit in sections.json s001-s021 is covered by its section row, so every removal can be checked."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 15,
+          "evidence": "\"1. If asked for a non-Mermaid format, stop (see the output contract). Next check the material can support a diagram: ... Then name the task kind and make its first decision:\" Also, \"parse failure and wrong meaning together\" sits at the same level as the task kinds, not under repair.",
+          "fix": "Split step 1 into three numbered steps: (1) format gate, (2) material sufficiency gate, (3) task-kind dispatch. Indent the \"parse failure and wrong meaning together\" bullet under \"repair\". This keeps every rule and only reorders it."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 15,
+          "evidence": "\"If asked for a non-Mermaid format, stop (see the output contract).\" Followed for a request like \"give me this as Mermaid and as PlantUML\", this rule stops the whole task, so the Mermaid part that could be delivered is never returned.",
+          "fix": "Add to step 1: \"If the request asks for Mermaid and a non-Mermaid format together, produce the Mermaid diagrams and name the unsupported format in the reply instead of stopping.\""
+        }
+      ]
+    },
+    {
+      "name": "ui-ux-designer",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 93.6,
+        "router-env-my-referee-three": 95.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/ui-ux-designer.md",
+          "line": 60,
+          "evidence": "Output names the skill's review table and then overrides it ('one table per screen instead of one', 'a ` \u2014 priority:` suffix inside evidence cells', 'prose around the tables') without showing the resulting header or one filled row.",
+          "fix": "Under Output, add one filled example row in the overridden form (rule | pass/fail/na | evidence with the priority suffix | fix) so the table shape is visible without reconstructing it from the skill."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/ui-ux-designer.md",
+          "line": 40,
+          "evidence": "Gotchas by input covers code and URL or mockup, but not a screenshot: step 2's checklist says screenshots hide touch-target scale, hover, focus, error and loading, and that limit is never a gotcha.",
+          "fix": "Add a screenshot bullet: a still hides touch-target scale, hover, focus, error and loading, so those stay unverified until code or a render supplies them."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "agents/ui-ux-designer.md",
+          "line": 53,
+          "evidence": "Research checks ends on a menu of five trend issues (glassmorphism, neumorphism, parallax, tiny body text, text over busy images) with no default for which to check first.",
+          "fix": "Name a default order: contrast and legibility (text over busy images, glassmorphism, neumorphism, tiny body text) before motion (parallax), since a contrast failure is already an accessibility blocker."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/ui-ux-designer.md",
+          "line": 64,
+          "evidence": "Output step 2 says a decision with no screen skips the review table and sets 'biggest win = the recommended alternative, or the step-3 hypothesis and the test that settles it', while step 4 always requires 'Biggest win, or an explicit outcome (below)' and the next paragraph says that outcome replaces the biggest win when an applicable criterion is unverified. A decision whose evidence cannot separate the alternatives and whose test cannot be run has a recommended alternative (step 3) and an untested hypothesis, so both clauses apply and the section never says which one step 4 prints.",
+          "fix": "State the order: when step 3 both recommends the highest-ranked alternative and leaves a hypothesis untested, step 4 prints the recommended alternative as the biggest win and names the untested hypothesis beside it; the observation-or-test outcome replaces the biggest win only when a screen criterion is unverified and no failure is proven."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/ui-ux-designer.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: \"removed units (197, showing 40)\". All 40 shown items map to valid record rows in docs/audit/recovery/ui-ux-designer/record.md (s001-s023 via sections.json), but 157 removed units were not shown, so they could not be checked.",
+          "fix": "Re-run the judge with the full digest (no cut list), or confirm that every unit of s001-s023 in docs/audit/recovery/ui-ux-designer/sections.json is covered by its section row in docs/audit/recovery/ui-ux-designer/record.md"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/ui-ux-designer.md",
+          "line": 73,
+          "evidence": "Step 4 says \"`fail` rows of the skill ... outrank aesthetic or trend issues\", but the Priority rule says \"High = accessibility blocker or primary-task break; Medium = a fail that slows the task or affects one state; Low = polish. A research-check or trend finding that is not a skill fail is Medium when cited evidence ties it to the primary task\". A skill fail that neither slows the task nor affects a state (for example a tokens literal) falls to Low. A cited trend finding then gets Medium and ranks above it, so the two rules give opposite orders.",
+          "fix": "Add a sentence to the Priority paragraph: \"A skill `fail` row is never ranked below a research-check or trend finding: a fail that matches no level above is Medium, and a research-check or trend finding is capped at Low when any skill fail is Medium.\" Alternatively, change step 4 so it ranks by the priority level first and states the tie-break."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

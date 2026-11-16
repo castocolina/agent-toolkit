@@ -1,0 +1,19 @@
+{
+  "skill": "commit-work",
+  "mode": "output",
+  "pass_rate": 0.9672,
+  "passed": 59,
+  "total": 61,
+  "failures": [
+    {
+      "eval": "commit-does-not-push",
+      "assertion": "Proposes no `git push` in any form, and says pushing is left to the user or not part of this request.",
+      "evidence": "The output only forbids a push (\"Do not push\", \"Commit (no push)\", \"Do not run `git push`\") and never says pushing is left to the user or not part of this request."
+    },
+    {
+      "eval": "no-commits-yet",
+      "assertion": "Puts the same `GIT_INDEX_FILE=` prefix on `git add -- src/index.ts README.md`, `git diff --cached`, `git write-tree`, `git commit` and `git show --stat`, and never runs `git add -A`, `git add .` or `git commit -a`.",
+      "evidence": "It prefixes `GIT_INDEX_FILE=\"$run/index\" git add -- README.md src/index.ts`, `git diff --cached`, `git write-tree`, and `git commit -F \"$run/msg.txt\"` and never proposes `git add -A`, `git add .`, or `git commit -a`, but the script contains no `git show --stat`."
+    }
+  ]
+}

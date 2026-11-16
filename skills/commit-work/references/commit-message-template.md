@@ -1,17 +1,20 @@
 # Repository message rules
 
-Read this when the repository sets its own commit-message rules, or a commit needs footers beyond `BREAKING CHANGE`. The shape and the no-trailers default live in SKILL.md step 6.
+Read this when the repository sets its own commit-message rules, a commit needs footers beyond `BREAKING CHANGE`, or you want worked messages. The shape and the no-trailers default live in SKILL.md step 6.
 
 ## Collect the repository's rules
 
 Read every source that exists and apply all of them; ask when two conflict.
 
 - commitlint: `commitlint.config.*`, `.commitlintrc*` or a `commitlint` key in `package.json`. Start from what `extends` pulls in (`@commitlint/config-conventional` means the defaults below), then apply the local `rules`, which override it.
-- `git config commit.template` (often `.gitmessage`), `.czrc` or `cz.json` (Commitizen).
+- `git config commit.template` (often `.gitmessage`), `.czrc` or `cz.json` (Commitizen; read whichever Commitizen config the repository actually has, since the file name depends on its setup).
 - `CONTRIBUTING.md` and PR templates (`.github/pull_request_template.md`, `.github/PULL_REQUEST_TEMPLATE/`): required footers or trailers (DCO `Signed-off-by`, issue refs), scope lists.
 - None of these: copy the type and scope vocabulary of `git log --format=%s -30`, then check each scope against current paths.
+- No history either (empty or brand-new repository): Conventional Commits 1.0.0 is the default.
 
 ## `@commitlint/config-conventional` defaults that reject plausible messages
+
+Values from the [preset source](https://github.com/conventional-changelog/commitlint/blob/master/%40commitlint/config-conventional/src/index.ts), checked 2026-11-07. Read the installed preset when the repository pins a version. The repository's own commitlint config (`commitlint.config.*`, `.commitlintrc*`, or the `commitlint` key in `package.json`) overrides any of these rules, so read it first and use its values.
 
 - `type-enum`: build, chore, ci, docs, feat, fix, perf, refactor, revert, style, test. Anything else fails, even though the spec allows any type.
 - `subject-case`: a subject in sentence, start, pascal or upper case fails (`fix: Handle nulls` is rejected).
@@ -24,3 +27,36 @@ Read every source that exists and apply all of them; ask when two conflict.
 - In a footer, `BREAKING CHANGE` must be upper case; `BREAKING-CHANGE` is a synonym. Every other footer token uses `-` for spaces (`Reviewed-by: name`, `Refs: #123`) and is separated by `: ` or ` #`.
 - Footers start one blank line after the body; a footer value can continue over lines until the next token.
 - For a revert, the spec suggests the `revert` type with a `Refs:` footer listing the reverted SHAs.
+
+## Worked messages
+
+A one-line fix, no body needed:
+
+```text
+fix(auth): treat a token at its expiry time as expired
+```
+
+A refactor whose body says why:
+
+```text
+refactor(ui): extract menu logic into a custom hook
+
+The open, close and focus handling lived inline in Header and was
+copied into Footer. One hook keeps the two in step; behavior is
+unchanged.
+```
+
+A breaking change, marked in the header and explained in the footer:
+
+```text
+feat(api)!: drop the v1 routes
+
+v1 doubled the test matrix and every client has a v2 equivalent.
+
+BREAKING CHANGE: /v1/* now returns 404; use the /v2/* routes.
+```
+
+## Message checklist
+
+- The summary starts with a concrete verb (`fix`, `add`, `remove`, `rename`) rather than `Update` or `Change`.
+- `Closes #123` appears only when merging this commit should close the issue; otherwise use `Refs: #123`.

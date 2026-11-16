@@ -19,17 +19,25 @@
       "assertions": [
         "Uses `onClose`, not `onBackdropClick`",
         "Includes Cancel and Delete",
-        "Uses MUI imports"
+        "Imports `Dialog`, `DialogTitle` and `DialogActions` from `@mui/material` or its one-level paths (`@mui/material/Dialog`)",
+        "`onClose` takes `(event, reason)` and branches on `reason` (`'backdropClick'` or `'escapeKeyDown'`) instead of a separate `onBackdropClick` handler",
+        "A `DialogTitle` names the dialog (for example `Delete {project name}?`), so the dialog has an accessible name"
       ]
     },
     {
       "id": "legacy-api",
-      "prompt": "MUI v7 adaptation: old deep import and onBackdropClick.",
-      "expected_output": "Use package exports, onClose, standardized slots/slotProps.",
+      "prompt": "MUI v7 adaptation: this component (legacy-api.tsx) still has the old deep import, onBackdropClick, components and componentsProps, and a TextField inputProps. Migrate every legacy API in it to v7 and show the typecheck command.",
+      "expected_output": "Use package exports, onClose, standardized slots/slotProps, and slotProps.htmlInput for the TextField.",
+      "files": [
+        "legacy-api.tsx"
+      ],
       "assertions": [
         "Rejects deep imports",
         "Recommends `onClose`",
-        "Mentions `slots` and `slotProps`"
+        "Mentions `slots` and `slotProps`",
+        "Imports Dialog from `@mui/material/Dialog`, replaces `onBackdropClick` with `onClose` and a `reason` check, and renames `components`/`componentsProps` to `slots`/`slotProps` with lowercase keys (`backdrop`)",
+        "Moves the TextField `inputProps` to `slotProps.htmlInput`, not `slotProps.input`",
+        "Shows the typecheck command: the repo's typecheck script, or `npx tsc --noEmit` when the repo has none"
       ]
     },
     {
@@ -52,7 +60,8 @@
       ],
       "assertions": [
         "Adds an aria-label on the IconButton naming the target action, such as switching to dark or light mode",
-        "Builds the nested theme with createTheme from shared ThemeOptions instead of spreading the resolved theme returned by useTheme"
+        "Builds the nested theme with createTheme from shared ThemeOptions instead of spreading the resolved theme returned by useTheme",
+        "Keeps the toggle working: the nested theme's `palette.mode` follows the `mode` state (a theme per mode at module scope, or a memo that depends on `mode`), not a hardcoded `'dark'`"
       ]
     },
     {
@@ -81,6 +90,82 @@
         "Augments Palette and PaletteOptions with tertiary and augments ButtonPropsColorOverrides so Button's color=\"tertiary\" typechecks",
         "Adds tertiary to the theme palette passed to createTheme",
         "Shows the typecheck command for the consumer: the repo's typecheck script, or `npx tsc --noEmit` when the repo has none"
+      ]
+    },
+    {
+      "id": "outlined-input-state-override",
+      "prompt": "This MUI v7 theme (outlined-input-theme.tsx) gives outlined inputs a divider-colored border, but on hover and focus the border still shows MUI's default colors, and the dark scheme branch never applies. Fix the override so hover, focus and the dark scheme all work.",
+      "expected_output": "The override moves to the OutlinedInput root, with the state selectors at the same depth as MUI's defaults built from outlinedInputClasses, and the dark scheme through theme.applyStyles.",
+      "files": [
+        "outlined-input-theme.tsx",
+        "resources/styling-guide.md"
+      ],
+      "assertions": [
+        "Puts the override on `styleOverrides.root` using `outlinedInputClasses` imported from `@mui/material/OutlinedInput` (for example `` `& .${outlinedInputClasses.notchedOutline}` ``), not only on the `notchedOutline` slot, because a one-class slot rule (0,1,0) loses to MUI's default hover and focus rules (0,3,0)",
+        "Adds hover and focus selectors at the same depth as MUI's defaults: `` `&:hover .${outlinedInputClasses.notchedOutline}` `` and `` `&.${outlinedInputClasses.focused} .${outlinedInputClasses.notchedOutline}` ``, using the exported classes objects, not string class names or generated `css-<hash>` classes",
+        "Handles the dark scheme with `theme.applyStyles('dark', ...)` instead of a `theme.palette.mode === 'dark'` branch, and says the mode check stays fixed at the default scheme when `cssVariables` and `colorSchemes` are on"
+      ]
+    },
+    {
+      "id": "recipe-list-grid",
+      "prompt": "MUI v7: give me a clickable settings list (icon, title, subtitle per row) next to a two-column grid of cards.",
+      "expected_output": "A List whose clickable rows use ListItemButton inside ListItem, and a Grid layout with the size prop.",
+      "assertions": [
+        "Makes each clickable row a `ListItemButton` (usually inside `<ListItem disablePadding>`) and never writes `<ListItem button>`, because `ListItem` has no `button` prop",
+        "Lays the cards out with `Grid` imported from `@mui/material` (or `@mui/material/Grid`) using `size={{ ... }}`; there is no `Grid2` import, no `@mui/material/Grid2` path, and no `item`, `xs` or `md` props on `Grid`"
+      ],
+      "files": [
+        "references/component-recipes.md"
+      ]
+    },
+    {
+      "id": "recipe-form-select",
+      "prompt": "Show a MUI v7 signup form with email validation errors, a role Select and a terms checkbox, ready for a screen reader.",
+      "expected_output": "A form built from TextField, FormControl with InputLabel and Select, FormControlLabel and Checkbox, with accessible names.",
+      "assertions": [
+        "The email field is a `TextField` with a `label` and `error` plus `helperText` for the validation message",
+        "The `Select` has an accessible name: the `InputLabel` has an `id` that the `Select` repeats as `labelId`, and the `Select` also receives a matching `label` prop",
+        "Colors and spacing on `Typography`, `Stack` or `Box` go through `sx` (for example `sx={{ color: 'text.secondary' }}`), not through system props such as `mt` or `color`"
+      ],
+      "files": [
+        "references/component-recipes.md"
+      ]
+    },
+    {
+      "id": "recipe-theme-overrides",
+      "prompt": "Write a MUI v7 theme where buttons are flat with no uppercase text, cards have 12px corners, and text fields have 8px corners.",
+      "expected_output": "A createTheme with MuiButton, MuiCard and MuiOutlinedInput overrides.",
+      "assertions": [
+        "Uses `components.MuiButton` with `defaultProps` such as `disableElevation: true` and a `styleOverrides` entry keyed by a slot name such as `root` with `textTransform: 'none'`, and `components.MuiCard` with a 12px radius",
+        "Puts the text-field corner radius on `components.MuiOutlinedInput` (`styleOverrides.root`), because a `TextField` is a wrapper and the border radius belongs to the `OutlinedInput` it renders",
+        "Does not rely on removed-in-v9 class keys such as `containedPrimary` for the flat contained button without saying they are removed in v9 and pointing to the upgrade guide or a `variants` entry under `root`"
+      ],
+      "files": [
+        "references/theme-recipes.md"
+      ]
+    },
+    {
+      "id": "recipe-styled-custom-prop",
+      "prompt": "Make a reusable MUI v7 styled Button with a custom prop that picks the primary or secondary palette color.",
+      "expected_output": "A styled(Button) with a typed custom prop, shouldForwardProp, and a prop name that does not collide with Button's own variant.",
+      "assertions": [
+        "The custom prop is not named `variant`, because `Button` already owns that prop and its type",
+        "Passes `shouldForwardProp` to `styled` so the custom prop is not forwarded, and types the prop by extending `ButtonProps` or a generic on `styled`",
+        "Reads colors from the theme palette (`theme.palette[...]` or `theme.vars`) rather than hex literals"
+      ],
+      "files": [
+        "references/sx-and-styled-recipes.md"
+      ]
+    },
+    {
+      "id": "v9-installed-system-props",
+      "prompt": "package.json has \"@mui/material\": \"^9.5.0\". Add a Stack with a heading that uses mt and color props, and a Dialog that must not close on Escape.",
+      "expected_output": "Reads the installed major, points to the v9 upgrade guide, and writes sx instead of system props and an onClose reason check instead of disableEscapeKeyDown.",
+      "assertions": [
+        "Notices the installed major is 9 and reads or cites the official upgrade guide `https://mui.com/material-ui/migration/upgrade-to-v9/` before applying v7 advice",
+        "Styles the heading through `sx` (for example `sx={{ mt: 2, color: 'primary.main' }}`) and does not pass `mt` or `color` as props on `Stack`, `Box`, `Grid` or `Typography`",
+        "Blocks Escape inside `onClose` by returning when `reason === 'escapeKeyDown'`, and does not use `disableEscapeKeyDown`",
+        "Does not import `GridLegacy` and uses `Grid` with `size` if a grid is needed"
       ]
     }
   ]

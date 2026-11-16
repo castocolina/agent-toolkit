@@ -1,0 +1,86 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 37,
+      "evidence": "A commit joins whatever operation is in progress. During a merge it becomes the merge commit, with two parents and the other branch's changes.",
+      "fix": "Keep the non-obvious rebase, cherry-pick and revert outcomes; move the merge-commit-has-two-parents sentence to references/ or record the removal, since an agent already knows a commit during a merge is a merge commit."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 33,
+      "evidence": "Read `references/commit-message-template.md` only when the repository sets its own message rules (commitlint config, commit template, CONTRIBUTING, PR template), you need footers beyond `BREAKING CHANGE`, or you want worked messages and the report block of step 8.",
+      "fix": "Split the load: read the report-block section of references/commit-message-template.md on every step 8 report, and load the repository-rules, commitlint defaults and spec sections only when the repository sets its own rules or a footer beyond BREAKING CHANGE is needed."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 31,
+      "evidence": "Verify the staged version with the fastest relevant check: tests for the touched paths, else lint, else build.",
+      "fix": "Name the default lookup (the repository's test script for the touched paths, else its lint script, else its build script) and say to ask only when none of those exists."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/commit-work/evals/evals.json",
+      "line": 1,
+      "evidence": "\"id\": \"review-and-commit\" ... \"Shows ordered `git status`, `git diff`, `git add -- src/auth.ts`, `git diff --cached`, and `git commit` commands.\"",
+      "fix": "Add assertions for a failed git apply --cached --check, a repository with no commits yet (read-tree --empty), and a pre-existing <gitdir>/commit-work.* directory that must be reported and left alone; keep the existing 15 prompts."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 29,
+      "evidence": "Overlap check, real index, before staging anything: `git diff --cached --name-only -- <approved paths>` lists approved paths that already hold staged content. Any listed path whose staged diff the user did not approve: stop and ask",
+      "fix": "State the overlap outcome when the user did approve that staged diff: commit that exact staged version, do not restage the working-tree file over it, and do not stop."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/commit-work/references/commit-message-template.md",
+      "line": 20,
+      "evidence": "header-max-length 100; body-max-line-length and footer-max-line-length 100",
+      "fix": "Read the installed @commitlint/config-conventional preset (or the cited index.ts) for header-max-length, body-max-line-length and footer-max-line-length instead of hardcoding 100; keep the source URL and the checked date only as the fallback, and note that the preset sets those lengths to Infinity."
+    }
+  ]
+}

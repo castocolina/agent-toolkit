@@ -1,0 +1,472 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "OpenAPI to TypeScript",
+      "text": "A Claude Code skill that converts OpenAPI 3.0 specifications (JSON or YAML) into TypeScript interfaces and type guards.",
+      "chars": 119,
+      "units": [
+        "para:63448119"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Purpose",
+      "text": "This skill automates the process of generating type-safe TypeScript code from OpenAPI API specifications. It creates:\n- TypeScript interfaces for all schema definitions\n- Request/Response type definitions for API endpoints\n- Runtime type guards for validation\n- Proper handling of complex types (unions, intersections, enums, arrays)",
+      "chars": 333,
+      "units": [
+        "para:b5e1b5c2",
+        "para:522ae956",
+        "para:ebc4c216",
+        "para:a2e4bf55",
+        "para:8a90c0da"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "When to Use",
+      "text": "Use this skill when you need to:\n- Generate TypeScript types from an OpenAPI specification\n- Create type-safe API client interfaces\n- Convert API documentation into TypeScript code\n- Maintain type safety between backend API specs and frontend code",
+      "chars": 247,
+      "units": [
+        "para:c6dc12c9",
+        "para:ad5b58e5",
+        "para:5f71e0af",
+        "para:39c5a9cb",
+        "para:67f30b93"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Trigger Phrases",
+      "text": "- \"generate types from openapi\"\n- \"convert openapi to typescript\"\n- \"create API interfaces\"\n- \"generate types from spec\"\n- \"convert schema to TS\"",
+      "chars": 145,
+      "units": [
+        "para:fc440e34",
+        "para:b3b2d3c9",
+        "para:62f2131c",
+        "para:6528d233",
+        "para:a410e57c"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Workflow",
+      "text": "1. **Request Input**: Asks for the OpenAPI file path (if not provided)\n2. **Validation**: Reads and validates the OpenAPI specification (must be 3.0.x)\n3. **Schema Extraction**: Extracts schemas from `components/schemas`\n4. **Endpoint Analysis**: Extracts request/response types from `paths`\n5. **Code Generation**: Generates TypeScript interfaces and type guards\n6. **Output**: Asks where to save (default: `types/api.ts`)\n7. **Write File**: Creates the TypeScript file",
+      "chars": 470,
+      "units": [
+        "para:e4e5409e",
+        "para:5d7cbc07",
+        "para:2d83c421",
+        "para:5313b844",
+        "para:1973ec6c",
+        "para:70d48a79",
+        "para:c5eefe52"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "OpenAPI Support",
+      "text": "- **Version**: OpenAPI 3.0.x only\n- **Format**: JSON or YAML\n- **Required fields**: `openapi`, `paths`, `components.schemas`",
+      "chars": 124,
+      "units": [
+        "para:0f4c9382",
+        "para:a4a15927",
+        "para:930e19a8"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Type Mapping",
+      "text": "**Primitives**:\n- `string` \u2192 `string`\n- `number` / `integer` \u2192 `number`\n- `boolean` \u2192 `boolean`\n- `null` \u2192 `null`\n\n**Format Modifiers** (with JSDoc comments):\n- `uuid` \u2192 `string` (/** UUID */)\n- `date` \u2192 `string` (/** Date */)\n- `date-time` \u2192 `string` (/** ISO DateTime */)\n- `email` \u2192 `string` (/** Email */)\n- `uri` \u2192 `string` (/** URI */)\n\n**Complex Types**:\n- **Objects** \u2192 TypeScript interfaces with optional/required fields\n- **Arrays** \u2192 TypeScript array types (`Type[]`)\n- **Enums** \u2192 TypeScript union types (`\"value1\" | \"value2\"`)\n- **oneOf** \u2192 Union types (`Type1 | Type2`)\n- **allOf** \u2192 Interface extension (`extends`)\n- **$ref** \u2192 Direct type references",
+      "chars": 665,
+      "units": [
+        "para:2c6887bb",
+        "para:77824074",
+        "para:d5c257f1",
+        "para:69a840bf",
+        "para:7a0df3ed",
+        "para:b8e43c45",
+        "para:b5feba9c",
+        "para:8ef1965d",
+        "para:1995ec8e",
+        "para:3a6bff0b",
+        "para:c2342385",
+        "para:187a3079",
+        "para:2ad53fd0"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Generated Code Structure",
+      "text": "```typescript\n/**\n * Auto-generated from: {source_file}\n * Generated at: {timestamp}\n *\n * DO NOT EDIT MANUALLY - Regenerate from OpenAPI schema\n */\n\n// Types\nexport interface User { ... }\nexport type Status = \"active\" | \"draft\";\n\n// Request/Response Types\nexport interface GetUsersRequest { ... }\nexport type GetUsersResponse = User[];\n\n// Type Guards\nexport function isUser(value: unknown): value is User { ... }\n\n// Error Types (always included)\nexport interface ApiError { ... }\nexport function isApiError(value: unknown): value is ApiError { ... }\n```",
+      "chars": 556,
+      "units": [
+        "para:7be8af9b"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Type Guards",
+      "text": "Runtime validation functions for each interface:\n- Check object structure\n- Validate required fields\n- Type-check primitives\n- Validate enums and arrays",
+      "chars": 152,
+      "units": [
+        "para:1dc80cd7",
+        "para:2a78066a",
+        "para:a4083536",
+        "para:e03a9faa",
+        "para:f2b2779f"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Basic Usage",
+      "text": "```\nUser: Generate TypeScript types from my OpenAPI spec at ./api/openapi.json\n\nClaude: I'll convert your OpenAPI specification to TypeScript.\n[Reads file, validates, generates types, saves to types/api.ts]\n```",
+      "chars": 210,
+      "units": [
+        "para:94fe52ce"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "With Custom Output Path",
+      "text": "```\nUser: Convert openapi.yaml to TypeScript and save it to src/types/backend.ts\n\nClaude: I'll generate TypeScript types from your OpenAPI spec.\n[Generates and saves to specified location]\n```",
+      "chars": 192,
+      "units": [
+        "para:1c9ee29a"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Example Input/Output",
+      "text": "**Input** (openapi.json):\n\n```json\n{\n  \"openapi\": \"3.0.0\",\n  \"components\": {\n    \"schemas\": {\n      \"Product\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"id\": {\"type\": \"string\", \"format\": \"uuid\"},\n          \"name\": {\"type\": \"string\"},\n          \"price\": {\"type\": \"number\"},\n          \"status\": {\"type\": \"string\", \"enum\": [\"active\", \"draft\"]}\n        },\n        \"required\": [\"id\", \"name\", \"price\", \"status\"]\n      }\n    }\n  },\n  \"paths\": {\n    \"/products\": {\n      \"get\": {\n        \"parameters\": [\n          {\"name\": \"page\", \"in\": \"query\", \"schema\": {\"type\": \"integer\"}},\n          {\"name\": \"limit\", \"in\": \"query\", \"schema\": {\"type\": \"integer\"}}\n        ],\n        \"responses\": {\n          \"200\": {\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\n                  \"type\": \"array\",\n                  \"items\": {\"$ref\": \"#/components/schemas/Product\"}\n                }\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n}\n```\n\n**Output** (types/api.ts):",
+      "chars": 1031,
+      "units": [
+        "para:a66c9a7e",
+        "para:ba616d49",
+        "para:29666e6e"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Example Input/Output",
+      "text": "```typescript\n/**\n * Auto-generated from: openapi.json\n * Generated at: 2026-01-18T19:00:00Z\n *\n * DO NOT EDIT MANUALLY - Regenerate from OpenAPI schema\n */\n\n// ============================================================================\n// Types\n// ============================================================================\n\nexport type ProductStatus = \"active\" | \"draft\";\n\nexport interface Product {\n  /** UUID */\n  id: string;\n\n  name: string;\n\n  price: number;\n\n  status: ProductStatus;\n}\n\n// ============================================================================\n// Request/Response Types\n// ============================================================================\n\nexport interface GetProductsRequest {\n  page?: number;\n  limit?: number;\n}\n\nexport type GetProductsResponse = Product[];\n\n// ============================================================================\n// Type Guards\n// ============================================================================\n\nexport function isProduct(value: unknown): value is Product {\n  return (\n    typeof value === 'object' &&\n    value !== null &&\n    'id' in value &&\n    typeof (value as any).id === 'string' &&\n    'name' in value &&\n    typeof (value as any).name === 'string' &&\n    'price' in value &&\n    typeof (value as any).price === 'number' &&\n    'status' in value &&\n    ['active', 'draft'].includes((value as any).status)\n  );\n}\n\n// ============================================================================\n// Error Types\n// ============================================================================\n\nexport interface ApiError {\n  status: number;\n  error: string;\n  detail?: string;\n}\n\nexport function isApiError(value: unknown): value is ApiError {\n  return (\n    typeof value === 'object' &&\n    value !== null &&\n    'status' in value &&\n    typeof (value as any).status === 'number' &&\n    'error' in value &&\n    typeof (value as any).error === 'string'\n  );\n}\n```",
+      "chars": 1950,
+      "units": [
+        "para:cb0251cd"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Benefits",
+      "text": "- **Type Safety**: Catch API contract violations at compile time\n- **Auto-completion**: Full IDE support for API request/response types\n- **Runtime Validation**: Type guards for validating API responses\n- **Documentation**: JSDoc comments preserved from OpenAPI descriptions\n- **Maintainability**: Regenerate types when API spec changes\n- **DRY Principle**: Single source of truth (OpenAPI spec)",
+      "chars": 395,
+      "units": [
+        "para:e08506dc",
+        "para:0d8c4cd1",
+        "para:8744618b",
+        "para:6d8856c5",
+        "para:c2e159ea",
+        "para:0c95a669"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Limitations",
+      "text": "- Only supports OpenAPI 3.0.x (not 2.0 or 3.1)\n- Circular references handled with type aliases\n- Unknown types fall back to `unknown` with warnings\n- Complex `allOf` scenarios may need manual refinement",
+      "chars": 202,
+      "units": [
+        "para:cb966c04",
+        "para:12111fe8",
+        "para:b99e5e48",
+        "para:cfe4726a"
+      ]
+    },
+    {
+      "id": "s016",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Related Tools",
+      "text": "This skill complements:\n- **openapi-validator**: Validate OpenAPI specs before conversion\n- **api-client-generator**: Generate full API clients using these types\n- **schema-diff**: Compare OpenAPI versions to track type changes",
+      "chars": 227,
+      "units": [
+        "para:136f4199",
+        "para:bde76a56",
+        "para:a35f5f6b",
+        "para:06a40817"
+      ]
+    },
+    {
+      "id": "s017",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Naming Conventions",
+      "text": "- **Interfaces**: PascalCase (e.g., `User`, `Product`)\n- **Request Types**: `{Method}{Path}Request` (e.g., `GetUsersRequest`)\n- **Response Types**: `{Method}{Path}Response` (e.g., `GetUsersResponse`)\n- **Type Guards**: `is{TypeName}` (e.g., `isUser`, `isProduct`)\n- **Enums**: `{TypeName}{FieldName}` (e.g., `ProductStatus`, `UserRole`)",
+      "chars": 336,
+      "units": [
+        "para:e3752e70",
+        "para:ce24000d",
+        "para:c82f3ba2",
+        "para:8a7098d2",
+        "para:7304a31d"
+      ]
+    },
+    {
+      "id": "s018",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Field Handling",
+      "text": "- **Required fields**: No `?` suffix\n- **Optional fields**: `?` suffix\n- **Descriptions**: Converted to JSDoc comments\n- **Formats**: Added as JSDoc comments",
+      "chars": 157,
+      "units": [
+        "para:f0fda29e",
+        "para:a5cd4c82",
+        "para:8b936a5d",
+        "para:8e81a403"
+      ]
+    },
+    {
+      "id": "s019",
+      "file": "skills/openapi-to-typescript/README.md",
+      "heading": "Error Handling",
+      "text": "The skill validates and reports:\n- Invalid OpenAPI version\n- Missing required fields (`openapi`, `paths`, `components`)\n- Unresolved `$ref` references\n- Unknown or unsupported types\n- Circular reference warnings",
+      "chars": 211,
+      "units": [
+        "para:e0f311da",
+        "para:38942dd8",
+        "para:398268c5",
+        "para:3d6dd45f",
+        "para:22e14a6d",
+        "para:370415db"
+      ]
+    },
+    {
+      "id": "s020",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: openapi-to-typescript\ndescription: Converts OpenAPI 3.0 JSON/YAML to TypeScript interfaces and type guards. This skill should be used when the user asks to generate types from OpenAPI, convert schema to TS, create API interfaces, or generate TypeScript types from an API specification.\n---",
+      "chars": 299,
+      "units": [
+        "para:23f466fb"
+      ]
+    },
+    {
+      "id": "s021",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "OpenAPI to TypeScript",
+      "text": "Converts OpenAPI 3.0 specifications to TypeScript interfaces and type guards.\n\n**Input:** OpenAPI file (JSON or YAML)\n**Output:** TypeScript file with interfaces and type guards",
+      "chars": 177,
+      "units": [
+        "para:ef7e8d82",
+        "para:5c31bda6"
+      ]
+    },
+    {
+      "id": "s022",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "When to Use",
+      "text": "- \"generate types from openapi\"\n- \"convert openapi to typescript\"\n- \"create API interfaces\"\n- \"generate types from spec\"",
+      "chars": 120,
+      "units": [
+        "para:fc440e34",
+        "para:b3b2d3c9",
+        "para:62f2131c",
+        "para:6528d233"
+      ]
+    },
+    {
+      "id": "s023",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "Workflow",
+      "text": "1. Request the OpenAPI file path (if not provided)\n2. Read and validate the file (must be OpenAPI 3.0.x)\n3. Extract schemas from `components/schemas`\n4. Extract endpoints from `paths` (request/response types)\n5. Generate TypeScript (interfaces + type guards)\n6. Ask where to save (default: `types/api.ts` in current directory)\n7. Write the file",
+      "chars": 344,
+      "units": [
+        "para:71d9276b",
+        "para:1b019378",
+        "para:78fe39d6",
+        "para:073691f1",
+        "para:09abc877",
+        "para:91c5f3d6",
+        "para:0efaedaa"
+      ]
+    },
+    {
+      "id": "s024",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "OpenAPI Validation",
+      "text": "Check before processing:\n\n```\n- Field \"openapi\" must exist and start with \"3.0\"\n- Field \"paths\" must exist\n- Field \"components.schemas\" must exist (if there are types)\n```\n\nIf invalid, report the error and stop.",
+      "chars": 211,
+      "units": [
+        "para:75bff5be",
+        "para:5a2dc4e1",
+        "para:9e2e0a97"
+      ]
+    },
+    {
+      "id": "s025",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "Primitives",
+      "text": "| OpenAPI     | TypeScript   |\n|-------------|--------------|\n| `string`    | `string`     |\n| `number`    | `number`     |\n| `integer`   | `number`     |\n| `boolean`   | `boolean`    |\n| `null`      | `null`       |",
+      "chars": 216,
+      "units": []
+    },
+    {
+      "id": "s026",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "Format Modifiers",
+      "text": "| Format        | TypeScript              |\n|---------------|-------------------------|\n| `uuid`        | `string` (comment UUID) |\n| `date`        | `string` (comment date) |\n| `date-time`   | `string` (comment ISO)  |\n| `email`       | `string` (comment email)|\n| `uri`         | `string` (comment URI)  |",
+      "chars": 307,
+      "units": [
+        "para:ae127513",
+        "para:68a86c3d",
+        "para:f5e0bf90",
+        "para:36e670c3",
+        "para:9ebeaa94"
+      ]
+    },
+    {
+      "id": "s027",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "Complex Types",
+      "text": "**Object:**\n```typescript\n// OpenAPI: type: object, properties: {id, name}, required: [id]\ninterface Example {\n  id: string;      // required: no ?\n  name?: string;   // optional: with ?\n}\n```\n\n**Array:**\n```typescript\n// OpenAPI: type: array, items: {type: string}\ntype Names = string[];\n```\n\n**Enum:**\n```typescript\n// OpenAPI: type: string, enum: [active, draft]\ntype Status = \"active\" | \"draft\";\n```\n\n**oneOf (Union):**\n```typescript\n// OpenAPI: oneOf: [{$ref: Cat}, {$ref: Dog}]\ntype Pet = Cat | Dog;\n```\n\n**allOf (Intersection/Extends):**\n```typescript\n// OpenAPI: allOf: [{$ref: Base}, {type: object, properties: ...}]\ninterface Extended extends Base {\n  extraField: string;\n}\n```",
+      "chars": 687,
+      "units": [
+        "para:e304459c",
+        "para:e53d83b7",
+        "para:031d0830",
+        "para:0ab78d87",
+        "para:4b7cb773",
+        "para:2a471fe7"
+      ]
+    },
+    {
+      "id": "s028",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "File Header",
+      "text": "```typescript\n/**\n * Auto-generated from: {source_file}\n * Generated at: {timestamp}\n *\n * DO NOT EDIT MANUALLY - Regenerate from OpenAPI schema\n */\n```",
+      "chars": 152,
+      "units": [
+        "para:0e19e9fa"
+      ]
+    },
+    {
+      "id": "s029",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "Interfaces (from components/schemas)",
+      "text": "For each schema in `components/schemas`:\n\n```typescript\nexport interface Product {\n  /** Product unique identifier */\n  id: string;\n\n  /** Product title */\n  title: string;\n\n  /** Product price */\n  price: number;\n\n  /** Created timestamp */\n  created_at?: string;\n}\n```\n\n- Use OpenAPI description as JSDoc\n- Fields in `required[]` have no `?`\n- Fields outside `required[]` have `?`",
+      "chars": 382,
+      "units": [
+        "para:11e67260",
+        "para:1e4c054c",
+        "para:26978897",
+        "para:d591bacc",
+        "para:155a8a0a"
+      ]
+    },
+    {
+      "id": "s030",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "Request/Response Types (from paths)",
+      "text": "For each endpoint in `paths`:\n\n```typescript\n// GET /products - query params\nexport interface GetProductsRequest {\n  page?: number;\n  limit?: number;\n}\n\n// GET /products - response 200\nexport type GetProductsResponse = ProductList;\n\n// POST /products - request body\nexport interface CreateProductRequest {\n  title: string;\n  price: number;\n}\n\n// POST /products - response 201\nexport type CreateProductResponse = Product;\n```\n\nNaming convention:\n- `{Method}{Path}Request` for params/body\n- `{Method}{Path}Response` for response",
+      "chars": 526,
+      "units": [
+        "para:4a143ac5",
+        "para:d95c9452",
+        "para:014991a5",
+        "para:d1850313"
+      ]
+    },
+    {
+      "id": "s031",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "Type Guards",
+      "text": "For each main interface, generate a type guard:\n\n```typescript\nexport function isProduct(value: unknown): value is Product {\n  return (\n    typeof value === 'object' &&\n    value !== null &&\n    'id' in value &&\n    typeof (value as any).id === 'string' &&\n    'title' in value &&\n    typeof (value as any).title === 'string' &&\n    'price' in value &&\n    typeof (value as any).price === 'number'\n  );\n}\n```\n\nType guard rules:\n- Check `typeof value === 'object' && value !== null`\n- For each required field: check `'field' in value`\n- For primitive fields: check `typeof`\n- For arrays: check `Array.isArray()`\n- For enums: check `.includes()`",
+      "chars": 643,
+      "units": [
+        "para:8b2799a6",
+        "para:d3a1e368",
+        "para:2a2cde13",
+        "para:db72822c",
+        "para:910cde3c",
+        "para:f5a2a63b",
+        "para:a8cbc824",
+        "para:0ee8acf5"
+      ]
+    },
+    {
+      "id": "s032",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "Error Type (always include)",
+      "text": "```typescript\nexport interface ApiError {\n  status: number;\n  error: string;\n  detail?: string;\n}\n\nexport function isApiError(value: unknown): value is ApiError {\n  return (\n    typeof value === 'object' &&\n    value !== null &&\n    'status' in value &&\n    typeof (value as any).status === 'number' &&\n    'error' in value &&\n    typeof (value as any).error === 'string'\n  );\n}\n```",
+      "chars": 382,
+      "units": [
+        "para:0deb39ff"
+      ]
+    },
+    {
+      "id": "s033",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "$ref Resolution",
+      "text": "When encountering `{\"$ref\": \"#/components/schemas/Product\"}`:\n1. Extract the schema name (`Product`)\n2. Use the type directly (don't resolve inline)\n\n```typescript\n// OpenAPI: items: {$ref: \"#/components/schemas/Product\"}\n// TypeScript:\nitems: Product[]  // reference, not inline\n```",
+      "chars": 283,
+      "units": [
+        "para:7ff4c3c4",
+        "para:3670835a",
+        "para:695681de",
+        "para:71830de3"
+      ]
+    },
+    {
+      "id": "s034",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "Complete Example",
+      "text": "```json\n{\n  \"openapi\": \"3.0.0\",\n  \"components\": {\n    \"schemas\": {\n      \"User\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"id\": {\"type\": \"string\", \"format\": \"uuid\"},\n          \"email\": {\"type\": \"string\", \"format\": \"email\"},\n          \"role\": {\"type\": \"string\", \"enum\": [\"admin\", \"user\"]}\n        },\n        \"required\": [\"id\", \"email\", \"role\"]\n      }\n    }\n  },\n  \"paths\": {\n    \"/users/{id}\": {\n      \"get\": {\n        \"parameters\": [{\"name\": \"id\", \"in\": \"path\", \"required\": true}],\n        \"responses\": {\n          \"200\": {\n            \"content\": {\n              \"application/json\": {\n                \"schema\": {\"$ref\": \"#/components/schemas/User\"}\n              }\n            }\n          }\n        }\n      }\n    }\n  }\n}\n```",
+      "chars": 746,
+      "units": [
+        "para:792eb298"
+      ]
+    },
+    {
+      "id": "s035",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "Complete Example",
+      "text": "```typescript\n/**\n * Auto-generated from: api.openapi.json\n * Generated at: 2025-01-15T10:30:00Z\n *\n * DO NOT EDIT MANUALLY - Regenerate from OpenAPI schema\n */\n\n// ============================================================================\n// Types\n// ============================================================================\n\nexport type UserRole = \"admin\" | \"user\";\n\nexport interface User {\n  /** UUID */\n  id: string;\n\n  /** Email */\n  email: string;\n\n  role: UserRole;\n}\n\n// ============================================================================\n// Request/Response Types\n// ============================================================================\n\nexport interface GetUserByIdRequest {\n  id: string;\n}\n\nexport type GetUserByIdResponse = User;\n\n// ============================================================================\n// Type Guards\n// ============================================================================\n\nexport function isUser(value: unknown): value is User {\n  return (\n    typeof value === 'object' &&\n    value !== null &&\n    'id' in value &&\n    typeof (value as any).id === 'string' &&\n    'email' in value &&\n    typeof (value as any).email === 'string' &&\n    'role' in value &&\n    ['admin', 'user'].includes((value as any).role)\n  );\n}\n\n// ============================================================================\n// Error Types\n// ============================================================================\n\nexport interface ApiError {\n  status: number;\n  error: string;\n  detail?: string;\n}\n\nexport function isApiError(value: unknown): value is ApiError {\n  return (\n    typeof value === 'object' &&\n    value !== null &&\n    'status' in value &&\n    typeof (value as any).status === 'number' &&\n    'error' in value &&\n    typeof (value as any).error === 'string'\n  );\n}\n```",
+      "chars": 1827,
+      "units": [
+        "para:d0f7f20e"
+      ]
+    },
+    {
+      "id": "s036",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "heading": "Common Errors",
+      "text": "| Error | Action |\n|-------|--------|\n| OpenAPI version != 3.0.x | Report that only 3.0 is supported |\n| $ref not found | List missing refs |\n| Unknown type | Use `unknown` and warn |\n| Circular reference | Use type alias with lazy reference |",
+      "chars": 243,
+      "units": [
+        "para:b583fe41",
+        "para:c0410ab3",
+        "para:e0caa1a2",
+        "para:47e78771"
+      ]
+    }
+  ],
+  "files": [],
+  "phrase_fate": {
+    "kept": 0.94,
+    "moved": 0.69,
+    "gone": 98.37,
+    "new": 99.68
+  }
+}

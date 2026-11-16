@@ -1,0 +1,24 @@
+{
+  "skill": "commit-work",
+  "mode": "output",
+  "pass_rate": 0.9508,
+  "passed": 58,
+  "total": 61,
+  "failures": [
+    {
+      "eval": "apply-check-fails",
+      "assertion": "Removes the run directory it created (`rm -rf -- /home/dev/app/.git/commit-work.k3Q9vT`) before replying, or names it as left behind and why.",
+      "evidence": "It only shows \u201cProposed only (not run)\u201d plus `rm -rf -- /home/dev/app/.git/commit-work.k3Q9vT`, so the directory is neither removed nor named as left behind with a reason."
+    },
+    {
+      "eval": "no-commits-yet",
+      "assertion": "Puts the same `GIT_INDEX_FILE=` prefix on `git add -- src/index.ts README.md`, `git diff --cached`, `git write-tree`, `git commit` and `git show --stat`, and never runs `git add -A`, `git add .` or `git commit -a`.",
+      "evidence": "It prefixes `GIT_INDEX_FILE=\"$RUN/index\" git add -- README.md src/index.ts`, `git diff --cached`, `git write-tree`, and `git commit -F` and never uses `git add -A`, `git add .`, or `git commit -a`, but it never proposes `git show --stat`."
+    },
+    {
+      "eval": "leftover-run-dir",
+      "assertion": "Creates its own run directory with `mktemp -d \"$(git rev-parse --absolute-git-dir)/commit-work.XXXXXX\"` and removes only that directory with `rm -rf -- \"<run>\"` once the run ends.",
+      "evidence": "The script uses `run=$(mktemp -d \"/home/dev/app/.git/commit-work.XXXXXX\")` and ends with `rm -rf -- \"$run\"`, not `mktemp -d \"$(git rev-parse --absolute-git-dir)/commit-work.XXXXXX\"`."
+    }
+  ]
+}

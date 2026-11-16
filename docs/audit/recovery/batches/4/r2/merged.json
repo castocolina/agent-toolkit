@@ -1,0 +1,419 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "commit-work",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-two": 92.0
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest commit-work at dbff837f: 'removed units (108, showing 40)'. The prompt showed only 40 of 108 removed units. All 40 shown are explained by valid rows in docs/audit/recovery/commit-work/record.md (s002-s022 via sections.json units), but the other 68 could not be checked.",
+          "fix": "Re-run the removal check with the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/commit-work/SKILL.md --judge direct --digest-dir <tmp>). For any unit that no row explains, restore it (into references/ when it is domain-specific, a template users ask for or a tested example; into the main file only when the procedure depends on it) or add a row for it to docs/audit/recovery/commit-work/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 33,
+          "evidence": "Step 6: 'The body says why, and `!` or a `BREAKING CHANGE:` footer marks only a real compatibility break.' This is Conventional Commits basics the model already knows. It is activation content inside an otherwise expert step.",
+          "fix": "Keep step 6 to the non-obvious parts (no bare `git commit` because an editor cannot run in an agent shell, -F <run>/msg.txt, no trailers by default, copy the repository's vocabulary). Leave the why-body and breaking-change basics to references/commit-message-template.md \u00a7 Message template, where they already appear, and add a record row for the trimmed sentence."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 25,
+          "evidence": "Step 3 ('Stage. Scratch files ... go in a run directory of their own ...') and its four sub-bullets make up about a third of the body. Run-directory lifecycle, index choice, overlap check, temporary-index setup and three staging methods are mixed together, which weakens the Process pattern's checkpoint structure.",
+          "fix": "Split step 3 into labelled sub-steps without removing any content: 3a run directory (create, list leftovers, cleanup), 3b choose the index (including the overlap check), 3c stage (whole file / part of a tracked file / untracked file). Keep every command and rule as written."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/commit-work/evals/evals.json",
+          "line": null,
+          "evidence": "Eval 'split-one-file-two-commits' lists \"references/split-one-file.md\" under \"files\". That is the skill's own reference, not an eval input, so the eval cannot test whether the agent loads it from step 3. Eval 'review-and-commit' gives its repo state only in prose and ships no fixture.",
+          "fix": "Remove references/split-one-file.md from that eval's files and add an assertion that the run reads it, or follows its pick-patch sequence, when one file holds two commits. Add an evals/files/ fixture (git status plus the src/auth.ts diff) for review-and-commit."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 14,
+          "evidence": "Route 'draft a message': 'with none, read-only inspection only (`git status`, `git diff --cached`, `git log`); reply with the message text only'. Following this branch with an empty index has no outcome: the skill does not say whether to draft from the unstaged `git diff` or to ask.",
+          "fix": "Add to the draft-a-message row: 'when nothing is staged, say so and draft from `git diff` only if the user confirms that is the change to commit; otherwise ask which changes the message is for.'"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/commit-work/references/commit-message-template.md",
+          "line": 30,
+          "evidence": "Message template restates the Conventional Commits skeleton `<type>(<scope>): <summary>` plus a what/why body that step 6 already requires.",
+          "fix": "Keep the skeleton in references/commit-message-template.md (users ask for the template by name); do not delete it. Trim only the duplicate prose if a later edit touches that section, and record any removed sentence in docs/audit/recovery/commit-work/record.md."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 36,
+          "evidence": "Step 6 gates references/commit-message-template.md on repository rules, extra footers, or wanting worked messages, but also says to read it for the step 8 report block, which step 8 then requires for every commit.",
+          "fix": "Move the report-block format inline at step 8 (it is six lines) and keep the reference gated on repository message rules, footers beyond BREAKING CHANGE, and worked messages."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 36,
+          "evidence": "Step 6 says write Conventional Commits 1.0.0 when the repository uses it or has no vocabulary of its own, but does not say how to tell that it uses it, while the reference says to copy `git log --format=%s -30` only when none of the rule files exist.",
+          "fix": "In step 6, name the default: the repository uses Conventional Commits when a commitlint config, a commit.template, or recent `git log --format=%s -30` subjects already use type(scope); otherwise copy that log's vocabulary. Point the conflicting case at the reference's collect-and-ask step."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/commit-work/evals/trigger-queries.json",
+          "line": 6,
+          "evidence": "The should-trigger query \"can you check in the tests for the parser separately from the parser change itself?\" asks for the split the skill's opening rule forbids (implementation and its tests in one commit).",
+          "fix": "Replace that query with a should-trigger that matches the skill, such as splitting formatting from a behavior change, and add a should-not-trigger only if a neighbouring skill owns history rewrites; keep the set near 10/10."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/commit-work/evals/evals.json",
+          "line": 1,
+          "evidence": "Eighteen evals assert command sequences, but none checks the step 4 overlap case: an approved path that already holds a staged diff the user did not approve, where the skill must stop and never run the step 8 git reset.",
+          "fix": "Add one eval whose fixture shows an approved path with an unapproved staged hunk plus other approved files, asserting a stop, no git apply or git add over that path, and no git reset on it."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 36,
+          "evidence": "Step 6's \"or has no vocabulary of its own\" contradicts references/commit-message-template.md, which says that with no rule files you copy `git log --format=%s -30` rather than default to Conventional Commits.",
+          "fix": "Make step 6 defer to the reference whenever commitlint, commit.template, CONTRIBUTING, a PR template, or recent subjects exist, and default to Conventional Commits only when those sources are absent; the reference's collect step already says to ask when two sources conflict."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/commit-work/references/split-one-file.md",
+          "line": 14,
+          "evidence": "After the first commit, step 6 says `git add -- src/components/Header.js` stages the rest of the file, but a temporary index was built from the old HEAD and still lacks the bugfix commit, so that add would stage the refactor against a stale tree.",
+          "fix": "State the order as a requirement: in temporary-index mode, rebuild with `GIT_INDEX_FILE=<run>/index git read-tree HEAD` (and re-copy any approved staged patches) before `git add -- src/components/Header.js`; only the real-index route may add the rest immediately."
+        }
+      ]
+    },
+    {
+      "name": "meme-factory",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0,
+        "router-env-my-referee-two": 91.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/meme-factory/record.md",
+          "line": null,
+          "evidence": "previous-version digest: meme-factory at dbff837f lists 'removed units (458, showing 40)'. The cut list hides 418 items, so this check cannot confirm them. All 40 items shown are explained by valid record rows or by content found in references/text-memes.md, references/blog-posts.md and references/image-memes.md",
+          "fix": "Re-run the removal check with the full digest (no 'showing' cap), or confirm that every one of the 458 para: units maps to a section id whose units in sections.json have a valid row in docs/audit/recovery/meme-factory/record.md"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 10,
+          "evidence": "Step 1: 'Text-only request (greentext, copypasta, ASCII, \"no image\"): read references/markdown-memes-guide.md, answer in text, and stop.' A text meme then skips step 4's audience check ('Who will see it ... Who is the butt of the joke ... never a named teammate or customer'), even though text memes get pasted into the same Slack channels and PRs",
+          "fix": "Change step 1 to: '... read references/markdown-memes-guide.md, answer step 4's three questions (audience, butt of the joke, channel tone) and leave out real names and secrets, then answer in text and stop. Do not build an image URL.'"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/meme-factory/evals/evals.json",
+          "line": 35,
+          "evidence": "\"files\": [\"references/markdown-memes-guide.md\"] (also in text-corporate-satire, docusaurus-admonition, unavailable-template-two-buttons, gru-plan-long-id, background-415, no-watermark-parameter, blog-post-mix). The spec defines files as input files for the user's task, kept in evals/files/. These entries point at the skill's own references instead",
+          "fix": "Remove the references/ paths from the files arrays, because the skill loads them itself. Keep files only for real user inputs under evals/files/, and if you want to track which reference each case exercises, add an assertion such as 'Follows the Docusaurus ::: syntax from references/blog-posts.md'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 17,
+          "evidence": "Step 6: '404 means a wrong template ID; 422 means an unknown style or font, or a width or height of 1-9; 415 means a background or style image URL the service cannot fetch'. These are status-code facts that can change between versions of the vendor's API, and SKILL.md gives no source or check date for them. Only references/image-memes.md carries 'checked live against api.memegen.link and the service README ... on 2026-11-07'",
+          "fix": "Add to step 6: '(memegen README https://github.com/jacebrowning/memegen and live probes, checked 2026-11-07; details in references/image-memes.md)'"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/meme-factory/references/text-memes.md",
+          "line": 33,
+          "evidence": "Aim for three layers in every format: a setup that sets context, a pattern that builds expectation, then a punchline or twist that subverts or amplifies it.",
+          "fix": "The model produces setup-pattern-punchline unprompted. Move this sentence into the existing SKILL.md step 4 payoff rule or record the removal in docs/audit/recovery/meme-factory/record.md; keep the format catalog."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 18,
+          "evidence": "Write the joke. First answer three questions. Who will see it: team Slack, a PR, or a public post?",
+          "fix": "This is the right Tool pattern with one deviation: step 4 is a taste framework for a creative task. Keep the redaction, line-count and escape procedures exact, and leave the joke itself as principles (audience, butt of the joke, payoff first) rather than a numbered joke recipe."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 86,
+          "evidence": "Never add a watermark parameter (`watermark=none` and similar).",
+          "fix": "The Gotchas list already has reasons. Add the two remaining landmines the body states elsewhere: `list-templates` covers 17 of 209 IDs so a missing ID is not invalid, and a single quoted caption keeps a slash while a slash-separated caption list does not."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/meme-factory/references/text-memes.md",
+          "line": 3,
+          "evidence": "Read this with `markdown-memes-guide.md` (greentext, copypasta and ASCII fence rules)",
+          "fix": "SKILL.md step 1 already gates the three references. Make that routing exclusive: a named format loads only text-memes.md, and a blog or docs platform loads only blog-posts.md, and say not to load image-memes.md for a text-only request."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 21,
+          "evidence": "If the user did not give one caption per template line, ask for the missing lines, or pick a template whose `lines` matches the captions given",
+          "fix": "Two equal actions sit on one fragile choice. Default to asking for the missing lines; pick another template only when the user did not name one."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/meme-factory/evals/trigger-queries.json",
+          "line": 14,
+          "evidence": "\"query\": \"write a greentext story about debugging\", \"should_trigger\": true",
+          "fix": "The set has 10 should-trigger and 10 should-not-trigger queries, but the last negative (\"make a funny one-liner about code reviews in plain text, no meme format\") shares almost no wording with the skill. Replace it with a near-miss such as asking where a meme template originated or for a stock photo, and add one should-trigger query that names a text format without saying meme."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/meme-factory/references/text-memes.md",
+          "line": 151,
+          "evidence": "The emoji samples in format 11 render as U+FFFD replacement characters: \"leaving my responsibilities\" and \"wondering if coffee counts as a personality\".",
+          "fix": "Rewrite those two lines with the intended emoji so the sample is a template the agent can adapt; the same replacement characters repeat in the complete post example in references/blog-posts.md."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/meme-factory/references/blog-posts.md",
+          "line": 16,
+          "evidence": "![Drake rejecting \"make it fun\", approving \"make it accessible\"](https://api.memegen.link/images/drake/make_it_fun/make_it_accessible.png)",
+          "fix": "The Drake template rejects the top caption and approves the bottom one, so this example and the \"test thoroughly / deploy on friday\" example in the complete post say the opposite of the joke. Swap the captions, or state that the sample is intentionally the wrong choice."
+        }
+      ]
+    },
+    {
+      "name": "mui",
+      "percent": 90.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6,
+        "router-env-my-referee-two": 86.4
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/mui/record.md",
+          "line": null,
+          "evidence": "Digest for mui at dbff837f: 'removed units (114, showing 40)'. The 40 listed items are all explained: each has a valid record row, or its content now sits in references/component-recipes.md, references/sx-and-styled-recipes.md or references/theme-recipes.md. The other 74 units could not be checked one by one.",
+          "fix": "Re-run the removal digest without the display cap, or check that every unit listed under the sections in sections.json has a valid row in docs/audit/recovery/mui/record.md. Also, the many drop-pending rows that use reason class 'scope-change' should use a reason class fixer-rules.md allows for drop-pending (for example generic-model-knowledge). Their content was restored to references/, so nothing has to be put back."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 12,
+          "evidence": "The Version check section repeats several version-specific v9 removal bullets ahead of the decision order. They are expert content, but they weigh on the core file even for a v7-only task.",
+          "fix": "Keep the version read and the upgrade-guide link in SKILL.md. Move the five v9 removal bullets into a references file, for example references/v9-deltas.md, and load it with a gate: 'read when package.json shows @mui/material 9.x'. Record the move in docs/audit/recovery/mui/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 24,
+          "evidence": "'1. **Confirm the installed API.** Read the version in `package.json`...' repeats the earlier '## Version check' instruction 'Read the installed `@mui/material` version first (`package.json`...)'. The procedure starts twice.",
+          "fix": "Merge Version check into Decision order step 1: read the installed version, and if it is 9.x, follow the v9 guide or the gated v9 reference. Then the workflow has one entry point and the Tool pattern stays clean."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/mui/evals/evals.json",
+          "line": null,
+          "evidence": "recipe-list-grid, recipe-form-select, recipe-theme-overrides and recipe-styled-custom-prop give the skill's own reference files as inputs ('files': ['references/component-recipes.md']). The other evals give bare evals/files names ('legacy-api.tsx'). dialog-v7 also has vague assertions such as 'Uses MUI imports'.",
+          "fix": "Give each recipe eval a user input under evals/files/ (for example a legacy settings list in a .tsx file) instead of a skill reference. A with-skill run loads the reference anyway, and a without-skill baseline must not get it. Replace 'Uses MUI imports' with a checkable assertion, for example 'imports Dialog, DialogTitle, DialogActions from @mui/material or its one-level paths'."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/mui/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "Several should-not-trigger queries share nothing with the skill and test little: 'Configure Vite for React.', 'Explain CSS specificity.', 'Explain React server components in Next.js.'",
+          "fix": "Replace them with near-misses that share MUI keywords but belong elsewhere, for example 'Add a date range picker from @mui/x-date-pickers to our filter bar' or 'Style a Joy UI Sheet with the sx prop'."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/mui/SKILL.md",
+          "line": 24,
+          "evidence": "Decision order step 1 reads the installed version, but only 9.x has a branch ('On v9, read the official upgrade guide'). Following the decision order with package.json at @mui/material ^5 or ^6 on a task that is not a migration ('editing an existing MUI screen' triggers the skill) still applies v7-only facts such as the Grid size prop, slotProps.htmlInput and one-level exports, which may not exist in the installed version.",
+          "fix": "Add a branch to step 1: 'Installed major below 7 and the user did not ask to upgrade: keep the installed API, check each v7 fact against the installed .d.ts before using it, and offer the migration instead of applying it.' Also say what to do for any major not covered (read that version's upgrade guide)."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/mui/SKILL.md",
+          "line": 1,
+          "evidence": "removed units (114, showing 40) from dbff837f; the 40 shown para ids all sit in sections.json units of record rows (s014, s027-s042, s047-s105, s106)",
+          "fix": "No single unit is unexplained. Record the omitted 74 para ids in docs/audit/recovery/mui/record.md, or expand the digest so each omitted unit is shown."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/mui/README.md",
+          "line": 5,
+          "evidence": "MUI is one of the most popular React UI libraries, and v7 introduced several breaking changes from v6.",
+          "fix": "The model reliably produces that popularity claim unprompted. Delete the sentence and add a drop row to docs/audit/recovery/mui/record.md; keep the March 2025 release fact."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/mui/README.md",
+          "line": 33,
+          "evidence": "How It Works is five generic steps (identify the task, leverage theme tokens, ensure type safety, build responsively) that restate Decision order without its traps.",
+          "fix": "Point How It Works at SKILL.md Decision order, or drop steps 1 and 3-5 into the record as generic-model-knowledge. Keep step 2, which states the sx, styled, and theme-override choice."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/mui/references/theme-recipes.md",
+          "line": 65,
+          "evidence": "variants: [ { props: { variant: 'contained', color: 'primary' }, style: ... } ] is nested inside styleOverrides.root.",
+          "fix": "Move variants to the sibling of styleOverrides and defaultProps under MuiButton, matching the v9 upgrade guide the comment cites, and say a variants key inside root is not a slot override."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 3,
+          "evidence": "Description lists sx, Grid size, slots, createTheme, CSS variables, colorSchemes, Dialog onClose, Skeleton and IconButton, but not the styled and styleOverrides state-class work in resources/styling-guide.md.",
+          "fix": "Use when writing, fixing or migrating React code on Material UI v7 (@mui/material, @mui/icons-material, @mui/material/styles): sx styling and its spacing and borderRadius multipliers, Grid size layouts, slots/slotProps, createTheme palettes and color augmentation, CSS variables, colorSchemes dark mode, CSS layers, Dialog onClose, Skeleton loading, IconButton names, and styled or styleOverrides that must beat a MUI state class. Trigger when upgrading v5 or v6 code (onBackdropClick, Grid item/xs/md, components/componentsProps, deep imports) or editing an existing MUI screen, even when the user does not say v7. Not for Joy UI, MUI X data grids or pickers, Base UI, Chakra UI, Vuetify, Radix, a native <dialog>, Tailwind-only or plain CSS styling, or general React setup."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 74,
+          "evidence": "references/sx-and-styled-recipes.md and references/theme-recipes.md are loaded when the user asks for an example, while resources/styling-guide.md and resources/theme-customization.md load on the task.",
+          "fix": "Gate the two recipe files on the task (conditional sx, a custom styled prop, theme typography, shadows, transitions), and add Do NOT Load references/sx-and-styled-recipes.md or references/theme-recipes.md for a prop or import migration."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/mui/SKILL.md",
+          "line": 19,
+          "evidence": "Decision order step 2 offers sx, styled, and theme components overrides as three equal layers, with reuse or readability as the only decider.",
+          "fix": "Default to sx for one instance. Use styled only when a second callsite needs the same component, and theme components overrides only when every instance in the app should change. Name that order in Decision order step 2."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/mui/evals/evals.json",
+          "line": 1,
+          "evidence": "Twelve evals cover migration, loading, theme nesting, palette augmentation and recipes, but none assert the state-class specificity fix or theme.applyStyles in resources/styling-guide.md.",
+          "fix": "Add an eval whose prompt is a MuiOutlinedInput notchedOutline override that loses to hover and focus, with assertions that the override uses outlinedInputClasses on root at the same selector depth and uses theme.applyStyles for a dark scheme."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/mui/references/theme-recipes.md",
+          "line": 65,
+          "evidence": "The worked MuiButton theme puts variants inside styleOverrides.root, so copying it does not produce the v9 root variants entry the comment promises.",
+          "fix": "Lift variants next to styleOverrides. Keep the note that containedPrimary still works on v7 and is removed in v9, and point to https://mui.com/material-ui/migration/upgrade-to-v9/ (checked 2026-11-07)."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/mui/README.md",
+          "line": 169,
+          "evidence": "read the installed version's with `pnpm view @mui/material@<version> peerDependencies`",
+          "fix": "Change to: read the installed version's peerDependencies with `pnpm view @mui/material@<version> peerDependencies`."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

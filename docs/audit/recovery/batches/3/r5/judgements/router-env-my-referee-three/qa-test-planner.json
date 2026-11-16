@@ -1,0 +1,95 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/qa-test-planner/record.md",
+      "line": null,
+      "evidence": "previous-version digest qa-test-planner at dbff837f: 'removed units (599, showing 40)'. This is a cut list. Each of the 40 units shown, and both file: items, has a valid row that sections.json maps (restore-references content found in references/, not-lost, superseded-by, intended-change). The other 559 units could not be checked from the digest.",
+      "fix": "Regenerate the digest without the cut, or check the full unit list against sections.json, and add a row to docs/audit/recovery/qa-test-planner/record.md for any unit no section row covers"
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 143,
+      "evidence": "'In every supplied-log reply, end with one line on reading results: exit 0 the `file` path in the JSON line, exit 2 the `missing` flags or bad value, exit 1 the file exists (ask before `--overwrite`), exit 3 an I/O failure'. The supplied log already shows the outcome, so explaining the other exit codes every time does nothing for the user. The line reads as if written to satisfy the script-bug-file eval assertion 'Says how to read the result'.",
+      "fix": "Tie the line to its purpose: 'When the logged exit is not 0, end with the remedy for that exit code', then narrow the eval assertion to match. Or remove the line and record the removal with a row in docs/audit/recovery/qa-test-planner/record.md"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 108,
+      "evidence": "'## 7. Optional scripts: files on disk' takes about 45 of the 161 body lines: two full command examples, a flag table, quoting rules and a five-step 'Reading the result' procedure with sub-steps. It loads on every run, although section 7 itself says the scripts are only for when the user wants a file written. This bends the Process pattern.",
+      "fix": "Move the 'Reading the result' procedure and the second command example to references/scripts.md. In section 7, keep the when-to-use rule, the never-without-a-field-flag rule and the quoting rule, and add: 'Read references/scripts.md when you run a script or a run log is supplied; do NOT load it otherwise'. Record the move as a row in docs/audit/recovery/qa-test-planner/record.md"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 103,
+      "evidence": "'- Failed-case reruns, safe reproduction and the reproduction rate follow section 3b.' This bullet in the Gotchas list is only a cross-reference. It is not a gotcha with a reason.",
+      "fix": "Restate it as a gotcha with its reason, for example: 'NEVER rerun a failed case until it passes and report the pass: the first failure is the evidence, and a retried green hides an intermittent P0 (procedure in section 3b).'"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 77,
+      "evidence": "The enumeration oracle row puts concrete numbers in the table ('30 alternating requests per input', 'medians within 50 ms'). Line 79 then needs a whole paragraph to say they are placeholders that must never be copied.",
+      "fix": "Write placeholders in the table cell: 'state the sampling plan ([n] alternating requests per input) and the agreed tolerance ([ms] between medians), or Unknown'. Then shorten line 79 to one sentence saying a missing plan is Unknown under Open Questions"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/qa-test-planner/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "There are 23 queries: 14 should_trigger true and 9 false. The guidance is 8-10 of each, so the positives are over-weighted and the negatives (named-but-out-of-scope and unnamed near-misses) are fewer.",
+      "fix": "Replace 4 of the 14 positives with negatives. Good candidates: a named request to fix implementation code ('/qa-test-planner fix the null check in src/checkout/pay.ts'), an unnamed bug triage, an unnamed regression selection, and a named Playwright request. That gives 10 and 10 at about 20 total"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 16,
+      "evidence": "The 'Read first' cell of the plan row packs three conditional clauses into one table cell: 'at once when the request names entry or exit criteria, a risk table, an executive summary, deliverables or a full plan document, or the user asks for a plan example; a plan request that asks for none of these keeps the section 3 shape; references/regression_testing.md only if the plan schedules a regression run'. Following it means parsing nested conditions inside the table.",
+      "fix": "Make the cell 'see the plan bullet below'. Add a bullet under the table: 'Plan: read references/test_plan_template.md when the request names entry/exit criteria, a risk table, an executive summary, deliverables, a full plan document or a plan example; otherwise use the section 3 shape. Read references/regression_testing.md only if the plan schedules a regression run.'"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+$ git status
+On branch fix/token-expiry
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   src/auth.ts
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+$ git diff --cached
+$ git rev-parse --absolute-git-dir
+/home/dev/app/.git
+$ ls -d /home/dev/app/.git/commit-work.*
+ls: cannot access '/home/dev/app/.git/commit-work.*': No such file or directory
+$ mktemp -d "/home/dev/app/.git/commit-work.XXXXXX"
+/home/dev/app/.git/commit-work.k3Q9vT
+$ git diff -U1 -- src/auth.ts > /home/dev/app/.git/commit-work.k3Q9vT/all.diff
+$ cp /home/dev/app/.git/commit-work.k3Q9vT/all.diff /home/dev/app/.git/commit-work.k3Q9vT/pick.diff
+(the refactor hunk was deleted from pick.diff by hand; the expiry hunk was kept)
+$ git apply --cached --check /home/dev/app/.git/commit-work.k3Q9vT/pick.diff
+error: corrupt patch at line 9

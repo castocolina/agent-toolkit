@@ -1,0 +1,39 @@
+{
+  "skill": "qa-test-planner",
+  "mode": "output",
+  "pass_rate": 0.9231,
+  "passed": 72,
+  "total": 78,
+  "failures": [
+    {
+      "eval": "auth-plan",
+      "assertion": "Excludes an area only with cited evidence that the change cannot reach it; otherwise records impact as Unknown, names the missing-information owner or marks it Unknown, and retains a minimal smoke check or an owned Blocked check",
+      "evidence": "Rate limiting and SSO-only/unverified accounts have no smoke check and are only \"listed as `Blocked` until specified\" with \"Owner `Unknown`\", so neither has a smoke check or an owned Blocked check."
+    },
+    {
+      "eval": "checkout-cases",
+      "assertion": "Each case has a cleanup step that resets the data it seeded",
+      "evidence": "TC-CHK-003's cleanup reads only \"None expected. If a record was created, delete it and note it as a defect.\" It does not reset the seeded empty-cart account, unlike the resets in TC-CHK-001 and TC-CHK-002."
+    },
+    {
+      "eval": "script-bug-file",
+      "assertion": "Checks that the logged command passes the observed rate 2/10 and the build 2.4.0-rc2 from the notes, and no --os, --browser or --device value",
+      "evidence": "The table checks \"`--build` | `2.4.0-rc2` | \u2705 Exact\" and \"`--rate` | `2/10`\", but never states that no --os, --browser or --device flag was passed; it only comments that \"`--console`: not passing it was correct\"."
+    },
+    {
+      "eval": "script-bug-file",
+      "assertion": "Checks that the logged command single-quotes every flag value and passes ./bugs as the output directory",
+      "evidence": "The output never mentions quoting of flag values and does not check the `./bugs` positional argument; it only cites the resulting path \"./bugs/BUG-CHK-5521.md\"."
+    },
+    {
+      "eval": "script-bug-file",
+      "assertion": "Says how to read the result: the file path from the JSON line on exit 0, the missing flags on exit 2, and asking before --overwrite on exit 1",
+      "evidence": "The output only says \"exit 0, so the report is at the JSON `file` path, `./bugs/BUG-CHK-5521.md`\" and never covers exit 2 or exit 1 with --overwrite."
+    },
+    {
+      "eval": "security-bug-owasp",
+      "assertion": "Writes reproduction rate, environment facts not supplied and the disclosure owner as Unknown, listed under Open Questions",
+      "evidence": "The environment and \"Disclosure owner: Unknown\" are written Unknown and asked about, but the rate is given as \"1 occurrence reported, not reproduced\" rather than Unknown, and no Open Question asks for the reproduction rate."
+    }
+  ]
+}

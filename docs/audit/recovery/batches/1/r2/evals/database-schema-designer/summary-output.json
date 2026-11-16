@@ -1,0 +1,24 @@
+{
+  "skill": "database-schema-designer",
+  "mode": "output",
+  "pass_rate": 0.9524,
+  "passed": 60,
+  "total": 63,
+  "failures": [
+    {
+      "eval": "mysql-myisam-foreign-key",
+      "assertion": "Recommends converting the table to InnoDB (`ENGINE=InnoDB`) and cleaning up orphaned orders before adding the foreign key",
+      "evidence": "It recommends `ENGINE=InnoDB` and re-adding the foreign key, but never tells the user to clean up orphaned orders before adding the key."
+    },
+    {
+      "eval": "mysql-explain-on-writes-and-reading-plans",
+      "assertion": "Defaults to plain `EXPLAIN` for the `UPDATE` because `EXPLAIN ANALYZE` executes the statement, and allows `EXPLAIN ANALYZE` only on disposable production-like data or inside `BEGIN; ... ROLLBACK;`",
+      "evidence": "The output says \"Do not use `EXPLAIN ANALYZE`\" and \"A `BEGIN; \u2026 ROLLBACK;` wrapper is not a substitute here,\" so it never allows `EXPLAIN ANALYZE` on disposable data or inside a rollback."
+    },
+    {
+      "eval": "mysql-explain-on-writes-and-reading-plans",
+      "assertion": "States that MySQL 8.4 does not measure a single-table UPDATE with EXPLAIN ANALYZE and tells the user to run it on their server to see the exact output, instead of promising an exact message",
+      "evidence": "It promises a specific result\u2014\"it reports that the statement is not executable by the iterator executor\"\u2014rather than only telling the user to confirm the exact output on the server."
+    }
+  ]
+}

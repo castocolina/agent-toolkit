@@ -207,7 +207,8 @@ class MemeGenerator:
         """
         if width:
             return f'<img src="{url}" alt="{alt_text}" width="{width}"/>'
-        return f"![{alt_text}]({url})"
+        alt = re.sub(r"([\\\[\]])", r"\\\1", alt_text)
+        return f"![{alt}]({url})"
 
 
 def main() -> None:
@@ -231,7 +232,7 @@ def main() -> None:
     generate_parser.add_argument("--style", help="Template style name or overlay image URL")
     generate_parser.add_argument("--background", help="Background image URL (template 'custom')")
     generate_parser.add_argument("--markdown", "-m", action="store_true", help="Output as markdown")
-    generate_parser.add_argument("--alt", default="Meme", help="Alt text for --markdown (describe picture and joke)")
+    generate_parser.add_argument("--alt", help="Alt text, required with --markdown (describe picture and joke)")
 
     # List templates command
     subparsers.add_parser("list-templates", help="List all available templates")
@@ -244,6 +245,8 @@ def main() -> None:
     generator = MemeGenerator()
 
     if args.command == "generate":
+        if args.markdown and not args.alt:
+            parser.error("--markdown needs --alt: describe the picture and the joke")
         url = generator.generate(
             args.template,
             *args.captions,

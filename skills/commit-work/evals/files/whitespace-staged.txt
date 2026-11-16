@@ -1,0 +1,21 @@
+$ git status --short
+M  src/report.ts
+
+$ git diff --cached
+diff --git a/src/report.ts b/src/report.ts
+index 3c5d1f8..a9e07b2 100644
+--- a/src/report.ts
++++ b/src/report.ts
+@@ -10,2 +10,4 @@ export function render(rows: Row[]): string {
+   const lines = rows.map(formatRow);
++  const footer = `${rows.length} rows`;
++  lines.push(footer);
+   return lines.join("\n");
+
+$ git diff --cached --check
+src/report.ts:11: trailing whitespace.
++  const footer = `${rows.length} rows`;
+(exit status 2)
+
+$ cat package.json | grep '"test"'
+    "test": "vitest run",

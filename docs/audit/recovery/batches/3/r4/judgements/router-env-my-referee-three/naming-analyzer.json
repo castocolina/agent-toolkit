@@ -1,0 +1,68 @@
+{
+  "skill": "naming-analyzer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/naming-analyzer/record.md",
+      "line": null,
+      "evidence": "previous-version digest naming-analyzer at dbff837f: 'removed units (139, showing 40)'. The digest is cut, so 99 removed units could not be checked. All 40 listed items are explained by valid record rows or by content in references/naming-guidelines.md.",
+      "fix": "Rerun the removal check with the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/naming-analyzer/SKILL.md --judge direct --digest-dir <dir>, then use a digest file with no cut). For any unit that has no section-id row in docs/audit/recovery/naming-analyzer/sections.json, add a row to docs/audit/recovery/naming-analyzer/record.md."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 61,
+      "evidence": "All four Gotchas items repeat what the body already says: Celery/RQ is in Hidden consumers line 58, the polarity flip is in the Cases row at line 43, string-key access is at line 53 and generated code is at line 56. They add no new environment fact.",
+      "fix": "Keep the four items, because they put the riskiest traps in one place. Add one gotcha the body does not cover yet, from a real mistake, for example: 'Search results that hit only the definition do not prove the name is local: dynamic access through f-strings (getattr(obj, f\"{prefix}_nm\")) or template filters will not match a literal string search, so rate such names medium confidence.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 55,
+      "evidence": "'Next.js `page.tsx`/`layout.tsx`/`route.ts`, and Rails Zeitwerk (`app/models/user_account.rb` must define `UserAccount`) are discovered by name.' Framework file conventions change between releases (the Next.js App Router replaced the pages/ conventions), and this fact has neither a source URL with a check date nor a live-read instruction. The pytest fact on the same line has both.",
+      "fix": "Add the official sources with the date checked, as the pytest fact does: '([Next.js file conventions](https://nextjs.org/docs/app/api-reference/file-conventions/page), checked <date>; [Rails autoloading](https://guides.rubyonrails.org/autoloading_and_reloading_constants.html), checked <date>)'. Or add a live check: read next.config and the app/ or pages/ layout before you rate the rename."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 105,
+      "evidence": "The worked-example table cites 'billing.py:8' for `get_total`. In the code block, `def get_total(invoice):` is line 9, and line 8 is blank.",
+      "fix": "Change the Location of the first row to 'billing.py:9', so the example's Location column points at the definition it describes."
+    }
+  ]
+}

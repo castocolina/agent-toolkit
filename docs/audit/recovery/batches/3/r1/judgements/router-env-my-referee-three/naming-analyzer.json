@@ -1,0 +1,68 @@
+{
+  "skill": "naming-analyzer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": null,
+      "evidence": "Digest naming-analyzer at dbff837f: 'removed units (139, showing 40)'. The digest shows only part of the removed units. All 40 shown items map through sections.json to a valid row in docs/audit/recovery/naming-analyzer/record.md (sections s001-s032 all have rows), but 99 units were not listed in the digest itself.",
+      "fix": "Regenerate the digest without a cut (or with a higher display limit) so every removed unit can be checked against record.md directly. Do not change the skill content."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 33,
+      "evidence": "Step 3: 'then **report** and end with the counts line from that reference', but the gated read at line 31 lists only Priority class, boolean name, abbreviation, no-convention and convention-split as triggers",
+      "fix": "Add 'or write the closing counts line' to the trigger sentence at line 31, so the second instruction that needs references/naming-guidelines.md is gated too: 'Read references/naming-guidelines.md when you assign a Priority class, ..., find a convention split across the repo, or write the closing counts line.'"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/naming-analyzer/evals/evals.json",
+      "line": null,
+      "evidence": "Nine output evals, but none covers the riskiest Cases-table row ('disableRetry \u2192 retryEnabled inverts meaning, so every default, read, write and test must flip') or an ORM column rename (Django db_column / makemigrations)",
+      "fix": "Add an eval whose prompt pastes a config class with `disableRetry = false` and a Django model field `usr_nm`, with assertions that the reply states the inverted mapping (`retryEnabled = !disableRetry`, default flips to true), says a symbol-only IDE rename is unsafe, and proposes `db_column=\"usr_nm\"` rather than a plain field rename"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 52,
+      "evidence": "'Non-interactive `makemigrations --noinput` cannot confirm a rename, so it emits RemoveField plus AddField, which drops the column's data.' This is version-sensitive behavior of a vendor CLI, and it has no inline source URL or checked date. The NestJS claim at line 54 likewise has a link but no date, unlike the Angular and Google TS facts.",
+      "fix": "Add the official source and the check date where each fact appears, for example '([Django makemigrations](https://docs.djangoproject.com/en/stable/ref/django-admin/), checked 2026-11-07)', and add 'checked 2026-11-07' after the NestJS link. Alternatively, tell the agent to confirm the behavior live with `python manage.py makemigrations --dry-run` in the project."
+    }
+  ]
+}

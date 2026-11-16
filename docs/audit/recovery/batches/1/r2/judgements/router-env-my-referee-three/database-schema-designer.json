@@ -1,0 +1,86 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": null,
+      "evidence": "Digest at dbff837f is a cut list: 'removed units (306, showing 40)'. All 40 shown items are explained by record.md rows (checked against sections.json) or are present in references/schema-fundamentals.md, migrations.md or the template. The other 266 units could not be checked.",
+      "fix": "Regenerate the dbff837f digest without the cut so every removed unit can be checked against docs/audit/recovery/database-schema-designer/record.md and sections.json. Add a row for any unit no section-level row covers."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 11,
+      "evidence": "Knowledge delta is high: the defaults, workflow and gotchas are almost all expert, engine-specific content. The 1-point gap is a judgment call, not a defect (the only deduction is the D1-1 cut-list finding).",
+      "fix": "No content change needed. Keep the current Defaults, Workflow and Gotchas as they are."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 34,
+      "evidence": "Workflow step 4 'Check before answering' puts the sketch check, the routing to schema-fundamentals.md, the routing to the review checklist and the full report-format rules into one bullet of about 150 words. The checkpoint gets lost.",
+      "fix": "Split step 4 into labeled sub-bullets: (a) sketch self-check, (b) when to read references/schema-fundamentals.md, (c) review or sign-off with references/schema-design-checklist.md and its report format, (d) MongoDB variant. Keep every rule, only restructure."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 50,
+      "evidence": "'MongoDB documents stop at 16 MiB': this vendor limit has no source URL or date checked, and no instruction reads it live. The upstream registry already lists https://www.mongodb.com/docs/manual/reference/limits/.",
+      "fix": "Add the source after the limit: '(https://www.mongodb.com/docs/manual/reference/limits/, checked <date>)'."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 43,
+      "evidence": "'add the FK with ALGORITHM=COPY ... INPLACE works only with foreign_key_checks = 0': this MySQL online-DDL behavior has no source URL or date checked.",
+      "fix": "Cite https://dev.mysql.com/doc/refman/8.4/en/innodb-online-ddl-operations.html (foreign key operations) with the date checked, or tell the reader to confirm on that page for their server version."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 28,
+      "evidence": "The MySQL 'MODIFY phone VARCHAR(32) NOT NULL, ALGORITHM=INPLACE, LOCK=NONE' step does not say that in-place NOT NULL needs STRICT_TRANS_TABLES or STRICT_ALL_TABLES. On a non-strict sql_mode the branch fails without a fallback.",
+      "fix": "Add: 'INPLACE NOT NULL requires a strict sql_mode (STRICT_TRANS_TABLES or STRICT_ALL_TABLES); check SELECT @@sql_mode first, and read the Online DDL Operations page for your version.'"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "skill": "qa-test-planner",
+  "mode": "output",
+  "pass_rate": 0.9231,
+  "passed": 72,
+  "total": 78,
+  "failures": [
+    {
+      "eval": "script-bug-file",
+      "assertion": "Checks that the logged command single-quotes every flag value and passes ./bugs as the output directory",
+      "evidence": "The review never checks the quoting of the logged flag values or confirms `./bugs` as the output directory; `./bugs` appears only in its own proposed rerun command."
+    },
+    {
+      "eval": "script-bug-file",
+      "assertion": "Says how to read the result: the file path from the JSON line on exit 0, the missing flags on exit 2, and asking before --overwrite on exit 1",
+      "evidence": "The output covers only exit 0 (\"on exit 0, the file to read is the `file` path in the JSON line\"); it does not describe exit 2 or link asking before `--overwrite` to exit 1."
+    },
+    {
+      "eval": "regression-tiers",
+      "assertion": "Gives a run frequency per priority as a default the team's cadence overrides, and does not use a pass-rate percentage as the release gate",
+      "evidence": "The release gate avoids a pass rate (\"Release gate (exit criterion; no pass-rate threshold)\"), but the output gives no per-priority run frequency such as \"P0 every build\": cadence appears only per tier."
+    },
+    {
+      "eval": "full-plan-sections",
+      "assertion": "The risk table has probability, impact, mitigation, covering case IDs and an owner column, and writes Unknown where the requester gave no basis instead of inventing H, M or L",
+      "evidence": "There is no risk table: the output gives each risk as a bulleted list ('**K1: ...** - Impact: H (money) - Mitigation: ... - Cases: TC-CHK-001 - Owner: `Unknown`') and states probability only once, globally ('Probability: `Unknown` for every risk'), not as a column."
+    },
+    {
+      "eval": "security-bug-owasp",
+      "assertion": "Writes reproduction rate, environment facts not supplied and the disclosure owner as Unknown, listed under Open Questions",
+      "evidence": "Environment and \"Disclosure owner: Unknown\" are written as Unknown and asked under Open Questions, but the rate is \"1 occurrence reported, not reproduced\" instead of Unknown, and Open Questions never asks for it."
+    },
+    {
+      "eval": "run-report-without-pass-rate",
+      "assertion": "Includes the build, environment, a summary of counts and a by-priority table, and writes any count the requester did not give (the by-priority split, passed total) as Unknown rather than inventing it",
+      "evidence": "The by-priority split is written as Unknown, but the summary derives a passed total that was not given instead of writing Unknown: \"Executed 120  Passed 115  Failed 5\", which Open Questions admits rests on an assumption (\"I assumed yes, giving 115 passed\")."
+    }
+  ]
+}

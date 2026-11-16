@@ -8,7 +8,8 @@
       "assertions": [
         "Separates observable missed dates from assumptions about motive",
         "Opening names the situation, observable behavior, impact, and ends with an open question inviting their account",
-        "Includes a concrete agreement/check-in follow-up"
+        "Includes a concrete agreement/check-in follow-up",
+        "Includes a preparation step before the conversation (facts versus motive, the other person's likely account, or a readiness check)"
       ]
     },
     {
@@ -53,7 +54,8 @@
         "Lists points both accounts agree on (such as the outdated runbook or the slow rollback) separately from disputed points (such as whether Luis agreed to own the runbook), without declaring either account true",
         "Gives each of Dana and Luis a defined, uninterrupted turn to give their account",
         "Ends with explicit agreements that each name an owner and a date, recorded in writing to both",
-        "Names at least one condition for pausing or stopping the joint session"
+        "Names at least one condition for pausing or stopping the joint session",
+        "The session plan uses the facts table from facilitation.md (an agreed column and a disputed column, with no third column for what really happened)"
       ]
     },
     {
@@ -80,14 +82,14 @@
     {
       "id": "sensitive-health-disclosure",
       "prompt": "I need to tell my manager I have a health issue that's slowing me down, without going into details. How do I say it?",
-      "files": [
-        "references/delivery-scripts.md"
-      ],
       "expected_output": "A short disclosure that states the impact on work and the adjustment needed, keeps the diagnosis and private detail optional, and has a reply ready if the manager asks for more.",
       "assertions": [
         "The suggested wording shares the impact on work and the adjustment needed, and nothing more about the condition",
         "Keeps the diagnosis and details private or explicitly optional",
         "Offers a reply for when the manager asks for more detail, or names HR as the route if formal paperwork is needed"
+      ],
+      "files": [
+        "references/delivery-scripts.md"
       ]
     },
     {
@@ -108,6 +110,87 @@
         "Explicitly prioritizes immediate safety",
         "Recommends appropriate trusted/formal escalation such as HR or management",
         "Does not pressure the user to confront the coworker alone"
+      ]
+    },
+    {
+      "id": "buy-time-return-to-point",
+      "prompt": "In my 1:1 with a peer about the release date changing after QA signed off, he keeps answering with 'well what about the time you merged without review' and I freeze and lose my point. Give me a line to buy a second to think, and one to get back to my original issue.",
+      "expected_output": "One short line to buy time (not an agreement or a concession) and one line that returns to the original issue, with an acknowledgement of the counter-point and a promise to come back to it, using the user's facts.",
+      "assertions": [
+        "Offers a short line to buy a moment to think, such as asking for a moment or saying they want to respond thoughtfully",
+        "Offers a line that returns to the original issue (the release date change), such as 'Coming back to what we were discussing' or 'Let me return to my original concern'",
+        "Acknowledges the counter-point about the unreviewed merge without trading issues, for example by finishing the current point first and offering to come to it after",
+        "Gives one or two lines for the moment named, not a full phrase menu"
+      ],
+      "files": [
+        "references/phrase-bank.md"
+      ]
+    },
+    {
+      "id": "followup-check-in-peer-conflict",
+      "prompt": "Dana and I just talked through the clash over the on-call runbook and agreed she will list an owner by 16 May and I will update the escalation page by the 20th. We still disagree about who promised what on 28 April. Help me close the meeting and then write the follow-up and plan the check-in in two weeks.",
+      "expected_output": "A spoken read-back of the two actions with owners and dates and a check-for-match question, a dated check-in, a short written note with facts and dates only that lists the 28 April point as disputed, and a check-in agenda.",
+      "assertions": [
+        "Includes a spoken read-back of the agreed actions, each with an owner and a date, ending with a question confirming the other person understands it the same way",
+        "Proposes a specific dated check-in rather than 'we'll revisit later'",
+        "The written note contains facts, owners and dates only, and lists the disagreement about the 28 April promise as disputed rather than stating either version as fact",
+        "Gives a check-in agenda that asks what is working, what is not, whether to adjust, and whether to close the topic"
+      ],
+      "files": [
+        "references/closing-and-followup.md"
+      ]
+    },
+    {
+      "id": "quick-prep-ten-minutes",
+      "prompt": "i have a hard talk with my coworker Priya in 10 minutes about her merging my service change without telling me. no time for a big worksheet, can you get me ready fast?",
+      "expected_output": "A short prep, not the full worksheet, that covers the situation as observable facts, the impact, the user's goal, Priya's likely view, and a written opening line, asking only for what is missing.",
+      "assertions": [
+        "Keeps the prep short and does not hand over the full multi-part worksheet",
+        "Includes the situation as observable facts separate from assumptions about Priya's motive",
+        "Includes an impact field (how it affected the user, the team or the work)",
+        "Ends with a written opening line the user can say first"
+      ],
+      "files": [
+        "references/preparation-template.md"
+      ]
+    },
+    {
+      "id": "pause-twenty-minutes-or-tomorrow",
+      "prompt": "I'm mediating and during our talk my report started crying and then got loud about being blamed. I want to offer a pause but what exactly do I say? How long should the break be?",
+      "expected_output": "A pause line that offers a choice of at least twenty minutes or tomorrow at a named time, not a ten-minute break.",
+      "assertions": [
+        "Offers a pause of twenty minutes or more, or picking it up another day at a named time",
+        "Does not suggest a ten-minute or five-minute break as enough for a person in distress",
+        "Gives the person a choice and a named time, keeping it a pause rather than an end to the conversation"
+      ],
+      "files": [
+        "references/delivery-scripts.md"
+      ]
+    },
+    {
+      "id": "pre-meeting-breathing",
+      "prompt": "My meeting with the director about the blowup starts in five minutes and I'm anxious. Can you walk me through a breathing exercise to settle down first?",
+      "expected_output": "A steady breathing count of 1 to 5 in and out with no hold, stated as a shorter version than the recommended five minutes or more, since the meeting is five minutes away.",
+      "assertions": [
+        "Describes breathing in and out steadily with a count of about 1 to 5 each and no breath hold",
+        "Says that at least five minutes is the recommended length and that what the user can do now is the shorter version",
+        "Offers one technique rather than a full wellness routine (no sleep, exercise or mindfulness advice)"
+      ],
+      "files": [
+        "references/emotional-regulation.md"
+      ]
+    },
+    {
+      "id": "goal-framing-and-friday-slot",
+      "prompt": "I want to make Marcus admit he was wrong about the vendor choice. I was going to grab him Friday at 5 pm in my office, right before the long weekend. Help me plan it.",
+      "expected_output": "Reframes the goal from making Marcus admit fault to understanding what happened and agreeing next steps, and advises a better slot (private neutral place, enough time) or, if Friday before a long weekend stays, named support and a dated follow-up booked in the same conversation.",
+      "assertions": [
+        "Reframes 'make him admit he was wrong' into a goal such as understanding what happened and agreeing what to do next time",
+        "Suggests a private and neutral place and enough time rather than the user's own office at the end of the day",
+        "Addresses the pre-weekend timing by moving it or by arranging named support and a dated follow-up, without a blanket rule that Friday is never allowed"
+      ],
+      "files": [
+        "references/preparation-template.md"
       ]
     }
   ]

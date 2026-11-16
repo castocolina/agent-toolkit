@@ -1,5 +1,7 @@
 -- PostgreSQL 15+ migration template (MySQL variant at the end). Relational engines
 -- only: MongoDB shape changes are in-place backfills (see the MongoDB gotcha in SKILL.md).
+-- Syntax is standard on PostgreSQL 18 and MySQL 8.4 (https://www.postgresql.org/docs/current/sql-createtable.html,
+-- https://dev.mysql.com/doc/refman/8.4/en/datetime.html, checked 2026-11-07); run it on the target engine.
 -- Migration: YYYYMMDDHHMMSS_descriptive_name.sql
 -- Description: [What this migration does]
 -- Author: [Your Name]

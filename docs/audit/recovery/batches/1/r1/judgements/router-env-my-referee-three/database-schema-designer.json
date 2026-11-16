@@ -1,0 +1,104 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 15,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/database-schema-designer/record.md",
+      "line": null,
+      "evidence": "Digest at dbff837f lists 'removed units (306, showing 40)'. All 40 items shown are explained by section rows in record.md, by sections.json units, or by text found in references/schema-fundamentals.md, but the other 266 removed units were not shown and could not be checked one by one.",
+      "fix": "Regenerate the digest without the cut, or check every one of the 306 units against record.md and sections.json. For any unit that has no valid row, restore it (into references/ when it is domain-specific, a template users ask for or a tested example) or add a row to docs/audit/recovery/database-schema-designer/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 33,
+      "evidence": "Workflow step 4 repeats the report-format rules at length ('every finding carries its own complete corrected DDL with every statement written in full, never \"same as F7\" or a \"then: ...\" shorthand list...'). references/schema-design-checklist.md \u00a7 Report format already holds these rules, and step 4 tells the agent to read that file.",
+      "fix": "In step 4, keep 'read references/schema-design-checklist.md and report in its format'. Delete the restated rules, which stay in the checklist's Report format section, and record the move in record.md. If the MongoDB 'exact mongosh command' line is not already in Report format, move it there."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 48,
+      "evidence": "The five-step MongoDB shape-change sequence (readers, writers and drain, idempotent backfill, reconcile, then tighten with collMod) sits inside one long Gotchas bullet. Workflow step 1 only says 'on MongoDB follow the MongoDB gotcha', so the Process pattern has no MongoDB checkpoint.",
+      "fix": "Add a short 'Migrations (MongoDB)' workflow step after step 3 that lists the five ordered steps. Keep only the facts in the gotcha (no FKs, the $jsonSchema limits, collMod does not re-check existing documents) and record the move."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 3,
+      "evidence": "The description has no keyword for normalization, normal forms, junction tables or foreign-key actions. The References table, schema-fundamentals.md and two evals (normal-forms-and-denormalizing, fk-actions-and-junction-table) all target these requests.",
+      "fix": "Design and review SQL and MongoDB schemas - tables or collections, keys, foreign keys and their ON DELETE actions, constraints, normalization, multi-tenant isolation, soft deletes, timestamp and money types, query-aligned indexes, and staged live migrations (expand-contract, NOT NULL, online DDL) for PostgreSQL, MySQL and SQLite. Use when users need a data model, DDL, an ERD-ready table list, normal forms or a denormalization decision, a junction table, an embed-or-reference decision, a schema review, or a safe migration plan, even if they only describe entities and queries or a symptom such as re-signup failing after soft delete, cross-tenant data leaking, or a migration that locked production. Not for REST or GraphQL API models, ORM classes for an existing schema, data-warehouse dashboards, database deployment, backups or connection pooling, or tuning a query without changing the schema."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/database-schema-designer/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "None of the 10 should-trigger queries asks for normal forms, foreign-key actions or a junction table, although evals.json has output evals for these (normal-forms-and-denormalizing, fk-actions-and-junction-table) and the References table routes them to schema-fundamentals.md.",
+      "fix": "Add one or two realistic should-trigger queries, for example 'my orders table stores product_ids as '1,2,3' - is that bad and how do I normalize it?'. Add a near-miss negative, for example a general SQL JOIN tutorial question."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 41,
+      "evidence": "'from 3.53, `ALTER COLUMN ... SET/DROP NOT NULL` and `ADD CHECK`' is a minimum-version fact with no source URL and no check date. Facts not verified online.",
+      "fix": "Add the source and date inline, for example '(https://www.sqlite.org/releaselog/3_53_0.html, checked <date>)', or tell the agent to read https://www.sqlite.org/lang_altertable.html for the target version."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 49,
+      "evidence": "'`ADD COLUMN` with a non-volatile default is metadata-only from PostgreSQL 11 on' is a minimum-version fact with no source URL and no check date in this section. Facts not verified online.",
+      "fix": "Cite the PostgreSQL ALTER TABLE page or the PostgreSQL 11 release notes (https://www.postgresql.org/docs/release/) with the date checked, as the NOT NULL section already does."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 42,
+      "evidence": "The polymorphic-parents branch gives only the PostgreSQL CHECK, 'CHECK (num_nonnulls(article_id, photo_id) = 1) on PostgreSQL'. On MySQL or SQLite the agent gets no equivalent constraint and has to guess.",
+      "fix": "Add the portable form for MySQL 8.0.16+ and SQLite, for example 'CHECK ((article_id IS NOT NULL) + (photo_id IS NOT NULL) = 1)', or the explicit IS NULL / IS NOT NULL disjunction."
+    }
+  ]
+}

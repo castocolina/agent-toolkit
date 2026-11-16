@@ -1,0 +1,77 @@
+{
+  "skill": "gemini",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/gemini/record.md",
+      "line": null,
+      "evidence": "previous-version digest gemini at dbff837f: 'removed units (218, showing 40)'. This is a cut list, so 178 removed units could not be checked one by one. All 40 units shown map through sections.json to valid record rows (s001-s054).",
+      "fix": "Re-run the removal check with the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/gemini/SKILL.md --judge direct --digest-dir <tmp>). For any unit without a row, restore it (into references/ when it is domain-specific) or add a row for it to docs/audit/recovery/gemini/record.md."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/gemini/evals/trigger-queries.json",
+      "line": 51,
+      "evidence": "\"query\": \"write a Python script to scan our repository\" (should_trigger false). This negative shares no Gemini, review or big-context terms, so it tests nothing about the description's boundary.",
+      "fix": "Replace it with a near-miss, for example: \"use the gemini-cli npm package's config to change my default model to flash\" (Gemini CLI configuration, not a review run) or \"have Gemini rewrite src/auth to fix the bugs it finds\" (implementation, which the description excludes)."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 27,
+      "evidence": "\"Send a single file from outside (a plan, a spec) on stdin rather than widening the workspace: `-p` text is appended to stdin.\" This is a version-sensitive CLI behaviour, and the plan-review command shape depends on it. The Sources list at the end of Gotchas does not cite it and gives no date checked.",
+      "fix": "Add a line to the Sources list: \"`-p` text appended to stdin input: `cli/headless.md`\" (the vendor page that documents it), checked <date>. Keep the instruction to run `gemini --help` when the claim fails."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 41,
+      "evidence": "Step 6 gives `gemini --resume latest` and `gemini -r \"latest\" \"query\"` as commands for the user's terminal with no wrapper. Defaults says \"Never run unbounded\", and Gotchas says \"Interactive commands need `--foreground`\". Followed as written, this branch gives an unbounded interactive command, which the follow-up-resume eval assertion ('a bounded `timeout` on any command it proposes') rejects.",
+      "fix": "Show the resume command in the same form as the interactive shape: `timeout --foreground --kill-after=10s 1800 gemini --resume latest -m <same model> --approval-mode default`. Name the same model and approval mode in it, and keep the note that combining `--resume` with `-p` is not documented."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/gemini/README.md",
+      "line": 31,
+      "evidence": "\"- [Gemini CLI Documentation](https://github.com/google/generative-ai-docs)\". The label says Gemini CLI docs, but the link is a different Google repository. The line above it already links the official CLI repository and docs.",
+      "fix": "Relabel the link to say what it points to (\"Google generative AI docs (legacy)\") and keep it in Resources. Do not delete it: it is a carried-over upstream resource."
+    }
+  ]
+}

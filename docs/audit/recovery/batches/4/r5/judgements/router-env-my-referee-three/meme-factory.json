@@ -1,0 +1,77 @@
+{
+  "skill": "meme-factory",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest meme-factory at dbff837f: 'removed units (463, showing 40)'. All 40 shown items resolve to valid rows in docs/audit/recovery/meme-factory/record.md or sections.json, or to content in references/ (for example s066 to image-memes.md 'Where the URL goes', and s124/s125 to blog-posts.md 'Complete post example'). The other 423 units could not be checked from the digest.",
+      "fix": "Re-run the removal check with the full unit list (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/meme-factory/SKILL.md ...) and add a row to docs/audit/recovery/meme-factory/record.md for any unit that is not yet explained. Restore nothing that is already recorded."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 47,
+      "evidence": "'- `font`: a font ID or alias from `https://api.memegen.link/fonts/`, such as `impact` or `notosans`.' Some Query parameters bullets (font, color) restate parameter meanings the agent can read from the API docs. They are activation content, not expert content.",
+      "fix": "Keep the non-obvious facts inline (layout values other than default and top are silently ignored; both width and height pad the image; background must be public or the service returns 415). Move the plain font and color descriptions to the Endpoints section of references/image-memes.md, and record the move in docs/audit/recovery/meme-factory/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 15,
+      "evidence": "Step 5 ends with 'let the helper escape them:'. The next line is 'Before calling `generate`, compare the number of captions with the template's `lines`...', and only then comes the command. The inserted sentence splits the colon from the command it introduces and repeats the line-count rule from line 14, which blurs an otherwise clean Process pattern.",
+      "fix": "Merge the line-count check into one sentence at the start of step 5, before 'Pass one raw caption per template line', so the colon leads directly into the `python3 scripts/meme_generator.py generate ...` command."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 19,
+      "evidence": "Step 6 says 'Present the result as a Markdown image whose alt text describes both the picture and the joke.' The Slack and Discord exception (post the plain image URL) appears only in references/image-memes.md 'Where the URL goes'. An agent making a Slack meme, the most common request in the evals, may never load that file.",
+      "fix": "Add a gotcha to SKILL.md: '- **Never paste Markdown image syntax into Slack or Discord.** They show `![alt](url)` as literal text; post the plain `.png` or `.jpg` URL and give the Markdown form as a fallback.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 14,
+      "evidence": "Line 14 says 'ask for the missing lines, or pick a template whose `lines` matches the captions given'. Line 15 says 'when they differ, stop and ask the user instead of generating.' Following the mismatch branch (for example a user giving 3 captions for `drake`) gives two different instructions: switch template, or stop and ask.",
+      "fix": "Give one rule: 'If the caption count differs from the template's `lines`, switch to a template whose `lines` matches only when the user named no template; otherwise stop and ask for the missing or extra lines. Never invent caption text.'"
+    }
+  ]
+}

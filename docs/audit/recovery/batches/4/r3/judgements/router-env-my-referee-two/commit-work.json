@@ -1,0 +1,95 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/references/commit-message-template.md",
+      "line": 35,
+      "evidence": "Message template restates `<type>(<scope>): <summary>` plus a what/why body, which step 6 and the spec section already require.",
+      "fix": "Keep the worked messages; move the skeleton template to the end of references/commit-message-template.md as an optional reminder, or delete it and add a row to docs/audit/recovery/commit-work/record.md, since the model reliably produces that skeleton unprompted."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 19,
+      "evidence": "The skill is a process workflow, but step 3 packs index selection, overlap checks, staging methods and cleanup into one paragraph instead of phased checkpoints.",
+      "fix": "Split step 3 into numbered checkpoints (choose the index, stage, review the overlap) while keeping the same commands and the behavior-split rule."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 33,
+      "evidence": "Step 6 says to read references/commit-message-template.md only when the repository sets message rules, then also when the agent merely wants worked messages or the step 8 report block.",
+      "fix": "Gate the worked messages and report block on a concrete case (a multi-line body, a footer beyond BREAKING CHANGE, or the step 8 report), and say not to load the file for a one-line message in a repository with no rules."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 32,
+      "evidence": "Step 5 says to find the check in package.json scripts, Makefile targets or the CI config, a menu of equal places rather than one default.",
+      "fix": "Default to the repository's test script for the touched paths, then its lint script, then its build script, and look at CI only when none of those exists."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/commit-work/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "The file has 10 should-trigger and 10 should-not-trigger queries, but no train/validation split, and near-miss coverage stops at history edits, PRs and merge conflicts.",
+      "fix": "Add a fixed train/validation split and near-misses such as amending a message, reverting one commit, or writing a changelog from commits already made."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 30,
+      "evidence": "Step 3 says to copy the diff to pick.diff and delete whole hunks, but never says to keep the diff and index header lines; deleting them makes git apply --cached --check fail.",
+      "fix": "State that pick.diff keeps the diff --git, index and ---/+++ header lines and drops only whole @@ hunks, and that a failed --check means stop and ask rather than edit the hunk."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/commit-work/references/commit-message-template.md",
+      "line": 10,
+      "evidence": "The collect step names only .github/pull_request_template.md and .github/PULL_REQUEST_TEMPLATE/, while GitHub also reads a template in the repository root or docs/.",
+      "fix": "Add the root and docs/ locations GitHub documents, and keep the existing .github paths."
+    }
+  ]
+}

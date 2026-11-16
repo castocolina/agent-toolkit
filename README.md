@@ -178,6 +178,8 @@ Specialized sub-agents that Claude Code can delegate tasks to:
 | mermaid-diagram-specialist | Create flowcharts, sequence diagrams, ERDs |
 | ui-ux-designer | Research-backed UI/UX design feedback |
 
+Agent credits: mermaid-diagram-specialist is adapted from [qazuor/qazuor.com](https://github.com/qazuor/qazuor.com/blob/main/.claude/skills/tech/mermaid-diagram-specialist.md) by qazuor (MIT), through [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit/blob/main/agents/mermaid-diagram-specialist.md).
+
 ### Slash Commands
 
 Reusable workflows invoked with `/command-name`:
@@ -191,6 +193,8 @@ Reusable workflows invoked with `/command-name`:
 | `/sync-branch` | Sync feature branch with main |
 | `/sync-skills-readme` | Update README skills table |
 | `/viral-tweet` | Optimize tweet ideas for X engagement |
+
+Command credits: viral-tweet is adapted from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit/blob/main/commands/viral-tweet.md) by Leonardo Flores (@leonardocouy), via softaworks/agent-toolkit.
 
 ---
 

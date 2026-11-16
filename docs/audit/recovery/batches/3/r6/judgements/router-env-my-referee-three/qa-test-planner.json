@@ -1,0 +1,59 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/qa-test-planner/record.md",
+      "line": null,
+      "evidence": "previous-version digest qa-test-planner at dbff837f: 'removed units (599, showing 40)'. All 40 shown para items map through sections.json to valid record rows (for example s049, s051, s061, s070-s073, s077, s095, s122, s125-s129 restore-references, now present in references/), and both file: rows are valid intended-change rows. The other 559 units could not be checked.",
+      "fix": "Regenerate the digest without the cut, or confirm that every one of the 599 units has a valid row or a named destination in docs/audit/recovery/qa-test-planner/record.md, so the whole removal set can be checked."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 143,
+      "evidence": "'In every supplied-log reply, end with one line on reading results: exit 0 the `file` path in the JSON line, exit 2 the `missing` flags or bad value, exit 1 the file exists (ask before `--overwrite`), exit 3 an I/O failure' closely matches the script-bug-file eval assertion 'Says how to read the result: the file path from the JSON line on exit 0, the missing flags on exit 2, and asking before --overwrite on exit 1', even though no exit is unknown once a log is supplied.",
+      "fix": "Tie the line to the run actually supplied: explain only the exit code in the log (the exit table in steps 2-5 already covers the others). Do not add a closing line that exists only to satisfy an eval. Record the change in docs/audit/recovery/qa-test-planner/record.md."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 141,
+      "evidence": "'On exit 0, read the file and apply steps 2.1-2.3 and 2.5 below; step 2.4's edits wait for the user's authorization (see the fourth sub-step).' The supplied-log branch points forward to numbered sub-steps and back to its own sub-step 4, so an agent has to jump around the list to work out what to do. I followed it to the right outcome (no edits, no rerun), but only after cross-checking three places.",
+      "fix": "State the supplied-log exit-0 actions directly: '3. On exit 0: read the file named in `file`, quote each supplied field's value, confirm every gap reads Unknown under Open Questions, list the section 8 edits you would make without making them, and ask the user each Open Question.' Keep step 2 unchanged for runs started in this task."
+    }
+  ]
+}

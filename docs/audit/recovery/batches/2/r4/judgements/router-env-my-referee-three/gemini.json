@@ -1,0 +1,77 @@
+{
+  "skill": "gemini",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/gemini/record.md",
+      "line": null,
+      "evidence": "previous-version digest gemini at dbff837f: 'removed units (218, showing 40)'. All 40 shown units resolve through sections.json to valid record rows, but the other 178 units could not be checked item by item.",
+      "fix": "Regenerate the dbff837f digest without the cut, or with a higher display limit, and confirm that every removed para id maps to a section row in docs/audit/recovery/gemini/record.md. Restore any unit with no valid row into references/, or add a row for it."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/gemini/SKILL.md",
+      "line": 40,
+      "evidence": "'6. **Follow-up.** When the user asks a follow-up about a finished run, Gemini CLI can continue the earlier session: `gemini --resume latest` ... Sources: [CLI reference](...), [session management](...).' One numbered step packs a decision, two command forms, a doc caveat and source links into a single paragraph.",
+      "fix": "Split step 6 into a short decision: (a) interactive resume command for the user's terminal; (b) otherwise a new headless run that restates the accepted findings. Move the 'checked 2026-11-07' caveat and the source links to the Sources list under Gotchas. Keep all the content."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/gemini/evals/trigger-queries.json",
+      "line": 51,
+      "evidence": "Negatives such as 'write a Python script to scan our repository' and 'make a small code change in this repository yourself' share no Gemini, second-opinion or big-context concept with the skill, so they do not test the description's boundary.",
+      "fix": "Replace the two weak negatives with near-misses, for example 'use gemini to refactor src/auth and apply the changes' (Gemini implementing changes, which the description excludes) and 'set up a GitHub Action that calls Gemini on every PR' (CI integration, not a CLI review)."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 30,
+      "evidence": "'For a background run, record the `timeout` PID and wait on it' plus `... & pid=$!` / `wait \"$pid\"`. The 300 s or 900 s budget can exceed a harness tool call's own timeout, which can kill the shell before `timeout` reports 124. A `$pid` set in one tool call is also gone in the next, yet references/troubleshooting.md depends on it.",
+      "fix": "Add to step 3: when the harness limits tool-call duration below the budget, launch with the harness's background-run option, or write the PID to a file (`echo $! > gemini.pid`). Then poll with `kill -0 \"$(cat gemini.pid)\"` and read gemini-review.log, instead of a blocking `wait`. Point troubleshooting.md at the saved PID file."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/gemini/SKILL.md",
+      "line": 68,
+      "evidence": "Line 14: 'Use 900 for a >200k-token scope'. Line 68: 'A scope well over 200k tokens: split it by area (one directory or document group per run)'. 'Well over' has no threshold, so a 350k scope (the big-scope-budget eval) could go either way: one 900 s run or a split.",
+      "fix": "Give a concrete cut-off, for example: '>200k up to ~500k tokens: one run with the 900 s budget; above that, or when a 900 s run exits 124: split by area, one run per directory or document group, then merge the verified findings.'"
+    }
+  ]
+}

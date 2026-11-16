@@ -1,0 +1,77 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest qa-test-planner at dbff837f: \"removed units (597, showing 40)\". The digest is cut, so the 557 removed units it does not show could not be checked against docs/audit/recovery/qa-test-planner/record.md. All 40 shown para: items and both file: items have valid record rows or are present in the current files.",
+      "fix": "Regenerate the digest without a cap (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/qa-test-planner/SKILL.md ...) and confirm that every removed para: unit maps to a row in docs/audit/recovery/qa-test-planner/record.md, either directly or through a section id in sections.json."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 137,
+      "evidence": "\"In every supplied-log reply, add one line on reading results: exit 0 the `file` path in the JSON line, exit 2 the `missing` flags or bad value, exit 1 the file exists...\" This repeats exit codes already listed in steps 2-5. It appears to exist to satisfy the script-bug-file eval assertion \"Says how to read the result...\", not to help a user who pastes a run log.",
+      "fix": "Tie it to the purpose: replace the forced extra line with \"When the user pasted the log, interpret its exit code using steps 2-5 below.\" Record the rewrite in docs/audit/recovery/qa-test-planner/record.md. Keep the eval assertion only if a real reviewer needs that line."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 135,
+      "evidence": "Section 7 (\"Optional scripts\") spends about 40 lines of a roughly 156-line process skill on flag rules, a supplied-log review protocol and exit-code handling, which every non-script request also loads. This weakens the routing-plus-process pattern.",
+      "fix": "Move the \"Reading the result\" steps and the flag table into references/scripts.md. In section 7, keep the two example commands and the stdin-hang warning, and add \"Read references/scripts.md when you run a script or the user supplies a run log; do NOT load it otherwise.\" Record the move in docs/audit/recovery/qa-test-planner/record.md."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/qa-test-planner/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "23 queries: 14 should_trigger true and 9 false. The positives exceed the 8-10 per side that optimizing-descriptions.md recommends, and some are near-duplicates (several '/qa-test-planner smoke suite' variants).",
+      "fix": "Merge 4 of the near-duplicate positives (for example the two smoke-suite-for-hotfix positives) to reach about 10 positives. Add 1 more named-but-out-of-scope negative, such as 'qa-test-planner write Playwright e2e specs for login', so each side has 10."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 137,
+      "evidence": "\"Then read the exit code below, but as a reviewer: present the corrected command... On exit 0, steps 2.1-2.3 and 2.5 still apply; step 2.4's edits wait for that authorization.\" Following this branch for a supplied log with exit 0 means jumping between nested sub-step numbers, and the order of the reply's parts is unclear. Also, line 135 \"Reading the result, in this order:\" directly follows a bullet with no blank line, so it renders as part of that bullet.",
+      "fix": "Add a blank line before line 135. Then rewrite step 1 as a short ordered list: (a) report the exit code and JSON verbatim; (b) list and check each flag against the source; (c) on exit 0, read the file and run steps 2.1-2.3 and 2.5; (d) propose edits or a corrected command without executing them unless the user authorizes it."
+    }
+  ]
+}

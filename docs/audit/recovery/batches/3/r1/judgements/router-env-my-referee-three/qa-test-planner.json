@@ -1,0 +1,68 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": null,
+      "evidence": "Digest at dbff837f: 'removed units (597, showing 40)'. All 40 shown para items and both file items are explained: restored text is in references/ (test_case_templates.md, bug_report_templates.md, regression_testing.md, figma_validation.md section 5, test_plan_template.md, test_case_examples.md), or a valid record row covers them. The other 557 units were not shown, so this check could not confirm them.",
+      "fix": "Regenerate the digest without the cut, or confirm that every unit of the 597 maps through docs/audit/recovery/qa-test-planner/sections.json to a section row in record.md. Add a para: row to record.md for any unit that maps to no row."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 135,
+      "evidence": "'A run log is supplied: do not run the script again. Report its exit code and JSON fields verbatim ... Then list every flag in the logged command with its value, one per line ... In every supplied-log reply, add one line on reading results: exit 0 the `file` path...'. This branch repeats the script-bug-file and script-test-case-file eval assertions item by item (the 'harness already ran the command' scenario) instead of stating a general review rule.",
+      "fix": "Tie the step to the skill's purpose. Keep one general rule: 'When the user supplies a script run log, review it without rerunning: check each flag against the source and the written file against section 8, and propose the corrected command.' Drop the forced one-line exit-code recap. Record each removed line in docs/audit/recovery/qa-test-planner/record.md with reason class superseded-by."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 106,
+      "evidence": "'## 7. Optional scripts: files on disk' runs about 40 lines: two long example commands, a flag table and a five-branch result protocol. This bulks up an otherwise clean Process-pattern body for an optional path that most requests never take.",
+      "fix": "Move the example commands, the flag table and the 'Reading the result' steps to references/scripts.md. Leave a gated pointer in section 7: 'Only when the user wants a Markdown file written, read references/scripts.md; Do NOT load it for drafts in the reply.' Then add a 'redistributed' row for each moved block to the recovery record."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 133,
+      "evidence": "'- Single-quote every flag value and the output directory, even plain ones (...)' is followed directly by 'Reading the result, in this order:' with no blank line. Markdown therefore renders the lead-in as part of the last bullet, which blurs where the result-handling procedure starts.",
+      "fix": "Insert a blank line before 'Reading the result, in this order:', or make it a '### Reading the result' subheading, so the exit-code procedure renders as its own block."
+    }
+  ]
+}

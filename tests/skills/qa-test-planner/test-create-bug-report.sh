@@ -92,8 +92,8 @@ EOF
   check step2_own_line "$(grep -c '^2\. App stays open$' "$report")" 1
   check expected "$(grep -c '^The user logs in$' "$report")" 1
   check actual "$(grep -c '^The app crashes$' "$report")" 1
-  check console_default "$(grep -c '^Not provided (whether console errors were observed is unknown)$' "$report")" 1
-  check workaround_default "$(grep -c '^- \*\*Workaround:\*\* Not provided (availability is unknown)$' "$report")" 1
+  check console_default "$(grep -c '^Unknown (whether console errors were observed)$' "$report")" 1
+  check workaround_default "$(grep -c '^- \*\*Workaround:\*\* Unknown (whether a workaround exists)$' "$report")" 1
   check success_msg "$(grep -c 'Bug report generated successfully' "$root/stderr")" 1
   check manifest "$(cat "$root/stdout")" "{\"status\":\"created\",\"id\":\"BUG-20260120101112\",\"file\":\"$root/out/BUG-20260120101112.md\"}"
   check no_ansi_stdout "$(grep -c $'\033' "$root/stdout")" 0

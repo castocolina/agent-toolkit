@@ -1,0 +1,77 @@
+{
+  "skill": "naming-analyzer",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/references/naming-guidelines.md",
+      "line": 59,
+      "evidence": "Convention fallback tree: boolean prefix, verb phrase for a function, noun for a class, UPPER_SNAKE_CASE for a constant, descriptive noun otherwise. Record s017 and s031 drop this as generic-model-knowledge, but the same tree was restored here after the user rejected that drop.",
+      "fix": "Keep the tree, since the user rejected the drop and step 1 sends the agent here when no project convention exists; drop the 'old Critical/Major/Minor tier' glosses in the Priority classes table (line 27-29) or add a row, and do not add another copy to SKILL.md."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 35,
+      "evidence": "Step 2 says to read only the section for the case at hand, then names six sections (Priority classes, Boolean names, Convention fallback tree, Convention splits, What not to flag or suggest, What to look for) without saying which of the other sections to leave unread.",
+      "fix": "Add one Do NOT Load clause per case: for a single boolean do not load Convention splits or What to look for; for a repo-wide convention split do not load the fallback tree; for a keep verdict load none."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/evals/evals.json",
+      "line": 1,
+      "evidence": "Twelve evals cover the Decide rows, hidden consumers and the counts line, but two assertions are brittle: python-evidence requires renaming user_profile to UserProfile, and created-at-time-basis requires citing record_event and events_since, while SKILL.md only requires the convention form and the lines that show each time basis.",
+      "fix": "Accept any project-or-PEP-8 class casing for user_profile, and accept any citation of the naive datetime.now() write and the UTC cutoff comparison rather than those two function names."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 79,
+      "evidence": "Hidden consumers names Next.js page.tsx, layout.tsx and route.ts and Rails Zeitwerk (user_account.rb must define UserAccount) with no official source or checked date, unlike the Django, Spring, pytest, NestJS, Angular and Celery claims beside them.",
+      "fix": "Add the vendor URL and the date checked for the Next.js file conventions and the Rails Zeitwerk constant rule, the same way the pytest python_files bullet does, or tell the agent to confirm both with the project's docs before treating a file rename as contract."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/references/naming-guidelines.md",
+      "line": 79,
+      "evidence": "The counts-line example hardcodes Reviewed 156 identifiers; 23 candidates (Priority 1: 5, 2: 12, 3: 6); 13 not shown, while the sentence above says the line is built only from what you actually read. The worked example in SKILL.md has no such line.",
+      "fix": "Mark the numbers as a shape example (Reviewed <n> identifiers; <m> candidates ...) and add one filled counts line under the worked example in SKILL.md so the template and the filled case agree."
+    }
+  ]
+}

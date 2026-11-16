@@ -1,0 +1,311 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "database-schema-designer",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 92.8,
+        "router-env-my-referee-three": 94.4
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 1,
+          "evidence": "dbff837f digest: removed units (306, showing 40); the 40 shown paras all map to sections.json units whose section ids (s001-s002, s009, s013, s022, s027, s029-s030, s033-s035, s038, s040, s042, s046-s051, s053-s054, s056-s058, s060-s061) have allowed record rows",
+          "fix": "No per-item restore. Add one record note that the other 266 unshown units of that digest are covered by the same section rows, so a later judge does not treat the cut list as unexplained."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/references/schema-fundamentals.md",
+          "line": 170,
+          "evidence": "## The N+1 query problem ... An application pattern, not a schema change",
+          "fix": "The description excludes tuning a query without a schema change, and record row s060 already dropped this as out-of-scope. Move the index-on-customer_id point into the FK indexing gotcha if it is not already there, then record the N+1 section as removed-on-merit / out-of-scope; do not delete the bind-parameter warning without that row."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 34,
+          "evidence": "## Gotchas has no NEVER list; the only NEVER is 'Never change what an existing column means in place' and migrations.md 'Never copy once' / 'Never rename the old table first'",
+          "fix": "Add a short NEVER list at the top of Gotchas that points at the existing items (plain FK for a tenant child, in-place meaning change, EXPLAIN ANALYZE on a live write, invented NULL replacement) with the reason already written beside each. Do not invent new warnings."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 28,
+          "evidence": "Workflow step 2 says 'For writes, see the EXPLAIN gotcha' while that gotcha is already in this file, and step 4 names the reference files only by filename",
+          "fix": "Keep the references table as the gate. In step 2 name the in-file gotcha explicitly, and in step 4 say 'read references/schema-fundamentals.md' and 'read references/schema-design-checklist.md' so the load path matches the table."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 23,
+          "evidence": "MySQL NOT NULL example hard-codes `MODIFY phone VARCHAR(32) NOT NULL` while the same paragraph says to copy the full definition from SHOW CREATE TABLE",
+          "fix": "Make the example a copy of a SHOW CREATE line with only nullability changed, and mark VARCHAR(32) as an illustration that must be replaced by the restated definition. Keep the rule that an owner-approved non-NULL default is the only exception."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/evals/evals.json",
+          "line": 1,
+          "evidence": "11 prompts with verifiable assertions and 10/10 trigger queries, but no assertion checks the SQLite 12-step gate table, the MongoDB five-step shape change, or the tenant retrofit's owner decision on bad rows",
+          "fix": "Add one eval whose prompt is a live SQLite rebuild or a live composite-FK retrofit, with assertions for `.bail on`, the `gate` table, `PRAGMA foreign_keys = OFF` outside the transaction, and an owner-confirmed fix of mismatched tenant rows rather than a blind UPDATE."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 76,
+          "evidence": "SQLite rebuild step 2 says 'Every check below inserts into `gate`' but steps 5 and 8 are the only inserts, and the comment says 'a failed check raises an error' without stating that `INSERT INTO gate SELECT 0` is what raises the CHECK",
+          "fix": "Write the two gate inserts in full, `INSERT INTO gate SELECT ((SELECT count(*) FROM x) = (SELECT count(*) FROM new_x));` and `INSERT INTO gate SELECT NOT EXISTS (SELECT 1 FROM pragma_foreign_key_check);`, and say that a 0 violates `CHECK (ok = 1)` and aborts under `.bail on`. Keep the official 12-step order."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 18,
+          "evidence": "For another named engine the skill says its lock and online-DDL behavior is unverified, but workflow step 3 still says to read references/migrations.md before writing DDL on any relational engine",
+          "fix": "In step 3, limit the migrations.md read to PostgreSQL, MySQL and SQLite, and for SQL Server, Oracle or DynamoDB say to apply only the engine-neutral gotchas and to state the lock behavior as unverified."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": null,
+          "evidence": "Digest at dbff837f is a cut list: 'removed units (306, showing 40)'. All 40 shown items are explained by record.md rows (checked against sections.json) or are present in references/schema-fundamentals.md, migrations.md or the template. The other 266 units could not be checked.",
+          "fix": "Regenerate the dbff837f digest without the cut so every removed unit can be checked against docs/audit/recovery/database-schema-designer/record.md and sections.json. Add a row for any unit no section-level row covers."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 11,
+          "evidence": "Knowledge delta is high: the defaults, workflow and gotchas are almost all expert, engine-specific content. The 1-point gap is a judgment call, not a defect (the only deduction is the D1-1 cut-list finding).",
+          "fix": "No content change needed. Keep the current Defaults, Workflow and Gotchas as they are."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 34,
+          "evidence": "Workflow step 4 'Check before answering' puts the sketch check, the routing to schema-fundamentals.md, the routing to the review checklist and the full report-format rules into one bullet of about 150 words. The checkpoint gets lost.",
+          "fix": "Split step 4 into labeled sub-bullets: (a) sketch self-check, (b) when to read references/schema-fundamentals.md, (c) review or sign-off with references/schema-design-checklist.md and its report format, (d) MongoDB variant. Keep every rule, only restructure."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 50,
+          "evidence": "'MongoDB documents stop at 16 MiB': this vendor limit has no source URL or date checked, and no instruction reads it live. The upstream registry already lists https://www.mongodb.com/docs/manual/reference/limits/.",
+          "fix": "Add the source after the limit: '(https://www.mongodb.com/docs/manual/reference/limits/, checked <date>)'."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 43,
+          "evidence": "'add the FK with ALGORITHM=COPY ... INPLACE works only with foreign_key_checks = 0': this MySQL online-DDL behavior has no source URL or date checked.",
+          "fix": "Cite https://dev.mysql.com/doc/refman/8.4/en/innodb-online-ddl-operations.html (foreign key operations) with the date checked, or tell the reader to confirm on that page for their server version."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 28,
+          "evidence": "The MySQL 'MODIFY phone VARCHAR(32) NOT NULL, ALGORITHM=INPLACE, LOCK=NONE' step does not say that in-place NOT NULL needs STRICT_TRANS_TABLES or STRICT_ALL_TABLES. On a non-strict sql_mode the branch fails without a fallback.",
+          "fix": "Add: 'INPLACE NOT NULL requires a strict sql_mode (STRICT_TRANS_TABLES or STRICT_ALL_TABLES); check SELECT @@sql_mode first, and read the Online DDL Operations page for your version.'"
+        }
+      ]
+    },
+    {
+      "name": "mermaid-diagram-specialist",
+      "percent": 97.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 99.2,
+        "router-env-my-referee-three": 96.0
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: removed units (143, showing 40)",
+          "fix": "The cut is covered by section rows s001-s021 in docs/audit/recovery/mermaid-diagram-specialist/record.md (moved into skills/mermaid-diagrams or dropped as generic). No restore is needed; the digest itself stays a cut list, so do not add a second row."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: 'removed units (143, showing 40)'. The list was cut, so 103 removed units could not be checked one by one. The 40 shown all map to rows in docs/audit/recovery/mermaid-diagram-specialist/record.md through sections.json: s006-s021 are redistributed into skills/mermaid-diagrams/, s001-s005 are not-lost, and s020 has an allowed removed-to-fit/low/drop/generic-model-knowledge row.",
+          "fix": "Re-run the digest without the cut, for example `python3 scripts/audit/audit.py judge-prompt --kind agent --artifact agents/mermaid-diagram-specialist.md --judge direct --digest-dir <tmp>`, so every removed unit can be checked against record.md. Then restore any unit with no row into skills/mermaid-diagrams/references/, or add a row for it to docs/audit/recovery/mermaid-diagram-specialist/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 15,
+          "evidence": "Step 1 packs both stop checks plus every task kind (new, repair with three sub-branches, parse+meaning together, mixed, extend/update, restyle) into one numbered item. 'parse failure and wrong meaning together' sits at task-kind level, but it is a repair sub-case.",
+          "fix": "Make step 1 'Stop checks' (non-Mermaid format, missing core facts). Make step 2 'Pick the task kind', with new / repair / extend / restyle / mixed as siblings, and nest 'parse failure and wrong meaning together' under repair. Renumber Draft/validate and Report to 3 and 4. Keep every branch's wording."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 25,
+          "evidence": "'mixed kinds (for example restyle plus a fix): repair first, then restyle'. No branch orders a request that combines extend/update with restyle and does not need a repair, so that combination has no defined order.",
+          "fix": "Extend the mixed-kinds rule: 'mixed kinds: repair first, then extend/update, then restyle, and report each change list.' This gives every combination one order."
+        }
+      ]
+    },
+    {
+      "name": "ui-ux-designer",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 94.4,
+        "router-env-my-referee-three": 96.0
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/ui-ux-designer.md",
+          "line": 57,
+          "evidence": "Familiar patterns: are conventional patterns used where users expect them (recognition over recall)?",
+          "fix": "Drop this bullet and record the removal in docs/audit/recovery/ui-ux-designer/record.md: recognition over recall is textbook and the rest of the list already carries the citable checks."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/ui-ux-designer.md",
+          "line": 58,
+          "evidence": "Choice load (Hick): are choices limited or grouped? Target size and distance (Fitts): are targets sized for the input and related items close?",
+          "fix": "Keep both named laws, but add the non-obvious application: group choices rather than cutting to a fixed count (7\u00b12 is not a limit), and state that Fitts is pointer-only here, with the touch target owned by the skill a11y rule."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/ui-ux-designer.md",
+          "line": 44,
+          "evidence": "URL or mockup: content length and localisation overflow are not shown; a fetched page may differ from users' (auth, A/B).",
+          "fix": "Name the wrong assumption each hides: a fetched page can be the logged-out or control variant, and copy that fits the mock overflows once localised, so neither is a pass."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "agents/ui-ux-designer.md",
+          "line": 60,
+          "evidence": "Trend issues, all judgment unless a source is cited; rank by user impact, never taste: glassmorphism ... neumorphism ... parallax ... tiny body text ... text over busy images",
+          "fix": "Give each trend one default check instead of an equal list: glassmorphism and text-over-image fail only where measured contrast fails, neumorphism where the control edge fails 3:1, parallax when it ignores reduced-motion, tiny body text when it cannot resize."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/ui-ux-designer.md",
+          "line": 32,
+          "evidence": "If evidence cannot separate alternatives, state a falsifiable hypothesis and the test that settles it.",
+          "fix": "Name the outcome when the test cannot be run (no users, no metric): recommend the alternative the source-precedence order already ranks highest and say the hypothesis is untested."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/ui-ux-designer.md",
+          "line": 71,
+          "evidence": "Per screen, the skill's unchanged review table ... append ` \u2014 priority:` ... to each evidence cell",
+          "fix": "Resolve the clash: the skill evidence cell ends in the deciding fact, so put ` \u2014 priority:` after that fact and before nothing else, and state that a row the skill marks pass or na keeps ` \u2014 priority: none` even when this agent's research check disagrees."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/ui-ux-designer.md",
+          "line": null,
+          "evidence": "Digest at dbff837f: 'removed units (197, showing 40)'. All 40 listed items are explained by valid section rows in docs/audit/recovery/ui-ux-designer/record.md, but the other 157 removed units could not be checked",
+          "fix": "Regenerate the digest with the full unit list, or confirm that each of the 157 unlisted units is covered by a section row (s001-s023) in docs/audit/recovery/ui-ux-designer/record.md through sections.json"
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/ui-ux-designer.md",
+          "line": 51,
+          "evidence": "'Choice load (Hick): are choices limited or grouped? Target size and distance (Fitts): are targets sized for the input and related items close?' and line 50 'Familiar patterns: are conventional patterns used where users expect them' are activation reminders of textbook heuristics, not expert content",
+          "fix": "Keep them brief, as they are now. Do not add more textbook heuristics. If they grow, move them to a reference file in skills/ui-ux-principles/ with a record row"
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "agents/ui-ux-designer.md",
+          "line": 3,
+          "evidence": "The description does not separate the agent from its own preloaded skill ui-ux-principles, which also triggers on 'review this page' and 'why does this feel off'. Comparing design alternatives and mobile reach are not among its keywords",
+          "fix": "Use for an honest, research-backed critique of a UI, screen, mockup, screenshot, user flow or design decision, run in its own context. Delegate when asked to review, critique or sanity-check a design, compare design alternatives, or about usability, UX, accessibility, layout, navigation, mobile thumb reach or onboarding, or when the user wants pushback with cited sources, even without the word UX. Returns a verdict, per-screen rule tables, ranked findings with evidence and fixes, and the single biggest win. Not for implementing frontend code or generating new designs from scratch; for a quick in-context rule check while building a component, use the ui-ux-principles skill directly."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/ui-ux-designer.md",
+          "line": 72,
+          "evidence": "'Priority: High = accessibility blocker or primary-task break; Medium = a fail that slows the task or affects one state; Low = polish.' Line 42 says research checks 'never move a pass or fail row', yet the line 76 calibration example gives a judgment-only centered-nav finding 'Priority: Medium'. A non-fail research finding has no defined priority level",
+          "fix": "Extend the priority line: 'A research-check or trend finding that is not a skill fail is Medium when cited evidence ties it to the primary task, else Low', so the calibration example follows a stated rule"
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

@@ -1,0 +1,24 @@
+{
+  "skill": "naming-analyzer",
+  "mode": "output",
+  "pass_rate": 0.9286,
+  "passed": 39,
+  "total": 42,
+  "failures": [
+    {
+      "eval": "convention-split-grouped",
+      "assertion": "Reports the prefix split as one grouped finding naming the locations and the dominant form, not as a separate row for every identifier",
+      "evidence": "Row 3 does group the split (\"Majority is 8/14\"), but the table also gives separate rows for `error` \u2192 `hasError`, `enabled` \u2192 keep the JSON key, and `active` \u2192 keep, so it reports one row per identifier."
+    },
+    {
+      "eval": "convention-split-grouped",
+      "assertion": "Rates the group by its riskiest member and identifies `enabled` as a public JSON key, so contract compatibility with an alias or mapping instead of a plain rename",
+      "evidence": "`enabled` is called a \"Public API key\" rated \"contract\" with \"internal `isEnabled`, mapped at the serializer\", but the grouped split row is rated \"\u2014 (policy)\", not by its riskiest member."
+    },
+    {
+      "eval": "repo-wide-triage",
+      "assertion": "Ends with a counts line of the form 'Reviewed N identifiers; M candidates (Priority 1: ..., 2: ..., 3: ...); K not shown, ask for the next batch or name a path' with K greater than zero, because the folder has more than ten candidate names",
+      "evidence": "The final line reads \"**Counts:** 10 reported (3 Priority 1, 1 tentative, 1 contract keep, 5 clarity), 7 more candidates, 4 explicit keeps.\", which lacks the 'Reviewed N identifiers; M candidates ... K not shown, ask for the next batch or name a path' form; the 'Ask for the next batch' prompt appears earlier and separately."
+    }
+  ]
+}

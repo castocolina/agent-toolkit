@@ -1,0 +1,204 @@
+{
+  "base": "dbff837f",
+  "sections": [
+    {
+      "id": "s001",
+      "file": "skills/codex/README.md",
+      "heading": "Codex Integration for Claude Code",
+      "text": "<img width=\"2288\" height=\"808\" alt=\"skillcodex\" src=\"https://github.com/user-attachments/assets/85336a9f-4680-479e-b3fe-d6a68cadc051\" />",
+      "chars": 136,
+      "units": [
+        "para:7acfba7a"
+      ]
+    },
+    {
+      "id": "s002",
+      "file": "skills/codex/README.md",
+      "heading": "Purpose",
+      "text": "Enable Claude Code to invoke the Codex CLI (`codex exec` and session resumes) for automated code analysis, refactoring, and editing workflows.",
+      "chars": 142,
+      "units": [
+        "para:31ecab45"
+      ]
+    },
+    {
+      "id": "s003",
+      "file": "skills/codex/README.md",
+      "heading": "Prerequisites",
+      "text": "- `codex` CLI installed and available on `PATH`.\n- Codex configured with valid credentials and settings.\n- Confirm the installation by running `codex --version`; resolve any errors before using the skill.",
+      "chars": 204,
+      "units": [
+        "para:d3485319",
+        "para:f38f9ade",
+        "para:6cd65e9d"
+      ]
+    },
+    {
+      "id": "s004",
+      "file": "skills/codex/README.md",
+      "heading": "Installation",
+      "text": "Download this repo and store the skill in ~/.claude/skills/codex\n\n```\ngit clone --depth 1 git@github.com:skills-directory/skill-codex.git /tmp/skills-temp && \\\nmkdir -p ~/.claude/skills && \\\ncp -r /tmp/skills-temp/ ~/.claude/skills/codex && \\\nrm -rf /tmp/skills-temp\n```",
+      "chars": 270,
+      "units": [
+        "para:71a6a5f8",
+        "para:64f7ed5b"
+      ]
+    },
+    {
+      "id": "s005",
+      "file": "skills/codex/README.md",
+      "heading": "Important: Thinking Tokens",
+      "text": "By default, this skill suppresses thinking tokens (stderr output) using `2>/dev/null` to avoid bloating Claude Code's context window. If you want to see the thinking tokens for debugging or insight into Codex's reasoning process, explicitly ask Claude to show them.",
+      "chars": 265,
+      "units": [
+        "para:9a2763ee"
+      ]
+    },
+    {
+      "id": "s006",
+      "file": "skills/codex/README.md",
+      "heading": "Example Workflow",
+      "text": "**User prompt:**\n```\nUse codex to analyze this repository and suggest improvements for my claude code skill.\n```\n\n**Claude Code response:**\nClaude will activate the Codex skill and:\n1. Ask which model to use (`gpt-5` or `gpt-5-codex`) unless already specified in your prompt.\n2. Ask which reasoning effort level (`low`, `medium`, or `high`) unless already specified in your prompt.\n3. Select appropriate sandbox mode (defaults to `read-only` for analysis)\n4. Run a command like:\n```bash\ncodex exec -m gpt-5-codex \\\n  --config model_reasoning_effort=\"high\" \\\n  --sandbox read-only \\\n  --full-auto \\\n  --skip-git-repo-check \\\n  \"Analyze this Claude Code skill repository comprehensively...\" 2>/dev/null\n```\n\n**Result:**\nClaude will summarize the Codex analysis output, highlighting key suggestions and asking if you'd like to continue with follow-up actions.",
+      "chars": 856,
+      "units": [
+        "para:1d9269eb",
+        "para:838f8873",
+        "para:519b3550",
+        "para:b7696f48",
+        "para:fad0f009",
+        "para:c639fb0a",
+        "para:22b13a36",
+        "para:141b20e9"
+      ]
+    },
+    {
+      "id": "s007",
+      "file": "skills/codex/README.md",
+      "heading": "Detailed Instructions",
+      "text": "See `SKILL.md` for complete operational instructions, CLI options, and workflow guidance.",
+      "chars": 89,
+      "units": [
+        "para:d8ff8eb6"
+      ]
+    },
+    {
+      "id": "s008",
+      "file": "skills/codex/SKILL.md",
+      "heading": "(preamble)",
+      "text": "---\nname: codex\ndescription: Use when the user asks to run Codex CLI (codex exec, codex resume) or references OpenAI Codex for code analysis, refactoring, or automated editing. Uses GPT-5.2 by default for state-of-the-art software engineering.\n---",
+      "chars": 247,
+      "units": [
+        "para:56bd5783"
+      ]
+    },
+    {
+      "id": "s009",
+      "file": "skills/codex/SKILL.md",
+      "heading": "Running a Task",
+      "text": "1. Default to `gpt-5.2` model. Ask the user (via `AskUserQuestion`) which reasoning effort to use (`xhigh`,`high`, `medium`, or `low`). User can override model if needed (see Model Options below).\n\n2. Select the sandbox mode required for the task; default to `--sandbox read-only` unless edits or network access are necessary.\n\n3. Assemble the command with the appropriate options:\n\n   - `-m, --model <MODEL>`\n\n   - `--config model_reasoning_effort=\"<high|medium|low>\"`\n\n   - `--sandbox <read-only|workspace-write|danger-full-access>`\n\n   - `-C, --cd <DIR>`\n\n   - `--skip-git-repo-check`\n\n3. Always use --skip-git-repo-check.\n\n4. When continuing a previous session, use `codex exec --skip-git-repo-check resume --last` via stdin. When resuming don't use any configuration flags unless explicitly requested by the user e.g. if he species the model or the reasoning effort when requesting to resume a session. Resume syntax: `echo \"your prompt here\" | codex exec --skip-git-repo-check resume --last 2>/dev/null`. All flags have to be inserted between exec and resume.\n\n5. **IMPORTANT**: By default, append `2>/dev/null` to all `codex exec` commands to suppress thinking tokens (stderr). Only show stderr if the user explicitly requests to see thinking tokens or if debugging is needed.\n\n6. Run the command, capture stdout/stderr (filtered as appropriate), and summarize the outcome for the user.",
+      "chars": 1393,
+      "units": [
+        "para:55e2065b",
+        "para:ee90c057",
+        "para:69dc4c23",
+        "para:51a3f879",
+        "para:735c7db1",
+        "para:aa6796ab",
+        "para:857f5d72",
+        "para:02790c00",
+        "para:ced2fefc",
+        "para:fce16166",
+        "para:3e349fb0",
+        "para:4bb11ff3"
+      ]
+    },
+    {
+      "id": "s010",
+      "file": "skills/codex/SKILL.md",
+      "heading": "Running a Task",
+      "text": "7. **After Codex completes**, inform the user: \"You can resume this Codex session at any time by saying 'codex resume' or asking me to continue with additional analysis or changes.\"",
+      "chars": 181,
+      "units": [
+        "para:2664b0b1"
+      ]
+    },
+    {
+      "id": "s011",
+      "file": "skills/codex/SKILL.md",
+      "heading": "Quick Reference",
+      "text": "| Use case | Sandbox mode | Key flags |\n| --- | --- | --- |\n| Read-only review or analysis | `read-only` | `--sandbox read-only 2>/dev/null` |\n| Apply local edits | `workspace-write` | `--sandbox workspace-write --full-auto 2>/dev/null` |\n| Permit network or broad access | `danger-full-access` | `--sandbox danger-full-access --full-auto 2>/dev/null` |\n| Resume recent session | Inherited from original | `echo \"prompt\" \\| codex exec --skip-git-repo-check resume --last 2>/dev/null` (no flags allowed) |\n| Run from another directory | Match task needs | `-C <DIR>` plus other flags `2>/dev/null` |",
+      "chars": 598,
+      "units": [
+        "para:ae800984",
+        "para:e0f5ce64",
+        "para:b96fbbe1",
+        "para:c83ebd6b",
+        "para:b0b709e5",
+        "para:6868ea8c"
+      ]
+    },
+    {
+      "id": "s012",
+      "file": "skills/codex/SKILL.md",
+      "heading": "Model Options",
+      "text": "| Model | Best for | Context window | Key features |\n| --- | --- | --- | --- |\n| `gpt-5.2-max` | **Max model**: Ultra-complex reasoning, deep problem analysis | 400K input / 128K output | 76.3% SWE-bench, adaptive reasoning, $1.25/$10.00 |\n| `gpt-5.2` \u2b50 | **Flagship model**: Software engineering, agentic coding workflows | 400K input / 128K output | 76.3% SWE-bench, adaptive reasoning, $1.25/$10.00 |\n| `gpt-5.2-mini` | Cost-efficient coding (4x more usage allowance) | 400K input / 128K output | Near SOTA performance, $0.25/$2.00 |\n| `gpt-5.1-thinking` | Ultra-complex reasoning, deep problem analysis | 400K input / 128K output | Adaptive thinking depth, runs 2x slower on hardest tasks |\n\n**GPT-5.2 Advantages**: 76.3% SWE-bench (vs 72.8% GPT-5), 30% faster on average tasks, better tool handling, reduced hallucinations, improved code quality. Knowledge cutoff: September 30, 2024.\n\n**Reasoning Effort Levels**:\n- `xhigh` - Ultra-complex tasks (deep problem analysis, complex reasoning, deep understanding of the problem)\n- `high` - Complex tasks (refactoring, architecture, security analysis, performance optimization)\n- `medium` - Standard tasks (refactoring, code organization, feature additions, bug fixes)\n- `low` - Simple tasks (quick fixes, simple changes, code formatting, documentation)\n\n**Cached Input Discount**: 90% off ($0.125/M tokens) for repeated context, cache lasts up to 24 hours.",
+      "chars": 1407,
+      "units": [
+        "para:25dd9749",
+        "para:8cb8d24c",
+        "para:bd5fab2e",
+        "para:2ed55dc7",
+        "para:fd285f81",
+        "para:309674d8",
+        "para:b23e2173",
+        "para:696cf1ed",
+        "para:b2551318",
+        "para:de3144ee",
+        "para:7bde888c",
+        "para:422fccd9"
+      ]
+    },
+    {
+      "id": "s013",
+      "file": "skills/codex/SKILL.md",
+      "heading": "Following Up",
+      "text": "- After every `codex` command, immediately use `AskUserQuestion` to confirm next steps, collect clarifications, or decide whether to resume with `codex exec resume --last`.\n- When resuming, pipe the new prompt via stdin: `echo \"new prompt\" | codex exec resume --last 2>/dev/null`. The resumed session automatically uses the same model, reasoning effort, and sandbox mode from the original session.\n- Restate the chosen model, reasoning effort, and sandbox mode when proposing follow-up actions.",
+      "chars": 494,
+      "units": [
+        "para:c1ae1d59",
+        "para:259db988",
+        "para:2100f3b5"
+      ]
+    },
+    {
+      "id": "s014",
+      "file": "skills/codex/SKILL.md",
+      "heading": "Error Handling",
+      "text": "- Stop and report failures whenever `codex --version` or a `codex exec` command exits non-zero; request direction before retrying.\n- Before you use high-impact flags (`--full-auto`, `--sandbox danger-full-access`, `--skip-git-repo-check`) ask the user for permission using AskUserQuestion unless it was already given.\n- When output includes warnings or partial results, summarize them and ask how to adjust using `AskUserQuestion`.",
+      "chars": 431,
+      "units": [
+        "para:186b2cfd",
+        "para:b09f8449",
+        "para:299c7004"
+      ]
+    },
+    {
+      "id": "s015",
+      "file": "skills/codex/SKILL.md",
+      "heading": "CLI Version",
+      "text": "Requires Codex CLI v0.57.0 or later for GPT-5.2 model support. The CLI defaults to `gpt-5.2` on macOS/Linux and `gpt-5.2` on Windows. Check version: `codex --version`\n\nUse `/model` slash command within a Codex session to switch models, or configure default in `~/.codex/config.toml`.",
+      "chars": 283,
+      "units": [
+        "para:df82462e",
+        "para:d7bd3f85"
+      ]
+    }
+  ],
+  "files": [],
+  "phrase_fate": {
+    "kept": 30.22,
+    "moved": 0.38,
+    "gone": 69.4,
+    "new": 62.17
+  }
+}

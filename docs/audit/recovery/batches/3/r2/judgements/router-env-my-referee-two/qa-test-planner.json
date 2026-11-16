@@ -1,0 +1,104 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 15,
+    "D3": 15,
+    "D4": 13,
+    "D5": 15,
+    "D6": 13,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 16,
+      "evidence": "\"plan\", release or feature scope, entry/exit criteria | Test plan (section 3) | `references/test_plan_template.md` when the plan needs more than the section 3 shape",
+      "fix": "The row never fires on its own stated trigger: a request for a plan, release scope, or entry/exit criteria is routed to section 3 and told not to load the plan template, while the template is exactly where entry criteria live. Change the Read first cell so a request that names entry criteria, a risk table, an executive summary or a full plan document loads `references/test_plan_template.md` immediately."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/qa-test-planner/record.md",
+      "line": null,
+      "evidence": "removed units (597, showing 40) at dbff837f, plus para:9e5380d3 at 0e4951c85e2564003561626152fbee677da3c5d0",
+      "fix": "No per-item restore: every shown unit is covered by a valid record row (section id or para/file row; drop, intended-change, restore-references or not-lost), and the 597-item cut is one finding rather than 557 extra deductions. Record the truncation itself if a later audit still lists it."
+    },
+    {
+      "id": "D1-3",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/qa-test-planner/references/test_plan_template.md",
+      "line": 17,
+      "evidence": "Approach: black box; positive and negative cases; boundary value analysis; equivalence partitioning.",
+      "fix": "The model already names those techniques. Move the sentence into the worked example only where a technique changes a decision, and record the removal of the generic list in `docs/audit/recovery/qa-test-planner/record.md`."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 3,
+      "evidence": "Use only when the user invokes qa-test-planner by name or /qa-test-planner. Not for Cypress, Playwright, unit or API test automation, fixing implementation code, or manual QA requests that do not name this skill.",
+      "fix": "Create manual QA test plans, executable test cases, regression and smoke suites, a ship-or-block release decision, Figma design-validation checklists and structured bug reports (repro rate, environment, Open Questions). Use when the user invokes qa-test-planner by name or /qa-test-planner, including a request that only implies the deliverable once the name is present: a password-reset or checkout plan, cases for a flow, a smoke or targeted suite, a ship-or-block decision, a Figma frame comparison, or a bug whose rate or browser is unknown. Not for Cypress, Playwright, unit or API automation, fixing implementation code, or any QA request that does not name this skill."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/references/regression_testing.md",
+      "line": 9,
+      "evidence": "4. Smoke first: the few P0 checks that prove the build is testable at all. If smoke fails, stop and report; later results on a broken build are noise.",
+      "fix": "State the default smoke set as the cases the catalog or suite marks SMOKE-, in ID order, and say a product with no smoke cases uses the section 5 precedence until the first non-smoke case. Leave the stop-on-failure rule as written."
+    },
+    {
+      "id": "D6-2",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/qa-test-planner/references/bug_report_templates.md",
+      "line": 168,
+      "evidence": "Start from severity, then raise or lower one step for how often and how widely it hits.",
+      "fix": "Delete the raise-or-lower sentence. The grid already returns the priority, and the following sentence defines the only adjustment: a security or data-loss bug starts at P0 at any rate."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/qa-test-planner/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "23 queries: 13 should-trigger and 10 should-not-trigger; the file is a flat array with no train/validation split.",
+      "fix": "Keep the 13 positives and 10 near-miss negatives. Add a `split` field (about 60% train, 40% validation) so description changes are graded on held-out queries."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 16,
+      "evidence": "Read first | `references/test_plan_template.md` when the plan needs more than the section 3 shape (executive summary, entry criteria, risk table, deliverables)",
+      "fix": "Make the plan row load `references/test_plan_template.md` whenever the user asks for entry criteria, a risk table, an executive summary, deliverables or a full plan document, and keep the section 3 shape for a plan that asks for none of those."
+    }
+  ]
+}

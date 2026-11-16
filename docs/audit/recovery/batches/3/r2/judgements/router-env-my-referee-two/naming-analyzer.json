@@ -1,0 +1,95 @@
+{
+  "skill": "naming-analyzer",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/references/naming-guidelines.md",
+      "line": 52,
+      "evidence": "Convention fallback tree: boolean prefix, verb phrase, noun, UPPER_SNAKE_CASE, descriptive noun. Record s017/s031 already dropped this tree as generic-model-knowledge.",
+      "fix": "Keep the tree in references/naming-guidelines.md only as the fallback the Decide table points at, and add a row to docs/audit/recovery/naming-analyzer/record.md if any further shortening is intended; do not delete the credit or the project-first sentence above it."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/naming-analyzer/references/naming-guidelines.md",
+      "line": 32,
+      "evidence": "Boolean names restates is/has/can/should (is_, has_, can_ in Python) with examples the model already produces.",
+      "fix": "Move the prefix list to one line under the polarity and missing-prefix rules, which are the part the model does not apply by default, and record any deleted examples in docs/audit/recovery/naming-analyzer/record.md."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 61,
+      "evidence": "Gotchas has one bullet, and it repeats the RQ job.func_name caution already stated under Hidden consumers.",
+      "fix": "Replace that bullet with environment facts that are not already in Hidden consumers, such as when a plain IDE rename is unsafe (polarity flips, string-key access, generated clients), each with the reason."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/naming-analyzer/references/naming-guidelines.md",
+      "line": 64,
+      "evidence": "The constant branch always says UPPER_SNAKE_CASE, while step 1 says to write the language's own form.",
+      "fix": "Change that branch to 'the language's constant form, with the unit when it has one' and keep UPPER_SNAKE_CASE only as the Python/JS example."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/evals/evals.json",
+      "line": 1,
+      "evidence": "11 prompts and assertions are realistic and verifiable, but none asserts the counts line, the top-10 cut, or the lexical-local versus full-search rule in Workflow step 0.",
+      "fix": "Add one repo-wide fixture that expects at most 10 ranked rows, the counts line, and a full string search for an exported or string-keyed name."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 16,
+      "evidence": "Step 1 says 'If the repo has no established pattern, use the language's dominant convention' and names PEP 8 and Effective Go, while naming-guidelines.md checks project, then framework, then language, then an industry standard.",
+      "fix": "In step 1, point at the Convention layers order in references/naming-guidelines.md and say the language guide is used only after project and framework have no answer."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/naming-analyzer/evals/files/audit_events.py",
+      "line": 15,
+      "evidence": "purge_older_than calls .timestamp() on createdAt, which the comment says is a naive datetime, so the cited comparison is not only a naive-versus-UTC compare.",
+      "fix": "Make the fixture's comparison the one the Cases row describes, or add a note in the createdAt row that a later .timestamp() call is a separate defect and not the rename evidence."
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "skill": "viral-tweet",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/viral-tweet.md",
+      "line": null,
+      "evidence": "Digest at dbff837f: 'removed units (75, showing 40)'. The list is cut, so 35 removed units could not be checked against docs/audit/recovery/viral-tweet/record.md. All 40 listed items, and para:5e05a69b from the 89cb6a11 digest (rewritten as the THREAD line), are explained.",
+      "fix": "Re-run the removal check with the full unit list (python3 scripts/audit/audit.py judge-prompt --kind command --artifact commands/viral-tweet.md ...). Then confirm that each of the 35 hidden units is covered by a valid section row in docs/audit/recovery/viral-tweet/record.md, or add a para: row for it."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/viral-tweet.md",
+      "line": 22,
+      "evidence": "'Sound human, not like a marketer: short sentences, no corporate-speak, match the author's voice, specific over generic, confident over hedging.'",
+      "fix": "This is activation content the model mostly knows. Keep it, since the record restores it on purpose, but cut it to the one correction that matters, for example 'Counter your default marketer tone: no corporate-speak, keep the author's voice; any odd angle stays within the supplied facts.' Delete nothing without a record row."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/viral-tweet.md",
+      "line": 27,
+      "evidence": "Step 4d packs the thread question, the three-thread fallback, the single-thread expansion and the longer-allowance ceiling into one sentence chain.",
+      "fix": "Split 4d into labelled sub-branches (4d-i over the limit: ask about a thread; 4d-ii no answer: three alternative threads; 4d-iii user expands one post: THREAD block; 4d-iv longer allowance: ask for the ceiling, else 280) so the process pattern has clear checkpoints. Keep every rule."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/viral-tweet.md",
+      "line": 39,
+      "evidence": "'Add hashtag stacks, \"link in bio\", or unrelated @mentions or links. Keep a link only if it substantiates the claim, and prefer it outside the main post text.' This is the only NEVER item with no reason.",
+      "fix": "Add the reason the other items have, for example '...: readers read stacked tags and off-topic mentions as spam and scroll past, and a URL costs 23 characters of the 280'."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/viral-tweet.md",
+      "line": 19,
+      "evidence": "3a(a) hook-led: 'lead with the concrete outcome if supplied; a contrast only when both sides are supported; else the author's concrete observation; ...'. This is a fixed fallback chain for a creative choice.",
+      "fix": "Keep the hard factual limits (supported contrast only, a closed curiosity gap) and turn the order into a default with an escape hatch: 'Default: lead with the concrete outcome; pick another supported angle when it reads stronger.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/viral-tweet.md",
+      "line": 47,
+      "evidence": "Step 2 says of the primary objective 'State it in ANALYSIS', but the template reads '**ANALYSIS:** facts kept, the intended reader and payoff, friction points, facts you would need confirmed', with no objective slot. Step 3b's minimal-edit trim is also forced under the label 'VERSION 1 (hook)'.",
+      "fix": "Change the template to '**ANALYSIS:** facts kept, the intended reader and payoff, primary objective (and why), friction points, facts you would need confirmed' and label VERSION 1 '(hook, or minimal-edit trim when the user only asked to shorten)'."
+    }
+  ]
+}
