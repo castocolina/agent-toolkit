@@ -52,26 +52,7 @@ init_repo() {
 write_gh_stub() {
   local root=$1
   mkdir -p "$root/bin" "$root/fixtures"
-  cat > "$root/bin/gh" << 'EOF'
-#!/bin/bash
-printf '%s\n' "$*" >> "$GH_LOG"
-code=${GH_STUB_FAIL_CODE:-} msg=${GH_STUB_FAIL_MSG:-} body=${GH_STUB_FAIL_BODY:-}
-if [ -n "$code" ]; then
-  printf '%s\n' "$body"
-  printf 'gh: %s (HTTP %s)\n' "$msg" "$code" >&2
-  exit 1
-fi
-endpoint=""
-for a in "$@"; do
-  case "$a" in
-    repos/*) endpoint=$a ;;
-  esac
-done
-file=${GH_FIXTURES}/${endpoint//\//__}
-if [ -f "$file" ]; then cat "$file"; exit 0; fi
-echo "stub: no fixture for $endpoint" >&2
-exit 1
-EOF
+  cp "$HERE/fixtures/gh-api-stub.sh" "$root/bin/gh"
   chmod +x "$root/bin/gh"
 }
 
@@ -81,28 +62,8 @@ EOF
 # instead of being masked by a canned exit 0.
 write_converter_stub() {
   local path=$1 mode=${2:-png}
-  cat > "$path" << EOF
-#!/bin/bash
-set -e
-echo "Converting inputs..."
-mode=$mode
-generated=()
-for src in "\$@"; do
-  case "\$src" in
-    *.drawio) out="\${src%.drawio}.drawio.png" ;;
-    *) continue ;;
-  esac
-  case "\$mode" in
-    png) printf '\211PNG\r\n\032\nembedded' > "\$out"; echo "Generated \$out"; generated+=("\$out") ;;
-    none) echo "no output for \$src" ;;
-    bad) printf 'not a png' > "\$out"; echo "Generated \$out"; generated+=("\$out") ;;
-  esac
-done
-if [ -n "\${STUB_CWD_LOG:-}" ]; then
-  printf '%s git=%s\n' "\$PWD" "\$(git rev-parse --is-inside-work-tree 2>/dev/null || echo false)" >> "\$STUB_CWD_LOG"
-fi
-if [ \${#generated[@]} -gt 0 ]; then git add -- "\${generated[@]}"; fi
-EOF
+  cp "$HERE/fixtures/converter-stub.sh" "$path"
+  printf '%s\n' "$mode" > "$path.mode"
   chmod +x "$path"
 }
 
@@ -450,6 +411,29 @@ test_render_rejects_missing_or_invalid_png() {
   check stdout_bad "$OUT" ""
 }
 
+test_render_warns_when_png_exceeds_image_limit() {
+  local root; root=$(mktemp -d); TMPS+=("$root")
+  cp "$FIXTURE" "$root/flow.drawio"
+  write_converter_stub "$root/conv.sh" big
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" -- render "$root/flow.drawio"
+  check exit_big "$CODE" 0
+  check warn_big "$(grep -c '10 MB image limit.*branch mode' "$root/err")" 1
+  check png_kept "$([ -s "$root/flow.drawio.png" ] && echo yes || echo no)" yes
+  write_converter_stub "$root/conv.sh" png
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" -- render "$root/flow.drawio"
+  check exit_small "$CODE" 0
+  check no_warn_small "$(grep -c '10 MB image limit' "$root/err" || true)" 0
+}
+
+test_none_filter_keeps_ordinary_inline_image() {
+  local ad; ad=$(mktemp -d); TMPS+=("$ad")
+  sed -n '/^````bash$/,/^````$/p' "$HERE/../../../skills/pr-diagrams/references/pr-body.md" | sed '1d;$d' > "$ad/filter.sh"
+  cp "$HERE/fixtures/none-filter-body.md" "$ad/body.md"
+  AD="$ad" REPO=owner/repo bash "$ad/filter.sh"
+  check filter_exit "$?" 0
+  check filtered "$(cat "$ad/body.md")" "$(cat "$HERE/fixtures/none-filter-body.expected.md")"
+}
+
 test_render_leaves_caller_index_untouched() {
   init_repo
   cp "$FIXTURE" "$REPO/flow.drawio"
@@ -490,6 +474,38 @@ test_render_refuses_symlink_destination() {
   check sentinel "$([ "$(cat "$root/outside/sentinel.png")" = SENTINEL ] && echo yes || echo no)" yes
   check still_symlink "$([ -L "$root/flow.drawio.png" ] && echo yes || echo no)" yes
   check stdout "$OUT" ""
+}
+
+test_render_replaces_nothing_when_a_later_destination_fails() {
+  local root; root=$(mktemp -d); TMPS+=("$root")
+  mkdir -p "$root/a" "$root/b" "$root/outside"
+  cp "$FIXTURE" "$root/a/one.drawio"
+  cp "$FIXTURE" "$root/b/two.drawio"
+  printf 'OLD\n' > "$root/a/one.drawio.png"
+  printf 'SENTINEL\n' > "$root/outside/sentinel.png"
+  ln -s "$root/outside/sentinel.png" "$root/b/two.drawio.png"
+  write_converter_stub "$root/conv.sh"
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" -- render "$root/a/one.drawio" "$root/b/two.drawio"
+  check exit_symlink "$CODE" 1
+  check msg_symlink "$(grep -c 'symlink' "$root/err")" 1
+  check first_kept "$(cat "$root/a/one.drawio.png")" OLD
+  check sentinel "$(cat "$root/outside/sentinel.png")" SENTINEL
+  check stdout_symlink "$OUT" ""
+  check no_stage_files "$(find "$root/a" "$root/b" -name '.pr-diagrams.*' | wc -l | tr -d ' ')" 0
+  # A later destination directory that is not writable fails the same way.
+  rm "$root/b/two.drawio.png"
+  chmod 555 "$root/b"
+  if [ -w "$root/b" ]; then
+    echo "  SKIP read-only directory is still writable (running as root?)"
+  else
+    run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" -- render "$root/a/one.drawio" "$root/b/two.drawio"
+    check exit_readonly "$CODE" 1
+    check msg_readonly "$(grep -c 'not writable' "$root/err")" 1
+    check first_kept_readonly "$(cat "$root/a/one.drawio.png")" OLD
+    check second_absent "$([ -e "$root/b/two.drawio.png" ] && echo yes || echo no)" no
+    check stdout_readonly "$OUT" ""
+  fi
+  chmod 755 "$root/b"
 }
 
 test_render_names_with_spaces_are_not_false_duplicates() {
@@ -587,6 +603,9 @@ cap() { # cap VERSION URL [env...]; sets OUT CODE ERR
 test_capability_rule() {
   cap 'gh version 2.101.0 (2026-09-15)' https://github.com/o/r; check v2101 "$OUT/$CODE" attach/0
   cap 'gh version 2.100.0' https://github.com/o/r; check v2100 "$OUT/$CODE" branch/0
+  # --attach shipped in 2.99.0; 2.101 is only the tested floor, so the message must not claim the flag is missing.
+  check floor_msg "$(printf '%s' "$ERR" | grep -c 'gh 2.100 is older than the tested floor 2.101: using branch mode')" 1
+  check no_false_claim "$(printf '%s' "$ERR" | grep -c 'no --attach')" 0
   cap 'gh version 3.0.0' https://github.com/o/r; check v3 "$OUT/$CODE" attach/0
   cap 'gh version 2.101.0' https://GitHub.com/o/r/; check upper "$OUT/$CODE" attach/0
   local u
@@ -615,6 +634,10 @@ test_capability_probe_failures_print_branch() {
   done
   cap 'gh version 2.101.0' https://github.com/o/r PR_DIAGRAMS_MODE=bogus
   check bogus "[$OUT]/$CODE" "[]/2"
+  local s; s=$(mktemp -d); TMPS+=("$s"); write_cap_stub "$s"
+  run_in "$s" GH="$s/bin/gh" -- capability extra
+  check stray_arg "[$OUT]/$CODE" "[]/2"
+  check stray_arg_usage "$(printf '%s' "$ERR" | grep -c 'usage: pr-diagrams.sh capability')" 1
 }
 
 test_capability_without_timeout_still_attaches() {

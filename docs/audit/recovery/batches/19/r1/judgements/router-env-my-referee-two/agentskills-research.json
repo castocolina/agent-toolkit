@@ -1,0 +1,86 @@
+{
+  "skill": "agentskills-research",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 19,
+      "evidence": "Step 3.2 says \"rubric_stale false (so changed or removed is non-empty: references repaired or pruned to the pin the rubric already matches)\". The fetcher advances the pin whenever changed is non-empty (\"[ ${#CHANGED[@]} -gt 0 ] && PINNED=$RESOLVED\") and sets rubric_stale only by comparing the rubric spec_sha with that new pin, so a content change and rubric_stale false cannot occur together. The gotcha at line 73 states the opposite and is the branch an agent will actually meet.",
+      "fix": "Rewrite step 3.2 to the case the gotcha already names: changed non-empty and rubric_stale false cannot happen, because any changed file moves sha to resolved and makes rubric_stale true. Keep removed non-empty with rubric_stale false as the only repair-or-prune, no-rule-change branch, and send every changed run down the BASE-diff path."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 48,
+      "evidence": "Source 2 step 1 stops the whole skill when changed and profiles_stale are empty (\"delete the kept directory, report 'Claude Code specs unchanged', edit nothing, stop\"), while the intro says a request with no source named runs both fetchers and, if one exits 1, still runs the other.",
+      "fix": "Change that stop to \"stop this source\": delete kept, report Claude Code specs unchanged, edit nothing for this source, then return to the caller so an unnamed request can still finish the other source, run build_plugins.py and rubric-check once, and make one commit."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/agentskills-research/references/structure-change.md",
+      "line": 3,
+      "evidence": "The only load trigger is \"Read this only when fetch-spec.sh reports structure_changed: true or rubric-check reports a broken source anchor.\" It does not name the reference to leave unread on the ordinary unchanged, repair and rule-update paths.",
+      "fix": "Add one line at that trigger: do not load references/structure-change.md when structure_changed is false and rubric-check reports no broken source anchor, including the unchanged early return, the repair branch and the rule-update branch."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/agentskills-research/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "19 queries: 10 should-trigger and 9 should-not-trigger. The near-miss negatives cover judging, validating and summarizing, but none names the repo's other vendored docs or another host's format rules.",
+      "fix": "Add one should-not-trigger near-miss such as \"refresh the opencode plugin format docs we pin\" (the body says other hosts are not pinned) so the set reaches about 20 and tests the Claude Code boundary."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 16,
+      "evidence": "Step 2 says the unchanged early return is \"changed empty AND removed empty AND rubric_stale false\". The eval fixture fetch-unchanged.json is exactly that case and omits removed, structure_changed, new_pages and removed_pages, all of which the fetcher always prints. An agent that treats a missing removed as not empty never takes the early return the eval requires.",
+      "fix": "State the test in terms of the arrays the fetcher always emits: unchanged only when changed and removed are both present and empty and rubric_stale is false; a missing field is a malformed result, so re-run with -h and do not guess. Put the same four fields in evals/files/fetch-unchanged.json and the other fetcher fixtures."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 52,
+      "evidence": "Source 2 step 4 says a rule change updates \"the provenance header (digest lines and the '<page>: <bytes> bytes, sha256 <hash>' lines)\". fetch-claude-specs.sh records only url and sha256 per page in SOURCE.json and never a byte count, and it deletes the kept pages unless --keep is still holding them. The byte lines in docs/audit/artifact-specs.md (lines 5-7) therefore have no source the workflow names.",
+      "fix": "Tell the agent to set each provenance byte line from the kept page before deleting it, with wc -c on \"$kept/<page>.md\", and to set the sha256 from SOURCE.json pages[page].sha256. Name that command next to the digest-line update so the header rubric-check reads can actually be produced."
+    }
+  ]
+}

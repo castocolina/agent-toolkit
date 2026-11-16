@@ -35,8 +35,9 @@ NR == FNR {
     t = substr(rest, RSTART, RLENGTH); lab = t; sub(/^!\[/, "", lab)
     if (lab ~ /\]\[/) { alt = lab; sub(/\]\[.*$/, "", alt); sub(/^.*\]\[/, "", lab); sub(/\]$/, "", lab); if (lab == "") lab = alt }
     else sub(/\]$/, "", lab)
+    inl = (t !~ /^!\[[^]]*\]\[/) && substr(rest, RSTART + RLENGTH, 1) == "("
     out = out substr(rest, 1, RSTART - 1)
-    if (!(norm(lab) in att)) out = out t
+    if (inl || !(norm(lab) in att)) out = out t
     rest = substr(rest, RSTART + RLENGTH)
   }
   print out rest
@@ -45,7 +46,7 @@ NR == FNR {
   && mv "$AD/body.filtered.md" "$AD/body.md"
 ````
 
-The sed step removes inline images (`![alt](url)`). The last awk step reads the file twice: the first pass collects the labels of reference definitions (`[label]: url`, case-insensitive, whitespace collapsed) whose URL is a diagram URL (above); the second removes each image usage `![alt][label]`, `![alt][]` and `![label]` that resolves to such a label. Images that resolve to any other label, ordinary-host images and surrounding prose stay. The definition lines themselves stay: they render nothing, and a plain link `[text][label]` may still use them.
+The sed step removes inline images (`![alt](url)`). The last awk step reads the file twice: the first pass collects the labels of reference definitions (`[label]: url`, case-insensitive, whitespace collapsed) whose URL is a diagram URL (above); the second removes each image usage `![alt][label]`, `![alt][]` and `![label]` that resolves to such a label. The last awk step keeps an inline image (`![alt](url)`, already handled by the sed step) even when its alt text equals a diagram label. Images that resolve to any other label, ordinary-host images and surrounding prose stay. The definition lines themselves stay: they render nothing, and a plain link `[text][label]` may still use them.
 
 The awk step writes to its own file first so the `&&` chain sees awk's exit status. When a source body's mermaid fence is never closed, `skip` is still set at EOF: the awk step then exits non-zero and the command stops with the named error `unclosed mermaid fence in PR body` before any PR write, instead of silently dropping the rest of the body.
 

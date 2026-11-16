@@ -1,0 +1,59 @@
+{
+  "skill": "pr-diagrams",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 30,
+      "evidence": "`PNG=$(bash \"$PRD\" render path/to/diagram.drawio | jq -r '.[0].png')` ... `Exit 1 means no PNG`",
+      "fix": "Capture and check the render command's exit status before piping its JSON to jq, or enable and check pipefail explicitly. On failure, report stderr and use the fallback body without attempting an attachment."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 55,
+      "evidence": "`git rev-list --merges \"origin/$BASE..origin/$HEAD\"`. Empty output means the history was squashed or rebased ... stop and ask for an explicit merged source PR.",
+      "fix": "Do not treat the presence of any merge commit as proof that all relevant promotions used merge commits: mixed merge, squash and rebase histories can pass this check while returning already-promoted sources. Require explicit source PRs when the merge strategy cannot be verified, or verify candidate PRs against a reliable promotion boundary."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+      "line": 203,
+      "evidence": "`for f in \"$@\"` copies each destination before checking the next destination for a symlink; SKILL.md says `render` exit 1 means no PNG was copied.",
+      "fix": "Preflight all destination paths and stage all copies before replacing any output, with rollback or another all-or-nothing strategy for replacement failures. Add a multi-input test where a later destination is a symlink or cannot be written, and ensure the documented failure contract matches the implementation."
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "skill": "agentskills-research",
+  "mode": "output",
+  "pass_rate": 0.6964,
+  "passed": 39,
+  "total": 56,
+  "failures": [
+    {
+      "eval": "unchanged",
+      "assertion": "Reports that the spec is unchanged at the pinned sha",
+      "evidence": "The output says, \u201cIf those establish that omitted `removed` means empty and omitted `structure_changed` means false, I would report\u201d the unchanged status, rather than reporting it unconditionally."
+    },
+    {
+      "eval": "validator-only",
+      "assertion": "Lists the added validator check from validator.diff (a 200-character limit on the license field) as a rule change",
+      "evidence": "The output calls it an \u201cintended **200-character maximum for `license`**\u201d and treats it as a rule change only \u201cIf the validator really rejects longer license values.\u201d"
+    },
+    {
+      "eval": "casual-unchanged",
+      "assertion": "Reports that the spec is unchanged at the pinned sha",
+      "evidence": "The output says only conditionally that \u201cthe spec is unchanged at that SHA\u201d if additional conditions are met."
+    },
+    {
+      "eval": "repair-only",
+      "assertion": "Says the restored references still need committing",
+      "evidence": "The output says to \u201creport the repair and any pending changes without committing,\u201d but does not say the restored references still need committing."
+    },
+    {
+      "eval": "claude-rule-change",
+      "assertion": "Finishes by running audit.py rubric-check and expecting exit 0",
+      "evidence": "The output puts Git commands after `rubric-check` and concludes, \"I cannot run `python3 scripts/audit/audit.py rubric-check` here, so its exit code is **not available**.\""
+    },
+    {
+      "eval": "claude-editorial",
+      "assertion": "Classifies the change as editorial because the fields and values are the same",
+      "evidence": "The output says that \u201cthe excerpts alone are not enough to conclude that the refresh is editorial.\u201d"
+    },
+    {
+      "eval": "claude-editorial",
+      "assertion": "Updates source_digest and the provenance header",
+      "evidence": "The output proposes those updates only \u201cIf the full comparison finds no rule change\u201d and does not provide the completed provenance header."
+    },
+    {
+      "eval": "claude-editorial",
+      "assertion": "Does not edit any field row or profile rule",
+      "evidence": "The output conditionally proposes to \u201cupdate the affected artifact-spec sections\u201d and \u201cthe affected agent-profile D4/D5/D7 criteria\u201d if the comparison is uncertain."
+    },
+    {
+      "eval": "claude-editorial",
+      "assertion": "Does not bump profile_version",
+      "evidence": "The output conditionally proposes to \u201cbump `profile_version` from 3 to 4\u201d if the comparison is uncertain."
+    },
+    {
+      "eval": "claude-unchanged",
+      "assertion": "Deletes the kept directory",
+      "evidence": "The output shows the command \u201crm -rf -- /tmp/claude-specs-kept.XyZ789\u201d but does not execute it."
+    },
+    {
+      "eval": "claude-stale-only",
+      "assertion": "Finding the excerpt editorial, sets the agent profile source_digest (line 2) and the agent_digest header line to the agent digest in the output",
+      "evidence": "The output says the excerpts \u201care not enough to rule out changes elsewhere\u201d and proposes setting both digests only \u201cIf there are no rule changes.\u201d"
+    },
+    {
+      "eval": "claude-stale-only",
+      "assertion": "Leaves the command profile alone and does not bump profile_version",
+      "evidence": "The output preserves \u201cprofile_version: 3\u201d only conditionally and otherwise proposes to \u201cbump each affected profile_version by one.\u201d"
+    },
+    {
+      "eval": "only-agentskills",
+      "assertion": "Runs fetch-spec.sh",
+      "evidence": "The output says, \u201cI can\u2019t fetch the spec\u201d and \u201cI would run\u201d the fetcher, rather than reporting that it ran."
+    },
+    {
+      "eval": "attribution-kept",
+      "assertion": "Names the CC-BY-4.0 attribution of the agentskills docs as one that must stay",
+      "evidence": "The output says to \u201ckeep the attribution headers in the Agent Skills reference copies\u201d but does not name CC-BY-4.0."
+    },
+    {
+      "eval": "unspecified-source-both",
+      "assertion": "Treats the request as naming no source and runs both fetch-spec.sh and fetch-claude-specs.sh",
+      "evidence": "The output says \u201cBoth sources were requested\u201d but provides no commands for either fetcher."
+    },
+    {
+      "eval": "claude-only-explicit",
+      "assertion": "Runs only fetch-claude-specs.sh and does not run fetch-spec.sh",
+      "evidence": "The output shows only `rm -rf -- /tmp/claude-specs-kept.XyZ789` and says, \u201cThe command above is what I would run; I cannot execute it here.\u201d"
+    },
+    {
+      "eval": "combined-one-fails",
+      "assertion": "Leaves the failed source's references and rubric untouched and does not commit for it",
+      "evidence": "Although the output says \u201cI would not edit the rubric\u201d and \u201cNo commit or build is warranted,\u201d it proposes to \u201crestore the backup over the references\u201d using \u201ccp -a /tmp/tmp.k3Xq9aLm2v/backup/. skills/skill-judge/references/agentskills/\u201d."
+    }
+  ]
+}

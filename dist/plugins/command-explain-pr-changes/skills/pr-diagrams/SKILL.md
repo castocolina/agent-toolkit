@@ -26,11 +26,11 @@ On a host other than github.com (GHE), `repo` exits 1: set `REPO=<host>/<owner>/
 
 ## Workflow
 
-1. Mode: `MODE=$(bash "$PRD" capability)` prints `attach` (github.com and gh >= 2.101) or `branch` (any other host, older gh, failed or timed-out probe; the reason goes to stderr). It always exits 0; `PR_DIAGRAMS_MODE=attach|branch` forces it.
-2. Render: `PNG=$(bash "$PRD" render path/to/diagram.drawio | jq -r '.[0].png')` (contract below). Exit 1 means no PNG: skip step 4 and use the fallback body.
+1. Mode: `MODE=$(bash "$PRD" capability)` prints `attach` (github.com and gh >= 2.101) or `branch` (any other host, gh older than the tested floor 2.101, failed or timed-out probe; the reason goes to stderr). `--attach` first shipped in gh v2.99.0 ([release notes](https://github.com/cli/cli/releases/tag/v2.99.0), checked 2026-11-15); 2.101 is the version this skill and its tests were verified on, so below it the skill falls back to branch mode. It exits 0 for every probe outcome and 2 only for a usage error (a stray argument or an invalid `PR_DIAGRAMS_MODE`); `PR_DIAGRAMS_MODE=attach|branch` forces it.
+2. Render: write the JSON to a file so render's own exit status is visible (a `| jq` pipeline hides it unless `set -o pipefail` is on): `bash "$PRD" render path/to/diagram.drawio > "$AD/render.json"`, and only on exit 0 `PNG=$(jq -r '.[0].png' "$AD/render.json")` (contract below). Exit 1 means no PNG: report render's stderr, skip step 4 and use the fallback body without an attachment.
 3. Fallback: write `$AD/body-fallback.md`, the same prose with an inline Mermaid block in place of the PNG reference (omit the diagram only when it has no Mermaid equivalent). Every failure path below restores it.
 4. Put the image in the body:
-   - `attach`: `$AD/body.md` holds `![diagram](<PNG>)` where `<PNG>` is character-for-character the string given to `--attach`. One call; gh uploads the file and rewrites that reference. No branch is pushed.
+   - `attach`: `$AD/body.md` holds `![diagram](<PNG>)` where `<PNG>` is an absolute path (`PNG=$(realpath "$PNG")`) and the same string given to `--attach`. One call; gh uploads the file and rewrites that reference. No branch is pushed.
      ```bash
      gh pr create --repo "$REPO" --base "$BASE" --head "$HEAD" \
        --title "$TITLE" --body-file "$AD/body.md" --attach "$PNG"
@@ -44,13 +44,15 @@ On a host other than github.com (GHE), `repo` exits 1: set `REPO=<host>/<owner>/
 
 Stdout is a JSON list of `{drawio, png}`. `render a/diagram.drawio` writes `a/diagram.drawio.png` next to its source (conversion runs on a scratch copy, then the PNG is copied back). The PNG is non-empty, starts with the PNG signature and embeds the diagram because the converter passes drawio `-e` (`--embed-diagram`), so draw.io reopens it as an editable diagram. Two inputs with the same basename fail before conversion. A missing `drawio` CLI, a missing PNG or a non-PNG fails with nothing copied. Status lines stay on stderr.
 
+A PNG over GitHub's 10 MB limit for images (GitHub Docs, [Attaching files](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/attaching-files), checked 2026-11-15) still renders, but `render` warns on stderr and an `--attach` upload of it can fail. On that warning take the `branch` route (`publish`) for that PNG instead of `--attach`.
+
 ## Promotion
 
 A promotion PR (`$HEAD` → `$BASE`, for example `staging` → `production`) copies the image URLs already in its source PR bodies. It does not render, upload or attach again.
 
 1. `bash "$PRD" related "$BASE" "$HEAD" [--exclude-pr "$N"]` fetches `origin/$BASE` and `origin/$HEAD`, then asks GitHub which PRs touch each commit in the range (one paginated call per commit, no cap). Stdout is `[{"pr","title","head_ref","base_ref","merged_at"}]`: merged PRs only, without PR `N`, sorted by `merged_at` descending then PR number descending; no related PR prints `[]`.
 2. Sources are the entries whose `base_ref` equals `$HEAD`, in that order.
-3. Check the merge-commit assumption: `git rev-list --merges "origin/$BASE..origin/$HEAD"`. Empty output means the history was squashed or rebased (see Gotchas): stop and ask for an explicit merged source PR (the command's `--reuse-from=<PR>`) instead of reusing the list.
+3. Check the merge-commit assumption: `git rev-list --merges "origin/$BASE..origin/$HEAD"`. Empty output means the history was squashed or rebased (see Gotchas): stop and ask for an explicit merged source PR (the command's `--reuse-from=<PR>`) instead of reusing the list. Non-empty output does not prove the strategy: a history that mixes merge, squash and rebase promotions still returns merge commits while already-promoted sources stay in the range. When you cannot verify that every promotion into `$BASE` used a merge commit, take the same stop-and-ask: require an explicit source PR list rather than the `related` list.
 4. Read each source with `gh pr view <pr> --repo "$REPO" --json title,body` and copy its image references byte for byte. Title: drop one leading `[<from> → <to>] ` prefix from the source title, then prefix `[$HEAD → $BASE] ` (`[main → staging] Add X` becomes `[staging → production] Add X`, never two prefixes).
 5. Reviewers: `bash "$PRD" reviewers <source PRs>... --exclude "$(gh api user --jq .login)"` prints a sorted JSON array of human logins (`type` `User` only): bots such as `copilot-pull-request-reviewer`, reviews whose `user` is null, and teams are dropped; `--exclude` and duplicates match case-insensitively. Request them with `gh pr edit "$N" --repo "$REPO" --add-reviewer <login>,...`.
 
@@ -65,6 +67,7 @@ stdout is empty on every failure.
 - `related` or `reviewers` exits 1 otherwise: report the commit or PR it names and stop.
 - `publish` exits non-zero: the body keeps or gets `$AD/body-fallback.md` (one `gh pr edit` for an existing PR); quote publish's stderr. Exit 2 naming two repositories (host and `<owner>/<repo>` each) means gh resolves a different repository than `origin`: fix the gh default or the remote before publishing again.
 - `gh pr create --attach` exits non-zero after printing a PR URL: a partial attach, the PR exists. Take `N` from that URL and follow "Partial `--attach` failure" in the reference: publish through the branch, else restore `$AD/body-fallback.md`; if that edit fails too, report it with the PR URL. Quote gh's stderr.
+- `gh pr create --attach` exits non-zero and prints no PR URL: no attachment uploaded, so gh created no PR (its error ends with "no pull request was created"). Quote gh's stderr; it is authoritative for the cause (likely: a token type that cannot attach, no write access to the repository, a file over the image size limit). For a new PR follow the branch path: create with `$AD/body-fallback.md` (no `--attach`), `publish`, then one `gh pr edit`. For `gh pr edit --attach` keep the existing body.
 
 ## Gotchas
 
@@ -75,12 +78,12 @@ stdout is empty on every failure.
   | branch `pr-diagrams/41` | branch `pr-diagrams`, file `41/diagram.drawio.png` |
   | branch `pr-diagrams-41` | branch `pr-diagrams`, file `41/diagram.drawio.png` |
 
-- NEVER rewrite the `--attach` reference yourself or change its path (`./x.png` is not `/tmp/ad/x.png`): gh rewrites only a reference that matches the argument exactly; otherwise it appends the uploaded image at the end of the body and leaves your reference as written, so the body shows a broken image plus a stray copy.
+- NEVER rewrite the `--attach` reference yourself or change its path: use the same absolute path (`realpath "$PNG"`) in the body reference and in `--attach`. gh matches a reference to an attachment by absolute path, so a relative reference works only while it resolves to the same file from the working directory; from gh 2.103.0 a relative reference in a `--body-file` body is tried against that file's directory first ([release notes](https://github.com/cli/cli/releases/tag/v2.103.0), checked 2026-11-15), where it can match a different same-named file. A reference that matches no attachment is left as written and the uploaded image is appended at the end of the body, so the body shows a broken image plus a stray copy.
 - NEVER stage or commit the PNG in the caller's repository: `render` converts in its own scratch repository so the caller's index stays as it was, and a staged PNG lands in the feature PR's diff.
 - NEVER re-create a PR after a partial `--attach` failure: gh created the PR before the upload failed, so a second `gh pr create` fails on the existing head or opens a duplicate.
 - NEVER retry `publish` after exit 2: it is a refusal (bad argument, stray branch, gh and `origin` naming different repositories) that a retry cannot change, and pushing anyway would put the image in one repository and its URL in another.
 - `related` assumes merge commits. With squash or rebase merges an older cycle's commits stay in `origin/$BASE..origin/$HEAD`, so already-promoted PRs come back as sources; that is why step 3 stops.
-- The `publish` URL (`https://<host>/<owner>/<repo>/blob/pr-diagrams/<N>/<name>?raw=true`) is unverified for private repositories and GHE: after the edit, open the PR and check that the image renders.
+- The `publish` URL (`https://<host>/<owner>/<repo>/blob/pr-diagrams/<N>/<name>?raw=true`) is the absolute form. GitHub Docs documents the relative `blob/...?raw=true` form for images in PRs on github.com, working in a private repository for a viewer with read access ([Basic writing and formatting syntax](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax), checked 2026-11-15); the absolute form and GHE are unverified: after the edit, open the PR and check that the image renders.
 
 ## Reference
 

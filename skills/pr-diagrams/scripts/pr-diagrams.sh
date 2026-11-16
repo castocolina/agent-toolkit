@@ -187,6 +187,9 @@ cmd_render() {
     if ! png_ok "$png"; then
       echo "pr-diagrams: $f: no valid PNG (missing, empty, or not a PNG)" >&2
       missing=1
+    elif [ "$(wc -c < "$png")" -gt 10485760 ]; then
+      # Pointer, not a promise: GitHub documents "10MB for images and gifs" (Docs, Attaching files, checked 2026-11-15).
+      echo "pr-diagrams: $f: PNG is over GitHub's 10 MB image limit, an --attach upload can fail with no PR created; use branch mode (publish) for it" >&2
     fi
   done
   if [ "$missing" -ne 0 ]; then
@@ -197,21 +200,50 @@ cmd_render() {
   manifest=$(mktemp); TMPS+=("$manifest")
   : > "$manifest"
   local f png dest dest_dir tmp
+  local dests=() stages=() srcs=() drawios=("$@")
+  # Pass 1: preflight every destination before anything is written. Never write
+  # through an existing destination symlink: refuse instead of following it.
   for f in "$@"; do
     png=$scratch/$(basename "$f" .drawio).drawio.png
     dest_dir=$(dirname "$f")
     dest=$dest_dir/$(basename "$png")
-    # Never write through an existing destination symlink: refuse instead of
-    # following it, and copy through a temp file in the destination directory
-    # so the final rename replaces the entry itself.
     if [ -L "$dest" ]; then
       die "refusing to overwrite a symlinked destination: $dest"
     fi
+    if [ ! -d "$dest_dir" ] || [ ! -w "$dest_dir" ]; then
+      die "destination directory is not writable: $dest_dir"
+    fi
+    dests+=("$dest"); srcs+=("$png")
+  done
+  # Pass 2: stage every copy as a temp file in its destination directory (so the
+  # final rename replaces the entry itself); a failure here leaves every output as it was.
+  local n=${#dests[@]} i
+  for ((i = 0; i < n; i++)); do
+    dest_dir=$(dirname "${dests[i]}")
     tmp=$(mktemp "$dest_dir/.pr-diagrams.XXXXXX") || die "cannot create a temp file in $dest_dir"
-    cp "$png" "$tmp"
+    TMPS+=("$tmp"); stages+=("$tmp")
+    cp "${srcs[i]}" "$tmp" || die "cannot stage a copy in $dest_dir"
     chmod 644 "$tmp"
-    mv -f "$tmp" "$dest"
-    jq -nc --arg drawio "$f" --arg png "$dest" '{drawio: $drawio, png: $png}' >> "$manifest"
+  done
+  # Pass 3: replace the outputs. Keep a backup of each replaced output and, on a
+  # late failure, restore the ones already replaced (remove the ones that did not exist).
+  local bak=$scratch/backup j
+  mkdir -p "$bak"
+  for ((i = 0; i < n; i++)); do
+    if [ -e "${dests[i]}" ]; then
+      cp -p "${dests[i]}" "$bak/$i" || die "cannot back up ${dests[i]}"
+    fi
+  done
+  for ((i = 0; i < n; i++)); do
+    if ! mv -f "${stages[i]}" "${dests[i]}"; then
+      for ((j = 0; j < i; j++)); do
+        if [ -e "$bak/$j" ]; then cp -p "$bak/$j" "${dests[j]}"; else rm -f "${dests[j]}"; fi
+      done
+      die "cannot replace ${dests[i]}; earlier outputs were restored"
+    fi
+  done
+  for ((i = 0; i < n; i++)); do
+    jq -nc --arg drawio "${drawios[i]}" --arg png "${dests[i]}" '{drawio: $drawio, png: $png}' >> "$manifest"
   done
   jq -s '.' "$manifest"
 }
@@ -269,7 +301,7 @@ cmd_capability() {
     echo "pr-diagrams: cannot parse gh version [$ver], using branch" >&2; echo branch; return 0
   fi
   if [ "${BASH_REMATCH[1]}" -lt 2 ] || { [ "${BASH_REMATCH[1]}" -eq 2 ] && [ "${BASH_REMATCH[2]}" -lt 101 ]; }; then
-    echo "pr-diagrams: gh ${BASH_REMATCH[1]}.${BASH_REMATCH[2]} has no --attach, using branch" >&2; echo branch; return 0
+    echo "pr-diagrams: gh ${BASH_REMATCH[1]}.${BASH_REMATCH[2]} is older than the tested floor 2.101: using branch mode" >&2; echo branch; return 0
   fi
   rc=0
   origin_target || O_ARG=""  # no parsable origin: fall back to gh's own repository
@@ -309,7 +341,7 @@ cmd_publish() {
   done
   local stray
   stray=$( { git for-each-ref --format='%(refname:short)' 'refs/heads/pr-diagrams-*' 'refs/heads/pr-diagrams/*'
-             git ls-remote --heads origin 'pr-diagrams-*' 'pr-diagrams/*' | sed 's|.*refs/heads/||'; } | tr '\n' ' ')
+             git ls-remote origin 'refs/heads/pr-diagrams-*' 'refs/heads/pr-diagrams/*' | sed 's|.*refs/heads/||'; } | tr '\n' ' ')
   [ -z "$stray" ] || usage_err "stray branch(es), only 'pr-diagrams' is allowed: $stray"
   local rurl
   origin_target || usage_err "cannot determine origin's repository from its URL"
@@ -324,7 +356,7 @@ cmd_publish() {
   git worktree add -q --detach --no-checkout "$dir/wt" HEAD || die "cannot create worktree"
   WT=$dir/wt
   for attempt in 1 2; do
-    if [ -n "$(git ls-remote --heads origin refs/heads/pr-diagrams)" ]; then
+    if [ -n "$(git ls-remote origin refs/heads/pr-diagrams)" ]; then
       git fetch -q origin refs/heads/pr-diagrams || die "fetch of pr-diagrams failed"
       parent=$(git rev-parse FETCH_HEAD)
     fi
@@ -343,7 +375,7 @@ cmd_help() {
   printf '%s\n' \
     'usage: pr-diagrams.sh <subcommand> [args]' \
     '' \
-    '  capability                              print attach or branch, always exit 0' \
+    '  capability                              print attach or branch; exit 0 for every probe outcome, 2 for a usage error (stray argument or invalid PR_DIAGRAMS_MODE)' \
     '  render <file.drawio>...                 stdout [{"drawio","png"}]; each PNG embeds its diagram, next to its source' \
     '  publish <N> <png>...                    commit <N>/<name> on branch pr-diagrams; stdout one {"png","url"} line per file' \
     '  related <base> <head> [--exclude-pr N]  stdout [{"pr","title","head_ref","base_ref","merged_at"}], merged PRs, newest first' \

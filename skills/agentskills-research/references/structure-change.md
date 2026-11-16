@@ -2,6 +2,8 @@
 
 Read this only when `fetch-spec.sh` reports `structure_changed: true` or `rubric-check` reports a broken source anchor. Step 4 needs network access: `--pages-dir DIR` downloads the raw pages. If the fetcher cannot download them, stop and tell the user to re-run with network access; do not edit `SOURCE.json` or the references by hand.
 
+Anchor-only branch: when `rubric-check` reports a broken source anchor and `structure_changed` is false (no page was added or removed), the steps below do not apply. `SKILL.md` Source 1 step 3 would otherwise pick the no-rubric-edit repair branch when the fetcher reports no changed or removed pages and `rubric_stale` is false; never route an anchor break through that branch. Instead: identify the renamed or missing heading (`grep -n '^#' skills/skill-judge/references/agentskills/<file>.md`), update the rubric `source` anchor and the affected criteria as needed, rerun `python3 scripts/audit/audit.py rubric-check` until it exits 0, then continue at `SKILL.md` Source 1 step 5 (`spec_sha` from the latest fetcher JSON) and step 6, committing as the rule-update branch does because the rubric was edited.
+
 For each added or removed page, in this order:
 
 1. Edit the `FILES` array in `scripts/fetch-spec.sh` (`"<name>.md|docs/<path>.mdx"`): add or delete the entry.

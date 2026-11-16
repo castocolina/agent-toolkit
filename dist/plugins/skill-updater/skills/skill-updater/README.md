@@ -21,7 +21,7 @@ cp -r skills/skill-updater ~/.claude/skills/
 | path missing, and exactly one new path confirmed | `path-moved` |
 | path missing, several candidate paths | nothing; the candidates are listed and the user picks |
 | auth, rate-limit or network error, or no candidate path | `unreachable` |
-| an artifact with no source row (every command and agent), after the model probe | `current` on its `local` row |
+| an artifact with no upstream, after the model probe | `current` on its `local` row |
 
 A rule written to counter a model behavior is checked with a probe before anyone proposes removing it. Nothing is edited unless you ask for the update itself.
 
@@ -34,3 +34,7 @@ A rule written to counter a model behavior is checked with a probe before anyone
 
 - `agentskills-research`: refreshes the Agent Skills spec pin. This skill does not.
 - `skill-judge`: scores a skill after its content changed. This skill records review state; it does not grade.
+
+## Sources
+
+Endpoint behavior (commits, compare, git trees, repository contents) and `gh api` flags are read from the GitHub REST API documentation and the GitHub CLI manual (GitHub): https://docs.github.com/en/rest and https://cli.github.com/manual/gh_api.
