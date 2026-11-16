@@ -60,6 +60,20 @@ Official pages used for the facts (one `unversioned` row each; `upstreams` never
 ]
 ```
 
+Registry rows added in PR 6 review fix wave 1 (2026-11-16, `unversioned`, pages used in facts.md or the references that had no row; matched by URL against the registry first):
+
+- https://semver.org/#spec-item-4 (Tom Preston-Werner)
+- https://github.com/nodejs/corepack (Node.js, Corepack)
+- https://classic.yarnpkg.com/en/docs/cli/audit (Yarn)
+- https://dependency-check.github.io/DependencyCheck/dependency-check-gradle/ (OWASP)
+- https://docs.astral.sh/uv/reference/cli/ (Astral)
+- https://docs.astral.sh/uv/concepts/projects/sync/#upgrading-locked-package-versions (Astral; cited in python.md)
+- https://docs.npmjs.com/cli/commands/npm-install (npm, GitHub)
+- https://docs.npmjs.com/cli/using-npm/config (npm, GitHub)
+- https://go.dev/ref/mod#minimal-version-selection (The Go Authors)
+- https://python-poetry.org/docs/cli/#update (Poetry; cited in python.md)
+- https://pipenv.pypa.io/en/latest/commands.html (Pipenv, Python Packaging Authority; cited in python.md)
+
 Tool output used instead of a page (no row): `go help get|list|mod tidy` (go 1.27.4), `pnpm audit|why --help` (11.18.0), `pip help lock|list|check` (26.1.2), `uv lock|pip tree --help` (0.11.28).
 
 ## Skill-updater review (REVIEW ONLY; adopt / adapt / ignore for the restore brief)

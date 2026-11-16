@@ -44,7 +44,7 @@ The skill will auto-detect your project type, apply the safe minor and patch upd
 | Rust | Cargo.toml | `cargo update -p crate --precise version` | `cargo audit` |
 | Ruby | Gemfile | set the Gemfile constraint, then `bundle update --conservative gem` | `bundle audit` |
 | Java | pom.xml, build.gradle | `mvn versions:*` | `mvn org.owasp:dependency-check-maven:check` |
-| .NET | *.csproj | `dotnet add package PackageName --version approved-version` (`dotnet outdated` only as optional discovery) | `dotnet list package --vulnerable` |
+| .NET | *.csproj | `dotnet add <project> package PackageName --version approved-version` (`<project>` is the project directory or the owning `*.csproj` path; `dotnet outdated` only as optional discovery) | `dotnet list package --vulnerable` |
 
 ## How It Works
 
@@ -176,7 +176,7 @@ The scripts live in this skill's directory, not in your project: resolve them fr
 
 A candidate scan (no `--write`) prints `{"status":"ok","candidates":<taze JSON>}`; a write run, or taze output that is not valid JSON, prints the text report in an `output` field instead.
 
-Both run commands above are scans that write nothing: add `-r` only after the workspace scope is confirmed, and add the `major` mode (`run-taze.sh major`) to also report out-of-range and major candidates. A write follows the scoped order in SKILL.md: `--include` naming the approved packages plus `--no-github-actions --no-node-version`, in a disposable copy of the project.
+Both run commands above are scans that write nothing: add `-r` only after the workspace scope is confirmed, and add the `major` mode (`run-taze.sh major`) to also report out-of-range and major candidates. A write follows the scoped order in SKILL.md: `--include` naming the packages in the target map plus `--no-github-actions --no-node-version`, in a disposable copy of the project.
 
 ## Prerequisites
 
@@ -335,6 +335,16 @@ Tool commands and flags were checked on 2026-11-15 against the official document
 - dotnet-outdated: dotnet-outdated contributors, https://github.com/dotnet-outdated/dotnet-outdated
 - Safety CLI: Safety Cybersecurity, https://github.com/pyupio/safety
 - pip-review: Joris Gonggrijp, https://github.com/jgonggrijp/pip-review
+- Semantic Versioning 2.0.0, item 4 (major version zero): Tom Preston-Werner, https://semver.org/#spec-item-4
+- packageManager field: Node.js (Corepack), https://github.com/nodejs/corepack
+- uv lock (CLI reference): Astral, https://docs.astral.sh/uv/reference/cli/
+- uv, upgrading locked package versions: Astral, https://docs.astral.sh/uv/concepts/projects/sync/#upgrading-locked-package-versions
+- Poetry update: Poetry, https://python-poetry.org/docs/cli/#update
+- pipenv update: Pipenv (Python Packaging Authority), https://pipenv.pypa.io/en/latest/commands.html
+- Yarn Classic audit: Yarn, https://classic.yarnpkg.com/en/docs/cli/audit
+- npm install and config (dry-run): npm (GitHub), https://docs.npmjs.com/cli/commands/npm-install
+- Go minimal version selection: The Go Authors, https://go.dev/ref/mod#minimal-version-selection
+- dependency-check Gradle plugin: OWASP, https://dependency-check.github.io/DependencyCheck/dependency-check-gradle/
 
 ## License
 

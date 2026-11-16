@@ -1,0 +1,88 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "dependency-updater",
+      "percent": 95.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 97.6,
+        "router-env-my-referee-one": 93.6
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/dependency-updater/record.md",
+          "line": null,
+          "evidence": "The dbff837f digest is a cut list: 'removed units (95, showing 40)'; the 55 unshown units cannot be checked against the record (every one of the 40 shown para and file items is explained by a valid record row)",
+          "fix": "Publish the full list of all 95 removed units (or add record rows covering the 55 unshown ones) so each removal is verifiable; the shown 40 already hold valid rows"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 50,
+          "evidence": "The 'Order for a Node write' bullet carries the full six-step write order (direct edit, scoped taze write forms, diff compare, copy-back, resolve, complete-diff check) that references/node.md's 'Scoped taze procedure' (line 19) already details for every Node write",
+          "fix": "Keep the routing bullet and the NEVER-grade scoping rules in SKILL.md and let the existing 'Scoped taze procedure' in references/node.md carry the six-step order (which node.md loads for every Node manifest); move, do not delete, any step"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": null,
+          "evidence": "The dbff837f digest says 'removed units (95, showing 40)'; the remaining 55 items are not available for individual review.",
+          "fix": "Provide the complete digest so every omitted removal can be checked against the current files and recovery record."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/dependency-updater/scripts/run-taze.sh",
+          "line": 52,
+          "evidence": "The wrapper accepts '--interactive' and '-I' and passes them through as write-mode arguments.",
+          "fix": "Reject interactive arguments with a structured error instead of invoking taze, and update tests/skills/dependency-updater/test-run-taze.sh to verify that taze is not run for those arguments."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 13,
+          "evidence": "'read a target-specific dry run' is offered as the check that an update 'breaks no peer, ABI or runtime-floor constraint'.",
+          "fix": "Separate resolver and declared-runtime checks from ABI verification: inspect applicable native-binary and runtime compatibility evidence, and ask per target when ABI compatibility cannot be established. Update the eval that treats an npm dry run and engines range alone as an ABI check."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 24,
+          "evidence": "'If the scanner is unavailable or errors ... stop before any write' does not distinguish scanner failure from a nonzero exit caused by vulnerability findings.",
+          "fix": "For each supported scanner, interpret its documented exit status together with its structured output: record valid vulnerability findings as the baseline, and stop only when the scan itself could not produce a usable result."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 28,
+          "evidence": "After a failed cohort, the procedure says to 'reinstall with the owning manager from the restored lockfile', although step 7 explicitly permits projects without a lockfile.",
+          "fix": "Add a no-lockfile rollback branch: restore the manifest, preserve user-owned environment state, explain that an exact dependency graph may not be reproducible, and ask before a best-effort reinstall or other environment changes."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

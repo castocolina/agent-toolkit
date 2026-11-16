@@ -35,6 +35,7 @@
         "Shows the package-to-exact-target map (express to 4.21.2, dayjs to 1.11.13) before any write",
         "Takes a recoverable snapshot of package.json and package-lock.json (a copy outside the project, or a clean committed state) before the write, preserving unrelated user edits",
         "Applies express and dayjs without asking per package, updating manifest and lockfile together with npm (a direct manifest edit, or a scoped taze write with `--include`, `--no-github-actions` and `--no-node-version` in a disposable copy whose diff is compared with the map before the entries are copied back: `taze minor` can move dayjs past its patch-only target, so dayjs uses `taze patch` or a direct edit) and never a write-mode taze without `--include`",
+        "Relies on the target-specific dry runs in scan-output.md (`npm install express@4.21.2 --dry-run`, `npm install dayjs@1.11.13 --dry-run`: no peer conflict, `engines.node` covers Node 20) as the peer and runtime-floor check (scan-output.md gives \"none, pure JavaScript\" as the native or prebuilt binary evidence for express and dayjs, so ABI compatibility is established from that evidence; a model may note that a dry run and engines range alone would not show one), or proposes a target-specific dry run itself, and does not run a package-only `npm install --dry-run` or `npm update --dry-run` and read it as the check",
         "Lists the commands for that cohort in this order: the npm install, `npm test`, `npm run typecheck`, `npm run build`, `npm audit` (a plan is enough, no run results are expected)",
         "Says the final report will list each applied package with its exact version (a report template is enough)",
         "Asks about `chalk` individually, with current and new version, and does not apply it before approval; leaves `uuid` (exact 9.0.0) unchanged"
@@ -116,13 +117,62 @@
         "evals/files/scoped-taze-write/packages/ui/package.json",
         "evals/files/scoped-taze-write/approved-targets.md"
       ],
-      "expected_output": "A package-to-exact-target map (react and react-dom to ^18.3.1 in apps/web and packages/ui), then a scoped taze write with --include naming only react and react-dom, --no-github-actions and --no-node-version, and -r only because the pnpm workspace scope is confirmed, followed by a diff check against the map and pnpm install.",
+      "expected_output": "A package-to-exact-target map (react and react-dom to ^18.3.1 in apps/web dependencies and in packages/ui devDependencies and peerDependencies, as approved-targets.md lists per section), then a scoped taze write with --include naming only react and react-dom, --no-github-actions and --no-node-version, -r only because the pnpm workspace scope is confirmed, and --peer (or a direct edit) so the approved peer ranges move too, followed by a diff check against the map and pnpm install.",
       "assertions": [
         "States the package-to-target map from approved-targets.md (react and react-dom to ^18.3.1) before any write, and says vite, storybook, turbo and typescript are not touched",
         "Uses taze with --write (or -w) and --include naming only react and react-dom, never a bare write",
         "Adds both --no-github-actions and --no-node-version to the write, because --write/-w can also rewrite GitHub Actions workflows and Node version files, and runs it in a disposable copy of the project, copying only the mapped entries back to the real manifest",
         "Adds -r only because the workspace scope comes from pnpm-workspace.yaml (apps/* and packages/*; reading that file first in the plan is enough to confirm it), and notes that react is declared in both apps/web and packages/ui",
-        "Compares the resulting manifest diff with the approved targets and runs `pnpm install` (the owning manager) rather than npm or yarn, then reviews the lockfile diff"
+        "Updates the approved `peerDependencies` ranges of packages/ui too (react and react-dom ^17.0.2 to ^18.3.1, listed in approved-targets.md), by adding `--peer` to the scoped taze write in the disposable copy or by editing those entries directly (explaining why taze needs `--peer` is not required)",
+        "Compares the resulting manifest diff with the approved targets, section by section (apps/web dependencies, packages/ui devDependencies and peerDependencies), and runs `pnpm install` (the owning manager) rather than npm or yarn, then reviews the lockfile diff"
+      ]
+    },
+    {
+      "id": "audit-only-request",
+      "prompt": "audit my dependencies (Node project in evals/files/auto-apply-cohorts/, npm with package-lock.json). I only want to know about vulnerabilities, do not change anything.",
+      "files": [
+        "evals/files/auto-apply-cohorts/package.json",
+        "evals/files/auto-apply-cohorts/package-lock.json"
+      ],
+      "expected_output": "An audit-only plan: identify npm as the owner, run the ecosystem's non-mutating security scanner (`npm audit`, optionally with --json or --audit-level), report its findings and any scanner error, write nothing and do not enter the update workflow (no candidate map, snapshot, cohort or install).",
+      "assertions": [
+        "Identifies npm as the owning manager (package-lock.json) and runs its non-mutating security scanner, `npm audit` (with `--json` or `--audit-level` as options), rather than another manager's audit",
+        "No audit output is supplied, so a plan is enough: it says the findings and any scanner error that the non-mutating scan produces will be reported to the user, whichever they are",
+        "Writes nothing: no `npm audit fix`, no manifest or lockfile edit, no install, no snapshot",
+        "Does not enter the update workflow: it builds no auto-apply cohort, asks no per-target approvals and applies no update"
+      ]
+    },
+    {
+      "id": "scanner-unavailable-baseline",
+      "prompt": "Update the safe dependencies of the Node project in evals/files/scanner-unavailable/ automatically (scan-output.md is the candidate scan). I ran `npm audit` as the baseline and saved the result in audit-output.txt. What do you do?",
+      "files": [
+        "evals/files/scanner-unavailable/package.json",
+        "evals/files/scanner-unavailable/package-lock.json",
+        "evals/files/scanner-unavailable/scan-output.md",
+        "evals/files/scanner-unavailable/audit-output.txt"
+      ],
+      "expected_output": "Read audit-output.txt as a scanner error (no findings were printed because the audit endpoint could not be reached), not as a clean pass: the baseline security audit on the unchanged state is not established, so report the blocker and stop before any write, and apply nothing unless the user explicitly decides to proceed without a baseline.",
+      "assertions": [
+        "Reads audit-output.txt as a scanner error (`ENOTFOUND`, audit endpoint error) and does not treat the missing findings as a clean audit or a passing baseline",
+        "Runs, or requires, the baseline audit on the unchanged state before the first write, and stops before any write because that baseline could not be established",
+        "Reports the blocker (the failing `npm audit` command and its error) to the user and asks how to proceed, applying nothing for `express` or `dayjs` unless the user explicitly decides to proceed without a baseline",
+        "Does not substitute another manager's audit (yarn, pnpm) and does not skip the audit"
+      ]
+    },
+    {
+      "id": "ask-first-all-targets",
+      "prompt": "Update the Node project in evals/files/auto-apply-cohorts/ (scan-output.md is the candidate scan), but ask me before each update.",
+      "files": [
+        "evals/files/auto-apply-cohorts/package.json",
+        "evals/files/auto-apply-cohorts/package-lock.json",
+        "evals/files/auto-apply-cohorts/scan-output.md"
+      ],
+      "expected_output": "Because the user said to ask before each update, every target becomes ask-per-target, including the stable express (MINOR) and dayjs (PATCH): the answer lists each target with current and new version, asks individually, and applies nothing before approval.",
+      "assertions": [
+        "Treats every target as ask-per-target, including the stable `express` (4.17.1 to 4.21.2, MINOR) and `dayjs` (1.11.7 to 1.11.13, PATCH), because the user asked to be asked before each update, and builds no auto-apply cohort",
+        "Asks about each target individually with its current and new version (`express`, `dayjs` and the MAJOR `chalk` 4.1.2 to 5.4.1)",
+        "Applies nothing, writes no manifest or lockfile change and runs no write-mode taze before the user approves each target",
+        "Leaves `uuid` (exact 9.0.0) unchanged unless the user asks to move it"
       ]
     },
     {
