@@ -37,11 +37,13 @@ Please humanize this text: [your text]
 
 ## Overview
 
-Based on [Wikipedia's "Signs of AI writing"](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) guide, maintained by WikiProject AI Cleanup. This comprehensive guide comes from observations of thousands of instances of AI-generated text.
+Based on [Wikipedia's "Signs of AI writing"](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) guide, maintained by WikiProject AI Cleanup. The page is a field guide built from editors' observations of real AI-generated text on Wikipedia, with real examples taken from articles, drafts and comments.
 
 ### Key Insight from Wikipedia
 
-> "LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely result that applies to the widest variety of cases."
+> "LLMs (and artificial neural networks in general) use statistical algorithms to guess (infer) what should come next based on a large corpus of training material. It thus tends to regress to the mean; that is, the result tends toward the most statistically likely result that applies to the widest variety of cases."
+
+Quoted from the page's Content section, checked 2026-11-13 against the live page (raw text, https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing); the page keeps changing, so read the live version.
 
 ## Contents
 
@@ -53,6 +55,7 @@ Based on [Wikipedia's "Signs of AI writing"](https://en.wikipedia.org/wiki/Wikip
 
 - [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) - Primary source
 - [WikiProject AI Cleanup](https://en.wikipedia.org/wiki/Wikipedia:WikiProject_AI_Cleanup) - Maintaining organization
+- Skill-format facts were checked against the Claude Code documentation (Anthropic) and the Agent Skills specification (Agent Skills); the Wikipedia licensing note against the Wikimedia Foundation Terms of Use (Wikimedia Foundation). Checked 2026-11-13: [Claude Code skills](https://code.claude.com/docs/en/skills), [Claude Code tools reference](https://code.claude.com/docs/en/tools-reference), [Agent Skills specification](https://agentskills.io/specification), [Wikimedia Terms of Use](https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use).
 
 ## Version History
 

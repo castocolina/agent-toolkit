@@ -1,0 +1,113 @@
+{
+  "skill": "excalidraw",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 14,
+    "D5": 14,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 8,
+      "evidence": "Labels and connections are under 10% of a scene file; the rest is per-element styling and geometry.",
+      "fix": "Move the signal-to-noise restatement to skills/excalidraw/README.md Why (it already states the 20+ properties and the under-10% share) and record the removal in docs/audit/recovery/excalidraw/record.md; keep the NEVER rule and the 80-line versus 12-line comparison on SKILL.md line 10."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/excalidraw/README.md",
+      "line": 1,
+      "evidence": "The dbff837f digest lists 175 removed units and shows 40, so 135 units were not itemized.",
+      "fix": "No content change: the shown units and the second digest's para:e6b14934 and para:41b6ea0f are covered by record.md rows (accepted drops, intended changes, or text-present); expand the digest if a later judge must see the other 135."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 25,
+      "evidence": "`.excalidraw.md` (Obsidian plugin) | ask for a plain `.excalidraw` export: the plugin stores the scene as `compressed-json`",
+      "fix": "Add the non-default case to that route row: with useExcalidrawExtension off the plugin writes a plain .md whose frontmatter contains excalidraw-plugin: parsed (and compression off stores the scene in a json fence, not compressed-json); ask for a plain .excalidraw export in either case."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 3,
+      "evidence": "Create, inspect, edit and compare Excalidraw diagrams (.excalidraw, .excalidraw.json) through a bundled script that keeps scene JSON out of context",
+      "fix": "Create, inspect, edit and compare Excalidraw diagrams. Use when the user names an Excalidraw file, asks to change labels or connections in one, compares two, or wants a flowchart or architecture sketch in Excalidraw, even for a tiny file and even without saying Excalidraw. Keywords: .excalidraw, .excalidraw.json, .excalidraw.png, .excalidraw.svg, .excalidraw.md, flowchart, architecture diagram. Not for Mermaid, draw.io, PlantUML, Graphviz, ordinary PNG edits or text-only architecture explanations."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 10,
+      "evidence": "Run `python3 <skill-dir>/scripts/scene.py <command>` from the user's working directory",
+      "fix": "Keep the command in SKILL.md and add one clause that <skill-dir> is this skill's directory (the directory containing SKILL.md), so the relative script path resolves from the skill root."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 39,
+      "evidence": "Boxes are 180x80 and text is sized at 11 units per character without fitting, so keep each label to 16 characters or fewer",
+      "fix": "Make the 16-character cap the default for new and --add-node, and name the escape hatch already used for long relabels: a longer label goes to the worker, which sizes the box to the text, rather than being forbidden."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/excalidraw/evals/evals.json",
+      "line": 1,
+      "evidence": "Eight evals all expect a scene.py command, a worker, or a refusal; none covers a request to move or restyle, which the route table sends to the worker.",
+      "fix": "Add one realistic move-or-restyle prompt whose assertions check the worker contract: edit a copy, allow the moved shape and its bound arrows, pass check and diff --strict, and report text only."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 39,
+      "evidence": "text is sized at 11 units per character without fitting, so keep each label to 16 characters or fewer (12 characters measured 132 wide and fits; 30 measured 330 and overflows; checked 2026-11-13)",
+      "fix": "Replace the hardcoded 11-units and 16-character rule with an instruction to measure the written text element's width against the 180-wide box (scene.py text_for sets width to max line length times 11), and keep 16 only as an example dated 2026-11-13; the measurement is not in tests/skills/excalidraw/test_scene.py."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 10,
+      "evidence": "A one-box scene is about 80 lines of JSON; `summary` returns its label in 12.",
+      "fix": "Point the 80-line and 12-line figures at skills/excalidraw/evals/files/box.excalidraw and the summary command output, and note the date they were counted, so the claim is reproducible."
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "skill": "plugin-forge",
+  "mode": "output",
+  "pass_rate": 0.8108,
+  "passed": 30,
+  "total": 37,
+  "failures": [
+    {
+      "eval": "version",
+      "assertion": "Says plugin.json wins when it contains version, else the existing marketplace entry version is bumped; synchronizes both only when both already contain version, and adds no redundant entry version.",
+      "evidence": "The output only says plugin.json is updated to `1.5.0`, that an existing marketplace entry \u201cis set to the same `1.5.0`,\u201d and that \u201ca missing entry `version` is not added,\u201d without saying plugin.json wins when it contains version or that the existing entry version is bumped otherwise."
+    },
+    {
+      "eval": "reserved-exact-name",
+      "assertion": "States that the exact name `anthropics` is reserved: `claude plugin validate` reports it as passing for one of Anthropic's own and `create_plugin.py` rejects it (it is not only the `anthropics-` prefix that is refused).",
+      "evidence": "The output says \"`claude plugin validate`, `claude plugin init`, and `claude plugin tag` refuse it as well,\" and never says validate reports `anthropics` as passing for one of Anthropic's own."
+    },
+    {
+      "eval": "remote-npm-source",
+      "assertion": "Says to edit the manifest by hand (the `plugin.json` inside the npm package, which wins for `version` when it sets one) and that the `create_plugin.py` and `bump_version.py` scripts do not apply to this entry.",
+      "evidence": "It says \"Edit by hand, in the package,\" that \".claude-plugin/plugin.json\" \"wins,\" and that \"`bump_version.py` does not apply,\" but it never says `create_plugin.py` does not apply."
+    },
+    {
+      "eval": "remote-npm-source",
+      "assertion": "Does not describe the source as a git repository or checkout: the plugin directory is the unpacked npm package.",
+      "evidence": "It calls the plugin \"the `@acme/fmt-kit` repo\" and tells you to validate \"<unpacked-@acme/fmt-kit-or-its-repo-checkout>,\" which treats a git repo checkout as the plugin directory."
+    },
+    {
+      "eval": "layout-directories",
+      "assertion": "Lists the default layout directories from the reference (skills/, commands/, agents/, hooks/hooks.json, .mcp.json, .lsp.json, output-styles/, bin/) and says `skills/` is preferred for new instructions while `commands/` holds legacy flat command files, as the listed reference states.",
+      "evidence": "The tree lists skills/<skill>/SKILL.md, commands/<file>.md, agents/<agent>.md, hooks/hooks.json, .mcp.json, .lsp.json, output-styles/, and bin/, but it never says skills/ is preferred for new instructions or that commands/ holds legacy flat command files; it only says \"Put instructions in a skill.\""
+    },
+    {
+      "eval": "casual-already-latest",
+      "assertion": "Tells the user to push the change and then run the marketplace and plugin update again (`claude plugin marketplace update`, `claude plugin update <name>@<marketplace>`).",
+      "evidence": "It says to push and that \"Users run `claude plugin update` again,\" but it never mentions `claude plugin marketplace update` or `claude plugin update <name>@<marketplace>`."
+    },
+    {
+      "eval": "casual-folder-to-plugin",
+      "assertion": "Determines or asks for the marketplace root and a kebab-case plugin name before giving commands, instead of inventing them as facts.",
+      "evidence": "The reply immediately gives manifests and `claude plugin validate <marketplace-root>` using placeholders such as \"name\": \"<kebab-name>\" instead of asking for the marketplace root and plugin name first."
+    }
+  ]
+}

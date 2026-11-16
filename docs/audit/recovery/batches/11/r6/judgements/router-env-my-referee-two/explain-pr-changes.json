@@ -1,0 +1,95 @@
+{
+  "skill": "explain-pr-changes",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 14,
+    "D4": 14,
+    "D5": 10,
+    "D6": 13,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 108,
+  "max_total": 125,
+  "percent": 86.4,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 284,
+      "evidence": "Feature body rules restate triage a model already applies: \"NEEDS_REVIEW is any logic or behavior change; APPROVED is only trivial non-logic change (comment typos, formatting, private renames). When in doubt, NEEDS_REVIEW.\" The record's s008 row covers only the trimmed enumeration, not this surviving restatement.",
+      "fix": "Keep the two labels and the signature/public-behavior note the template depends on; move the definitions of what counts as logic to skills/pr-diagrams/references/pr-body.md next to the changeset template and record the move. Do not delete the labels."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 229,
+      "evidence": "Section 3 is a process workflow, but the same decision is stated again in 1.6, 1.7, phase 2 and phase 3 (push ordering, missing-script stop, lookup truncation), so the procedure is not one sequence an agent can follow without reconciling copies.",
+      "fix": "Keep phases 1-6 as the only ordered procedure and leave sections 1-2 as the rules those phases cite, deleting the repeated command sequences from the phase text and recording each removed duplicate."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 124,
+      "evidence": "The squash/rebase gotcha names the failure (\"an older cycle's PRs can be picked as sources\") but the hard-learned confirmation is deferred to 2.2, so the Gotchas list itself does not say why the agent must stop.",
+      "fix": "Add the 2.2 reason to that gotcha: detection assumes merge commits, so when git log --merges does not show every SRC merge the command stops and asks for --reuse-from rather than publishing a possibly stale body."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 2,
+      "evidence": "The description says what the command does and names triggers (\"open, write, refresh or describe a pull request\", \"promote develop to main\", \"reuse merged PR bodies\") and a boundary, but it never names the accepted flags --diagrams, --reuse-from or --base.",
+      "fix": "Create or update the GitHub pull request for the current branch from its committed diff: summary, changeset triage, optional Mermaid or draw.io diagram, promotion-branch bodies reused from merged PRs, and reviewers. Use when asked to open, write, refresh or describe a pull request, \"explain PR changes\", \"open or refresh the PR summary\", \"promote develop to main\", or \"reuse merged PR bodies\", including with --diagrams=none|mermaid|drawio, --reuse-from=<PR> or --base=<branch>. Pushes feature branches and writes PRs. Not for a read-only explanation of a diff (use explain-changes-mental-model)."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 301,
+      "evidence": "The command is 442 lines. Templates, assembly code and the none-mode filter are already loaded from skills/pr-diagrams/references/pr-body.md, but phase 4 and phase 5 still inline the attach, branch and partial-failure recipes that the same file's \"Branch publish and attach recovery\" section already holds.",
+      "fix": "Replace the phase 5 attach/branch/partial-failure command blocks with one conditional read of the \"Branch publish and attach recovery\" section of skills/pr-diagrams/references/pr-body.md, keeping only the stop conditions that the phase itself must enforce."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 209,
+      "evidence": "2.9 gives a high-freedom diagram-type choice (\"flowchart TD, with LR only for a row of at most four nodes\") while also requiring a read of authoring-rules.md, whose section 1 says an API call chain is a sequenceDiagram and a flowchart is used only after every other type loses. The two defaults disagree on the same decision.",
+      "fix": "Make authoring-rules.md section 1 the only type default and keep the inline minimums strictly as the fallback for when neither rules file exists, matching its direction, grouping and classDef rules."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/explain-pr-changes.md",
+      "line": 71,
+      "evidence": "A mermaid or none feature PR \"makes no pr-diagrams.sh call of any kind\", but 1.4 says a run with --reuse-from uses PRD and sets REPO from `bash \"$PRD\" repo`, and phase 3 step 5 runs `bash \"$PRD\" reviewers` on every reuse path. The no-call branch and the reviewers branch do not resolve to one outcome.",
+      "fix": "State one rule: a mermaid or none feature PR without --reuse-from makes no script call and parses REPO inline; with --reuse-from it still calls `bash \"$PRD\" repo` and `reviewers` and stops when the script is missing, as 1.5 already says."
+    }
+  ]
+}

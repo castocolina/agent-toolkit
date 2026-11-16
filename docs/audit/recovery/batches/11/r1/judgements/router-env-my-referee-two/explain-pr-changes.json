@@ -1,0 +1,95 @@
+{
+  "skill": "explain-pr-changes",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 14,
+    "D5": 10,
+    "D6": 14,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 113,
+  "max_total": 125,
+  "percent": 90.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 310,
+      "evidence": "The command is 468 lines, and phase 5 still inlines the new-PR and existing-PR gh pr create/edit --attach forms, the no-PNG form, and the no-URL failure path, even though 'Branch publish and attach recovery' is already split into skills/pr-diagrams/references/pr-body.md.",
+      "fix": "Move the remaining phase 5 gh create/edit command forms and the no-URL failure path into the 'Branch publish and attach recovery' section of skills/pr-diagrams/references/pr-body.md, and leave phase 5 as the condition that loads that section."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 312,
+      "evidence": "Phase 5 repeats the gh pr create and gh pr edit --attach invocations, the title-file rule, and the no-PNG rule that phase 2, section 5 and the loaded pr-body.md already state.",
+      "fix": "Keep one canonical copy of those invocations in skills/pr-diagrams/references/pr-body.md and point phase 5 at it; do not delete the recovery outcomes."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 224,
+      "evidence": "2.2 says the promotion history must show merge commits and that every SRC entry is a PR merged into the current head, but gives no outcome when git log --merges lists some of the source merges and omits others.",
+      "fix": "State that a partial merge-commit list is the same stop: do not publish, and ask for --reuse-from=<PR>."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 296,
+      "evidence": "Phase 4 treats empty output, any other output, or a non-zero exit of 'bash \"$PRD\" capability' as branch mode, while skills/pr-diagrams/scripts/pr-diagrams.sh documents capability as printing attach or branch and always exiting 0; a usage error exits 2 with empty stdout.",
+      "fix": "Say that exit 2 (or any non-zero exit with empty stdout) is the branch fallback, and that a non-empty stdout other than exactly 'attach' is branch mode, matching the script's exit line."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 2,
+      "evidence": "The description names open, write, refresh, describe, explain PR changes, promotion and reuse, but not the accepted argument tokens --diagrams, --reuse-from and --base.",
+      "fix": "Create or update the GitHub pull request for the current branch from its committed diff: summary, changeset triage, optional Mermaid or draw.io diagram, promotion-branch bodies reused from merged PRs, and reviewers. Use when asked to open, write, refresh or describe a pull request, \"explain PR changes\", \"open or refresh the PR summary\", \"promote develop to main\", or \"reuse merged PR bodies\", including with --diagrams=none|mermaid|drawio, --reuse-from=<PR>, or --base=<branch>. Pushes feature branches and writes PRs. Not for a read-only explanation of a diff (use explain-changes-mental-model)."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 19,
+      "evidence": "The Gotchas list states the jq -j, squash-merge and screenshot facts, but not why a body without a trailing newline glues the next heading, or why an older cycle is selected.",
+      "fix": "Add the reason to those two Gotchas: jq -j omits the newline so the next printf heading joins the last line, and a squash or rebase leaves the older cycle's commits inside origin/$base..origin/$head."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 39,
+      "evidence": "1.1 says to add 'Close <remaining arguments>' joined, while phase 3b says to add that line to the summary, without saying whether it is its own line or part of the 150-word paragraph.",
+      "fix": "Pick one default in both places: a separate final line 'Close <remaining arguments joined by spaces>', not counted against the 150-word summary."
+    }
+  ]
+}

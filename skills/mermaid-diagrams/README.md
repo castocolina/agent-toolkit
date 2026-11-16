@@ -58,10 +58,10 @@ Do not default to a flowchart. Classify the question first (sequence, C4, class,
 
 ### Advanced Capabilities
 
-- **Themes and styling** - Default, forest, dark, neutral, base themes
+- **Themes and styling** - Built-in themes include redux-color (the default since Mermaid 12.0.0), default, neutral, dark, forest and base; the full list is on the [theming page](https://mermaid.js.org/config/theming.html) and in `mmdc --help` (checked 2026-11-13)
 - **Custom theming** - Configure colors, fonts, and layout
-- **Layout options** - Dagre (balanced) or ELK (advanced)
-- **Look options** - Classic or hand-drawn sketch style
+- **Layout options** - ELK (the default since Mermaid 12.0.0) or Dagre, plus cose-bilkent and tidy-tree; see the [layouts page](https://mermaid.js.org/config/layouts.html) (checked 2026-11-13)
+- **Look options** - Neo (the default since Mermaid 12.0.0), classic or hand-drawn sketch style; `theme: default`, `look: classic` and `layout: dagre` restore the Mermaid 11 appearance
 - **Subgraphs** - Group related elements for clarity
 - **Notes and comments** - Add context and explanations
 - **Alt/loop/opt blocks** - Complex flow control in sequences
@@ -245,3 +245,9 @@ For questions, syntax help, or advanced features, refer to:
 - SKILL.md for quick reference
 - Reference files in `references/` for detailed syntax
 - [Mermaid official docs](https://mermaid.js.org) for latest features
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+Documentation owners credited (official pages listed in `docs/audit/upstream-sources.json`, checked 2026-11-13): Mermaid (diagram syntax, configuration, mermaid-cli), GitHub (Mermaid diagrams in Markdown), Matt Bierner (Markdown Preview Mermaid Support extension), Puppeteer (browser sandbox troubleshooting).

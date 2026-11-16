@@ -1,0 +1,95 @@
+{
+  "skill": "reducing-entropy",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 9,
+      "evidence": "The dbff837f digest shows 175 removed units but only 40 (a cut list). The record explains the listed units, including accepted drops for para:76965640, para:6a3dd121, para:106d25cc, para:ef78cea9, para:54a485c3, para:03bac19a, para:9a10630b, para:ed3a2005, para:0d934ff5, para:d9e3d633, para:b2d1613f, para:f8a73e33, para:57ec194a, para:ee546dca, para:1d152dbb, para:10b58a7b, para:34594ff0, para:717782ab, para:53a4e92d, para:5c30bccf, para:16d09475, para:e78bc320, para:c797f356, para:64aa1d62, para:ed073dc4 and para:f4227108; the other 135 were not shown, so they cannot be checked.",
+      "fix": "Re-run the digest with the full removed-unit list (or the next 40) and add a record row, or restore into references/, for any substantive unit among the 135 not shown."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/reducing-entropy/README.md",
+      "line": 25,
+      "evidence": "Primary sources for simplicity thinking, to draw from when creating new mindsets, lists nine well-known talks and papers (Simple Made Easy, Out of the Tar Pit, No Silver Bullet, Zen of Python) that a model already names unprompted.",
+      "fix": "Move the nine-item reading list into references/adding-reference-mindsets.md under External References, or record the removal in docs/audit/recovery/reducing-entropy/record.md; keep the Attribution block and the Git project credit line."
+    },
+    {
+      "id": "D1-3",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/evals/evals.json",
+      "line": 118,
+      "evidence": "Eval id reference-sources-corrected only checks a URL spelling (MoseleyMarks06a.pdf) and a quote attribution the references already state, so it tests nothing the deletion procedure does.",
+      "fix": "Replace it with a case that exercises a real procedure branch (an unknown merge invariant, or a name held only by stored data) with assertions on the keep-or-delete decision, or remove the eval and record the removal."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 11,
+      "evidence": "Step 2 prescribes one exact counter, `git ls-files -z --cached --others --exclude-standard -- src ':(exclude,glob)**/tests/**' ... | xargs -0 sh -c '...' | wc -l`, for a judgment skill whose consequence of a slightly different counter is low, and the example scope is hardcoded to `src`.",
+      "fix": "Keep the requirements (NUL-safe, counts untracked files, skips deleted paths, excludes tests and generated code, rerun unchanged) as the rule and offer that command as the default for a git repo whose code lives under src, with an escape hatch to retarget the pathspec."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/evals/evals.json",
+      "line": 1,
+      "evidence": "Ten evals cover lenses, PAGNI, red flags and stop conditions with verifiable assertions, and trigger-queries.json has 10 should-trigger and 10 should-not-trigger queries, but no eval exercises the step-4 Unknown row, the step-5 displacement rule, or the stored-name Gotcha (pickled objects, ORM identities, Celery task names).",
+      "fix": "Add one eval whose input holds a class name only inside a stored pickle or ORM identity, asserting the skill keeps it and does not treat an empty caller search as proof it is dead."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 14,
+      "evidence": "Step 3b says a candidate whose after count is not below its before count routes to red-flags-and-stop-conditions.md, but the after count is only produced by step 7, so that trigger cannot be evaluated while ranking candidates.",
+      "fix": "Move the less-total-code check to after step 6's re-measure: reject a candidate whose after count exceeds its before count unless a step-1 need requires the extra code, and keep the red-flags file for arguments and stop conditions only."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/reducing-entropy/SKILL.md",
+      "line": 11,
+      "evidence": "The step-2 counter pipes `git ls-files -z` into `xargs -0`, which drops an empty file list and then runs `sh -c` with no path arguments, so `cat` waits on stdin instead of reporting zero.",
+      "fix": "Add `xargs -0 -r` (or an equivalent empty-list guard) so an empty tree prints 0, and state that fallback in the command."
+    }
+  ]
+}

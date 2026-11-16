@@ -1,6 +1,6 @@
 # Test and Publish Workflows
 
-Source: https://code.claude.com/docs/en/plugins/create-marketplace and https://code.claude.com/docs/en/plugins/cli-reference (checked 2026-11-04). Run the `claude plugin ...` commands in a shell; `/...` commands run inside a Claude Code session.
+Source: https://code.claude.com/docs/en/plugins/create-marketplace and https://code.claude.com/docs/en/plugins/cli-reference (checked 2026-11-13). Run the `claude plugin ...` commands in a shell; `/...` commands run inside a Claude Code session.
 
 ## Local install test
 

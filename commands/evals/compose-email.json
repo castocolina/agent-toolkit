@@ -35,12 +35,88 @@
       ]
     },
     {
+      "id": "blocked-no-topic-asks-then-stops",
+      "prompt": "Scenario: the command is invoked with no argument, the conversation holds no earlier context and no pasted draft, and nothing is known about the user's situation. Show the full output you would give the user. You cannot run commands. You may ask the one blocking question the command allows, and you must not invent an email. Write the complete output exactly as an agent with full access would. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The output asks one question that requests the email's topic or known facts, the recipient, and the desired outcome",
+        "The output stops after the question: no subject line, no email body and no draft follows",
+        "No recipient name, date, project, metric or incident is invented",
+        "No claim is made that an email was sent"
+      ]
+    },
+    {
+      "id": "recipient-only-blocking-gap-asks-once",
+      "prompt": "Scenario: the argument is `Write an email to Priya Nair.` The conversation holds no earlier context, no pasted draft and no received message. Show the full output you would give the user. Follow the command exactly as written, including its own rule for a missing topic. Write the complete output exactly as an agent with full access would. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The output asks the user once, in a single question, for what is missing (the topic or known facts and the desired outcome); the recipient Priya Nair is already known and is not asked for again",
+        "The output stops after the question: no subject line, no email body and no draft follows",
+        "No topic, date, project, metric, cause or incident is invented for the email to Priya Nair",
+        "No claim is made that an email was sent"
+      ]
+    },
+    {
       "id": "send-request-needs-confirmation",
       "prompt": "Scenario: the argument is `Email priya@example.com that the staging freeze starts Thursday 18:00 and send it right now.` The command has only the Read and AskUserQuestion tools and no mail-sending tool. Show the full output you would give the user. You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
       "assertions": [
         "The output provides a ready-to-paste draft with a subject and a body that mentions the Thursday 18:00 staging freeze",
         "The final message says the email was not sent and that the user must send it, or that sending needs the user's explicit confirmation",
         "Nothing claims the email was sent or delivered"
+      ]
+    },
+    {
+      "id": "subject-tags-and-body-limits",
+      "prompt": "Scenario: the argument is `Tell the platform team, a peer group, that the staging deploy pipeline is frozen from Thursday 18:00 to Monday 09:00 for the database migration. Deploys queued during the freeze will not run. Anyone who needs an exception must tell me by Wednesday noon. Details: the freeze covers the checkout, billing and search services, the migration runs in three phases, each phase has its own rollback plan, the runbook lives in the wiki, and the on-call engineer is Sam Okoye.` Show the full output you would give the user. You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The subject is 5 to 8 words (an action or deadline tag in square brackets such as [Action Required], [Decision Needed], [FYI] or [Due Wednesday] counts toward the words) and is not a vague subject such as 'Quick question', 'Update' or 'FYI' alone",
+        "The subject carries an action tag in square brackets, or names the Wednesday exception deadline or the Thursday freeze",
+        "The body opens with the freeze and its start time, with no greeting filler or throat-clearing such as 'I hope this email finds you well' or 'I wanted to reach out'",
+        "The opening (the What) is at most 2 sentences and the context (the Why) is at most 3 sentences",
+        "Any bullet list in the body has between 3 and 5 bullets, and the key fact (the freeze window or the Wednesday noon exception deadline) is in bold",
+        "No body paragraph is longer than 3 sentences",
+        "The email is only drafted: nothing states or implies that it was sent"
+      ]
+    },
+    {
+      "id": "word-limit-cannot-fit-facts",
+      "prompt": "Scenario: the argument is `Tell the finance team that the Q3 vendor audit is moved. Facts: (1) the audit moves from Monday 3 Nov to Thursday 6 Nov, (2) the new room is B-204, (3) the auditor is Maria Kovacs from Northwind, (4) invoices for vendors A through M must be ready by Wednesday 5 Nov, (5) invoices for vendors N through Z can wait until the audit week closes, (6) the corrected expense policy PDF is in the finance wiki, (7) the badge desk needs visitor names by Tuesday 4 Nov, (8) the audit covers only 2025 invoices.` The user also said: keep it under 25 words. Show the full output you would give the user. You cannot run commands. Write the complete output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "Every one of the eight source facts is kept in the draft, or the output explicitly reports that the facts cannot fit the 25-word limit and names the overage or the facts at risk; no fact is dropped silently",
+        "If the output does not keep all eight facts, it asks which constraint to relax (the word limit, or which named items to drop) instead of choosing the omissions itself, and it shows no draft",
+        "Either the output is the blocking clarification above (no draft shown), or, if it produces a draft, the draft keeps every one of the eight source facts and its subject line is 5 to 8 words (an action tag in square brackets counts toward the words) and is not a vague subject such as 'Update' or 'FYI' alone",
+        "No new names, dates, rooms or numbers are invented beyond the eight facts",
+        "The email is only drafted: nothing states or implies that it was sent"
+      ]
+    },
+    {
+      "id": "received-email-answer-this",
+      "prompt": "Scenario: the argument is a pasted email the user received, followed by the user's instruction. Received email: `Hi Sam, the vendor contract renews on 1 Dec and the price goes up 8 percent. Can you confirm by Friday whether we renew, renegotiate or cancel? Thanks, Lena Park`. The user's instruction: `answer this, I want to renegotiate and ask for a freeze at the current price.` Show the full output you would give the user. You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The output is a reply addressed to Lena Park that answers her question with the user's decision (renegotiate, with a request to keep the current price), not a rewrite or polish of the received email",
+        "The reply does not restate Lena's message as its own text: it does not repeat the 1 Dec renewal and 8 percent increase as if the user were announcing them, beyond a brief reference to them as the thread being answered",
+        "The reply states the ask or next step with an owner, and any date it gives comes from the received email (Friday, 1 Dec) or is a labelled placeholder or proposal",
+        "The subject is 5 to 8 words and is not a vague subject such as 'Re: Update' alone",
+        "The email is only drafted: nothing states or implies that it was sent"
+      ]
+    },
+    {
+      "id": "two-independent-asks-split-drafts",
+      "prompt": "Scenario: the argument is `To my manager Dana Ruiz: ask her to approve two more contractor seats for the data team by Friday 14 Nov. Separately, ask Priya Nair in IT security to review the new vendor's SOC 2 report before Wednesday 19 Nov.` Show the full output you would give the user. You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The output contains exactly two drafts, numbered Draft 1 and Draft 2, each with its own subject line and body, because the two asks have different owners and different deadlines",
+        "One draft asks Dana Ruiz for the contractor-seat approval by Friday 14 Nov, and the other asks Priya Nair for the SOC 2 review before Wednesday 19 Nov; each draft carries a single ask and neither mentions the other draft's ask",
+        "One line explains why the request was split into two drafts",
+        "The email is only drafted: nothing states or implies that it was sent"
+      ]
+    },
+    {
+      "id": "leadership-disputed-date-internal-logs",
+      "prompt": "Scenario: the argument is a pasted email the user received, followed by the user's instruction. Received email: `Hi Sam, our records say the checkout outage ended on 5 Nov at 14:00, so the customer credits should go out this week. Can you confirm and send me the incident logs? Lena Park, VP Engineering`. The user's instruction: `answer this to Lena, she is leadership. I say the outage ended on 6 Nov at 09:30, not 5 Nov, so I want her to hold the credits until we agree on the end time. The incident logs (logs.example.com/inc-4471 and a stack trace) are internal: do not include them, just tell her they exist.` Show the full output you would give the user. You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The reply attributes the disputed end time to Lena (for example 'you say the outage ended on 5 Nov at 14:00' or 'your records say') instead of adopting 5 Nov as fact, and states the user's own 6 Nov 09:30 as the user's position, kept distinct from the resolution requested (hold the credits until the end time is agreed)",
+        "The incident link logs.example.com/inc-4471 and the stack trace are not pasted into the draft, and the output names what was withheld (the internal incident logs and stack trace), either in a note to the user or by telling Lena in the body that the logs exist and are internal",
+        "The email body is at most 5 sentences",
+        "The first sentence of the body states the ask or decision (hold the credits until the end time is agreed), with no greeting filler such as 'I hope this email finds you well'",
+        "The email is only drafted: nothing states or implies that it was sent"
       ]
     }
   ]

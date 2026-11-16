@@ -47,6 +47,27 @@
         "The final message says there are no uncommitted changes to analyze",
         "No change groups or invented changes are produced"
       ]
+    },
+    {
+      "id": "large-diff-stat-and-provisional",
+      "prompt": "Scenario: the argument is `feature/billing`, a verified local branch whose base is `main`. `git diff --shortstat main...feature/billing` reports `142 files changed, 9120 insertions(+), 3350 deletions(-)`, and the working tree has uncommitted edits you must not disturb. After reading `--stat` and the contract files (types, schemas, migrations), the rest of the patch is still too large to read in full within your limits. Show the git commands you run and the report you produce. You cannot run commands or ask questions. Write the complete commands and output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The size is measured with `--shortstat` before the diff is read, and the size is recognised as above the 800-changed-line or 30-file threshold, so it always pages",
+        "The commands use `--stat` on the same source (`git diff --stat main...feature/billing` or equivalent) and then read per-file diffs with a `-- <path>` pathspec instead of one full diff",
+        "The contract and schema files (types, schemas, migrations) are read first to fix the dependency order",
+        "Because the patch cannot be read in full, the group list with file counts is explicitly marked provisional and a deep-dive per group is offered; no firm per-group claims are made about unread files",
+        "No `git checkout`, `git switch`, `git stash` or `git fetch` command is run"
+      ]
+    },
+    {
+      "id": "merge-commit-first-parent-diff",
+      "prompt": "Scenario: the argument is `3f9c2ab`, a verified commit hash that is not a branch. `git rev-list --parents -n1 3f9c2ab` prints the commit followed by two parent hashes (a merge commit), and `git show --format= --no-color 3f9c2ab` prints nothing because the combined diff is empty. The first-parent diff touches `src/api/orders.ts`, `src/api/orders.test.ts` and `docs/orders.md`. Show the git commands you run and the mental-model report you produce. You cannot run commands or ask questions. Write the complete commands and output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The agent detects the merge commit (more than one parent, for example via `git rev-list --parents -n1`) and runs `git diff \"3f9c2ab^1\" \"3f9c2ab\" --no-color` instead of relying on `git show`",
+        "The empty combined diff from `git show` is never reported as 'No changes found for the specified source'; the first-parent diff is explained instead",
+        "The file manifest used to check the groups is built with `git diff --name-only \"3f9c2ab^1\" \"3f9c2ab\"` and every one of the three files is in exactly one group",
+        "The report ends with a Review Sequence and a Gotchas section"
+      ]
     }
   ]
 }

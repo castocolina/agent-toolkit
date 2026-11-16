@@ -112,6 +112,10 @@ section.lead {
   background: linear-gradient(135deg, #fff5f7 0%, #ffe5ec 50%, #ffd5e0 100%);
 }
 
+section.lead.final {
+  border-bottom: none;
+}
+
 section.lead footer {
   display: none;
 }

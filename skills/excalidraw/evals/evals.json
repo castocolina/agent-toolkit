@@ -82,17 +82,47 @@
     },
     {
       "id": "relabel-arrow",
-      "prompt": "in architecture.excalidraw.json the arrow from Web Client to API Service says HTTPS, change it to 'HTTPS (TLS 1.3)'. then tell me what the diff says changed",
+      "prompt": "in architecture.excalidraw.json the arrow from Web Client to API Service says HTTPS, change it to 'HTTPS 1.3'. then tell me what the diff says changed",
       "files": [
         "evals/files/architecture.excalidraw.json"
       ],
-      "expected_output": "Runs `scene.py edit architecture.excalidraw.json -o NEW --relabel \"HTTPS=HTTPS (TLS 1.3)\"`, then `diff` against the original, and reads the removed 'Web Client -> API Service [HTTPS]' plus added 'Web Client -> API Service [HTTPS (TLS 1.3)]' pair as the expected result of an arrow relabel, not a bug.",
+      "expected_output": "Runs `scene.py edit architecture.excalidraw.json -o NEW --relabel \"HTTPS=HTTPS 1.3\"`, then `diff` against the original, and reads the removed 'Web Client -> API Service [HTTPS]' plus added 'Web Client -> API Service [HTTPS 1.3]' pair as the expected result of an arrow relabel, not a bug.",
       "assertions": [
-        "Uses `scene.py edit` with `--relabel \"HTTPS=HTTPS (TLS 1.3)\"` written to a new path, not a hand edit",
+        "Uses `scene.py edit` with `--relabel \"HTTPS=HTTPS 1.3\"` written to a new path, not a hand edit",
         "Runs `scene.py diff` of the original against the new file before replacing the original",
-        "Explains that the diff shows one removed connection 'Web Client -> API Service [HTTPS]' and one added 'Web Client -> API Service [HTTPS (TLS 1.3)]'",
+        "Explains that the diff shows one removed connection 'Web Client -> API Service [HTTPS]' and one added 'Web Client -> API Service [HTTPS 1.3]'",
         "States that this removed/added pair is the expected result of relabelling an arrow, not an unintended change",
         "Does not print scene JSON"
+      ]
+    },
+    {
+      "id": "relabel-long-multiline",
+      "prompt": "in architecture.excalidraw.json change the API Service box label to three lines: 'API Service', 'Handles authentication, rate limiting and request routing', 'Owned by the platform team'. Save it as a new file and tell me what changed.",
+      "files": [
+        "evals/files/architecture.excalidraw.json"
+      ],
+      "expected_output": "Recognises that the new label is substantially longer and multiline, so `--relabel` (which leaves the box and text sizes alone) would overflow the box; routes the change to the isolated worker with the layout check instead of the direct `edit --relabel` command, then verifies with `check` and `diff --strict` on the separate output file before publishing it, leaves the input file unchanged, and reports in prose.",
+      "assertions": [
+        "Does not use `scene.py edit --relabel` as the whole change for this long multiline label, and explains that it leaves width, height and position unchanged so the text would overflow the box",
+        "Sends the change to the isolated worker (or stops to ask for an isolated session) with the worker contract, rather than editing the scene by hand in the main context",
+        "When an isolated worker is available, has the worker resize or re-lay out the box and its bound text so the label fits, then run `scene.py check` and `scene.py diff --strict` with the allowed ids on the separate output file before publishing it; when none is available, the documented stop that asks for an isolated session is accepted instead",
+        "The input architecture.excalidraw.json remains unchanged (the new label is written only to the new file)",
+        "Reports the result as a text summary and does not print scene JSON"
+      ]
+    },
+    {
+      "id": "move-and-restyle-worker",
+      "prompt": "in architecture.excalidraw.json move the Postgres box 200 units to the right and make it red, and save the result as architecture-moved.excalidraw.json. Tell me what changed.",
+      "files": [
+        "evals/files/architecture.excalidraw.json"
+      ],
+      "expected_output": "Recognises that no `scene.py` command moves or restyles a shape, so it sends the change to the isolated worker with the contract: the worker edits a copy, writes down the permitted set (the Postgres shape, its bound text and every arrow bound to Postgres), recomputes those arrows and the bound text, then runs `check` and `diff --strict` with one `--allow` per permitted id. Because the user asked for a new file, the validated copy is kept as architecture-moved.excalidraw.json and the original is left alone. The reply is text only.",
+      "assertions": [
+        "Does not hand-edit the scene in the main context and does not use `scene.py edit` for a move or restyle; sends the change to the isolated worker with the contract (or stops to ask for an isolated session)",
+        "Has the worker edit a copy and allow only the moved Postgres shape and the arrows bound to it (their points, x and y change), plus the bound text, passing one `--allow` per permitted id",
+        "Has the worker run `scene.py check` on the copy and `scene.py diff ORIGINAL COPY --strict` with the allowed ids, and treat a `preservation` failure as a reason to undo the listed changes",
+        "Keeps the validated copy as architecture-moved.excalidraw.json and does not replace architecture.excalidraw.json, since the user asked for a new file",
+        "Reports text only: the check result, the diff result and one sentence per change, with no scene JSON"
       ]
     }
   ]

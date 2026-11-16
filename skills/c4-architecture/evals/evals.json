@@ -9,7 +9,8 @@
         "Provides both C4Context and C4Container diagrams for the stated audience and request",
         "Includes React app, Node.js API, PostgreSQL, Stripe, and customer with directional labeled relationships",
         "Writes the context view to a file under docs/architecture/ (such as c4-context.md) that contains a C4Context block",
-        "Writes the container view to a separate file under docs/architecture/ (such as c4-containers.md) that contains a C4Container block"
+        "Writes the container view to a separate file under docs/architecture/ (such as c4-containers.md) that contains a C4Container block",
+        "Each written file contains a one-line prose key under its diagram that explains the notation, and uses no Legend macro"
       ]
     },
     {
@@ -90,7 +91,8 @@
         "Uses a C4Deployment diagram whose title names the production environment",
         "Shows the api container once inside a node whose label carries the 3 replicas (for example shop-api x3), not as three duplicate api containers",
         "Does not state a cloud provider, cluster or host for the worker, PostgreSQL, Redis or Kafka as observed fact; marks them unknown or inferred, or asks",
-        "Does not present the docker-compose.yml topology as the production deployment, or says explicitly that compose describes a local setup"
+        "Does not present the docker-compose.yml topology as the production deployment, or says explicitly that compose describes a local setup",
+        "The written file contains a one-line prose key under the diagram that explains the notation, and uses no Legend macro"
       ]
     },
     {
@@ -101,6 +103,62 @@
         "Models the catalog service as its own System, separate from the shop",
         "Keeps the web app, order API and payment worker as containers of one shop system, although two teams own them",
         "States the reason for the catalog system boundary from its other consumers, public API or release cycle, not from team count alone"
+      ]
+    },
+    {
+      "id": "element-fields-and-key",
+      "prompt": "Quick container diagram for our small CRM, saved under the architecture docs: a Vue web app calls a Django API, and the API reads and writes a MySQL database. Engineering will read it.",
+      "expected_output": "A C4Container diagram in which every element carries a specific name, its type, a technology and a one-line description of its responsibility, with a one-line prose key under the diagram (Mermaid has no legend).",
+      "assertions": [
+        "Every Container and ContainerDb has four fields: a specific name, a technology (Vue, Django, MySQL) and a description of what it is responsible for, none left empty; a name the prompt itself gives (for example \"web app\", \"API\" or \"MySQL database\") is accepted, a bare placeholder such as \"Service\" is not",
+        "Writes a one-line key in prose under the diagram that explains the notation (element types, arrow meaning or colors), and does not use a Legend macro",
+        "Does not leave a relationship without a technology or label it with a single word such as \"Uses\" or \"Accesses\"; because the prompt supplies no protocol, a technology of `unknown`, `unknown (ask)` or `not provided` is accepted and an invented protocol presented as fact is not"
+      ]
+    },
+    {
+      "id": "generic-relationship-labels",
+      "prompt": "Make the C4 container diagram for this: the web app uses the API, the API uses the database, the API uses the email service. Technologies: React, Node.js, PostgreSQL, SendGrid. Put it in docs/architecture/.",
+      "expected_output": "A C4Container diagram whose relationship labels are specific verbs with the technology, replacing the word \"uses\" from the request.",
+      "assertions": [
+        "No Rel label is the bare word \"Uses\", \"Accesses\" or another single generic word; each says what is requested or sent, such as \"Fetches data\" or \"Reads and writes\"",
+        "Each Rel carries a technology that comes from the prompt (React, Node.js, PostgreSQL or SendGrid) or is marked `unknown`, `unknown (ask)` or `not provided` because the prompt supplies no protocol; a protocol the prompt never gave (for example HTTPS) presented as fact fails",
+        "Every relationship is a one-way Rel, with no BiRel"
+      ]
+    },
+    {
+      "id": "replicas-in-one-node-label",
+      "prompt": "Draw the production deployment of our reporting API. It runs as 8 identical pods on a Kubernetes cluster, in front of one managed PostgreSQL database. Keep the diagram readable for the ops team.",
+      "expected_output": "A C4Deployment titled for production in which the 8 identical pods appear as one node whose label carries the count, with the api container drawn once inside it.",
+      "assertions": [
+        "Uses a C4Deployment diagram whose title names the production environment",
+        "Shows the replicas in one node label that carries the count of 8 (for example reporting-api x8, or the official bigbank-api*** x8 form), not as eight nodes or eight api containers",
+        "Contains the api Container exactly once and the PostgreSQL database once, with one-way Rel lines that each have a verb label and a technology"
+      ]
+    },
+    {
+      "id": "deployment-version-labels",
+      "prompt": "Draw the production Kubernetes deployment for the shop API on EKS. I have not told you the cluster version and the Dockerfile is not in the repo, so use the files you have. Also tell me how you labelled the nodes.",
+      "files": [
+        "evals/files/shop-repo/apps/api/package.json",
+        "evals/files/shop-repo/k8s/api-deployment.yaml"
+      ],
+      "expected_output": "A C4Deployment for production with the api in a node labelled with its 3 replicas, the cluster node labelled EKS without a version number, and no version invented for Node.js.",
+      "assertions": [
+        "The cluster node is labelled \"EKS\" (or the node says the version is unknown) and does not carry a Kubernetes version such as 1.30 that the user never supplied",
+        "Does not label the api technology \"Node.js 20\"; it says Node.js with no version, or Node.js 22 stated as an assumption, because no file names a Node.js version",
+        "Writes the replicas in the node label (for example shop-api x3), not as three api containers",
+        "Says, once and for the labelled technologies as a group (not one statement per technology), that no versions were provided, instead of presenting any label version as fact"
+      ]
+    },
+    {
+      "id": "split-oversized-view",
+      "prompt": "Make the container diagram for our marketplace and keep every service in it. Orders: order-api, order-worker, orders-db, order-events queue. Catalog: catalog-api, search-indexer, catalog-db, search cluster. Billing: billing-api, invoice-worker, billing-db, payment-events queue. Shipping: shipping-api, label-worker, shipping-db, carrier gateway. Identity: auth-api, sessions cache, users-db. Plus web storefront, mobile app and admin portal. Stripe is the external payment provider. Save it under docs/architecture/.",
+      "expected_output": "Several C4Container diagrams in separate files under docs/architecture/, split by bounded context, none over 20 elements, instead of one diagram with all 22 containers and Stripe.",
+      "assertions": [
+        "Does not put all of the more than 20 containers into one C4Container block; produces several C4Container views, one view per file under docs/architecture/ as SKILL.md step 4 requires (the prompt names a directory, not a single destination file, so several views in one file do not pass)",
+        "Splits the views by bounded context (for example orders, catalog, billing, shipping and identity), each view holding one context's containers with its direct dependencies",
+        "No single view contains more than 20 elements",
+        "Each Rel in every view has a verb label and a technology and is one-way"
       ]
     },
     {

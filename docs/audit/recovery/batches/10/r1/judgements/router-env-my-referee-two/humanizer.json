@@ -1,0 +1,104 @@
+{
+  "skill": "humanizer",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 13,
+    "D4": 14,
+    "D5": 14,
+    "D6": 14,
+    "D7": 12,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 111,
+  "max_total": 125,
+  "percent": 88.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/humanizer/evals/evals.json",
+      "line": 1,
+      "evidence": "readme-quote-and-provenance asks the agent to quote README.md's Wikipedia sentence word for word and report what the README says the guide is built from; the skill's task is editing existing prose, and README.md is never part of that workflow.",
+      "fix": "Replace this eval with one that exercises the editing task, such as a house-style exemption or a pre-2022 passage that still has editable cues, and record the removed assertions in docs/audit/recovery/humanizer/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/humanizer/SKILL.md",
+      "line": 30,
+      "evidence": "The load condition for references/pattern-catalog.md is a list of symptoms ('chatbot correspondence, disclaimers, hedging, filler, vocabulary clusters, em dashes or other mechanics') rather than a step that says which catalog section to open for which diagnosis.",
+      "fix": "In step 3, name the catalog heading to read for each leftover cue (Correspondence and disclaimers, Conclusions and hedging, Vocabulary by model era, Style and mechanics) and keep the existing do-not-load rule for a narrow edit already covered above."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/humanizer/SKILL.md",
+      "line": 34,
+      "evidence": "Never alter evidence forbids inventing facts and rewriting quotes, but it does not warn that deleting a chatbot wrapper or a trailing participle can leave a sentence fragment or drop the only verb.",
+      "fix": "Add one NEVER: after deleting a wrapper, disclaimer or trailing participle, re-read the sentence and restore its grammar from words already present; if nothing remains, flag the gap instead of writing a new sentence."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/humanizer/SKILL.md",
+      "line": 4,
+      "evidence": "The description covers WHAT, WHEN, keywords and a boundary, but it never names a file path, so a request to edit an existing draft in place is easy to miss.",
+      "fix": "Edit existing drafts to remove formulaic AI-like prose, promotional puffery and hype, vague attributions, inflated significance and repetitive sentence patterns while preserving facts, quotations, author voice and house style. Use when a draft, pasted passage or file path sounds robotic, generic, salesy or breathless, or the user asks to humanize text, tone down hype, make copy more natural or factual, or remove AI writing patterns, chatbot phrasing, clich\u00e9s or em-dash overuse, even without mentioning AI. Not for authorship detection, factual research, translation, spelling-only proofreading, or writing from scratch."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/humanizer/SKILL.md",
+      "line": 30,
+      "evidence": "Load `references/pattern-catalog.md` when the text shows chatbot correspondence, disclaimers, hedging, filler, vocabulary clusters, em dashes or other mechanics: one catch-all trigger loads the whole catalog, including era lists the current diagnosis may not need.",
+      "fix": "Point each leftover cue at its heading and say not to load Vocabulary by model era unless the diagnosis is a word cluster, and not to load Style and mechanics unless the cue is punctuation, formatting or synonym cycling."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/humanizer/SKILL.md",
+      "line": 16,
+      "evidence": "Step 1 says to ask only for missing information that changes the edit, but never says which missing fact to ask for and which to default, so audience, stance and house style become an equal menu.",
+      "fix": "Default audience and stance to the source's own register and ask only when the request names two audiences or two house styles; keep the existing default for unspecified depth."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/humanizer/evals/evals.json",
+      "line": 1,
+      "evidence": "Fifteen evals have realistic prompts and mostly verifiable assertions, but readme-quote-and-provenance grades a README recitation, and current-era-ordinary-words and disclaimer-era-labels grade catalog labels rather than an edit of the supplied draft.",
+      "fix": "Rewrite those three prompts so each supplies a draft and asserts the edit outcome: leave a lone ordinary word, delete the cutoff frame while keeping the fact, and keep source-availability uncertainty without inventing a date. Keep the era labels only as part of the change note."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/humanizer/SKILL.md",
+      "line": 20,
+      "evidence": "The gate says 'with fewer than three, fix only the evidence and inflation cues and skip the style pass,' but it never says what to do when the only cues are style or mechanics and there are fewer than three.",
+      "fix": "Add the branch: with fewer than three cues and none of them evidence or inflation, leave the text and say so in the change note, unless the user named that pattern."
+    }
+  ]
+}

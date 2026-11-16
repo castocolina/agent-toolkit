@@ -1,0 +1,59 @@
+{
+  "skill": "c4-architecture",
+  "mode": "output",
+  "pass_rate": 0.8148,
+  "passed": 44,
+  "total": 54,
+  "failures": [
+    {
+      "eval": "context-container-commerce",
+      "assertion": "Writes the context view to a file under docs/architecture/ (such as c4-context.md) that contains a C4Context block",
+      "evidence": "The output identifies \"docs/architecture/c4-context.md\" and provides a C4Context block, but explicitly says \"no files were written\"."
+    },
+    {
+      "eval": "context-container-commerce",
+      "assertion": "Writes the container view to a separate file under docs/architecture/ (such as c4-containers.md) that contains a C4Container block",
+      "evidence": "The output identifies \"docs/architecture/c4-containers.md\" and provides a C4Container block, but explicitly says \"no files were written\"."
+    },
+    {
+      "eval": "no-invented-architecture",
+      "assertion": "Contains a C4Context with one Person for the users and one System for the backend, and no Container, ContainerDb or Deployment_Node elements",
+      "evidence": "The diagram contains `System(app, \"App\", \"Application described as having a backend\")`, which represents the app rather than the backend as the system."
+    },
+    {
+      "eval": "repo-evidence",
+      "assertion": "Includes an evidence table that names the source file for each element or relationship and marks each as Observed or Inferred",
+      "evidence": "The evidence table lists \u201cShopper uses Web\u201d with \u201cShop application context; no user-facing behavior supplied\u201d rather than a source file, and marks the protocols row \u201cUnknown\u201d rather than Observed or Inferred."
+    },
+    {
+      "eval": "component-order-api",
+      "assertion": "Saves to a per-container file under docs/architecture/, such as c4-components-order-api.md",
+      "evidence": "The output says `Proposed file: docs/architecture/c4-components-order-api.md`, but does not show that the file was saved."
+    },
+    {
+      "eval": "element-fields-and-key",
+      "assertion": "Every Container and ContainerDb has four fields: a specific name, a technology (Vue, Django, MySQL) and a description of what it is responsible for, none left empty; a name the prompt itself gives (for example \"web app\", \"API\" or \"MySQL database\") is accepted, a bare placeholder such as \"Service\" is not",
+      "evidence": "The database is named only \"Database\" in `ContainerDb(db, \"Database\", \"MySQL\", \"Stores CRM data.\")`, rather than having a specific name such as \"MySQL database\"."
+    },
+    {
+      "eval": "element-fields-and-key",
+      "assertion": "Does not leave a relationship without a technology or label it with a single word such as \"Uses\" or \"Accesses\"; because the prompt supplies no protocol, a technology of `unknown`, `unknown (ask)` or `not provided` is accepted and an invented protocol presented as fact is not",
+      "evidence": "`Rel(web, api, \"Calls\", \"unknown (ask)\")` supplies an accepted technology value but labels the relationship with the single word \"Calls\"."
+    },
+    {
+      "eval": "generic-relationship-labels",
+      "assertion": "No Rel label is the bare word \"Uses\", \"Accesses\" or another single generic word; each says what is requested or sent, such as \"Fetches data\" or \"Reads and writes\"",
+      "evidence": "The labels \"Accesses database\" and \"Uses email service\" do not specify what is read, written, requested, or sent."
+    },
+    {
+      "eval": "replicas-in-one-node-label",
+      "assertion": "Contains the api Container exactly once and the PostgreSQL database once, with one-way Rel lines that each have a verb label and a technology",
+      "evidence": "The relationship is written as \"Rel(api, db, \\\"Reads from and writes to\\\", \\\"unknown (ask)\\\")\", so its technology is not specified."
+    },
+    {
+      "eval": "split-oversized-view",
+      "assertion": "Splits the views by bounded context (for example orders, catalog, billing, shipping and identity), each view holding one context's containers with its direct dependencies",
+      "evidence": "The heading `Marketplace containers: Orders and Catalog` combines two contexts, and the output states that `No relationships are shown because none were supplied.`"
+    }
+  ]
+}

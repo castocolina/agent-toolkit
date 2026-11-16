@@ -7,6 +7,8 @@ description: Some things you Probably Are Gonna Need - know when YAGNI doesn't a
 ## The Core Insight
 
 > "When should you override YAGNI? When the cost of adding something later is so dramatically expensive compared with the cost of adding it early on that it's worth taking the risk."
+>
+> - Simon Willison, [PAGNIs: Probably Are Gonna Need Its](https://simonwillison.net/2021/Jul/1/pagnis/) (1 July 2021)
 
 The exceptions are things that touch everything when added late, cannot be added retroactively at all, or lose data for good when missing.
 
@@ -20,9 +22,12 @@ The exceptions are things that touch everything when added late, cannot be added
 **Infrastructure that's painful to retrofit:**
 - API versioning (even if v1 is the only version)
 - API pagination (even if lists are small now)
+- Automated deploys and CI from day one
+- A kill switch for mobile apps (it cannot be added retroactively to installed apps)
 - Logging infrastructure
 
 **Security fundamentals:**
+- Vulnerability disclosure policy and security@ email (a SECURITY policy file is not clutter)
 - Session/password invalidation mechanisms
 - Safe ways to move redacted data out of production
 

@@ -1,0 +1,29 @@
+{
+  "skill": "explain-pr-changes",
+  "mode": "output",
+  "pass_rate": 0.9856,
+  "passed": 273,
+  "total": 277,
+  "failures": [
+    {
+      "eval": "fetch-base-fails",
+      "assertion": "The command stops quoting git's fetch stderr ('fatal: couldn't find remote ref release')",
+      "evidence": "The final message repeats: \"fatal: couldn't find remote ref release\"."
+    },
+    {
+      "eval": "drawio-rules-paths",
+      "assertion": "Both candidate paths appear in the command's calls",
+      "evidence": "The example commands use the substituted path `plugin_rules='/opt/claude/plugins/pr-workflows/skills/draw-io/SKILL.md'` and `fallback_rules=\"$HOME/.claude/skills/draw-io/SKILL.md\"`, rather than both literal candidate paths."
+    },
+    {
+      "eval": "mermaid-rules-paths",
+      "assertion": "The Mermaid authoring rules are read from the literal '${CLAUDE_PLUGIN_ROOT}/skills/mermaid-diagrams/references/authoring-rules.md' first, before the Mermaid block is written",
+      "evidence": "The output says, \"If the first path still contains the literal `${CLAUDE_PLUGIN_ROOT}`, it is skipped.\""
+    },
+    {
+      "eval": "mermaid-rules-paths",
+      "assertion": "When that text is unsubstituted or missing, '$HOME/.claude/skills/mermaid-diagrams/references/authoring-rules.md' is used instead",
+      "evidence": "The output says, \"It reads the second file only if it exists,\" and that under the stated assumptions it \"is absent, so the minimums apply.\""
+    }
+  ]
+}

@@ -1,0 +1,284 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "excalidraw",
+      "percent": 95.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 97.6,
+        "router-env-my-referee-one": 93.6
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/excalidraw/README.md",
+          "line": 34,
+          "evidence": "**claude.ai:** add the skill to project knowledge or paste `SKILL.md` into the conversation.",
+          "fix": "The model already knows how to add a skill in claude.ai. Delete this sentence and add a row for it to docs/audit/recovery/excalidraw/record.md (fate removed-on-merit, value low, decision drop, reason class generic-model-knowledge). Keep the Claude Code install block and the Credits and sources section."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 49,
+          "evidence": "When `check` passes, run `diff ORIGINAL COPY --strict` with one `--allow` per id in the step 2 set (each element the task names or creates, each arrow it rebinds and that arrow's old and new endpoint shapes, and each arrow whose `points`/`x`/`y` it recomputed because a bound shape moved)",
+          "fix": "Add the bound text to the `--allow` list in step 5, matching step 2: one `--allow` per bound-text id, or state that allowing a shape or arrow also covers its bound text. As written, step 2 permits changing bound text while step 5's allow list omits it, so a correct move fails `preservation`."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": null,
+          "evidence": "para:9ec775fa: worked example dispatching a subagent to extract and explain a diagram; record row s038 drops the implementation example as stale.",
+          "fix": "Restore the substantive worked example in skills/excalidraw/references/ with its historical delegation context, or add a valid row for it to docs/audit/recovery/excalidraw/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/excalidraw/record.md",
+          "line": null,
+          "evidence": "The dbff837f digest reports 175 removed units but shows only 40.",
+          "fix": "Supply the complete digest and assess each remaining removal against the recovery record."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/excalidraw/scripts/scene.py",
+          "line": 393,
+          "evidence": "The edit branch passes the requested output directly to write(), whose tmp.replace(out) overwrites an existing path, including the input path.",
+          "fix": "Reject edit output paths that already exist or resolve to the input; require a fresh copy so the documented diff-before-replacement gate cannot be bypassed accidentally, and add tests for both cases."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/excalidraw/scripts/scene.py",
+          "line": 322,
+          "evidence": "Relabelling changes text and originalText but leaves the text element's width, height and position unchanged.",
+          "fix": "Recompute label geometry and wrapping for the new text, or route geometry-sensitive relabels to the worker; test substantially longer and multiline labels."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 54,
+          "evidence": "Dispatch an isolated subagent with this brief; never edit by hand in the main context.",
+          "fix": "Provide a safe fallback for environments without subagents, such as stopping and requesting an isolated session or explicitly reporting that the unsupported edit cannot be performed."
+        }
+      ]
+    },
+    {
+      "name": "explain-changes-mental-model",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 94.4,
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 71,
+          "evidence": "Hunk headers `@@ -a,b +c,d @@`: cite new code by the `+c` post-image lines, not working-tree lines.",
+          "fix": "Keep the binary, submodule and mode-only rule. Move the hunk-header citation rule into a skill this plugin bundles and load it only when the report must cite line numbers; record the move in docs/audit/recovery/explain-changes-mental-model/record.md."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 34,
+          "evidence": "Above roughly 800 changed lines or 30 files, which is where the truncation gotcha below starts to bite, switch to this procedure",
+          "fix": "State one default trigger: switch when the first read of the source is truncated or when --shortstat shows more than roughly 800 changed lines; keep 30 files only as a secondary signal, not a second equal trigger."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "commands/evals/explain-changes-mental-model.json",
+          "line": 1,
+          "evidence": "The five scenarios cover the range, invalid-ref, HEAD~3, custom and empty-diff paths. None covers the large-diff branch (above roughly 800 lines or 30 files: --stat, then per-file reads, provisional group list).",
+          "fix": "Add a scenario whose diff is above that threshold and assert --stat or per-file reads are used, groups are marked provisional when the patch cannot be read in full, and no checkout, switch, stash or fetch command appears."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 34,
+          "evidence": "Measure size before reading: run --shortstat on the same source ... Above roughly 800 changed lines or 30 files ... switch to this procedure",
+          "fix": "Name the size command per source: git diff --shortstat HEAD, gh pr diff piped to a line count, git diff --shortstat for a range or <base>...<arg>, and git show --shortstat --format= for a commit. Say which number (insertions plus deletions) is compared with 800."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": null,
+          "evidence": "Removed para:92b38085 contains the worked JWT-authentication mental-model report. Record row 's012 Example Output' marks it removed-on-merit / low / drop because it is fabricated, unfinished and superseded by the output template and eval. That explanation does not preserve the substantive worked example: the eval supplies a scenario and assertions, not an example report.",
+          "fix": "Restore the worked example into a skill bundled by this command's plugin, reference its explicit path when an example is needed, and record that destination in docs/audit/recovery/explain-changes-mental-model/record.md. Alternatively, obtain and record an explicit user-accepted drop for this example."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": null,
+          "evidence": "The dbff837f digest states 'removed units (59, showing 40)', so 19 removed units are not individually listed for judgment.",
+          "fix": "Supply the complete removal digest and assess every omitted unit against the current content and docs/audit/recovery/explain-changes-mental-model/record.md; retain or explicitly account for each removal."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 34,
+          "evidence": "The large-PR branch says to save the patch with 'gh pr diff \"<pr>\" --color=never > \"$(mktemp)\"' and then 'read it in sections by file'. The temporary filename is neither retained nor printed, leaving the next read without a known path.",
+          "fix": "Retain and expose the filename, for example: patch_file=$(mktemp); gh pr diff \"<pr>\" --color=never > \"$patch_file\"; then, only on success, print \"$patch_file\" and read that file in sections."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 25,
+          "evidence": "The PR workflow relies on the vendor CLI interface 'gh pr diff', including '--color=never', '--name-only' and the statement that it takes no pathspec, without an instruction to inspect the live interface or an official source URL and checked date.",
+          "fix": "Before the PR workflow, require reading `gh pr diff --help` to confirm the supported flags and path-filtering behavior, adapting the acquisition procedure to that output; alternatively, cite official GitHub CLI documentation with the date checked."
+        }
+      ]
+    },
+    {
+      "name": "feedback-mastery",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 95.2,
+        "router-env-my-referee-one": 88.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": 9,
+          "evidence": "Default when purpose and power are clear but evidence is thin: draft one opener with bracketed placeholders and ask for the one missing fact.",
+          "fix": "Keep the one-fact rule; move the worked placeholder sentence into references/feedback-sbi-model.md next to the disputed-evidence example, and record the move. The thin-versus-missing test stays in SKILL.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": 1,
+          "evidence": "SKILL.md is a 107-line process (classify, route, deliver, receive, reset, follow up) for a navigation task whose detail already lives in five gated references.",
+          "fix": "Keep the six-step order and R1-R6. Do not add phases; the navigation pattern already fits."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": 95,
+          "evidence": "When power is unequal, state a required change as required. \"Could you maybe try...\" from a manager makes a non-optional expectation sound optional.",
+          "fix": "Add one line that the same hedge is correct when the user is not the person who may set the expectation (peer or upward), so the gotcha is not applied in every direction."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/feedback-mastery/evals/evals.json",
+          "line": 1,
+          "evidence": "\"expected_output\": \"A constructive preparation and delivery response using SBI, neutral phrasing, curiosity about causes, and an actionable next step.\"",
+          "fix": "Rewrite expected_output for casual-code-review, scope-deadline-options and receiving-hostile-feedback to name the pass condition the way notes-to-public-post does (private delivery, one or two dated items, no inferred motive), so a grader can fail a draft that meets the tone but misses the rule."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/feedback-mastery/references/feedback-sbi-model.md",
+          "line": null,
+          "evidence": "para:dbb2774b: the architecture-meeting recognition example was dropped under s099 as generic model knowledge; the removed unit is a substantive worked example.",
+          "fix": "Restore the example in skills/feedback-mastery/references/feedback-sbi-model.md, or add a valid row for it to docs/audit/recovery/feedback-mastery/record.md."
+        },
+        {
+          "id": "D1-3",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/feedback-mastery/record.md",
+          "line": null,
+          "evidence": "The dbff837f digest reports 459 removed units but shows only 40; the remaining items cannot be individually judged from the supplied digest.",
+          "fix": "Provide the complete digest and check each remaining removal against the current files and recovery record."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": 36,
+          "evidence": "R1 says to deliver recognition and corrective feedback separately, 'never in the same conversation or message.'",
+          "fix": "Keep separation as the default to avoid a feedback sandwich, but allow a context-sensitive combined conversation when the user explicitly needs one and the recognition is genuine and clearly distinct."
+        },
+        {
+          "id": "D6-2",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": 83,
+          "evidence": "For all corrective feedback and expectation resets, the skill says to 'send a written recap within one working day.'",
+          "fix": "Make the timing a default subject to the user's agreement, workplace policy, confidentiality needs and the importance of the conversation; preserve the recap template."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/feedback-mastery/references/cause-exploration.md",
+          "line": 25,
+          "evidence": "The lateness branch permits recording a health or family reason 'unless they ask for it to be written down', while the SKILL.md confidentiality test excludes health and family details and requires policy and need-to-know checks.",
+          "fix": "Align the branch with the confidentiality test: leave personal details out of ordinary recaps and notes even on request, and direct any necessary accommodation documentation to the appropriate authorized process."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": 45,
+          "evidence": "The dispute test says an assertion is an inference if the other person cannot dispute it 'by pointing to a record'. An observed interruption may have no record, while a recorded accusation can still be an inference.",
+          "fix": "Distinguish firsthand observable behavior from interpretation, and separately check the available evidence and acknowledge uncertainty; do not require a record for every observation."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

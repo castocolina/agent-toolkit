@@ -1,0 +1,86 @@
+{
+  "skill": "explain-pr-changes",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 14,
+    "D5": 10,
+    "D6": 13,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 335,
+      "evidence": "Phase 4 restates the script's capability contract (exit 0 prints attach or branch; exit 2 or other stdout is terminal; old gh prints branch) and then repeats the same 2.101 sort -V check the script already ran.",
+      "fix": "Keep only the command-specific outcome (when to skip render, the Mermaid fallback, and the warning text) and point the probe rules at skills/pr-diagrams/SKILL.md, which already states capability always exits 0 and that gh older than 2.101 selects branch."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/explain-pr-changes.md",
+      "line": 335,
+      "evidence": "Exit 2, any other non-zero exit, or exit 0 with any other stdout stops the run before render as a terminal failure ... names the failing pr-diagrams.sh capability call. The bundled script's own help says capability prints attach or branch and always exits 0, and cmd_capability returns 0 after a failed, timed-out, or unparsable gh --version probe with stdout branch.",
+      "fix": "Follow the script: treat exit 0 with stdout branch as branch mode (including a failed probe), and reserve the terminal stop for the cases the script actually fails, exit 2 from a stray argument or an invalid PR_DIAGRAMS_MODE."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 2,
+      "evidence": "argument-hint lists only --diagrams=none|mermaid|drawio, not the bare aliases the body treats as the only recognized option tokens.",
+      "fix": "argument-hint: \"[--diagrams=none|mermaid|drawio|--drawio|--mermaid|--no-diagrams] [--reuse-from=<PR>] [--base=<branch>] [Close-args]\""
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 335,
+      "evidence": "Only in attach mode, run gh --version and compare the printed version with 2.101 using sort -V ... the check runs before rendering, even though capability already selected attach only when gh is at least 2.101.",
+      "fix": "Drop the second gh --version comparison in attach mode and trust the capability result the command just stored in MODE."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 335,
+      "evidence": "A version older than 2.101, for example gh version 2.100.0, fails the check, restates a comparison the bundled capability probe already performs and documents.",
+      "fix": "Delete the worked example of the version comparison and record the removal; the mode decision stays in pr-diagrams.sh."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 328,
+      "evidence": "Because $AD and the pointer file do not exist yet at this point, the phase 6 cleanup is skipped and nothing needs removing; \"nothing else runs\" refers to reads and PR writes.",
+      "fix": "State the phase-2 stop once: quote the tool error and skip cleanup because no scratch directory exists. Do not re-explain the same sentence."
+    }
+  ]
+}

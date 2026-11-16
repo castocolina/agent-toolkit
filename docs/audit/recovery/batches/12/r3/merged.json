@@ -1,0 +1,446 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "marp-slide",
+      "percent": 92.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 92.0,
+        "router-env-my-referee-two": 92.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/marp-slide/references/official-themes.md",
+          "line": null,
+          "evidence": "para:b6d09ed0: a complete presentation using the built-in default theme; record s152 says template-basic.md is a complete default-theme deck, but that template embeds CSS that restyles the built-in theme.",
+          "fix": "Restore the built-in default-theme example in references/marp-syntax.md, corrected if necessary, or add an accurate row explaining its removal to docs/audit/recovery/marp-slide/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/marp-slide/references/official-themes.md",
+          "line": null,
+          "evidence": "para:4a0f2237: a complete gaia deck example; record s153 says marp-syntax.md covers gaia and its classes, but it does not retain a complete gaia deck example.",
+          "fix": "Restore a complete gaia example in references/marp-syntax.md or add an accurate row explaining its removal to docs/audit/recovery/marp-slide/record.md."
+        },
+        {
+          "id": "D1-3",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/marp-slide/record.md",
+          "line": null,
+          "evidence": "The dbff837f digest reports 562 removed units but shows only 40; the remaining removals cannot be individually judged from the supplied digest.",
+          "fix": "Provide the full digest so every removed unit can be checked against its current destination or recovery-record row."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/marp-slide/SKILL.md",
+          "line": 29,
+          "evidence": "The style table selects the first matching row, and its first row chooses near-black tech for any code or developer audience; only a named style is explicitly given precedence.",
+          "fix": "Make explicit user appearance preferences, such as a light background, override the audience-based default even when they do not name a bundled style."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/marp-slide/SKILL.md",
+          "line": 28,
+          "evidence": "The new-deck path says a user-named style wins, but the selection table contains only bundled styles; a request for the built-in gaia or uncover theme has no new-deck construction path.",
+          "fix": "Add a new-deck branch for requested built-in and registered custom themes, including how to initialize the deck and select valid classes, and route built-in-theme details to references/marp-syntax.md."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/marp-slide/SKILL.md",
+          "line": 52,
+          "evidence": "The validation commands render deck.md without registering a custom theme, although the lint branch explicitly supports a registered custom theme and references/theme-css-guide.md requires --theme-set name.css.",
+          "fix": "For custom-theme decks, register the theme CSS in both HTML and PNG validation commands, and preserve the documented argument ordering so the input is not consumed by --theme-set."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/marp-slide/references/slide-count.md",
+          "line": 9,
+          "evidence": "Rule of thumb, not a vendor or Marp rule: 5 minutes 5-8, 10 minutes 10-15, 20 minutes 15-25",
+          "fix": "Keep the table as a default when the user gives a talk length and no count, and add one line that it is a pacing heuristic the model already knows, so the agent states the choice and does not treat the bands as a Marp constraint. Do not delete the file: SKILL.md New deck step 2 and the slide-count eval depend on it."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/marp-slide/references/vscode.md",
+          "line": 7,
+          "evidence": "Open it with Ctrl+Shift+V (Cmd+Shift+V on macOS), or side by side with Ctrl+K V (Cmd+K V). Shortcuts are VS Code's own Markdown preview keys",
+          "fix": "The preview keybindings are VS Code defaults the model already knows. Keep the sentence that marp: true turns Marp features on in the built-in preview, and move the key list to one parenthetical or drop it with a record row; keep the export command and settings table, which are not generic."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/marp-slide/SKILL.md",
+          "line": 12,
+          "evidence": "Existing deck (\"redesign\", \"less crowded\", \"make it look good\", fix its CSS): follow \"Existing deck\", then \"Save\".",
+          "fix": "After the existing-deck path, also run Fit and Validate. The path already says to render or lint and recheck, but it skips the named Fit section, so a redesign can leave a two-line heading colliding with a pinned h2."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/marp-slide/references/theme-css-guide.md",
+          "line": 54,
+          "evidence": "Render with the theme registered: marp --no-stdin deck.md --theme-set name.css -o deck.html. --theme-set takes several values, so put it after the input file",
+          "fix": "This flag-order trap produces a silent help dump instead of a deck. Copy it into the SKILL.md Gotchas list (one line, with the why) so it is read on every theme conversion, not only when theme-css-guide.md is loaded."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/marp-slide/SKILL.md",
+          "line": 100,
+          "evidence": "references/slide-count.md: the user gives a talk length and no slide count (also named in New deck step 2).",
+          "fix": "The body already names the load condition twice and the other references are gated. Drop the parenthetical on this one line; do not add a Do NOT Load list."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/marp-slide/SKILL.md",
+          "line": 32,
+          "evidence": "Otherwise take the first matching row and mention the runner-up in one line.",
+          "fix": "Keep the first-match default so an unattended run is not blocked, and add one escape: when two rows match equally (for example dark plus a developer audience), name both in the one line and use the row the user already implied, instead of silently taking table order."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/marp-slide/evals/evals.json",
+          "line": 5,
+          "evidence": "Includes safe database migrations and junior backend developers.",
+          "fix": "The 16 evals are realistic and the later ones have verifiable assertions, but the first three check presence of words and a five-bullet cap rather than the render-or-lint outcome, contrast, or the Fit collision rule. Add one assertion per early eval that the output reports rendered versus linted and that no pinned-heading template keeps a two-line h2."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/marp-slide/references/export.md",
+          "line": 11,
+          "evidence": "HTML presenter (fragments, transitions) | marp --no-stdin deck.md -o deck.html",
+          "fix": "SKILL.md Validate says to run through npx --yes @marp-team/marp-cli because a bare marp alias is not a command in an agent shell, while export.md, theme-css-guide.md and vscode.md write marp. Prefix every command block with npx --yes @marp-team/marp-cli (keep @4 in the CI step) or say once that marp means that invocation."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/marp-slide/references/theme-snippets.md",
+          "line": 186,
+          "evidence": "background-color: rgba(255, 255, 255, 0.1);",
+          "fix": "White body text on a 10% white overlay over the dark gradient stays below the 4.5:1 body contrast the Validate section requires. Raise the overlay alpha, or tell the agent to set the box text to a dark color, and keep the existing warm/teal contrast reminder."
+        }
+      ]
+    },
+    {
+      "name": "mermaid-diagrams",
+      "percent": 89.2,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 81.6,
+        "router-env-my-referee-two": 96.8
+      },
+      "missing_judges": [],
+      "disagreement": true,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/mermaid-diagrams/references/c4-diagrams.md",
+          "line": null,
+          "evidence": "para:4c67a828: C4Context System Context - E-Commerce Platform; record s091 claims redistribution to c4-syntax.md, which instead contains an Internet Banking context example.",
+          "fix": "Restore the e-commerce context example into references/ or add a valid item-specific row explaining its removal in docs/audit/recovery/mermaid-diagrams/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/mermaid-diagrams/references/c4-diagrams.md",
+          "line": null,
+          "evidence": "para:97f28dff: C4Container Container Diagram - E-Commerce Platform; record s095 names c4-syntax.md, but that destination contains an Internet Banking container example, not the e-commerce frontend, services and data-layer example.",
+          "fix": "Restore the e-commerce container example into references/ or add a valid item-specific row explaining its removal in docs/audit/recovery/mermaid-diagrams/record.md."
+        },
+        {
+          "id": "D1-3",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/mermaid-diagrams/references/c4-diagrams.md",
+          "line": null,
+          "evidence": "para:a3d08877: C4Component Component Diagram - Order Service; record s097 names c4-syntax.md, whose component example is a banking API rather than the order-service example.",
+          "fix": "Restore the order-service component example into references/ or add a valid item-specific row explaining its removal in docs/audit/recovery/mermaid-diagrams/record.md."
+        },
+        {
+          "id": "D1-4",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/mermaid-diagrams/references/c4-diagrams.md",
+          "line": null,
+          "evidence": "para:8dd10485: C4Container Container Diagram for Banking System with React and Node.js; record s092 points to c4-syntax.md, whose banking example uses different containers and technologies.",
+          "fix": "Restore the original banking container template into references/ or add a valid item-specific row explaining its removal in docs/audit/recovery/mermaid-diagrams/record.md."
+        },
+        {
+          "id": "D1-5",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/mermaid-diagrams/references/c4-diagrams.md",
+          "line": null,
+          "evidence": "para:bb3664af: C4Component Component Diagram for API Application with controller, service, repository and email client; record s096 points to a different banking component example in c4-syntax.md.",
+          "fix": "Restore the API application component template into references/ or add a valid item-specific row explaining its removal in docs/audit/recovery/mermaid-diagrams/record.md."
+        },
+        {
+          "id": "D1-6",
+          "dimension": "D1",
+          "severity": "high",
+          "file": "skills/mermaid-diagrams/references/c4-diagrams.md",
+          "line": null,
+          "evidence": "para:3b6e5a49: C4Container event-driven architecture with frontend, API gateway, order, inventory and notification services; record s102 points to advanced-patterns.md, which has different event-driven examples rather than this topology.",
+          "fix": "Restore the event-driven container template into references/ or add a valid item-specific row explaining its removal in docs/audit/recovery/mermaid-diagrams/record.md."
+        },
+        {
+          "id": "D1-7",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/mermaid-diagrams/record.md",
+          "line": null,
+          "evidence": "The dbff837f digest says 'removed units (446, showing 40)', so the remaining removed units cannot be individually judged from the supplied digest.",
+          "fix": "Provide the full digest and judge the remaining items against their recovery rows and destinations."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 3,
+          "evidence": "The description lists 'sequence flows, class models, ER diagrams' but omits flowchart, decision tree, process and workflow requests, even though flowcharts are a supported route.",
+          "fix": "Create, edit and repair Mermaid diagrams in .mmd files or Markdown mermaid blocks. Use when asked to diagram, visualize, model or map a process, workflow, decision tree, flowchart, sequence, class model, ERD or database schema, state machine, C4 or infrastructure architecture, Gantt schedule, pie chart or Git branch history, or to repair Mermaid rendering or export, even when Mermaid is not named. Not for prose-only explanations, unchanged diagrams, PlantUML or draw.io work, matplotlib charts, or interactive diagram-canvas components."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+          "line": 26,
+          "evidence": "The rules assume 'a Markdown column ... of about 900px' and say to 'go left-to-right only for a row of three or four nodes,' even when the requested output is a presentation or other wide canvas.",
+          "fix": "Use the 900px column and top-down direction as defaults for Markdown documentation; let an explicitly supplied target canvas, renderer or readability requirement override them."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 58,
+          "evidence": "'Every `->>` call gets its `-->>` reply unless the user says it is fire-and-forget' conflicts with the grounding rule when a detailed source specifies a call but does not establish its reply.",
+          "fix": "Show a reply when the supplied facts establish it; otherwise label an inferred reply as an assumption or ask, rather than inventing an interaction."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 27,
+          "evidence": "On a Chromium sandbox error the workflow automatically retries with '{\"args\":[\"--no-sandbox\"]}', including when the diagram or its input source is untrusted.",
+          "fix": "Prefer a supported sandboxed renderer; explain the reduced isolation and obtain permission before using --no-sandbox, limiting that fallback to trusted inputs and an isolated environment."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 42,
+          "evidence": "'architecture-beta ... reported as 11.1+ (unverified)' gives a version-sensitive minimum without an official source or a live check that establishes the minimum.",
+          "fix": "Cite and date an official release or documentation source establishing the minimum, or avoid the numeric claim and instruct the agent to check host support."
+        },
+        {
+          "id": "D8-4",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 44,
+          "evidence": "'Expanded node shapes ... reported as 11.3+ (unverified)' gives a version-sensitive minimum without an official source or a live check that establishes the minimum.",
+          "fix": "Cite and date an official source establishing the minimum, or avoid the numeric claim and check the target renderer before using expanded shapes."
+        },
+        {
+          "id": "D8-5",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 45,
+          "evidence": "'Frontmatter config needs Mermaid 10.5+ ... look: handDrawn needs 11+' are explicitly unverified, and the cited layouts page is stated not to establish either minimum.",
+          "fix": "Cite dated official sources for each minimum or replace the numeric claims with instructions to check support in the target renderer."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/references/erd-diagrams.md",
+          "line": 166,
+          "evidence": "Worked schemas then paste two full blog and social-network schemas (USER, POST, COMMENT, CATEGORY, TAG, POST_TAG, LIKE, FOLLOW, MESSAGE, NOTIFICATION, CHAT_GROUP, GROUP_MEMBER), about 230 of the file's 400 lines, after steps 1-8 already decide naming, parent/child glyphs, identifying lines and junctions.",
+          "fix": "Keep one compact worked schema that exercises a composite-key junction, a nullable self-reference and a polymorphic column. Move the second full schema to a short pointer (the steps already produce it) or record the cut in docs/audit/recovery/mermaid-diagrams/record.md; do not delete the cardinality rules."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+          "line": 121,
+          "evidence": "Section 6 says palette A is the default, then 'Pick another block only by what the colors mean: A for architecture or service maps, B when the diagram shows status, C for before/after.' A status or before/after flowchart has two equal instructions.",
+          "fix": "Make the default conditional: status meanings use palette B, before/after uses C, and A is the default only when the colors mean structure or services. Leave the hex blocks unchanged."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 24,
+          "evidence": "Step 4 says 'for a new diagram, split it if it fails' the section 2 size check, but authoring-rules.md section 2 says 'Split only when text becomes unreadable at the target column width (about 900px) or the diagram grows taller than about three screens' and a height/width below 0.4 is only a warning sign.",
+          "fix": "In SKILL.md step 4, split a new diagram only when the rendered text is unreadable at about 900px or the diagram is taller than about three screens; keep a short wide diagram whose text stays readable, and still only report (do not restructure) a repair."
+        }
+      ]
+    },
+    {
+      "name": "ship-learn-next",
+      "percent": 94.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.8,
+        "router-env-my-referee-two": 91.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/ship-learn-next/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest at dbff837f: \"removed units (110, showing 40)\".",
+          "fix": "Provide the complete digest and check the remaining removed units against the current files and docs/audit/recovery/ship-learn-next/record.md."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/ship-learn-next/SKILL.md",
+          "line": 36,
+          "evidence": "\"Usable evidence (a causal comparison): the result moved the metric the plan named by more than the sample's noise, and only the one planned variable changed.\"",
+          "fix": "Require an appropriate comparison and consider confounding and measurement bias before attributing a result to the change; if these cannot be assessed, treat causal evidence as inconclusive."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/ship-learn-next/SKILL.md",
+          "line": 41,
+          "evidence": "\"choose a distinct filename (append the date as YYYY-MM-DD) or ask first\"",
+          "fix": "Check the dated candidate as well; if it exists, choose a verified unused suffix or ask before writing."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/ship-learn-next/SKILL.md",
+          "line": 52,
+          "evidence": "Worked review: \"process evidence (6 of 10) outranks the outcome, so the reply count is not read at all; the inconsistent-execution row applies\"",
+          "fix": "The review table already classifies a partial run (4 of 10 posts) as inconsistent execution; keep the worked review only if it states the non-obvious rule the table omits (a metric must not be read at all while execution is inconsistent), otherwise move the example to references/rep-templates.md and record the move"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/ship-learn-next/SKILL.md",
+          "line": 9,
+          "evidence": "Workflow is a five-step process (route, extract, design, review, save) but step 5's checklist is prose, not a checkpoint list, and there is no validation pass before the plan is presented",
+          "fix": "Add a short checklist at step 5 the agent marks before presenting: source or provisional heading, lessons each with a testable artifact, Rep 1 done-when controllable, learning metric separate, process measure present when outcomes are noisy, steps inside the time budget including setup, later reps one line each; this fits the process pattern the workflow already follows"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/ship-learn-next/references/rep-templates.md",
+          "line": 15,
+          "evidence": "\"Increase difficulty based on success\" and \"Keep reps shippable (not theoretical)\" with no reason a reviewer would not already assume",
+          "fix": "Tie each principle to the failure it prevents: raising difficulty on a noisy or inconsistent rep hides the lesson (point at the review rows), and a theoretical rep produces no artifact so step 4's first row can never fire"
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/ship-learn-next/SKILL.md",
+          "line": 3,
+          "evidence": "description names content types and trigger phrases but no keyword for a rep log, a rep report file, or an existing plan file being updated",
+          "fix": "Turn articles, tutorials, YouTube transcripts, talks, course notes or a rep log into a Ship-Learn-Next plan: a first rep the user can ship within their time budget, with controllable completion criteria, reflection questions and provisional next reps; also reviews a reported rep's results, including an appended update to an existing plan file, to choose the next rep. Use when the user says \"make this actionable\", \"I watched/read X, now what?\", \"help me actually implement this advice\", \"turn my notes into something I can ship\", pastes a rep log, or reports how a rep went and asks what to do next. Not for summaries or key takeaways, reading lists, curricula, exam-study schedules, or project and sprint plans that do not start from learning content."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/ship-learn-next/SKILL.md",
+          "line": 63,
+          "evidence": "references/rep-templates.md is gated to \"only when expanding Rep 2 or a later rep (step 3 or step 4)\" but does not say not to load it while designing or saving Rep 1",
+          "fix": "Add one clause: do not load references/rep-templates.md while routing, extracting lessons, designing Rep 1, or saving a new plan; load it only once a later rep is being expanded"
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/ship-learn-next/SKILL.md",
+          "line": 20,
+          "evidence": "\"When several compete for Rep 1, pick the one with the smallest shippable test inside the user's available time\" gives no tie-break when two lessons have the same smallest test",
+          "fix": "Add one default with an escape hatch: on a tie, pick the lesson the source demonstrates with a real implementation or number; if neither does, pick either and name the assumption"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/ship-learn-next/evals/trigger-queries.json",
+          "line": 1,
+          "evidence": "20 queries (10 should-trigger, 10 should-not-trigger) with near-misses, but no query pastes rep results or names an existing plan file, which is half of what the skill does",
+          "fix": "Replace one generic should-trigger query with a rep-report prompt that pastes results and asks whether to repeat or advance, and one that asks to append a review to an existing Ship-Learn-Next plan file"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/ship-learn-next/SKILL.md",
+          "line": 34,
+          "evidence": "\"Usable evidence (a causal comparison): the result moved the metric the plan named by more than the sample's noise\" never says how to judge the noise, so the noisy-outcome row and the usable-evidence row are not separable on a number",
+          "fix": "Add one rule: the user or the source supplies the noise band or the sample the plan treats as decisive; with neither, the evidence is too thin and the rep repeats, and the agent never computes a significance test the plan did not specify"
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

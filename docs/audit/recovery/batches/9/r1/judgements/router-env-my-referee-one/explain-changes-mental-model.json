@@ -1,0 +1,68 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": null,
+      "evidence": "Removed para:92b38085 contains the worked JWT-authentication mental-model report. Record row 's012 Example Output' marks it removed-on-merit / low / drop because it is fabricated, unfinished and superseded by the output template and eval. That explanation does not preserve the substantive worked example: the eval supplies a scenario and assertions, not an example report.",
+      "fix": "Restore the worked example into a skill bundled by this command's plugin, reference its explicit path when an example is needed, and record that destination in docs/audit/recovery/explain-changes-mental-model/record.md. Alternatively, obtain and record an explicit user-accepted drop for this example."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": null,
+      "evidence": "The dbff837f digest states 'removed units (59, showing 40)', so 19 removed units are not individually listed for judgment.",
+      "fix": "Supply the complete removal digest and assess every omitted unit against the current content and docs/audit/recovery/explain-changes-mental-model/record.md; retain or explicitly account for each removal."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 34,
+      "evidence": "The large-PR branch says to save the patch with 'gh pr diff \"<pr>\" --color=never > \"$(mktemp)\"' and then 'read it in sections by file'. The temporary filename is neither retained nor printed, leaving the next read without a known path.",
+      "fix": "Retain and expose the filename, for example: patch_file=$(mktemp); gh pr diff \"<pr>\" --color=never > \"$patch_file\"; then, only on success, print \"$patch_file\" and read that file in sections."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 25,
+      "evidence": "The PR workflow relies on the vendor CLI interface 'gh pr diff', including '--color=never', '--name-only' and the statement that it takes no pathspec, without an instruction to inspect the live interface or an official source URL and checked date.",
+      "fix": "Before the PR workflow, require reading `gh pr diff --help` to confirm the supported flags and path-filtering behavior, adapting the acquisition procedure to that output; alternatively, cite official GitHub CLI documentation with the date checked."
+    }
+  ]
+}

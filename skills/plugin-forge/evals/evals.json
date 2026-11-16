@@ -14,11 +14,11 @@
     {
       "id": "version",
       "prompt": "Plugin docs-kit 1.4.2 has backward-compatible feature. Command and versions?",
-      "expected_output": "Minor bump expected 1.5.0: plugin.json wins when it has version, otherwise the existing entry version is bumped; both are synchronized only when both already contain version, and no entry version is added.",
+      "expected_output": "Minor bump expected 1.5.0 by editing the plugin's own plugin.json version; no redundant entry version is added.",
       "assertions": [
         "Uses the version command `python3 scripts/bump_version.py docs-kit minor` (or equivalent explicit Python 3 invocation).",
         "States expected `1.5.0`",
-        "Says plugin.json wins when it contains version, else the existing marketplace entry version is bumped; synchronizes both only when both already contain version, and adds no redundant entry version."
+        "Edits the plugin's own `plugin.json` version (through `bump_version.py`) and does not add a redundant `version` to the marketplace entry; saying that `plugin.json` wins is optional wording, not required."
       ]
     },
     {
@@ -42,6 +42,93 @@
       ],
       "files": [
         "evals/files/stale-update.txt"
+      ]
+    },
+    {
+      "id": "reserved-exact-name",
+      "prompt": "Scaffold a plugin called `anthropics` in the marketplace at /work/market (author Kim Park, kim@example.com, description Org helpers, keywords org,helpers). Will that name work, and where do I check the current naming rules?",
+      "expected_output": "The exact name anthropics is reserved and rejected (by the scaffold script or the claude plugin commands); pick another name; the live name rules are in the manifest reference name table.",
+      "assertions": [
+        "Treats the exact name `anthropics` as reserved and rejected, by `create_plugin.py` or by the `claude plugin` commands (it is not only the `anthropics-` prefix that is refused), and does not scaffold with it.",
+        "Proposes a different kebab-case name instead of running the scaffold with `anthropics`.",
+        "Points to the live `name` table of the plugin manifest reference (https://code.claude.com/docs/en/plugins/manifest-reference#name) for the full, current rules rather than treating the SKILL.md list as complete."
+      ]
+    },
+    {
+      "id": "remote-npm-source",
+      "prompt": "Our marketplace entry for `fmt-kit` is `{\"name\": \"fmt-kit\", \"source\": {\"source\": \"npm\", \"package\": \"@acme/fmt-kit\", \"version\": \"^2.0.0\"}}`. I need to bump its version and validate it. Is this a local, standard or remote plugin, and where do I edit?",
+      "expected_output": "An npm source is remote (also archive and command): the plugin.json lives inside the package; edit the version there by hand, validate the unpacked package directory, then publish a new package version.",
+      "assertions": [
+        "Classifies the entry as a remote plugin (an `npm` object source), not standard or other local.",
+        "Says to edit the manifest by hand (the `plugin.json` inside the npm package) and that `bump_version.py` does not apply to this entry; saying that `create_plugin.py` does not apply either is optional.",
+        "Does not tell the user to run the scripts against a git checkout of the entry as if it were a local plugin; a passing mention of a repo is fine.",
+        "Says `claude plugin validate` of the marketplace never fetches remote sources, so the unpacked package directory is validated separately with `claude plugin validate <plugin-dir>`."
+      ],
+      "files": [
+        "references/marketplace-schema.md"
+      ]
+    },
+    {
+      "id": "layout-directories",
+      "prompt": "Which top-level directories and files can a Claude Code plugin have? I want to add a workflow script and a color theme. Also, does a `settings.json` at the plugin root only honor the `agent` and `subagentStatusLine` keys?",
+      "expected_output": "The default layout: workflows/, themes/ and monitors/monitors.json exist as directories and files in the plugin; skills/ is preferred over commands/ as the reference says; no unverified settings.json key list is repeated.",
+      "assertions": [
+        "Lists default layout entries that the reference names (skills/, commands/, agents/, hooks/hooks.json, .mcp.json, .lsp.json, output-styles/, bin/) and invents no directory the reference does not list; the reference also states that `skills/` is preferred for new instructions and `commands/` holds legacy flat command files, so that note is accepted.",
+        "Names `workflows/` as the directory for the workflow script, `themes/` as the directory for the color theme, and `monitors/monitors.json` as the monitors file.",
+        "Does not confirm that a plugin-root `settings.json` takes effect only for `agent` and `subagentStatusLine`: it says that is not documented or cannot be confirmed from the reference."
+      ],
+      "files": [
+        "references/plugin-structure.md"
+      ]
+    },
+    {
+      "id": "reserved-marketplace-name",
+      "prompt": "I want to name my new marketplace `pip`, or maybe `skills-dir`, or `claude-community`. Which of these can I use, and is there a full list of refused names?",
+      "expected_output": "pip and skills-dir are refused as tool and source names; a name that claims the official marketplace is refused too; the schema file gives examples only, so the list is longer and a distinctive name is advised.",
+      "assertions": [
+        "Says `pip` and `skills-dir` cannot be used: they are reserved tool and source names.",
+        "Says names that claim an official marketplace (such as `claude-plugins-official`, `anthropic-plugins` or the look-alike `official-claude-plugins`) are refused; any statement about `claude-community` is allowed but not required.",
+        "Says the reference lists only examples and the real list is longer, so the name should be checked with `claude plugin validate` or the live Reserved names section.",
+        "Suggests choosing a distinctive name other authors are unlikely to use."
+      ],
+      "files": [
+        "references/marketplace-schema.md"
+      ]
+    },
+    {
+      "id": "details-omits-subdir-commands",
+      "prompt": "I added commands/db/migrate.md to plugin `ops-kit`, but `claude plugin details ops-kit` lists my skills and flat commands and not the migrate command. Is the command broken, and how do I confirm it loaded?",
+      "expected_output": "Not broken: details omits commands in subdirectories (checked on Claude Code 2.1.323); confirm by typing /ops-kit: in a session, the command is /ops-kit:db:migrate.",
+      "assertions": [
+        "Says the command is not necessarily broken: `claude plugin details` omits commands that live in `commands/` subdirectories.",
+        "Gives the namespaced name `/ops-kit:db:migrate` (plugin prefix, then the directory segment, then the file name).",
+        "Says to confirm the command loaded in a fresh session or after `/reload-plugins` (for example by typing `/ops-kit:` to list it); checking the `/plugin` Errors tab if it is missing is an optional extra, not required."
+      ],
+      "files": [
+        "references/plugin-structure.md",
+        "references/workflows.md"
+      ]
+    },
+    {
+      "id": "casual-already-latest",
+      "prompt": "my plugin update says already at the latest version wat do i do",
+      "expected_output": "Explains the unchanged version string is why nothing updates, then gives the fix: bump the version in the file that wins (or omit it so a git source tracks commits), push, and update again.",
+      "assertions": [
+        "Says the update does nothing because the computed version did not change, so the cached copy stays in place however many commits were pushed.",
+        "Tells the user to bump the version (with `bump_version.py <name> patch|minor|major` for a standard layout plugin, or by hand in the winning file otherwise) or, for a git-hosted source, to omit `version` from both files so the commit SHA becomes the version.",
+        "Tells the user to push the change and then re-run the update (any of `claude plugin update`, a marketplace update, or `/plugin update`); the exact two command forms are optional.",
+        "Does not claim to have run any command or to know the plugin's current version."
+      ]
+    },
+    {
+      "id": "casual-folder-to-plugin",
+      "prompt": "how do i make a plugin from this folder real quick",
+      "expected_output": "Asks for or states the assumed marketplace root and plugin name, then gives a scaffold or hand-written plugin.json route with only plugin.json under .claude-plugin/, and validates with claude plugin validate; no execution claim.",
+      "assertions": [
+        "Either asks for or states the marketplace root and kebab-case plugin name it assumes (placeholders count when labelled as assumptions to confirm); asking first is not required, but they are not presented as known facts.",
+        "Gives a valid scaffold: either `python3 scripts/create_plugin.py <name> --marketplace-root <root>` with the required author, description and keywords arguments, or, for a folder outside `<root>/plugins/`, a hand-written `.claude-plugin/plugin.json` plus a marketplace entry.",
+        "Keeps only `plugin.json` inside `.claude-plugin/` and the components (skills, commands, agents, hooks) at the plugin root.",
+        "Ends with `claude plugin validate` until it passes, and does not claim the plugin was created."
       ]
     }
   ]

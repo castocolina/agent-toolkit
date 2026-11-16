@@ -4,17 +4,18 @@
     {
       "id": "casual-code-review",
       "prompt": "I need to tell a teammate their last few PRs keep breaking tests, but I don’t want to sound harsh. Help me phrase it.",
-      "expected_output": "A constructive preparation and delivery response using SBI, neutral phrasing, curiosity about causes, and an actionable next step.",
+      "expected_output": "Passes when the draft is for private delivery, uses SBI with one or two dated, observable examples (not a list of every PR), states no inferred motive or character judgment, ends with an open question about the cause, and proposes a specific next step (for example running the suite before opening a PR). Where the prompt gives no dates, bracketed placeholders for the missing specifics are acceptable.",
       "assertions": [
         "Uses Situation-Behavior-Impact framing with the situation, the observable behavior, and the impact each separately identifiable",
         "Avoids character judgments and absolute language such as “always”",
-        "Includes an invitation for the teammate’s perspective and a specific next step"
+        "Includes an invitation for the teammate’s perspective and a specific next step",
+        "Is written for private delivery and rests on one or two observable, dated examples (or bracketed placeholders for them) rather than every failing PR"
       ]
     },
     {
       "id": "scope-deadline-options",
       "prompt": "Leadership wants a six-week feature delivered in two weeks. Prepare a concise pushback using evidence, options, trade-offs, and explicit alignment.",
-      "expected_output": "A respectful expectations conversation that acknowledges the goal, presents evidence, lays out scope/date options and asks leadership to choose.",
+      "expected_output": "Passes when the pushback names the goal the date serves before the constraint, states the estimate and its basis, offers at least two options each with its cost (for example reduced scope on the original date, or full scope at six weeks), does not answer with a softer estimate or accept the date with hidden risk, asks leadership to choose, and records the decision and accepted risk in writing.",
       "assertions": [
         "Acknowledges the business goal without conceding feasibility",
         "Offers at least two concrete options with explicit trade-offs",
@@ -24,7 +25,7 @@
     {
       "id": "receiving-hostile-feedback",
       "prompt": "My manager told me I’m unreliable, but gave no examples. Help me respond in the meeting without getting defensive and get specifics.",
-      "expected_output": "A calm receiving-feedback script that requests specific situations and impact, acknowledges the concern, and defers conclusions until clarified.",
+      "expected_output": "Passes when the reply treats \"unreliable\" as a label rather than an instance, does not argue it or deny it, asks for one recent example (a project or date) and what it affected, offers to agree on how the next instance will be flagged if none comes, and reaches no conclusion about the claim before an instance is named.",
       "assertions": [
         "Requests a concrete example or observable behavior",
         "Avoids immediate denial or counterattack",
@@ -138,9 +139,9 @@
     {
       "id": "mixed-praise-and-criticism",
       "prompt": "want to message Lena today: she did a great job running the incident review on monday, but her last two design docs were late and held up the API work. can you write one message that covers both so it doesn't feel harsh",
-      "expected_output": "Splits the two: a recognition message for the incident review that stops after the effect, and a separate private conversation (not the same message) for the late design docs.",
+      "expected_output": "Splits the two by default: a recognition message for the incident review that stops after the effect, and a separate private conversation (not the same message) for the late design docs. The user's reason for combining them (so it does not feel harsh) is the feedback-sandwich motive, not an explicit need for one conversation, so the separation stands.",
       "assertions": [
-        "Does not combine the praise and the late-design-doc feedback in a single message",
+        "Does not combine the praise and the late-design-doc feedback in a single message (the request to avoid sounding harsh is not a need for a combined conversation); it may mention that a combined conversation is only for a genuine, clearly distinct recognition the user explicitly needs",
         "The recognition part names the incident review and its effect and contains no improvement point",
         "The late design docs are moved to a separate conversation, preferably live or private, rather than written into the praise message"
       ]
@@ -154,6 +155,75 @@
         "Directs the user to the formal HR or policy channel for harassment",
         "Says the user should not promise to keep it between them, or warns that policy or reporting duties may override that promise",
         "Offers help preparing factual questions or notes for the formal process"
+      ]
+    },
+    {
+      "id": "sbii-ask-intent",
+      "prompt": "Sam pushed to main without a PR yesterday and the build was broken for two hours, five people blocked. I'm giving him feedback and I want to understand why he did it. How do I add that to my opener?",
+      "files": [
+        "references/feedback-sbi-model.md"
+      ],
+      "expected_output": "An SBI opener with the situation, behavior and impact, plus a closing question that asks what Sam was aiming for. It names the intent step as SBII from the Center for Creative Leadership and never asserts his intent.",
+      "assertions": [
+        "States the situation, the behavior (pushed to main without a PR) and the impact (broken build, blocked developers) separately",
+        "Asks an open question about what Sam was aiming for or why he did it, instead of stating his intent",
+        "Does not assert his motive or feelings, for example with \"I'm sure you didn't mean to\" or \"I know you meant well\"",
+        "Names the intent step as the SBII extension (SBI plus Intent) from the Center for Creative Leadership"
+      ]
+    },
+    {
+      "id": "defensive-good-intentions",
+      "prompt": "I told Priya her last three PRs failed CI before review and she said 'I was just doing what I thought was right!' What do I say back?",
+      "files": [
+        "references/difficult-conversation-scripts.md"
+      ],
+      "expected_output": "A reply that acknowledges the aim Priya stated without asserting it as fact, returns to the effect of the failed PRs, and asks how to get what she wanted without that effect.",
+      "assertions": [
+        "Acknowledges the aim Priya stated (doing what she thought was right) without asserting her intent as fact, for example without \"I believe you had good intentions\" or \"I know you meant well\"",
+        "Returns to the effect (failed CI, blocked review) rather than debating her intent or fairness",
+        "Moves to a forward step, such as asking how to meet the bar without that effect"
+      ]
+    },
+    {
+      "id": "lateness-cause-playbook",
+      "prompt": "Dev joined our 9:00 standup about 15 minutes late on Monday and Wednesday this week, and it has happened before. I don't know why. Plan the conversation for me. I'm his team lead and I own the standup rule.",
+      "files": [
+        "references/cause-exploration.md"
+      ],
+      "expected_output": "An opener with the dated instances and an open question about the cause, then a response for each answer (defensive, a reason, no clear reason) and a dated follow-up criterion.",
+      "assertions": [
+        "Opens with the dated instances (Monday and Wednesday, 9:00 start, about 9:15) and asks an open question about what is going on, without guessing a cause",
+        "Gives a different response for at least two answers: a reason is given, and no clear reason (state the expectation and ask for a commitment)",
+        "States the 9:00 start as a requirement, not an optional request, and asks what would help Dev meet it",
+        "Checks the power relationship before stating the bar: because the user is the team lead who owns the rule, the bar is stated as an authorized requirement; notes that a peer or upward feedback would instead make a specific request or take the rule to the decision-maker",
+        "Ends with a dated check-in and a stated criterion for considering it resolved"
+      ]
+    },
+    {
+      "id": "receive-specific-feedback",
+      "prompt": "My lead said in review that my last two PRs (#118 and #121) skipped tests and CI failed, which blocked the release branch on Thursday. She's right, but I'm annoyed at how she put it. How do I reply, and what do I do afterwards?",
+      "files": [
+        "references/receiving-feedback.md"
+      ],
+      "expected_output": "A reply that paraphrases the instance and its effect to confirm it, acknowledges the effect without debating tone or motive, then a follow-up that picks concrete actions, tells the lead what changes and asks how to be flagged next time.",
+      "assertions": [
+        "The reply paraphrases the instance and effect (PRs #118 and #121, no tests, blocked release branch) to confirm understanding",
+        "Acknowledges the effect on the lead's work without defending or arguing about her tone",
+        "After the conversation, commits to one or two concrete actions, for example running the suite before opening a PR",
+        "Tells the lead what is changing and asks her to flag it the same day if it happens again"
+      ]
+    },
+    {
+      "id": "success-criteria-explicit",
+      "prompt": "Product says the new search must be 'fast and user-friendly' and wants it next sprint. I'm worried we will not agree on what done means. How do I pin it down before we start?",
+      "files": [
+        "references/expectation-alignment.md"
+      ],
+      "expected_output": "Turns each vague word into a measurable check to agree with the product owner, asks assumption questions, and records the result where the work lives.",
+      "assertions": [
+        "Turns \"fast\" and \"user-friendly\" into explicit, checkable criteria that the product owner confirms rather than the user inventing alone",
+        "Asks about assumptions, for example dependencies, what would make it harder, or the definition of done",
+        "Recommends recording the agreed criteria and assumptions where the work lives, such as the ticket"
       ]
     }
   ]

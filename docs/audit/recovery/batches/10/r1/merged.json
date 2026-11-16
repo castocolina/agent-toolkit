@@ -1,0 +1,278 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "humanizer",
+      "percent": 88.8,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-two": 88.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-one"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/humanizer/evals/evals.json",
+          "line": 1,
+          "evidence": "readme-quote-and-provenance asks the agent to quote README.md's Wikipedia sentence word for word and report what the README says the guide is built from; the skill's task is editing existing prose, and README.md is never part of that workflow.",
+          "fix": "Replace this eval with one that exercises the editing task, such as a house-style exemption or a pre-2022 passage that still has editable cues, and record the removed assertions in docs/audit/recovery/humanizer/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 30,
+          "evidence": "The load condition for references/pattern-catalog.md is a list of symptoms ('chatbot correspondence, disclaimers, hedging, filler, vocabulary clusters, em dashes or other mechanics') rather than a step that says which catalog section to open for which diagnosis.",
+          "fix": "In step 3, name the catalog heading to read for each leftover cue (Correspondence and disclaimers, Conclusions and hedging, Vocabulary by model era, Style and mechanics) and keep the existing do-not-load rule for a narrow edit already covered above."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 34,
+          "evidence": "Never alter evidence forbids inventing facts and rewriting quotes, but it does not warn that deleting a chatbot wrapper or a trailing participle can leave a sentence fragment or drop the only verb.",
+          "fix": "Add one NEVER: after deleting a wrapper, disclaimer or trailing participle, re-read the sentence and restore its grammar from words already present; if nothing remains, flag the gap instead of writing a new sentence."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 4,
+          "evidence": "The description covers WHAT, WHEN, keywords and a boundary, but it never names a file path, so a request to edit an existing draft in place is easy to miss.",
+          "fix": "Edit existing drafts to remove formulaic AI-like prose, promotional puffery and hype, vague attributions, inflated significance and repetitive sentence patterns while preserving facts, quotations, author voice and house style. Use when a draft, pasted passage or file path sounds robotic, generic, salesy or breathless, or the user asks to humanize text, tone down hype, make copy more natural or factual, or remove AI writing patterns, chatbot phrasing, clich\u00e9s or em-dash overuse, even without mentioning AI. Not for authorship detection, factual research, translation, spelling-only proofreading, or writing from scratch."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 30,
+          "evidence": "Load `references/pattern-catalog.md` when the text shows chatbot correspondence, disclaimers, hedging, filler, vocabulary clusters, em dashes or other mechanics: one catch-all trigger loads the whole catalog, including era lists the current diagnosis may not need.",
+          "fix": "Point each leftover cue at its heading and say not to load Vocabulary by model era unless the diagnosis is a word cluster, and not to load Style and mechanics unless the cue is punctuation, formatting or synonym cycling."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 16,
+          "evidence": "Step 1 says to ask only for missing information that changes the edit, but never says which missing fact to ask for and which to default, so audience, stance and house style become an equal menu.",
+          "fix": "Default audience and stance to the source's own register and ask only when the request names two audiences or two house styles; keep the existing default for unspecified depth."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/humanizer/evals/evals.json",
+          "line": 1,
+          "evidence": "Fifteen evals have realistic prompts and mostly verifiable assertions, but readme-quote-and-provenance grades a README recitation, and current-era-ordinary-words and disclaimer-era-labels grade catalog labels rather than an edit of the supplied draft.",
+          "fix": "Rewrite those three prompts so each supplies a draft and asserts the edit outcome: leave a lone ordinary word, delete the cutoff frame while keeping the fact, and keep source-availability uncertainty without inventing a date. Keep the era labels only as part of the change note."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 20,
+          "evidence": "The gate says 'with fewer than three, fix only the evidence and inflation cues and skip the style pass,' but it never says what to do when the only cues are style or mechanics and there are fewer than three.",
+          "fix": "Add the branch: with fewer than three cues and none of them evidence or inflation, leave the text and say so in the change note, unless the user named that pattern."
+        }
+      ]
+    },
+    {
+      "name": "plugin-forge",
+      "percent": 91.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 91.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-one"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 17,
+          "evidence": "No .claude-plugin/marketplace.json yet: create it first with {\"name\": \"<kebab-name>\", \"owner\": {\"name\": \"<maintainer>\"}, \"plugins\": []} (all three keys are required).",
+          "fix": "Keep the required-keys fact; move the one-line JSON literal to references/marketplace-schema.md (users ask for the minimal file by name) and point step 1 at it. Do not delete it, and record the move in docs/audit/recovery/plugin-forge/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 15,
+          "evidence": "Workflow step 1 is one bullet list that both classifies source (standard, other local, remote, npm, archive, command) and decides the action (create the manifest, dry-run, hand-write, run the script).",
+          "fix": "Split the classification into a short decision table before the action bullets so the first branch an agent hits is the source type, then the single action for that type."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/plugin-forge/references/plugin-structure.md",
+          "line": 31,
+          "evidence": "Unknown top-level keys are stripped with a validate warning; an unknown key inside userConfig, channels, lspServers or monitors stops the plugin from loading.",
+          "fix": "Add the why next to that sentence: a warning lets the plugin load with the key dropped, while a key inside those objects fails loading, so a typo there is a hard failure rather than a dropped field."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 24,
+          "evidence": "For a standard-layout scaffold-only or bump-only request, the contract above is enough; do not load the references. Other-local and remote scaffolding still need the step 1 reads.",
+          "fix": "Name the files the skip covers (references/plugin-structure.md, references/marketplace-schema.md, references/workflows.md) so a standard bump does not load any of them."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/plugin-forge/references/workflows.md",
+          "line": 30,
+          "evidence": "Commit, then push the branch or open a pull request the way the repository releases (protected default branch, release branch, PR review).",
+          "fix": "Give one default, a pull request against the repository's default branch, and keep the escape hatch that an unprotected branch the user named may be pushed directly."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/plugin-forge/evals/evals.json",
+          "line": 1,
+          "evidence": "Nine evals, all precise and none casual, and several assert phrases the skill states (\"Says none of the three can be used\", \"Names references/marketplace-schema.md\") rather than an observable result.",
+          "fix": "Add two casual phrasings (for example \"my plugin update says already at the latest version, wat do i do\") and rewrite the brittle assertions to check the outcome (reserved names refused, remote source edited by hand) instead of a quoted sentence."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/plugin-forge/evals/trigger-queries.json",
+          "line": 12,
+          "evidence": "The last ten should-not-trigger queries are terse (\"Create VS Code extension manifest and package layout.\") while the eleven should-trigger queries carry paths and backstory.",
+          "fix": "Rewrite four negatives as near-misses with the same context density, such as a Helm chart repo install, an npm library version bump with a changelog, and a standalone SKILL.md the user says not to package."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 10,
+          "evidence": "It rejects names claude plugin validate treats as Anthropic's own (exact claude, anthropic, anthropics, claude-code, claude-mods, prefixes claude-, anthropic-, anthropics-, cc-plugin-, or official beside claude/anthropic; the live rules, which ignore case and also warn on these words elsewhere in a name, are the name table at https://code.claude.com/docs/en/plugins/manifest-reference#name, checked 2026-11-13).",
+          "fix": "Add one clause that the script's check is case-sensitive and does not warn on those words elsewhere in a name (mcp-for-claude passes), and that claude plugin init and claude plugin tag also refuse an erroring name, matching the live table the sentence already cites."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 21,
+          "evidence": "A version that does not change keeps hosted users on their cached copy ... Bump every release, or omit version from both files so the commit SHA becomes the version.",
+          "fix": "Qualify the SHA fallback: it holds for github, url, git-subdir and git-hosted relative paths (shortened to 12 characters); an npm source and a non-git local directory resolve to unknown, so omitting version there does not produce a commit SHA."
+        }
+      ]
+    },
+    {
+      "name": "reducing-entropy",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 93.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-one"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 9,
+          "evidence": "The dbff837f digest shows 175 removed units but only 40 (a cut list). The record explains the listed units, including accepted drops for para:76965640, para:6a3dd121, para:106d25cc, para:ef78cea9, para:54a485c3, para:03bac19a, para:9a10630b, para:ed3a2005, para:0d934ff5, para:d9e3d633, para:b2d1613f, para:f8a73e33, para:57ec194a, para:ee546dca, para:1d152dbb, para:10b58a7b, para:34594ff0, para:717782ab, para:53a4e92d, para:5c30bccf, para:16d09475, para:e78bc320, para:c797f356, para:64aa1d62, para:ed073dc4 and para:f4227108; the other 135 were not shown, so they cannot be checked.",
+          "fix": "Re-run the digest with the full removed-unit list (or the next 40) and add a record row, or restore into references/, for any substantive unit among the 135 not shown."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/reducing-entropy/README.md",
+          "line": 25,
+          "evidence": "Primary sources for simplicity thinking, to draw from when creating new mindsets, lists nine well-known talks and papers (Simple Made Easy, Out of the Tar Pit, No Silver Bullet, Zen of Python) that a model already names unprompted.",
+          "fix": "Move the nine-item reading list into references/adding-reference-mindsets.md under External References, or record the removal in docs/audit/recovery/reducing-entropy/record.md; keep the Attribution block and the Git project credit line."
+        },
+        {
+          "id": "D1-3",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/evals/evals.json",
+          "line": 118,
+          "evidence": "Eval id reference-sources-corrected only checks a URL spelling (MoseleyMarks06a.pdf) and a quote attribution the references already state, so it tests nothing the deletion procedure does.",
+          "fix": "Replace it with a case that exercises a real procedure branch (an unknown merge invariant, or a name held only by stored data) with assertions on the keep-or-delete decision, or remove the eval and record the removal."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 11,
+          "evidence": "Step 2 prescribes one exact counter, `git ls-files -z --cached --others --exclude-standard -- src ':(exclude,glob)**/tests/**' ... | xargs -0 sh -c '...' | wc -l`, for a judgment skill whose consequence of a slightly different counter is low, and the example scope is hardcoded to `src`.",
+          "fix": "Keep the requirements (NUL-safe, counts untracked files, skips deleted paths, excludes tests and generated code, rerun unchanged) as the rule and offer that command as the default for a git repo whose code lives under src, with an escape hatch to retarget the pathspec."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/evals/evals.json",
+          "line": 1,
+          "evidence": "Ten evals cover lenses, PAGNI, red flags and stop conditions with verifiable assertions, and trigger-queries.json has 10 should-trigger and 10 should-not-trigger queries, but no eval exercises the step-4 Unknown row, the step-5 displacement rule, or the stored-name Gotcha (pickled objects, ORM identities, Celery task names).",
+          "fix": "Add one eval whose input holds a class name only inside a stored pickle or ORM identity, asserting the skill keeps it and does not treat an empty caller search as proof it is dead."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 14,
+          "evidence": "Step 3b says a candidate whose after count is not below its before count routes to red-flags-and-stop-conditions.md, but the after count is only produced by step 7, so that trigger cannot be evaluated while ranking candidates.",
+          "fix": "Move the less-total-code check to after step 6's re-measure: reject a candidate whose after count exceeds its before count unless a step-1 need requires the extra code, and keep the red-flags file for arguments and stop conditions only."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/reducing-entropy/SKILL.md",
+          "line": 11,
+          "evidence": "The step-2 counter pipes `git ls-files -z` into `xargs -0`, which drops an empty file list and then runs `sh -c` with no path arguments, so `cat` waits on stdin instead of reporting zero.",
+          "fix": "Add `xargs -0 -r` (or an equivalent empty-list guard) so an empty tree prints 0, and state that fallback in the command."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

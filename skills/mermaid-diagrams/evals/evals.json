@@ -115,11 +115,24 @@
     {
       "id": "api-flowchart-request",
       "prompt": "can you do a flowchart of our API? the checkout service calls payments, payments calls the bank, and the bank answers back.",
-      "expected_output": "A sequence diagram instead of a flowchart, with a brief reason.",
+      "expected_output": "The requested flowchart drawn accurately, plus one sentence naming the sequence diagram as the better type for an API call chain; the format the user named is never swapped silently.",
       "assertions": [
-        "Uses `sequenceDiagram`, not `flowchart`",
+        "Honors the explicitly requested format: draws a `flowchart` that shows Checkout calling Payments, Payments calling the Bank and the Bank's answer coming back, and does not ask a question first (a flowchart can represent this call chain)",
+        "Every node and edge matches the stated call chain with no invented step",
+        "The reply adds one sentence naming `sequenceDiagram` as the better type for an API call chain and saying why, without replacing the requested format"
+      ],
+      "files": [
+        "references/authoring-rules.md"
+      ]
+    },
+    {
+      "id": "api-call-chain-no-format",
+      "prompt": "can you diagram how our API handles a payment? the checkout service calls payments, payments calls the bank, and the bank answers back.",
+      "expected_output": "A sequence diagram of the call chain, with a brief reason, because the user named no diagram format.",
+      "assertions": [
+        "Uses `sequenceDiagram`, not `flowchart`, because the prompt names no format and an API call chain is a sequence",
         "Includes Checkout, Payments, and Bank as participants with the reply back",
-        "Says why a sequence fits better than a flowchart"
+        "Says why a sequence fits an API call chain"
       ],
       "files": [
         "references/authoring-rules.md"
@@ -302,6 +315,119 @@
       ],
       "files": [
         "evals/files/notification-refactor.md",
+        "references/authoring-rules.md"
+      ]
+    },
+    {
+      "id": "mermaid12-old-look",
+      "prompt": "Since we moved our docs build to the latest mermaid-cli, every flowchart is laid out differently and the colors changed, with no edits to the diagrams. Please give me the frontmatter that puts back the old look.",
+      "expected_output": "Frontmatter config with theme default, look classic and layout dagre, with a note that Mermaid 12 changed the defaults.",
+      "assertions": [
+        "Gives a frontmatter `config` block that sets `theme: default`, `look: classic` and `layout: dagre`, as the first lines of the fence",
+        "Says Mermaid 12 changed the defaults (theme `redux-color`, look `neo`, layout `elk`) and that this explains the change",
+        "Does not say that dagre or the `default` theme is the current default"
+      ],
+      "files": [
+        "references/advanced-features.md",
+        "references/authoring-rules.md"
+      ]
+    },
+    {
+      "id": "elk-layout-options",
+      "prompt": "Make the flowchart in our README use the ELK layout with merged edges and the network simplex node placement. Do I need to register or install anything for ELK in the latest mermaid-cli?",
+      "expected_output": "Frontmatter with layout elk and the two elk options, and the statement that Mermaid 12 bundles ELK.",
+      "assertions": [
+        "Uses a frontmatter `config` block with `layout: elk` and an `elk:` key holding `mergeEdges: true` and `nodePlacementStrategy: NETWORK_SIMPLEX`",
+        "Says that no registration is needed on Mermaid 12 because ELK is bundled, and that only an older host or the tiny build needs `@mermaid-js/layout-elk`",
+        "Does not claim that `BRANDES_KOEPF` is the default node placement strategy",
+        "Does not claim that `layout: elk` silently falls back to dagre on Mermaid 12"
+      ],
+      "files": [
+        "references/advanced-features.md",
+        "references/authoring-rules.md"
+      ]
+    },
+    {
+      "id": "themes-and-cluster-colors",
+      "prompt": "Which built-in Mermaid themes can I put in the frontmatter config? Also I want my flowchart subgraph box to have its own border and background color, not the theme's.",
+      "expected_output": "A list of theme names that includes the Mermaid 12 ones with a pointer to the live list, and a theme base config with clusterBkg and clusterBorder.",
+      "assertions": [
+        "Names built-in themes beyond the old five, including at least `redux-color` and `neo`, together with `default`, `neutral`, `dark`, `forest` and `base`",
+        "Points to the Mermaid theming page or `mmdc --help` for the current list instead of presenting a fixed list as complete",
+        "Sets `theme: base` and writes `clusterBkg` and `clusterBorder` under `themeVariables`",
+        "Says that `themeVariables` is honored only with `theme: base`"
+      ],
+      "files": [
+        "references/advanced-features.md",
+        "references/authoring-rules.md"
+      ]
+    },
+    {
+      "id": "export-docker-size",
+      "prompt": "I don't have Node on this box. Export diagram.mmd as a PNG limited to 1600px with a transparent background, using Docker, and tell me which flags set the size and background.",
+      "expected_output": "A docker run command that runs as the current user and mounts the diagrams folder, with --size and -b transparent.",
+      "assertions": [
+        "Uses `docker run --rm` with `-u` set to the current user and group (for example `` `id -u`:`id -g` ``) and a `-v` mount to `/data`",
+        "Uses the image `minlag/mermaid-cli` or `ghcr.io/mermaid-js/mermaid-cli/mermaid-cli`",
+        "Sets the size with `--size 1600` and the background with `-b transparent`, writing a `.png` output",
+        "Does not use `-w` or `-H` for the size, or says those flags no longer exist",
+        "Points to `mmdc --help` for the installed flags"
+      ],
+      "files": [
+        "references/advanced-features.md"
+      ]
+    },
+    {
+      "id": "unpinned-npx-mermaid-version",
+      "prompt": "In CI we validate diagrams with an unpinned `npx -y @mermaid-js/mermaid-cli`. Which Mermaid version does that check against today, and would pinning the CLI version pin Mermaid?",
+      "expected_output": "An answer that the CLI's bundled Mermaid decides, that the latest CLI resolves Mermaid 12, and that pinning the CLI does not pin Mermaid exactly.",
+      "assertions": [
+        "Says the Mermaid bundled with the CLI decides what parses and renders",
+        "Says an unpinned npx now resolves Mermaid 12 (a 12.x CLI depends on `mermaid ^12`), so the Mermaid 12 defaults apply",
+        "Says pinning the CLI does not pin Mermaid itself, because the CLI's dependency range resolves the latest release in range",
+        "Says an exact Mermaid version needs a package-manager override in a scratch project, and does not say an unpinned npx resolves 11.x"
+      ]
+    },
+    {
+      "id": "github-mermaid-version",
+      "prompt": "How can I find out which Mermaid version GitHub uses to render the diagrams in our README? I need to know before I use a newer node shape.",
+      "expected_output": "A way to read the host's Mermaid version by rendering an info block on GitHub, without stating a fixed version.",
+      "assertions": [
+        "Tells the user to render a ```mermaid block that contains `info` on GitHub to read its Mermaid version",
+        "Does not state a specific GitHub Mermaid version as fact",
+        "Relates the answer to the version-gated syntax: expanded shapes `A@{ shape: cyl }` need a Mermaid version that supports them, so it says to render once with the installed mmdc and check support in the target renderer (it names no version number as fact), and bracket shapes work everywhere"
+      ]
+    },
+    {
+      "id": "abstract-shape-class",
+      "prompt": "Class diagram for the README: an abstract class Shape with abstract methods draw() and area() (returns double), a static counter method count() returning int, and Circle and Rectangle that extend it.",
+      "expected_output": "classDiagram with Shape marked abstract, trailing * on the abstract methods, trailing $ on the static method and inheritance arrows pointing at Shape.",
+      "assertions": [
+        "Uses `classDiagram` with `<<abstract>>` inside the Shape class",
+        "Writes the abstract members with a trailing `*` after the signature (`+draw()*`, `+area() double*`), not as the words `abstract` in the member text",
+        "Writes the static member with a trailing `$` (`+count()$ int` or `+count() int$`)",
+        "Circle and Rectangle inherit with the arrowhead on Shape (`Shape <|-- Circle`, `Shape <|-- Rectangle`)",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ],
+      "files": [
+        "references/class-diagrams.md",
+        "references/authoring-rules.md"
+      ]
+    },
+    {
+      "id": "sequence-participant-links",
+      "prompt": "Sequence diagram of Web calling Billing with a reply, where the Billing participant has a link menu with a Dashboard link and a Runbook link. Also, what is the equivalent of that link menu for a node in a flowchart?",
+      "expected_output": "A sequenceDiagram using link or links on the participant, and the answer that flowcharts use click with a tooltip instead.",
+      "assertions": [
+        "Declares the Billing participant and then uses `link Billing: Dashboard @ <url>` lines or one `links Billing: {...}` JSON line for Dashboard and Runbook",
+        "Includes the Web call to Billing with a `-->>` reply",
+        "Says that flowcharts have no `link` keyword and use `click NODE \"url\" \"tooltip\"` instead",
+        "Says the link menu is interactive and may not show on every host, so the docs should not rely on it",
+        "Validates with `npx -y @mermaid-js/mermaid-cli` or states that it could not run and names the unverified syntax"
+      ],
+      "files": [
+        "references/sequence-diagrams.md",
+        "references/advanced-features.md",
         "references/authoring-rules.md"
       ]
     }

@@ -193,8 +193,15 @@ def edges(scene, s):
 
 # ---- element builders: every field the editor writes, so a fresh scene opens without repair
 
+def new_id():
+    """A url-safe id that never starts with '-', which argparse would read as an option in `--allow ID`."""
+    while (eid := secrets.token_urlsafe(15))[0] == "-":
+        pass
+    return eid
+
+
 def base(kind, x, y, w, h, **extra):
-    TOUCHED.add(eid := secrets.token_urlsafe(15))  # created ids are part of the request
+    TOUCHED.add(eid := new_id())  # created ids are part of the request
     return {"id": eid, "type": kind, "x": x, "y": y, "width": w, "height": h,
             "angle": 0, "strokeColor": "#1e1e1e", "backgroundColor": "transparent", "fillStyle": "solid",
             "strokeWidth": 2, "strokeStyle": "solid", "roughness": 1, "opacity": 100, "groupIds": [],
@@ -330,6 +337,8 @@ def edit(scene, args):
 
 
 def write(scene, out, original=None):
+    if Path(out).exists():  # also covers out == input; keeps the diff-before-replacement gate
+        raise SceneError(f"{out} already exists (an output must not be the input or any existing file); write to a new name and diff, or ask before replacing it")
     result = check(scene)
     if not result["ok"]:
         raise SceneError("refusing to write an invalid scene: " + "; ".join(result["errors"]))

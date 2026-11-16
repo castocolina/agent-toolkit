@@ -24,7 +24,7 @@ cp -r skills/c4-architecture ~/.claude/skills/
 
 **claude.ai:** add the skill to project knowledge, or paste the contents of `SKILL.md` into the conversation.
 
-Rendering checks use mermaid-cli (`mmdc`) when it is installed, or `npx -y -p @mermaid-js/mermaid-cli@11.17.0 mmdc` with network access.
+Rendering checks use the installed mermaid-cli (`mmdc`) only when it is 11.17.1 or newer (checked 2026-11-13); an older install may render, but its element-text wrapping is unverified, so check that renderer's wrapping or use the pinned `npx -y -p @mermaid-js/mermaid-cli@11.17.1 mmdc` with network access.
 
 ## What It Does
 
@@ -47,7 +47,7 @@ C4Container
     ContainerDb(db, "Orders DB", "PostgreSQL", "Orders")
   }
   Rel(customer, web, "Places orders", "HTTPS")
-  Rel(web, api, "Calls", "JSON/HTTPS")
+  Rel(web, api, "Sends order requests to", "JSON/HTTPS")
   Rel(api, db, "Reads and writes", "SQL")
   Rel(api, stripe, "Charges cards", "HTTPS")
 ```
@@ -62,3 +62,9 @@ C4Container
 
 - [C4 Model](https://c4model.com/) - Official C4 model documentation
 - [Mermaid C4 Diagrams](https://mermaid.js.org/syntax/c4.html) - Mermaid C4 syntax documentation
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+Documentation owners credited (official pages listed in `docs/audit/upstream-sources.json`, checked 2026-11-13): Mermaid (C4 diagram syntax, mermaid-cli), Simon Brown (C4 model), Puppeteer.

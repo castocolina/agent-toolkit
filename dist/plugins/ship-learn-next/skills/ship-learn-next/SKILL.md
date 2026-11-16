@@ -11,11 +11,13 @@ A loop: ship a small deliverable, read the evidence, choose the next rep. The pl
 ## Workflow
 
 1. **Route the request.**
-   - Content supplied (pasted text or a file): read it, go to step 2.
-   - Only a URL, a title or the user's memory of the content: ask for the transcript or text. If the user wants a plan now, give one headed `Provisional: not derived from the source`, with its lessons listed as assumptions drawn from the stated goal.
+   - Content supplied (pasted text or a file): read it, go to step 2. A URL together with a pasted excerpt is content: use the excerpt and go to step 2.
+   - Only a URL, a title or the user's memory of the content, with no source text supplied: ask for the transcript or text. If the user wants a plan now, give one headed `Provisional: not derived from the source`, with its lessons listed as assumptions drawn from the stated goal. That heading applies only when no source text was supplied, or when the supplied source holds no actionable lesson (step 2); a plan derived from supplied source text never carries it.
    - The user reports how a rep went: go to step 4.
    - The user wants a summary, reading list or study schedule: answer that; do not force a rep.
 2. **Extract and pick.** For each lesson ask: what would the user do differently tomorrow, and what single artifact proves it? No answer means drop the lesson. When several compete for Rep 1, pick the one with the smallest shippable test inside the user's available time. Reuse the stated deadline and time budget; ask only for a missing constraint that changes Rep 1, otherwise state the assumption ("assuming 3 hours this week") and continue.
+   - Also extract the real implementations, case studies and numbers the source mentions: they anchor the rep and its criteria. Never invent one the source does not show.
+   - If no actionable lesson remains (all of the source is motivational or empty of actions), say so and ask for a more concrete source, or offer a plan headed `Provisional: not derived from the source` with the assumptions listed.
 3. **Design Rep 1** in the shape below.
    - Done-when criteria are actions the user controls: publish, send, build, demo. Replies, revenue, conversion and adoption are learning metrics.
    - When outcomes are noisy (small samples, slow feedback, a market), add a process measure the user can observe during the rep.
@@ -28,13 +30,16 @@ A loop: ship a small deliverable, read the evidence, choose the next rep. The pl
    |---|---|
    | Not shipped (no artifact produced) | Shrink the rep or remove the named blocker |
    | Shipped, execution inconsistent (skipped steps or days, or a partial run with some artifacts, such as 4 of 10 posts) | Repeat the same rep once, with the observed blocker removed and the process measure as the target |
-   | Shipped consistently, outcome noisy or ambiguous | Draw no conclusion from the outcome; keep the same single variable and extend the sample or time |
-   | Shipped consistently, usable evidence | Raise difficulty or test the next lesson |
+   | Shipped consistently, creative or integrative rep (no causal comparison) | Judge completion against the done-when criteria and the declared learning target; claim no cause; then raise difficulty or test the next lesson |
+   | Shipped consistently, causal comparison, outcome noisy or ambiguous | Draw no conclusion from the outcome; keep the same single variable and extend the sample or time |
+   | Shipped consistently, causal comparison, usable evidence | Raise difficulty or test the next lesson |
+
+   Usable evidence (a causal comparison): the result moved the metric the plan named by more than the sample's noise, and only the one planned variable changed; that last requirement applies to causal comparisons only. Usable evidence also needs the comparison basis (before and after, or A and B) stated in the plan, and nothing else known changed during the rep; if confounders or measurement bias cannot be assessed, treat the evidence as inconclusive and repeat the rep. The noise band or the decisive sample comes from the plan or the user; with neither, the evidence is too thin and the rep repeats, and never compute a significance test the plan did not specify. Noisy or ambiguous: the sample or comparison cannot support a cause (a small sample, a shift inside normal variation, or more than one change at once). When you cannot tell which, say the evidence is too thin and repeat the rep.
 
    Time-box: every repeat must fit the remaining budget and deadline. If a repeat fails too, never offer the same rep a third time: shrink it, remove the blocker, or renegotiate the target or deadline with the user.
 
    Then go to step 5 with a `Rep N review` section (evidence read, row taken) and the next rep expanded in the shape below.
-5. **Save and present.** Default path `Ship-Learn-Next Plan - <brief title>.md` unless the user names one. Contents: source (or the provisional heading), extracted lessons, Rep 1 in the shape below, provisional later reps. After a review, append the `Rep N review` section and the expanded next rep to the existing plan file; with no plan file, put them in the reply. On a chat-only request or without write access, put the complete plan, or the section to append marked with the target plan path, in the reply and say it was not saved. End by asking for a ship date or naming the next concrete commitment.
+5. **Save and present.** Default path `Ship-Learn-Next Plan - <brief title>.md` unless the user names one. If that file already exists and this is a new plan, never overwrite it: choose a distinct filename (append the date as `YYYY-MM-DD`, and check that dated name too: if it exists as well, choose a verified unused suffix (`-2`, `-3`) or ask before writing) or ask first; reviews still append to the existing plan. Contents: source (or the provisional heading), extracted lessons, Rep 1 in the shape below, provisional later reps. After a review, append the `Rep N review` section and the expanded next rep to the existing plan file; with no plan file, put them in the reply. On a chat-only request or without write access, put the complete plan, or the section to append marked with the target plan path, in the reply and say it was not saved. End by asking for a ship date or naming the next concrete commitment. After a new plan (not after a review), also ask what might stop the user from shipping Rep 1 and how they will handle it; keep the answer as the named blocker that step 4's Not shipped row removes. Invite them to come back after shipping to reflect and plan Rep 2: their report starts step 4.
 
 ## Rep 1 shape
 
@@ -59,3 +64,7 @@ A loop: ship a small deliverable, read the evidence, choose the next rep. The pl
 - Never cite a section or timestamp the content does not show: false provenance makes a generic plan look source-derived.
 - Never leave setup (accounts, tools, research) out of the Rep 1 step estimates: users budget only the shipping steps, so the rep overruns and lands in the Not shipped row.
 - Never report a plan file as saved before the write succeeded; a tool-less or chat-only run must say the plan was not saved.
+
+## References
+
+- `references/rep-templates.md`: only when expanding Rep 2 or a later rep (step 3 or step 4): the Rep 2 template with its `Expected difficulty` field and the progression principles.

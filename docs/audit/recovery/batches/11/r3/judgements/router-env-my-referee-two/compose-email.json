@@ -1,0 +1,122 @@
+{
+  "skill": "compose-email",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 14,
+    "D3": 13,
+    "D4": 14,
+    "D5": 15,
+    "D6": 11,
+    "D7": 12,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 106,
+  "max_total": 125,
+  "percent": 84.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 14,
+      "evidence": "Step 1's blocking rule (no topic and no source draft; ask one question for topic, recipient and outcome, then stop) is contradicted by the later clause that a pasted email the user received is the prior thread, not a draft, and is answered from the user's instruction.",
+      "fix": "State the exception inside the blocking rule: a received message plus an answer instruction is the prior thread and is not blocking, so the agent answers it instead of asking for a topic."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 17,
+      "evidence": "Audience only adjusts length and order, then gives a concrete cap for leadership only: 'decision in the first sentence, at most 5 sentences'.",
+      "fix": "Add one default length or order for peer, stakeholder and manager (for example peer stays under the 150-word fresh-draft default, stakeholder leads with the business effect) so the audience adjustment is not a single special case."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 16,
+      "evidence": "The purpose list is a good procedure, but the thinking prompt is only the reader test: 'what will the reader do in their first 10 seconds'.",
+      "fix": "Keep the reader test and add one decision question before choosing a purpose, such as 'what decision or action is still missing, and who owns it', so the strategy choice is a framework rather than a list lookup."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 26,
+      "evidence": "Gotchas give reasons for vague subjects, unconfirmed dates, unasked CCs and hedged facts, but 'bullets only for 3-5 parallel points (never more)' and 'keep paragraphs to 2-3 sentences' state the limit without a why.",
+      "fix": "Add the reason already used for walls of text: more than five bullets or a paragraph past three sentences hides the ask, so the reader replies with a question instead of a decision."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 2,
+      "evidence": "description: 'Draft or rewrite a professional email ... even without the word email. Produces a subject and body to paste; never sends. Not for casual chat replies'.",
+      "fix": "Draft or rewrite a professional email to a peer, stakeholder, manager or leadership using What-Why-How: subject line, ask-first body, proposed-versus-committed dates. Use for status updates, approval requests, escalations, follow-ups, or when the user only asks to make a message shorter, clearer or less defensive, even without the word email. Produces a subject and body to paste; never sends. Not for casual chat replies; a finished draft can be reformatted for Slack or Teams on request."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 17,
+      "evidence": "Purpose chooses among Request, Status, FYI, Escalation and Follow-up, then 'Audience only adjusts length and order, never the strategy. Leadership: ... at most 5 sentences' is the only audience default; peer, stakeholder and manager have no length or order default.",
+      "fix": "Give one default per remaining audience (peer: under 150 words, jargon kept; stakeholder and manager: business effect first, jargon translated) and keep leadership's 5-sentence cap as the exception."
+    },
+    {
+      "id": "D6-2",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 19,
+      "evidence": "Step 4 says if facts cannot fit a stated word limit, 'ask (blocking) whether to relax the limit or drop named items', while step 1 says the only blocking gap is no topic and no source draft.",
+      "fix": "Name the word-limit question as a second blocking case in step 1, or say step 4's question is the only exception to the one-question rule."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "commands/evals/compose-email.json",
+      "line": 1,
+      "evidence": "Eight scenarios cover the main path (approval-request-full-context) and failure paths (empty-request-asks-for-facts, blocked-no-topic-asks-then-stops, word-limit-cannot-fit-facts), but none is an edge case: every prompt is a complete, well-formed scenario.",
+      "fix": "Add one edge scenario with verifiable assertions, such as two independent asks with different owners that must become Draft 1 and Draft 2, or a mixed peer-plus-leadership audience whose technical detail is confined to a final paragraph."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 14,
+      "evidence": "The blocking branch 'no topic and no source draft' asks and stops, but the same step then says a pasted email the user received 'is the prior thread, not a draft to rewrite: answer it'. A received email with no topic and no source draft matches both and does not resolve.",
+      "fix": "Order the branches: if the input is a received message plus an instruction to answer, treat it as the prior thread and draft the reply; only when there is neither a topic, nor a source draft, nor a received message, ask once and stop."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 58,
+      "evidence": "Example Usage ends at the draft for one extension request; it never shows the required closing 'one line of refinements (tone, length, jargon level, Slack/Teams format)' from step 5.",
+      "fix": "After the placeholder list in the example, add one refinements line such as 'I can make this shorter, more formal, or reformat it for Slack.'"
+    }
+  ]
+}

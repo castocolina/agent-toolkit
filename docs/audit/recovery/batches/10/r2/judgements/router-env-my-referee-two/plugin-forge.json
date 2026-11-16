@@ -1,0 +1,95 @@
+{
+  "skill": "plugin-forge",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 13,
+    "D4": 15,
+    "D5": 14,
+    "D6": 13,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": null,
+      "evidence": "removed units (209, showing 40) in the dbff837f digest; the 40 shown para ids all sit in sections.json units of record.md rows, and the remaining 169 are not listed",
+      "fix": "List every omitted para id in the digest, or add one docs/audit/recovery/plugin-forge/record.md row per omitted unit, so each can be judged instead of being covered only by the cut-list note."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 27,
+      "evidence": "For a standard-layout scaffold-only or bump-only request, the contract above is enough; do not load the references.",
+      "fix": "Keep the Process pattern and the do-not-load exception; name the escape explicitly in step 2 so a scaffold-only request that then adds a non-default component still loads references/plugin-structure.md."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 31,
+      "evidence": "A passing local test therefore does not prove that hosted users will receive the update.",
+      "fix": "Add one Gotcha for the other load-time failure already implied by the contract: a source that validates but is missing fails only at install with Source path does not exist, and say why validate cannot catch it."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/plugin-forge/references/marketplace-schema.md",
+      "line": 22,
+      "evidence": "npm, archive and command sources also exist; see the source page above.",
+      "fix": "Gate that sentence: read the marketplace-reference source section only when the entry source is npm, archive or command; for relative, github, url and git-subdir, the table in this file is enough."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 20,
+      "evidence": "Drop version from the other file, or keep it equal.",
+      "fix": "Make plugin.json the default place for version and tell the agent to delete an entry version unless the user asked to keep the two equal; the current or leaves a mismatch that install ignores."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/plugin-forge/evals/trigger-queries.json",
+      "line": 12,
+      "evidence": "Create VS Code extension manifest and package layout.",
+      "fix": "Rewrite the should-not-trigger queries as full user prompts with paths and near-miss context, matching the should-trigger set, so they test the description boundary rather than keyword absence."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 22,
+      "evidence": "If its entry pins ref (tag or branch) or sha (full 40-character commit), push the new tag or commit, set the entry's ref/sha to it in marketplace.json",
+      "fix": "Split the pin update by source: github and url entries carry ref and sha; an npm source pins package version and has no ref or sha, so do not tell the agent to set those fields on it."
+    }
+  ]
+}

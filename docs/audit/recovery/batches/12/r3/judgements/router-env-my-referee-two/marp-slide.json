@@ -1,0 +1,113 @@
+{
+  "skill": "marp-slide",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/marp-slide/references/slide-count.md",
+      "line": 9,
+      "evidence": "Rule of thumb, not a vendor or Marp rule: 5 minutes 5-8, 10 minutes 10-15, 20 minutes 15-25",
+      "fix": "Keep the table as a default when the user gives a talk length and no count, and add one line that it is a pacing heuristic the model already knows, so the agent states the choice and does not treat the bands as a Marp constraint. Do not delete the file: SKILL.md New deck step 2 and the slide-count eval depend on it."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/marp-slide/references/vscode.md",
+      "line": 7,
+      "evidence": "Open it with Ctrl+Shift+V (Cmd+Shift+V on macOS), or side by side with Ctrl+K V (Cmd+K V). Shortcuts are VS Code's own Markdown preview keys",
+      "fix": "The preview keybindings are VS Code defaults the model already knows. Keep the sentence that marp: true turns Marp features on in the built-in preview, and move the key list to one parenthetical or drop it with a record row; keep the export command and settings table, which are not generic."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/marp-slide/SKILL.md",
+      "line": 12,
+      "evidence": "Existing deck (\"redesign\", \"less crowded\", \"make it look good\", fix its CSS): follow \"Existing deck\", then \"Save\".",
+      "fix": "After the existing-deck path, also run Fit and Validate. The path already says to render or lint and recheck, but it skips the named Fit section, so a redesign can leave a two-line heading colliding with a pinned h2."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/marp-slide/references/theme-css-guide.md",
+      "line": 54,
+      "evidence": "Render with the theme registered: marp --no-stdin deck.md --theme-set name.css -o deck.html. --theme-set takes several values, so put it after the input file",
+      "fix": "This flag-order trap produces a silent help dump instead of a deck. Copy it into the SKILL.md Gotchas list (one line, with the why) so it is read on every theme conversion, not only when theme-css-guide.md is loaded."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/marp-slide/SKILL.md",
+      "line": 100,
+      "evidence": "references/slide-count.md: the user gives a talk length and no slide count (also named in New deck step 2).",
+      "fix": "The body already names the load condition twice and the other references are gated. Drop the parenthetical on this one line; do not add a Do NOT Load list."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/marp-slide/SKILL.md",
+      "line": 32,
+      "evidence": "Otherwise take the first matching row and mention the runner-up in one line.",
+      "fix": "Keep the first-match default so an unattended run is not blocked, and add one escape: when two rows match equally (for example dark plus a developer audience), name both in the one line and use the row the user already implied, instead of silently taking table order."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/marp-slide/evals/evals.json",
+      "line": 5,
+      "evidence": "Includes safe database migrations and junior backend developers.",
+      "fix": "The 16 evals are realistic and the later ones have verifiable assertions, but the first three check presence of words and a five-bullet cap rather than the render-or-lint outcome, contrast, or the Fit collision rule. Add one assertion per early eval that the output reports rendered versus linted and that no pinned-heading template keeps a two-line h2."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/marp-slide/references/export.md",
+      "line": 11,
+      "evidence": "HTML presenter (fragments, transitions) | marp --no-stdin deck.md -o deck.html",
+      "fix": "SKILL.md Validate says to run through npx --yes @marp-team/marp-cli because a bare marp alias is not a command in an agent shell, while export.md, theme-css-guide.md and vscode.md write marp. Prefix every command block with npx --yes @marp-team/marp-cli (keep @4 in the CI step) or say once that marp means that invocation."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/marp-slide/references/theme-snippets.md",
+      "line": 186,
+      "evidence": "background-color: rgba(255, 255, 255, 0.1);",
+      "fix": "White body text on a 10% white overlay over the dark gradient stays below the 4.5:1 body contrast the Validate section requires. Raise the overlay alpha, or tell the agent to set the box text to a dark color, and keep the existing warm/teal contrast reminder."
+    }
+  ]
+}

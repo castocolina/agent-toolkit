@@ -1,0 +1,302 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "excalidraw",
+      "percent": 92.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 92.0,
+        "router-env-my-referee-one": 93.6
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 8,
+          "evidence": "Labels and connections are under 10% of a scene file; the rest is per-element styling and geometry.",
+          "fix": "Move the signal-to-noise restatement to skills/excalidraw/README.md Why (it already states the 20+ properties and the under-10% share) and record the removal in docs/audit/recovery/excalidraw/record.md; keep the NEVER rule and the 80-line versus 12-line comparison on SKILL.md line 10."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/excalidraw/README.md",
+          "line": 1,
+          "evidence": "The dbff837f digest lists 175 removed units and shows 40, so 135 units were not itemized.",
+          "fix": "No content change: the shown units and the second digest's para:e6b14934 and para:41b6ea0f are covered by record.md rows (accepted drops, intended changes, or text-present); expand the digest if a later judge must see the other 135."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 25,
+          "evidence": "`.excalidraw.md` (Obsidian plugin) | ask for a plain `.excalidraw` export: the plugin stores the scene as `compressed-json`",
+          "fix": "Add the non-default case to that route row: with useExcalidrawExtension off the plugin writes a plain .md whose frontmatter contains excalidraw-plugin: parsed (and compression off stores the scene in a json fence, not compressed-json); ask for a plain .excalidraw export in either case."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 3,
+          "evidence": "Create, inspect, edit and compare Excalidraw diagrams (.excalidraw, .excalidraw.json) through a bundled script that keeps scene JSON out of context",
+          "fix": "Create, inspect, edit and compare Excalidraw diagrams. Use when the user names an Excalidraw file, asks to change labels or connections in one, compares two, or wants a flowchart or architecture sketch in Excalidraw, even for a tiny file and even without saying Excalidraw. Keywords: .excalidraw, .excalidraw.json, .excalidraw.png, .excalidraw.svg, .excalidraw.md, flowchart, architecture diagram. Not for Mermaid, draw.io, PlantUML, Graphviz, ordinary PNG edits or text-only architecture explanations."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 10,
+          "evidence": "Run `python3 <skill-dir>/scripts/scene.py <command>` from the user's working directory",
+          "fix": "Keep the command in SKILL.md and add one clause that <skill-dir> is this skill's directory (the directory containing SKILL.md), so the relative script path resolves from the skill root."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 39,
+          "evidence": "Boxes are 180x80 and text is sized at 11 units per character without fitting, so keep each label to 16 characters or fewer",
+          "fix": "Make the 16-character cap the default for new and --add-node, and name the escape hatch already used for long relabels: a longer label goes to the worker, which sizes the box to the text, rather than being forbidden."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/excalidraw/evals/evals.json",
+          "line": 1,
+          "evidence": "Eight evals all expect a scene.py command, a worker, or a refusal; none covers a request to move or restyle, which the route table sends to the worker.",
+          "fix": "Add one realistic move-or-restyle prompt whose assertions check the worker contract: edit a copy, allow the moved shape and its bound arrows, pass check and diff --strict, and report text only."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 39,
+          "evidence": "text is sized at 11 units per character without fitting, so keep each label to 16 characters or fewer (12 characters measured 132 wide and fits; 30 measured 330 and overflows; checked 2026-11-13)",
+          "fix": "Replace the hardcoded 11-units and 16-character rule with an instruction to measure the written text element's width against the 180-wide box (scene.py text_for sets width to max line length times 11), and keep 16 only as an example dated 2026-11-13; the measurement is not in tests/skills/excalidraw/test_scene.py."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 10,
+          "evidence": "A one-box scene is about 80 lines of JSON; `summary` returns its label in 12.",
+          "fix": "Point the 80-line and 12-line figures at skills/excalidraw/evals/files/box.excalidraw and the summary command output, and note the date they were counted, so the claim is reproducible."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest at dbff837f: removed units (175, showing 40).",
+          "fix": "Review the remaining digest items against the current files and docs/audit/recovery/excalidraw/record.md; restore substantive unexplained content to references/ or record a valid disposition for each item."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 43,
+          "evidence": "For labels over 16 characters, 'shorten a longer label or move the detail into the summary, and do not use `new` or `--add-node` for it.'",
+          "fix": "Preserve user-requested label text: route long-label creation to an isolated worker with explicit sizing and validation, or ask before abbreviating or moving content out of the diagram."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 21,
+          "evidence": "The edit route says '`diff FILE NEW`, then move NEW over FILE'; worker step 5 likewise says 'Replace the original only on exit 0.'",
+          "fix": "Respect the requested destination: retain the validated copy when the user asks for a new file, and replace the original only when an in-place change is requested or approved."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 18,
+          "evidence": "The route for 'What is in it ... what connects to what' uses only `summary FILE`; the script reports unbound arrow ends as '(unbound)' and does not expose their geometry.",
+          "fix": "When summary has unbound endpoints or spatial interpretation is needed, route inspection to an isolated worker that examines geometry and returns a compact explanation, rather than treating the summary as a complete account of relationships."
+        }
+      ]
+    },
+    {
+      "name": "explain-changes-mental-model",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 91.2,
+        "router-env-my-referee-one": 99.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 19,
+          "evidence": "Check in this order; the first match wins. Quote the argument in every command.",
+          "fix": "Move the shell-quoting reminder to the Gotchas (the model already quotes shell arguments) and keep the first-match order, which the procedure depends on."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 76,
+          "evidence": "A single-group change keeps only the summary, the one group and its gotchas.",
+          "fix": "State why the Review Sequence is dropped for one group (it would only repeat that group) so the exception is a gotcha, not a bare rule."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 2,
+          "evidence": "Explain a git diff, commit, branch, range, PR or pasted patch as dependency-ordered logical groups... Not for editing code, a defect-focused code review, or the PR-workflow command explain-pr-changes.",
+          "fix": "Explain a git diff, commit, branch, range, PR or pasted patch as dependency-ordered logical groups, with file references and a review sequence. Use when the user wants to understand, onboard onto or walk through a changeset, asks what changed or what to read first, even without saying 'mental model', 'diff', 'commit' or 'PR'. Not for editing code, a defect-focused code review, or the PR-workflow command explain-pr-changes."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 43,
+          "evidence": "above 30 files or 800 changed lines, always switch to this paging procedure",
+          "fix": "Keep the 30-file / 800-line threshold, and say to read the full diff anyway when the user named one file or one group, because the limit is a context hedge, not a correctness rule."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 26,
+          "evidence": "If <arg> is the base itself or its remote twin (main, origin/main), that diff is empty: explain the tip commit as in rule 7 instead.",
+          "fix": "Resolve the remote twin of a non-origin base (upstream/main, a fork remote) the same way as origin/main, and say what to do when git merge-base fails for the three-dot diff."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 3,
+          "evidence": "argument-hint: [commit|branch|range|#PR|custom]",
+          "fix": "Add an upstream-sources.json note is unnecessary (the rows exist); add a credit line at the end of the command body naming Leonardo Flores (@leonardocouy) via softaworks/agent-toolkit, since the command text itself has no credit and the registry row is not visible to the agent."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": null,
+          "evidence": "The dbff837f previous-version digest states \"removed units (59, showing 40)\", so its removal list is truncated. The 40 displayed units are accounted for by current content or valid recovery-record rows, including user-accepted drops.",
+          "fix": "Supply the complete dbff837f removal digest and check the remaining 19 units against the current command and docs/audit/recovery/explain-changes-mental-model/record.md. Restore any unexplained substantive content into the command when its procedure depends on it, or into a skill its plugin bundles otherwise; record each disposition."
+        }
+      ]
+    },
+    {
+      "name": "feedback-mastery",
+      "percent": 95.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 96.0,
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/feedback-mastery/record.md",
+          "line": null,
+          "evidence": "Digest dbff837f reports \"removed units (459, showing 40)\": the 419 unshown removed units cannot be checked item by item against the record's section rows",
+          "fix": "Regenerate the digest for dbff837f without truncation (or add para: rows to docs/audit/recovery/feedback-mastery/record.md) so every removed unit has a row or a named destination in the current files"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/feedback-mastery/references/receiving-feedback.md",
+          "line": 7,
+          "evidence": "1. **Listen to the end.** Do not draft a rebuttal while they talk.",
+          "fix": "Keep the sequences the model would not derive (acknowledge the effect without conceding intent; settle disputed claims against a record afterwards) and record the generic listen/paraphrase/thank steps as generic-model-knowledge in docs/audit/recovery/feedback-mastery/record.md instead of spending the gated reference on them"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/feedback-mastery/references/receiving-feedback.md",
+          "line": 10,
+          "evidence": "4. **Acknowledge the effect, not their reading of your motive:** \"I can see that cost you a day.\"",
+          "fix": "Promote this correction to a NEVER item with its reason in the Gotchas list of skills/feedback-mastery/SKILL.md (conceding the effect is not conceding intent; arguing intent reopens the dispute), keeping the reply sequence in the reference, so the rule is read before a reply is drafted"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest at dbff837f: removed units (459, showing 40).",
+          "fix": "Review the remaining digest items against the current files and docs/audit/recovery/feedback-mastery/record.md; restore any substantive unexplained losses to an appropriate reference or add valid record rows."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": 24,
+          "evidence": "The recognition path says 'SBI opener plus one open question', but section 3 says recognition 'names the behavior and its effect, then stops'.",
+          "fix": "Split recognition from corrective feedback in the routing table: recognition ends after the behavior and effect, while corrective feedback adds an open question."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/feedback-mastery/references/cause-exploration.md",
+          "line": 41,
+          "evidence": "The quality-issues opener lists 'The last three PRs ([#, #, #])', although R2 and the reference's preparation step specify one or two instances.",
+          "fix": "Revise the worked opener to use the most recent one or two PRs, retaining the cause-exploration and follow-up guidance."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/feedback-mastery/SKILL.md",
+          "line": 30,
+          "evidence": "The routing table sends disputed ownership and success criteria to section 5, which starts by asking what a date exists for and requires scope/date options.",
+          "fix": "Route ownership and success-criteria disputes directly to their respective procedures in references/expectation-alignment.md; reserve the date-goal and scope/date trade-off sequence for deadline or scope resets."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

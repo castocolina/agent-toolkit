@@ -1,0 +1,77 @@
+{
+  "skill": "explain-pr-changes",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 14,
+    "D5": 10,
+    "D6": 14,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 238,
+      "evidence": "The command is 470 lines. Phase 5 still restates the whole branch-publish and partial-attach recovery that section 5 of skills/pr-diagrams/references/pr-body.md already holds and that phase 5 orders the agent to read.",
+      "fix": "Keep the phase-5 decision (PNG vs no PNG, attach vs branch, terminal vs recoverable) and the exact create/edit lines, and move the repeated publish/retry recipe into the already-loaded 'Branch publish and attach recovery' section of skills/pr-diagrams/references/pr-body.md so the command only points at it."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/explain-pr-changes.md",
+      "line": 304,
+      "evidence": "Phase 4 says a valid capability probe 'always exits 0 and prints exactly attach or branch', and 'when capability exits non-zero or prints anything else, stop before render'. skills/pr-diagrams/scripts/pr-diagrams.sh usage_err exits 2 with empty stdout for a stray argument or an invalid PR_DIAGRAMS_MODE, and eval capability-probe-fails (empty stdout, exit 1) asserts the opposite: treat it as branch mode, still render, and publish.",
+      "fix": "Make phase 4 match the script and the eval: only an invalid probe (non-zero, or stdout other than exactly attach or branch) stops before render, naming pr-diagrams.sh capability and quoting stderr; a probe that falls back itself (stderr reason, stdout exactly branch, exit 0) continues in branch mode. Then rewrite the capability-probe-fails assertion so empty stdout plus exit 1 is a stop, not a guessed branch mode."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 11,
+      "evidence": "Gotchas restates facts the phases already specify: bare 'gh pr view --repo' (line 11 and 1.4), the literal ${CLAUDE_PLUGIN_ROOT} skip (line 12 and 1.5), and 'Shell variables do not persist between Bash calls' (line 19 and the phase-3 note).",
+      "fix": "Keep the non-obvious landmines (user-attachments screenshots counting as diagrams, squash/rebase related detection, jq -j gluing headings, the single pr-diagrams branch). Drop the three restatements, or record each drop in docs/audit/recovery/explain-pr-changes/record.md; do not cut the gotchas that the phases do not already say."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 2,
+      "evidence": "The description names the task and the not-for neighbour, but it does not say when a bare request such as 'open the PR' or 'write up this branch' should load it without naming a pull request or 'explain PR changes'.",
+      "fix": "Create or update the GitHub pull request for the current branch from its committed diff: summary, changeset triage, optional Mermaid or draw.io diagram, promotion-branch bodies reused from merged PRs, and reviewers. Use when asked to open, write, refresh or describe a pull request, even as a bare 'open the PR' or 'write up this branch', and for 'explain PR changes', 'open or refresh the PR summary', 'promote develop to main', or 'reuse merged PR bodies'. Pushes feature branches and writes PRs. Not for a read-only explanation of a diff (use explain-changes-mental-model)."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/explain-pr-changes.md",
+      "line": 336,
+      "evidence": "Feature body rules leave the summary and changeset grouping to judgment ('purpose and key changes, at most 150 words', 'group the diff by file into changesets') while the surrounding PR-write path is exact commands. That mix is right for prose, but the grouping rule gives no default when one file serves two changes.",
+      "fix": "Keep the 150-word and triage rules. Add one default: one changeset per file unless two files change the same exported signature or data flow, in which case they share a changeset; the agent may still split a file that contains two unrelated edits."
+    }
+  ]
+}

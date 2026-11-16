@@ -15,24 +15,27 @@ cp -r skills/reducing-entropy ~/.claude/skills/
 ## Files
 
 - `SKILL.md` - trigger boundary, lens routing, procedure and NEVER rules.
-- `references/` - one decision lens per file, each loaded only when `SKILL.md` routes to it.
+- `references/` - one decision lens per file, each loaded only when `SKILL.md` routes to it. `red-flags-and-stop-conditions.md` is the one non-lens file (the less-total-code rule, replies to arguments for keeping code, stop conditions), also loaded by a `SKILL.md` trigger.
+- `references/adding-reference-mindsets.md` - file template and exclusion list for a new lens; read it when adding a reference, it is not loaded at runtime.
 - `evals/` - output evals, trigger queries, and fixtures in `evals/files/`.
 
 ## Adding a reference mindset
 
-Add a reference only for a distinct decision lens that changes a real delete/consolidate judgment. Keep it brief, name it by concept (not by person or source), link it from the lens list in `SKILL.md` with its trigger, avoid restating general design philosophy, and end it with an External References list of its primary sources.
+Add a reference only for a distinct decision lens that changes a real delete/consolidate judgment. Keep it brief, name it by concept (not by person or source), link it from the lens list in `SKILL.md` with its trigger, avoid restating general design philosophy, and end it with an External References list of its primary sources. Read [references/adding-reference-mindsets.md](references/adding-reference-mindsets.md) first for the file template and for what not to add.
 
 Primary sources for simplicity thinking, to draw from when creating new mindsets:
 
 - [Simple Made Easy](https://www.infoq.com/presentations/Simple-Made-Easy/) - Rich Hickey
 - [Hammock Driven Development](https://www.youtube.com/watch?v=f84n5oFoZBc) - Rich Hickey
 - [The Value of Values](https://www.infoq.com/presentations/Value-Values/) - Rich Hickey
-- [Out of the Tar Pit](https://curtclifton.net/papers/MosesleyMarks06a.pdf) - Moseley & Marks
+- [Out of the Tar Pit](https://curtclifton.net/papers/MoseleyMarks06a.pdf) - Moseley & Marks
 - [No Silver Bullet](https://www.cs.unc.edu/techreports/86-020.pdf) - Fred Brooks
 - [The Grug Brained Developer](https://grugbrain.dev/) - grugbrain.dev
 - [Worse Is Better](https://www.dreamsongs.com/WorseIsBetter.html) - Richard Gabriel
 - [A Philosophy of Software Design](https://www.amazon.com/dp/173210221X) - John Ousterhout
 - [The Zen of Python](https://peps.python.org/pep-0020/) - Tim Peters
+
+The git commands in the step-2 counter of SKILL.md follow the documentation of the Git project ([git-ls-files](https://git-scm.com/docs/git-ls-files), [gitglossary](https://git-scm.com/docs/gitglossary)), checked 2026-11-13.
 
 ## Attribution
 

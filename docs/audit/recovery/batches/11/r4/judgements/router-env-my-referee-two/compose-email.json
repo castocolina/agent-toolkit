@@ -1,0 +1,122 @@
+{
+  "skill": "compose-email",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 13,
+    "D2": 13,
+    "D3": 13,
+    "D4": 14,
+    "D5": 15,
+    "D6": 11,
+    "D7": 12,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 103,
+  "max_total": 125,
+  "percent": 82.4,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "docs/audit/recovery/compose-email/record.md",
+      "line": 4,
+      "evidence": "s005 Step 3: Apply Email Best Practices | removed-to-fit | real | restore-references | reusable-template | subject tag convention (\"5-8 words\", \"[Action Required]\", \"[FYI]\", \"[Decision Needed]\", \"[Due Friday]\") and body limits (3-5 bullets, bold the key fact, 2-3 sentence paragraphs) exist nowhere in current text",
+      "fix": "The restore was not done: those conventions are now in commands/compose-email.md Gotchas and step 5, so rewrite this row to fate redistributed commands/compose-email.md, decision none, reason class moved-to commands/compose-email.md; do not delete the tags or limits"
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "docs/audit/recovery/compose-email/record.md",
+      "line": 6,
+      "evidence": "s004 Step 2: Apply Communication Framework | removed-to-fit | real | restore-references | tested-example | the per-part sentence caps (WHAT 1-2, WHY 2-3 sentences) and \"No throat-clearing (\\\"I hope this email finds you well...\\\")\" are gone",
+      "fix": "The restore was not done: step 5 now states both the sentence caps and the throat-clearing ban, so rewrite this row to fate redistributed commands/compose-email.md, decision none, reason class moved-to commands/compose-email.md; keep both rules"
+    },
+    {
+      "id": "D1-3",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 24,
+      "evidence": "Fresh drafts default to under 150 words unless the facts need more.",
+      "fix": "Move the generic length, scannability and tone advice (150 words, 5-8 word subjects, 2-3 sentence paragraphs, bold one fact) into a skill this plugin bundles and load it only when the user asks for a length or format change; keep the non-obvious rules (proposed-versus-confirmed dates, disclosure, hedging qualifiers, split asks) in the command"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 17,
+      "evidence": "Anything else (announcement, thank-you, introduction) uses FYI: lead with what changes or what is recognised",
+      "fix": "Give thank-you and introduction their own one-line closings instead of routing both through the FYI change-lead, and name the Mindset pattern this short creative command follows"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 30,
+      "evidence": "NEVER write a vague subject such as \"Quick question\", \"Update\" or \"FYI\" alone: the reader cannot triage it and it is skipped or answered late.",
+      "fix": "Keep the Gotchas list; add the non-obvious reason only where it is still generic, for example why an unexpected CC escalates a thread beyond 'wrong audience'"
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 2,
+      "evidence": "Not for casual chat replies; a finished draft can be reformatted for Slack or Teams on request.",
+      "fix": "Draft or rewrite a professional email to a peer, stakeholder, manager or leadership using What-Why-How: subject, ask-first body and a labelled proposal date. Use for status updates, approval requests, escalations, follow-ups, or when the user only asks to make a message shorter, clearer or less defensive, even without the word email. Produces a subject and body to paste; never sends. Not for sending mail, scheduling, or casual chat replies; a finished draft can be reformatted for Slack or Teams on request."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 17,
+      "evidence": "choose from the list below. A status update that needs a decision, or an FYI that carries an ask, is a request",
+      "fix": "Collapse the purpose list and the later tie-break restatement into one ordered decision with a single default (Request when the reader must decide), and leave voice, tone and length as principles once the user sets them"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "commands/evals/compose-email.json",
+      "line": 6,
+      "evidence": "\"id\": \"approval-request-full-context\" ... \"You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would\"",
+      "fix": "Add one verifiable failure scenario whose prompt does not forbid the command's own AskUserQuestion path, covering a blocking gap the current empty-request and word-limit scenarios do not already cover, with assertions that the output stops and invents nothing"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 15,
+      "evidence": "Blocking: no topic, no source draft and no received message: ask once and stop only then.",
+      "fix": "State the three blocking conditions as an explicit or (no topic AND no source draft AND no received message), and say the same question is the fallback when AskUserQuestion is unavailable"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 45,
+      "evidence": "`/command-compose-email:compose-email <context or pasted draft>`.",
+      "fix": "Keep the Dana Ruiz example; add one short example that follows the received-message branch to a reply, so that branch is not only prose"
+    }
+  ]
+}

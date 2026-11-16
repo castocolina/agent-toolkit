@@ -1,0 +1,86 @@
+{
+  "skill": "mermaid-diagrams",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/README.md",
+      "line": 1,
+      "evidence": "README restates a generic Mermaid guide (Purpose, Key Features, Usage Examples, Getting Started, Best Practices, Tips for Success) that the agent already gets from SKILL.md and the type references",
+      "fix": "Keep README.md (the repo requires it) and the Credits section. Move any fact a user asks for by name into references/ if it is not already there, then record each remaining generic paragraph in docs/audit/recovery/mermaid-diagrams/record.md; do not delete the Credits lines"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/references/other-diagrams.md",
+      "line": 32,
+      "evidence": "Git gotchas cover checkout-before-branch and cherry-pick id, but not that merge needs the branch name (merge id: \"rc1\" is a parse error) while cherry-pick needs the commit id",
+      "fix": "Add one NEVER to SKILL.md Gotchas or other-diagrams.md Git: merge takes the branch name (merge hotfix), cherry-pick takes a commit id set on that commit; swapping them parses as an error"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/references/architecture-diagrams.md",
+      "line": 40,
+      "evidence": "Reference links https://iconify.design with no instruction to open it, while the Custom icon packs section already states the mmdc and registerIconPacks facts",
+      "fix": "Drop the Iconify catalog link or gate it: open it only when the user names a pack the renderer does not register; keep the official architecture docs link"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/evals/evals.json",
+      "line": 1,
+      "evidence": "28 evals and 22 trigger queries are realistic and verifiable, but several assertions are mechanical (Uses `gantt`, Uses `pie`, Uses `stateDiagram-v2`) and no grading.json or benchmark.json shows they were run",
+      "fix": "Keep the edge-case assertions (cardinality glyphs, unique C4 ids, quoted labels, Mermaid 12 frontmatter). Replace the type-name-only checks with an outcome the skill can get wrong, and store one graded iteration next to the skill"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+      "line": 111,
+      "evidence": "Section 7 says write the entity codes `#35;` and `#59;` for `#` and `;` in sequence text; Mermaid's documented forms are `#35` and `#59` with no semicolon, and a trailing semicolon ends the statement",
+      "fix": "Change both codes to the official form `#35` and `#59`, cite https://mermaid.js.org/syntax/sequenceDiagram.html with the date checked, and keep the eval assertion in repair-sequence-end aligned with that form"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 18,
+      "evidence": "Step 3 says a target whose name starts with o or x after a link parses as a circle or cross edge, but the example is `A---orders` with no space, which is the ordinary edge to node orders; the circle form is `A---oB`",
+      "fix": "Replace the example with `A---oB` and `A---xB` as written in authoring-rules.md section 7, and say a space before the target (`A--- orders`) is the repair when the circle or cross was not intended"
+    }
+  ]
+}

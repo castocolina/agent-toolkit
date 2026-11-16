@@ -6,10 +6,10 @@ A skill for creating, inspecting, editing and comparing Excalidraw diagrams (`*.
 
 Excalidraw files have a very low signal-to-noise ratio. Each element carries 20+ geometry and styling properties (x, y, seed, version, roughness, ...), while the content that matters, labels and connections, is under 10% of the file. Measured on real diagrams:
 
-- 14-element diagram: 596 lines, 16K, about 4k tokens
-- 79-element diagram: 2,916 lines, 88K, about 22k tokens (exceeds read limits)
+- 14-element diagram: 596 lines, 16K
+- 79-element diagram: 2,916 lines, 88K (tens of thousands of tokens; more lines than the Read tool returns in one call, so it needs paging)
 
-Reading 7 such diagrams directly cost about 67k tokens, a third of a 200k context.
+Token counts depend on the tokenizer, so the sizes above are lines and bytes. Reading 7 such diagrams directly cost about 67k tokens, a third of a 200k-token window; the window size varies by model (see the "Context window" row of the [models overview](https://platform.claude.com/docs/en/about-claude/models/overview), checked 2026-11-13).
 
 ## What it does
 
@@ -38,6 +38,13 @@ cp -r skills/excalidraw ~/.claude/skills/
 ```bash
 python3 -m unittest discover -s tests/skills/excalidraw -p 'test_*.py'
 ```
+
+## Credits and sources
+
+- The skill began as `skills/excalidraw` in softaworks/agent-toolkit; `scripts/scene.py`, the routing and the worker contract were written for this repository.
+- The scene format and the embedded-scene export (`.excalidraw.png`, `.excalidraw.svg`, "Embed scene") follow the [Excalidraw](https://plus.excalidraw.com/docs/sdk/codebase/json-schema) documentation and source.
+- The Obsidian `.excalidraw.md` layout (`compressed-json`, `## Text Elements`) follows the Obsidian Excalidraw plugin by Zsolt Viczian.
+- The context-window statement follows Anthropic's [models overview](https://platform.claude.com/docs/en/about-claude/models/overview).
 
 ## License
 

@@ -62,10 +62,10 @@ Each rep should be:
 ## Key Features
 
 - **Content Analysis**: Extracts actionable lessons from any educational content
-- **Quest Framing**: Helps define specific, measurable goals
+- **Quest Framing**: Reuses your stated goal, deadline and available time, asking only for a missing constraint that changes Rep 1
 - **Progressive Difficulty**: Each rep adds ONE new element
 - **Built-in Reflection**: Structured questions after each shipped rep
-- **Action Orientation**: Always ends with "what's next?"
+- **Action Orientation**: Always ends with "what's next?", asks what might stop you from shipping, and invites you back to plan Rep 2
 - **Plan Saving**: Saves your quest plan as a Markdown file by default, or gives it in chat when you ask
 
 ## Usage Examples
@@ -131,22 +131,21 @@ Ship-Learn-Next Plan - [Your Quest Title].md
 # Your Ship-Learn-Next Quest: [Title]
 
 ## Quest Overview
-- Goal (4-8 week target)
+- Goal and deadline (the ones you state, or a stated assumption)
 - Source (content that inspired this)
-- Core Lessons (3-5 actionable takeaways)
+- Core Lessons (the actionable takeaways, each with a testable action)
 
-## Rep 1: [Specific, Shippable Goal]
-- Ship Goal
-- Timeline (this week)
-- Success Criteria (checkboxes)
-- What You'll Practice
-- Action Steps
-- Minimal Resources
-- After Shipping - Reflection Questions
+## Rep 1: [Specific, Shippable Goal] (lesson N)
+- Done when (actions you control, such as publish, send, build, demo)
+- Learning metric (replies, conversion, adoption: read after the rep, never a gate)
+- Process measure (what you can observe during the rep, added when outcomes are noisy)
+- Steps (sized to your time budget, setup included)
+- Resources (only what this rep needs)
+- Reflect (questions to answer after shipping)
 
-## Rep 2-5: Future Path
-- Progressive iterations with increasing challenge
-- Each rep adds ONE new element
+## Later reps: Future Path
+- Provisional one-line outlines with increasing challenge
+- Each rep changes ONE thing from the rep before; Rep 2 is expanded after Rep 1 evidence
 
 ## Remember
 - Focus on doing, not studying
@@ -184,3 +183,7 @@ Every great practitioner got there through reps - hundreds of attempts, failures
 The goal isn't to create the perfect plan. It's to help you ship something real, learn from it, and ship the next thing. Then the next. Then the next.
 
 Let's help you ship.
+
+Based on the original skill in [michalparkola/tapestry-skills-for-claude-code](https://github.com/michalparkola/tapestry-skills-for-claude-code/tree/main/ship-learn-next) (MIT), via [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit/tree/main/skills/ship-learn-next); this version is rewritten. The upstream README says the framework is inspired by the "ShipLearnNext GPT methodology" and names no originator.
+
+Sources: michalparkola/tapestry-skills-for-claude-code (MIT), via softaworks/agent-toolkit (original skill). Frontmatter facts (`allowed-tools`, `name`, `description`) were checked 2026-11-13 against the [Claude Code skills docs](https://code.claude.com/docs/en/skills) (Anthropic) and the [Agent Skills specification](https://agentskills.io/specification) (Agent Skills (agentskills.io)).

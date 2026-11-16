@@ -22,9 +22,28 @@ classDiagram
 
 The arrowhead or diamond sits on the side it is written: `Parent <|-- Child`, `Interface <|.. Impl`, `Owner *-- Part`, `Whole o-- Member`.
 
+## Abstract and static members
+
+A trailing `*` marks an abstract member and a trailing `$` a static one, written after the signature: `+draw()*`, `+area() double*`, `+count()$ int`, `String name$`. The annotation between `<<` and `>>` is free text (`<<abstract>>`, `<<interface>>`, `<<service>>`, `<<enumeration>>`); it does not change the drawing, so add `<<abstract>>` next to the `*` members.
+
+```mermaid
+classDiagram
+    class Shape {
+        <<abstract>>
+        +int x
+        +draw()*
+        +area() double*
+        +count()$ int
+    }
+    Shape <|-- Circle
+    Shape <|-- Rectangle
+```
+
+Source: https://mermaid.js.org/syntax/classDiagram.html (members, annotations), checked 2026-11-13.
+
 ## Generics
 
-- Generics use tildes, not angle brackets: `Repository~T~`, `List~Order~`. Nested generics render in member types (`+List~List~int~~ items` shows `List<List<int>>`); as a class name (`class Box~List~int~~`) Mermaid 11.17 rejects them, so keep the class as `Box~T~` and put the nested type on its members. Use an alias only when validation on the target renderer fails.
+- Generics use tildes, not angle brackets: `Repository~T~`, `List~Order~`. Nested generics render in member types (`+List~List~int~~ items` shows `List<List<int>>`); as a class name (`class Box~List~int~~`) Mermaid 11.17 and 12.3 reject them (tested 2026-11-13), so keep the class as `Box~T~` and put the nested type on its members. Use an alias only when validation on the target renderer fails.
 
 ## Traps
 

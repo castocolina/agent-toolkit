@@ -1,0 +1,104 @@
+{
+  "skill": "c4-architecture",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 11,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/c4-architecture/references/c4-syntax.md",
+      "line": 36,
+      "evidence": "Rel_U / Rel_Up, Rel_D / Rel_Down, Rel_L / Rel_Left, Rel_R / Rel_Right   placement hints",
+      "fix": "The four compass aliases are standard Mermaid C4 the model already emits. Move that one signature line into a short 'directional aliases' note at the end of references/c4-syntax.md Relationships (keep Rel_Back and the ignored RelIndex, which the NEVER list depends on) and record the move in docs/audit/recovery/c4-architecture/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/c4-architecture/references/c4-syntax.md",
+      "line": 1,
+      "evidence": "digest cut list 'removed units (334, showing 40)' for c4-architecture at dbff837f; the 40 shown paras all sit in sections.json units of sections that have allowed record rows",
+      "fix": "No single para is unexplained. The unshown 294 units are not itemized, so confirm each against docs/audit/recovery/c4-architecture/sections.json and record.md; restore any substantive template, procedure, rule or example the rows do not cover into references/ (into SKILL.md only when a step depends on it) or add its row."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/c4-architecture/references/common-mistakes.md",
+      "line": 153,
+      "evidence": "## Colors without a key ... If `UpdateElementStyle` colors carry meaning, explain them in a line of prose under the diagram.",
+      "fix": "This restates the following section, Diagram without a key (lines 157-164), which already requires one prose key per diagram and the same color meaning across views. Keep Diagram without a key, delete the Colors without a key heading and its two sentences, and add a drop row to docs/audit/recovery/c4-architecture/record.md."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": 16,
+      "evidence": "Produce a Component view when the user asks for one and the container is identifiable, or when one container holds distinct responsibilities a reader must see (about five or more modules is a hint, never a gate).",
+      "fix": "Step 1 already defaults to Context + Container and adds a Component view when developers or architects name a container. Make the unsolicited case an offer, not a second production rule: 'If nobody asked for a Component view, offer one for the container with the most distinct responsibilities; draw it only when accepted or when the user named that container.'"
+    },
+    {
+      "id": "D6-2",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": 55,
+      "evidence": "Render every file with mermaid-cli 11.17.1 or newer: `mmdc -i docs/architecture/c4-containers.md ...`. ... No `mmdc`, or one older than 11.17.1: `npx -y -p @mermaid-js/mermaid-cli@11.17.1 mmdc ...`. Any mermaid-cli 11 or newer works",
+      "fix": "One default: use the mmdc already on PATH when `mmdc --version` is 11.17.1 or newer; otherwise run the pinned `npx -y -p @mermaid-js/mermaid-cli@11.17.1 mmdc`. State older 11.x only as the known text-wrap exception, and point the README Installation pin (currently `@mermaid-js/mermaid-cli@11.17.0`) at the same 11.17.1 command."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/c4-architecture/evals/evals.json",
+      "line": 1,
+      "evidence": "14 evals with verifiable assertions and 10/10 trigger queries, but no assertion grades, iteration outputs or with-skill versus without-skill comparison are in the skill.",
+      "fix": "Run the 14 prompts once with the skill and once without it, write grading.json per eval (PASS/FAIL plus quoted evidence for each assertion) and a benchmark.json delta, and fix or drop any assertion that passes in both. Keep the existing prompts; they already cover casual and precise phrasings and the edge cases."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": 55,
+      "evidence": "Render every file with mermaid-cli 11.17.1 or newer ... No CLI, no network, or no browser for it to launch: check by hand against syntax reference",
+      "fix": "The hand-check fallback never says what 'passes' means. Add one line to step 5 item 1: a hand check passes only after every block is compared with references/c4-syntax.md (five headers, declared aliases, braces only on boundaries and deployment nodes) and the user is told the files were not rendered."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/c4-architecture/references/c4-syntax.md",
+      "line": 1,
+      "evidence": "Checked against the Mermaid C4 documentation (https://mermaid.js.org/syntax/c4.html) and rendered with mermaid-cli 11.17.",
+      "fix": "Facts not verified online (this judge has no web fetch). The opening line names mermaid-cli 11.17 with no date, while SKILL.md line 55 dates the 11.17.0 and 12.2.0 checks 2026-11-13 and this file's More examples date 12.2.0 as 2026-11-14. Add the check date to line 1 and name the exact 11.17.x build that rendered the five examples."
+    }
+  ]
+}

@@ -42,3 +42,9 @@ Script tests live in `tests/skills/plugin-forge/` at the repository root.
 - [Plugin manifest reference](https://code.claude.com/docs/en/plugins/manifest-reference)
 - [Marketplace reference](https://code.claude.com/docs/en/plugins/marketplace-reference)
 - [Plugin commands reference](https://code.claude.com/docs/en/plugins/cli-reference)
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+Documentation owners credited (official pages listed in `docs/audit/upstream-sources.json`, checked 2026-11-13): Anthropic (Claude Code plugin documentation).

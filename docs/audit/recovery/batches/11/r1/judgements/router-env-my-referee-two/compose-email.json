@@ -1,0 +1,113 @@
+{
+  "skill": "compose-email",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 14,
+    "D3": 14,
+    "D4": 13,
+    "D5": 15,
+    "D6": 12,
+    "D7": 12,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 105,
+  "max_total": 125,
+  "percent": 84.0,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 17,
+      "evidence": "Step 2(b) Split, step 3 Close by purpose, and step 5's What-Why-How labels restate the same purpose rules already given in step 2(c); the restated lines are activation or generic drafting knowledge, so expert content is under 70% of the 52-line body.",
+      "fix": "Keep the purpose list once in step 2 and point steps 3 and 5 at it. Move the reusable subject-tag and body-structure rules, which users ask for by name, into a skill bundled by the command-compose-email plugin and load that file only when drafting the subject or body; record the move in docs/audit/recovery/compose-email/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 11,
+      "evidence": "The command follows a Process pattern (ordered workflow, checkpoints, medium freedom) but the phases are one dense paragraph each with no checkpoint between strategy and close, so the pattern is clear with a minor deviation.",
+      "fix": "Keep the five steps and add a one-line checkpoint after step 2: purpose chosen, blocking gaps closed, split decided, before step 3 closes the draft."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 27,
+      "evidence": "Most Gotchas give a non-obvious why (proposed dates read as commitments; unflagged placeholders get pasted and sent; suspected causes become facts), but 'NEVER put the ask only in the subject line' only restates that mobile clients truncate subjects.",
+      "fix": "Replace that item with a reason an expert learned the hard way, for example that a subject-only ask is dropped when the thread is forwarded without the subject, or drop the item and record the removal in docs/audit/recovery/compose-email/record.md."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 2,
+      "evidence": "description: Draft or rewrite a professional email to a peer, stakeholder, manager or leadership using What-Why-How. Use for status updates, approval requests, escalations, follow-ups, or when the user only asks to make a message shorter, clearer or less defensive, even without the word email. Produces a subject and body to paste; never sends. Not for casual chat replies; a finished draft can be reformatted for Slack or Teams on request.",
+      "fix": "Draft or rewrite a professional email (subject plus body) with What-Why-How for a status update, approval request, escalation, follow-up or FYI. Use when the user asks to email a peer, stakeholder, manager or leadership, or only to make a message shorter, clearer or less defensive, even without the word email. Not for casual chat replies and not for sending mail (paste-only; Slack or Teams reformatting is on request)."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 17,
+      "evidence": "Step 2(c) lists six purposes with no default and no order for overlap: a status update that needs a decision is a request, an escalation can also be a follow-up, and 'anything else' is FYI, so two purposes can both match.",
+      "fix": "Default to one purpose and name the escape: if the reader must decide or approve, it is a Request even when it also reports status or follows up; use Escalation only when impact, uncertainty and a mitigation are all present; otherwise FYI."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "commands/evals/compose-email.json",
+      "line": 4,
+      "evidence": "Five scenarios have verifiable assertions, but every prompt says 'You cannot run commands or ask questions' and 'never reply that information is missing', so the blocking-gap path (step 1: no topic and no source draft, ask once and stop) is never actually exercised; empty-request-asks-for-facts contradicts the command it tests.",
+      "fix": "Add a failure-path scenario whose prompt allows the one blocking question and forbids inventing an email, with assertions that the output asks for topic, recipient and outcome and then stops, and drop the 'never reply that information is missing' line from that scenario only."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 40,
+      "evidence": "Example Usage is only `/command-compose-email:compose-email <context or pasted draft>` and never shows a finished subject or body, so the example does not reach an output.",
+      "fix": "Under Example Usage, add one short input (a deadline-extension request) and the subject-plus-body the workflow produces, including a labelled proposed date and the placeholder list."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 17,
+      "evidence": "Step 2(c) has no resolved branch when a message is both an escalation and a follow-up (prior thread plus observed impact and uncertainty): either purpose can be chosen and the closing rule in step 3 then differs.",
+      "fix": "Add one tie-break: if a prior unanswered ask exists, Follow-up wins and the escalation content (impact, uncertainty, mitigation) goes in Why; otherwise Escalation."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 21,
+      "evidence": "Step 4's word-limit fallback says to ask whether to relax the limit or drop named items and then redraft, but it does not say what to do when the user does not answer or names nothing to drop.",
+      "fix": "State the fallback: if the user does not choose, keep every source fact, leave the overage reported, and do not drop items."
+    }
+  ]
+}

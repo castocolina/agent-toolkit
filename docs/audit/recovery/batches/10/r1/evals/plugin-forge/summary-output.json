@@ -1,0 +1,44 @@
+{
+  "skill": "plugin-forge",
+  "mode": "output",
+  "pass_rate": 0.75,
+  "passed": 21,
+  "total": 28,
+  "failures": [
+    {
+      "eval": "remote-npm-source",
+      "assertion": "Classifies the entry as a remote plugin (an `npm` object source), not standard or other local, so `bump_version.py` and `create_plugin.py` do not apply and the files are edited by hand.",
+      "evidence": "The output says \"**Remote** (`npm` object source), not standard or other-local\" and \"`bump_version.py` does not apply\" plus \"Bump `version` by hand\", but it never says `create_plugin.py` does not apply."
+    },
+    {
+      "eval": "remote-npm-source",
+      "assertion": "Names `references/marketplace-schema.md` (or the marketplace reference) for the shapes of the `npm`, `archive` and `command` sources.",
+      "evidence": "The output never names `references/marketplace-schema.md` or the marketplace reference, and it never mentions `archive` or `command` source shapes."
+    },
+    {
+      "eval": "layout-directories",
+      "assertion": "Lists the default layout directories from the reference (skills/, commands/ as legacy, agents/, hooks/hooks.json, .mcp.json, .lsp.json, output-styles/, bin/) and says `skills/` is preferred over `commands/` for new instructions.",
+      "evidence": "The output lists skills/, commands/<file>.md, agents/, hooks/hooks.json, .mcp.json, .lsp.json, output-styles/, and bin/, but never calls commands/ legacy and only says \"put instructions in a skill\" about a root CLAUDE.md, not that skills/ is preferred over commands/."
+    },
+    {
+      "eval": "layout-directories",
+      "assertion": "Says a workflow script goes in `workflows/` and a theme in `themes/` (and that `monitors/monitors.json` also exists), pointing to the live Standard layout in the manifest reference for the full list.",
+      "evidence": "The output says \"For a workflow script and a color theme, use `workflows/` and `themes/`\" and lists \"`monitors/monitors.json` \u2014 the monitors array,\" but never points to the live Standard layout in the manifest reference."
+    },
+    {
+      "eval": "layout-directories",
+      "assertion": "Does not confirm that a plugin-root `settings.json` takes effect only for `agent` and `subagentStatusLine`: it says the reference does not document that and points to the official page.",
+      "evidence": "The output says \"This reference does not say a plugin-root `settings.json` is read, or that it only honors `agent` and `subagentStatusLine`,\" but it does not point to the official page."
+    },
+    {
+      "eval": "reserved-marketplace-name",
+      "assertion": "Says none of the three can be used: `pip` and `skills-dir` are reserved names, and `claude-community` is reserved for the official community marketplace.",
+      "evidence": "The output says \u201c`pip` and `skills-dir` are refused\u201d but \u201c`claude-community` is not on the short reserved list\u201d and is \u201cNot in that example set,\u201d not that it is reserved for the official community marketplace."
+    },
+    {
+      "eval": "details-omits-subdir-commands",
+      "assertion": "Recommends confirming by typing `/ops-kit:` in a new session or after `/reload-plugins`, and checking the `/plugin` Errors tab if it is missing.",
+      "evidence": "The output says to \"Type `/ops-kit:`\" and that local-path edits are live after `/reload-plugins`, but it never mentions checking the `/plugin` Errors tab if the command is missing."
+    }
+  ]
+}

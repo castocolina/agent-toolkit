@@ -63,3 +63,17 @@ Do not deliver it as "people have told me...". Either read the review threads an
 > "We talked on the 3rd about PRs failing CI before review. Since then, two of the last four have. The latest, on Monday, blocked Sam's merge for half a day. What's getting in the way of running the suite before opening a PR?"
 
 One recent example plus a reference to the earlier conversation, not a list of every instance. If the earlier conversation never happened, say so: "I should have raised this sooner."
+
+## Asking about intent (SBII)
+
+The Center for Creative Leadership extends SBI to Situation-Behavior-Impact-Intent (SBII): after the impact, ask about the person's original intentions, so the conversation learns what was behind the action. Source: CCL, "Use Situation-Behavior-Impact (SBI) To Understand Intent", https://www.ccl.org/articles/leading-effectively-articles/closing-the-gap-between-intent-vs-impact-sbii/ (checked 2026-11-13).
+
+The intent step is a question, never a statement. "I'm sure you didn't mean to cause a disruption" asserts a motive, and the person may dispute it or feel excused or accused.
+
+> **Situation, Behavior:** "Yesterday you pushed to `main` without a PR."
+>
+> **Impact:** "The build broke and five developers were blocked for two hours."
+>
+> **Intent (a question):** "What were you aiming for when you pushed it that way?"
+
+Use it when the impact surprised the user or the person's reason is the missing piece; skip it when the ask is already clear and the answer would not change it. Whatever they answer, acknowledge the aim they state and return to the effect and the agreed next step (for defensive replies see `difficult-conversation-scripts.md`).
