@@ -1,0 +1,59 @@
+{
+  "skill": "ui-ux-designer",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 15,
+    "D3": 15,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/ui-ux-designer.md",
+      "line": 72,
+      "evidence": "Output step 2 says to append ` \u2014 priority: <level>` to each evidence cell of the skill's review table, whose Cells rule requires `location \u2014 fact` (`dashboard.tsx:24 \u2014 width: 1200, uncapped`). The em dash already splits location from fact, so a second ` \u2014 priority:` has no stated parse.",
+      "fix": "In Output step 2, put priority outside the evidence cell: add a fifth column `priority` after `fix` on each per-screen table (the skill header stays the first four columns), or append ` (priority: <level>)` with parentheses and no em dash, and state that the skill's `location \u2014 fact` split is unchanged."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/ui-ux-designer.md",
+      "line": 34,
+      "evidence": "Step 1's missing-input branch says only \"review the description and say so up front\" and never names which description or what to emit when it has no user, task or screen.",
+      "fix": "Name the input: \"review the user's written description of the screen or decision.\" When that text names neither a user, a task nor a screen, stop after one line that says what is missing; do not emit the review table or ranked findings."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "agents/ui-ux-designer.md",
+      "line": 3,
+      "evidence": "The description covers critique, usability, accessibility, layout and a not-for boundary, but never names the preloaded ui-ux-principles pass/fail review (loading, responsive, hierarchy, tokens, states) that this agent returns.",
+      "fix": "Use for an honest, research-backed critique of a UI, screen, mockup, screenshot, user flow or design decision, run in its own context, returning the ui-ux-principles pass/fail review (loading, responsive, hierarchy, tokens, consistency, accessibility, states, interaction) plus ranked findings. Delegate when asked to review, critique or sanity-check a design, or about usability, UX, accessibility, layout, navigation, onboarding, loading, empty or error states, contrast or tap targets, or when the user wants pushback with cited sources, even without the word UX. Also flags generic template aesthetics (default fonts, stock gradients, cookie-cutter layouts) and recommends a more distinctive direction, grounded in user behaviour. Returns a verdict, one review table per screen, ranked findings with evidence and fixes, and the single biggest win. Not for implementing frontend code, generating new designs from scratch, or for the MUI theme API (mui)."
+    }
+  ]
+}
