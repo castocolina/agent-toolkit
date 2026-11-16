@@ -1,0 +1,81 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "qa-test-planner",
+      "percent": 94.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4,
+        "router-env-my-referee-one": 93.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 119,
+          "evidence": "Section 7 (lines 102-138, about a quarter of the body) holds a full flag table ('--step (repeat), --build --os --browser --device --url --rate --severity --priority --type --console --impact --workaround --reporter --regression --test-case --figma --first-noticed --id') that repeats what each script's --help already gives",
+          "fix": "Cut the 'Other flags' column down to 'run the script with --help for the full flag list'. Keep the required flags, the stdin-hang warning, the exact-value and quoting rules and the exit-code handling. Those are the parts the agent would get wrong without the skill."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 102,
+          "evidence": "'## 7. Optional scripts: files on disk' adds a long Tool-pattern block to what is otherwise a Process skill with a phased workflow and checkpoints",
+          "fix": "Move the script command examples and the exit-code reading procedure into references/scripts.md. Load it from section 7 with one line: 'Read references/scripts.md only when the user wants a file written or supplies a run log.' That keeps the SKILL.md body in the Process pattern."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/qa-test-planner/evals/evals.json",
+          "line": null,
+          "evidence": "Both script-run evals ('script-bug-file', 'script-test-case-file') attach logs with exit 0 only, so no output eval covers the exit 1 / 2 / 3 reviewer branches that section 7 step 1 spells out in detail",
+          "fix": "Add an eval with a run-log fixture in evals/files/ showing exit 3 (missing ./bugs). Assert three things: the reply reports the JSON 'error' verbatim, it proposes creating the directory or another writable destination without running anything, and it does not suggest --overwrite."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 129,
+          "evidence": "Step 1 is one dense paragraph: 'Then read the exit code below, but as a reviewer ... On exit 0, steps 2.1-2.3 and 2.5 still apply; step 2.4's edits wait for that authorization. In every supplied-log reply, add one line on reading results...'. It nests cross-references to sub-steps, and line 127 'Reading the result, in this order:' has no blank line after the previous bullet, so it renders inside that bullet",
+          "fix": "Put a blank line before line 127. Split step 1 into its own checklist: (a) report the exit code and JSON verbatim; (b) list each logged flag against the source; (c) for exit 0, do 2.1-2.3 and 2.5 and hold the 2.4 edits until the user authorizes them; for exit 1/2/3, show the remedy without running it; (d) add the one-line exit-code reading guide."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/references/bug_report_templates.md",
+          "line": 54,
+          "evidence": "\"A good title names the area, the failing behavior and the trigger\" repeats familiar bug-reporting advice; the severity table similarly restates standard definitions such as \"Low | Cosmetic or copy issue with no functional effect\". Across the line-weighted sections, useful activation guidance remains substantial alongside the stronger domain-specific oracles and local workflow rules.",
+          "fix": "Condense the generic title guidance and standard severity definitions into brief activation reminders. Retain the output template, impact-versus-rate crash distinction, Unknown-rate handling, explicit priority defaults and security/data-loss exception."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 130,
+          "evidence": "\"Then list every flag in the logged command with its value, one per line\" is mandatory for every supplied-log review, followed by \"quote each supplied field's actual value back\" on exit 0 and explanations of all four exit-code branches. This prescribes exhaustive, duplicated reporting even when the command and artifact agree.",
+          "fix": "Keep source-to-command and source-to-file verification mandatory, but default the reply to the observed exit code and manifest, discrepancies with quoted values, and Open Questions. Make the complete flag-by-flag and saved-field audit optional when explicitly requested or needed to explain a mismatch; describe recovery for the observed exit code rather than every possible code."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

@@ -1,0 +1,59 @@
+{
+  "skill": "codex-plan",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 42,
+      "evidence": "The illustrative excerpt repeats the context-list contract with generic examples: \"`package.json` - framework and dependencies\", \"`prisma/schema.prisma` - existing models\" and \"`src/middleware.ts` - current request handling\". These add no decision knowledge beyond the verified-path and one-line-reason instructions already given.",
+      "fix": "Remove the generic auth file-list excerpt; retain the verified-path requirement in step 1 and the one-line-reason contract under Prompt contents."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 33,
+      "evidence": "\"flag any changed file other than the chosen plan file\" also flags the workflow's own newly created prompt_to_codex.md when it is untracked. No pre-handoff baseline distinguishes existing user edits from changes made during the Codex run.",
+      "fix": "Record the workspace's baseline status and relevant diffs or file hashes after writing the prompt and before handing off. On return, compare against that baseline, allow the chosen plan output, and distinguish pre-existing changes and the expected prompt artifact from unexpected changes."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 31,
+      "evidence": "\"Add `--skip-git-repo-check` only when `git rev-parse --is-inside-work-tree` fails\" explicitly supports execution outside a Git worktree, but the return phase unconditionally requests \"`git status --short`\". That branch has no working source-change check or stated fallback.",
+      "fix": "Carry the Git-worktree check result into the return phase. Outside Git, compare a pre-handoff file snapshot or explicitly report that source-change verification is unavailable and request a file-change report instead of git status."
+    }
+  ]
+}

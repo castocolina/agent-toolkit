@@ -1,0 +1,77 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 113,
+  "max_total": 125,
+  "percent": 90.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 42,
+      "evidence": "The standard `type(scope)!: subject` skeleton, `Inspect git status, git diff --cached and git diff` instruction, and `Plan the commits` step repeat familiar Git and Conventional Commits knowledge. Alongside the largely activation-oriented intent table, these dilute the stronger temporary-index, staged-verification and hook-recovery expertise.",
+      "fix": "Keep brief approval and intent gates, but compress routine inspection/planning instructions and replace the generic message skeleton with a short Conventional Commits reminder. Preserve the Conventional Commits 1.0.0 credit and the specific non-interactive invocation, trailer, index-preservation and verification guidance."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/commit-work/evals/trigger-queries.json",
+      "line": 2,
+      "evidence": "`{\"query\":\"My commit is too broad; help split it into logical commits safely.\",\"should_trigger\":true}` does not establish whether the changes are uncommitted. It can describe splitting an existing commit, although the description excludes history rewriting.",
+      "fix": "Make this positive explicitly describe uncommitted changes, preferably with concrete paths and context. Add a negative explicitly asking to split an already-created commit so the history-editing boundary is tested unambiguously."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 16,
+      "evidence": "The stage-only route says `steps 1-4, stop after the review`, but step 3 directs unrelated user-staged content through `build the commit in a temporary index`. Following that branch stages the requested changes only in commit-work.index, then stops without putting them in the real index.",
+      "fix": "Restrict temporary-index isolation to commit requests. For stage-only requests, stage explicitly approved paths or an index-only patch directly in the real index while preserving disjoint pre-existing staged entries; stop and ask when the requested paths overlap user-staged content."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 49,
+      "evidence": "`git show --stat HEAD must match the reviewed git diff --cached --stat` is insufficient for the hook-restaging branch. A hook can replace the approved edit with a different edit in the same file while preserving identical insertion/deletion statistics, so this check can accept unreviewed committed content.",
+      "fix": "Capture `git write-tree` from the active index immediately before committing, then compare that tree ID with `git rev-parse 'HEAD^{tree}'` after success. On any mismatch, report the actual content difference and ask; do not automatically amend or create a fix-up commit."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/commit-work/references/commit-message-template.md",
+      "line": 7,
+      "evidence": "`The first source that exists wins` makes the commitlint-config branch skip requirements in commit templates or CONTRIBUTING.md. These sources can impose additive requirements, such as mandatory trailers, that a conventional commitlint configuration does not encode.",
+      "fix": "Collect all applicable repository message requirements rather than stopping at the first source. Resolve commitlint inheritance and local overrides, also inspect applicable templates and CONTRIBUTING guidance, combine compatible requirements, and ask about conflicts. Use recent history only as a fallback for unspecified vocabulary."
+    }
+  ]
+}

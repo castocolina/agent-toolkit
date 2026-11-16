@@ -1,0 +1,86 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 39,
+      "evidence": "\"Never use floating point, because binary rounding loses cents in sums. PostgreSQL and MySQL use fixed-scale NUMERIC(p,s)/DECIMAL(p,s).\"",
+      "fix": "Delete these two sentences, because the model already knows them. Keep the expert part: SQLite DECIMAL gets NUMERIC affinity and stores 0.1 as REAL, so use INTEGER minor units with a CHECK; MongoDB uses Decimal128; always store a currency column."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 36,
+      "evidence": "\"Unique columns accept many NULLs in PostgreSQL, MySQL and SQLite.\"",
+      "fix": "Cut this to one clause and keep only the non-obvious fix: \"For a nullable column that must be unique when missing too, use PostgreSQL 15+ UNIQUE NULLS NOT DISTINCT or make it NOT NULL.\""
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 3,
+      "evidence": "The description promises \"an embed-or-reference decision\", but the body gives only one criterion for it, unbounded growth (line 42: \"MongoDB documents stop at 16 MiB\").",
+      "fix": "Add a brief embed-or-reference rule to workflow step 1. Embed when the child is read with the parent, bounded in size, owned only by that parent and must update atomically with it. Reference when the child is shared across parents, grows without bound, is queried on its own or is updated independently at high rates."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/database-schema-designer/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "Several negatives are terse and restate the description's boundary word for word: \"Tune a slow SQL query using EXPLAIN output; do not change the schema.\" and \"Normalize this CSV export into a spreadsheet with separate tabs.\" No eval covers SQLite.",
+      "fix": "Rewrite the negatives as realistic near-misses that include file paths and context, for example \"this query in reports/monthly.sql takes 9s on prod, here's the EXPLAIN, can you speed it up without migrations?\". Add an output eval for a SQLite column-type change that needs the 12-step rebuild."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 24,
+      "evidence": "Workflow step 3 says \"start each file from assets/templates/migration-template.sql\". On SQLite, that template's \"BEGIN; SET LOCAL lock_timeout\" is invalid, and the SQLite rebuild in migrations.md requires \"PRAGMA foreign_keys = OFF; outside any transaction\" before BEGIN, so the SQLite branch reaches a template that fails.",
+      "fix": "Change step 3 to: \"Start PostgreSQL and MySQL migration files from assets/templates/migration-template.sql. For SQLite, skip the template and write the rebuild in the order given in references/migrations.md#sqlite-table-rebuild, with the PRAGMA outside the transaction.\" Alternatively, add a SQLite variant to the template."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 25,
+      "evidence": "\"For a quick sketch, skip the checklist.\" A quick sketch is then left with no self-check at all.",
+      "fix": "Add a minimal self-check for sketches: \"Before answering, confirm every named entity has a table, every FK has an ON DELETE, money and instant columns use the gotcha types, and each index names its query.\""
+    }
+  ]
+}

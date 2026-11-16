@@ -4,11 +4,12 @@
     {
       "id": "casual-strategy",
       "prompt": "Our neighborhood library app has 800 monthly users and one engineer. It works, but members rarely return. What could make it much more valuable?",
-      "expected_output": "A product strategy analysis with current-value framing, opportunity tiers, evaluation, and prioritized recommendations.",
+      "expected_output": "A ranked strategy session with tiered opportunities, each with a value mechanism, effort and assumption to validate, prioritized and labeled as hypotheses since no repository is available.",
       "assertions": [
-        "Separates Massive, Medium, and Small Gems opportunities.",
-        "Scores or reasons about impact and feasibility for concrete ideas.",
-        "Recommends Do Now, Do Next, Explore, or Backlog priorities without implementing code."
+        "Groups the ranked ideas under Massive Gems, Medium Gems and Small Gems.",
+        "Each ranked idea states a value mechanism, an effort or feasibility estimate, and an assumption to validate.",
+        "Gives each ranked idea one of Do Now, Do Next, Explore or Backlog with a reason, and contains no implementation code.",
+        "Labels claims about member behavior as hypotheses or assumptions, since no repository or data is provided."
       ]
     },
     {
@@ -16,9 +17,9 @@
       "prompt": "For a meal-planning app with 12,000 weekly users and a two-person team, propose 10x opportunities across effort scales; identify a next move and assumptions to validate.",
       "expected_output": "A grounded strategy document with tiered ideas, rationale, priorities, and validation questions.",
       "assertions": [
-        "Contains distinct Massive, Medium, and Small Gems ideas.",
-        "Uses impact and feasibility reasoning to prioritize.",
-        "Names an actionable priority and an assumption to validate; no code implementation."
+        "Has at least one idea under each of Massive Gems, Medium Gems and Small Gems.",
+        "Each ranked idea states its value mechanism, its reach in terms of the 12,000 weekly users, and its effort for a two-person team, and says which trade-off decides its rank.",
+        "Names one idea as Do Now (the next move), lists at least one assumption to validate with its cheapest test, and contains no implementation code."
       ]
     },
     {
@@ -26,9 +27,32 @@
       "prompt": "Add a CSV export button to our internal inventory tool. The team is 4 people and staff export reports weekly. Is this the right next move?",
       "expected_output": "A strategy response evaluates the incremental request against broader opportunities and prioritizes based on user value.",
       "assertions": [
-        "Evaluates CSV export as a small/incremental opportunity rather than treating it as transformative.",
-        "Compares it with at least one broader opportunity using impact or feasibility.",
-        "Gives a priority recommendation and does not implement code."
+        "Labels CSV export a Small or Medium Gem, not a Massive one.",
+        "Names at least one broader opportunity and compares it with CSV export on impact and on effort or feasibility.",
+        "Gives CSV export one of Do Now, Do Next, Explore or Backlog with a reason, and contains no implementation code."
+      ]
+    },
+    {
+      "id": "evidence-repo-session",
+      "prompt": "Attached is a snapshot of the Habitlane repo plus our latest feedback and metrics. What should we build next to make people stick around? Save it next to the last session like before.",
+      "files": [
+        "habit-repo/README.md",
+        "habit-repo/docs/ROADMAP.md",
+        "habit-repo/CHANGELOG.md",
+        "habit-repo/config/flags.yaml",
+        "habit-repo/docs/feedback.md",
+        "habit-repo/docs/metrics.md",
+        "habit-repo/.claude/docs/ai/habit-tracker/10x/session-1.md"
+      ],
+      "expected_output": "A ranked strategy session that treats streak reminders as shipped despite the stale roadmap, treats shared challenges as built but unreleased, sizes reach on weekly active users, turns the reminder conflict into a validation question, cites only snapshot files, and saves as session-2.md beside session-1.md.",
+      "assertions": [
+        "Treats streak reminders as already shipped (CHANGELOG.md 2.3.0, flags.yaml at 100%), not as planned work, even though docs/ROADMAP.md lists them under Planned.",
+        "Identifies shared challenges as built but unreleased (config/flags.yaml enabled false, rollout 0) and does not present it as a new idea or as part of the live product.",
+        "Sizes reach with the 1,150 weekly active users rather than the 9,400 registered accounts.",
+        "Reports the conflict between the reminder tickets and the survey's 58% finding notifications annoying (or the 18% opt-in) as an open question to validate rather than siding with one source.",
+        "Cites snapshot file paths (such as docs/metrics.md or docs/feedback.md) for factual claims, cites no file outside the snapshot, and labels claims the snapshot does not support as hypotheses or unknowns.",
+        "Names .claude/docs/ai/habit-tracker/10x/session-2.md as the save path (reusing the existing habit-tracker folder although the product is Habitlane), and leaves session-1.md unchanged; with writing tools, session-2.md is created beside it, and without them the full session appears in the reply.",
+        "Marks each session-1 item as done, still open or dropped with a snapshot citation (streak reminders done per CHANGELOG.md 2.3.0), and carries the still-open ones, such as the day-1 drop-off question, into the new session."
       ]
     }
   ]

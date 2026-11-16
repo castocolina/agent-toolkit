@@ -1,0 +1,113 @@
+{
+  "skill": "sync-branch",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 11,
+    "D3": 12,
+    "D4": 13,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 104,
+  "max_total": 125,
+  "percent": 83.2,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 19,
+      "evidence": "Plain `--force` overwrites commits pushed by others since your fetch; `--force-with-lease` refuses.",
+      "fix": "Cut this to the non-obvious part. The model already knows what --force-with-lease does. Keep only 'Never use --force or -f, even after a lease rejection' and add the expert caveat: a background `git fetch` (IDE or cron) updates the remote-tracking ref and silently disarms the lease. Use `--force-with-lease=\"$branch\":<sha recorded before the rebase>` or `--force-if-includes` to keep it armed."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 21,
+      "evidence": "check `git log --left-right --cherry-pick --oneline \"origin/$target\"...HEAD` first so only feature-only patches are replayed",
+      "fix": "Say what plain rebase does not handle. It already skips commits whose patch-id matches upstream. The real case is squash-merged or rewritten feature commits, whose patch-ids differ. Then use `git rebase --onto \"origin/$target\" <last-landed-commit> \"$branch\"`."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 14,
+      "evidence": "Inspect each conflicted file's intent, fix it, ... If a choice is uncertain, run `git rebase --abort`",
+      "fix": "Give a test for 'uncertain' the agent can apply. For example: resolve only when both sides change disjoint hunks, or when one side is a pure rename or format change. Abort when both sides edit the same logic, when a lockfile or generated file conflicts (regenerate it instead), or when tests fail after `--continue`."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 20,
+      "evidence": "Unquoted branch names break on `$` or spaces in the name.",
+      "fix": "Fix the factual error. `git check-ref-format` rejects spaces in ref names, so the hazard is `$`, glob characters and a leading `-`. Write: 'Quote \"$branch\" and pass it after the remote. A branch with `$` or `*` is expanded by the shell when unquoted.'"
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 2,
+      "evidence": "Use when a feature branch or PR is behind its base.",
+      "fix": "Rebase the current feature branch onto the latest origin/main (or a given target branch) and update its PR with git push --force-with-lease. Use when a branch or PR is behind, out of date, has merge conflicts with main, or the user asks to update, catch up, refresh or sync their branch, even without the word rebase. Not for merge-based sync, updating local main, or rebasing a shared branch others push to."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 21,
+      "evidence": "If the base was rewritten or feature commits already landed upstream, check `git log ...` first",
+      "fix": "Give a default action after the check, not only a diagnostic. If the log shows `=` (equivalent) or already-landed commits on the right side, run `git rebase --onto \"origin/$target\" <fork-point> \"$branch\"`. If unsure, stop and report the commit list without pushing."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 14,
+      "evidence": "If a choice is uncertain, run `git rebase --abort` and report ... tells the user to resolve then `git rebase --continue` (or `--abort`)",
+      "fix": "Split the conflict branch into two final messages. After `--abort`: 'Rebase aborted, branch unchanged at <sha>, nothing pushed; conflicting files: ...; rerun /sync-branch after resolving manually.' When leaving the rebase paused: name the files and say to resolve, then `git rebase --continue` or `--abort`. Telling the user to `--continue` after an abort points at a rebase that no longer exists."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 12,
+      "evidence": "A rebase, merge or cherry-pick already in progress (`.git/rebase-merge`, `MERGE_HEAD`): stop.",
+      "fix": "Resolve the paths through git so the check works in linked worktrees, where `.git` is a file. Check `git rev-parse --git-path rebase-merge`, `rebase-apply`, `MERGE_HEAD` and `CHERRY_PICK_HEAD`, and stop if any exists. The current list also omits `CHERRY_PICK_HEAD` even though the bullet names cherry-pick."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 13,
+      "evidence": "`git fetch origin --prune`, then `git rebase \"origin/$target\"`.",
+      "fix": "Add failure branches before step 3. If `git fetch` fails (network or auth), stop and report it. If `git rev-parse --verify --quiet \"origin/$target\"` fails, stop with 'origin/<target> does not exist'. Otherwise a non-zero rebase exit from an invalid upstream falls into the conflict-resolution step."
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "react-dev",
+      "percent": 94.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4,
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 95,
+          "evidence": "- Handlers: `ChangeEvent<El>` plus `e.currentTarget`, never `any` or `e.target.value as string`",
+          "fix": "Remove this generic handler-typing bullet; the model already types ChangeEvent with currentTarget. Keep only the pointer to the submitter and IME traps in references/event-handlers.md, which is the part the model lacks."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 108,
+          "evidence": "Before fixing by hand, on a clean git tree run `npx types-react-codemod@3.5.3 preset-19 ./src`, review `git diff`, then typecheck.",
+          "fix": "Move the React 19 upgrade order (clean tree, codemod, review the diff, fix the remaining breaks, typecheck) into section 5 as a conditional step 0 that applies 'when the task is a React 19 upgrade'. Right now this ordered procedure sits at the end of a long Gotchas bullet, where the agent can miss it."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/react-dev/references/react-19-patterns.md",
+          "line": 52,
+          "evidence": "A Server Action used here needs the auth checks in [server-components.md](../examples/server-components.md).",
+          "fix": "Keep references one level deep. Drop the cross-link and add 'when the action is a Server Action, also read examples/server-components.md' to the load table in SKILL.md. Do the same for the examples/server-components.md link to hooks.md."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/react-dev/evals/evals.json",
+          "line": null,
+          "evidence": "No eval covers the Next.js 15 Promise `params`/`searchParams` gotcha or creating a `use()` promise during client render; these appear only in trigger-queries.json",
+          "fix": "Add an output eval with a fixture page.tsx that types params as a plain object and passes a promise created during render to a client component. Assert that params is awaited, that the promise is created in the Server Component, and that use() is not wrapped in try/catch."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 18,
+          "evidence": "| `react` 19 and `@types/react` 19 | React 19 APIs ... | followed by | `react` 18, or a library whose `peerDependencies` still allow 18 | React 18-compatible code",
+          "fix": "Put the library row first and add 'first matching row wins'. A shared package with react 19 in devDependencies and peers '^18 || ^19' currently matches the React 19 row first and gets ref-as-prop, which contradicts the shared-lib-ref eval."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/references/react-19-patterns.md",
+          "line": 42,
+          "evidence": "The form scaffold around \"const [state, formAction, isPending] = useActionState(saveProfile, { status: 'idle' } satisfies SaveState)\" repeats the import, tuple and action contract already supplied in SKILL.md:58. This ordinary hook example, together with routine handler-inference and context-default reminders in the other references, dilutes the otherwise strong version-specific knowledge.",
+          "fix": "Replace the routine useActionState form scaffold with the migration-specific import/tuple delta and a compact typed action/initial-state signature. Compress baseline handler-inference and context-default advice into brief activation reminders; retain the correlated-generic, rollback, transition, router-version and keyed-storage procedures."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 26,
+          "evidence": "\"server only (Server Component), or both server and browser (every 'use client' file is also server-rendered)\" omits browser-only rendering. A CSR-only app or an explicitly SSR-disabled component cannot be classified correctly, and the unconditional storage warning consequently imposes hydration constraints where hydration does not occur.",
+          "fix": "Classify components as browser-only CSR, server-rendered/hydrated client components, or Server Components. Explain that 'use client' marks a component boundary rather than guaranteeing SSR, and scope the hydration-stable initialization requirement to components that actually render on the server."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 122,
+          "evidence": "\"Keep each designed contract's rejected case as a // @ts-expect-error line in compile-only code (a *.test-d.ts file or an uncalled function...)\" offers a declaration-file branch that does not work reliably with the prescribed ordinary tsc validation. Declaration files cannot contain the shown function implementations, and skipLibCheck can skip their checks entirely, defeating the promised regression guarantee.",
+          "fix": "Put executable negative contract checks in an included .type-test.ts or .type-test.tsx file, inside uncalled functions, and check them through a noEmit TypeScript configuration. Reserve .test-d.ts for a separately configured declaration-testing runner, and document that runner if supported."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/react-dev/references/event-handlers.md",
+          "line": 54,
+          "evidence": "\"Declare the event once and both addEventListener and dispatchEvent callers get detail typed\" is incorrect. WindowEventMap augmentation types listener callbacks, but dispatchEvent accepts Event and does not correlate a CustomEvent's name with that map; dispatching 'cart:updated' with a string count still compiles.",
+          "fix": "State that the augmentation types listeners only. Route producers through a typed dispatchCartUpdated(detail: WindowEventMap['cart:updated']['detail']) helper that constructs and dispatches the CustomEvent, and add a compile-only check rejecting a nonnumeric count."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

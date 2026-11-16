@@ -1,0 +1,14 @@
+classDiagram
+    %% CardPayment and WalletPayment implement PaymentMethod; RefundReceipt is a kind of Receipt
+    class PaymentMethod {
+        <<interface>>
+        +charge(amount Decimal) Receipt
+    }
+    class Receipt {
+        +UUID id
+        +Decimal amount
+    }
+    CardPayment <|.. PaymentMethod
+    WalletPayment <|.. PaymentMethod
+    RefundReceipt <|-- Receipt
+    PaymentMethod ..> Receipt : issues

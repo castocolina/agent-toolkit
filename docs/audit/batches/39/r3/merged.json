@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "react-dev",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 63,
+          "evidence": "Activation checklist, no explanation needed: native props via `ComponentPropsWithoutRef<'button'>`, variants as a discriminated union, `children: ReactNode`, an explicit state type when the initializer is `null`...",
+          "fix": "Keep only the item the model often misses (an explicit useState type when the initializer is null, [] or a single literal) and delete ComponentPropsWithoutRef, discriminated-union variants and children: ReactNode, which current models already apply."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/react-dev/examples/server-components.md",
+          "line": 121,
+          "evidence": "Use the keyed storage hook in [hooks.md](../references/hooks.md#external-state-and-ssr)",
+          "fix": "Add references/hooks.md to the Server Components row of the SKILL.md load table (\"plus hooks.md when the component reads browser storage\") and drop the link from the example file, so every file reference stays one level deep from SKILL.md."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/react-dev/evals/evals.json",
+          "line": 30,
+          "evidence": "\"id\": \"submit-handler\" ... assertions: FormEvent<HTMLFormElement>, ChangeEvent<HTMLInputElement>, FormData from e.currentTarget",
+          "fix": "Replace the submit-handler and typed-button evals with prompts that need the skill, since the model passes both without it. For example: a form with two submit buttons that must read which one was clicked (assert (e.nativeEvent as SubmitEvent).submitter is passed to FormData), and a Button request with no package.json and no stated major (assert React 18-compatible forwardRef and that the response states the assumed version)."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/react-dev/references/react-19-patterns.md",
+          "line": 131,
+          "evidence": "Run the codemod exactly as the SKILL.md React 19 gotcha says (pinned version, real source roots, opt-in transforms...)",
+          "fix": "Point to the right place: \"Run the codemods exactly as SKILL.md step 1 lists them\". The React 19 gotcha only refers back to step 1, so an agent following this pointer reaches a bullet that has no commands."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 83,
+          "evidence": "// columns.type-test.tsx: compile-only, never called or imported by app code.\nexport function columnContract() { ... col('createdAt', ...) }",
+          "fix": "Show the import the type-test file needs, for example `import { col } from './columns';`, or say that the column builder must be exported. As written, the snippet puts the contract in a separate file but uses `col` from the component module, and that file will not compile."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/react-dev/references/react-router.md",
+          "line": 53,
+          "evidence": "The heading promises \"Typed context (v8, or v7 with middleware on)\", but the example imports \"createContext\" and uses \"Route.MiddlewareFunction\" without a minor-version gate. The earlier version table explicitly includes pre-7.9 middleware. Following that branch on those releases fails because the middleware APIs still have unstable-prefixed names.",
+          "fix": "Split the middleware instructions at v7.9: use the unprefixed APIs for v7.9+ and v8; for earlier middleware-capable v7 releases, show unstable_createContext, unstable_RouterContextProvider and the corresponding unstable middleware exports/types with future.unstable_middleware. Alternatively, explicitly require upgrading to v7.9+ before applying this example."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/references/react-19-patterns.md",
+          "line": 128,
+          "evidence": "The eight-line \"Migration checklist (React 18 to 19)\" repeats the main file's migration protocol, including \"Pin react, react-dom, @types/react, @types/react-dom to 19 together\", running the codemod, replacing useFormState, preserving forwardRef for React 18 peers, and rerunning validation. Migration tasks load both files, so this adds little knowledge.",
+          "fix": "Replace the repeated checklist with a short pointer to SKILL.md steps 1 and 5; retain the reference's worked examples and any migration details not already covered there."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

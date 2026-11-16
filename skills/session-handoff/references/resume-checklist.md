@@ -1,80 +1,28 @@
 # Resume Checklist
 
-Follow this checklist when resuming work from a handoff document to ensure zero-ambiguity continuation.
+Extra verification for a handoff whose staleness level is not FRESH, or that cites a missing file. SKILL.md owns the resume steps (list, staleness, load, verify branch, working tree and assumptions, begin); this file adds the environment checks and the stop signals.
 
-## Pre-Resume Verification
-
-- [ ] Read the entire handoff document before taking any action
-- [ ] Verify you are in the correct project directory
-- [ ] Confirm the git branch matches (or understand why it might differ)
-- [ ] Check the handoff timestamp - how stale is this context?
-
-## Context Validation
-
-- [ ] Review "Important Context" section thoroughly
-- [ ] Understand all assumptions listed - are they still valid?
-- [ ] Check if any blockers have been resolved since handoff
-- [ ] Review "Potential Gotchas" to avoid known pitfalls
-
-## State Verification
-
-- [ ] Run `git status` to see current file state
-- [ ] Compare modified files list in handoff vs current state
-- [ ] Check if any environment variables need to be set
-- [ ] Verify any required services/processes are running
-
-## Resume Execution
-
-- [ ] Start with "Immediate Next Steps" item #1
-- [ ] Reference "Files Modified" table for context on recent changes
-- [ ] Apply patterns documented in "Key Patterns Discovered"
-- [ ] Follow architectural insights from "Architecture Overview"
-
-## During Work
-
-- [ ] Update handoff document if major new context is discovered
-- [ ] Mark completed items in "Pending Work" as you finish them
-- [ ] Add new blockers/questions as they arise
-- [ ] Consider creating a new handoff if session becomes long
-
-## Red Flags - Stop and Verify
-
-If you encounter any of these, pause and verify context before proceeding:
-
-1. **Files mentioned in handoff don't exist** - codebase may have changed significantly
-2. **Branch has diverged substantially** - check git log for recent commits
-3. **Assumptions are clearly invalid** - reassess the approach
-4. **Blockers marked as unresolved are now blocking you** - escalate to user
-5. **Architecture has changed** - re-explore before continuing
-
-## Quick Start Commands
-
-After reading the handoff, these commands help verify state:
+## Environment
 
 ```bash
-# Check current branch and status
-git branch --show-current
-git status
+# Commits since the handoff's baseline (use the full SHA from "Baseline commit:")
+git log --oneline '<baseline>'..HEAD
 
-# See recent commits (compare with handoff)
-git log --oneline -10
+# A process the handoff says was running (dev server, watcher)
+pgrep -af '<process-name>'
 
-# Check for any running processes mentioned
-ps aux | grep [process-name]
-
-# Check whether named variables are set without revealing their values
-python3 -c 'import os; names = ["RELEVANT_VAR"]; [print("{}: {}".format(name, "set" if name in os.environ else "unset")) for name in names]'
+# Whether named variables are set, without printing their values
+python3 -c 'import os, sys; [print(n, "set" if n in os.environ else "unset") for n in sys.argv[1:]]' STAGING_API_TOKEN DB_POOL_SIZE
 ```
 
-## Handoff Quality Assessment
+- Compare the handoff's Files Modified table with `git status`: a listed file that is now clean was committed or reverted; find out which before relying on it.
+- Services and environments the handoff names (staging, a local database, a queue) are not checked by any script; confirm each one the first next step depends on.
 
-Rate the handoff quality to identify if more exploration is needed:
+## Stop and ask the user
 
-| Aspect | Good | Needs Exploration |
-|--------|------|-------------------|
-| Next steps | Clear, actionable | Vague or missing |
-| File references | Specific paths/lines | General descriptions |
-| Decisions | Rationale included | Just outcomes |
-| Context | Complete picture | Gaps or assumptions |
-
-If multiple aspects "Need Exploration", spend time re-exploring the codebase before continuing implementation.
+| Signal | Likely cause | Do |
+|--------|--------------|----|
+| Files the handoff cites do not exist | Moved, renamed or reverted | `git log --oneline --follow -- '<path>'`, then re-locate before editing |
+| An assumption is now false | Requirements or code changed | Re-plan the next steps with the user |
+| A blocker marked unresolved blocks you | Still unresolved | Escalate; do not work around it silently |
+| Next steps are vague ("continue the refactor") | Weak handoff | Re-explore the code before implementing |

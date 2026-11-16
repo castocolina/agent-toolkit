@@ -10,7 +10,7 @@ need() { [ -e "$1" ] || { echo "FAIL missing: ${1#$ROOT/}" >&2; fail=1; }; }
 need "$S/SKILL.md"; need "$S/README.md"
 need "$S/references/frameworks.md"; need "$S/references/sources.md"
 need "$S/evals/evals.json"; need "$S/evals/trigger-queries.json"
-need "$S/evals/files/dashboard.tsx"; need "$S/evals/files/form.tsx"
+for f in dashboard.tsx form.tsx ProfileCard.vue invoices.tsx invoices.css settings-render-notes.md ProductGrid.tsx; do need "$S/evals/files/$f"; done
 for id in $IDS; do
   need "$S/references/rules/$id.md"
   grep -qx "## $id" "$S/SKILL.md" 2>/dev/null || { echo "FAIL SKILL.md lacks heading '## $id'" >&2; fail=1; }

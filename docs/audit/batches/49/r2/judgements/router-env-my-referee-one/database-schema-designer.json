@@ -1,0 +1,50 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 43,
+      "evidence": "The live MySQL branch says to fix orphan rows until the query returns zero, then add the FK with \"SET SESSION foreign_key_checks = 0\". Concurrent writes can invalidate that preflight before enforcement begins; the procedure also never explicitly restores foreign_key_checks. Re-enabling checks does not validate rows admitted while enforcement was absent.",
+      "fix": "Require a coordinated writer fence covering the zero-orphan preflight, FK installation and final orphan check. Save the original session foreign_key_checks value, disable checks only in the migration session, and restore the original value on both success and failure. Release the fence only after the final check returns zero. If writers cannot be fenced, use checked ALGORITHM=COPY in an approved maintenance window rather than presenting unchecked online installation as sufficient."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/database-schema-designer/references/schema-design-checklist.md",
+      "line": 11,
+      "evidence": "\"Are credentials and API tokens stored only as hashes?\" incorrectly treats recoverable credentials, such as upstream OAuth refresh tokens, like authentication verifiers. Following this check literally makes those credentials unusable when the application must present their original values.",
+      "fix": "Distinguish non-recoverable verifiers from recoverable secrets: require password KDFs for passwords and cryptographic hashes for locally verified high-entropy API tokens; require authenticated encryption with externally managed keys and restricted access for upstream credentials the application must recover. Retain the personal-data identification and retention checks."
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "react-dev",
+      "percent": 96.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.8,
+        "router-env-my-referee-three": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 17,
+          "evidence": "\u201cIf it prints anything, ask the user to commit or stash first, or work in a separate clean `git worktree` from HEAD\u201d blocks migration even for unrelated untracked files or non-overlapping edits. The HEAD-based alternative also excludes uncommitted application changes that may be relevant to the requested upgrade.",
+          "fix": "Record the initial status and preserve existing edits by default. Check whether changes overlap the migration targets; request a checkpoint or an explicitly approved isolated worktree only when the codemod cannot safely operate without it. Do not require committing or stashing unrelated changes."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/references/react-19-patterns.md",
+          "line": 11,
+          "evidence": "The elementary Button and LibButton examples expand standard native-prop forwarding into two implementations, including \u201creturn <button ref={ref} data-variant={variant} {...rest} />;\u201d. Their implementation mechanics add little beyond activating the React-major compatibility distinction.",
+          "fix": "Compress these two elementary wrappers into a short typed comparison of the React 19 ref prop and React 18-compatible forwardRef signature. Retain the generic List example and its explanation of inference erasure, which supply the non-obvious knowledge."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 64,
+          "evidence": "Activation checklist, no explanation needed: native props via `ComponentPropsWithoutRef<'button'>`, variants as a discriminated union, `children: ReactNode`, an explicit state type when the initializer is `null`, `[]` or one member of a literal union.",
+          "fix": "Keep only the item models get wrong (an explicit state type when the initializer is `null`, `[]` or one literal member). Drop `children: ReactNode` and discriminated-union variants because current models already write them."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 17,
+          "evidence": "0. Before touching anything, run `git status --porcelain`. If it prints anything, ask the user to commit or stash first",
+          "fix": "Number the migration steps from 1 and put them under their own short 'Migration' subsection. The upgrade sequence then reads as one checklist and does not sit inside the version-pinning step."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/react-dev/examples/server-components.md",
+          "line": 121,
+          "evidence": "Use the keyed storage hook in [hooks.md](../references/hooks.md#external-state-and-ssr)",
+          "fix": "Remove the second-level chain. In the SKILL.md load table row for Server Components, add 'plus references/hooks.md when the component reads browser storage', and make the example point back to SKILL.md instead of linking to another reference."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/react-dev/evals/trigger-queries.json",
+          "line": 20,
+          "evidence": "\"design the REST endpoints and database schema for our orders service\"",
+          "fix": "Replace the no-overlap negative with a near-miss such as 'convert this React class component to hooks in plain JSX, no TypeScript'. Also add one should-trigger query that never names React or TypeScript, for example 'my table's date column formatter crashes at runtime with toLocaleDateString is not a function'."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 99,
+          "evidence": "// columns.type-test.tsx: compile-only, never called or imported by app code.\nexport function columnContract() {\n  // @ts-expect-error ...\n  col('createdAt', ...",
+          "fix": "Show the separate-file setup explicitly. Export `columnsFor` (or `col`) from the app module and start the type-test file with `import { columnsFor } from './columns'; type User = ...; const col = columnsFor<User>();`. As written, `col` is not exported, so a separate `columns.type-test.tsx` fails with 'Cannot find name col'. That error satisfies the @ts-expect-error directive, so the test passes vacuously."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

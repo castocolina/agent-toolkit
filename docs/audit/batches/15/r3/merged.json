@@ -1,0 +1,81 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "c4-architecture",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4,
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 60,
+          "evidence": "Step 5.3 checklist: \"Every relationship is one-way, with a verb and a technology.\" and \"External systems are one `System_Ext` each, with no internals.\" restate the NEVER list (BiRel) and textbook C4 rules the model already knows, and the last bullet already says \"no NEVER rule is broken\"",
+          "fix": "Cut the step 5.3 bullets that repeat the NEVER list or standard C4 rules. Keep the skill-specific checks: deployability, element budget, consistent aliases across views, and the evidence table plus \"no NEVER rule is broken\"."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 65,
+          "evidence": "\"### Renderer gotchas\" is an H3 placed between workflow step 5 and step 6, so the numbered phases of the Process pattern are interrupted by a reference block",
+          "fix": "Move \"Renderer gotchas\" under step 5.1, where a failed render needs it, or after step 6 as its own H2 section, so steps 1 to 6 read as one uninterrupted phased workflow."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 41,
+          "evidence": "\"mark it unknown and ask, or state it as an assumption\" offers two equal options with no default. Line 47 also offers \"split by domain, or draw one service with its direct dependencies per diagram\" without a default.",
+          "fix": "Pick defaults with escape hatches: \"Mark it unknown in the diagram and ask. State it as an assumption only when the user asked for a complete diagram now.\" and \"Split by domain (bounded context); fall back to one service plus its direct dependencies per diagram when no domain split stays under the budget.\""
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/c4-architecture/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "Several should-trigger queries are terse and name the domain directly (\"Create a component diagram for the order feature and its internal modules.\", \"Document the system context: users, external payment provider, and our product.\") and carry no file paths or personal context",
+          "fix": "Rewrite two or three explicit positives as realistic, indirect requests with context, for example \"my CTO wants a one-pager of how checkout-svc, the ledger db and Adyen hang together before Thursday's board deck, repo is ~/work/payments\"."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 12,
+          "evidence": "\"Overrides, in this order:\" implies the first match wins, but line 17 \"Several audiences: the union of their views.\" combines matches. Following a prompt that names one view and also names executives and DevOps, it is unclear which rule applies.",
+          "fix": "State the precedence explicitly: \"Apply the first matching rule, except that audience rules combine: with several audiences, take the union of their views unless the user named a single view.\""
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/c4-architecture/SKILL.md",
+          "line": 58,
+          "evidence": "\"Every container is independently deployable; classes, modules and libraries are components or absent\" repeats standard C4 knowledge already reinforced by the extraction table and NEVER list. The 76-line Workflow mixes valuable evidence-reconciliation and renderer procedures with substantial activation-level audience/view and modeling guidance; the 11-line NEVER section is mostly expert, while the 5-line References section supplies activation/routing. The line-weighted expert share falls short of the rubric's >70% target.",
+          "fix": "Condense the routine audience-to-view mapping at lines 15\u201317, and shorten checks 58\u201360 to references to the extraction and NEVER rules rather than repeating standard C4 definitions. Preserve the scope precedence, environment reconciliation, renderer-specific gotchas, validation loop and fallback invariants."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

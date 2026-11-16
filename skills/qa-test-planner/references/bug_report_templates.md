@@ -1,423 +1,93 @@
 # Bug Report Templates
 
-Standard templates for clear, reproducible, actionable bug documentation.
+One base template, the extra fields each bug type needs, and how to set severity and priority. Write `Unknown` for any fact the reporter did not give.
 
----
-
-## Standard Bug Report Template
+## Base template
 
 ```markdown
-# BUG-[ID]: [Clear, Specific Title]
+# BUG-[ID]: [Area] [what fails] when [trigger]
 
-**Severity:** Critical | High | Medium | Low
-**Priority:** P0 | P1 | P2 | P3
+**Severity:** Critical | High | Medium | Low | Untriaged
+**Priority:** P0 | P1 | P2 | P3 | Untriaged
 **Type:** Functional | UI | Performance | Security | Data | Crash
-**Status:** Open | In Progress | In Review | Fixed | Verified | Closed
-**Assignee:** [Developer name]
-**Reporter:** [Your name]
-**Reported Date:** YYYY-MM-DD
-
----
+**Status:** Open
+**Reporter:** [name]  **Reported:** YYYY-MM-DD
 
 ## Environment
-
-| Property | Value |
-|----------|-------|
-| **OS** | [Windows 11 / macOS 14 / Ubuntu 22.04] |
-| **Browser** | [Chrome 120 / Firefox 121 / Safari 17] |
-| **Device** | [Desktop / iPhone 15 / Samsung S23] |
-| **Build/Version** | [v2.5.0 / commit abc123] |
-| **Environment** | [Production / Staging / Dev] |
-| **URL** | [Exact page URL] |
-
----
-
-## Description
-
-[2-3 sentences clearly describing what the bug is and its impact]
-
----
+- OS: [Windows 11 / Unknown]
+- Browser: [Chrome 120 / Unknown]
+- Device: [Desktop / iPhone 15 / Unknown]
+- Build: [v2.5.0 or commit / Unknown]
+- Environment: [Production / Staging / Dev / Unknown]
+- URL: [exact page]
 
 ## Steps to Reproduce
-
-**Preconditions:**
-- [Any setup required before reproduction]
-- [Test account: user@test.com]
-
-**Steps:**
-1. [Navigate to specific URL]
-2. [Perform specific action]
-3. [Enter specific data: "example"]
-4. [Click specific button]
-5. [Observe the issue]
-
-**Reproduction Rate:** [Always / 8 out of 10 times / Intermittent]
-
----
+Preconditions: [account, seeded data, feature flags]
+1. [action with exact input]
+2. [action]
+Reproduction rate: [3/10 attempts / 1 occurrence, not yet reproduced / Unknown]
 
 ## Expected Behavior
-
-[Clearly describe what SHOULD happen]
-
----
+[what should happen, observable]
 
 ## Actual Behavior
-
-[Clearly describe what ACTUALLY happens]
-
----
-
-## Visual Evidence
-
-**Screenshots:**
-- [ ] Before state: [attached]
-- [ ] After state: [attached]
-- [ ] Error message: [attached]
-
-**Video Recording:** [Link if available]
-
-**Console Errors:**
-```
-[Paste any console errors here]
-```
-
-**Network Errors:**
-```
-[Paste any failed requests here]
-```
-
----
-
-## Impact Assessment
-
-| Aspect | Details |
-|--------|---------|
-| **Users Affected** | [All users / Subset / Specific role] |
-| **Frequency** | [Every time / Sometimes / Rarely] |
-| **Data Impact** | [Data loss / Corruption / None] |
-| **Business Impact** | [Revenue loss / User frustration / Minimal] |
-| **Workaround** | [Describe workaround if exists, or "None"] |
-
----
-
-## Additional Context
-
-**Related Items:**
-- Feature: [FEAT-123]
-- Test Case: [TC-456]
-- Similar Bug: [BUG-789]
-- Figma Design: [URL if UI bug]
-
-**Regression Information:**
-- Is this a regression? [Yes / No]
-- Last working version: [v2.4.0]
-- First broken version: [v2.5.0]
-
-**Notes:**
-[Any additional context that might help fix the issue]
-
----
-
-## Developer Section (To Be Filled)
-
-### Root Cause
-[Developer fills in after investigation]
-
-### Fix Description
-[Developer describes the fix approach]
-
-### Files Changed
-- [file1.js]
-- [file2.css]
-
-### Fix PR
-[Link to pull request]
-
----
-
-## QA Verification
-
-- [ ] Fix verified in dev environment
-- [ ] Fix verified in staging
-- [ ] Regression tests passed
-- [ ] Related test cases updated
-- [ ] Ready for production
-
-**Verified By:** [QA name]
-**Verification Date:** [Date]
-**Verification Build:** [Build number]
-```
-
----
-
-## Quick Bug Report Template
-
-For minor issues or fast documentation.
-
-```markdown
-# BUG-[ID]: [Title]
-
-**Severity:** Low | Medium
-**Environment:** [Browser, OS, Build]
-
-## Issue
-[One paragraph description]
-
-## Steps
-1. [Step 1]
-2. [Step 2]
-3. [Step 3]
-
-## Expected
-[What should happen]
-
-## Actual
-[What happens]
-
-## Screenshot
-[Attached]
-```
-
----
-
-## UI/Visual Bug Template
-
-For design discrepancy reports.
-
-```markdown
-# BUG-[ID]: [Component] Visual Mismatch
-
-**Severity:** Medium
-**Type:** UI
-**Figma Design:** [URL to specific component]
-
-## Design vs Implementation
-
-### Expected (Figma)
-| Property | Value |
-|----------|-------|
-| Background | #0066FF |
-| Font Size | 16px |
-| Font Weight | 600 |
-| Padding | 12px 24px |
-| Border Radius | 8px |
-
-### Actual (Implementation)
-| Property | Expected | Actual | Match |
-|----------|----------|--------|-------|
-| Background | #0066FF | #0052CC | No |
-| Font Size | 16px | 16px | Yes |
-| Font Weight | 600 | 400 | No |
-| Padding | 12px 24px | 12px 24px | Yes |
-| Border Radius | 8px | 8px | Yes |
-
-## Screenshots
-
-**Figma Design:**
-[Screenshot of Figma component]
-
-**Current Implementation:**
-[Screenshot of implemented component]
-
-**Side-by-Side:**
-[Comparison image]
-
-## Impact
-Users see inconsistent branding. Component appears different from approved design.
-```
-
----
-
-## Performance Bug Template
-
-For speed, memory, or resource issues.
-
-```markdown
-# BUG-[ID]: [Feature] Performance Degradation
-
-**Severity:** High
-**Type:** Performance
-
-## Performance Issue
-
-**Affected Area:** [Page/Feature/API]
-**User Impact:** [Page load slow / App unresponsive / High resource usage]
-
-## Metrics
-
-| Metric | Expected | Actual | Variance |
-|--------|----------|--------|----------|
-| Page Load Time | < 2s | 8s | +300% |
-| API Response | < 200ms | 1500ms | +650% |
-| Memory Usage | < 100MB | 450MB | +350% |
-| CPU Usage | < 30% | 95% | +217% |
-
-## Environment
-- Data size: [Number of records]
-- Network: [Connection type]
-- Device specs: [RAM, CPU]
-
-## Reproduction
-1. [Load page with X records]
-2. [Perform action]
-3. [Observe slow response]
+[what happens, with the exact message]
 
 ## Evidence
-- Performance trace: [Link]
-- Network waterfall: [Screenshot]
-- Memory profile: [Screenshot]
-
-## Baseline
-- Previous version: [v2.4.0]
-- Previous metric: [2s load time]
-- Regression since: [v2.5.0]
-```
-
----
-
-## Security Bug Template
-
-For vulnerabilities and security concerns.
-
-```markdown
-# BUG-[ID]: [Security Issue Title]
-
-**Severity:** Critical
-**Type:** Security
-**OWASP Category:** [A01-A10]
-**CONFIDENTIAL - DO NOT SHARE PUBLICLY**
-
-## Vulnerability
-
-**Type:** [XSS / SQL Injection / Auth Bypass / etc.]
-**Risk Level:** Critical | High | Medium | Low
-**Exploitability:** [Easy / Moderate / Difficult]
-
-## Description
-[Describe the vulnerability without providing exploit code]
+- Screenshot or recording: [attached / none]
+- Console errors: [paste / Unknown]
+- Failed requests: [method, URL, status / Unknown]
 
 ## Impact
-- [ ] Data exposure
-- [ ] Privilege escalation
-- [ ] Account takeover
-- [ ] Service disruption
-- [ ] Other: [specify]
+- Users affected: [all / role / segment / Unknown]
+- Data impact: [lost / corrupted / none / Unknown]
+- Workaround: [describe / none / Unknown]
 
-**Affected Data:** [User PII / Payment info / etc.]
+## Context
+- Regression: [Yes since vX / No / Unknown]
+- Related: [test case, feature, similar bug]
 
-## Proof of Concept
-[Describe how to verify the issue exists - sanitize any sensitive data]
-
-## Recommended Fix
-[High-level recommendation for remediation]
-
-## References
-- [CVE if applicable]
-- [OWASP reference]
-
-## Disclosure
-- Internal report date: [Date]
-- Expected fix date: [Date]
-- Public disclosure: [N/A / Date if applicable]
+## Open Questions
+- [each Unknown above that the fixer needs]
 ```
 
----
+A good title names the area, the failing behavior and the trigger: "[Checkout] Cart total shows $0 when a discount code is applied twice". "Checkout broken" or "Please fix ASAP" gives triage nothing to sort by.
 
-## Crash/Error Bug Template
+## Extra fields by type
 
-For application crashes and unhandled errors.
+| Type | Add | Why it matters |
+| :- | :- | :- |
+| UI / visual | Figma frame link and version, viewport, theme, device-pixel ratio, measured value vs design value | Without matching conditions the mismatch may be the comparison, not the product |
+| Performance | Metric, expected vs actual with percentile (p95, not average), data size, network profile, baseline build | An average hides the slow tail; a different data size makes the baseline meaningless |
+| Security | Vulnerability class, affected data, how to verify without a working exploit, disclosure owner | A public tracker with a payload or a live token turns the report into the attack |
+| Crash / error | Exact error text, stack trace, logs before the crash, whether data was lost, whether the app recovers on restart | Recoverability and data loss set the severity, not the word "crash" |
 
-```markdown
-# BUG-[ID]: [Crash/Error Description]
+Before attaching evidence, redact it: HAR files and console logs carry cookies, bearer tokens and personal data.
 
-**Severity:** Critical
-**Type:** Crash
+## Severity: set by impact, not by symptom
 
-## Error Details
+| Severity | Criteria |
+| :- | :- |
+| Critical | Data loss or corruption, security breach, money charged wrongly, or a crash with no recovery path |
+| High | A core journey is blocked with no workaround, or a crash that loses the user's unsaved work |
+| Medium | A feature fails partly and a workaround exists; a crash that recovers with no data lost |
+| Low | Cosmetic or copy issue with no functional effect |
 
-**Error Type:** [Crash / Exception / Hang / White Screen]
-**Error Message:**
-```
-[Exact error message]
-```
+Classify a crash by what it costs (data, recovery), never by how often it happens: a rare crash that corrupts an order is still Critical. Record the reproduction rate separately; it feeds priority, not severity.
 
-**Stack Trace:**
-```
-[Full stack trace]
-```
+Response-time targets (for example Critical within 4 hours) are organization policy. Use the requester's if given; otherwise leave them out rather than present an example as a rule.
 
-## Reproduction
+## Priority: severity adjusted by rate and exposure
 
-**Frequency:** [Always / Intermittent]
+Start from severity, then raise or lower one step for how often and how widely it hits. This grid is an illustrative default, not policy:
 
-1. [Step to trigger crash]
-2. [Step 2]
-3. [App crashes / shows error]
+| Rate \ Severity | Low | Medium | High | Critical |
+| :- | :- | :- | :- | :- |
+| 1 occurrence, not reproduced | P3 | P3 | P2 | P1 |
+| Intermittent (1/10 to 5/10) | P3 | P2 | P1 | P0 |
+| Most attempts (6/10 or more) | P2 | P1 | P0 | P0 |
+| Unknown (intermittent, not measured) | P3 | P2 | P1 | P0 |
 
-## Environment
-- OS: [Version]
-- App Version: [Build]
-- Memory available: [If relevant]
-- Device: [Model]
+With an Unknown rate the priority comes from impact alone: mark it provisional (`P1 (provisional)`), write the rate as `Unknown`, and ask for it under Open Questions (with the script, pass the grid value to `--priority` and say "priority provisional, rate Unknown" in `--description`); re-triage once a safe rerun measures it.
 
-## Logs
-```
-[Relevant log entries before crash]
-```
-
-## Impact
-- User data lost: [Yes/No]
-- Session terminated: [Yes/No]
-- Recovery possible: [Yes/No]
-```
-
----
-
-## Severity Definitions
-
-| Level | Criteria | Response Time | Examples |
-|-------|----------|---------------|----------|
-| **Critical** | System down, data loss, security breach | < 4 hours | Login broken, payment fails, data exposed |
-| **High** | Major feature broken, no workaround | < 24 hours | Search not working, checkout fails |
-| **Medium** | Feature partial, workaround exists | < 1 week | Filter missing option, slow load |
-| **Low** | Cosmetic, rare edge case | Next release | Typo, minor alignment, rare crash |
-
----
-
-## Priority vs Severity Matrix
-
-|  | Low Impact | Medium Impact | High Impact | Critical Impact |
-|--|-----------|---------------|-------------|-----------------|
-| **Rare** | P3 | P3 | P2 | P1 |
-| **Sometimes** | P3 | P2 | P1 | P0 |
-| **Often** | P2 | P1 | P0 | P0 |
-| **Always** | P2 | P1 | P0 | P0 |
-
----
-
-## Bug Title Best Practices
-
-**Good Titles:**
-- "[Login] Password reset email not sent for valid email addresses"
-- "[Checkout] Cart total shows $0 when discount code applied twice"
-- "[Dashboard] Page crashes when loading more than 1000 records"
-
-**Bad Titles:**
-- "Bug in login" (too vague)
-- "It doesn't work" (no context)
-- "Please fix ASAP!!!" (emotional, no information)
-- "Minor issue" (unclear what the issue is)
-
----
-
-## Bug Report Checklist
-
-Before submitting:
-- [ ] Title is specific and descriptive
-- [ ] Steps can be reproduced by someone else
-- [ ] Expected vs actual clearly stated
-- [ ] Environment details complete
-- [ ] Screenshots/evidence attached
-- [ ] Severity/priority assigned
-- [ ] Checked for duplicates
-- [ ] Related items linked
+Exception to the grid: a security or data-loss bug starts at P0 at any rate, including a single unreproduced occurrence; only its owner may downgrade it, in writing.

@@ -1,0 +1,82 @@
+openapi: 3.0.3
+info:
+  title: Pointers
+  version: "1.0"
+paths:
+  /pets:
+    get:
+      operationId: listPets
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [name]
+                  properties:
+                    name:
+                      type: string
+  /pets/search:
+    get:
+      operationId: searchPets
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/paths/~1pets/get/responses/200/content/application~1json/schema"
+  /pets/copy:
+    get:
+      operationId: copyPets
+      responses:
+        "200":
+          $ref: "#/paths/~1pets/get/responses/200"
+  /health:
+    get:
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [up]
+                properties:
+                  up:
+                    type: boolean
+  /status:
+    $ref: "#/paths/~1health"
+  /addresses/validate:
+    post:
+      operationId: validatePostcode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [postcode]
+              properties:
+                postcode:
+                  $ref: "#/components/schemas/Address/properties/postcode"
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Address"
+components:
+  schemas:
+    Address:
+      type: object
+      required: [postcode]
+      properties:
+        postcode:
+          type: string
+        country:
+          type: string

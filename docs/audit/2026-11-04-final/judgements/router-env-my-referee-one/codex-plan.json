@@ -1,0 +1,41 @@
+{
+  "skill": "codex-plan",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 44,
+      "evidence": "Step 7 unconditionally says to \"run the same line from step 5 (same `<plan file>` exclusion)\" and \"diff the two literal paths\". However, step 5 permits unavailable verification and an unborn-repository fallback that records only `git status --porcelain=v1 -uall`. Unavailable verification leaves no valid baseline to compare; the unborn fallback neither excludes the expected plan creation nor clearly determines which command step 7 should repeat.",
+      "fix": "Record the verification mode in step 5: full, status-only or unavailable. In step 7, repeat the fingerprint command only for full verification. For unborn repositories, use `git status --porcelain=v1 -uall -- . \":(exclude)<plan file>\"` both before and after execution, retaining the stated content-verification limitation. If verification was unavailable or either capture fails, skip the baseline diff, report that limitation and continue with the plan-content review."
+    }
+  ]
+}

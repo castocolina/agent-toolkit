@@ -18,48 +18,27 @@ This skill analyzes recent git history and surfaces the engineering lesson embed
 
 ## How It Works
 
-1. **Determine scope** -- Detects whether you're on a feature branch (analyzes branch vs main) or main (analyzes last 5 commits). You can also specify a commit range or specific SHA.
-2. **Gather changes** -- Reads git log, diffs, and commit messages. For large diffs, selectively reads the most-changed files.
-3. **Analyze patterns** -- Identifies structural decisions, trade-offs, and problems solved. Maps observations to named SE principles.
-4. **Present the lesson** -- Delivers 1-3 specific, code-grounded takeaways with the principle name, how it manifested, why it matters, and an actionable next step.
-
-## Key Features
-
-- **Git-history-driven** -- Works from actual code changes, not hypotheticals
-- **Principle-grounded** -- Maps observations to named SE principles (SOLID, DRY, KISS, YAGNI, etc.)
-- **Specific, not generic** -- Every insight references actual files and lines from your diff
-- **Balanced** -- Recognizes good patterns, not just areas for improvement
-- **Configurable scope** -- Feature branch, last N commits, specific SHA, or working changes
+1. **Determine scope** -- Feature branch against its base branch, the last N commits (default 5), a specific SHA, or working changes including untracked files.
+2. **Gather and verify** -- Reads the scoped log and diff, then checks each candidate lesson against code and tests rather than commit messages.
+3. **Present the lesson** -- One lesson (at most three), with what changed, why it matters, and a next-time practice. A principle name is used only when the evidence supports it.
 
 ## Output Format
 
 ```markdown
 ## Lesson: Separation of Concerns
 
-**What happened in the code:**
-The `AuthController` was split into `AuthController` and `UserService` across
-commits abc123 and def456. Authentication logic stayed in the controller while
-user CRUD operations moved to a dedicated service.
-
-**The principle at work:**
-Separation of Concerns -- different responsibilities should live in different
-modules so each can change independently.
-
-**Why it matters:**
-Before the split, any change to user management risked breaking authentication.
-Now each module can evolve independently with a clear interface between them.
-
-**Takeaway for next time:**
-When a file handles two distinct responsibilities, split early -- it's cheaper
-than untangling them later.
+**What changed:** `src/auth/handler.ts` now calls `validateToken()` from the new
+`src/auth/token.ts`, which imports nothing from the handler.
+**Why it matters:** The new `token.test.ts` covers expiry without an HTTP request;
+before the split, that check could only be tested through the handler.
+**Next time:** Move a rule into its own module when it needs its own tests.
 ```
 
 ## Prerequisites
 
-- Must be in a git repository with commit history
-- Works best with descriptive commit messages
+- A git repository with commits or uncommitted changes
 
 ## Related Files
 
-- `references/se-principles.md` -- Curated SE principles catalog
-- `references/anti-patterns.md` -- Common anti-patterns to detect in diffs
+- `references/se-principles.md` -- Diff signals mapped to candidate lessons, with the evidence each needs
+- `references/anti-patterns.md` -- Anti-pattern signals and their false positives

@@ -1,0 +1,89 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "general-purpose",
+      "percent": 91.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 91.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 14,
+          "evidence": "reproduce a bug before fixing.",
+          "fix": "Delete the generic clause, which the model already knows. Keep only the branch the model needs: 'If a bug does not reproduce, say so under Remaining blockers with the attempt made; ...'"
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 13,
+          "evidence": "Plan: before any edit or delegation, record per requirement its owner, dependency order and acceptance check.",
+          "fix": "Shorten the generic planning step to the parts the model would not do by itself: one owner per requirement and no file shared by two parallel workers. Drop the restated plan-mode behaviour."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 14,
+          "evidence": "Step 2 has no 'Checkpoint:' clause, while steps 1, 3, 4 and 5 do. It packs gate discovery, the baseline run, reproduction and three fallbacks into one sentence.",
+          "fix": "Split step 2 into 2a (find and run the gates, then list pre-existing failures) and 2b (reproduce). Add 'Checkpoint: the gate commands and baseline failures are recorded, and each bug is either reproduced or listed under Remaining blockers.'"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 28,
+          "evidence": "They may run in another checkout.",
+          "fix": "Merge this Gotchas fact with the NEVER item on line 37, which checks the checkout path and tested revision, so the fact and its action sit in one place. Or append ': verify their checkout path before trusting results' here and keep the NEVER line as the reason."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 16,
+          "evidence": "fix the callers yourself if the fix is local, else re-delegate to the owning worker",
+          "fix": "Define 'local' with a concrete default, for example 'the fix touches only call sites in files you or no worker owns, with no change to the worker's own signatures'. Otherwise re-delegate."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 13,
+          "evidence": "record per requirement its owner, dependency order and acceptance check",
+          "fix": "Add a branch for a requirement that is ambiguous or has no derivable acceptance check. A subagent cannot ask the user, so add: 'If a requirement is ambiguous, pick the narrowest reading, state it under Result, and list the open question under Remaining blockers.'"
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 14,
+          "evidence": "fix from the code only when the defect sits in one code path and a test can fail before the fix, marked unverified",
+          "fix": "Resolve the contradiction: a test that fails before the fix and passes after it does reproduce the bug. Mark the fix 'reproduced by unit test, not end to end' instead of 'unverified', or explain what 'unverified' covers here."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

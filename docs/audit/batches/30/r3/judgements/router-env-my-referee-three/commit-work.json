@@ -1,0 +1,68 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 32,
+      "evidence": "Write the message in Conventional Commits 1.0.0: `type(scope)!: subject`, a blank line, a body saying why, then footers; use `!` or a `BREAKING CHANGE:` footer only for a real compatibility break.",
+      "fix": "Shorten this to 'Write the message in Conventional Commits 1.0.0; the body says why.' The model already knows the header, body and footer layout. Keep the parts it lacks: `-F <gitdir>/commit-work-msg.txt` instead of a bare `git commit`, the no-trailers default and the gated reference read."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 8,
+      "evidence": "A commit is one change that builds and tests on its own. Split by behavior, not by file type",
+      "fix": "Keep only the non-obvious part: 'Split by behavior: an implementation and the tests that pin it go in the same commit.' Drop the generic atomic-commit definition."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/commit-work/evals/evals.json",
+      "line": 10,
+      "evidence": "\"Shows ordered `git status`, `git diff`, `git add -- src/auth.ts`, `git diff --cached`, and `git commit` commands.\"",
+      "fix": "In review-and-commit, add an assertion that the staged version is verified (step 5) and that `git write-tree` runs before the commit and is compared with `git rev-parse 'HEAD^{tree}'` after it. Also add an eval whose fixture shows a pre-commit hook that reformats a file and lets the commit succeed. Assert that the agent reports the tree difference and asks before amending."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 31,
+      "evidence": "export the index into an empty directory with `git checkout-index -a --prefix=<dir>/` (the trailing slash matters) and run the check there",
+      "fix": "Name the directory: `git checkout-index -a --prefix=<gitdir>/commit-work-verify/`. This keeps it out of `git status`, and step 8's existing cleanup of `<gitdir>/commit-work*` then removes it. Today the export location and its removal are left to guesswork."
+    }
+  ]
+}

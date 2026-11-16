@@ -1,0 +1,41 @@
+{
+  "skill": "sync-branch",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 16,
+      "evidence": "`remote=$(git rev-parse --verify --quiet \"origin/$branch\")` is described as \"empty if the branch was never pushed\", and step 5 pushes to `origin \"$branch\"`. This assumes the local branch name equals the remote PR head name. For a local branch `local/login` tracking `origin/feature/login`, the missing `origin/local/login` instead selects the unpublished-branch path: it creates a different remote branch and leaves the existing PR unchanged while reporting success.",
+      "fix": "Resolve the remote destination separately from the local branch before recording its tip. Inspect the configured upstream and, for an existing PR, its headRefName and head repository; stop and ask if the destination is ambiguous or is not on origin. Use the verified remote head name consistently for the remote-tip lookup, divergence checks and explicit lease, and push with an explicit `HEAD:refs/heads/<remote-head>` refspec. Keep `$branch` for local rebase operations."
+    }
+  ]
+}

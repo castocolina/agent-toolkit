@@ -1,0 +1,104 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 14,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 12,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 41,
+      "evidence": "Step 6 repeats the Conventional Commits shape in a code block: \"type(scope)!: subject / body: why, not how / BREAKING CHANGE: what breaks and how to migrate\". Step 1 (line 23) also tells the agent to \"Inspect `git status`, `git diff --cached` and `git diff`\".",
+      "fix": "Replace the 7-line template with one line, \"Conventional Commits 1.0.0; `!` or a BREAKING CHANGE footer only for a real break\". Keep only the expert parts of step 6: `-F` instead of a bare `git commit`, the no-trailers default and the trigger for reading the reference."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 28,
+      "evidence": "Step 3 packs three staging branches, a bash block and the cleanup rule into lines 28-37. The decision (who owns the index, and whole file or part of a file) is buried in prose bullets.",
+      "fix": "Open step 3 with a two-question decision line: \"Does the index hold user content? Is the change a whole file or part of one?\". Map each answer to its branch, so the Process pattern's checkpoint is explicit."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 49,
+      "evidence": "\"Never amend or add fix-up commits without the user's say-so.\" This NEVER item gives no reason, while the other items do.",
+      "fix": "Add the reason. For example: \"amending rewrites a commit the user may already have pushed or reviewed, and a fix-up commit breaks the one-change-per-commit rule the user approved\"."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 3,
+      "evidence": "The description lists explicit intents only (\"Use when asked to commit work, stage selected files or hunks...\"). It covers no request that leaves out the word commit, such as \"check in my changes\" or \"save this to git\".",
+      "fix": "Stage and commit Git changes so each commit holds only the approved change, leaving content the user already staged untouched, splitting mixed hunks without an interactive terminal, verifying the staged version rather than the working tree, and writing Conventional Commits messages. Use when asked to commit work, check in or save changes to git, stage selected files or hunks, split a mixed tree into commits, review what is staged, or draft a commit message, even if the user never says 'commit'. Not for rebasing, squashing, amending or force-pushing history, resolving merge conflicts, opening pull requests, or code review unrelated to a commit."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/commit-work/evals/evals.json",
+      "line": 9,
+      "evidence": "The review-and-commit assertion accepts \"`git add src/auth.ts` (or `git add -p`)\", but SKILL.md says \"`git add -p` needs an interactive terminal\". Evals review-and-commit and split-mixed-work have no input files, and the assertion \"Separates unrelated README formatting only if independently reviewable\" cannot be checked.",
+      "fix": "Drop the `git add -p` alternative and require `git add -- src/auth.ts`. Add a fixture with the status and diff for split-mixed-work. Rewrite its assertion so it can be checked, for example: \"README.md is in a separate commit from src/api.ts and tests/api.test.ts\"."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/commit-work/evals/trigger-queries.json",
+      "line": 2,
+      "evidence": "All 20 queries are clean, formal one-liners with no file paths, typos or personal context. Most positives name the domain outright (\"Commit this fix with a good conventional commit message.\").",
+      "fix": "Rewrite about half the queries with realistic context and casual phrasing. Add positives that never say 'commit', such as \"ok im done with the auth fix in src/auth.ts, save it to git but leave my config tweak alone\"."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 30,
+      "evidence": "The partial-file branch writes `all.diff` and `pick.diff` without naming a location or cleanup. If they land in the worktree, they are untracked files. Step 5's \"no untracked file feeds the check\" test and step 8's report of untouched changes then include the skill's own artifacts.",
+      "fix": "Write the patches to `<gitdir>/commit-work-all.diff` and `<gitdir>/commit-work-pick.diff` (from `git rev-parse --absolute-git-dir`). Delete them after the commit, together with the temporary index."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 49,
+      "evidence": "In the temporary-index branch, the prefix rule covers only \"every git command of steps 3-6\". Step 7's \"run `git status` and `git diff --cached` again\" after a hook failure then reads the real index, not the one the hook restaged.",
+      "fix": "Extend the prefix rule to steps 3-7. State that after a failed commit in temporary-index mode, the re-inspection and the `git show --stat` check use the same `GIT_INDEX_FILE=` prefix."
+    }
+  ]
+}

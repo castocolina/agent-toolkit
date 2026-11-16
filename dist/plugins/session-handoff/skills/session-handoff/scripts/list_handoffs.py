@@ -7,11 +7,11 @@ Searches for handoff documents in .claude/handoffs/ and displays:
 - Title extracted from document
 - Status (if marked complete)
 
-Usage:
-    python list_handoffs.py           # List handoffs in current project
-    python list_handoffs.py /path     # List handoffs in specified path
+Run with --help for usage, exit codes and examples.
 """
 
+import argparse
+import json
 import os
 import re
 import sys
@@ -97,14 +97,30 @@ def format_date(dt: datetime | None) -> str:
 
 
 def main():
-    # Get project path
-    project_path = sys.argv[1] if len(sys.argv) > 1 else os.getcwd()
+    parser = argparse.ArgumentParser(
+        description="List handoffs in <project>/.claude/handoffs/, newest first. Status counts [TODO: markers only; it is not validation.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""exit codes:
+  0  listing printed (also when no handoffs exist)
+  2  usage error
+
+examples:
+  python3 scripts/list_handoffs.py
+  python3 scripts/list_handoffs.py --json /path/to/project""",
+    )
+    parser.add_argument("project_path", nargs="?", default=os.getcwd(), help="Project root (default: current directory)")
+    parser.add_argument("--json", action="store_true", help="Print the handoffs as a JSON array on stdout")
+    args = parser.parse_args()
+    project_path = args.project_path
 
     handoffs = list_handoffs(project_path)
 
+    if args.json:
+        print(json.dumps(handoffs, indent=2, default=str))
+        return
+
     if not handoffs:
         print(f"No handoffs found in {project_path}/.claude/handoffs/")
-        print("\nTo create a handoff, run: python create_handoff.py [task-slug]")
         return
 
     print(f"Found {len(handoffs)} handoff(s) in {project_path}/.claude/handoffs/\n")
@@ -117,7 +133,6 @@ def main():
         print(f"  File: {h['filename']}")
         print("-" * 80)
 
-    print(f"\nTo resume from a handoff, read the document and follow the resume checklist.")
     print(f"Most recent: {handoffs[0]['path']}")
 
 

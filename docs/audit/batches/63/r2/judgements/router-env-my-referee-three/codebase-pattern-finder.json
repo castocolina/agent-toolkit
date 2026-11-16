@@ -1,0 +1,68 @@
+{
+  "skill": "codebase-pattern-finder",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 12,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 113,
+  "max_total": 125,
+  "percent": 90.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 19,
+      "evidence": "1. Pin down the requested behavior, the runtime/framework and the architectural layer. ... 2. Search on the behavior and its synonyms ... 4. Read each promising file and extract the smallest self-contained section that works",
+      "fix": "Cut steps 1, 2 and 4 down to the parts the model would not do by itself: always open callers and tests, and keep a snippet small but complete. The model already knows to search with synonyms and read the files it finds. Use the freed lines for repository-specific signals, such as how to tell generated or vendored copies apart from maintained code."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 19,
+      "evidence": "Pattern types to cover when relevant: feature, structural, integration, testing.",
+      "fix": "Add a decision rule that maps the request to pattern types, for example: 'how do we call X' -> integration + testing; 'where does Y live' -> structural; otherwise feature + testing. This turns the list of types into a way of thinking about the request."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 55,
+      "evidence": "## Gotchas has two items (.gitignore-hidden scope, mock-only tests)",
+      "fix": "Add one more trap that runs against expectation: a barrel or re-export file (index.ts, __init__.py) often matches first and looks like the definition. Follow it to the defining file before you cite it, or the caller will copy an import path instead of the code."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 51,
+      "evidence": "Report one example per materially distinct approach ... at most 3 variations per pattern type, unless the caller asks for more. / Never ... rank",
+      "fix": "Resolve what happens when there are more than 3 distinct approaches without ranking them. For example: 'If more than 3 distinct approaches exist, show the 3 with the most call sites (state the count), and list the rest by file:line under Related Utilities with \"N further approaches not expanded\".' Also say what to do when the request names no clear behavior: report the interpretation you assumed at the top of the report."
+    }
+  ]
+}

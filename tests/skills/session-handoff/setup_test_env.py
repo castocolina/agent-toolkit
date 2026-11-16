@@ -24,9 +24,11 @@ DEFAULT_TEST_PATH = "/tmp/handoff-eval-project"
 
 
 def run_cmd(cmd: list[str], cwd: str = None) -> bool:
-    """Run a command and return success status."""
+    """Run a command and return success status. Commits are dated 1h ago so a handoff created now has none after it."""
+    when = (datetime.now() - timedelta(hours=1)).isoformat()
+    env = {**os.environ, "GIT_AUTHOR_DATE": when, "GIT_COMMITTER_DATE": when}
     try:
-        subprocess.run(cmd, cwd=cwd, capture_output=True, check=True)
+        subprocess.run(cmd, cwd=cwd, capture_output=True, check=True, env=env)
         return True
     except subprocess.CalledProcessError:
         return False
@@ -124,7 +126,11 @@ describe('Authentication', () => {
     return path
 
 
-def init_git_repo(path: Path):
+def git_out(path: Path, *args: str) -> str:
+    return subprocess.run(["git", *args], cwd=str(path), capture_output=True, text=True, check=True).stdout.strip()
+
+
+def init_git_repo(path: Path) -> tuple[str, str, str]:
     """Initialize git repo with commit history."""
     # Initialize
     run_cmd(["git", "init"], cwd=str(path))
@@ -134,6 +140,7 @@ def init_git_repo(path: Path):
     # Initial commit
     run_cmd(["git", "add", "."], cwd=str(path))
     run_cmd(["git", "commit", "-m", "Initial commit: project setup"], cwd=str(path))
+    first = git_out(path, "rev-parse", "HEAD")
 
     # Add more commits to simulate history
     commits = [
@@ -152,9 +159,10 @@ def init_git_repo(path: Path):
         run_cmd(["git", "commit", "-m", message], cwd=str(path))
 
     print(f"Initialized git repo with {len(commits) + 1} commits")
+    return git_out(path, "branch", "--show-current"), first, git_out(path, "rev-parse", "HEAD")
 
 
-def create_sample_handoffs(path: Path):
+def create_sample_handoffs(path: Path, branch: str, first_commit: str, head_commit: str):
     """Create sample handoff documents for testing."""
     handoffs_dir = path / ".claude" / "handoffs"
     handoffs_dir.mkdir(parents=True)
@@ -167,7 +175,8 @@ def create_sample_handoffs(path: Path):
 ## Session Metadata
 - Created: {now.strftime("%Y-%m-%d %H:%M:%S")}
 - Project: {path}
-- Branch: main
+- Branch: {branch}
+- Baseline commit: {head_commit}
 - Session duration: 2 hours
 
 ## Handoff Chain
@@ -280,7 +289,8 @@ The validateToken function in src/auth.js currently returns true always - this i
 ## Session Metadata
 - Created: {old_date.strftime("%Y-%m-%d %H:%M:%S")}
 - Project: {path}
-- Branch: main
+- Branch: {branch}
+- Baseline commit: {first_commit}
 - Session duration: 1 hour
 
 ## Handoff Chain
@@ -339,7 +349,7 @@ Using MongoDB Atlas for hosting. Connection string in DATABASE_URL.
 ## Session Metadata
 - Created: {now.strftime("%Y-%m-%d %H:%M:%S")}
 - Project: {path}
-- Branch: main
+- Branch: {branch}
 - Session duration: [estimate how long you worked]
 
 ## Current State Summary
@@ -403,8 +413,7 @@ def main():
         clean_test_env(args.path)
     else:
         path = create_test_project(args.path)
-        init_git_repo(path)
-        create_sample_handoffs(path)
+        create_sample_handoffs(path, *init_git_repo(path))
         print(f"\nTest environment ready at: {args.path}")
         print(f"\nTo test, run:")
         print(f"  cd {args.path}")

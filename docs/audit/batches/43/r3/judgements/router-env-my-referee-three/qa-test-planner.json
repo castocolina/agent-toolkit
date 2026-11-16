@@ -1,0 +1,68 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 86,
+      "evidence": "**Failure impact:** P0 money, security or irreversible data; P1 blocked core journey; P2 workaround exists; P3 cosmetic.",
+      "fix": "Drop the textbook P0-P3 definitions the model already knows. Keep only the non-obvious part: overlap shown by evidence, never assumed, and the tie-break by cost."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 59,
+      "evidence": "## 3b. Bug report branch: 1. Keep the first failure's evidence ... 4. Write every missing fact as `Unknown`",
+      "fix": "Add one thinking prompt before step 3, such as 'before setting severity, ask what the failure costs (money, data, recovery) and whether it is product or environment'. That makes the branch a decision framework and not only a four-step checklist."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/qa-test-planner/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "10 should-trigger vs 13 should-not-trigger queries; several positives are terse fragments ('Invoke /qa-test-planner for intermittent timeout report.')",
+      "fix": "Trim the negatives to 10 and keep the strongest near-misses (the unnamed plan, smoke, bug and release-decision prompts). Rewrite the terse positives with realistic context: file paths, builds, rates."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 61,
+      "evidence": "3. Set severity by impact, then priority from the rate grid in `references/bug_report_templates.md`.",
+      "fix": "Add the branch for an Unknown rate, which the grid has no row for (the 'sometimes does nothing, can't reliably repro' case): 'If the rate is Unknown, set priority from the intermittent row as a provisional value, or write Untriaged, and list the rate under Open Questions. Security or data-loss bugs stay P0.'"
+    }
+  ]
+}

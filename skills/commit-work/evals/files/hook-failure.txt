@@ -1,0 +1,16 @@
+Reviewed before committing:
+$ git diff --cached --stat
+ src/auth.ts | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+$ git commit -m "fix(auth): treat a token at its expiry time as expired"
+[pre-commit] prettier --write $(git diff --cached --name-only) && git add $(git diff --cached --name-only)
+src/auth.ts 38ms
+[pre-commit] vitest run --changed
+ FAIL  tests/auth.test.ts > refresh > retries once on 401
+AssertionError: expected "fetch" to be called 2 times, but got 1 times
+ Test Files  1 failed | 3 passed (4)
+pre-commit hook exited with code 1; commit aborted
+
+$ git status --short
+M  src/auth.ts

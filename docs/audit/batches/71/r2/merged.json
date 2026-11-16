@@ -1,0 +1,81 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "ascii-ui-mockup-generator",
+      "percent": 94.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6,
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 22,
+          "evidence": "Step 5: \"Deliver each mockup with four bullets (approach, ranked task it favors, main drawback, best-fit scenario)\" repeats Output format line 29: \"four bullets: **Approach**, **Favors**, **Drawback**, **Best fit**\"",
+          "fix": "In step 5, replace the bullet list with \"in the Output format below\" so the four-bullet spec is stated once"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 18,
+          "evidence": "\"Rank the user tasks; list the content every alternative must show.\" gives no method for ranking when the user states no priorities",
+          "fix": "Add a heuristic, for example: \"With no stated priorities, rank by frequency of use, then by cost of error; state the ranking above mockup 1 so the user can correct it\""
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 35,
+          "evidence": "\"Keep comparison fields aligned across repeated records ... Mixing the two makes records hard to compare.\" is general layout advice, not an environment fact that goes against assumptions",
+          "fix": "Replace it with an ASCII-specific trap, for example: \"NEVER let a label's length set a column's width in one row only: a single long value shifts every border to its right, so size columns from the longest required label (step 2) before drawing\""
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 19,
+          "evidence": "\"truncate with `...>` at the same column in every row, or move secondary fields to a detail view\" gives two equal options with no default",
+          "fix": "Pick a default: \"Move secondary fields to a detail view first; truncate with `...>` only for values that must stay in the row\""
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 29,
+          "evidence": "Output format says \"keep the ranked tasks' fields and primary actions in full, abbreviate secondary labels, and move the rest to a detail view\", but step 2 (line 19) says to truncate with `...>` or move fields. The two overflow rules disagree, and neither section gives a sample mockup to match against",
+          "fix": "Merge the overflow rules into one ordered rule in step 2 (keep ranked fields in full -> abbreviate secondary labels -> move to detail view -> truncate with `...>` as last resort) and point Output format at it. Add one short fenced example mockup with its four bullets as a template"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 37,
+          "evidence": "\"Always put mockups in fenced blocks: outside one, Markdown uses a proportional font and collapses repeated spaces.\" This explains familiar Markdown behavior and repeats the \"fenced mockup\" requirement at line 29; the adjacent tab-stop explanation is similarly standard knowledge rather than expert-only guidance.",
+          "fix": "Consolidate the familiar formatting reminders into Output format as \"Use fenced blocks and spaces, never tabs.\" Remove the repeated Markdown/font explanation, while retaining the backtick-collision escape rule and the domain-specific display-width checks."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

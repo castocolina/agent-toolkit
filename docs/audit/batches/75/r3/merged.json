@@ -1,0 +1,71 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codex-plan",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 50,
+          "evidence": "Plan structure: Overview, Prerequisites, Phases with tasks, Testing Strategy, Dependency Graph, Risks, Rollback ... Complexity 1-10, Test-First Approach and testable Acceptance Criteria.",
+          "fix": "Keep only the parts the model would not choose by default, namely task IDs in Dependencies so work can run in parallel, and Location limited to file paths. Point to a short template rather than restating a generic plan outline."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 39,
+          "evidence": "Add `--skip-git-repo-check` only when `git rev-parse --is-inside-work-tree` fails. ... State the directory the command must run from",
+          "fix": "Indent the code fences and follow-up paragraphs of steps 5 and 6 under their list items. As written, the numbered phase list breaks apart, and step 6's sub-instructions read like free-standing text outside the process."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 69,
+          "evidence": "The command uses relative paths: run it from the directory holding `prompt_to_codex.md`, or `$(cat ...)` fails and the plan lands elsewhere.",
+          "fix": "This gotcha repeats step 6 (line 41: \"State the directory the command must run from\"). Replace it with one the body does not already cover, such as a very large prompt passed through `\"$(cat ...)\"` hitting the shell argument-length limit, and what to do instead."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 44,
+          "evidence": "`diff` the two literal paths (or ask the user to). Flag any difference.",
+          "fix": "Make it a default with an escape hatch: \"Run `diff <baseline> <second>` yourself. Ask the user only if Bash is unavailable.\" Also say what to do with a difference, for example list the changed paths and do not review the plan as clean."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 32,
+          "evidence": "Outside git, or if the line prints the failure message, say change verification is unavailable. Without a HEAD (unborn repo) the diff part fails: say verification is limited to `git status`.",
+          "fix": "In an unborn repo, `git diff HEAD` fails, so the line prints \"baseline failed: change verification unavailable\". That matches both branches and tells the agent two different things. Check `git rev-parse --verify HEAD` first. Without a HEAD, run only `git status --porcelain=v1 -uall -- . \":(exclude)<plan file>\" > \"<literal path>\"` and report that verification is limited to git status."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

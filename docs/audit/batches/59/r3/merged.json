@@ -1,0 +1,190 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "ascii-ui-mockup-generator",
+      "percent": 91.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.0,
+        "router-env-my-referee-one": 90.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 43,
+          "evidence": "Mark interactive elements with labels such as `[Submit]`, `[ ] checkbox`, `(v) dropdown`.",
+          "fix": "Cut the generic wireframe notation (buttons, checkboxes, dropdowns): the model already uses these conventions. Keep only the non-obvious ones (scroll edge marks, modal as an inner box over the base screen)."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 23,
+          "evidence": "6. **Ask which to pick**, numbered. If the user rejects all, ask which ranked task each option got wrong, then redraw.",
+          "fix": "Steps 5-6 are generic present-and-ask steps. Replace them with a domain decision, for example: before you ask, state which mockup you recommend for the top-ranked task and why. Then the step carries expert judgment."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 48,
+          "evidence": "use Unicode box-drawing only if the user asks (common for TUIs), then check border alignment in a monospace font. Display width differs across fonts, which shifts borders.",
+          "fix": "Replace the check the agent cannot run (it cannot view a font) with a concrete gotcha: East Asian ambiguous-width and emoji characters take 2 columns in many terminals. Keep box-drawing lines free of such characters, and count wide characters as 2 when checking row lengths."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 33,
+          "evidence": "### 1. Sidebar + table",
+          "fix": "Make the example match its title and step 5. Either draw a sidebar next to the table or rename the example to 'Aligned table'. Also show the four rationale points as four bullets (Approach, Favors, Drawback, Best fit) instead of the single line '- Approach / Favors / Drawback / Best fit'."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 20,
+          "evidence": "Default to 3 structurally distinct mockups ... compare records -> aligned table vs cards ... Navigation placement (top, side, none) is the fallback axis.",
+          "fix": "Each task branch gives only 2 variants. Say where the third comes from, for example: 'When the dominant-task axis yields only two variants, take the third from the navigation-placement axis.'"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 18,
+          "evidence": "\"Confirm requirements\", \"Explain each mockup\" and \"Ask which to pick\", together with the basic Name/Status table example, occupy substantial space relative to the task-to-layout heuristics. These sections mainly activate familiar facilitation and formatting practices rather than transfer specialist knowledge.",
+          "fix": "Condense the requirements, rationale and selection scaffolding and the elementary table example into a compact output contract. Retain the dominant-task decision rules, and strengthen the knowledge delta with a concrete prioritization rule for which fields to retain, abbreviate or move to detail when comparison fields and primary actions compete for width."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 21,
+          "evidence": "\"count characters per row against the top border\" does not resolve the requested-Unicode branch: line 48 permits Unicode box drawing, but wide or combining characters in labels can produce equal character counts and unequal rendered widths. Checking a monospace font alone does not repair this.",
+          "fix": "Define alignment in display cells rather than character counts. For Unicode layouts or non-ASCII labels, use a display-width-aware check that handles wide and combining characters, then repair and re-check. When rendered width cannot be verified, state that limitation and offer an ASCII/transliterated fallback rather than claiming the borders are validated."
+        }
+      ]
+    },
+    {
+      "name": "general-purpose",
+      "percent": 84.0,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 80.8,
+        "router-env-my-referee-one": 87.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "high",
+          "file": "agents/general-purpose.md",
+          "line": 3,
+          "evidence": "description: Coordinate multi-file, multi-component programming work end to end: break the request down, ...",
+          "fix": "Quote the value so the frontmatter parses. An unquoted plain scalar containing ': ' is a YAML error ('mapping values are not allowed here'). Per artifact-specs.md, a plugin agent whose YAML does not parse loads under its file name with no fields, so the description that routes it is lost. Replacement: description: \"Coordinate multi-file, multi-component programming work end to end: break the request down, delegate to matching specialists or implement directly, integrate their changes and run the project's verification gates. Use for complex multi-step debugging, implementation or refactoring that spans several files or components, or when specialist results need integrating and verifying, even if coordination is not requested. Not for trivial one-step edits or a focused single-domain task a dedicated specialist owns. Unlike the built-in general-purpose agent, it returns Result, Changes, Validation and Remaining blockers.\""
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 20,
+          "evidence": "Write code, comments, docs and commit messages in English.",
+          "fix": "Keep the repo-specific trailer and checkout rules. Drop or shorten generic lines such as 'Read the output yourself' (line 15), which the model already follows, so expert content dominates the body."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 12,
+          "evidence": "1. Before any edit, record in your reply the owner, dependency order and acceptance check per requirement, plus baseline test results ... If a bug does not reproduce, say so ...",
+          "fix": "Split step 1 into separate phases: plan (owner, order, acceptance check), baseline (run the tests and record pre-existing failures) and reproduce (for bugs). Give each phase a 'before moving on, ask: ...' checkpoint so the Process pattern has clear phase boundaries."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 26,
+          "evidence": "Gotchas has a single item: 'Delegated specialists start without your conversation context ...'",
+          "fix": "Add environment-specific gotchas with reasons. Examples: a specialist whose frontmatter `tools` excludes Edit/Bash cannot apply or verify changes, so delegate verification elsewhere. Plugin agents ignore `permissionMode`, so a specialist may stall on a permission prompt."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 12,
+          "evidence": "then fix from the code only if it is clear, marked unverified",
+          "fix": "Define 'clear' with a default. For example: fix without reproduction only when the defect is visible in a single code path and a test can be written that fails before the fix. Otherwise stop and report it under Remaining blockers."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 15,
+          "evidence": "5. Run the verification gates ... Read the output yourself.",
+          "fix": "Add the failure branch: if a gate or the acceptance check fails, fix the cause (or re-delegate with the failing output), rerun the same gates, and repeat at most N times. After that, report the failure under Validation and mark the work incomplete. As written, the 'validation fails' branch does not resolve to an action."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 13,
+          "evidence": "Process list goes 1., 3., 4., 5. with no step 2",
+          "fix": "Renumber the ordered list 1-4, or restore the missing step 2, so the agent does not look for a step that does not exist."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "high",
+          "file": "agents/general-purpose.md",
+          "line": 3,
+          "evidence": "\"description: Coordinate multi-file, multi-component programming work end to end: break the request down\" contains an unquoted colon followed by a space inside a plain YAML scalar. This makes the frontmatter invalid. A plugin agent can fall back to its filename, but its routing description and other frontmatter settings are lost.",
+          "fix": "Use the following folded-scalar field to repair YAML parsing and preserve the routing description:\ndescription: >-\n  Coordinate multi-file, multi-component programming work end to end: break the request down, delegate to matching specialists or implement directly, integrate their changes and run the project's verification gates. Use for complex multi-step debugging, implementation or refactoring that spans several files or components, or when specialist results need integrating and verifying, even if coordination is not requested. Not for trivial one-step edits or a focused single-domain task a dedicated specialist owns. Unlike the built-in general-purpose agent, it returns Result, Changes, Validation and Remaining blockers."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 33,
+          "evidence": "Under \"## NEVER\": \"Report a check as passed that you did not run: the caller acts on it. Say it was not run.\" This generic verification reminder overlaps \"Read the output yourself\" in Process and \"Inspect the resulting diff and the observed validation output\" in the preceding NEVER rules. These repeated reminders dilute the more valuable worker-ownership and checkout/revision guidance.",
+          "fix": "Consolidate routine verification reporting into the output contract: \"Validation lists commands actually run, their observed outcomes, and required checks not run.\" Keep the separate orchestration-specific rules about overlapping worker files, unreliable specialist summaries, and checkout/revision provenance."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

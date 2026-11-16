@@ -4,7 +4,7 @@ description: Diff signals for mapping observed changes to defensible engineering
 
 # Diff-to-lesson lookup
 
-Use these as hypotheses, not labels. A pattern name is earned only when the diff shows the relevant consequence.
+Use these as hypotheses, not labels. A principle name is earned only when the evidence check in its row passes.
 
 | Diff signal | Candidate lesson | Evidence needed / false positive |
 |---|---|---|
@@ -16,7 +16,3 @@ Use these as hypotheses, not labels. A pattern name is earned only when the diff
 | Branches/guards moved toward input boundary | Fail-fast / invariant ownership | Verify invalid states are now rejected before side effects, not merely translated into another error later. |
 | State or data representation changed | Information ownership / migration risk | Compare readers, writers, persistence, and compatibility. A cleaner local representation may impose migration or coordination cost elsewhere. |
 | Behavior removed or simplified | YAGNI / scope discipline | Verify the removed behavior was unused or explicitly out of scope; absence from current tests is not evidence that users do not rely on it. |
-
-## Evidence standard for before/after claims
-
-A claimed improvement needs an observable consequence: changed output, eliminated failure path, fewer coordinated edits for the same future change, or a new test protecting a previously exposed behavior. Quote or point to the relevant code/test on both sides when available. If only the after-state exists, describe the change, not an unproven improvement. Commit intent is context, never proof.

@@ -1,0 +1,77 @@
+{
+  "skill": "react-useeffect",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/react-useeffect/SKILL.md",
+      "line": 14,
+      "evidence": "| Derived value, or work a user action caused (submit, buy, notify parent) | Render (`useMemo` only for measured cost), or that event handler |",
+      "fix": "The model already applies the basic render-or-handler routing from react.dev. Keep this row as a short reminder but drop the parenthetical examples. Spend the saved lines on the cases where the obvious answer is wrong (partial reset, cached getSnapshot), which the other rows already cover."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/react-useeffect/SKILL.md",
+      "line": 18,
+      "evidence": "| Widget, browser API, connection, analytics on display | `useEffect` with cleanup that undoes this setup |",
+      "fix": "The description triggers on useLayoutEffect, but the body never says when to use it. Add one routing row: 'Measure or mutate layout before paint (tooltip position, scroll restore) | useLayoutEffect with the same cleanup rules; useEffect otherwise, because useLayoutEffect blocks paint'."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/react-useeffect/SKILL.md",
+      "line": 3,
+      "evidence": "Not for networking outside a React component, data-library configuration (React Query or SWR caching), routing, Server Actions, reducer design, re-render questions with no Effect involved, generic component features such as keyboard navigation, TypeScript-only typing, accessibility, or test mocking unrelated to Effects.",
+      "fix": "Decide whether React logic belongs in render, an event handler, a key reset, useSyncExternalStore or useEffect, and fix Effects that misbehave: missing or suppressed dependencies, asymmetric cleanup, Effect chains, state copied from props, stale or out-of-order fetch responses, Strict Mode double runs and once-per-app initialization. Use when writing, reviewing or testing a component that uses useEffect, useLayoutEffect or useEffectEvent, derived or reset state, or browser and store subscriptions, even when the user only says the UI flashes old data, runs twice in development, or shows a previous search's results. Not for data-library configuration (React Query, SWR), routing, Server Actions, reducers, or React questions with no Effect or derived state involved."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/react-useeffect/evals/trigger-queries.json",
+      "line": 23,
+      "evidence": "\"query\": \"Chaining effects to update state\" (also \"Generic TypeScript component\", \"Add aria label to input\")",
+      "fix": "Make the terse should-trigger queries realistic, with file names, user context and casual phrasing. Add at least two queries that describe only a symptom the description promises, for example 'switching tabs in Profile.tsx shows the last user's avatar for a frame'. Replace the trivially unrelated negatives with near-misses, for example a SWR revalidation question that also mentions a useEffect."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/react-useeffect/SKILL.md",
+      "line": 31,
+      "evidence": "6. Test it: render inside `<StrictMode>`, `rerender` with a new dependency, resolve the old request after the new one (deferred promises inside `act`), then `unmount`",
+      "fix": "Add a short React Testing Library example to references/anti-patterns.md and load it when the task is writing tests. It should create two deferred promises, mock fetch to return them in order, rerender with the new query, resolve the second promise and then the first inside act, and assert that the newest results are shown. Without it, the agent has to guess how to set up the race."
+    }
+  ]
+}

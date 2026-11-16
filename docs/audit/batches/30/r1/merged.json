@@ -1,0 +1,144 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "commit-work",
+      "percent": 91.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.0,
+        "router-env-my-referee-one": 90.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 41,
+          "evidence": "Step 6 repeats the Conventional Commits shape in a code block: \"type(scope)!: subject / body: why, not how / BREAKING CHANGE: what breaks and how to migrate\". Step 1 (line 23) also tells the agent to \"Inspect `git status`, `git diff --cached` and `git diff`\".",
+          "fix": "Replace the 7-line template with one line, \"Conventional Commits 1.0.0; `!` or a BREAKING CHANGE footer only for a real break\". Keep only the expert parts of step 6: `-F` instead of a bare `git commit`, the no-trailers default and the trigger for reading the reference."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 28,
+          "evidence": "Step 3 packs three staging branches, a bash block and the cleanup rule into lines 28-37. The decision (who owns the index, and whole file or part of a file) is buried in prose bullets.",
+          "fix": "Open step 3 with a two-question decision line: \"Does the index hold user content? Is the change a whole file or part of one?\". Map each answer to its branch, so the Process pattern's checkpoint is explicit."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 49,
+          "evidence": "\"Never amend or add fix-up commits without the user's say-so.\" This NEVER item gives no reason, while the other items do.",
+          "fix": "Add the reason. For example: \"amending rewrites a commit the user may already have pushed or reviewed, and a fix-up commit breaks the one-change-per-commit rule the user approved\"."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 3,
+          "evidence": "The description lists explicit intents only (\"Use when asked to commit work, stage selected files or hunks...\"). It covers no request that leaves out the word commit, such as \"check in my changes\" or \"save this to git\".",
+          "fix": "Stage and commit Git changes so each commit holds only the approved change, leaving content the user already staged untouched, splitting mixed hunks without an interactive terminal, verifying the staged version rather than the working tree, and writing Conventional Commits messages. Use when asked to commit work, check in or save changes to git, stage selected files or hunks, split a mixed tree into commits, review what is staged, or draft a commit message, even if the user never says 'commit'. Not for rebasing, squashing, amending or force-pushing history, resolving merge conflicts, opening pull requests, or code review unrelated to a commit."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/commit-work/evals/evals.json",
+          "line": 9,
+          "evidence": "The review-and-commit assertion accepts \"`git add src/auth.ts` (or `git add -p`)\", but SKILL.md says \"`git add -p` needs an interactive terminal\". Evals review-and-commit and split-mixed-work have no input files, and the assertion \"Separates unrelated README formatting only if independently reviewable\" cannot be checked.",
+          "fix": "Drop the `git add -p` alternative and require `git add -- src/auth.ts`. Add a fixture with the status and diff for split-mixed-work. Rewrite its assertion so it can be checked, for example: \"README.md is in a separate commit from src/api.ts and tests/api.test.ts\"."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/commit-work/evals/trigger-queries.json",
+          "line": 2,
+          "evidence": "All 20 queries are clean, formal one-liners with no file paths, typos or personal context. Most positives name the domain outright (\"Commit this fix with a good conventional commit message.\").",
+          "fix": "Rewrite about half the queries with realistic context and casual phrasing. Add positives that never say 'commit', such as \"ok im done with the auth fix in src/auth.ts, save it to git but leave my config tweak alone\"."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 30,
+          "evidence": "The partial-file branch writes `all.diff` and `pick.diff` without naming a location or cleanup. If they land in the worktree, they are untracked files. Step 5's \"no untracked file feeds the check\" test and step 8's report of untouched changes then include the skill's own artifacts.",
+          "fix": "Write the patches to `<gitdir>/commit-work-all.diff` and `<gitdir>/commit-work-pick.diff` (from `git rev-parse --absolute-git-dir`). Delete them after the commit, together with the temporary index."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 49,
+          "evidence": "In the temporary-index branch, the prefix rule covers only \"every git command of steps 3-6\". Step 7's \"run `git status` and `git diff --cached` again\" after a hook failure then reads the real index, not the one the hook restaged.",
+          "fix": "Extend the prefix rule to steps 3-7. State that after a failed commit in temporary-index mode, the re-inspection and the `git show --stat` check use the same `GIT_INDEX_FILE=` prefix."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 42,
+          "evidence": "The standard `type(scope)!: subject` skeleton, `Inspect git status, git diff --cached and git diff` instruction, and `Plan the commits` step repeat familiar Git and Conventional Commits knowledge. Alongside the largely activation-oriented intent table, these dilute the stronger temporary-index, staged-verification and hook-recovery expertise.",
+          "fix": "Keep brief approval and intent gates, but compress routine inspection/planning instructions and replace the generic message skeleton with a short Conventional Commits reminder. Preserve the Conventional Commits 1.0.0 credit and the specific non-interactive invocation, trailer, index-preservation and verification guidance."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/commit-work/evals/trigger-queries.json",
+          "line": 2,
+          "evidence": "`{\"query\":\"My commit is too broad; help split it into logical commits safely.\",\"should_trigger\":true}` does not establish whether the changes are uncommitted. It can describe splitting an existing commit, although the description excludes history rewriting.",
+          "fix": "Make this positive explicitly describe uncommitted changes, preferably with concrete paths and context. Add a negative explicitly asking to split an already-created commit so the history-editing boundary is tested unambiguously."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 16,
+          "evidence": "The stage-only route says `steps 1-4, stop after the review`, but step 3 directs unrelated user-staged content through `build the commit in a temporary index`. Following that branch stages the requested changes only in commit-work.index, then stops without putting them in the real index.",
+          "fix": "Restrict temporary-index isolation to commit requests. For stage-only requests, stage explicitly approved paths or an index-only patch directly in the real index while preserving disjoint pre-existing staged entries; stop and ask when the requested paths overlap user-staged content."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 49,
+          "evidence": "`git show --stat HEAD must match the reviewed git diff --cached --stat` is insufficient for the hook-restaging branch. A hook can replace the approved edit with a different edit in the same file while preserving identical insertion/deletion statistics, so this check can accept unreviewed committed content.",
+          "fix": "Capture `git write-tree` from the active index immediately before committing, then compare that tree ID with `git rev-parse 'HEAD^{tree}'` after success. On any mismatch, report the actual content difference and ask; do not automatically amend or create a fix-up commit."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/commit-work/references/commit-message-template.md",
+          "line": 7,
+          "evidence": "`The first source that exists wins` makes the commitlint-config branch skip requirements in commit templates or CONTRIBUTING.md. These sources can impose additive requirements, such as mandatory trailers, that a conventional commitlint configuration does not encode.",
+          "fix": "Collect all applicable repository message requirements rather than stopping at the first source. Resolve commitlint inheritance and local overrides, also inspect applicable templates and CONTRIBUTING guidance, combine compatible requirements, and ask about conflicts. Use recent history only as a fallback for unspecified vocabulary."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

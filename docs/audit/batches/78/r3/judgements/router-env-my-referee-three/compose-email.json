@@ -1,0 +1,68 @@
+{
+  "skill": "compose-email",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 40,
+      "evidence": "NEVER add recipients or CC unless asked: an unexpected CC can escalate a thread or leak scope to the wrong audience.",
+      "fix": "Delete this line. The command only writes text and never sends it, and the model does not add CC lines unprompted, so the line costs tokens without changing what the model does."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 31,
+      "evidence": "Output a ready-to-paste draft: `**Subject:**` line (specific, names the action or deadline), then the body as What-Why-How: What = the decision or impact, Why = ...",
+      "fix": "Replace the prose description of the format with a short concrete template, for example a 4-line subject plus What/Why/How body for a request, followed by the placeholder list. A concrete structure is easier for the model to copy than prose, and it makes this read as a clean Process pattern."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 38,
+      "evidence": "NEVER put the ask only in the subject line: many clients truncate subjects on mobile and the reader misses it.",
+      "fix": "Replace this widely known rule with one an expert learns the hard way, for example: NEVER reply-all-paraphrase a thread's earlier decisions as settled; quote or link the decision, because recipients who missed the original treat the paraphrase as the record."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 13,
+      "evidence": "`$ARGUMENTS` - topic, known facts, or an existing draft to rewrite.",
+      "fix": "Add an input branch for a pasted email the user received and wants to answer: treat it as the prior thread, not as a draft to rewrite. Pick the purpose from the user's intended response (accept, decline or request), and quote or reference the incoming ask instead of rewriting it. Right now a pasted incoming message cannot be told apart from the user's own draft."
+    }
+  ]
+}

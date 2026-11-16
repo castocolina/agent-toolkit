@@ -1,0 +1,68 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 37,
+      "evidence": "The tenant-FK gotcha says, \"Do the same for a task's assignee against `users`.\" Following this instruction for global users with memberships in multiple organizations requires a nonexistent organization_id on users or incorrectly forces each identity into one organization.",
+      "fix": "Branch on identity ownership. For users belonging to exactly one organization, reference users(organization_id, id). For shared identities, retain users plus organization_users with PRIMARY KEY (organization_id, user_id), and make FOREIGN KEY (organization_id, assignee_id) reference organization_users(organization_id, user_id), with an explicit deletion policy."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 63,
+      "evidence": "The SQLite rebuild creates `CREATE TEMP TABLE gate (ok INTEGER NOT NULL CHECK (ok = 1));`, but the successful path commits without dropping it. A second rebuild in the same connection\u2014for example products followed by order_items from the bundled fixture\u2014fails because gate already exists.",
+      "fix": "After the final successful gate check, execute `DROP TABLE gate;` before `COMMIT;`, and retain rollback-on-error behavior. Alternatively, use and clean up a distinct gate table for each rebuild."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/evals/evals.json",
+      "line": 32,
+      "evidence": "The unsafe-column-migration case supplies `references/migrations.md` in `files`; other cases similarly supply the skill's migration instructions or review checklist as task inputs. Passing these inputs to both evaluation configurations would expose answer-bearing skill procedures to the without-skill baseline and bypass reference-discovery behavior.",
+      "fix": "Remove skill instruction documents from eval `files` arrays; retain genuine schema fixtures under evals/files/. Give baseline runs only the user prompt and schema inputs, and let with-skill runs discover references through SKILL.md. Check required reference loading through execution traces where relevant."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 31,
+      "evidence": "\"Each index names the hot read or FK path it serves\" repeats \"Hot reads? Each index you add must name one\" in the preceding step and \"each index names its query\" in the sketch checklist. These repetitions add no further schema expertise.",
+      "fix": "Keep the index-to-query invariant and engine-specific plan validation together in workflow step 2; remove the duplicate index-naming reminders from the initial questions and sketch checklist."
+    }
+  ]
+}

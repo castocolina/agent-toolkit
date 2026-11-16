@@ -1,0 +1,50 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/qa-test-planner/references/bug_report_templates.md",
+      "line": 54,
+      "evidence": "\"A good title names the area, the failing behavior and the trigger\" explains standard bug-report writing already demonstrated by the base template. This adds little knowledge compared with the skill's specific reproduction, waiver and environment rules.",
+      "fix": "Remove this explanatory paragraph while retaining the concrete title format in the base template; keep the reference focused on the non-obvious evidence, severity and priority rules."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/scripts/generate_test_cases.sh",
+      "line": 273,
+      "evidence": "The visual section is guarded by `if [ \"$TEST_TYPE\" = \"UI/Visual\" ] && [ -n \"$FIGMA_URL\" ]; then`. Following the flag-mode branch with `--type 'ui' --visual 'Button spacing and focus state'` but no --figma reaches successful creation while silently discarding the supplied visual checks. Supplying --figma or --visual for a regression case also discards those values.",
+      "fix": "Preserve supplied visual checks even when the Figma URL is unavailable, writing the design reference as Unknown and listing it under Open Questions. For non-UI cases, either retain supplied design context in the output or reject unsupported flag combinations with exit 2 instead of silently dropping them."
+    }
+  ]
+}

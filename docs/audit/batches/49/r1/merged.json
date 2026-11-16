@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "database-schema-designer",
+      "percent": 95.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 41,
+          "evidence": "\"On PostgreSQL and MySQL use fixed-scale `NUMERIC`/`DECIMAL`, never floating point.\" and line 38 \"Unique keys accept many NULLs in PostgreSQL, MySQL and SQLite.\"",
+          "fix": "Shorten the parts the model already knows to one clause each, for example \"Money: exact types (SQLite: INTEGER minor units, because DECIMAL gets NUMERIC affinity and stores REAL)\". Keep the engine-specific traps: SQLite affinity, Decimal128 and `NULLS NOT DISTINCT`."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 24,
+          "evidence": "Workflow step 1 fits four questions, their engine branches and the full MongoDB embed-or-reference rule into one paragraph of about 130 words",
+          "fix": "Split step 1 into four sub-bullets (live data, tenant noun, atomic writes, hot reads), each giving its action. Move the embed-or-reference criteria into the MongoDB 16 MiB gotcha or a sub-bullet so the process pattern reads as discrete checkpoints."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/database-schema-designer/evals/evals.json",
+          "line": 32,
+          "evidence": "\"files\": [ \"references/migrations.md\" ] lists the skill's own reference as an eval input file, and the same happens in the review, MySQL and SQLite evals",
+          "fix": "Limit `files` to user-supplied inputs under `evals/files/`. Drop `references/migrations.md` and `references/schema-design-checklist.md` from `files`, so the with-skill and without-skill runs differ only by the skill. This also tests whether the skill's own load triggers fire."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 32,
+          "evidence": "\"`ON DELETE SET NULL` on a composite tenant FK also nulls the tenant column... On PostgreSQL 15+, write `ON DELETE SET NULL (assignee_id)`\". The MySQL, SQLite and PostgreSQL <15 branch of a tenant model with a nullable assignee has no fallback, and `references/migrations.md` gives the composite-FK retrofit only for PostgreSQL",
+          "fix": "Add the fallback for other engines: \"On MySQL, SQLite or PostgreSQL <15, use `ON DELETE RESTRICT` on the composite FK and clear `assignee_id` in the same transaction before deleting the user (or with a BEFORE DELETE trigger).\" Add a MySQL note to the retrofit section: no `NOT VALID`, so clean bad rows first, then `ADD FOREIGN KEY` with `ALGORITHM=INPLACE, LOCK=NONE` under `foreign_key_checks=0` only after the orphan query returns zero rows."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 42,
+          "evidence": "The live MongoDB branch says: \"deploy readers that accept both shapes, backfill with batched `updateMany` scripts, then tighten the validator.\" It never transitions or drains old-shape writers. Those writers can recreate legacy documents during backfill and start failing when validation tightens.",
+          "fix": "Deploy compatible readers everywhere first, then deploy new-shape writers and drain every old writer and worker before completing the backfill. Use idempotent batches, reconcile existing documents, and gate collMod tightening on zero remaining legacy documents and no legacy producers. When moving data between collections, capture concurrent writes through dual writes or a change-stream reconciliation phase before reader cutover."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 29,
+          "evidence": "After covering both PostgreSQL and MySQL, the shared recovery step says: \"dropping the constraint (`DROP CONSTRAINT`, or `DROP NOT NULL` on PostgreSQL) is instant\". MySQL NOT NULL is a column attribute, not a constraint removable with DROP CONSTRAINT; relaxing it can require another table rebuild.",
+          "fix": "Separate recovery by engine. Retain PostgreSQL DROP CONSTRAINT or DROP NOT NULL guidance. For the MySQL orders.total example, use `ALTER TABLE orders MODIFY total DECIMAL(12,2) NULL, ALGORITHM=INPLACE, LOCK=NONE;`, preserving the original column attributes. State that this can rebuild the table, requires the same lock and version checks as the forward change, and must not be promised instant."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 20,
+          "evidence": "\"Include every named entity as its own table or collection unless you explain the equivalent representation\" is generic modeling activation rather than expert knowledge, and the named-entity check is repeated in workflow step 4. The substantive engine-specific Gotchas provide much stronger knowledge delta.",
+          "fix": "Keep the non-obvious users-versus-membership distinction, but consolidate the generic named-entity reminder into the existing sketch validation check instead of stating it twice."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

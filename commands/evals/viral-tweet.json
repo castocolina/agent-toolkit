@@ -1,0 +1,49 @@
+{
+  "skill_name": "viral-tweet",
+  "subject": "commands/viral-tweet.md",
+  "evals": [
+    {
+      "id": "launch-idea-three-variants",
+      "prompt": "Scenario: the argument is `We just launched our new product after 6 months of work`. Show the full output you would give the user. You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing, except where the scenario itself says the input is empty. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The output contains exactly three distinct rewrites, each labelled with a different angle (hook, reply or repost)",
+        "Every rewrite uses only the supplied facts (a launch, six months of work); none invents a number, customer, revenue figure, dramatic event or product detail",
+        "Each rewrite is at most 280 characters",
+        "The output recommends exactly one version and gives a reason",
+        "The output asks the user to confirm or supply specifics (what the product is, a real number) instead of inventing them",
+        "No rewrite contains hashtags, 'link in bio' or engagement bait such as 'RT if'",
+        "The output is draft text only: nothing states or implies the post was published"
+      ]
+    },
+    {
+      "id": "empty-argument-asks-first",
+      "prompt": "Scenario: the command is invoked with no argument and nothing else is known. Show the full output you would give the user. You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing, except where the scenario itself says the input is empty. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The output asks the user for their tweet idea or topic",
+        "The output contains no drafted tweet variants and no invented topic",
+        "No claim is made that anything was posted"
+      ]
+    },
+    {
+      "id": "grief-post-keeps-voice",
+      "prompt": "Scenario: the argument is `my dad passed away last week. he taught me to fix bikes. today i fixed my first one without him`. Show the full output you would give the user. You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing, except where the scenario itself says the input is empty. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "No rewrite adds anger, FOMO, urgency, a hot take or a polarizing framing",
+        "Every rewrite keeps the author's first-person, quiet voice and the supplied facts (father passed away, bikes, first repair alone)",
+        "No rewrite ends with a question or call to action aimed at provoking replies",
+        "The output recommends one version, and the reasoning prioritizes sincerity and clarity over reach",
+        "No invented detail appears, such as a bike model, the father's name or a number"
+      ]
+    },
+    {
+      "id": "long-draft-needs-trim-or-thread",
+      "prompt": "Scenario: the argument is a pasted draft of about 900 characters explaining five separate lessons from migrating a Postgres database, each with a concrete number the user supplied: `1) pgbouncer cut connections from 800 to 60. 2) pg_repack reclaimed 40% of disk. 3) logical replication lagged 12s at peak. 4) cutover took 7 minutes. 5) rollback plan was never needed.` Show the full output you would give the user. You cannot run commands or ask questions. Write the complete output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing, except where the scenario itself says the input is empty. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "Every standalone single-post rewrite is at most 280 characters",
+        "Where all five lessons cannot fit in 280 characters, the output asks whether to turn it into a thread or states that it chose a thread, and does not silently return an over-limit single post",
+        "All numbers used (800, 60, 40%, 12s, 7 minutes) match the supplied ones; none is changed or invented",
+        "The output is draft text only: nothing states or implies the post was published"
+      ]
+    }
+  ]
+}

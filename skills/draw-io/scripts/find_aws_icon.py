@@ -1,78 +1,67 @@
 #!/usr/bin/env python3
-"""AWS icon search script
+"""Look up draw.io AWS icon styles by service name in references/aws-icons.md.
 
-Search for icon information by service name in references/aws-icons.md.
-Extract only the information needed to improve token efficiency.
-
-Usage:
-    python find_aws_icon.py <service_name>
-    python find_aws_icon.py ec2
-    python find_aws_icon.py lambda
-    python find_aws_icon.py s3
+Prints only the matching rows, so the full table never enters the context.
+Results go to stdout; counts and errors go to stderr.
 """
 
+import argparse
+import json
 import re
 import sys
 from pathlib import Path
 
+TABLE = Path(__file__).resolve().parent.parent / "references" / "aws-icons.md"
+# | Amazon EC2 | mxgraph.aws4.ec2 |
+ROW_RE = re.compile(r"\|\s*([^|]+?)\s*\|\s*(mxgraph\.aws4\.[a-z0-9_]+)\s*\|")
 
-def load_icon_data() -> list[dict[str, str]]:
-    """Load icon data from aws-icons.md, preserving groups and variants."""
+
+def load_icon_data(table: Path = TABLE) -> list[dict[str, str]]:
+    """Every table row, keeping duplicate names (variants) and group icons."""
     icons = []
-    script_dir = Path(__file__).parent
-    aws_icons_path = script_dir.parent / "references" / "aws-icons.md"
-
-    if not aws_icons_path.exists():
-        return icons
-
-    content = aws_icons_path.read_text(encoding="utf-8")
-
-    # Extract the service name and resIcon from table rows
-    # | Amazon EC2 | mxgraph.aws4.ec2 |
-    pattern = r"\|\s*([^|]+?)\s*\|\s*(mxgraph\.aws4\.[a-z0-9_]+)\s*\|"
-    for match in re.finditer(pattern, content):
-        service_name = match.group(1).strip()
-        res_icon = match.group(2).strip()
-        kind = "group" if res_icon.rsplit(".", 1)[-1].startswith("group_") else "resourceIcon"
-        icons.append({"name": service_name, "icon": res_icon, "kind": kind})
-
+    for name, icon in ROW_RE.findall(table.read_text(encoding="utf-8")):
+        kind = "group" if icon.rsplit(".", 1)[-1].startswith("group_") else "resourceIcon"
+        attribute = "grIcon" if kind == "group" else "resIcon"
+        icons.append({"name": name.strip(), "icon": icon, "kind": kind,
+                      "style": f"shape=mxgraph.aws4.{kind};{attribute}={icon};"})
     return icons
 
 
-def search_icon(query: str) -> list[dict]:
-    """Search for icons matching the query"""
-    icons = load_icon_data()
-    query_lower = query.lower()
-    results = []
-
-    for data in icons:
-        if query_lower in data["name"].lower() or query_lower in data["icon"].lower():
-            results.append(data)
-
-    return results
+def search_icon(query: str, icons: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Case-insensitive substring match on the service name or the icon id."""
+    q = query.lower()
+    return [d for d in icons if q in d["name"].lower() or q in d["icon"].lower()]
 
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: python find_aws_icon.py <service_name>")
-        print("Example: python find_aws_icon.py ec2")
-        sys.exit(1)
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Find draw.io AWS icon styles (mxgraph.aws4.*) by service name.",
+        epilog="examples:\n  find_aws_icon.py lambda\n  find_aws_icon.py --json \"API Gateway\"\n"
+               "exit: 0 found, 1 no match, 2 usage error or missing table",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("query", help="service name or icon id fragment, case-insensitive")
+    parser.add_argument("--json", action="store_true",
+                        help="print a JSON array of {name, icon, kind, style}")
+    args = parser.parse_args()
 
-    query = sys.argv[1]
-    results = search_icon(query)
+    if not TABLE.is_file():
+        print(f"icon table not found: {TABLE}", file=sys.stderr)
+        return 2
+    results = search_icon(args.query, load_icon_data())
 
+    if args.json:
+        print(json.dumps(results, indent=2))
+    else:
+        for r in results:
+            attribute = "grIcon" if r["kind"] == "group" else "resIcon"
+            print(f"Service: {r['name']}\n{attribute}: {r['icon']}\nStyle: {r['style']}\n")
     if not results:
-        print(f"No icons found for: {query}")
-        sys.exit(1)
-
-    print(f"Found {len(results)} icon(s) for '{query}':\n")
-    for result in results:
-        print(f"Service: {result['name']}")
-        print(f"{ 'grIcon' if result['kind'] == 'group' else 'resIcon' }: {result['icon']}")
-        attribute = "grIcon" if result["kind"] == "group" else "resIcon"
-        print(f"Style: shape=mxgraph.aws4.{result['kind']};{attribute}={result['icon']};")
-        print()
+        print(f"No icons found for: {args.query}", file=sys.stderr)
+        return 1
+    print(f"Found {len(results)} icon(s) for '{args.query}'", file=sys.stderr)
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

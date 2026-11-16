@@ -1,0 +1,99 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "domain-name-brainstormer",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.0,
+        "router-env-my-referee-one": 92.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 21,
+          "evidence": "\"Is it close to an established brand in the same category?\" and line 29 \"Recommend trademark screening in the relevant jurisdictions and product classes\"",
+          "fix": "Merge these generic checks into one short line or cut them. The model already screens for brand collisions and recommends trademark searches. Keep the lines on the RDAP 404, HSTS preloading and premium pricing, which the model does not know."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 17,
+          "evidence": "\"Spread candidates across distinct naming directions (compound, affix, evocative real word, coined blend)\": no procedure for the \"replacing a taken first choice\" case that the description promises",
+          "fix": "Add a short sub-step for when the first choice is taken. Say when to keep the name on another TLD, when to add a modifier (get-, -hq, -app) and when to pick a new name. Give the trade-off for each choice in one line."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 38,
+          "evidence": "\"A registered domain grants no trademark right. Do not build a candidate around another company's mark or call a near-match safe.\"",
+          "fix": "Replace this with a non-obvious fact. For example, a registered .com can still lose a UDRP dispute to an earlier mark holder. Or merge it into Procedure step 5 so the gotchas list holds only facts that go against reasonable assumptions."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/evals/trigger-queries.json",
+          "line": 34,
+          "evidence": "\"Suggest names for a sustainable clothing store and explain the brand fit.\" is labelled should_trigger, but the description excludes \"naming without domains\". Most queries are terse one-liners with no personal context.",
+          "fix": "Relabel or reword this query so it clearly wants a domain, or move it to the negatives as a near-miss. Rewrite 3-4 positives with realistic context: a backstory, an existing name that is taken, a typo or a budget, as optimizing-descriptions.md recommends."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 28,
+          "evidence": "\"Lookup order when you have a network tool: RDAP at `https://rdap.org/domain/<name>`, which redirects...\" To tell rdap.org's no-service 404 from a registry 404, the agent must see the final URL. The skill gives no command that shows it, and nothing covers a missing `whois` binary.",
+          "fix": "Give an exact command, `curl -sS -L -o /tmp/rdap.json -w '%{http_code} %{url_effective}' https://rdap.org/domain/<name>`, and classify the result by host and status. Add: if `whois` is not installed, or the fetch tool hides redirects, label the name `unverified` and give the user the RDAP URL."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 18,
+          "evidence": "\"Heard once, does it have one obvious spelling?\" joins familiar language, brand-overlap and ranking checks in lines 16\u201322. Defaults and Output are primarily activation; Procedure mixes activation with expert lookup handling; Gotchas supplies the strongest expert delta. By line count, familiar guidance occupies a substantial share.",
+          "fix": "Condense the familiar spelling, language and brand-overlap checks into a brief screening rule, and consolidate the repeated trademark reminders. Preserve the joined-word ambiguity example, RDAP/WHOIS decision branches, concrete Gotchas and credits."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/evals/evals.json",
+          "line": 12,
+          "evidence": "\"Labels every candidate's status `unverified` or says no lookup was done, and never calls a name available\" requires the casual naming eval to remain unverified without specifying that network tools are unavailable. A successful live lookup following the skill could fail this assertion.",
+          "fix": "Make this assertion conditional: without lookup tools, require every candidate to be unverified and include its RDAP URL; with lookup tools, accept the prescribed evidence-backed status labels and require source and UTC time. Continue rejecting unsupported availability claims in both branches."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 16,
+          "evidence": "\"budget cap (first year and renewal) ... are filters, not ranking weights\" requires budget filtering, but the lookup workflow establishes registration status only. The later instruction that pricing appears at registrar checkout supplies no branch for determining whether candidates satisfy a hard budget.",
+          "fix": "Add a budget-validation branch: when first-year and renewal terms cannot be confirmed, explicitly mark budget compliance unverified and request registrar checkout evidence rather than implying the cap was satisfied. Use confirmed terms to exclude over-budget candidates without inventing or estimating prices."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

@@ -1,0 +1,71 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "explain-changes-mental-model",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 41,
+          "evidence": "Independent groups: contracts first, tests and docs last.",
+          "fix": "Delete this generic ordering advice, which the model already applies. Keep the non-obvious rule before it: configuration and migrations go first when later behaviour needs them."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 39,
+          "evidence": "Require a concrete reason for every dependency; merge groups that cannot be understood apart.",
+          "fix": "Give a concrete test for merging, for example: 'Before splitting two groups, ask: can a reviewer judge group B's hunks without reading group A's? If B only renames or forwards A's symbols, merge them.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 43,
+          "evidence": "no argument, `git diff HEAD --name-only` plus the untracked list from step 1",
+          "fix": "Add the no-commits branch that rule 1 already handles: 'with no commits yet, use the union of `git diff --cached --name-only` and `git diff --name-only` plus the untracked list'. Without it, `git diff HEAD --name-only` fails and the manifest check cannot pass."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 43,
+          "evidence": "commit, `git show --name-only --format= \"<arg>^{commit}\"`",
+          "fix": "Mirror rule 7's merge-commit branch: 'for a merge commit, use `git diff --name-only \"<arg>^1\" \"<arg>\"`'. As written, `git show` gives a combined listing that does not match the first-parent diff used for grouping, so the check of exactly one group per file fails."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 30,
+          "evidence": "Over about 5000 lines, switch to this procedure",
+          "fix": "Measure size before reading, then use a threshold that matches the truncation gotcha: 'First run `--shortstat` on the same source. If more than about 800 changed lines or 25K characters, switch to this procedure.' A 5000-line diff is well beyond the 10-30K-character truncation limit, and its size is only known after the full output has been read. Also change 'as in step 2' to 'as in section 2' to remove the ambiguous reference to sub-step 2."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

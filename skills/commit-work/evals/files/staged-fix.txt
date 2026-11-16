@@ -1,0 +1,27 @@
+$ git diff --cached --stat
+ src/auth.ts        | 2 +-
+ tests/auth.test.ts | 5 +++++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+$ git diff --cached
+diff --git a/src/auth.ts b/src/auth.ts
+index 2b8d7e4..c0f19a2 100644
+--- a/src/auth.ts
++++ b/src/auth.ts
+@@ -13,3 +13,3 @@ export function isExpired(token: Token, now: number = Date.now()): boolean {
+   }
+-  return now > token.expiresAt;
++  return now >= token.expiresAt;
+ }
+diff --git a/tests/auth.test.ts b/tests/auth.test.ts
+index 81d2a4f..f3a90be 100644
+--- a/tests/auth.test.ts
++++ b/tests/auth.test.ts
+@@ -21,2 +21,7 @@ describe("isExpired", () => {
+   });
++
++  it("treats a token at exactly expiresAt as expired", () => {
++    const token = { id: "t1", expiresAt: 1_000 };
++    expect(isExpired(token, 1_000)).toBe(true);
++  });
+ });

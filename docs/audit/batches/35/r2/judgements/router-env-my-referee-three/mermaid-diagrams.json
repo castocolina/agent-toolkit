@@ -1,0 +1,113 @@
+{
+  "skill": "mermaid-diagrams",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 14,
+    "D4": 14,
+    "D5": 14,
+    "D6": 14,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 63,
+      "evidence": "The most frequent parse failures are lowercase `end` as an id (it closes a block), an unquoted `(` in a label (it opens a second shape), and `A---oB` ...; step 3 scans for them",
+      "fix": "Drop this closing bullet. Step 3 and authoring-rules.md section 7 already say the same thing, so it spends context twice."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+      "line": 72,
+      "evidence": "Palette blocks A/B/C and a contrast-ratio walkthrough (status hex values and their ratios) are activation-level styling content that the model mostly derives itself",
+      "fix": "Keep only the non-obvious points: set fill, stroke and color together; use dark ink on light fills; don't mix palettes. Shorten the palette listings."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 13,
+      "evidence": "Step 2 uses a five-row job-by-section Read/Change table, then a separate type-file table, then a mixed-job rule. The pattern is a Process/Navigation hybrid and the routing is dense",
+      "fix": "Merge the two routing tables, or state one default path (new diagram: sections 1 and 7 plus the type file) with the other jobs as exceptions."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 59,
+      "evidence": "NEVER give a pie slice a negative value: it is a parse error; NEVER `checkout` a gitGraph branch before its `branch` line; it is a parse error",
+      "fix": "Move parse-error NEVERs that validation catches out of Gotchas, or mark them as low value. Keep Gotchas for failures the renderer accepts silently, such as duplicate C4 ids, inverted class arrows and the wrong ER end."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 3,
+      "evidence": "description is about 890 characters and packs the type list, trigger cases and exclusions into one long sentence. It is under 1024, but little room is left for future keywords",
+      "fix": "description: \"Create, edit and repair Mermaid diagrams (.mmd files or ```mermaid blocks in Markdown). Use when asked to diagram, visualize or map out sequence flows, class models, ER diagrams or database schemas, state machines, C4 or architecture-beta architecture (including terse requests like 'architecture: mobile client, API, database, email provider'), Gantt schedules, pie splits or Git branch history, or when a Mermaid diagram fails to render or export (mmdc, GitHub), even without naming Mermaid. Pick the type from the question the diagram answers; flowchart is the last resort. Not for prose-only explanations, explaining an existing diagram without changing it, edits that leave a mermaid block alone, PlantUML or draw.io work, matplotlib data charts, or interactive diagram-canvas components.\""
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/SKILL.md",
+      "line": 30,
+      "evidence": "The type-file table sits after step 4 (validate) although step 2 depends on it, and it adds a second routing layer on top of the step 2 table",
+      "fix": "Move the type-to-file table directly under step 2 so every loading trigger sits in one place, before drawing."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+      "line": 82,
+      "evidence": "Palettes A, B and C plus 'Any other palette ... is fine' leave a small menu, and the explicit rule 'Palette A is the default' is followed by a pick-by-meaning rule",
+      "fix": "State a single default (Palette A) and give B and C as one-line exceptions with their trigger (status, before/after)."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "11 should-trigger and 10 should-not-trigger queries. Several evals.json `files` entries list references/*.md, which are not eval inputs. No script test is needed (no scripts/)",
+      "fix": "Trim should-trigger to 10 and keep `files` limited to real inputs under evals/files/. Add a near-miss negative for a flowchart-only request, such as 'draw a decision flowchart of the signup funnel', if that should not trigger."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/references/sequence-diagrams.md",
+      "line": 6,
+      "evidence": "The example opens with `U->>+API` and `API->>+DB`, but the `else invalid` branch (`API--x U: 401`) has no deactivation, so the unbalanced activation rule it warns about is shown unfollowed",
+      "fix": "Add `deactivate API` in the else branch, or change the example to `API--x-U` with a matching `-`, so it demonstrates balanced activations."
+    }
+  ]
+}

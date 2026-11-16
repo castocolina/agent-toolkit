@@ -1,0 +1,68 @@
+{
+  "skill": "excalidraw",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 15,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/excalidraw/scripts/scene.py",
+      "line": 148,
+      "evidence": "preservation() iterates only 'for e in old[\"elements\"]:' and compares elements through an ID-indexed dictionary. An unrelated new element or a reordering of existing elements therefore passes diff --strict. In the worker route, an accidental standalone-text insertion or stacking-order change can pass both validation gates and be promoted over the original.",
+      "fix": "Check added IDs against an explicit creation allowlist and preserve the relative order of untouched elements. Track intended new elements and their text in TOUCHED so legitimate additions still pass. Add regression cases for unrelated insertions and reordering."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/scripts/scene.py",
+      "line": 83,
+      "evidence": "'\"free_text\": [e.get(\"text\", \"\") for e in els if e.get(\"type\") == \"text\" and not e.get(\"containerId\")]' omits IDs, while diff() compares only shapes and connections. Two identical standalone labels cannot use the documented ambiguous-label fallback, and a successful standalone-text relabel produces an empty diff.",
+      "fix": "Return standalone text as ID/text records, expose those IDs for ambiguous-label resolution, and include standalone-text additions, removals and relabels in diff output. Update the command documentation accordingly."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/scripts/scene.py",
+      "line": 219,
+      "evidence": "'edge_point(a, cb), edge_point(b, ca)' returns the same center point for a self-loop. The accepted spec {\"nodes\":[\"Retry\"],\"edges\":[[\"Retry\",\"Retry\"]]} consequently writes a zero-width, zero-height arrow with coincident points; check and summary still report success.",
+      "fix": "Generate nondegenerate self-loop geometry with distinct outline endpoints, or reject self-loops before writing and document a supported fallback. Add a regression assertion that an accepted retry loop has nonzero visible geometry."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 56,
+      "evidence": "'Keep every other element byte-for-byte, plus appState, files and top-level metadata' is unconditional, although the routing table sends image operations to the worker. Adding a new image requires adding its data to files, but the contract and strict preservation check prohibit that necessary change.",
+      "fix": "Permit narrowly scoped files changes for explicitly requested image additions or replacements, backed by per-file-ID preservation allowances and reference validation. Likewise, allow only explicitly requested appState fields for canvas changes, retaining strict preservation for everything unrelated."
+    }
+  ]
+}

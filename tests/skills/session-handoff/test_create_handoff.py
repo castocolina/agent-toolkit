@@ -1,8 +1,11 @@
+import importlib.util
+import json
 import os
-import re
 import subprocess
+import sys
 import tempfile
 import unittest
+from datetime import datetime
 from pathlib import Path
 
 SCRIPT = Path(__file__).resolve().parents[3] / "skills/session-handoff/scripts/create_handoff.py"
@@ -46,6 +49,36 @@ class CreateHandoffTests(unittest.TestCase):
             self.assertIn("Created handoff document:", result.stdout)
             self.assertRegex(matches[0].name, r"^\d{4}-\d{2}-\d{2}-\d{6}-my-task\.md$")
             self.assertIn("[TODO:", content)
+
+    def test_same_timestamp_collision_never_overwrites(self):
+        sys.dont_write_bytecode = True  # no __pycache__ inside the skill directory
+        spec = importlib.util.spec_from_file_location("create_handoff", SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        class FixedClock(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return datetime(2026, 1, 2, 3, 4, 5)
+
+        module.datetime = FixedClock
+        with tempfile.TemporaryDirectory() as tmp:
+            first = Path(module.generate_handoff(tmp, "auth"))
+            first.write_text("filled in by the first agent\n")
+            second = Path(module.generate_handoff(tmp, "auth"))
+            self.assertEqual(first.name, "2026-01-02-030405-auth.md")
+            self.assertEqual(second.name, "2026-01-02-030405-auth-2.md")
+            self.assertEqual(first.read_text(), "filled in by the first agent\n")
+
+    def test_json_output_and_help(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result = subprocess.run(["python3", str(SCRIPT), "--json", "task"], cwd=tmp, text=True, capture_output=True, check=True)
+            data = json.loads(result.stdout)
+            self.assertTrue(Path(data["path"]).is_file())
+            self.assertIsNone(data["continues_from"])
+        result = subprocess.run(["python3", str(SCRIPT), "--help"], text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("exit codes:", result.stdout)
 
 
 if __name__ == "__main__":

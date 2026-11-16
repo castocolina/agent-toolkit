@@ -1,0 +1,95 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 11,
+    "D3": 12,
+    "D4": 13,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 108,
+  "max_total": 125,
+  "percent": 86.4,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 68,
+      "evidence": "Use the codebase's own terms. Say so when something is genuinely complex and split it further; name the one insight that makes the rest click.",
+      "fix": "Delete this generic explanation advice, which the model already follows. Use the line for a diff-specific fact, for example that renames appear as delete plus add unless `-M` is passed."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 36,
+      "evidence": "Order so dependencies come first. Configuration or migrations go first when later behavior needs them, not last by category.",
+      "fix": "Add a tie-break rule for groups with no dependency between them. For example: 'When groups are independent, order by blast radius: public contracts and schemas, then core logic, then callers, then tests and docs.' This gives a deterministic order where the patch shows no dependency."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 64,
+      "evidence": "## Gotchas lists four items. None covers merge commits, renames or binary files, which are the common traps when reading a git patch.",
+      "fix": "Add: '- A merge commit under `git show` prints a combined diff that is often empty; use `git show --first-parent <rev>` or `git diff <rev>^1 <rev>` instead of reporting no changes.' Also add: '- Pass `-M` so renamed files are not shown as a delete plus an unrelated add.'"
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 2,
+      "evidence": "Use when the user wants to understand a changeset or asks what to read first. Not for editing code or a defect-focused code review.",
+      "fix": "description: Explain a git diff, commit, branch, range, PR or pasted patch as dependency-ordered logical groups with file references and a review sequence. Use when the user wants to understand, onboard onto or walk through a changeset, asks what changed or what to read first, even without saying 'mental model'. Not for editing code, a defect-focused code review, or the PR-workflow command explain-pr-changes."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 40,
+      "evidence": "The full template (Key Concepts, Change Groups, Review Sequence, Gotchas) is required for every diff, with no rule for a one-file or one-idea change.",
+      "fix": "Add under ## 3: 'For a single-group change, keep only the summary, the one group and its gotchas; skip Review Sequence and Key Concepts when they would repeat the summary.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 23,
+      "evidence": "No argument: `git diff HEAD --no-color`. Empty output: report \"No uncommitted changes to analyze\" and stop.",
+      "fix": "Also run `git status --porcelain` and include untracked files, for example with `git add -N` or by reading them directly. Otherwise a working tree with only new files hits the 'No uncommitted changes' stop by mistake. In a repository with no commits, where HEAD does not exist, fall back to `git diff --cached` plus the untracked files."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 28,
+      "evidence": "Verified, not a branch (hash, `HEAD~3`, tag): `git show \"<arg>\" --no-color`, a single-commit patch.",
+      "fix": "Add a branch for merge commits: check `git rev-list --parents -n1 \"<arg>\"`, and when it lists more than one parent run `git diff \"<arg>^1\" \"<arg>\" --no-color`. Otherwise the combined diff is empty and the 'No changes found' stop on line 30 fires wrongly. Separately, when local `main`/`master` are missing, try `origin/main` and then `origin/master` before asking for a base."
+    }
+  ]
+}

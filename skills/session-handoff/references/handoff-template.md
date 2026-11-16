@@ -1,6 +1,6 @@
 # Handoff Template
 
-Use this template structure when creating handoff documents. The smart scaffold script will pre-fill metadata sections; complete the remaining sections based on session context.
+What each scaffold section should hold. `create_handoff.py` writes this structure and fills Session Metadata; the rules for priority, depth and validation live in SKILL.md.
 
 ## Table of Contents
 
@@ -24,7 +24,6 @@ Use this template structure when creating handoff documents. The smart scaffold 
   - [Potential Gotchas](#potential-gotchas)
 - [Environment State](#environment-state)
 - [Related Resources](#related-resources)
-- [Template Usage Notes](#template-usage-notes)
 
 ---
 
@@ -34,6 +33,7 @@ Use this template structure when creating handoff documents. The smart scaffold 
 - Created: [TIMESTAMP]
 - Project: [PROJECT_PATH]
 - Branch: [GIT_BRANCH]
+- Baseline commit: [FULL_HEAD_SHA] (check_staleness.py reports UNKNOWN without it)
 - Session duration: [APPROX_DURATION]
 
 ## Current State Summary
@@ -127,13 +127,3 @@ Use this template structure when creating handoff documents. The smart scaffold 
 - [Related file paths]
 - [External resources consulted]
 
----
-
-## Template Usage Notes
-
-When filling this template:
-1. Be specific and concrete - vague descriptions don't help the next agent
-2. Include file paths with line numbers where relevant (e.g., `src/auth.ts:142`)
-3. Prioritize the "Important Context" and "Immediate Next Steps" sections
-4. Don't include sensitive data (API keys, passwords, tokens)
-5. Focus on WHAT and WHY, not just WHAT - rationale is crucial for handoffs

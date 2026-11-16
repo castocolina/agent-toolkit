@@ -1,0 +1,59 @@
+{
+  "skill": "marp-slide",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/marp-slide/evals/evals.json",
+      "line": 34,
+      "evidence": "The sparse-input assertion only checks \"Does not claim a file was saved to `/mnt/user-data/outputs/`.\" An answer could ask a question, fabricate slides and claim a save elsewhere while satisfying both assertions.",
+      "fix": "Assert that the response stops after one focused clarification question, produces no deck and makes no successful-save claim to any path."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/marp-slide/assets/template-basic.md",
+      "line": 98,
+      "evidence": "`section.lead { border-bottom: 8px solid var(--color-hr); }` follows the equally specific `section.final { border-bottom: none; }`. Consequently, the `<!-- _class: lead final -->` closing-title example recommended in SKILL.md retains its border. The dark and colorful templates have the same cascade.",
+      "fix": "In the basic, dark and colorful templates, move the final-border override after the lead rule or add a later `section.lead.final { border-bottom: none; }` rule."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/marp-slide/SKILL.md",
+      "line": 12,
+      "evidence": "The only workflow routes are \"New deck\" and \"Existing deck\", although the description explicitly includes \"custom Marp theme CSS\". A request to create a reusable theme stylesheet without creating slides has no matching route; the new-deck route instead requires a concrete topic and audience and proceeds to slide creation.",
+      "fix": "Add a theme-CSS-only route that loads references/theme-css-guide.md, creates or edits the requested stylesheet without demanding a deck topic or generating a presentation, and validates it through a small preview deck when rendering is available."
+    }
+  ]
+}

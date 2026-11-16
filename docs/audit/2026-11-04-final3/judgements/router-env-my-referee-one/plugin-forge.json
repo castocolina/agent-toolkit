@@ -1,0 +1,50 @@
+{
+  "skill": "plugin-forge",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 13,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 28,
+      "evidence": "\"For a scaffold-only or bump-only request, the contract above is enough; do not load the references.\" This blanket exception conflicts with step 1, which requires plugin-structure.md and marketplace-schema.md when scaffolding outside the standard directory or in a remote repository.",
+      "fix": "Limit the no-reference exception to standard-layout scaffold-only requests and bump-only requests already covered by the contract. Explicitly retain the required reference reads for other-local and remote scaffolding."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 25,
+      "evidence": "\"<plugin-dir> is the entry's ./ path, or a local checkout of the remote repository\" does not resolve a git-subdir source's path within that checkout. For an entry with path tools/release-kit, this directs validation at the repository root rather than the plugin directory. The subsequent workflows.md also hardcodes standard-layout paths in its --plugin-dir, staging and tagging examples despite accepting other-local and remote sources.",
+      "fix": "Define the resolved plugin directory during source routing: marketplace-root plus resolved source for local plugins, repository checkout root for whole-repository sources, and checkout root plus source.path for git-subdir. Use that directory consistently for validation, --plugin-dir and tagging. Branch publication instructions so other-local paths are staged correctly and remote plugin changes are committed in their source repository separately from marketplace.json."
+    }
+  ]
+}

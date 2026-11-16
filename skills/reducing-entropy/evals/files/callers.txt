@@ -1,0 +1,25 @@
+$ git grep -n "format_" -- . ':!src/billing/formatters.py'   # whole repo: src, tests, templates, config, docs
+docs/sdk.md:14:- `format_amount(value)`, `format_price(value)`: display money with half-up rounding.
+docs/sdk.md:15:- `format_invoice_total(value)`: invoice totals with banker's rounding.
+src/billing/test_formatters.py:1:from billing.formatters import format_amount, format_invoice_total, format_price
+src/web/cart.py:12:from billing.formatters import format_subtotal, format_discount, format_shipping
+src/web/cart.py:40:    return {"subtotal": format_subtotal(c.subtotal), "discount": format_discount(c.discount), "shipping": format_shipping(c.shipping)}
+src/web/account.py:8:from billing.formatters import format_balance, format_credit, format_debit
+src/web/account.py:31:    rows = [(format_credit(e.amount) if e.amount > 0 else format_debit(e.amount)) for e in ledger]
+src/web/account.py:33:    header = format_balance(acct.balance)
+src/web/payouts.py:5:from billing.formatters import format_payout, format_fee
+src/web/payouts.py:19:    return f"{format_payout(p.net)} (fee {format_fee(p.fee)})"
+src/web/receipt.py:4:from billing.formatters import format_amount, format_tip
+src/web/receipt.py:22:    lines.append(("Tip", format_tip(r.tip)))
+src/web/receipt.py:23:    lines.append(("Total", format_amount(r.total)))
+src/invoices/render.py:3:from billing.formatters import format_invoice_total
+src/invoices/render.py:17:    return format_invoice_total(inv.total)
+
+$ git grep -n -E "getattr|importlib|__import__|formatters\.|\"format|'format" -- . ':!src/billing/formatters.py'   # dynamic lookups, templates, config
+(no matches)
+
+$ git grep -n -E "entry.points|project\.scripts|register|registry" -- .   # packaging and registries
+pyproject.toml:18:[project.scripts]
+pyproject.toml:19:billing-report = "billing.cli:main"
+
+Summary: format_cost, format_refund and format_deposit have no static, dynamic, registry or documented consumer; they are not in __all__, and docs/sdk.md documents only the __all__ names to external SDK users. format_price has no in-repo caller but is public.

@@ -1,0 +1,100 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "explain-pr-changes",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 92.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 307,
+          "evidence": "The command remains 381 lines despite splitting out templates, assembly code and the diagram filter. Under \"### Phase 5: PR write\", it still embeds the full attachment-writing and recovery procedure.",
+          "fix": "Move the detailed attachment commands and partial-failure recovery procedure into an explicitly gated reference bundled with skills/pr-diagrams. Keep the phase order, selection conditions and stop invariants in the command, reducing the command toward the repository's 200-line convention."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/pr-diagrams/references/pr-body.md",
+          "line": 19,
+          "evidence": "The inline-image filter uses `[^)]*github\\.com/user-attachments/[^)]*`, stopping at the first closing parenthesis. A valid image such as `![d](https://github.com/user-attachments/assets/x \"Flow (v2)\")` leaves `\")` behind. The image-removal passes also process preserved non-Mermaid code fences, deleting literal image examples rather than only rendered diagrams.",
+          "fix": "Make image removal fence-aware and parse complete Markdown image spans, including optional titles and balanced parentheses. Preserve image examples inside non-Mermaid code fences and remove the entire actual diagram-image span without leaving fragments."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 375,
+          "evidence": "\"Once the body is written, create or update the PR as phase 5 specifies, passing the title from `$AD/title.txt` in the same call\" repeats Phase 5's title/body-file invariant. The final paragraph repeats the subsection-separator rule already established in 2.6.",
+          "fix": "Remove these duplicate operational restatements from section 5. Keep its conditional template-loading instruction and point to the existing Phase 5 and section 2.6 rules instead; retain the expert invariants at their authoritative definitions."
+        }
+      ]
+    },
+    {
+      "name": "skill-updater",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 26,
+          "evidence": "The contents check applies only to 'a `github-path` row with `stale: true`', although line 27 correctly explains that `stale: false` can result from a newer unrelated local commit. A renamed upstream path can therefore enter the false branch without an existence check; the comparison filters on the old filename and can return no patch, leading to an incorrect `current` result.",
+          "fix": "Check the effective path (`new_path` when present, otherwise the source path) for every successful github-path row before branching on stale. Route a contents 404 to step 5 regardless of the timestamp signal, while retaining the existing auth, rate-limit and network-error handling."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 34,
+          "evidence": "'One candidate: confirm it with' a commits query selecting only `.[0].sha`, 'then record `path-moved --new-path <candidate> --sha <sha>`'. This branch never reads the candidate's content or patch. If the move also changes rules, it advances the comparison base past changes that were never reviewed; a later comparison can then report no change.",
+          "fix": "After confirming the unique candidate, compare its current source material against the artifact and document any adopt/adapt/ignore decisions before recording its SHA. If content review cannot be completed, report the relocation without advancing last_upstream_sha; preserve the previous comparison base and explicitly mark the content review unresolved."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 28,
+          "evidence": "'Page or patch retrieval that fails or is cut short: the review is unresolved, so pass no `--sha` and leave the comparison base unchanged.' When last_upstream_sha is absent, this same branch uses last_reviewed as its fallback base. However, audit.py track updates last_reviewed on every sibling row, even without --sha, so proceeding to step 7 can advance that fallback past unread changes.",
+          "fix": "Explicitly prohibit track calls for the artifact while an incomplete retrieval depends on a last_reviewed fallback, including calls targeting sibling rows. Log the unresolved review only in updates.md and retry without changing registry dates. Once retrieval and review are complete, record the verified SHA and review date."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

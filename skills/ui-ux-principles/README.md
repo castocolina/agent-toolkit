@@ -10,16 +10,18 @@ cp -r skills/ui-ux-principles ~/.claude/skills/
 
 ## Rules
 
-| id | in one line |
-|----|-------------|
-| `loading` | Skeletons that match the final layout; spinners only inside one module; submits disable while pending |
-| `responsive` | Mobile-first, verified at 360, 768, 1280 and 1920 px |
-| `hierarchy` | At most one filled button per view; outlined and text never count; destructive never filled |
-| `tokens` | Colors, type, spacing, radii and shadows defined once and consumed everywhere |
-| `consistency` | One visual language; dark mode through the same tokens |
-| `a11y` | Alt text, accessible names, contrast, target size, keyboard operation (WCAG 2.2 figures) |
-| `states` | Empty, error with recovery, and success states |
-| `interaction` | Hover, focus-visible, active and disabled states |
+| id | covers |
+|----|--------|
+| `loading` | skeletons, spinners, pending submits |
+| `responsive` | widths, horizontal scroll |
+| `hierarchy` | button emphasis |
+| `tokens` | theme roles versus literals |
+| `consistency` | shared components, dark mode |
+| `a11y` | names, contrast, target size, keyboard (WCAG 2.2) |
+| `states` | empty, error, success |
+| `interaction` | hover, focus-visible, pressed, disabled |
+
+The pass line of each rule lives in `SKILL.md`.
 
 Ask for a review and the output is a `rule | pass/fail/na | evidence file:line | fix` table.
 

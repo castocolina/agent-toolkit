@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "database-schema-designer",
+      "percent": 95.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.8,
+        "router-env-my-referee-one": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 44,
+          "evidence": "**Unique keys accept many NULLs** in PostgreSQL, MySQL and SQLite. If a missing value must also be unique, use PostgreSQL 15+ `UNIQUE NULLS NOT DISTINCT` or make the column `NOT NULL`.",
+          "fix": "Shorten this to the non-obvious part: 'For a nullable column that must also be unique when missing, use PostgreSQL 15+ `UNIQUE NULLS NOT DISTINCT`.' The model already knows that NULLs do not collide in unique keys. Apply the same trim to the MyISAM line (line 40), keeping only the 'no warning' fact."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 42,
+          "evidence": "Use one nullable FK per parent type plus `CHECK (num_nonnulls(article_id, photo_id) = 1)` on PostgreSQL, or a shared supertype table the FK can target.",
+          "fix": "Choose a default and give the condition for the alternative: 'Default: one nullable FK per parent type plus `CHECK (num_nonnulls(...) = 1)`. Switch to a shared supertype table only when there are more than about three parent types, or when new parent types are added often.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 33,
+          "evidence": "When auditing an existing schema or finalizing a design, read `references/schema-design-checklist.md` instead and report in its format: every finding carries its own complete corrected DDL with every statement written in full, never \"same as F7\" or a \"then: ...\" shorthand list, and every alternative path written in full too, and a finding that is not a schema change ...",
+          "fix": "Split step 4 into two branches with separate sub-bullets: '4a. Sketch: confirm entities, ON DELETE, money/instant types, index-to-query mapping.' and '4b. Audit or sign-off: read `references/schema-design-checklist.md` and follow its Report format section.' The report-format rules are already in the checklist, so remove the restated copy here."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 37,
+          "evidence": "The tenant-FK gotcha says, \"Do the same for a task's assignee against `users`.\" Following this instruction for global users with memberships in multiple organizations requires a nonexistent organization_id on users or incorrectly forces each identity into one organization.",
+          "fix": "Branch on identity ownership. For users belonging to exactly one organization, reference users(organization_id, id). For shared identities, retain users plus organization_users with PRIMARY KEY (organization_id, user_id), and make FOREIGN KEY (organization_id, assignee_id) reference organization_users(organization_id, user_id), with an explicit deletion policy."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 63,
+          "evidence": "The SQLite rebuild creates `CREATE TEMP TABLE gate (ok INTEGER NOT NULL CHECK (ok = 1));`, but the successful path commits without dropping it. A second rebuild in the same connection\u2014for example products followed by order_items from the bundled fixture\u2014fails because gate already exists.",
+          "fix": "After the final successful gate check, execute `DROP TABLE gate;` before `COMMIT;`, and retain rollback-on-error behavior. Alternatively, use and clean up a distinct gate table for each rebuild."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/evals/evals.json",
+          "line": 32,
+          "evidence": "The unsafe-column-migration case supplies `references/migrations.md` in `files`; other cases similarly supply the skill's migration instructions or review checklist as task inputs. Passing these inputs to both evaluation configurations would expose answer-bearing skill procedures to the without-skill baseline and bypass reference-discovery behavior.",
+          "fix": "Remove skill instruction documents from eval `files` arrays; retain genuine schema fixtures under evals/files/. Give baseline runs only the user prompt and schema inputs, and let with-skill runs discover references through SKILL.md. Check required reference loading through execution traces where relevant."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 31,
+          "evidence": "\"Each index names the hot read or FK path it serves\" repeats \"Hot reads? Each index you add must name one\" in the preceding step and \"each index names its query\" in the sketch checklist. These repetitions add no further schema expertise.",
+          "fix": "Keep the index-to-query invariant and engine-specific plan validation together in workflow step 2; remove the duplicate index-naming reminders from the initial questions and sketch checklist."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

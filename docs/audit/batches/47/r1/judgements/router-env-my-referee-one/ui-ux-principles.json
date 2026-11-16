@@ -1,0 +1,77 @@
+{
+  "skill": "ui-ux-principles",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 13,
+    "D6": 15,
+    "D7": 14,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/ui-ux-principles/SKILL.md",
+      "line": 63,
+      "evidence": "\u201cOne shared component per role; dark mode is a second value set on the same tokens, switched at the root.\u201d Familiar activation also occupies much of the tokens and interaction sections, including \u201cCustom controls have hover and pressed states.\u201d Weighted by section length, these reminders dilute the stronger, task-specific evidence contract and framework gotchas.",
+      "fix": "Compress familiar token, component-reuse and interaction explanations into brief pass predicates. Preserve the source-versus-render decision rules, framework-specific exceptions, live-region timing and other non-obvious failure modes."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/ui-ux-principles/SKILL.md",
+      "line": 42,
+      "evidence": "The source-only responsive fail branch includes \u201cwhite-space: nowrap on a content row\u201d and \u201can image without max-width: 100%\u201d. Following it with a short nonwrapping row or an explicitly sized 16px image produces fail even when neither can overflow.",
+      "fix": "Treat nowrap and unconstrained intrinsic sizing as investigation cues, not sufficient failures. Fail from source only when resolved dimensions or minimum-content sizing prove overflow beyond the available container; otherwise request a render and mark the unresolved criterion unverified."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/ui-ux-principles/SKILL.md",
+      "line": 27,
+      "evidence": "\u201cFor CLS, record a Playwright trace or a Lighthouse run.\u201d A standard Playwright trace does not itself report the numeric CLS measurement required by the loading rule, leaving that branch without a usable measurement procedure.",
+      "fix": "Use Lighthouse's reported CLS as the default measurement. For Playwright, explicitly collect layout-shift entries, exclude recent-input shifts and calculate the maximum session-window score; use the trace only as supporting diagnostic evidence."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/ui-ux-principles/SKILL.md",
+      "line": 149,
+      "evidence": "\u201cload when the changed files use MUI, Tailwind or plain CSS and you need the construct; do not load it for Vue, Svelte or any other framework.\u201d A Vue component using Tailwind, as supplied in ProfileCard.vue, satisfies both the load and do-not-load conditions.",
+      "fix": "Gate this reference by styling stack independently of the host framework: load it for relevant MUI, Tailwind or plain-CSS constructs even inside Vue or Svelte; skip it when only host-framework-specific guidance is needed."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/ui-ux-principles/evals/evals.json",
+      "line": 41,
+      "evidence": "\u201cAfter a successful delete, the order disappears from the list or a confirmation is shown.\u201d This assertion permits silent removal with no announcement, although the states rule requires success to be announced through role=\"status\".",
+      "fix": "Add a separate assertion requiring an initially mounted empty status region to receive the success message after deletion. Also verify that retry clears the previous error before refetching, so the state-management eval checks these explicit rule requirements rather than only visible branch presence."
+    }
+  ]
+}

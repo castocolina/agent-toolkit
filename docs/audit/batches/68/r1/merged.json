@@ -1,0 +1,72 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "mermaid-diagram-specialist",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6,
+        "router-env-my-referee-one": 98.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 21,
+          "evidence": "3. Draft, then validate as the skill prescribes; on failure fix and re-validate.",
+          "fix": "Shorten step 3 to the delegate-only part, for example 'Validate per the skill before reporting', because the preloaded mermaid-diagrams skill already defines the draft, self-check and validate loop (its steps 3 and 4)."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 14,
+          "evidence": "new: pick the type from the question the diagram must answer, using the skill.",
+          "fix": "Add one delegate-level question to ask before drafting a new diagram, for example 'Before drafting, ask: which nodes can the caller's reader drop without losing the answer? Cap the diagram at that level of detail and list what was left out as an assumption.'"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 15,
+          "evidence": "a minimal diff beats a rewrite.",
+          "fix": "Add this rule to the NEVER list with its reason, for example 'NEVER rewrite a diagram you were asked to repair: the caller cannot review the diff, and lines that were already correct can regress.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 20,
+          "evidence": "If the supplied material cannot support a diagram, return the specific missing facts and stop.",
+          "fix": "Set the threshold between stopping and assuming, and cover the repair case with no source material. For example: 'Stop only when no node or relationship can be grounded in the material. Otherwise draft what is grounded and list every gap as an assumption. For a wrong-meaning repair with no source material, ask for the intended relationships instead of guessing.'"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 21,
+          "evidence": "\u201cDraft, then validate as the skill prescribes; on failure fix and re-validate.\u201d repeats the validation loop already supplied by the preloaded mermaid-diagrams skill; the following \u201cReport per the output contract\u201d also restates instructions below.",
+          "fix": "Remove procedure steps 3\u20134; the preloaded skill already supplies drafting and validation, and this agent's Output contract already specifies reporting. Retain the delegate-specific task branches and deliverables."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

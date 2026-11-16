@@ -7,7 +7,9 @@ description: Render draw.io diagrams to PNGs with the diagram embedded, attach t
 
 `pr-diagrams` never pushes images to a branch: a draw.io diagram is rendered to a PNG with the diagram embedded and uploaded with `gh pr create/edit --attach` (gh >= 2.101).
 
-The helper is `bash ${CLAUDE_SKILL_DIR}/scripts/pr-diagrams.sh`. A harness that does not substitute `${CLAUDE_SKILL_DIR}` uses `bash ~/.claude/skills/pr-diagrams/scripts/pr-diagrams.sh`. `render` needs `skills/draw-io` installed beside `pr-diagrams` (or `$DRAWIO_CONVERTER`) and the `drawio` CLI on `PATH`.
+The helper is `bash ${CLAUDE_SKILL_DIR}/scripts/pr-diagrams.sh`. A harness that does not substitute `${CLAUDE_SKILL_DIR}` uses `scripts/pr-diagrams.sh` under the directory this SKILL.md was loaded from (absolute path, wherever it is installed). `render` needs `skills/draw-io` installed beside `pr-diagrams` (or `$DRAWIO_CONVERTER`) and the `drawio` CLI on `PATH`.
+
+The `explain-pr-changes` command loads `references/pr-body.md` (none-mode diagram filter and PR body templates) on demand.
 
 ## Attach
 

@@ -16,7 +16,7 @@ export function SignupForm() {
   return (
     <form onSubmit={onSubmit}>
       <style>{`
-        input, button { outline: none; border: 1px solid #ccc; padding: 8px; }
+        input, button { outline: none; border: 1px solid #ccc; background: #fff; padding: 8px; }
         button { background: #1d4ed8; color: #fff; }
       `}</style>
       <label htmlFor="email">Email</label>

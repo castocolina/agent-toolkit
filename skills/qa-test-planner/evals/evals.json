@@ -4,31 +4,128 @@
     {
       "id": "auth-plan",
       "prompt": "/qa-test-planner plan password reset: link expires after 30m, one use, unknown addresses generic response. Include scope and risks.",
-      "expected_output": "Plan with scope, strategy, criteria and expiry/replay/account enumeration risks.",
+      "expected_output": "Plan with scope from the change, expiry/replay/account-enumeration risks with covering cases, exit gates derived from critical requirements and no open P0 (no bare pass rate), and the residual-risk owner named or marked Unknown.",
       "assertions": [
-        "Defines scope",
-        "Identifies expiry and one-time risks",
-        "Covers generic unknown-address behavior"
-      ]
+        "Excludes an area only with cited evidence that the change cannot reach it; otherwise records impact as Unknown, names the missing-information owner or marks it Unknown, and retains a minimal smoke check or an owned Blocked check",
+        "Has a K risk for link use after 30 minutes with a boundary case on both sides (29:59 / 30:01) and a K risk for link reuse whose case asserts the password is unchanged",
+        "Covers generic unknown-address behavior",
+        "Exit criteria come from critical requirements passing and no open P0, not a bare pass-rate percentage",
+        "Names who may accept residual risk, or marks that owner Unknown"
+      ],
+      "files": []
     },
     {
       "id": "checkout-cases",
       "prompt": "/qa-test-planner generate cases: valid card, declined card, empty cart. Preconditions, steps, expected per step, priority.",
-      "expected_output": "Three executable cases with preconditions, outcomes, priorities.",
+      "expected_output": "Three executable cases with seeded preconditions, an observable expected result per numbered step, and priorities; the declined-card and empty-cart cases also assert that no order is created.",
       "assertions": [
-        "Includes all three scenarios",
-        "Preconditions/data for each",
-        "Expected results per numbered step and priority"
+        "Has one case each for valid card, declined card and empty cart, each with a seeded precondition",
+        "Each case lists a seeded account or data item in its preconditions",
+        "Expected results per numbered step and priority",
+        "The declined-card case asserts that no order or charge is created, not only that a message appears",
+        "Each case has a cleanup step that resets the data it seeded"
+      ],
+      "files": [
+        "references/test_case_templates.md"
       ]
     },
     {
       "id": "bug-report",
-      "prompt": "/qa-test-planner bug: checkout submit sometimes does nothing; browser and reproducible steps unknown. Draft report.",
-      "expected_output": "Report marks missing facts unknown and provides expected/actual/evidence fields.",
+      "prompt": "/qa-test-planner bug: checkout submit sometimes does nothing, no idea which browser and I can't reliably repro. draft the report",
+      "expected_output": "Report with a specific checkout title, environment, steps and reproduction rate written as Unknown, expected/actual/evidence fields, and an Open Questions list for the missing facts.",
       "assertions": [
-        "Specific checkout title",
+        "Title names the checkout submit action and the no-op symptom (e.g. [Checkout] Submit click does nothing)",
         "Marks environment and reproduction unknown",
-        "Does not invent facts"
+        "Invents no browser, OS, build or reproduction rate; each is Unknown",
+        "Writes the reproduction rate as Unknown or a measured ratio, never Always",
+        "Lists the missing facts under Open Questions"
+      ],
+      "files": [
+        "references/bug_report_templates.md"
+      ]
+    },
+    {
+      "id": "regression-time-box",
+      "prompt": "/qa-test-planner pick the regression suite for release 2.4 from the attached change list. I only have the 2 hours it says.",
+      "files": [
+        "evals/files/release-2-4-changes.md",
+        "references/regression_testing.md"
+      ],
+      "expected_output": "An ordered suite that starts with SMOKE-001 and SMOKE-002, states the ordering rule (failure impact, then overlap with the change, then cost), puts the payment cases ahead of the cosmetic avatar-dialog check, fits within 120 of the catalog's 150 minutes, and lists every case that does not fit as residual risk.",
+      "assertions": [
+        "Runs SMOKE-001 and SMOKE-002 first and says to stop and report if smoke fails",
+        "States the ordering rule it applied: failure impact first, then overlap with the change, then execution cost",
+        "Orders TC-PAY-001, TC-PAY-002 and TC-PAY-003 ahead of TC-PROF-006, because money impact outranks a directly changed cosmetic area",
+        "The selected cases' catalog minutes add up to 120 or less",
+        "Lists every catalog case left out as residual risk, not as passed or silently dropped"
+      ]
+    },
+    {
+      "id": "p0-waiver-pressure",
+      "prompt": "/qa-test-planner TC-PAY-001 failed on 2.4.0-rc2: a retried payment charged the card twice. Support can refund by hand, and the PM says that's a workaround so we ship tomorrow. Write the release decision part of the run report.",
+      "files": [
+        "references/regression_testing.md"
+      ],
+      "expected_output": "Release decision: blocked by the failing P0; the manual refund does not waive it; only the authorized release-risk owner may accept the risk in writing, with the acceptance record fields; TC-PAY-001 stays reported as failing.",
+      "assertions": [
+        "States the release is blocked because a P0 case failed, and that the manual-refund workaround does not waive the gate",
+        "Says only the authorized release-risk owner can accept the risk, in writing, and does not treat the PM's statement as that acceptance unless the PM is named as the owner",
+        "Lists the acceptance record fields: failing case and evidence, owner name and role, rationale and affected scope, mitigation, and a follow-up ticket with owner and date",
+        "Keeps TC-PAY-001 shown as failing in the report even if the risk is later accepted"
+      ]
+    },
+    {
+      "id": "script-bug-file",
+      "prompt": "/qa-test-planner turn the attached support notes into a bug report file with the script. The harness already ran the command in the attached run log; check that run and the file it wrote against the notes, and tell me what is still open.",
+      "files": [
+        "evals/files/checkout-bug-notes.md",
+        "references/bug_report_templates.md",
+        "evals/files/bug-run/run-log.txt",
+        "evals/files/bug-run/BUG-CHK-5521.md"
+      ],
+      "expected_output": "Checks the logged create_bug_report.sh call (without running the script again) with single-quoted field flags (checkout double order and charge title, description, steps, expected, actual, --build '2.4.0-rc2', --rate '2/10', severity critical, priority P0, ./bugs) and no OS, browser or device guesses; reads the attached run log (exit 0, JSON line with status created and file ./bugs/BUG-CHK-5521.md) and the attached BUG-CHK-5521.md, confirming Build 2.4.0-rc2, Reproduction rate 2/10, Severity Critical, Priority P0, and OS, Browser and Device as Unknown listed under its Open Questions, which it relays as the open items. It also confirms that staging, the build, the rate, the steps and ticket #5521 survive in both the command and the file.",
+      "assertions": [
+        "Checks that the logged command calls scripts/create_bug_report.sh with field flags (at least --title, --description, --expected and --actual), and does not run the script again",
+        "Checks that the logged command passes the observed rate 2/10 and the build 2.4.0-rc2 from the notes, and no --os, --browser or --device value",
+        "Checks that the logged command passes severity critical and priority P0, matching the double charge (money impact)",
+        "Checks that the logged command single-quotes every flag value and passes ./bugs as the output directory",
+        "Says how to read the result: the file path from the JSON line on exit 0, the missing flags on exit 2, and asking before --overwrite on exit 1",
+        "Reports verbatim from the attached run log the exit code 0 and the JSON fields status created, id BUG-CHK-5521 and file ./bugs/BUG-CHK-5521.md",
+        "Confirms from the attached BUG-CHK-5521.md that Build reads 2.4.0-rc2, Reproduction rate reads 2/10, Severity reads Critical and Priority reads P0",
+        "Confirms from the attached BUG-CHK-5521.md that OS, Browser and Device read Unknown and are listed under its Open Questions section, and relays those open items to the user",
+        "Checks that every reproduction-context fact the notes give survives in both the logged command and the attached BUG-CHK-5521.md: staging (in the description), build 2.4.0-rc2 exactly, rate 2/10, the three steps and ticket #5521, quoting the values found"
+      ]
+    },
+    {
+      "id": "figma-without-mcp",
+      "prompt": "/qa-test-planner check our login page against the Figma design. There's no Figma MCP here, I can send screenshots. The sign-in button looks a bit darker than in the design.",
+      "files": [
+        "references/figma_validation.md"
+      ],
+      "expected_output": "States the no-MCP limitation, asks for the frame link and a 1x export with inspect values, records viewport, theme and device-pixel ratio, and refuses to call the darker button a defect until computed values or tokens are compared.",
+      "assertions": [
+        "States that without the MCP server the values come from the requester, and asks for the exact frame link (node-id) plus a 1x export or inspect values",
+        "Asks for or records viewport, theme and device-pixel ratio before judging any difference",
+        "Does not report the darker button as a defect from the screenshot; asks to compare the computed color or token with the Figma value",
+        "Explains that sampled screenshot pixels are unreliable for color (color profile, compression or DPR)"
+      ]
+    },
+    {
+      "id": "script-test-case-file",
+      "prompt": "/qa-test-planner save a manual case file with the script: declined card must not create an order (REQ-PAY-7). We test with the seeded account qa+decline@example.test that has one item in the cart, using the sandbox decline card. After the run, empty that cart. Put it in ./cases. The harness already ran the command in the attached run log; check that run and the file it wrote.",
+      "files": [
+        "evals/files/case-run/run-log.txt",
+        "evals/files/case-run/TC-PAY-007.md"
+      ],
+      "expected_output": "Checks the logged generate_test_cases.sh call (without running the script again) with single-quoted --id, --title, --priority 'P0', --type 'functional', --objective, --requirement 'REQ-PAY-7', a --risk naming the failure mode, the seeded account as --precondition, the decline card as --data, a no-order step and the cart reset as --cleanup, writing to ./cases; reads the attached run log (exit 0, JSON line with file ./cases/TC-PAY-007.md) and the attached TC-PAY-007.md, confirming Requirement REQ-PAY-7, the Risk line, the Cleanup item, and Estimated Time as Unknown under its Open Questions.",
+      "assertions": [
+        "Checks that the logged command calls scripts/generate_test_cases.sh with field flags, including --requirement 'REQ-PAY-7' and a --risk that names the failure mode (a declined payment still creates an order), and does not run the script again",
+        "Checks that the logged command passes the seeded account as --precondition, the sandbox decline card as --data and emptying the cart as --cleanup",
+        "Checks that the logged command has a --step in 'ACTION | EXPECTED' form whose expected half says no order is created",
+        "Checks that the logged command passes --priority 'P0', matching money impact (a wrong order or charge)",
+        "Reports verbatim from the attached run log the exit code 0 and the JSON fields status created, id TC-PAY-007 and file ./cases/TC-PAY-007.md",
+        "Confirms from the attached TC-PAY-007.md that Requirement reads REQ-PAY-7, Risk reads 'A declined payment still creates an order', and Cleanup lists emptying the cart of qa+decline@example.test",
+        "Confirms from the attached TC-PAY-007.md that Estimated Time reads Unknown and is listed under its Open Questions, and asks the user for the duration"
       ]
     }
   ]

@@ -1,0 +1,72 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "openapi-to-typescript",
+      "percent": 96.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 69,
+          "evidence": "## Worked example: about 70 lines of input YAML and output TS that mostly repeat the mapping table and naming rules above it (readOnly/writeOnly split, nullable, Authorization header, collision rename)",
+          "fix": "Shorten the example input to the lines that show something the table does not: the path-item parameter inheritance and the GetUser2 rename. Keep the output and report lines, and drop the repeated put/v2 boilerplate that the elision comment already covers."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/evals/trigger-queries.json",
+          "line": 51,
+          "evidence": "\"Our spec says openapi: 3.1.0 ... generate TypeScript types from it.\" is should_trigger: false, but evals.json 'unsupported-version' and 'swagger-2' test the skill's own refusal on 3.1 and Swagger 2.0 input",
+          "fix": "Pick one contract. Either relabel the 3.1 and Swagger 2.0 trigger queries should_trigger: true, because the skill's preflight owns the refusal, and add other near-miss negatives (for example JSON Schema to Zod, or an OpenAPI changelog diff). Or remove the two refusal output evals and the Stop rows they test."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 38,
+          "evidence": "\"Any later generated name that collides gets the lowest free numeric suffix on its base\": when only one suffixed name (for example GetUserResponse200) collides with a schema key, it is unclear whether to rename the whole operation base (GetUser2*) or only that name",
+          "fix": "State the rule explicitly. For example: 'If any generated name of an operation collides, renumber the operation base so all of its types share one suffix (GetUser2PathParams, GetUser2Response200)'. Add one line to the worked-example report showing a schema-versus-operation collision."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 20,
+          "evidence": "Preflight requires stopping when \"`openapi` missing\" and when \"`paths` missing\", without distinguishing document generation from mapping explanations. The description advertises mapping questions, and the `union-ref` eval expects `Pet = Cat | Dog` from a question supplying neither field. Following the unconditional preflight instead stops that supported scenario.",
+          "fix": "Add an explicit branch for conceptual or fragment-only mapping questions: explain the applicable mapping and its assumptions without writing a file or requiring document-level fields. Apply the complete-document preflight to generation requests, while retaining the stop for explicitly unsupported versions in either mode."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 26,
+          "evidence": "\"`#/components/schemas/X` stays the named type `X`\" and the listed non-schema component substitutions do not cover other valid local references. For example, a request schema referencing `#/components/schemas/Address/properties/postcode` passes preflight when that target exists, but has no naming-table entry or specified resolution branch.",
+          "fix": "Distinguish exact component-schema pointers from other local JSON Pointers. Decode pointer escapes before looking up component names; resolve other existing local pointers to their target in context, inlining a referenced property schema rather than inventing a component name. Preserve cycle handling and add a regression case for a local subschema reference."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

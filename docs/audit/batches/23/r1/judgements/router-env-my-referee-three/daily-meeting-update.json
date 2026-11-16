@@ -1,0 +1,104 @@
+{
+  "skill": "daily-meeting-update",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 13,
+    "D4": 14,
+    "D5": 15,
+    "D6": 14,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 19,
+      "evidence": "If the harness has no `AskUserQuestion` tool, list numbered options and accept comma-separated picks (`1,3`).",
+      "fix": "Delete this line, because models already fall back to numbered options without being told. Put the saved line toward an expert fact, such as the gh query gotcha in D3-1."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 9,
+      "evidence": "Work through the steps in order; the fast path jumps straight to step 4.",
+      "fix": "Say that the fast path skips only steps 2 and 3 when no integration is approved. If the user gives all four answers and also approves a tool, the step 3 gates (provenance, contradiction, dedup) still run before step 4."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 49,
+      "evidence": "## Never section covers session logs, delivery claims, scope and intent; there are no gotchas for the GitHub or Jira data sources.",
+      "fix": "Add a Gotchas list of facts about the data sources that are easy to get wrong. Example: `gh pr list` returns only open PRs by default, so yesterday's merged PRs disappear unless you pass `--state all` or use `gh search prs --merged`. Example: `--author @me` misses PRs you only reviewed. Example: Jira 'updated' dates include comment-only edits."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 3,
+      "evidence": "Generate concise Markdown daily standup or scrum updates covering yesterday, today, blockers, and discussion topics.",
+      "fix": "Draft a concise Markdown daily standup or scrum update (yesterday, today, blockers or impediments, discussion topics). Use when the user prepares for a daily team sync, morning check-in, status update for today's meeting, or a short yesterday/today summary, even without saying standup. Interview only for missing facts; optionally use explicitly approved GitHub, Jira, or Claude Code activity. Not for weekly reports, stakeholder or release status reports, meeting agendas, performance reviews, timesheets, or retrospectives."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 17,
+      "evidence": "check only that an executable exists (`command -v gh`, `command -v jira`) or that a tool is advertised (`mcp__atlassian__*`)",
+      "fix": "Choose one default Jira path and keep the other as an escape hatch. For example: use the Atlassian MCP when it is advertised, and fall back to the `jira` CLI only when the MCP is absent. This replaces a menu of two equal options."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/evals/trigger-queries.json",
+      "line": 2,
+      "evidence": "Should-trigger queries are short and generic (\"Prepare a scrum update for the team sync this morning.\"), with no file paths, names or backstory.",
+      "fix": "Make 3 or 4 should-trigger queries realistic and indirect. Add repo names, ticket IDs, a teammate's name, or a Monday 'what did I do Friday' case, so they test the description's wording rather than the literal word standup."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 18,
+      "evidence": "Ask once per integration and scope: which GitHub repos, which Jira projects ... Access only what was approved.",
+      "fix": "After approval, give the exact queries that fill the 'PRs & Reviews' and 'Jira' sections. Examples: `gh search prs --author @me --repo R --updated \">=DATE\" --json number,title,state,isDraft,url` and `gh search prs --reviewed-by @me --repo R --updated \">=DATE\"`, plus one Jira JQL such as `assignee = currentUser() AND updated >= -1d`. Then the agent does not have to improvise how to fetch merged PRs or reviews."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 47,
+      "evidence": "At most 15 bullets; give every PR or ticket number its title; links only when known.",
+      "fix": "Say what to do when the merged items exceed 15 bullets (for example, keep blockers and topics and fold minor items into one bullet). Add a final self-check before printing: every PR or ticket has a title, nothing unconfirmed is listed as done, and all four required sections are present."
+    }
+  ]
+}

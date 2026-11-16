@@ -7,7 +7,7 @@
       "files": [
         "evals/files/dashboard.tsx"
       ],
-      "expected_output": "The eight-row review table and one summary line. Fail: loading (page-level CircularProgress, line 20), responsive (fixed widths, lines 24-26), a11y (unnamed icon-only delete, line 31), states (no error branch at lines 13-16, no empty branch at line 27, delete at line 31 confirms nothing). Pass: hierarchy (no filled button), tokens (no color, type or spacing literal; the widths belong to responsive), consistency (one component library), interaction (MUI IconButton keeps its focus-visible state).",
+      "expected_output": "The eight-row review table and one summary line. Fail: loading (page-level CircularProgress, line 20), responsive (uncapped width 1200 at line 24 on the root, which cannot shrink; the 960 at line 26 is a shrinkable flex child), a11y (unnamed icon-only delete, line 31), states (no error branch at lines 13-16, no empty branch at line 27, delete at line 31 confirms nothing). Pass: hierarchy (no filled button), tokens (no color, type or spacing literal; the widths belong to responsive), consistency (one component library), interaction (MUI IconButton keeps its focus-visible state).",
       "assertions": [
         "The output contains exactly one markdown table and its header row is `| rule | pass/fail/na | evidence file:line | fix |`",
         "The table has exactly eight data rows, in this order: loading, responsive, hierarchy, tokens, consistency, a11y, states, interaction",
@@ -16,7 +16,7 @@
         "Before the table there is no prose, and after it there is exactly one summary line",
         "Every pass row has `-` in its fix cell, and every fail row has a concrete change in its fix cell",
         "The loading row is fail and its evidence cites dashboard.tsx:20 (the CircularProgress that replaces the whole view)",
-        "The responsive row is fail and its evidence cites a line from dashboard.tsx:24-26 and one of the fixed widths 1200, 240 or 960",
+        "The responsive row is fail and its evidence cites dashboard.tsx:24 and the uncapped width 1200 on the root, which is not a flex item and cannot shrink; the 960 on the shrinkable flex child at line 26 is not given as the only cause",
         "The hierarchy row is pass and its evidence cites dashboard.tsx:31 or says the view has no filled button; the missing name on the icon button is not given as the hierarchy evidence",
         "The tokens row is pass; the fixed widths are not given as a tokens failure",
         "The consistency row is pass",
@@ -31,14 +31,18 @@
       "files": [
         "evals/files/dashboard.tsx"
       ],
-      "expected_output": "An updated OrdersDashboard with skeleton rows while loading, an error branch with a retry, an empty branch only after a successful zero-item response, an aria-label on the delete button, a fluid layout, and visible feedback after a delete. No review table.",
+      "expected_output": "An updated OrdersDashboard with skeleton rows while loading, an error branch with a retry, an empty branch only after a successful zero-item response, an aria-label on the delete button, a fluid layout (no uncapped width over 320 px), a confirm step before the DELETE (or an undo that restores the order), visible feedback after a delete announced through a role=\"status\" region mounted empty up front, and a retry that clears the error before refetching. Then the three-line hand-over (changed, rules, unverified). No review table.",
       "assertions": [
         "The updated code no longer returns a lone CircularProgress for the whole view; while loading it renders skeleton placeholders shaped like the list rows",
         "The updated code has an error branch, reached when the request fails or the response is not ok, that renders a message and a retry control",
         "The updated code renders an empty state with explanatory text when the request succeeded with zero orders, and not while loading or after an error",
         "The delete IconButton has an aria-label that contains the word Delete",
-        "The updated code no longer sets the fixed widths 1200, 240 and 960 and uses a fluid or breakpoint-based layout",
+        "The updated code no longer sets the uncapped root width 1200 (it is removed, capped with maxWidth: '100%' or changed at a breakpoint), any width left over 320 px sits on a flex item that can shrink, and the layout is fluid or breakpoint-based",
         "After a successful delete, the order disappears from the list or a confirmation is shown",
+        "Before the DELETE request is sent the user confirms it (a confirm dialog or step), or after it an undo restores the deleted order; post-delete success feedback alone does not satisfy this",
+        "A `role=\"status\"` region is rendered empty from the first render (not mounted together with its message) and receives a success message after a delete",
+        "The retry control clears the error state (or sets the status back to loading) before it refetches",
+        "After the code there is a hand-over with a `changed:` line, a `rules:` line and an `unverified:` line, and the unverified line names at least one check such as a render at 320 px or a CLS measurement",
         "The updated code adds no hex or rgb color literal",
         "The output does not contain a table with the header `| rule | pass/fail/na | evidence file:line | fix |`"
       ]
@@ -49,7 +53,7 @@
       "files": [
         "evals/files/form.tsx"
       ],
-      "expected_output": "The eight-row review table and one summary line. Fail: loading (the submit at line 26 stays enabled with no pending state while the fetch at lines 9-13 runs), tokens (#ccc, #1d4ed8, #fff and 8px at lines 19-20), consistency (a <style> element at lines 18-21 restyles every input and button and the submit is a one-off), a11y (#ccc input border at line 19 is about 1.6:1 on white, under 3:1, SC 1.4.11), states (the response at lines 9-13 is ignored: no error, no success), interaction (outline: none at line 19 with no focus-visible replacement). Pass: responsive (no fixed width), hierarchy (one filled submit at line 26).",
+      "expected_output": "The eight-row review table and one summary line. Fail: loading (the submit at line 26 stays enabled with no pending state while the fetch at lines 9-13 runs), tokens (#ccc, #1d4ed8, #fff and 8px at lines 19-20), consistency (a <style> element at lines 18-21 restyles every input and button and the submit is a one-off), a11y (#ccc input border at line 19 is about 1.6:1 against the #fff input background on the same line, under 3:1, SC 1.4.11), states (the response at lines 9-13 is ignored: no error, no success), interaction (outline: none at line 19 with no focus-visible replacement). Pass: hierarchy (one filled submit at line 26). Na: responsive (no declared width over 320 px, so source cannot fail it, and only renders can pass it: unverified, needs a 320 px render).",
       "assertions": [
         "The output contains exactly one markdown table and its header row is `| rule | pass/fail/na | evidence file:line | fix |`",
         "The table has exactly eight data rows, in this order: loading, responsive, hierarchy, tokens, consistency, a11y, states, interaction",
@@ -57,12 +61,12 @@
         "Every evidence cell contains `form.tsx:` followed by a line number or a line range",
         "Before the table there is no prose, and after it there is exactly one summary line",
         "Every pass row has `-` in its fix cell, and every fail row has a concrete change in its fix cell",
-        "The loading row is fail and its evidence cites form.tsx:26 or form.tsx:9-13: the submit shows no pending state and stays enabled while the request runs",
-        "The responsive row is pass",
+        "The loading row is fail and its evidence cites form.tsx:26, or a range within form.tsx:7-14 that covers the fetch at 9-13 (such as 9-13 or 7-13): the submit shows no pending state and stays enabled while the request runs",
+        "The responsive row is na and its evidence says unverified and needs a 320 px render (no declared width over 320 px proves a fail)",
         "The hierarchy row is pass and its evidence cites form.tsx:26, the single Create account submit",
         "The tokens row is fail and its evidence cites form.tsx:19 or form.tsx:20 and at least one of #ccc, #1d4ed8 or #fff",
         "The consistency row is fail and its evidence cites form.tsx:18-21: the <style> element restyles every input and button in the document, or the submit is a one-off styled button",
-        "The a11y row is fail and its evidence cites form.tsx:19: the #ccc input border is under the 3:1 non-text contrast line",
+        "The a11y row is fail and its evidence cites form.tsx:19: the #ccc input border against the #fff input background on the same line is under the 3:1 non-text contrast line",
         "The states row is fail and its evidence cites form.tsx:9-13: the response is never checked, so there is no error state and no success confirmation",
         "The interaction row is fail and its evidence cites form.tsx:19 (outline: none with no focus-visible replacement)",
         "The interaction fix restores a visible keyboard focus style such as a :focus-visible outline, not only deleting outline: none"
@@ -102,6 +106,113 @@
         "Every evidence cell says checkout.tsx not provided",
         "No cell contains a line number, a rendered width or a screenshot",
         "The summary line after the table asks for checkout.tsx or a render"
+      ]
+    },
+    {
+      "id": "review-tailwind-vue-card",
+      "prompt": "quick UX check on ProfileCard.vue? we use Tailwind, dark mode is done with dark: classes. verdict per rule please",
+      "files": [
+        "evals/files/ProfileCard.vue"
+      ],
+      "expected_output": "The eight-row review table and one summary line. Fail: tokens (Tailwind arbitrary values bg-[#1d4ed8], the hover/active/focus/dark hex values on line 12, and dark:bg-[#1f2937] and p-[18px] on line 7 are literals; gray-600 and similar value names used as roles), consistency (dark: patches on lines 7, 9 and 12 while the theme stays light-only), a11y (the #1d4ed8 focus ring on line 12 sits on the dark #1f2937 card from line 7 at about 2.2:1, under 3:1). Na: loading and states (no request). Na: responsive (no width over 320 px; needs a 320 px render). Pass: hierarchy (one filled Edit profile button), interaction (focus-visible:, hover: and active: states on line 12; the ring contrast belongs to a11y).",
+      "assertions": [
+        "The output contains exactly one markdown table and its header row is `| rule | pass/fail/na | evidence file:line | fix |`",
+        "The table has exactly eight data rows, in this order: loading, responsive, hierarchy, tokens, consistency, a11y, states, interaction",
+        "Every verdict cell is exactly pass, fail or na",
+        "Every evidence cell contains `ProfileCard.vue:` followed by a line number, a line range or a note of what is absent",
+        "The tokens row is fail and its evidence cites ProfileCard.vue:12 or ProfileCard.vue:7 and at least one Tailwind arbitrary value such as bg-[#1d4ed8] or p-[18px]",
+        "The tokens row does not treat the arbitrary values as passing because they are utility classes",
+        "The consistency row is fail and its evidence cites the dark: classes on the component (ProfileCard.vue:7, :9 or :12)",
+        "The consistency fix moves the dark values into the theme tokens switched at the root, not into more dark: classes",
+        "The hierarchy row is pass",
+        "The a11y row is fail and its evidence cites ProfileCard.vue:12 (with :7 or the dark #1f2937 card): the #1d4ed8 focus ring is under 3:1 against the dark card",
+        "The interaction row is pass: the button has focus-visible:, hover: and active: states, and the dark-theme ring contrast is not given as an interaction failure",
+        "The loading row is na and the states row is na, each saying the component makes no request"
+      ]
+    },
+    {
+      "id": "review-scrolling-table",
+      "prompt": "Review invoices.tsx and its stylesheet invoices.css. On a phone the invoice table scrolls sideways inside its box; is that a responsive problem?",
+      "files": [
+        "evals/files/invoices.tsx",
+        "evals/files/invoices.css"
+      ],
+      "expected_output": "The eight-row review table and one summary line that leads with the answer: the sideways scroll inside the table's own container is not a responsive problem. Responsive is na, not fail: the overflow-x: auto at invoices.css:2 is on the table's own container (invoices.tsx:17), not on the page, and whether the page itself fits at 320 px needs a render. Tokens pass (every color and spacing value reads a custom property; the table min-width is not a token defect). Loading na (no request), hierarchy na (no button).",
+      "assertions": [
+        "The output contains exactly one markdown table and its header row is `| rule | pass/fail/na | evidence file:line | fix |`",
+        "The table has exactly eight data rows, in this order: loading, responsive, hierarchy, tokens, consistency, a11y, states, interaction",
+        "Every verdict cell is exactly pass, fail or na",
+        "Every evidence cell contains `invoices.tsx:` or `invoices.css:` followed by a line number, a line range or a note of what is absent",
+        "The responsive row is na, not fail, and its evidence cites invoices.css:2 or invoices.tsx:17 (the scroll sits on the table's own container) and says the page still needs a 320 px render",
+        "The responsive row does not call the table scroll a page-level horizontal scroll",
+        "The tokens row is pass; the 48rem min-width is not given as a tokens failure",
+        "The loading row is na",
+        "The hierarchy row is na or pass; it is not fail",
+        "The summary line leads with the answer: the sideways table scroll is not a responsive problem because it sits inside the table's own container"
+      ]
+    },
+    {
+      "id": "review-render-only",
+      "prompt": "I can't share the code for our settings page, only what I saw in the browser (settings-render-notes.md). Verdict per rule?",
+      "files": [
+        "evals/files/settings-render-notes.md"
+      ],
+      "expected_output": "The eight-row review table and one summary line, with render evidence and no line numbers. Fail: responsive (settings-320.png@320px: page scrolls sideways, Save off-screen), hierarchy (settings-1280.png@1280px: toolbar has Save and Export both filled), a11y (#cccccc border on #ffffff is about 1.6:1, under 3:1). Na with 'unverified: needs source': loading, tokens, consistency, states, interaction.",
+      "assertions": [
+        "The output contains exactly one markdown table and its header row is `| rule | pass/fail/na | evidence file:line | fix |`",
+        "The table has exactly eight data rows, in this order: loading, responsive, hierarchy, tokens, consistency, a11y, states, interaction",
+        "Every verdict cell is exactly pass, fail or na",
+        "No evidence cell contains a source line reference such as `.tsx:` or `.vue:` followed by a number",
+        "The responsive row is fail and its evidence names settings-320.png or the 320 px width",
+        "The hierarchy row is fail and its evidence names Save and Export as two filled buttons in the same toolbar",
+        "The a11y row is fail and its evidence cites the #cccccc input border on #ffffff as under 3:1",
+        "The tokens row is na and its evidence says it is unverified or needs the source",
+        "None of the loading, tokens, consistency, states or interaction rows is pass"
+      ]
+    },
+    {
+      "id": "build-no-theme-plain-css",
+      "prompt": "Add a dismissible info banner to our static marketing site in plain HTML and CSS. There is no CSS framework and no stylesheet variables anywhere yet.",
+      "expected_output": "Banner HTML and CSS where the colors and spacing are defined once in a single :root custom-property block and the banner rules read them with var(); a note telling the user a theme block was created; a dismiss button with an accessible name. No review table.",
+      "assertions": [
+        "The CSS has exactly one `:root` block, and it defines custom properties for the banner's colors",
+        "Every color in the banner's own rules (outside `:root`) is a `var(--...)` reference, not a hex, rgb or named color",
+        "The output tells the user that it created the `:root` theme block (or theme roles) because the site had none",
+        "The dismiss control is a `<button>` with an accessible name, such as an aria-label or visible text containing Dismiss or Close",
+        "The output does not contain a table with the header `| rule | pass/fail/na | evidence file:line | fix |`"
+      ]
+    },
+    {
+      "id": "review-and-fix-form",
+      "prompt": "Review form.tsx and then fix whatever fails.",
+      "files": [
+        "evals/files/form.tsx"
+      ],
+      "expected_output": "The eight-row review table, then one summary line, then the updated form.tsx: no <style> element, theme roles instead of literals, a :focus-visible ring, a pending-disabled submit, and an error and success branch.",
+      "assertions": [
+        "The output contains exactly one markdown table and its header row is `| rule | pass/fail/na | evidence file:line | fix |`",
+        "Before the table there is no prose",
+        "The line right after the table is one summary line, and the updated code comes after it",
+        "The interaction row is fail and the updated code adds a visible :focus-visible style instead of only deleting outline: none",
+        "The updated code disables the submit button while the request is pending",
+        "The updated code no longer renders a `<style>` element inside the component"
+      ]
+    },
+    {
+      "id": "review-product-grid-dialog",
+      "prompt": "Check the button emphasis in ProductGrid.tsx and give me the verdict per rule.",
+      "files": [
+        "evals/files/ProductGrid.tsx"
+      ],
+      "expected_output": "The eight-row review table and one summary line. Hierarchy fails on the confirm dialog: Delete at line 43 is contained with the error color, and a destructive confirm is never filled; the fix makes Delete outlined with the danger role. The contained Add to cart on every card (line 32, rendered from the products.map at line 24) is the equal-priority product-choice exception and is not a defect. Loading na (no request).",
+      "assertions": [
+        "The output contains exactly one markdown table and its header row is `| rule | pass/fail/na | evidence file:line | fix |`",
+        "The table has exactly eight data rows, in this order: loading, responsive, hierarchy, tokens, consistency, a11y, states, interaction",
+        "Every evidence cell starts with `ProductGrid.tsx:`",
+        "The hierarchy row is fail and its evidence cites ProductGrid.tsx:43, the contained Delete in the confirm dialog",
+        "The hierarchy fix makes Delete outlined with the danger or error color, and does not make Cancel contained",
+        "The repeated contained Add to cart (ProductGrid.tsx:32 or the products.map at :24) is not given as a hierarchy defect",
+        "The loading row is na, saying the component makes no request"
       ]
     }
   ]

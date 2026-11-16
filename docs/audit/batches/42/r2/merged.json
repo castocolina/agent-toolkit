@@ -1,0 +1,72 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "command-creator",
+      "percent": 96.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0,
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 85,
+          "evidence": "Gotchas spend about seven lines teaching POSIX single-quote encoding: \"wrap it in `'...'` and write each `'` inside it as `'\\''`. So `it's` becomes `'it'\\''s'`...\"",
+          "fix": "Keep the NEVER rule and step 3 (where the encoded value goes: operand after `--`, option value attached to its option). Cut step 2 to one line, such as \"single-quote it, with `'` written as `'\\''`\": the model already knows this shell idiom and only needs the reminder."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/command-creator/evals/evals.json",
+          "line": null,
+          "evidence": "Six evals cover the simple, iterative, side-effect, safety and collision paths. None covers the Plan, approve, execute pattern or the approved-update path (option 2 of Workflow step 2).",
+          "fix": "Add one eval that asks for a plan-then-implement command. Assert that nothing is written before an explicit approval signal, that the plan is saved to a named path, and that there is no `context: fork` on the approval step. Add another eval where the user approves updating the existing `.claude/commands/release.md`. Assert that the file is read first, its frontmatter is kept and a diff is shown."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 123,
+          "evidence": "Worked example step 5: \"It succeeds with no output: the tag is not on the remote. Show the push error and ask before one retry.\" Nothing says what happens if that one approved retry also fails or times out.",
+          "fix": "Add: \"If the approved retry fails or times out, run the same `git ls-remote` check once more and apply these branches again, with no further retry: report the final state and the local tag's recovery options.\""
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/command-creator/evals/evals.json",
+          "line": 72,
+          "evidence": "The collision eval asserts \"Does not overwrite, edit or delete `.claude/skills/release/SKILL.md` or `.claude/commands/release.md` in this answer\". The six output evals cover creation, clarification and collision refusal, but none exercises the approved-update continuation or the plan/approve/execute pattern.",
+          "fix": "Add an approved-update eval using an existing command fixture, asserting preservation of unrelated frontmatter and body content, resolution of any skill shadowing, and a reported diff. Add a multi-turn planning eval that checks no writes before approval, revision after feedback, and saving and execution only after explicit approval."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 118,
+          "evidence": "The release example says \"Run `git tag -a 'v\\$version' -m 'Release \\$version' TARGET`, then `git push origin 'refs/tags/v\\$version'`.\" It defines recovery for push failure but not for tag-creation failure; later recovery assumes the local tag \"still exists\". If tag creation fails, the agent must guess whether to proceed and whether that recovery statement is true.",
+          "fix": "Check the exit status of local tag creation explicitly. On failure, stop and report the error without pushing or entering the push-retry branch. Enter remote recovery only after successful tag creation, and verify local tag state before claiming it remains available for a later push."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

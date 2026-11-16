@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "database-schema-designer",
+      "percent": 95.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 23,
+          "evidence": "\"For each hot read, put the equality columns first, then the range or sort columns, and check whether an existing index already covers that prefix.\" The model already knows the equality-before-range rule for composite indexes and the standard EXPLAIN commands for each engine.",
+          "fix": "Shorten step 2 to the part the model lacks: \"Each index must name the hot read or FK path it serves; not adding one is a valid, documented decision. Verify with the engine's plan command on production-like row counts (see the EXPLAIN ANALYZE gotcha).\""
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 24,
+          "evidence": "\"3. **Migrations.** Start migration files from `assets/templates/migration-template.sql`.\" This step only points at a file. It gives no ordering decision, while the other workflow steps each ask a question first.",
+          "fix": "Turn step 3 into a decision: \"Before writing a migration, classify each statement: does it rewrite the table, which lock does it take, and must it run outside a transaction (CREATE INDEX CONCURRENTLY, NOT VALID then VALIDATE)? Split it into one migration file per phase, then start each file from the template.\""
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/evals/evals.json",
+          "line": null,
+          "evidence": "All five evals target PostgreSQL or MongoDB. None exercises the MySQL gotchas (no partial index, generated-column uniqueness, implicit DDL commit, ALGORITHM/LOCK) or the SQLite gotchas (PRAGMA foreign_keys, table rebuild, INTEGER money). Evals 3 and 5 also list skill reference files (\"references/migrations.md\") under \"files\", but those are not eval inputs.",
+          "fix": "Add an eval such as \"our MySQL 8 app soft-deletes users and re-signup with the same email fails; also need to make orders.total non-null on a 20M-row table\". Assert the generated-column unique key, explicit `ALGORITHM=INPLACE, LOCK=NONE` and one DDL statement per migration. Keep only files under evals/files/ in \"files\"."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 34,
+          "evidence": "Following the review branch on the production legacy schema leads to adding the cross-tenant fix to a live table. The skill covers \"add the FK `NOT VALID`, then run `VALIDATE CONSTRAINT`\". It does not cover adding the required `UNIQUE (organization_id, id)` without blocking writes. It also gives no step to find existing rows whose tasks.organization_id differs from their project's, so VALIDATE would fail with no fallback.",
+          "fix": "Add to migrations.md a 'Retrofit tenant composite FK on a live table' section with these steps: (1) `CREATE UNIQUE INDEX CONCURRENTLY projects_org_id_uq ON projects (organization_id, id);` (2) `ALTER TABLE projects ADD CONSTRAINT projects_org_id_uq UNIQUE USING INDEX projects_org_id_uq;` (3) find mismatches with `SELECT t.id FROM tasks t JOIN projects p ON p.id = t.project_id WHERE t.organization_id <> p.organization_id;` and fix them (4) `ADD FOREIGN KEY (organization_id, project_id) ... NOT VALID`, commit, then `VALIDATE CONSTRAINT` (5) drop the old single-column FK."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 22,
+          "evidence": "\"Is there a tenant noun? If yes, every tenant-owned child gets the composite-FK gotcha.\" Following this branch for a multi-tenant MongoDB design requires composite foreign keys that MongoDB cannot enforce. The review workflow likewise requires corrected DDL without distinguishing MongoDB.",
+          "fix": "Gate composite-FK requirements and SQL migration templates to relational engines. Add a MongoDB branch that requires tenant-scoped reference validation and authorization, explains the absence of database-enforced foreign keys, and defines the required atomicity boundary. For MongoDB reviews, provide executable MongoDB commands or application changes rather than requiring SQL DDL."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 53,
+          "evidence": "\"Recreate the saved indexes, triggers and views.\" The preceding DROP TABLE removes associated indexes and triggers but does not remove dependent views. Replaying saved CREATE VIEW statements therefore encounters existing views; the procedure supplies no explicit view-drop ordering.",
+          "fix": "Separate dependent-view handling from automatically removed indexes and triggers. Save affected view definitions, explicitly drop those views inside the rebuild transaction before dropping the old table, and recreate them after the replacement table has its original name. Retain the foreign_key_check gate before committing."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/database-schema-designer/references/schema-design-checklist.md",
+          "line": 3,
+          "evidence": "\"either a SKILL.md gotcha or a section of `migrations.md`\" uses a reference-directory-relative filename; the live-change check repeats \"Answer each from `migrations.md`.\" The specification requires file references relative to the skill root, where that filename does not exist.",
+          "fix": "Replace both bare `migrations.md` references with `references/migrations.md`, preserving the existing live-schema loading condition."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

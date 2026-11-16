@@ -1,0 +1,86 @@
+{
+  "skill": "c4-architecture",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 13,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 12,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 109,
+  "max_total": 125,
+  "percent": 87.2,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": 65,
+      "evidence": "The 12-line example beginning \"flowchart LR\" primarily demonstrates familiar Mermaid nodes, subgraphs and edges; the audience matrix likewise includes standard guidance such as \"Executives | Context only\". In the line-weighted H2 classification, Workflow occupies 67 of 83 lines and mixes expert guidance with this activation/redundant material; NEVER occupies 11 predominantly expert/activation lines, and References occupies 5 routing/activation lines.",
+      "fix": "Compress the standard audience matrix to concise defaults plus the named-view override. Replace the generic flowchart example with a compact downgrade contract: preserve the original elements, abstraction level, boundaries, aliases, relationship directions, labels and technologies while translating only the notation. Retain the Mermaid-specific failure modes and evidence-mapping guidance."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": 31,
+      "evidence": "The evidence mapping combines \"Compose service with `build:`, Dockerfile, Kubernetes Deployment, package with a `start` script\" without a procedure for reconciling sources from different environments or conflicting versions before declaring facts Observed.",
+      "fix": "Before extracting elements, establish the requested environment and scope. Reconcile Compose, package and deployment records into logical deployable units; use manifests applicable to the target environment, and mark conflicting or environment-mismatched facts Inferred or unknown rather than merging them into one observed model."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/c4-architecture/evals/evals.json",
+      "line": 3,
+      "evidence": "The five cases\u2014\"context-container-commerce\", \"specific-flow\", \"no-invented-architecture\", \"repo-evidence\" and \"renderer-downgrade\"\u2014cover useful common and edge cases, but none exercises a C4Component output, a C4Deployment output or multi-team boundary selection.",
+      "fix": "Add component and deployment cases with verifiable assertions for the selected container boundary, environment title, replica representation and unknown infrastructure. Add a multi-team case that checks the rationale for software-system boundaries rather than merely counting teams."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/c4-architecture/evals/trigger-queries.json",
+      "line": 3,
+      "evidence": "The positives mostly directly name architecture or a diagram view, for example \"Make C4 context and container diagrams for our customer portal and its services.\" None includes a file path or the implicit repository-inspection and wiki-renderer-failure contexts supported by the output evals.",
+      "fix": "Replace several repetitive positives with contextual, casual requests containing repository paths, onboarding goals or a wiki rendering error without explicitly requesting C4. Retain the balanced positive/negative counts and existing near-miss negatives."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/c4-architecture/SKILL.md",
+      "line": 45,
+      "evidence": "\"Separate teams own services: each becomes a `System` in the Context view, with its own Container view.\" Following this branch for one product maintained by several teams forces every team-owned service into a separate software system, although team ownership alone does not establish a C4 software-system boundary. references/advanced-patterns.md repeats the same unconditional rule.",
+      "fix": "Treat team ownership as evidence, not a mandatory abstraction rule. Establish software-system scope from externally meaningful capabilities, users, lifecycle and explicit boundary decisions. Permit multiple teams to own containers within one software system; promote a service to a System only when its independent system boundary is justified. Update the corresponding advanced-patterns guidance."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/c4-architecture/references/common-mistakes.md",
+      "line": 100,
+      "evidence": "The many-topics alternative recommends `Rel(orderSvc, inventorySvc, \"order.created\", \"Kafka\")`. This branch produces noun-only relationship labels, so its recommended correction fails SKILL.md step 5.3, which requires every relationship to have a verb.",
+      "fix": "Use verb-bearing event labels, such as `Rel(orderSvc, inventorySvc, \"Publishes order.created for\", \"Kafka\")`, and make the equivalent correction for the other events. Explain that these collapsed arrows represent event delivery with queue boxes omitted, and ensure the alternative passes the stated model-validation checklist."
+    }
+  ]
+}

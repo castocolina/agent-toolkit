@@ -1,0 +1,68 @@
+{
+  "skill": "command-creator",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 63,
+      "evidence": "The body says \"Take `$ARGUMENTS` whole\" and contains unescaped positional placeholders throughout. Under the pre-reading placeholder substitution described on line 8, invoking command-creator with arguments substitutes those arguments into its own instructional text and examples.",
+      "fix": "Escape the literal dollar signs used to document placeholders in this skill's SKILL.md, using the backslash escaping described on line 67. Preserve unescaped placeholders in the generated command files. Verify that activating command-creator with a sentinel argument leaves its instructional placeholder names intact."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 104,
+      "evidence": "The release example requires \"`git fetch origin` then `git status -sb` shows no ahead or behind\". A local main branch without an upstream produces no ahead/behind indication even when it differs from origin/main, so this branch can pass and tag an outdated commit.",
+      "fix": "Require a successful fetch of origin's main branch, then compare HEAD directly with the fetched commit. For example, run `git fetch origin refs/heads/main`, stop on failure, and require `git rev-parse HEAD` to equal `git rev-parse --verify FETCH_HEAD` before creating the tag. Do not infer synchronization from the absence of ahead/behind text."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 110,
+      "evidence": "The post-push check says \"the `^{}` line is the commit the tag points to\" and branches on that value, no output, or query failure. If another actor creates a lightweight remote tag between the preflight and push, ls-remote succeeds with a direct ref but no `^{}` line; none of the stated branches handles that result.",
+      "fix": "After a successful query, select the peeled value when present and otherwise the direct tag-ref value. Compare that value with TARGET to distinguish an already-landed release from a conflict. Treat successful empty output as absence and retain the existing stop rule for query failures."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 15,
+      "evidence": "\"the file stem is the command name (`fix-ci.md` is `/fix-ci`)\" and line 19's \"tell the user to type `/` to see it listed\" restate basic native command naming and discovery rather than adding expert knowledge.",
+      "fix": "Condense the basic file-stem and menu-discovery explanations. Retain the non-obvious command frontmatter constraints, shadowing checks, scope-conflict routing, and requirement to report the resulting path and invocation."
+    }
+  ]
+}

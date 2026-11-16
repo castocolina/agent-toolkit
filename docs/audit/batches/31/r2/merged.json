@@ -1,0 +1,126 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "plugin-forge",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 91.2,
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 12,
+          "evidence": "It rejects names `claude plugin validate` treats as Anthropic's own (`claude`, `anthropic`, `claude-code`, `claude-mods`, prefixes `claude-`, `anthropic-`, `anthropics-`, `cc-plugin-`, or `official` beside claude/anthropic).",
+          "fix": "Shorten this to 'It rejects reserved Anthropic-looking names (exit 2 with the reason)'. The script already enforces the full list and its error message gives the details, so the list costs tokens on every run."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 24,
+          "evidence": "3. **Version**, once per release, after the component changes. Standard: `bump_version.py`.",
+          "fix": "Add a one-line decision rule for the part argument: 'patch for fixes only; minor for a new skill, command, agent, hook or MCP server; major when a component is renamed or removed, or a namespaced name changes (it breaks users' /<plugin>:<name> calls)'."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 3,
+          "evidence": "Use when packaging Claude Code capabilities, repairing marketplace registration/manifests, or debugging a plugin install or update that does not pick up changes.",
+          "fix": "Create and manage Claude Code marketplace plugins: scaffold plugin directories, edit plugin.json and marketplace.json, add commands, skills, agents, hooks and MCP components, bump versions, and test or publish packages. Use when bundling skills, slash commands, agents, hooks or MCP servers so a team can install them, repairing marketplace registration or manifests, or debugging a plugin install or update that does not pick up changes, even if the user never says 'plugin' or 'marketplace'. Not for other IDE extensions, npm releases, or authoring standalone skills/commands without plugin packaging."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 26,
+          "evidence": "5. **Test the install, then publish.** Read `references/workflows.md`... a remote plugin's repository and the marketplace repository are published separately.",
+          "fix": "Add a gated trigger to step 5: 'When the user wants the marketplace available to everyone in a repository (team distribution), read the Team distribution section of `references/marketplace-schema.md`'. Right now that content is reachable only from the References list at the end."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/plugin-forge/evals/trigger-queries.json",
+          "line": 71,
+          "evidence": "\"query\": \"Create Firefox browser extension.\"",
+          "fix": "Replace the terse, no-overlap negatives (Firefox, IntelliJ, npm package, GitHub Actions) with realistic near-misses that have context. Examples: 'add a PreToolUse hook to my ~/.claude/settings.json for just me', 'write a .mcp.json for my project so Claude can reach Postgres', 'install the docs-kit plugin from our team marketplace'."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/plugin-forge/evals/evals.json",
+          "line": 6,
+          "evidence": "\"prompt\": \"Create Claude Code plugin release-helper, Dana Lee (dana@example.com), description Release checklist tools, keywords release/deploy, category productivity. Give scaffold command and next files.\"",
+          "fix": "Add an eval for the remote-source branch, for example a git-subdir plugin whose version must be edited by hand in the remote plugin.json. Assert that the answer does not run bump_version.py and that it validates against a local checkout."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 33,
+          "evidence": "Change versions only through `bump_version.py` so both stay equal; for a prerelease such as `2.0.0-beta.1`, which the script rejects, set the same string in both files by hand.",
+          "fix": "Make it match workflow step 3: 'For a standard `./plugins/<name>` source change versions through `bump_version.py` so both stay equal; for other-local or remote sources, or a prerelease the script rejects, set the same string by hand in both files (or drop the entry `version`)'. As written it contradicts step 3's hand-edit branch for other-local and remote plugins."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/plugin-forge/references/plugin-structure.md",
+          "line": 38,
+          "evidence": "Names starting with `claude-`, `anthropic-` or `cc-plugin-` fail validation as impersonating Anthropic.",
+          "fix": "Align with the SKILL.md contract and the script: 'Reserved: exact claude, anthropic, claude-code, claude-mods; prefixes claude-, anthropic-, anthropics-, cc-plugin-; or official beside claude/anthropic'. A hand-written plugin otherwise misses the anthropics- and official cases."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/plugin-forge/scripts/bump_version.py",
+          "line": 55,
+          "evidence": "The branch `if \"version\" not in plugin_data:` reports `the plugin is versioned by commit SHA` before reading the marketplace. A versionless plugin.json can instead inherit a pinned marketplace-entry version, as SKILL.md's version-precedence rule acknowledges. In that case, the instruction to push without bumping leaves users on the cached release.",
+          "fix": "Read the matching marketplace entry before deciding how the plugin is versioned. When only the entry supplies a version, bump that effective version; report SHA-versioning only when both manifests omit version. Update the script contract and replace the existing versionless test with separate marketplace-versioned and genuinely SHA-versioned cases."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 26,
+          "evidence": "The remote-source branch says `push the plugin repository before testing it from the marketplace`, but never advances a pinned source. references/marketplace-schema.md explicitly permits `ref` and `sha` pins and gives a GitHub example pinned to `v1.0.0`; pushing a newer plugin commit alone still installs the old target.",
+          "fix": "Add a pinned-remote release branch: publish the new target commit or tag, update the marketplace source's ref or sha to that target, then install from the revised marketplace entry and verify the loaded version. Keep plugin-repository and marketplace-repository publication separate and within user authorization."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/plugin-forge/scripts/bump_version.py",
+          "line": 53,
+          "evidence": "`plugin_data = json.load(f)` is followed by a membership test without checking that the result is an object. A plugin.json containing valid JSON `null` raises an uncaught TypeError rather than the documented exit 2 with an actionable bad-input diagnostic.",
+          "fix": "Validate that plugin_data is a JSON object before inspecting its fields and raise ValueError with the manifest path when it is not. Add subprocess tests for null, array and scalar manifests that assert exit 2, empty stdout, a useful stderr message and unchanged files."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

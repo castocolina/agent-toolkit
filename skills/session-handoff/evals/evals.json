@@ -13,22 +13,52 @@
     },
     {
       "id": "resume-chain",
-      "prompt": "Resume from the latest handoff. Its excerpt says: \u201cContinue from 2026-10-23-api-start.md. Completed the request adapter; next verify the v2 invoice response. Working tree may have changed since then.\u201d Propose the commands and checks before editing.",
+      "prompt": "Resume from the latest handoff. Its excerpt says: “Continue from 2026-10-23-api-start.md. Completed the request adapter; next verify the v2 invoice response. Working tree may have changed since then.” Propose the commands and checks before editing.",
       "expected_output": "Resume workflow finding handoffs, checking staleness, reading latest plus predecessor, verifying current context, then beginning the stated next step.",
       "assertions": [
-        "Proposes `python scripts/list_handoffs.py` and `python scripts/check_staleness.py <handoff-file>`.",
+        "Proposes `python3 scripts/list_handoffs.py` and `python3 scripts/check_staleness.py <handoff-file>`.",
         "Reads the linked `2026-10-23-api-start.md` predecessor as well as the latest handoff.",
         "Verifies branch, working tree, and assumptions before checking the v2 invoice response."
       ]
     },
     {
       "id": "no-handoff",
-      "prompt": "Please fix the typo in this line: \u201cThe server recieves requests.\u201d It is a one-line documentation edit. Decide whether a handoff is warranted and explain briefly.",
-      "expected_output": "Corrects \u201crecieves\u201d to \u201creceives\u201d and makes a small-task judgment without being told the answer.",
+      "prompt": "Please fix the typo in this line: “The server recieves requests.” It is a one-line documentation edit. Decide whether a handoff is warranted and explain briefly.",
+      "expected_output": "Corrects “recieves” to “receives” and makes a small-task judgment without being told the answer.",
       "assertions": [
-        "Provides the corrected sentence with \u201creceives\u201d.",
+        "Provides the corrected sentence with “receives”.",
         "Explains the one-line typo is a small task and makes an explicit handoff judgment.",
         "Does not force a handoff document or handoff command for this isolated typo."
+      ]
+    },
+    {
+      "id": "resume-unknown-staleness",
+      "prompt": "I ran the staleness check on our latest handoff before picking the work back up; the handoff and the output are attached. It says only 1 commit and 3 files changed, so can I just start at next step 1?",
+      "files": [
+        "evals/files/2026-10-24-091500-invoice-v2.md",
+        "evals/files/staleness-report.txt"
+      ],
+      "expected_output": "Reviews the supplied report without re-running it, explains that UNKNOWN (exit 2) from a baseline that is not an ancestor of HEAD makes the counts meaningless, verifies the baseline by hand and re-checks the handoff's assumptions before starting step 1.",
+      "assertions": [
+        "Says the level is UNKNOWN (exit 2) because the baseline commit is not an ancestor of HEAD, so the 1-commit / 3-files counts cannot be trusted and the handoff is not treated as fresh.",
+        "Proposes a manual check of baseline 77e5aa9a98271db995c0471151c890b56bc2b005 against HEAD before editing, such as `git cat-file -e`, `git diff --stat <baseline> HEAD` or `git reflog`.",
+        "Flags that the handoff's assumption \"Branch feat/invoices-v2 was not rebased\" is contradicted by the squash/rebase commit in the report, and re-checks the staging-contract assumption.",
+        "Works from the supplied report and does not claim to have re-run `check_staleness.py`."
+      ]
+    },
+    {
+      "id": "validate-blocked",
+      "prompt": "here's my handoff draft and what the validator printed. it's late, can I just ship it like this and fix it tomorrow?",
+      "files": [
+        "evals/files/2026-11-03-174000-db-pool.md",
+        "evals/files/validate-report.txt"
+      ],
+      "expected_output": "Refuses to finalize a BLOCKED handoff, removes the connection-string password in favour of a variable name, completes Immediate Next Steps, and re-runs the validator until READY.",
+      "assertions": [
+        "Says the handoff must not be finalized yet because the verdict is BLOCKED (exit 1).",
+        "Replaces the postgres connection string containing the password with a variable name only (for example a DATABASE_URL-style name) and does not repeat the password Tr0ub4dor-3 in its reply.",
+        "Replaces or deletes the `[TODO: Second priority]` placeholder so Immediate Next Steps is complete.",
+        "Re-runs `scripts/validate_handoff.py` on the file and finalizes only when the verdict is READY (exit 0)."
       ]
     }
   ]

@@ -29,7 +29,7 @@ section {
   padding: 56px;
 }
 
-section:last-of-type {
+section.final {
   border-bottom: none;
 }
 
@@ -145,6 +145,8 @@ Dark Mode
 - Topic3
 
 ---
+
+<!-- _class: final -->
 
 ## Slide
 

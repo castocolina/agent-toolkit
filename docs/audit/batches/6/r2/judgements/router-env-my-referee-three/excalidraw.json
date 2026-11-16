@@ -1,0 +1,77 @@
+{
+  "skill": "excalidraw",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 52,
+      "evidence": "1. Copy the original; edit the copy only.",
+      "fix": "Delete step 1. Step 5 already says to replace the original only after check and diff pass, and the model already knows to work on a copy. Begin the contract at 'Change only the elements the task names'."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 41,
+      "evidence": "Nodes default to a left-to-right row; ... For a decision or fan-out, give each branch an explicit `y`",
+      "fix": "Add a short layout framework before the spec: 'Before writing a spec, ask: is it linear (default row, wrap after about 5 nodes), a decision (diamond, with each branch on its own y), or layered architecture (one row per tier, with x aligned across tiers)?' Use the 180x80 box size and the 100/60 gaps to compute coordinates."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 3,
+      "evidence": "through a bundled script that keeps scene JSON out of context - label and connection summaries, add/rename/remove boxes and arrows, binding and ID validation, label-level diffs",
+      "fix": "Use when the user wants to create, read, change or compare an Excalidraw diagram (.excalidraw, .excalidraw.json, or .excalidraw.png/.excalidraw.svg with an embedded scene): list what boxes and arrows it shows, add, rename, connect or delete boxes, check for broken arrow bindings, diff two versions, or draw a new hand-drawn flowchart or architecture sketch to open in excalidraw.com, even for a tiny file and even when the user just says 'whiteboard sketch' and names an .excalidraw file. Not for Mermaid, draw.io, PlantUML, Graphviz, ordinary PNG edits or text-only architecture explanations."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/excalidraw/evals/trigger-queries.json",
+      "line": 59,
+      "evidence": "\"query\": \"Explain the concept of event-driven architecture in a few paragraphs.\"",
+      "fix": "Replace far misses (event-driven explanation, Figma review) with near-misses such as 'export my tldraw board to SVG' or 'turn this Excalidraw screenshot into a slide image'. Add should-trigger queries that never say 'Excalidraw', for example 'what's connected to the API box in docs/arch.excalidraw.json'. Add realistic typos and backstory."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 43,
+      "evidence": "`edit` and `new` write through a `.tmp` file and refuse to write if `check` fails, so the original survives a bad edit.",
+      "fix": "Add a fallback branch: 'If edit refuses because the ORIGINAL already fails check (a pre-existing dangling binding or a duplicate id), run `check FILE`. Send a worker to repair only the named errors on a copy, using the repair table, then rerun the edit on the repaired file.' Without this branch, an add or rename on an already-broken scene dead-ends."
+    }
+  ]
+}

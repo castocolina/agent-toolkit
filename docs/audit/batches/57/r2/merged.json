@@ -1,0 +1,117 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codex-plan",
+      "percent": 93.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 90.4,
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 37,
+          "evidence": "Plan structure: Overview, Prerequisites, Phases with tasks, Testing Strategy, Dependency Graph, Risks, Rollback ... Tasks must be small and independently testable",
+          "fix": "Cut the generic planning advice to a single line naming the required per-task fields (Location, Dependencies, Complexity, Acceptance Criteria). Spend the saved lines on Codex-specific facts the model would otherwise get wrong."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 31,
+          "evidence": "When the plan arrives, check that every confirmed requirement maps to a task with acceptance criteria, list gaps, and do not implement unless asked.",
+          "fix": "Make plan review its own numbered step 6 with a fixed output: a requirement-to-task table, then missing or untestable criteria, then dependency cycles. Right now it is buried in a prose paragraph after the workflow ends."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 55,
+          "evidence": "Never tell Codex to run tests or install packages: under `-s workspace-write` the network is off and the run stalls or fails.",
+          "fix": "Split the reason in two. Package installs and other network calls fail because the sandbox has no network. Running tests is only a problem when the tests need the network or the run takes too long. The real rule: a planning run should read files and write the plan, not execute the project."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 2,
+          "evidence": "description: Prepare prompt_to_codex.md so the user can run Codex themselves and get an implementation plan in codex-plan.md. Use when planning a feature, API, auth change, migration or test strategy...",
+          "fix": "Prepare prompt_to_codex.md so the user can run OpenAI Codex CLI (codex exec) themselves and get an implementation plan in codex-plan.md. Use when the user wants to plan a feature, API, auth change, migration or test strategy with Codex, hand planning off to Codex, or write a Codex prompt, including underspecified requests. Gathers repo context, asks only blocking questions, shows the manual command. Not for implementing changes; never runs Codex."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 17,
+          "evidence": "**Context first.** Read what the plan depends on.",
+          "fix": "Give context gathering a default scope, for example: manifest files, the entry points and modules the request names, and .env.example. Read more only when the request crosses module boundaries, so large repos do not trigger unbounded reading."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 11,
+          "evidence": "Request: `$ARGUMENTS`",
+          "fix": "Add a branch for an empty `$ARGUMENTS` or one that contains only `--model <id>`. In that case, ask for the planning topic with AskUserQuestion before step 1, and never build a prompt with no objective."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 21,
+          "evidence": "If either exists, ask whether to overwrite or use a numeric suffix",
+          "fix": "Check for existing output files before the readiness gate and put the overwrite-or-suffix question in the same AskUserQuestion batch. Step 2 says to ask in one batch, and step 3 currently forces a second round of questions."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 38,
+          "evidence": "The generated instructions say \"write the full plan to the chosen plan file in the current directory\" and \"begin immediately\", but do not explicitly prohibit implementation or edits to other files, despite the workspace-write sandbox.",
+          "fix": "Require the generated prompt to state: \"This is planning only. Do not implement changes or modify source, configuration, dependencies or data. Write only the chosen plan file; describe implementation and validation steps without executing them.\""
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 37,
+          "evidence": "\"Tasks must be small and independently testable (\\\"Add Google OAuth config to env\\\", not \\\"Implement Google OAuth\\\").\" This restates standard task-decomposition advice rather than adding Codex-handoff knowledge.",
+          "fix": "Remove the generic task-granularity explanation and auth example; retain the required task-field schema and confirmed-requirement-to-acceptance-criteria check."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 55,
+          "evidence": "\"Never tell Codex to run tests or install packages: under `-s workspace-write` the network is off and the run stalls or fails.\" The rationale incorrectly treats running tests as inherently network-dependent; offline tests need no network.",
+          "fix": "Replace the rationale with: \"Do not execute tests or install packages during this planning-only pass; describe those commands in the plan. Network-dependent operations may fail in the default workspace-write sandbox.\""
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

@@ -1,0 +1,59 @@
+{
+  "skill": "react-useeffect",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 12,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/react-useeffect/references/anti-patterns.md",
+      "line": 9,
+      "evidence": "The catalog repeats standard React guidance already present in the mandatory routing table, including \"`useEffect(() => setX(f(a, b)), [a, b])`\" becoming \"`const x = f(a, b)`\" and \"Call `onChange` in the same handler that sets state, or make the component controlled\". These repeated recipes, together with standard subscription boilerplate, leave a substantial activation/tutorial share by line count despite the stronger async and initialization material.",
+      "fix": "Collapse the duplicated derived-state, event-handler and full-key-reset rows into a short pointer to SKILL.md. Keep the reference focused on non-obvious partial resets, guarded async error/finally writes, request identity, retries and initialization lifetimes; shorten ordinary listener boilerplate without removing its snapshot and hydration constraints."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/react-useeffect/evals/evals.json",
+      "line": 2,
+      "evidence": "The six output cases cover \"derived-name\", \"query-race\", \"external-widget\", \"strict-mode-fetch-errors\", \"init-runs-twice\" and \"partial-reset-casual\", but none exercises the external-store snapshot or React-version-dependent non-reactive-read branches.",
+      "fix": "Add output cases for an uncached object snapshot with server hydration and for a non-reactive read on React 18 versus React 19.2. Assert snapshot stability, matching server/hydration values, correct dependency retention and the appropriate Effect Event or committed-ref implementation."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/react-useeffect/SKILL.md",
+      "line": 18,
+      "evidence": "The routing table sends \"Widget, browser API, connection, analytics on display\" to \"`useEffect` with cleanup that undoes this setup\", and the correctness loop universally requires cleanup to reverse setup. However, references/anti-patterns.md says \"A doubled analytics call in development is expected; react.dev recommends leaving it.\" A new analytics task is therefore routed to an irreversible operation while being required to undo it.",
+      "fix": "Separate disposable-resource synchronization from fire-and-forget display analytics in the routing table. Qualify the cleanup invariant as applying when setup acquires a reversible resource, and state inline that sent analytics cannot be undone and development replay duplication is expected rather than something to suppress with a ref guard."
+    }
+  ]
+}

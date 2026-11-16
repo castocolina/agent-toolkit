@@ -1,0 +1,81 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "react-dev",
+      "percent": 97.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0,
+        "router-env-my-referee-one": 98.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 105,
+          "evidence": "Under `strictFunctionTypes` (part of `strict`) it rejects a `(value: string) => ...` renderer, but declared with method syntax ... parameters are bivariant and that narrower renderer is accepted, then crashes at runtime.",
+          "fix": "Cut the paragraph down to one sentence: `T[keyof T]` does not tie a key to its renderer, so renderers get the union type, and method-syntax `render` accepts a mismatched renderer through bivariance. The model already knows how strictFunctionTypes works in general."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 37,
+          "evidence": "| Server Component | RSC framework (Next.js App Router), file without `'use client'` and not imported from one | no hooks or browser APIs; `await` data; may call Server Actions |",
+          "fix": "Drop the Server Component row, which the model already knows. Keep the two client-component rows and line 41, which teach the less obvious point: 'use client' code is still rendered on the server, and ssr:false SPA mode still prerenders."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/react-dev/examples/server-components.md",
+          "line": 121,
+          "evidence": "Use the keyed storage hook in [hooks.md](../references/hooks.md#external-state-and-ssr)",
+          "fix": "Remove the nested link from examples/server-components.md to references/hooks.md. Instead, add references/hooks.md to SKILL.md's load table on the Server Components row, gated by the condition 'when the component reads browser storage', so every reference stays one level deep from SKILL.md."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/react-dev/evals/evals.json",
+          "line": null,
+          "evidence": "11 output evals cover refs, forms, routers, SSR storage and optimistic updates, but none covers the Next.js 15 Promise `params` or the `use()` promise-creation gotcha (both appear only in trigger-queries.json).",
+          "fix": "Add an eval with a fixture such as evals/files/user-page.tsx, where a Next 15 page types `params` as a plain object and a client component creates a promise for `use()` during render. Assert that `params` is awaited as a Promise and that the promise is created in the Server Component and not in client render."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 16,
+          "evidence": "Migration target first: when the task is upgrading an app to React 19, the target is 19 regardless of what is installed. On a clean git tree:",
+          "fix": "Add a fallback for a dirty working tree, for example: 'If the tree is dirty, ask the user to commit or stash first, or run the codemods on a new branch, so that the `git diff` review in step 3 shows only codemod changes.' The current branch gives no instruction when the precondition fails."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/examples/generic-components.md",
+          "line": 68,
+          "evidence": "The syntax-trap rows teach standard TypeScript syntax: \"<T,>(x: T) => x\" to disambiguate a generic arrow in TSX and \"<List<Row> items={rows} render={(r) => r.id} />\" to supply an explicit type argument. These add little beyond the model's existing knowledge, unlike the surrounding version-specific inference and ref-erasure guidance.",
+          "fix": "Remove the generic-arrow syntax and explicit-JSX-type-argument rows. Retain the forwardRef/memo inference trap, version-specific narrowing behavior, and the key/value correlation procedures."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

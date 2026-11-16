@@ -1,0 +1,50 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 41,
+      "evidence": "The plan's exit gates require 'every critical requirement has an executed, passing case; no open P0', but section 6 says 'A P0 failure blocks release until the authorized owner accepts the risk in writing'. references/regression_testing.md explicitly keeps accepted failures reported as failing. The authorized-waiver branch therefore permits release while still failing the plan's mandatory exit gates.",
+      "fix": "Make the exit gates and release-decision branch use one exception rule: every critical requirement must have a passing executed case and every P0 must be resolved, except specific failures covered by a valid written acceptance from the authorized release-risk owner. Require the acceptance record fields from references/regression_testing.md and retain the original failing status and evidence."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 75,
+      "evidence": "The worked example gives only the requirement 'a coupon applies once per account', then prescribes that the second checkout 'shows the stated refusal and charges full price'. The requirement establishes neither a refusal message nor whether checkout proceeds at full price; an implementation that blocks checkout until the coupon is removed could satisfy the requirement but fail this oracle.",
+      "fix": "Make the example's oracle assert that a second discounted redemption cannot occur. Specify the refusal and subsequent checkout behavior only when requirements establish them; otherwise record those details as Unknown under Open Questions. Assert a full-price charge only in a separately specified flow where the user confirms the undiscounted purchase."
+    }
+  ]
+}

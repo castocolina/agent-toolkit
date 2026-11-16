@@ -542,6 +542,19 @@ test_render_embeds_diagram_in_real_png() {
   check marker "$(grep -a -c zTXtmxGraphModel "$root/flow.drawio.png" || true)" 1
 }
 
+test_related_fetch_narrow_refspec() {
+  init_repo
+  local s=$STUB; write_gh_stub "$s"; mkdir -p "$s/fixtures"
+  "$REAL_GIT" -C "$REPO" config remote.origin.fetch '+refs/heads/main:refs/remotes/origin/main'
+  "$REAL_GIT" -C "$REPO" update-ref -d refs/remotes/origin/feature
+  local x
+  for x in "$SHA_A" "$SHA_B" "$SHA_C"; do : > "$s/fixtures/repos__acme__widgets__commits__${x}__pulls"; done
+  # shellcheck disable=SC2046
+  run_in "$REPO" $(gh_env "$s") -- related main feature
+  check exit "$CODE" 0
+  check commits "$(wc -l < "$s/gh.log" | tr -d ' ')" 3
+}
+
 test_stdout_clean_on_http_errors() {
   init_repo
   local s=$STUB; write_gh_stub "$s"

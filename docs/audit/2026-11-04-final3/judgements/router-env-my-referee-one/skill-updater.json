@@ -1,0 +1,68 @@
+{
+  "skill": "skill-updater",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 27,
+      "evidence": "\"`stale: false` is `current`.\" The referenced audit.py computes stale solely as source_updated > ours_updated. An unrelated local SKILL.md commit newer than an unreviewed upstream change therefore takes this branch and records current without inspecting that change, even when last_upstream_sha identifies an older reviewed revision.",
+      "fix": "Treat the timestamp result as a preliminary signal, not proof of currency. Compare the applicable current upstream revision with last_upstream_sha and inspect unreviewed changes even when stale is false; when no verified review base exists, compare the current source against the artifact before recording current."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 38,
+      "evidence": "\"A row that already has `new_path` gets `--new-path <that value>` on every call unless the user corrected the source.\" If an already-moved path moves again, step 5 confirms a replacement candidate, but this later instruction requires passing the previous new_path because source has not changed.",
+      "fix": "Preserve an existing new_path only when the review has not confirmed a replacement. Explicitly require a newly confirmed candidate to replace the previous new_path on a path-moved call, while leaving source unchanged pending the user's decision."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 22,
+      "evidence": "For an invalid entry, the procedure says \"give no `track` command for it\", while step 7 still requests one call per other source row. audit.py track updates last_reviewed and reviewed_for_model across every row of the artifact and validates rewritten siblings, so tracking a valid source can fail because another source row is malformed.",
+      "fix": "Before issuing any track call, check all registry rows belonging to the artifact. If any source row is malformed, defer tracking the entire artifact, propose the correction in updates.md, and rerun the review after the registry is corrected."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 39,
+      "evidence": "\"Judge the artifact with `skill-judge` when its content changed; the commit must touch `SKILL.md` or `references/` (step 3).\" The skill also supports commands/<name>.md and agents/<name>.md, whose legitimate content changes do not touch either skill-specific path.",
+      "fix": "Scope the SKILL.md/references history requirement to upstream-tracked skills. For changed commands and agents, judge the corresponding commands/<name>.md or agents/<name>.md and allow the commit to touch that artifact without requiring unrelated skill-file changes."
+    }
+  ]
+}

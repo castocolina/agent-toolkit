@@ -1,0 +1,77 @@
+{
+  "skill": "ui-ux-designer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/ui-ux-designer.md",
+      "line": 54,
+      "evidence": "Find flow breaks (task flow, navigation, onboarding) by counting steps to the primary goal, noting dead ends and back-tracking, and checking the next action is visible at each step.",
+      "fix": "Cut this to a pointer to the non-obvious part only (for example: 'a flow break is a fail row, ranked under accessibility blockers'). The model already knows how to do a generic step count and dead-end walk."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/ui-ux-designer.md",
+      "line": 30,
+      "evidence": "Screen (run on each screen when several are given): walk the primary task, then apply the skill and its review table.",
+      "fix": "Move the flow-break method from Output item 3 (line 54) into step 2, so the screen branch says how to walk the task before the skill's table is applied. Add one decision prompt, for example 'before judging, ask which step a first-time user abandons and why'. Right now the procedure is in the output section."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/ui-ux-designer.md",
+      "line": 35,
+      "evidence": "## Gotchas by input lists only 'Code' and 'URL or mockup'; screenshot limits sit in a checklist parenthetical on line 33 ('screenshots hide touch-target scale, hover, focus, error, loading')",
+      "fix": "Add a 'Screenshot' gotcha bullet: the device pixel ratio is unknown, so px sizes and tap targets cannot be measured from it, and it shows one state and one theme only. Remove the duplicate parenthetical from the step-5 checklist."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "agents/ui-ux-designer.md",
+      "line": 58,
+      "evidence": "Medium = a fail that slows the task or affects one state; Low = polish.",
+      "fix": "Give Medium a testable boundary, for example 'a fail row that is not an accessibility blocker and does not stop the primary task'. Two judges would then assign the same priority to the same row."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/ui-ux-designer.md",
+      "line": 50,
+      "evidence": "'Overrides only the skill's outer envelope; keep its header and fixed row order.' But line 53 says 'append ` \u2014 priority: <level>` to each evidence cell'. The preloaded skill fixes the evidence cell as 'location \u2014 fact' and also says 'no second table, list or per-defect breakdown'.",
+      "fix": "Say exactly which skill output rules the agent overrides: several tables (one per screen), the priority suffix inside evidence cells, and the list after the tables. For example: 'Overrides the skill's one-table, no-list and evidence-cell rules as follows: ...'. Then the agent does not have to pick between two contradicting instructions."
+    }
+  ]
+}

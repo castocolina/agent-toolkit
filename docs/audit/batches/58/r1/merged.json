@@ -1,0 +1,126 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "mermaid-diagram-specialist",
+      "percent": 77.2,
+      "grade": "C",
+      "judges": {
+        "router-env-my-referee-three": 64.8,
+        "router-env-my-referee-one": 89.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": true,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 17,
+          "evidence": "\"The preloaded `mermaid-diagrams` skill owns every rule ... Follow it; this file adds only the role.\" The body is mostly role and output reminders. It adds little expert knowledge of its own beyond the rule against inventing edges or cardinality.",
+          "fix": "Add 2-4 lines of delegate-specific expert judgment that the skill does not cover, for example when to split one large diagram into several and when to return a repair as a minimal diff instead of a rewrite. Keep the rest delegated to the skill."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 21,
+          "evidence": "\"In: new diagrams, repairs of diagrams that fail to render or read wrongly, and restyling of a given diagram\". The body names three task kinds but gives no way to think about any of them, for example what to check first in a repair (parse error or wrong semantics).",
+          "fix": "Add one line per task kind with the first decision: repair: reproduce the parse error, or name the semantic mismatch, before you edit; restyle: keep every node and edge unchanged and change only the styling; new: pick the type from the supplied material using the skill's type-choice rules."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 22,
+          "evidence": "\"any edge or cardinality the supplied material does not show (state the assumption instead)\". This is the only anti-pattern in the body. There is no NEVER list with reasons for delegate-specific failures.",
+          "fix": "Add a short NEVER list with reasons, for example: NEVER silently drop nodes when restyling, because the caller cannot see the diff; NEVER report a diagram as validated without running a renderer or parser, because the caller will paste it unchecked; NEVER change the diagram type during a repair unless you say why."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 4,
+          "evidence": "description: \"Mermaid diagram specialist for creating flowcharts, sequence diagrams, ERDs, and architecture visualizations\". It has WHAT and some keywords but no WHEN and no boundary. The WHEN text sits in the unknown `usage` field, which the host ignores.",
+          "fix": "description: Use to delegate creating, repairing or restyling Mermaid diagrams (flowchart, sequence, ERD/entity-relationship, class, state, C4, architecture, gantt) in a separate context when the user wants to visualize a workflow, process, data model, system design or architecture for Markdown docs, even without the word Mermaid. Returns fenced mermaid blocks with the chosen type, validation status and assumptions. Not for prose-only explanations or non-Mermaid formats such as PlantUML, Graphviz or draw.io."
+        },
+        {
+          "id": "D4-2",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 3,
+          "evidence": "Unknown top-level fields `category`, `usage`, `input` and `output` (lines 3, 7, 10 and 12) are not in the documented agent field list, so the host ignores them silently.",
+          "fix": "Frontmatter: keep only `name: mermaid-diagram-specialist`, the replacement `description` from D4-1 and `skills: [mermaid-diagrams]`. Fold the trigger text from `usage` into `description`, because routing reads only that field."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 28,
+          "evidence": "\"Say how it was validated, or that it was not and which constructs are unverified.\" Validating and not validating are offered as equal options, with no default validator.",
+          "fix": "Make validation the default: validate with the method the preloaded skill prescribes, and report the result as unverified only when that tool is unavailable. Name the unverified constructs in that case."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 24,
+          "evidence": "The `## Output contract` section states the output format, but no sentence states when the task is done.",
+          "fix": "Add a done-sentence, for example: \"The task is done when every requested diagram is returned in its own fenced mermaid block, each block has been validated or explicitly marked unverified, and the assumption list (plus the change list for a repair) is complete.\""
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 19,
+          "evidence": "The body has a Scope list and an Output contract but no ordered action list for a multi-step delegate task (read input, choose type, draft, validate, report). It also does not say what to do when the supplied material is too thin to draw anything: return assumptions, or stop and ask.",
+          "fix": "Add an ordered list: 1. Identify the task kind (new, repair or restyle) and the supplied material. 2. If the material cannot support a diagram, return the specific missing facts and stop. 3. Choose the type using the preloaded skill. 4. Draft. 5. Validate; on failure, fix and re-validate. 6. Report as the Output contract requires."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 4,
+          "evidence": "The description says \"Mermaid diagram specialist for creating flowcharts, sequence diagrams, ERDs, and architecture visualizations\". Delegation scenarios appear under the ignored \"usage\" field, while repair and restyling scenarios and scope boundaries appear only in the body.",
+          "fix": "Create, repair, and restyle Mermaid diagrams in Markdown or .mmd files: flowcharts, sequences, ERDs, class and state diagrams, and C4 or infrastructure views. Use when asked to visualize a process, schema, call chain, or architecture, or fix a Mermaid diagram that fails to render or communicates the wrong relationships, even without naming Mermaid. Not for prose-only explanations or non-Mermaid formats."
+        },
+        {
+          "id": "D4-2",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 3,
+          "evidence": "\"category: tech\", \"usage:\", \"input:\", and \"output:\" are unsupported plugin-agent frontmatter fields; Claude Code silently ignores them.",
+          "fix": "Replace the frontmatter with:\n---\nname: mermaid-diagram-specialist\ndescription: >-\n  Create, repair, and restyle Mermaid diagrams in Markdown or .mmd files: flowcharts, sequences, ERDs, class and state diagrams, and C4 or infrastructure views. Use when asked to visualize a process, schema, call chain, or architecture, or fix a Mermaid diagram that fails to render or communicates the wrong relationships, even without naming Mermaid. Not for prose-only explanations or non-Mermaid formats.\nskills: [mermaid-diagrams]\n---\nThis leaves only supported agent fields and places routing guidance in the description the host actually reads. Keep any additional input guidance in the body."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "agents/mermaid-diagram-specialist.md",
+          "line": 25,
+          "evidence": "\"## Output contract\" specifies fenced Mermaid source, a type rationale, validation status, assumptions, and repair explanations, but the body has no sentence stating when the task is done.",
+          "fix": "Add: \"The task is done when every requested diagram has been produced within scope, validation has passed or its limits and unverified constructs have been reported, and the Mermaid source, type rationale, assumptions, and any repair explanation have been returned.\""
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

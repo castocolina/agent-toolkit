@@ -1,0 +1,59 @@
+{
+  "skill": "command-creator",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 85,
+      "evidence": "Gotchas spend about seven lines teaching POSIX single-quote encoding: \"wrap it in `'...'` and write each `'` inside it as `'\\''`. So `it's` becomes `'it'\\''s'`...\"",
+      "fix": "Keep the NEVER rule and step 3 (where the encoded value goes: operand after `--`, option value attached to its option). Cut step 2 to one line, such as \"single-quote it, with `'` written as `'\\''`\": the model already knows this shell idiom and only needs the reminder."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/command-creator/evals/evals.json",
+      "line": null,
+      "evidence": "Six evals cover the simple, iterative, side-effect, safety and collision paths. None covers the Plan, approve, execute pattern or the approved-update path (option 2 of Workflow step 2).",
+      "fix": "Add one eval that asks for a plan-then-implement command. Assert that nothing is written before an explicit approval signal, that the plan is saved to a named path, and that there is no `context: fork` on the approval step. Add another eval where the user approves updating the existing `.claude/commands/release.md`. Assert that the file is read first, its frontmatter is kept and a diff is shown."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 123,
+      "evidence": "Worked example step 5: \"It succeeds with no output: the tag is not on the remote. Show the push error and ask before one retry.\" Nothing says what happens if that one approved retry also fails or times out.",
+      "fix": "Add: \"If the approved retry fails or times out, run the same `git ls-remote` check once more and apply these branches again, with no further retry: report the final state and the local tag's recovery options.\""
+    }
+  ]
+}

@@ -1,572 +1,72 @@
-# Event Handler TypeScript Patterns
+# Event Handlers
 
-Proper event typing ensures type-safe access to event properties and target elements.
+Value extraction and React-vs-DOM event behavior. Snippets type-check with `@types/react` 19 and TypeScript 5.6 `lib.dom`.
 
-## Mouse Events
+## Checklist
 
-```typescript
-// Click events
-function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
-  event.preventDefault();
-  event.stopPropagation();
+- Read from `e.currentTarget`: `valueAsNumber` (is `NaN` when empty or partial, so check `Number.isNaN`), `checked` (not `value`, which is the static `"on"`), `files?.[0]` (`FileList | null`), `Array.from(selectedOptions, (o) => o.value)` for `<select multiple>`.
+- `FormData.get` returns `string | File | null`: narrow with `typeof v === 'string'`.
+- Handler props: `ChangeEventHandler<HTMLInputElement>` or `ComponentProps<'input'>['onBlur']`.
+- In files that also add native listeners, import React's events under aliases (`type KeyboardEvent as ReactKeyboardEvent`); they shadow the DOM globals with the same names.
 
-  // Target element typed correctly
-  event.currentTarget.disabled = true;
-  event.currentTarget.textContent = 'Clicked';
+## Which button submitted
 
-  // Mouse position
-  console.log(event.clientX, event.clientY);
-  console.log(event.pageX, event.pageY);
+With several submit buttons, the clicked one is on the native event, which React types as a plain `Event`:
 
-  // Mouse buttons
-  console.log(event.button); // 0 = left, 1 = middle, 2 = right
-  console.log(event.buttons); // Bitmask of pressed buttons
-
-  // Modifier keys
-  if (event.ctrlKey || event.metaKey) {
-    console.log('Ctrl/Cmd + Click');
-  }
-  if (event.shiftKey) {
-    console.log('Shift + Click');
-  }
-  if (event.altKey) {
-    console.log('Alt + Click');
-  }
-}
-
-// Mouse movement
-function handleMouseMove(event: React.MouseEvent<HTMLDivElement>) {
-  const rect = event.currentTarget.getBoundingClientRect();
-  const x = event.clientX - rect.left;
-  const y = event.clientY - rect.top;
-  console.log(`Position in element: ${x}, ${y}`);
-}
-
-// Hover events
-function handleMouseEnter(event: React.MouseEvent<HTMLDivElement>) {
-  event.currentTarget.style.backgroundColor = 'lightblue';
-}
-
-function handleMouseLeave(event: React.MouseEvent<HTMLDivElement>) {
-  event.currentTarget.style.backgroundColor = '';
-}
-
-// Double click
-function handleDoubleClick(event: React.MouseEvent<HTMLElement>) {
-  console.log('Double clicked');
-}
-```
-
-## Form Events
-
-```typescript
-// Form submission
-function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault();
-
-  const form = event.currentTarget;
-  const formData = new FormData(form);
-
-  const data = {
-    name: formData.get('name') as string,
-    email: formData.get('email') as string,
-  };
-
-  console.log(data);
-}
-
-// Input change
-function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-  const target = event.target;
-
-  // For text inputs
-  if (target.type === 'text' || target.type === 'email') {
-    console.log(target.value); // string
-  }
-
-  // For checkboxes
-  if (target.type === 'checkbox') {
-    console.log(target.checked); // boolean
-  }
-
-  // For radio buttons
-  if (target.type === 'radio') {
-    console.log(target.value, target.checked);
-  }
-
-  // For number inputs
-  if (target.type === 'number') {
-    console.log(target.valueAsNumber); // number
-  }
-
-  // For file inputs
-  if (target.type === 'file') {
-    const files = target.files; // FileList | null
-    if (files && files.length > 0) {
-      console.log(files[0].name);
-    }
-  }
-}
-
-// Textarea change
-function handleTextareaChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
-  console.log(event.target.value);
-  console.log(event.target.selectionStart); // Cursor position
-}
-
-// Select change
-function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
-  const value = event.target.value;
-  const selectedIndex = event.target.selectedIndex;
-  const selectedOption = event.target.options[selectedIndex];
-  console.log(value, selectedOption.text);
-}
-
-// Input events (fires on every keystroke)
-function handleInput(event: React.FormEvent<HTMLInputElement>) {
-  console.log(event.currentTarget.value);
-}
-
-// Reset event
-function handleReset(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault();
-  console.log('Form reset');
-}
-```
-
-## Keyboard Events
-
-```typescript
-function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-  // Key identification
-  console.log(event.key); // 'Enter', 'Escape', 'a', etc.
-  console.log(event.code); // 'Enter', 'Escape', 'KeyA', etc.
-
-  // Common patterns
-  if (event.key === 'Enter') {
-    event.preventDefault();
-    console.log('Enter pressed');
-  }
-
-  if (event.key === 'Escape') {
-    event.currentTarget.blur();
-  }
-
-  // Arrow keys
-  if (event.key === 'ArrowUp') {
-    event.preventDefault();
-    // Navigate up
-  }
-
-  // Modifier keys
-  if (event.ctrlKey && event.key === 's') {
-    event.preventDefault();
-    console.log('Ctrl+S - Save');
-  }
-
-  if (event.metaKey && event.key === 'k') {
-    event.preventDefault();
-    console.log('Cmd+K - Search');
-  }
-
-  // Check multiple modifiers
-  if (event.ctrlKey && event.shiftKey && event.key === 'P') {
-    event.preventDefault();
-    console.log('Ctrl+Shift+P - Command palette');
-  }
-
-  // Key combinations
-  if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
-    console.log('Submit with Ctrl/Cmd+Enter');
-  }
-}
-
-function handleKeyUp(event: React.KeyboardEvent<HTMLInputElement>) {
-  console.log('Key released:', event.key);
-}
-
-function handleKeyPress(event: React.KeyboardEvent<HTMLInputElement>) {
-  // Deprecated - use keyDown instead
-  console.log('Key pressed:', event.key);
-}
-```
-
-## Focus Events
-
-```typescript
-function handleFocus(event: React.FocusEvent<HTMLInputElement>) {
-  // Select all text on focus
-  event.target.select();
-
-  // Add visual indicator
-  event.currentTarget.classList.add('focused');
-}
-
-function handleBlur(event: React.FocusEvent<HTMLInputElement>) {
-  // Validate on blur
-  const value = event.target.value;
-  if (value === '') {
-    event.currentTarget.classList.add('error');
-  }
-
-  // Remove visual indicator
-  event.currentTarget.classList.remove('focused');
-}
-
-// Focus within
-function handleFocusWithin(event: React.FocusEvent<HTMLDivElement>) {
-  // Related target - element receiving focus
-  const relatedTarget = event.relatedTarget as HTMLElement | null;
-  console.log('Focus moved from:', relatedTarget);
-}
-```
-
-## Drag and Drop Events
-
-```typescript
-function handleDragStart(event: React.DragEvent<HTMLDivElement>) {
-  event.dataTransfer.effectAllowed = 'move';
-  event.dataTransfer.setData('text/plain', event.currentTarget.id);
-
-  // Custom drag image
-  const dragImage = document.createElement('div');
-  dragImage.textContent = 'Dragging...';
-  event.dataTransfer.setDragImage(dragImage, 0, 0);
-}
-
-function handleDragOver(event: React.DragEvent<HTMLDivElement>) {
-  event.preventDefault();
-  event.dataTransfer.dropEffect = 'move';
-  event.currentTarget.classList.add('drag-over');
-}
-
-function handleDragLeave(event: React.DragEvent<HTMLDivElement>) {
-  event.currentTarget.classList.remove('drag-over');
-}
-
-function handleDrop(event: React.DragEvent<HTMLDivElement>) {
-  event.preventDefault();
-  event.currentTarget.classList.remove('drag-over');
-
-  const data = event.dataTransfer.getData('text/plain');
-  console.log('Dropped:', data);
-
-  // Handle files
-  const files = event.dataTransfer.files;
-  if (files.length > 0) {
-    Array.from(files).forEach((file) => {
-      console.log(file.name, file.type, file.size);
-    });
-  }
-}
-
-function handleDragEnd(event: React.DragEvent<HTMLDivElement>) {
-  console.log('Drag ended');
-}
-```
-
-## Clipboard Events
-
-```typescript
-function handleCopy(event: React.ClipboardEvent<HTMLDivElement>) {
-  event.preventDefault();
-
-  // Custom copy behavior
-  const selection = window.getSelection();
-  if (selection) {
-    const text = `Copied from app: ${selection.toString()}`;
-    event.clipboardData.setData('text/plain', text);
-  }
-}
-
-function handleCut(event: React.ClipboardEvent<HTMLInputElement>) {
-  console.log('Cut:', event.currentTarget.value);
-}
-
-function handlePaste(event: React.ClipboardEvent<HTMLInputElement>) {
-  event.preventDefault();
-
-  const pastedText = event.clipboardData.getData('text/plain');
-  console.log('Pasted:', pastedText);
-
-  // Validate pasted content
-  const sanitized = pastedText.replace(/[^a-zA-Z0-9]/g, '');
-  event.currentTarget.value = sanitized;
-}
-```
-
-## Composition Events (IME)
-
-```typescript
-// For international input methods (Chinese, Japanese, etc.)
-function handleCompositionStart(event: React.CompositionEvent<HTMLInputElement>) {
-  console.log('Composition started');
-}
-
-function handleCompositionUpdate(event: React.CompositionEvent<HTMLInputElement>) {
-  console.log('Composing:', event.data);
-}
-
-function handleCompositionEnd(event: React.CompositionEvent<HTMLInputElement>) {
-  console.log('Composition ended:', event.data);
-}
-```
-
-## Touch Events
-
-```typescript
-function handleTouchStart(event: React.TouchEvent<HTMLDivElement>) {
-  const touch = event.touches[0];
-  console.log('Touch start:', touch.clientX, touch.clientY);
-}
-
-function handleTouchMove(event: React.TouchEvent<HTMLDivElement>) {
-  event.preventDefault(); // Prevent scrolling
-
-  const touch = event.touches[0];
-  console.log('Touch move:', touch.clientX, touch.clientY);
-}
-
-function handleTouchEnd(event: React.TouchEvent<HTMLDivElement>) {
-  console.log('Touch ended');
-}
-
-// Multi-touch
-function handleMultiTouch(event: React.TouchEvent<HTMLDivElement>) {
-  if (event.touches.length === 2) {
-    const [touch1, touch2] = event.touches;
-
-    const distance = Math.hypot(
-      touch2.clientX - touch1.clientX,
-      touch2.clientY - touch1.clientY
-    );
-
-    console.log('Pinch distance:', distance);
-  }
-}
-```
-
-## Wheel Events
-
-```typescript
-function handleWheel(event: React.WheelEvent<HTMLDivElement>) {
-  // Prevent default scroll
-  event.preventDefault();
-
-  // Scroll delta
-  console.log('Delta X:', event.deltaX);
-  console.log('Delta Y:', event.deltaY);
-  console.log('Delta Z:', event.deltaZ);
-
-  // Delta mode (0 = pixels, 1 = lines, 2 = pages)
-  console.log('Delta mode:', event.deltaMode);
-
-  // Zoom with Ctrl+Wheel
-  if (event.ctrlKey) {
-    const zoomDelta = event.deltaY > 0 ? -0.1 : 0.1;
-    console.log('Zoom:', zoomDelta);
-  }
-}
-```
-
-## Generic Event Handlers
-
-Reusable handlers with proper typing.
-
-```typescript
-// Generic change handler
-type ValueElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-
-function createChangeHandler<T extends ValueElement>(
-  callback: (value: string) => void
-): React.ChangeEventHandler<T> {
-  return (event) => callback(event.currentTarget.value);
-}
-
-// Usage
-const handleNameChange = createChangeHandler<HTMLInputElement>((value) => {
-  setName(value);
-});
-
-const handleBioChange = createChangeHandler<HTMLTextAreaElement>((value) => {
-  setBio(value);
-});
-
-// Generic click handler with target validation
-function createClickHandler<T extends HTMLElement>(
-  selector: string,
-  callback: (element: T) => void
-) {
-  return (event: React.MouseEvent<HTMLElement>) => {
-    const target = event.target as HTMLElement;
-    const match = target.closest(selector);
-
-    if (match) {
-      callback(match as T);
-    }
-  };
-}
-
-// Usage
-const handleItemClick = createClickHandler<HTMLLIElement>('li[data-id]', (item) => {
-  const id = item.dataset.id;
-  console.log('Clicked item:', id);
-});
-```
-
-## Event Handler Type Aliases
-
-```typescript
-// Create reusable type aliases
-type InputChangeHandler = React.ChangeEventHandler<HTMLInputElement>;
-type ButtonClickHandler = React.MouseEventHandler<HTMLButtonElement>;
-type FormSubmitHandler = React.FormEventHandler<HTMLFormElement>;
-
-// Usage
-const handleChange: InputChangeHandler = (event) => {
-  console.log(event.target.value);
-};
-
-const handleClick: ButtonClickHandler = (event) => {
-  event.currentTarget.disabled = true;
-};
-
-const handleSubmit: FormSubmitHandler = (event) => {
-  event.preventDefault();
-};
-
-// Generic handler type
-type EventHandler<E extends HTMLElement, Evt extends React.SyntheticEvent> = (
-  event: Evt & { currentTarget: E }
-) => void;
-
-// Usage
-const handleInput: EventHandler<HTMLInputElement, React.ChangeEvent<HTMLInputElement>> = (
-  event
-) => {
-  console.log(event.currentTarget.value);
+```tsx
+const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  const submitter = (e.nativeEvent as SubmitEvent).submitter; // HTMLElement | null
+  const data = new FormData(e.currentTarget, submitter);      // includes the clicked button's name=value
+  return data.get('intent');                                   // the clicked button's value
 };
 ```
 
-## Delegated Event Handlers
+## Where React differs from the DOM
 
-Type-safe event delegation.
+| Behavior | Consequence |
+|---|---|
+| `onChange` fires on every keystroke (the DOM `input` event), not on blur | do not expect DOM `change` timing; use `onBlur` for commit-on-leave |
+| Since React 17, listeners attach to the root container, not `document` | `e.stopPropagation()` in a React handler now also stops native listeners on `document` |
+| `onScroll` does not bubble since React 17 | attach it to the element that scrolls |
+| `wheel`, `touchstart` and `touchmove` are registered as passive | `e.preventDefault()` in `onWheel` is ignored: add a native listener with `{ passive: false }` in an Effect |
+| `onFocus` / `onBlur` bubble (they map to `focusin` / `focusout`) | a container's `onBlur` fires when focus moves between its children; check `e.currentTarget.contains(e.relatedTarget)` |
 
-```typescript
-function ListContainer() {
-  const handleListClick = (event: React.MouseEvent<HTMLUListElement>) => {
-    const target = event.target as HTMLElement;
+## Enter to submit and IME composition
 
-    // Find clicked list item
-    const listItem = target.closest('li');
-    if (!listItem) return;
+An `<input>` inside a form already submits on Enter natively, and browsers generally do not submit on the Enter that confirms an IME composition. Do not add a `keydown` handler for that case: a handler calling `requestSubmit()` on top of the native submission submits twice.
 
-    // Type guard for data attributes
-    const itemId = listItem.getAttribute('data-id');
-    if (itemId) {
-      console.log('Clicked item:', itemId);
-    }
+Add one only for custom Enter behavior, such as Enter-to-send in a `<textarea>` (which has no native submission). Return early for every other key and during composition, and call `preventDefault()` only for the Enter you handle:
 
-    // Handle button within list item
-    if (target.matches('button.delete')) {
-      event.stopPropagation();
-      console.log('Delete clicked');
-    }
-  };
-
-  return (
-    <ul onClick={handleListClick}>
-      <li data-id="1">
-        Item 1<button className="delete">Delete</button>
-      </li>
-      <li data-id="2">
-        Item 2<button className="delete">Delete</button>
-      </li>
-    </ul>
-  );
-}
-```
-
-## Native vs Synthetic Events
-
-```typescript
-function Component() {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-
-    // Native event listener
-    const handleNativeClick = (event: MouseEvent) => {
-      console.log('Native click:', event.target);
-    };
-
-    element.addEventListener('click', handleNativeClick);
-
-    return () => {
-      element.removeEventListener('click', handleNativeClick);
-    };
-  }, []);
-
-  // React synthetic event
-  const handleReactClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    console.log('React click:', event.target);
-
-    // Access native event
-    const nativeEvent = event.nativeEvent;
-    console.log('Native event:', nativeEvent);
-  };
-
-  return <div ref={ref} onClick={handleReactClick}>Click me</div>;
-}
-```
-
-## Custom Events
-
-```typescript
-// Define custom event type
-type CustomEventMap = {
-  'user:login': CustomEvent<{ userId: string }>;
-  'user:logout': CustomEvent;
+```tsx
+const onKeyDown = (e: ReactKeyboardEvent<HTMLTextAreaElement>) => {
+  const composing = e.nativeEvent.isComposing || e.nativeEvent.keyCode === 229;  // Safari can report isComposing=false on the IME-confirm Enter
+  if (e.key !== 'Enter' || e.shiftKey || composing) return;                      // Shift+Enter: newline; composing: IME confirm
+  e.preventDefault();                                                       // no newline for the handled Enter
+  e.currentTarget.form?.requestSubmit();                                    // runs validation and onSubmit once
 };
+```
 
-// Typed custom event dispatcher
-function dispatchCustomEvent<K extends keyof CustomEventMap>(
-  element: HTMLElement,
-  type: K,
-  detail?: CustomEventMap[K]['detail']
-) {
-  const event = new CustomEvent(type, { detail, bubbles: true });
-  element.dispatchEvent(event);
+## Custom DOM events
+
+Augmenting `WindowEventMap` types listeners only. `dispatchEvent` accepts any `Event`, so `new CustomEvent('cart:updated', { detail: { count: 'three' } })` still compiles. Route every producer through one typed helper:
+
+```ts
+declare global {
+  interface WindowEventMap { 'cart:updated': CustomEvent<{ count: number }> }
 }
 
-// Component using custom events
-function UserButton() {
-  const ref = useRef<HTMLButtonElement>(null);
+export function dispatchCartUpdated(detail: WindowEventMap['cart:updated']['detail']) {
+  window.dispatchEvent(new CustomEvent('cart:updated', { detail }));
+}
 
-  const handleLogin = () => {
-    if (ref.current) {
-      dispatchCustomEvent(ref.current, 'user:login', { userId: '123' });
-    }
-  };
+window.addEventListener('cart:updated', (e) => console.log(e.detail.count)); // e: CustomEvent<{ count: number }>
 
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-
-    const handleCustomLogin = (event: Event) => {
-      const customEvent = event as CustomEvent<{ userId: string }>;
-      console.log('User logged in:', customEvent.detail.userId);
-    };
-
-    element.addEventListener('user:login', handleCustomLogin);
-
-    return () => {
-      element.removeEventListener('user:login', handleCustomLogin);
-    };
-  }, []);
-
-  return <button ref={ref} onClick={handleLogin}>Login</button>;
+// cart.type-test.ts (compile-only, never called)
+export function cartContract() {
+  // @ts-expect-error count must be a number
+  dispatchCartUpdated({ count: 'three' });
 }
 ```
+
+For an element, augment `HTMLElementEventMap` instead. React's JSX props do not know custom events; subscribe in an Effect with a ref.

@@ -1,0 +1,50 @@
+{
+  "skill": "pr-diagrams",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+      "line": 208,
+      "evidence": "`mv -f \"$tmp\" \"$dest\"` follows a destination check that rejects only symlinks. If the expected output path, such as flow.drawio.png, is an existing directory, mv moves the temporary PNG inside that directory and succeeds. The manifest then identifies the directory itself as the PNG to attach.",
+      "fix": "Preflight destination paths before publishing any output and reject existing directories or other non-regular destinations with a clear error and empty stdout. Add a regression test with an existing flow.drawio.png directory that verifies a nonzero exit, no manifest, and no temporary PNG deposited inside it."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+      "line": 222,
+      "evidence": "`*) die \"usage: pr-diagrams.sh repo|related|reviewers|render ...\" ;;` handles --help as an error. The script has substantial runnable tests and structured data output, but no successful --help interface documenting its subcommands and flags.",
+      "fix": "Add -h/--help handling that exits successfully and documents subcommands, flags, prerequisites, output formats, and exit behavior. Extend tests/skills/pr-diagrams/test-pr-diagrams.sh to verify the help exit status and advertised command signatures."
+    }
+  ]
+}

@@ -1,653 +1,135 @@
-# React 19 TypeScript Patterns
+# React 19 Patterns
 
-React 19 introduces breaking changes and new APIs requiring updated TypeScript patterns.
+Code for the React 19 rules in SKILL.md (the rules themselves live there). All snippets type-check with `@types/react` 19 under `strict`.
 
-## ref as Prop (No More forwardRef)
+## Refs: React 19 prop vs React 18-compatible `forwardRef`
 
-React 19 allows ref as regular prop — forwardRef deprecated but still works.
+```tsx
+import { forwardRef, type ComponentPropsWithoutRef, type ForwardedRef, type ReactElement, type Ref } from 'react';
 
-```typescript
-// ✅ React 19 - ref as prop
-type InputProps = {
-  ref?: React.Ref<HTMLInputElement>;
-  label: string;
-} & React.ComponentPropsWithoutRef<'input'>;
-
-export function Input({ ref, label, ...props }: InputProps) {
-  return (
-    <div>
-      <label>{label}</label>
-      <input ref={ref} {...props} />
-    </div>
-  );
+// React 19-only app: ref is an ordinary prop.
+type ButtonProps = { variant: 'primary' | 'secondary'; ref?: Ref<HTMLButtonElement> } & ComponentPropsWithoutRef<'button'>;
+export function Button({ variant, ref, ...rest }: ButtonProps) {
+  return <button ref={ref} data-variant={variant} {...rest} />;
 }
 
-// Usage
-function Form() {
-  const inputRef = useRef<HTMLInputElement>(null);
+// Peers allow React 18: forwardRef (still valid in 19). A named function keeps the DevTools name.
+type LibButtonProps = { variant: 'primary' | 'secondary' } & ComponentPropsWithoutRef<'button'>;
+export const LibButton = forwardRef<HTMLButtonElement, LibButtonProps>(function LibButton({ variant, ...rest }, ref) {
+  return <button ref={ref} data-variant={variant} {...rest} />;
+});
 
-  return (
-    <form>
-      <Input ref={inputRef} label="Name" />
-      <button onClick={() => inputRef.current?.focus()}>Focus</button>
-    </form>
-  );
+// forwardRef erases generics: re-assert the generic call signature on the result.
+type ListProps<T> = { items: T[]; label: (item: T) => string };
+function ListInner<T>({ items, label }: ListProps<T>, ref: ForwardedRef<HTMLUListElement>) {
+  return <ul ref={ref}>{items.map((i) => <li key={label(i)}>{label(i)}</li>)}</ul>;
 }
+export const List = forwardRef(ListInner) as <T>(props: ListProps<T> & { ref?: Ref<HTMLUListElement> }) => ReactElement;
 ```
 
-```typescript
-// ❌ Old pattern (still works, but unnecessary)
-import { forwardRef } from 'react';
+Without the cast, `<List items={[1, 2]} label={(n) => ...} />` infers `n: unknown`. `memo()` erases generics the same way and takes the same cast.
 
-type InputProps = {
-  label: string;
-} & React.ComponentPropsWithoutRef<'input'>;
+## `useActionState`
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, ...props }, ref) => {
-    return (
-      <div>
-        <label>{label}</label>
-        <input ref={ref} {...props} />
-      </div>
-    );
-  }
-);
+```tsx
+type SaveState = { status: 'idle' | 'saved' | 'error'; errors?: Partial<Record<'name', string[]>> };
+declare function saveProfile(prev: SaveState, formData: FormData): Promise<SaveState>; // annotated return, 'use server' module
 
-Input.displayName = 'Input';
+const [state, formAction, isPending] = useActionState(saveProfile, { status: 'idle' } satisfies SaveState);
 ```
 
-### Generic Components with ref
+Migration from `ReactDOM.useFormState`: same `(state, payload)` action signature; the import moves to `react` and the tuple gains `isPending`. When the action is a Server Action, also apply the authorization rules in SKILL.md (code in the server examples).
 
-```typescript
-type SelectProps<T> = {
-  ref?: React.Ref<HTMLSelectElement>;
-  options: T[];
-  value: T;
-  onChange: (value: T) => void;
-  getLabel: (option: T) => string;
-};
+## `useOptimistic`: confirm, commit, roll back
 
-export function Select<T>({ ref, options, value, onChange, getLabel }: SelectProps<T>) {
-  return (
-    <select
-      ref={ref}
-      value={getLabel(value)}
-      onChange={(e) => {
-        const selected = options.find((opt) => getLabel(opt) === e.target.value);
-        if (selected) onChange(selected);
-      }}
-    >
-      {options.map((opt) => (
-        <option key={getLabel(opt)} value={getLabel(opt)}>
-          {getLabel(opt)}
-        </option>
-      ))}
-    </select>
-  );
-}
-```
-
-### Combining ref with Other Props
-
-```typescript
-type ButtonProps = {
-  ref?: React.Ref<HTMLButtonElement>;
-  variant?: 'primary' | 'secondary';
-  size?: 'sm' | 'md' | 'lg';
-} & React.ComponentPropsWithoutRef<'button'>;
-
-export function Button({
-  ref,
-  variant = 'primary',
-  size = 'md',
-  className,
-  children,
-  ...props
-}: ButtonProps) {
-  return (
-    <button
-      ref={ref}
-      className={`btn btn-${variant} btn-${size} ${className || ''}`}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-}
-```
-
-## useActionState - Form State Management
-
-Replaces useFormState — manages form submission state with Server Actions.
-
-```typescript
+```tsx
 'use client';
+import { startTransition, useOptimistic, useState } from 'react';
 
-import { useActionState } from 'react';
+type Message = { id: string; text: string; pending?: true };
 
-type FormState = {
-  success?: boolean;
-  errors?: Record<string, string[]>;
-  message?: string;
-};
+export function Thread({ initial }: { initial: Message[] }) {
+  const [messages, setMessages] = useState(initial);          // authoritative state
+  const [error, setError] = useState<string | null>(null);
+  const [optimistic, addOptimistic] = useOptimistic(messages, (state, m: Message) => [...state, m]);
 
-// actions/login.ts ('use server' module)
-export async function login(
-  prevState: FormState,
-  formData: globalThis.FormData
-): Promise<FormState> {
-
-  const email = formData.get('email');
-  const password = formData.get('password');
-
-  if (!email || typeof email !== 'string') {
-    return {
-      success: false,
-      errors: { email: ['Email is required'] },
-    };
+  async function send(formData: FormData) {                    // runs as an Action via <form action>
+    const text = formData.get('text');
+    if (typeof text !== 'string' || !text.trim()) return;
+    setError(null);
+    addOptimistic({ id: crypto.randomUUID(), text, pending: true }); // unique temp id: two quick sends never collide
+    try {
+      const res = await fetch('/api/messages', { method: 'POST', body: JSON.stringify({ text }) });
+      if (!res.ok) throw new Error(`Send failed: ${res.status}`);
+      const saved = (await res.json()) as Message;               // the server's id and text
+      startTransition(() => setMessages((prev) => [...prev, saved])); // success: commit, after await needs its own transition
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Send failed');  // failure: base state unchanged, so the temp row disappears
+    }
   }
-
-  if (!password || typeof password !== 'string') {
-    return {
-      success: false,
-      errors: { password: ['Password is required'] },
-    };
-  }
-
-  try {
-    await signIn(email, password);
-    return { success: true, message: 'Logged in successfully' };
-  } catch (error) {
-    return {
-      success: false,
-      message: 'Invalid credentials',
-    };
-  }
-}
-
-// LoginForm.tsx ('use client' module)
-import { login } from './actions/login';
-
-export function LoginForm() {
-  const initialState: FormState = { success: false };
-  const [state, formAction, isPending] = useActionState<FormState, FormData>(
-    login,
-    initialState
-  );
 
   return (
-    <form action={formAction}>
-      <div>
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          required
-          aria-invalid={!!state.errors?.email}
-        />
-        {state.errors?.email?.map((error) => (
-          <p key={error} className="error">{error}</p>
-        ))}
-      </div>
-
-      <div>
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          required
-          aria-invalid={!!state.errors?.password}
-        />
-        {state.errors?.password?.map((error) => (
-          <p key={error} className="error">{error}</p>
-        ))}
-      </div>
-
-      {state.message && (
-        <div className={state.success ? 'success' : 'error'}>
-          {state.message}
-        </div>
-      )}
-
-      <button type="submit" disabled={isPending}>
-        {isPending ? 'Logging in...' : 'Log In'}
-      </button>
-    </form>
+    <>
+      <ul>{optimistic.map((m) => <li key={m.id} aria-busy={m.pending}>{m.text}</li>)}</ul>
+      {error && <p role="alert">{error}</p>}
+      <form action={send}><input name="text" /><button>Send</button></form>
+    </>
   );
 }
 ```
 
-### useActionState with Optimistic Updates
+When the Action ends, React renders the base state: the temp row is replaced by `saved` on success and simply vanishes on failure. If a parent owns `messages`, commit by calling the parent's callback or `router.refresh()` inside that inner transition instead of local `setMessages`. Validate `saved` at runtime if the API is untrusted; the cast only names the expected shape.
 
-**Server module** (`actions/todos.ts`):
+## `use()`
 
-```typescript
-'use server';
-
-type Todo = { id: string; title: string; completed: boolean };
-type TodoState = { todos: Todo[] };
-
-export async function toggleTodo(
-  prevState: TodoState,
-  formData: FormData
-): Promise<TodoState> {
-  const todoId = formData.get('todoId');
-  if (typeof todoId !== 'string') throw new Error('Missing todoId');
-  await db.todo.update({
-    where: { id: todoId },
-    data: { completed: { toggle: true } },
-  });
-
-  return { todos: await db.todo.findMany() };
-}
-```
-
-**Client component** (`TodoList.tsx`):
-
-```typescript
-'use client';
-
-import { useActionState, useOptimistic } from 'react';
-import { toggleTodo } from './actions/todos';
-
-type Todo = { id: string; title: string; completed: boolean };
-
-export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
-  const [state, formAction] = useActionState(
-    toggleTodo,
-    { todos: initialTodos }
-  );
-
-  const [optimisticTodos, setOptimisticTodos] = useOptimistic(
-    state.todos,
-    (currentTodos, todoId: string) =>
-      currentTodos.map((todo) =>
-        todo.id === todoId ? { ...todo, completed: !todo.completed } : todo
-      )
-  );
-
-  return (
-    <ul>
-      {optimisticTodos.map((todo) => (
-        <li key={todo.id}>
-          <form
-            action={(formData) => {
-              setOptimisticTodos(todo.id);
-              formAction(formData);
-            }}
-          >
-            <input type="hidden" name="todoId" value={todo.id} />
-            <button type="submit">
-              {todo.completed ? '✓' : '○'} {todo.title}
-            </button>
-          </form>
-        </li>
-      ))}
-    </ul>
-  );
-}
-```
-
-## use() Hook - Unwrapping Resources
-
-use() unwraps promises and context — enables new patterns for data fetching.
-
-### use() with Promises
-
-```typescript
-// Server Component
-async function UserPage({ params }: { params: { id: string } }) {
-  // Create the promise in the Server Component and pass the stable resource down.
-  const userPromise = fetchUser(params.id);
-
-  return (
-    <Suspense fallback={<UserSkeleton />}>
-      <UserProfile userPromise={userPromise} />
-    </Suspense>
-  );
+```tsx
+// Server Component: create the promise, do not await, wrap the consumer in Suspense.
+export default function Page() {
+  const userPromise = fetchUser();                       // stable: created once per server render
+  return <Suspense fallback={<Skeleton />}><Profile userPromise={userPromise} /></Suspense>;
 }
 
 // Client Component
 'use client';
+export function Profile({ userPromise }: { userPromise: Promise<User> }) {
+  const user = use(userPromise);                         // may sit inside if/loops; not inside try/catch
+  return <h1>{user.name}</h1>;
+}
+```
 
-import { use } from 'react';
+In a client-only app, get the promise from a cache keyed by resource id (a module `Map`, or the data library's Suspense API), never from a call in render. `use(Context)` works like `useContext` but may be conditional; it is not supported in Server Components. The resolved value must be serializable when it crosses the server/client boundary.
 
-type UserProfileProps = {
-  userPromise: Promise<User>;
-};
+## Transitions and deferred rendering
 
-export function UserProfile({ userPromise }: UserProfileProps) {
-  // Suspends until resolved
-  const user = use(userPromise);
+`startTransition(fn)` runs `fn` immediately and synchronously; it only lowers the priority of the state updates scheduled during it. Wrapping a heavy `filter` in it does not move that work off the input's critical path. Defer the render that does the work instead:
 
+```tsx
+const Results = memo(function Results({ query, products }: { query: string; products: Product[] }) {
+  const q = query.toLowerCase();
+  return <ul>{products.filter((p) => p.name.toLowerCase().includes(q)).map((p) => <li key={p.id}>{p.name}</li>)}</ul>;
+});
+
+export function Search({ products }: { products: Product[] }) {
+  const [query, setQuery] = useState('');                // urgent: the input never lags
+  const deferred = useDeferredValue(query);              // Results re-renders later, interruptibly
   return (
-    <div>
-      <h1>{user.name}</h1>
-      <p>{user.email}</p>
-    </div>
+    <>
+      <input value={query} onChange={(e) => setQuery(e.currentTarget.value)} />
+      <div style={{ opacity: query !== deferred ? 0.6 : 1 }}><Results query={deferred} products={products} /></div>
+    </>
   );
 }
 ```
 
-### Conditional use()
+`memo` is required: without it `Results` re-renders with the parent on every keystroke and the deferral buys nothing. When one synchronous computation is itself too slow (hundreds of milliseconds), no React API fixes it; move it to a Web Worker or index the data.
 
-use() can be called conditionally — unlike hooks.
+Use `useTransition` for navigation-like updates and Actions, where `isPending` drives UI: `startTransition(async () => { await save(); startTransition(() => setSaved(true)); })`.
 
-```typescript
-'use client';
+## Migration checklist (React 18 to 19)
 
-import { use } from 'react';
-
-type Props = {
-  userPromise?: Promise<User>;
-  userId?: string;
-};
-
-// A Suspense boundary must exist above this component.
-export function UserDisplay({ userPromise, userId }: Props) {
-  let user: User | undefined;
-
-  if (userPromise) {
-    user = use(userPromise); // Conditional use() is allowed; promise must be stable.
-  } else if (userId) {
-    // Resolve through a Suspense-enabled cache keyed by userId; do not create
-    // a fresh uncached promise during client render.
-    user = use(userCache.getPromise(userId));
-  }
-
-  if (!user) return <div>No user data</div>;
-
-  return <div>{user.name}</div>;
-}
-```
-
-### use() in Loops
-
-```typescript
-'use client';
-
-import { use } from 'react';
-
-type Props = {
-  userPromises: Promise<User>[];
-};
-
-// A Suspense boundary must exist above this component; each promise has a stable owner.
-export function UserList({ userPromises }: Props) {
-  return (
-    <ul>
-      {userPromises.map((promise, index) => {
-        const user = use(promise); // use() in loop - allowed!
-        return <li key={user.id}>{user.name}</li>;
-      })}
-    </ul>
-  );
-}
-```
-
-### use() with Context
-
-Alternative to useContext — can be called conditionally.
-
-```typescript
-import { createContext, use } from 'react';
-
-type Theme = 'light' | 'dark';
-const ThemeContext = createContext<Theme>('light');
-
-export function ThemedComponent({ override }: { override?: Theme }) {
-  let theme: Theme;
-
-  if (override) {
-    theme = override;
-  } else {
-    theme = use(ThemeContext); // Conditional context access
-  }
-
-  return <div className={theme}>Content</div>;
-}
-```
-
-## useOptimistic - Optimistic UI Updates
-
-Show immediate UI feedback before server confirms.
-
-```typescript
-'use client';
-
-import { useOptimistic } from 'react';
-
-type Message = { id: string; text: string; sending?: boolean };
-
-export function MessageThread({ messages }: { messages: Message[] }) {
-  const [optimisticMessages, addOptimisticMessage] = useOptimistic(
-    messages,
-    (state, newMessage: Message) => [...state, newMessage]
-  );
-
-  async function sendMessage(formData: FormData) {
-    const text = formData.get('message') as string;
-
-    // Add optimistic message immediately
-    addOptimisticMessage({ id: 'temp', text, sending: true });
-
-    // Send to server
-    await fetch('/api/messages', {
-      method: 'POST',
-      body: JSON.stringify({ text }),
-    });
-  }
-
-  return (
-    <div>
-      <ul>
-        {optimisticMessages.map((msg) => (
-          <li key={msg.id} className={msg.sending ? 'opacity-50' : ''}>
-            {msg.text}
-          </li>
-        ))}
-      </ul>
-
-      <form action={sendMessage}>
-        <input name="message" required />
-        <button type="submit">Send</button>
-      </form>
-    </div>
-  );
-}
-```
-
-### useOptimistic with State Updates
-
-```typescript
-'use client';
-
-import { useOptimistic, useState, useTransition } from 'react';
-
-type Item = { id: string; name: string; quantity: number };
-
-export function ShoppingCart({ items: initialItems }: { items: Item[] }) {
-  const [items, setItems] = useState(initialItems);
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-
-  const [optimisticItems, updateOptimistic] = useOptimistic(
-    items,
-    (state, { id, quantity }: { id: string; quantity: number }) =>
-      state.map((item) =>
-        item.id === id ? { ...item, quantity } : item
-      )
-  );
-
-  function updateQuantity(id: string, quantity: number) {
-    startTransition(async () => {
-      updateOptimistic({ id, quantity });
-      try {
-        const response = await fetch(`/api/cart/${id}`, {
-          method: 'PATCH',
-          body: JSON.stringify({ quantity }),
-        });
-        if (!response.ok) throw new Error('Cart update failed');
-        const updated: Item[] = await response.json();
-        // State updates after await need a new transition in React 19.
-        startTransition(() => setItems(updated));
-      } catch (error) {
-        setError(error instanceof Error ? error.message : 'Cart update failed');
-        // No base-state update means optimistic state rolls back.
-      }
-    });
-  }
-
-  return (
-    <ul>
-      {optimisticItems.map((item) => (
-        <li key={item.id}>
-          {item.name}
-          <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>
-            -
-          </button>
-          <span>{item.quantity}</span>
-          <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>
-            +
-          </button>
-        </li>
-      ))}
-    </ul>
-  );
-}
-```
-
-## useTransition - Non-Blocking Updates
-
-Mark state updates as non-urgent — UI stays responsive.
-
-```typescript
-'use client';
-
-import { useTransition, useState } from 'react';
-
-export function SearchResults() {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<string[]>([]);
-  const [isPending, startTransition] = useTransition();
-
-  function handleSearch(value: string) {
-    setQuery(value); // Urgent - update input immediately
-
-    startTransition(() => {
-      // Non-urgent - can be interrupted
-      const filtered = hugeDataset.filter((item) =>
-        item.toLowerCase().includes(value.toLowerCase())
-      );
-      setResults(filtered);
-    });
-  }
-
-  return (
-    <div>
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => handleSearch(e.target.value)}
-        placeholder="Search..."
-      />
-
-      {isPending && <div>Searching...</div>}
-
-      <ul>
-        {results.map((result) => (
-          <li key={result}>{result}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-```
-
-### useTransition with Server Actions
-
-```typescript
-'use client';
-
-import { useTransition } from 'react';
-import { deletePost } from '@/actions/posts';
-
-export function DeleteButton({ postId }: { postId: string }) {
-  const [isPending, startTransition] = useTransition();
-
-  function handleDelete() {
-    startTransition(async () => {
-      await deletePost(postId);
-      // UI stays responsive during deletion
-    });
-  }
-
-  return (
-    <button onClick={handleDelete} disabled={isPending}>
-      {isPending ? 'Deleting...' : 'Delete'}
-    </button>
-  );
-}
-```
-
-## useDeferredValue - Deferred Rendering
-
-Defer expensive re-renders while keeping UI responsive.
-
-```typescript
-'use client';
-
-import { useDeferredValue, useState } from 'react';
-
-export function ProductSearch() {
-  const [query, setQuery] = useState('');
-  const deferredQuery = useDeferredValue(query);
-
-  return (
-    <div>
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search products..."
-      />
-
-      {/* Uses deferred value - won't block input */}
-      <ExpensiveResults query={deferredQuery} />
-    </div>
-  );
-}
-
-function ExpensiveResults({ query }: { query: string }) {
-  const results = useMemo(() => {
-    // Expensive filtering/sorting
-    return products.filter((p) => p.name.includes(query));
-  }, [query]);
-
-  return (
-    <ul>
-      {results.map((result) => (
-        <li key={result.id}>{result.name}</li>
-      ))}
-    </ul>
-  );
-}
-```
-
-## Migration Checklist
-
-Updating from React 18 to React 19:
-
-- [ ] Replace forwardRef with ref as prop
-- [ ] Replace useFormState with useActionState
-- [ ] Update Server Action types to include prevState parameter
-- [ ] Use use() for promises in Server Components
-- [ ] Add 'use server' directive to Server Actions
-- [ ] Add 'use client' directive to Client Components
-- [ ] Update TypeScript to 5.0+ for better React 19 support
-- [ ] Update @types/react to 19.x
-- [ ] Test all forms with useActionState
-- [ ] Verify ref forwarding works without forwardRef
+1. Pin `react`, `react-dom`, `@types/react`, `@types/react-dom` to 19 together.
+2. Run the codemod exactly as the SKILL.md React 19 gotcha says (pinned version, real source roots, opt-in transforms for ref-callback returns and `ReactElement` props).
+3. Replace `import { act } from 'react-dom/test-utils'` with `import { act } from 'react'`; replace other test-utils calls (for example with Testing Library).
+4. `useFormState` from `react-dom` becomes `useActionState` from `react`.
+5. Keep `forwardRef` in anything still published for React 18 peers; convert app-only components to the `ref` prop.
+6. Re-run the typecheck and tests; fix ref callbacks that return values.

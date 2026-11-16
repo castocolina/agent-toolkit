@@ -1,0 +1,126 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codex-plan",
+      "percent": 91.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 88.0,
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 37,
+          "evidence": "Plan structure: Overview, Prerequisites, Phases with tasks, Testing Strategy, Dependency Graph, Risks, Rollback. ... Tasks must be small and independently testable",
+          "fix": "Cut the generic plan-section list to the parts Codex would not choose by itself (Dependencies as task IDs for parallel work, Complexity 1-10, Test-First Approach per task). The model already writes Overview, Risks and Rollback without being told."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 17,
+          "evidence": "Read what the plan depends on: README, manifests, config, the code to be extended, schemas, test patterns, docs.",
+          "fix": "Keep only the verified-paths rule ('the prompt may cite nothing else'). The list of file kinds to read is generic context-gathering the model already does."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 18,
+          "evidence": "Sort what you know into confirmed requirements, blocking decisions (they change the plan's shape: stack, scope, auth method) and non-blocking assumptions.",
+          "fix": "Add a short test for blocking decisions, for example: 'Before asking, ask yourself: would Codex produce a structurally different phase list under each answer? If not, record it as an assumption.' That turns the sorting step into a reusable thinking framework."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 55,
+          "evidence": "- Reply in English unless the user asks otherwise.",
+          "fix": "Give this item a reason (for example, the Codex prompt and plan file stay in English so the user can pass them on), or move it out of Gotchas. It is a preference, not an environment fact that defies assumptions."
+        },
+        {
+          "id": "D3-2",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 49,
+          "evidence": "## Gotchas (no item on Codex prompt-size or sandbox limits)",
+          "fix": "Add a Codex-specific gotcha you learned the hard way, for example: 'NEVER tell Codex to run tests or install packages in the prompt: under -s workspace-write network is off and the plan run stalls or fails.'"
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 2,
+          "evidence": "description: Prepare prompt_to_codex.md so the user can run Codex themselves and get an implementation plan in codex-plan.md. Use when planning a feature, API, auth change, migration or test strategy, including underspecified requests.",
+          "fix": "Prepare prompt_to_codex.md so the user can run the OpenAI Codex CLI (codex exec) themselves and get an implementation plan in codex-plan.md. Use when the user wants a Codex-written plan, a hand-off prompt for Codex, or a plan for a feature, API, auth change, migration or test strategy, including underspecified requests. Gathers repo context, asks only blocking questions, shows the manual command. Not for implementing changes or running Codex; never runs Codex."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 37,
+          "evidence": "Plan structure: Overview, Prerequisites, Phases with tasks, Testing Strategy, Dependency Graph, Risks, Rollback.",
+          "fix": "Make the section list a default with an escape hatch: 'Drop Rollback or Dependency Graph when they do not apply (for example, a pure test-strategy plan).' A fixed section set for every plan type is more rigid than this low-consequence step needs."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 31,
+          "evidence": "Ask the user to send you the content of `codex-plan.md` when Codex finishes. Do nothing else until they do, and never guess what the plan says.",
+          "fix": "Add what happens after the plan comes back, for example: 'When the user pastes it, check that every confirmed requirement maps to a task with acceptance criteria and list any gaps; do not start implementing unless asked.' Also cover the case where Codex fails or writes no file (ask for the Codex output and rerun guidance)."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 21,
+          "evidence": "If either exists, ask whether to overwrite or use a `-2` suffix (both names); never overwrite silently.",
+          "fix": "Resolve the case where the -2 names also exist: 'increment the suffix (-3, -4, ...) until both names are free.' Add how to detect a non-git directory for line 29 (`git rev-parse --is-inside-work-tree`)."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 17,
+          "evidence": "The Workflow includes \"Read what the plan depends on: README, manifests, config\"; Prompt contents adds \"Tasks must be small and independently testable\" with an OAuth illustration. These are familiar repository-planning activation, whereas the distinctive knowledge is the manual Codex handoff and its operational gotchas.",
+          "fix": "Condense the routine repository-reading and task-sizing advice: retain the verified-path constraint, required task-field schema and requirement-coverage check, but omit the generic file-category enumeration and OAuth task-sizing illustration."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 21,
+          "evidence": "\"If either exists, ask whether to overwrite or use a `-2` suffix (both names); never overwrite silently.\" The new-name branch does not specify an outcome when prompt_to_codex-2.md or codex-plan-2.md also exists; selecting the prescribed suffix can therefore produce another collision.",
+          "fix": "Check both candidate filenames before writing. If either suffixed name exists, increment the suffix until both names are unused, or obtain explicit overwrite consent for that exact pair. Use the selected names in the generated prompt, displayed command and request for the returned plan."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

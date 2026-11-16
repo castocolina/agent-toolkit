@@ -1,0 +1,50 @@
+{
+  "skill": "compose-email",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 13,
+      "evidence": "The Arguments section says \"`$ARGUMENTS` - topic, known facts, or an existing draft to rewrite,\" and Example Usage only shows \"/command-compose-email:compose-email <context or pasted draft>\". These sections repeat the argument hint and ordinary invocation mechanics rather than adding domain knowledge.",
+      "fix": "Remove the standalone Arguments section because workflow step 1 already explains argument handling. Replace the invocation-only example with a compact before/after demonstrating a non-obvious decision, such as preserving suspected impact while redacting internal details for an external recipient."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 17,
+      "evidence": "The over-limit branch says to ask whether to \"relax the limit or drop named items, then resume step 4\". Step 4 is validation rather than drafting and still requires \"every source fact kept\". After the user authorizes dropping items, the workflow does not explicitly update the required fact set or direct the agent to produce the revised draft before validating.",
+      "fix": "After the user resolves a word-limit conflict, update the effective limit and retained fact set, explicitly exempt user-authorized omissions from the keep-every-fact check, and return to drafting before running step 4."
+    }
+  ]
+}

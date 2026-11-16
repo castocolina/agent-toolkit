@@ -1,0 +1,63 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "excalidraw",
+      "percent": 97.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 97.6,
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 60,
+          "evidence": "Worker step 5: \"run `diff ORIGINAL COPY --strict` with one `--allow` per element id the task names or creates (and per arrow it rebinds) ... if `preservation` fails, undo each listed change\". The Gotcha at line 85 requires recomputing arrow endpoints when a box moves. Those arrows are neither named nor rebound, so following the move branch makes strict diff flag them, and step 5 then tells the worker to undo the fix and leave detached arrows.",
+          "fix": "Change step 5 to: \"... one `--allow` per element id the task names or creates, per arrow it rebinds, and per arrow whose `points`/`x`/`y` it recomputed because a bound shape moved ...\". This lets the move branch pass strict preservation without reverting the endpoint fix."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/excalidraw/evals/evals.json",
+          "line": null,
+          "evidence": "The seven evals and twenty trigger queries never exercise the Obsidian `.excalidraw.md` route (SKILL.md line 24), even though the description advertises \"Obsidian .excalidraw.md drawings\". The worker route for a move or restyle is also untested end to end.",
+          "fix": "Add an eval such as \"rename the 'Queue' box in vault/Drawings/pipeline.excalidraw.md\" with these assertions: it asks for a plain .excalidraw export, it does not decompress or edit the `compressed-json`, and it mentions the separate `## Text Elements` copy. Also add one should-trigger query that names an Obsidian .excalidraw.md file."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 60,
+          "evidence": "The worker allows each element the task names or creates '(and per arrow it rebinds)' and must 'undo each listed change' when preservation fails. Moving a box requires changing incident-arrow geometry without necessarily rebinding those arrows. The strict diff therefore rejects the required geometry changes; undoing them can leave detached arrows while the structural check passes.",
+          "fix": "Define the permitted dependency set before editing: requested elements, incident arrows whose geometry changes even without rebinding, their bound labels, and old/new endpoint shapes whose reciprocal bindings must change. Use that set consistently in worker step 2 and the strict-diff allowlist. Add a regression test that moves a connected box without changing binding targets and verifies both preservation and updated arrow endpoints."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 46,
+          "evidence": "'`--connect` and `new` edges refuse ... a self-loop ... use the worker route', but the worker begins 'Copy the original; edit the copy only.' For a new diagram containing a self-loop, scene.py aborts before writing OUT, leaving no original scene for that fallback.",
+          "fix": "Add an explicit creation fallback for unsupported edges: build a temporary scaffold containing the requested nodes and supported edges, then have the worker add the self-loop to a copy. Validate that copy and run strict preservation against the scaffold before publishing OUT; clean up temporary files afterward."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

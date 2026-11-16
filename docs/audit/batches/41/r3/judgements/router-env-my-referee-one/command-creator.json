@@ -1,0 +1,59 @@
+{
+  "skill": "command-creator",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/command-creator/references/examples.md",
+      "line": 53,
+      "evidence": "The submit-stack example takes `$ARGUMENTS` as the basis for the commit message, then shows `git commit -m \"[Single sentence summary of what was done]\"`. Double-quoted shell text still expands dollar expressions and command substitutions, contradicting SKILL.md's required single-quoted encoding for argument-derived values.",
+      "fix": "Add an explicit encoding step for the final commit message: encode it as one single-quoted shell word, escaping embedded single quotes, then run `git commit -m <encoded-message>`. Update the example snippet accordingly and preserve its upstream attribution."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 134,
+      "evidence": "The checklist requires an approved update to have 'no other skill or command shares the name (if one does, stop and use the step 2 template)'. When both a same-named skill and command exist, as in the collision fixture, approving either offered update returns to the same collision menu rather than completing the update.",
+      "fix": "Make the initial collision offer distinguish viable resolutions: a renamed command, an explicitly approved resolution of the shadowing collision before updating the command, or routing a requested SKILL.md edit out of scope. Carry the selected resolution into the approved-update checklist instead of returning to the unchanged menu."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 68,
+      "evidence": "'The frontmatter is read only when `---` is on line 1; broken YAML loads the body with no fields and no error' repeats the same loading constraint stated again in Gotchas at line 92.",
+      "fix": "Keep the complete silent-frontmatter warning and its auto-invocation consequence once in Gotchas; replace the repeated explanation in Frontmatter with a short cross-reference."
+    }
+  ]
+}

@@ -4,31 +4,111 @@
     {
       "id": "design-shop-schema",
       "prompt": "I’m opening a tiny online shop for handmade mugs. Can you sketch the database tables?",
-      "expected_output": "A SQL schema for customers, products, orders, and order items with relationships and basic integrity constraints.",
+      "expected_output": "A PostgreSQL schema for customers, products, orders and order items with relationships, basic integrity constraints and labeled assumptions.",
       "assertions": [
         "Includes separate customer, product, order, and order-item entities",
         "Defines primary keys and foreign keys for order relationships",
-        "Uses exact `DECIMAL`/`NUMERIC` or integer minor units for monetary values, never floating point"
+        "Uses exact `DECIMAL`/`NUMERIC` or integer minor units for monetary values, never floating point",
+        "States its defaults (engine, new schema, scale) as labeled assumptions instead of stopping to ask questions",
+        "Any instant column such as an order's creation or placement time uses `TIMESTAMPTZ`, not `TIMESTAMP` without time zone"
       ]
     },
     {
       "id": "postgres-tenant-model",
-      "prompt": "Design a PostgreSQL schema for a multi-tenant SaaS: organizations own users and projects; projects have tasks. Include uniqueness, deletion behavior, and indexes for listing a tenant’s tasks by status and date.",
-      "expected_output": "PostgreSQL DDL with tenant-scoped relationships, constraints, deletion behavior, and a query-aligned composite index.",
+      "prompt": "Design a PostgreSQL schema for a multi-tenant SaaS: organizations own users and projects; projects have tasks, and each task can be assigned to a user. Include uniqueness, deletion behavior, and indexes for listing a tenant’s tasks by status and date.",
+      "expected_output": "PostgreSQL DDL with tenant-scoped composite foreign keys, constraints, deletion behavior, and a query-aligned composite index.",
       "assertions": [
         "Includes organizations, users, projects, and tasks tables",
         "Uses foreign keys and an explicit ON DELETE strategy",
-        "Includes a composite index covering tenant task listing by status/date"
+        "Includes a composite index covering tenant task listing by status/date",
+        "Prevents a task from referencing a project or an assignee from another organization with composite foreign keys that include the organization id, such as `FOREIGN KEY (organization_id, project_id) REFERENCES projects (organization_id, id)`, backed by a `UNIQUE (organization_id, id)` key on the parent, or justifies an equivalent database-enforced mechanism; application-side filtering alone does not satisfy this",
+        "If the assignee foreign key uses `ON DELETE SET NULL`, it limits the action to the assignee column (for example `ON DELETE SET NULL (assignee_id)`) so the organization id is not nulled"
       ]
     },
     {
       "id": "unsafe-column-migration",
       "prompt": "We need to make existing users.phone NOT NULL on a live app with millions of rows. Give me a safe migration approach and rollback considerations.",
-      "expected_output": "A staged backward-compatible migration that avoids immediate NOT NULL enforcement, with backfill, validation, deployment sequencing, and rollback notes.",
+      "files": [
+        "references/migrations.md"
+      ],
+      "expected_output": "A staged backward-compatible PostgreSQL migration: keep nullable, deploy writers, backfill in batches, enforce with CHECK NOT VALID plus VALIDATE before SET NOT NULL, with lock and rollback notes.",
       "assertions": [
         "Recommends adding or retaining the column nullable before backfill",
         "Describes backfill before applying NOT NULL",
-        "Mentions backward compatibility and a rollback or recovery consideration"
+        "Mentions backward compatibility and a rollback or recovery consideration",
+        "Enforces the constraint without a long write-blocking scan: on PostgreSQL a `CHECK (phone IS NOT NULL) NOT VALID` constraint, then `VALIDATE CONSTRAINT`, then `SET NOT NULL` (or the PostgreSQL 18 `NOT NULL ... NOT VALID` form); for another named engine, its online equivalent",
+        "Sets a `lock_timeout` (or the engine's lock wait limit) before the DDL so a blocked ALTER does not queue all other queries behind it",
+        "Does not invent the value for existing NULL phones: it gives a diagnostic count query and leaves the replacement as an owner-confirmed placeholder or decision"
+      ]
+    },
+    {
+      "id": "mongodb-unbounded-comments",
+      "prompt": "our blog runs on mongo. every post doc has a comments array and the viral posts now have like 40k comments each. the post page shows the newest 20 comments plus the total count. keep embedding or what?",
+      "expected_output": "Moves comments to their own collection referencing the post, explains the 16 MiB document limit and unbounded growth, indexes by post and time, and keeps at most a bounded embedded slice plus a counter.",
+      "assertions": [
+        "Recommends moving comments out of the post document into a separate collection whose documents reference the post id",
+        "Gives the 16 MiB BSON document size limit, or unbounded growth of the embedded array, as the reason",
+        "Proposes a compound index on post id and creation time (for example `{ postId: 1, createdAt: -1 }`) for the newest-20 query",
+        "Any comments kept embedded in the post are bounded to a fixed number (for example `$push` with `$slice`), and the total comes from a stored counter rather than the array length"
+      ]
+    },
+    {
+      "id": "review-legacy-tenant-schema",
+      "prompt": "Can you review our production schema in legacy-saas-schema.sql before we onboard our biggest customer? Tell me what's wrong and how to fix it.",
+      "files": [
+        "evals/files/legacy-saas-schema.sql",
+        "references/schema-design-checklist.md"
+      ],
+      "expected_output": "A severity-ordered review: cross-tenant task->project FK, soft-delete email uniqueness, float money, timestamp without time zone, the unindexed comments.task_id under nightly deletes, the redundant idx_tasks_org, plaintext API tokens, with corrected DDL for each.",
+      "assertions": [
+        "Flags `tasks.project_id REFERENCES projects(id)` as allowing a task to point at another organization's project, and fixes it with a composite foreign key on `(organization_id, project_id)` backed by `UNIQUE (organization_id, id)` on projects",
+        "Flags that `users.email` UNIQUE blocks re-signup after soft delete and proposes a partial unique index `WHERE deleted_at IS NULL` or an equivalent active-only uniqueness",
+        "Flags `invoices.amount DOUBLE PRECISION` and replaces it with `NUMERIC`/`DECIMAL` or integer minor units",
+        "Flags the `TIMESTAMP` instant columns (such as `created_at`, `issued_at`, `deleted_at`) and recommends `TIMESTAMPTZ`",
+        "Recommends an index on `comments.task_id` because the nightly hard-delete of tasks scans comments for each deleted task in PostgreSQL",
+        "Flags `idx_tasks_org` as redundant because `idx_tasks_org_status_created` already starts with `organization_id` and `idx_tasks_org` backs no constraint and has no predicate or expression",
+        "Does not ask for a separate index on `projects.organization_id`, because `UNIQUE (organization_id, slug)` already starts with that column",
+        "Flags `api_tokens.token` stored in plaintext and recommends storing only a hash",
+        "Lists the cross-tenant reference before performance findings, and every finding carries its own complete corrected DDL with every statement written in full (never a pointer such as \"same pattern as F7\" or a \"then: ...\" shorthand list), or the exact SQL statement to run when the fix is not a schema change (for example a cleanup or retention job)",
+        "Converting existing `TIMESTAMP` data to `TIMESTAMPTZ` names the zone the old rows were written in as an owner-confirmed input (for example `USING created_at AT TIME ZONE :source_zone`), or states it as a labeled assumption to confirm, rather than silently assuming one"
+      ]
+    },
+    {
+      "id": "mysql-soft-delete-and-not-null",
+      "prompt": "our MySQL 8 app soft-deletes users (deleted_at) and now people who deleted their account can't sign up again with the same email. we also need orders.total to be NOT NULL, orders is ~20M rows and we can't take downtime. schema is in mysql-users-orders.sql. what migrations do we run?",
+      "files": [
+        "evals/files/mysql-users-orders.sql",
+        "references/migrations.md"
+      ],
+      "expected_output": "MySQL-specific migrations: a generated active_email column with a unique key replacing uq_users_email (no partial index in MySQL), and a batched backfill of NULL totals followed by MODIFY total ... NOT NULL with explicit ALGORITHM=INPLACE, LOCK=NONE, one DDL statement per migration because MySQL DDL commits implicitly.",
+      "assertions": [
+        "Does not propose a partial index (`... WHERE deleted_at IS NULL`), since MySQL has none; instead adds a generated column such as `active_email AS (IF(deleted_at IS NULL, email, NULL))` with a unique key on it, relying on MySQL allowing many NULLs in a unique key",
+        "Adds the new active-email unique key before dropping `uq_users_email`, so there is no window without email uniqueness for active users",
+        "Backfills the NULL `orders.total` rows in bounded batches before enforcing NOT NULL",
+        "Enforces NOT NULL with `ALTER TABLE orders MODIFY total DECIMAL(12,2) NOT NULL` plus an explicit `ALGORITHM=INPLACE, LOCK=NONE`, noting that the statement fails rather than silently falling back to a blocking copy",
+        "Puts each DDL statement in its own migration (or makes each idempotent), because MySQL DDL commits implicitly and a `BEGIN ... ROLLBACK` cannot undo a half-applied migration",
+        "Uses MySQL syntax throughout; no PostgreSQL-only constructs such as `NOT VALID`, `CREATE INDEX CONCURRENTLY` or `TIMESTAMPTZ`",
+        "Does not invent the replacement for NULL `orders.total` values: it gives a diagnostic count query and leaves the replacement (for example 0.00 or a total recomputed from line items) as an owner-confirmed placeholder or decision",
+        "States that rolling back the NOT NULL on MySQL is another in-place table rebuild (`ALTER TABLE orders MODIFY total DECIMAL(12,2) NULL, ALGORITHM=INPLACE, LOCK=NONE`), not an instant constraint drop"
+      ]
+    },
+    {
+      "id": "sqlite-price-to-cents-rebuild",
+      "prompt": "our little POS app uses SQLite (schema in sqlite-shop-schema.sql). products.price is REAL and the daily totals are off by a cent sometimes. switch it to integer cents, give me the exact migration script.",
+      "files": [
+        "evals/files/sqlite-shop-schema.sql",
+        "references/migrations.md"
+      ],
+      "expected_output": "A SQLite rebuild script: PRAGMA foreign_keys = OFF outside the transaction, save and drop the product_list view, create new_products with an INTEGER price_cents column and CHECK, copy with explicit rounding, drop products, rename new_products, recreate the index, trigger and view, PRAGMA foreign_key_check, COMMIT, PRAGMA foreign_keys = ON.",
+      "assertions": [
+        "Rebuilds the table (create `new_products`, copy, `DROP TABLE products`, `ALTER TABLE new_products RENAME TO products`) instead of an `ALTER COLUMN ... TYPE`, which SQLite does not support",
+        "Runs `PRAGMA foreign_keys = OFF` before `BEGIN` (outside the transaction) and `PRAGMA foreign_keys = ON` after `COMMIT`",
+        "Drops the dependent view `product_list` before dropping the old table and recreates it after the rename",
+        "Recreates `idx_products_name` and `trg_products_touch` after the rename, updating the trigger for the new column name",
+        "Stores the price as an `INTEGER` cents column with a `CHECK` range, converted with explicit rounding such as `CAST(ROUND(price * 100) AS INTEGER)`",
+        "Checks foreign keys before `COMMIT` (`PRAGMA foreign_key_check` or `pragma_foreign_key_check`) and commits only if it reports zero violations",
+        "Does not rename the old table first (for example `ALTER TABLE products RENAME TO old_products`)",
+        "Notes that `order_items.unit_price REAL` has the same money problem and gives its own complete rebuild script or states it as a separate follow-up"
       ]
     }
   ]

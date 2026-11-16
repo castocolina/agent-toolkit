@@ -1,0 +1,80 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "sync-branch",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 27,
+          "evidence": "Pass `\"$branch\"` quoted. Single quotes are needed only for a literal name you type containing `$` (`'feature/weird$name'`), which the shell would otherwise expand.",
+          "fix": "Delete this gotcha. The model already knows how shell quoting works, and the steps already quote \"$branch\" everywhere."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 19,
+          "evidence": "Compute `fork=$(git merge-base --fork-point ...)` ... `git rebase --onto \"origin/$target\" \"$fork\" \"$branch\"` ... Gotcha: `--fork-point` can silently drop feature commits ... Before using `fork`, compare ...",
+          "fix": "Split step 3 into ordered sub-steps: (a) compute fork and the plain merge-base; (b) compare the commit counts of the two ranges and stop if the fork-point range is shorter; (c) only then choose one of the three rebase forms from a short decision list. The safety check currently comes after the instruction it guards."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 19,
+          "evidence": "Rebase onto the remote ref, never local `main`; never `git pull` or `git merge`.",
+          "fix": "Give the reason for each NEVER: local main is often stale, so the rebase goes onto an old base. `git pull` merges or rebases the wrong upstream (the feature branch's own remote). `git merge` adds a merge commit that the PR's linear history rejects."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "commands/evals/sync-branch.json",
+          "line": null,
+          "evidence": "push-lease-quoted-branch asserts: \"The branch name is passed quoted, as `\\\"$(git branch --show-current)\\\"` or the literal `'feature/weird$name'` in single quotes\"",
+          "fix": "Allow `\"$branch\"`, the form the command itself prescribes in step 5, in this assertion. Also add scenarios for a rejected lease (no --force retry, report $orig) and for a remote that is ahead (stop and list the commits)."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 19,
+          "evidence": "if the fork-point range has fewer commits, stop and ask.",
+          "fix": "State the question and what each answer does. For example, ask \"fork-point would drop N commits; use the plain merge-base rebase instead, or stop?\" On use, run `git rebase \"origin/$target\"`. On anything else, stop and change nothing."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 6,
+          "evidence": "Target = the argument, else `main`.",
+          "fix": "Add an edge case for fork-based PRs. If an `upstream` remote exists and the PR base lives there, fetch and rebase onto `upstream/$target` instead of `origin/$target`, or stop and ask. As written, a stale fork main is used without any warning. Also reject an argument that already starts with `origin/`."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

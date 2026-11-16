@@ -1,0 +1,81 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "ascii-ui-mockup-generator",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6,
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 34,
+          "evidence": "Keep comparison fields aligned across repeated records (tables, lists of the same shape); reserve stacked layouts for items scanned independently. Mixing the two makes records hard to compare.",
+          "fix": "Delete this generic layout advice, which the model already applies. Step 3 already maps the compare-records task to an aligned table or cards. Use the line for an ASCII-specific trap instead."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 17,
+          "evidence": "**Confirm requirements.** Rank the user tasks; list the content every alternative must show.",
+          "fix": "Say how to rank the tasks when the user gives no priority. For example: rank by how often the task is done, then by cost of error. State the ranking as an assumption above mockup 1, so the Favors bullets and the recommendation in step 5 have a defined basis."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 30,
+          "evidence": "## Gotchas lists tabs, emoji/box-drawing width, implementation code and fencing, but nothing on viewer wrapping",
+          "fix": "Add a gotcha: \"NEVER assume the 80-column block survives: narrow chat panes and mobile viewers soft-wrap or side-scroll code blocks, which breaks the right border. When the user's viewer is unknown, keep mockups at 80 columns or fewer and say a wrapped border is a viewer artifact, not a drawing error.\""
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 19,
+          "evidence": "Default to 3 structurally distinct mockups ... compare records -> aligned table vs cards; inspect one item -> master/detail if both panes fit the width, else a single detail view; complete a sequence -> wizard if later steps depend on earlier answers, else one form. Navigation placement (top, side, none) is the fallback axis.",
+          "fix": "Resolve how to get the third alternative. Each task branch gives only two structures, or one when master/detail does not fit or the wizard condition picks a single option. Add: \"If the task axis yields fewer than 3 structures, fill the rest by varying navigation placement on the strongest structure. If the dominant task matches none of the three classes, vary navigation placement alone.\""
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 37,
+          "evidence": "\"Always put mockups in fenced blocks: outside one, Markdown uses a proportional font and collapses repeated spaces.\" This explains familiar Markdown behavior and repeats the Output format requirement for \"the fenced mockup\".",
+          "fix": "Keep the non-obvious delimiter escape rule, replacing this bullet with: \"If the mockup contains backticks, fence with four backticks or ~~~.\" Leave the general fencing requirement in Output format."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 19,
+          "evidence": "\"Size each column to its longest required label\" and \"If content exceeds the width, truncate with `...>` ... or move secondary fields to a detail view\" leave an unresolved narrow-width branch because line 29 also requires keeping \"the ranked tasks' fields and primary actions in full\". A required primary label wider than the user-specified interior width cannot satisfy all these instructions.",
+          "fix": "Add an overflow branch: when required primary content cannot fit, stack fields or wrap labels across bordered rows while preserving the requested width. If even a minimal usable layout cannot fit, explain the minimum width and ask permission to widen rather than truncating required primary content."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

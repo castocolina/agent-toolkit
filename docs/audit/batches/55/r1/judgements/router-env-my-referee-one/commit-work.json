@@ -1,0 +1,59 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 19,
+      "evidence": "\u201cWhen the user asks for proposed commands, label them as proposed and do not claim they ran.\u201d Together with \u201cPlan each commit as paths, plus hunks for a mixed file,\u201d this adds generic presentation and planning reminders rather than commit-specific expertise.",
+      "fix": "Remove these generic reminders or fold them into the intent-routing table; retain the non-obvious temporary-index, staged-verification, hook and shared-state safeguards."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 26,
+      "evidence": "\u201cIf an approved path already holds user-staged content, stop and ask.\u201d This unconditional gate also stops a straightforward request to commit an explicitly approved staged diff, despite step 1 already requiring approval for that content.",
+      "fix": "Allow an already-staged path when the user explicitly approved its staged diff. Preserve that exact staged version rather than restaging the whole working-tree file; ask only when approval or the intended hunk selection is ambiguous."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 23,
+      "evidence": "\u201cAnything staged before you started is the user's; it enters a commit only if the user says so, and until they say, commit nothing.\u201d For an approved auth fix with unrelated staged config explicitly excluded, this says to commit nothing, while step 3 and the unrelated-staged eval prescribe proceeding with a temporary index.",
+      "fix": "Replace the blanket stop with: \u201cNever include pre-existing staged content without the user's approval. When only other paths are approved and the existing staged content must remain excluded, continue using the temporary-index branch in step 3.\u201d"
+    }
+  ]
+}

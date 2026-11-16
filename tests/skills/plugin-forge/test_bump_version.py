@@ -35,7 +35,7 @@ class BumpVersionTests(unittest.TestCase):
     def test_invalid_part_is_rejected_by_cli(self):
         r=self.run_cli("demo","invalid"); self.assertNotEqual(r.returncode,0)
     def test_missing_plugin_manifest_fails(self):
-        (self.root/"plugins/demo/.claude-plugin/plugin.json").unlink(); r=self.run_cli("demo","patch"); self.assertNotEqual(r.returncode,0); self.assertIn("Plugin manifest not found",r.stdout)
+        (self.root/"plugins/demo/.claude-plugin/plugin.json").unlink(); r=self.run_cli("demo","patch"); self.assertNotEqual(r.returncode,0); self.assertIn("Plugin manifest not found",r.stderr); self.assertEqual(r.stdout,"")
     def test_missing_marketplace_entry_fails(self):
         plugin_path = self.root/"plugins/demo/.claude-plugin/plugin.json"
         original_plugin = plugin_path.read_text()
@@ -43,7 +43,39 @@ class BumpVersionTests(unittest.TestCase):
         original_marketplace = (self.root/".claude-plugin/marketplace.json").read_text()
         r=self.run_cli("demo","patch")
         self.assertNotEqual(r.returncode,0)
-        self.assertIn("not found in marketplace manifest",r.stdout)
+        self.assertIn("not found in marketplace manifest",r.stderr)
+        self.assertEqual(r.stdout,"")
         self.assertEqual(plugin_path.read_text(), original_plugin)
         self.assertEqual((self.root/".claude-plugin/marketplace.json").read_text(), original_marketplace)
+    def test_invalid_versions_leave_both_manifests_unchanged(self):
+        plugin_path=self.root/"plugins/demo/.claude-plugin/plugin.json"; market_path=self.root/".claude-plugin/marketplace.json"
+        for bad in ["1.2", "1.2.3-beta.1", "1.2.3+build", "01.2.3", "1.2.x", "1.2.3.4"]:
+            plugin_path.write_text(json.dumps({"name":"demo","version":bad})); before=(plugin_path.read_text(), market_path.read_text())
+            r=self.run_cli("demo","patch")
+            self.assertEqual(r.returncode,2,bad); self.assertIn("Invalid version",r.stderr); self.assertEqual(r.stdout,"")
+            self.assertEqual((plugin_path.read_text(), market_path.read_text()), before)
+    def test_help_documents_output_and_exit_codes(self):
+        r=subprocess.run([sys.executable,str(SCRIPT),"--help"],capture_output=True,text=True)
+        self.assertEqual(r.returncode,0); self.assertIn("JSON",r.stdout); self.assertIn("exit 2",r.stdout)
+    def test_manifest_only_version_does_not_add_entry_version(self):
+        market_path=self.root/".claude-plugin/marketplace.json"; market_path.write_text('{"plugins":[{"name":"demo"}]}')
+        r=self.run_cli("demo","patch"); self.assertEqual(r.returncode,0,r.stderr)
+        self.assertEqual(self.read_plugin_version(),"1.2.4"); self.assertEqual(market_path.read_text(),'{"plugins":[{"name":"demo"}]}')
+    def read_plugin_version(self): return json.loads((self.root/"plugins/demo/.claude-plugin/plugin.json").read_text())["version"]
+    def test_entry_only_version_is_bumped_in_entry(self):
+        plugin_path=self.root/"plugins/demo/.claude-plugin/plugin.json"; plugin_path.write_text('{"name":"demo"}')
+        r=self.run_cli("demo","minor"); self.assertEqual(r.returncode,0,r.stderr)
+        self.assertEqual(plugin_path.read_text(),'{"name":"demo"}')
+        m=json.loads((self.root/".claude-plugin/marketplace.json").read_text()); self.assertEqual(m["plugins"][0]["version"],"1.3.0")
+        self.assertEqual(json.loads(r.stdout)["paths"],[str(self.root/".claude-plugin/marketplace.json")])
+    def test_no_version_anywhere_is_sha_versioned(self):
+        plugin_path=self.root/"plugins/demo/.claude-plugin/plugin.json"; plugin_path.write_text('{"name":"demo"}')
+        market_path=self.root/".claude-plugin/marketplace.json"; market_path.write_text('{"plugins":[{"name":"demo"}]}')
+        r=self.run_cli("demo","patch"); self.assertEqual(r.returncode,2); self.assertIn("versioned by commit SHA",r.stderr)
+        self.assertEqual(plugin_path.read_text(),'{"name":"demo"}'); self.assertEqual(market_path.read_text(),'{"plugins":[{"name":"demo"}]}')
+    def test_non_object_plugin_manifest_is_rejected(self):
+        plugin_path=self.root/"plugins/demo/.claude-plugin/plugin.json"
+        for bad in ["null","[]","\"1.2.3\"","3"]:
+            plugin_path.write_text(bad); r=self.run_cli("demo","patch")
+            self.assertEqual(r.returncode,2,bad); self.assertIn(f"Invalid plugin manifest {plugin_path}",r.stderr); self.assertEqual(r.stdout,"")
 if __name__ == "__main__": unittest.main()

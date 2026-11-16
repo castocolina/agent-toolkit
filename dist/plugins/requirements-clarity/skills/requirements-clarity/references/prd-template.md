@@ -1,14 +1,12 @@
 # PRD template
 
-Load only when generating the PRD. Include relevant sections; omit irrelevant ones rather than filling them with generic assumptions.
-
 ```markdown
 # {Feature} — Product Requirements Document
 
 ## Problem and users
 - Problem:
 - Target users:
-- Desired outcome / success measure:
+- Success measure (user-supplied, or "not yet defined"):
 
 ## Scope
 - Included:
@@ -16,15 +14,18 @@ Load only when generating the PRD. Include relevant sections; omit irrelevant on
 - User-visible behavior and important edge cases:
 
 ## Decisions and constraints
-- Product decisions (source/owner):
-- Technical facts discovered in repository:
+- Product decisions (source: user round N / owner):
+- Technical facts (source: repo path):
 - Constraints and rationale:
-- Assumptions or unresolved questions (owner, if known):
+
+## Assumptions and open questions
+- Assumption: ... (not confirmed by the user)
+- Open decision: ... (positions and owner, if known)
 
 ## Acceptance criteria
-- [ ] Given [context], when [action], then [observable result].
+- [ ] Given [context], when [action], then [observable result]. (traces to: decision)
 
-## Risks and delivery notes (if consequential)
+## Risks and delivery notes (only if consequential)
 - Risk / dependency:
 - Mitigation or decision needed:
 

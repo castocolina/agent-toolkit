@@ -1,0 +1,135 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "compose-email",
+      "percent": 88.0,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 88.0,
+        "router-env-my-referee-one": 88.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 36,
+          "evidence": "## Example Usage ... /command-compose-email:compose-email Need to ask team lead for deadline extension on API migration",
+          "fix": "Remove the 12-line invocation examples, or cut them to one line that shows only the no-argument case. The host already shows the command and its argument-hint, so the model learns nothing new here."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 23,
+          "evidence": "3. **Organize as What-Why-How** (internal default, not visible labels).",
+          "fix": "Keep the ending rules for asks and FYIs. Swap the generic What-Why-How restatement for the non-obvious rule for each purpose, for example that an escalation opens with impact and current status before any history."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 2,
+          "evidence": "description promises 'a peer, stakeholder, manager or leadership' but the body only adjusts for audience at line 34 ('Mixed audience (peers plus leadership)')",
+          "fix": "In step 2, add a short audience rule. Leadership: put the decision first, keep it to 3-5 sentences and put details on request. Manager: state the trade-off and your recommendation. Peer: give the context they need to act. This makes the reader shape the draft, not just the purpose."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 34,
+          "evidence": "Mixed audience (peers plus leadership): write for the least technical reader and put technical detail in a short final paragraph.",
+          "fix": "Add the reason ('leadership stops reading at the first unfamiliar term and the ask is lost'), so this item reads like the other gotchas and not like generic advice."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 2,
+          "evidence": "'Not for chat or Slack threads that need no email structure.' conflicts with line 24 'offer one line of refinements (tone, length, jargon level, Slack/Teams format)'",
+          "fix": "Draft or rewrite a professional email to a peer, stakeholder, manager or leadership using What-Why-How. Use for status updates, approval or extension requests, escalations, follow-ups, or when the user only asks to make a message shorter, clearer or less defensive, even without the word 'email'. Produces a subject and body to paste and never sends. Not for casual chat replies; a finished email draft can be reformatted for Slack or Teams on request."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 24,
+          "evidence": "4. **Output** a ready-to-paste draft: `**Subject:**` line ... then the body.",
+          "fix": "Add a default length for fresh drafts, for example 'under 150 words unless the facts need more'. Rewrites already keep the source length limits, but new drafts have no default."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "commands/evals/compose-email.json",
+          "line": null,
+          "evidence": "empty-request-asks-for-facts asserts 'asks the user for the email's topic or known facts, the recipient, and the desired outcome', while the command says a missing recipient or outcome is 'Not blocking' and to 'Ask only for blocking gaps'",
+          "fix": "Align the assertion with the command: 'The output asks for the topic or the facts (the blocking gap) and produces no draft'. Or change step 1 so that when nothing is known, the agent asks for topic, recipient and outcome in one question."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 24,
+          "evidence": "Workflow goes from '3. Organize' straight to '4. Output' with no self-check",
+          "fix": "Before step 4, add a validation step: 'Check the draft against the source: every source fact kept, no new names, dates, causes or numbers, proposed dates labelled as proposals, qualifiers such as suspected kept, and any length limit met. Fix and recheck before output.' This turns the Gotchas into a loop the agent actually runs."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "commands/compose-email.md",
+          "line": 22,
+          "evidence": "- Follow-up: reference the prior thread and restate the open ask.",
+          "fix": "Add a fallback for when the prior thread is not in context: 'If the earlier message is unavailable, use [prior email date/subject] as a placeholder and do not paraphrase what was said.'"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 36,
+          "evidence": "The 12-line '## Example Usage' section repeats ordinary context, rewrite and empty invocations, including '/command-compose-email:compose-email \"Hi team, wanted to let you know about the deployment...\"', without showing an expert transformation or decision. Alongside familiar email-structure guidance, this dilutes the more valuable gotchas.",
+          "fix": "Collapse routine invocation examples to one line. If an example is retained, demonstrate a non-obvious transformation, such as shortening an incident update without turning a suspected cause into a confirmed fact."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 18,
+          "evidence": "'Rewriting is an operation, not a purpose: apply the matching purpose strategy, then keep the source facts, voice and length or format limits.' This routes rewrites appropriately but supplies no method for the advertised 'less defensive' transformation beyond preserving the source and selecting a purpose.",
+          "fix": "Add a concise rewrite decision rule: retain evidence-backed accountability and uncertainty, remove self-justifying explanations that do not help the recipient decide, and replace defensive framing with observed impact plus the next action. Preserve necessary explanations rather than treating every justification as padding."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "commands/compose-email.md",
+          "line": 23,
+          "evidence": "'Informational updates end with \"No response needed\"' mandates an exact closing even though line 18 routes thank-you messages and introductions through Status or FYI. That rigidity can undermine the requested voice or produce an unnatural closing.",
+          "fix": "Keep the prohibition on manufactured asks, but make the closing contextual: explicitly say no response is needed when it usefully removes ambiguity; otherwise allow a natural informational, thank-you or introduction closing that preserves the user's voice."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

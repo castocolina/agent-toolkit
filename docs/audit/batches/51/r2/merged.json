@@ -1,0 +1,99 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "daily-meeting-update",
+      "percent": 95.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 67,
+          "evidence": "Never let tool activity replace the why, the blockers or the plans: tools show motion, not intent or impediments.",
+          "fix": "Delete this line. Step 3 already says 'Ask for topics even when tools found plenty' and has the provenance gate, so this repeats generic advice the model already follows."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 38,
+          "evidence": "## Gotchas sits between '## 2. Optional integrations' and '## 3. Interview', and step 1 points ahead to 'the four required answers (step 4)'",
+          "fix": "Name the four required answers (Yesterday, Today, Blockers, Topics) in step 1. Move ## Gotchas after step 4, next to ## Never, so the numbered process reads straight through without a forward reference."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 33,
+          "evidence": "CLI: `jira issue list --jql '<JQL>' --plain`",
+          "fix": "Add a Gotcha: 'Two unrelated tools install as `jira` (ankitpokhrel/jira-cli and go-jira). `--plain` and `issue list --jql` exist only in jira-cli. If `jira version` does not report jira-cli, treat the CLI as unavailable instead of guessing flags.'"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/evals/evals.json",
+          "line": null,
+          "evidence": "None of the six evals use Jira data. The provenance gate 'Won't Do, Duplicate, Cannot Reproduce ... never as delivered' and the JQL timezone gotcha are never tested.",
+          "fix": "Add an eval with an evals/files/jira-issues.json input. Include one ticket resolved as Won't Do inside the window and one resolved Done after END. Assert that the first is reported as a triage outcome, not as delivered, and that the second is absent from Yesterday."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 13,
+          "evidence": "If the user already gave the four required answers (step 4) and approved no integration, skip steps 2 and 3 and draft.",
+          "fix": "Resolve the branch for a user who gives all four answers but does not mention tools. For example: 'If the user gave all four answers and did not ask for tools, do not offer integrations; draft directly. Offer integrations only when an answer is missing or the user asks.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/scripts/claude_digest.py",
+          "line": 189,
+          "evidence": "Candidate directories require \"d.name == n or d.name.startswith(n + '-')\" before messages are inspected. A session launched in /home/user/api and later switched to /home/user/payments remains in the api log directory, so --project /home/user/payments misses its matching messages and can incorrectly return an empty digest.",
+          "fix": "Discover matching sessions through an approved project-to-session metadata index or an explicitly approved session-file set, then apply the existing per-message cwd filter. When discovering cross-project logs would exceed consent, ask for additional permission rather than silently scanning them or treating the empty candidate set as proof of no activity."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 62,
+          "evidence": "The Never section repeats earlier invariants: \"Never report an investigation or an open PR as delivered\" repeats the provenance gate, and \"Never access an unapproved repo, project or session\" repeats \"Access only what was approved\" in step 2.",
+          "fix": "Keep the rationale-bearing Never checklist, but consolidate the repeated invariants: retain concrete consent mechanics and outcome-verification branches in steps 2 and 3, referring to the checklist instead of restating its prohibitions."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/evals/evals.json",
+          "line": null,
+          "evidence": "The output cases cover \"manual-standup\", \"consented-integration\", \"missing-interview-details\", \"approved-integration-merge\", \"answer-contradicts-activity\", and \"monday-window\"; none supplies Jira activity to exercise the resolution and timezone gates.",
+          "fix": "Add Jira fixture-based output evals covering a successful resolution, a triage resolution such as Won't Do or Duplicate, and a resolutiondate outside the requested UTC window despite matching the discovery query. Assert that triage is not described as delivered and out-of-window events are excluded from Yesterday."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

@@ -1,0 +1,59 @@
+{
+  "skill": "session-handoff",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/session-handoff/scripts/validate_handoff.py",
+      "line": 28,
+      "evidence": "The PEM detector is r'-----BEGIN [A-Z]+ PRIVATE KEY-----'. It requires a prefix such as RSA and therefore misses the common unencrypted PKCS#8 header '-----BEGIN PRIVATE KEY-----'. An otherwise complete handoff containing that private-key block can receive READY despite SKILL.md advertising PEM-header detection.",
+      "fix": "Allow an absent PEM type prefix, for example with r'-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----'. Add regression tests for unprefixed PKCS#8, encrypted PKCS#8, RSA, EC and OpenSSH headers, asserting BLOCKED and exit 1 without printing key material."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/scripts/validate_handoff.py",
+      "line": 104,
+      "evidence": "FILE_REF_PATTERNS covers only 'Table cells', 'Inline code' and 'path:line'. The scaffold instead emits its predecessor as '- **Continues from**: [filename](./filename)'. That Markdown link is not extracted, so a deleted predecessor is absent from both validation's missing-file list and the staleness check's shared reference parser.",
+      "fix": "Extract local Markdown link destinations as file references, ignoring external URLs and resolving relative predecessor links against the handoff directory. Add a regression test using an actual scaffold-style chain link whose predecessor is deleted; require both validation and staleness reports to identify the missing predecessor."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "tests/skills/session-handoff/setup_test_env.py",
+      "line": 162,
+      "evidence": "The fixture labeled '# Fresh handoff (today)' writes Created, Project and Branch metadata but no 'Baseline commit:'; the stale fixture also omits it. The current check_staleness.py explicitly returns UNKNOWN when that baseline is absent, so these documented model-evaluation fixtures no longer exercise their advertised fresh and stale outcomes.",
+      "fix": "Populate fixture baselines from real commits in the generated repository and record the actual branch instead of hard-coding main. Add assertions that the fresh fixture yields FRESH and that the deliberately old fixture yields the intended stale level. The runnable smoke tests, output evals and balanced trigger queries otherwise provide substantial coverage; tests were inspected read-only, not executed."
+    }
+  ]
+}

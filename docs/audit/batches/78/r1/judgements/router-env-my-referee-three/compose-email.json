@@ -1,0 +1,86 @@
+{
+  "skill": "compose-email",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 113,
+  "max_total": 125,
+  "percent": 90.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 41,
+      "evidence": "## Example Usage `/command-compose-email:compose-email <context or pasted draft>`.",
+      "fix": "Remove this line, because the harness already shows how to invoke a slash command. Put a short input-to-output example in its place: one pasted draft and the rewritten subject and body."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 34,
+      "evidence": "NEVER put the ask only in the subject line: many clients truncate subjects on mobile and the reader misses it.",
+      "fix": "The model already knows this general email advice. Shorten it to one clause inside step 5's subject rule, or replace it with a non-obvious, environment-specific gotcha."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 27,
+      "evidence": "Output a ready-to-paste draft: `**Subject:**` line (specific, names the action or deadline), then the body as What-Why-How: What = ..., Why = ..., How = ...",
+      "fix": "Add a short fenced output template after step 5 with these lines: **Subject:** <action + deadline>; What sentence; Why sentence; How line (ask, owner, deadline or 'No response needed'); a refinements line. The model matches a concrete template more reliably than a prose description."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 17,
+      "evidence": "use placeholders such as `[recipient]` or `[date]` and infer audience and outcome from context",
+      "fix": "Add this gotcha: 'NEVER leave placeholders unflagged: users paste and send drafts with [date] or [recipient] still in them. After the draft, list every remaining placeholder on one line (\"Fill before sending: [recipient], [date]\").'"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 26,
+      "evidence": "If the source facts cannot fit a stated word limit, keep every fact, report the overage and ask (blocking) whether to relax the limit or drop named items",
+      "fix": "Set a default for small overages, for example: 'If the overage is 10% or less, deliver the draft and state the word count. Ask (blocking) only for larger overages.' This avoids an extra round trip for a few words."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 18,
+      "evidence": "Anything else (announcement, thank-you, introduction) uses Status or FYI.",
+      "fix": "Make this branch resolve to one strategy, for example: 'Anything else (announcement, thank-you, introduction) uses FYI: lead with what changes or what is being recognised, and add \"No response needed\" only if the reader might otherwise think action is expected.' Currently a thank-you has no 'delta since the last update', so the Status branch cannot be applied."
+    }
+  ]
+}

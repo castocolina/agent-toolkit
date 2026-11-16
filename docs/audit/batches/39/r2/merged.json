@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "react-dev",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6,
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 58,
+          "evidence": "Activation checklist, no explanation needed: native props via `ComponentPropsWithoutRef<'button'>`, variants as a discriminated union, `children: ReactNode`, an explicit state type when the initializer is `null`, `[]` or one member of a literal union.",
+          "fix": "Keep only the item the model gets wrong: give `useState` an explicit type when the initializer is `null`, `[]` or one member of a literal union. Drop ComponentPropsWithoutRef, discriminated-union variants and `children: ReactNode`, which current models already write by default."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 116,
+          "evidence": "React 19 upgrade breaks: ... Before fixing by hand, on a clean git tree run `npx types-react-codemod@3.5.3 preset-19 <dirs>` ... review `git diff`, then typecheck.",
+          "fix": "Move the ordered migration steps (clean tree, then codemod, then git diff review, then typecheck) out of the Gotchas bullet into a short numbered 'React 19 migration' step in section 1 or 5. Keep only the type-break facts in Gotchas, so the sequence reads as a workflow and not as one of many warnings."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 104,
+          "evidence": "- Handlers: the submitter and IME Enter traps are in event-handlers.md.",
+          "fix": "State both traps inline in one line each. Read the submitter from `e.nativeEvent.submitter`, because `currentTarget` is the form. Check `e.nativeEvent.isComposing` before treating Enter as submit. An agent writing a handler without loading event-handlers.md will not know to look for these traps."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 116,
+          "evidence": "select them at its prompt, run them by name (`npx types-react-codemod@3.5.3 no-implicit-ref-callback-return <dirs>`), or fix those two breaks by hand.",
+          "fix": "Make one default: after `preset-19`, always run `npx types-react-codemod@3.5.3 no-implicit-ref-callback-return <dirs>` and `npx types-react-codemod@3.5.3 react-element-default-any-props <dirs>` by name. Agents run in non-interactive shells and cannot answer the codemod's selection prompt. Mention fixing by hand only as the fallback when a transform fails."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/react-dev/evals/evals.json",
+          "line": 30,
+          "evidence": "\"id\": \"submit-handler\" ... assertions: FormEvent<HTMLFormElement>, ChangeEvent<HTMLInputElement>, FormData from e.currentTarget",
+          "fix": "Replace this eval, whose assertions pass without the skill, with one that exercises a skill-only rule. Example: a form with two submit buttons where the handler must read `e.nativeEvent.submitter`, or an Enter-to-submit input that must ignore IME composition. Add assertions for both."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 129,
+          "evidence": "Run the project's typecheck script, or `npx tsc --noEmit -p .` when a `tsconfig.json` exists.",
+          "fix": "Add this branch: if `tsconfig.json` is a solution file (`\"files\": []` with `references`, as in the Vite react-ts template), `tsc --noEmit -p .` checks nothing and passes silently. Run `npx tsc -b` instead, or `-p` on the referenced app config such as `tsconfig.app.json`. Check that config's `include` when placing `*.type-test.tsx` files in step 3."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 21,
+          "evidence": "The API table says \"first matching row wins\" and maps \"`react` 18 in `dependencies`\" to \"React 18-compatible code\". For an explicit React 18-to-19 migration in an existing app, this selects the source version instead of the requested target; the requested-major branch only applies when package.json is absent.",
+          "fix": "Add an explicit migration-target branch before the installed-major rows: when upgrading an app to React 19, update react, react-dom, @types/react and @types/react-dom together, then select React 19 APIs. Preserve React 18 compatibility for published packages whose peer contract still allows 18 unless changing that contract is explicitly requested."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/references/event-handlers.md",
+          "line": 43,
+          "evidence": "The Enter-to-send guard is \"if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing) return\". Safari can report isComposing=false for the Enter that commits an IME composition, so this branch can submit the form instead of merely accepting the composed text.",
+          "fix": "Add the Safari compatibility guard e.nativeEvent.keyCode === 229 alongside isComposing. Add an eval distinguishing IME-confirm Enter, ordinary Enter-to-send and Shift+Enter."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/references/react-19-patterns.md",
+          "line": 11,
+          "evidence": "The reference supplies complete ordinary Button and LibButton implementations using \"ComponentPropsWithoutRef<'button'>\", \"ref?: Ref<HTMLButtonElement>\" and forwardRef. These repeat the main file's ref-selection table and standard wrapper mechanics; the subsequent generic call-signature repair supplies the actual additional knowledge.",
+          "fix": "Condense the two ordinary button implementations to a short signature comparison, retaining the generic forwardRef repair and version-specific failure modes."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

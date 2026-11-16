@@ -1,0 +1,59 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/assets/templates/migration-template.sql",
+      "line": 20,
+      "evidence": "\"CREATE TABLE IF NOT EXISTS table_name\" introduces a generic table, foreign-key and index example across lines 19\u201336. Much of this block repeats standard SQL syntax rather than adding knowledge beyond the model's baseline; the engine-specific transaction and locking guidance provides the actual delta.",
+      "fix": "Replace the generic table, foreign-key and index example bodies with short insertion placeholders. Retain the engine-specific wrappers, lock and transaction rules, time-zone guidance, rollback warnings and author header."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 29,
+      "evidence": "\"The writes that must commit together set the table or document boundaries.\" The relational branch conflates transaction boundaries with table boundaries: creating an order, its line items and an inventory decrement can require one atomic transaction without placing those entities in one table.",
+      "fix": "Separate the engine branches explicitly: on relational engines, derive tables from entities, keys and integrity requirements, then identify the changes that must share a transaction. On MongoDB, use the existing boundedness, ownership and access-pattern conditions to choose document boundaries, and identify when a multi-document transaction is necessary."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 63,
+      "evidence": "\"CREATE TEMP TABLE gate (ok INTEGER NOT NULL CHECK (ok = 1));\" creates a connection-scoped temporary table, but the rebuild procedure reaches COMMIT without dropping it. Following the procedure for a second table on the same application or migration-runner connection fails because gate already exists; this also affects a combined products/order_items money conversion.",
+      "fix": "After the final successful validation insert and before COMMIT, execute `DROP TABLE temp.gate;`. Alternatively, use a distinct gate name for each rebuild and drop each gate before committing. Preserve the existing rollback-on-error behavior."
+    }
+  ]
+}

@@ -1,0 +1,126 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "lesson-learned",
+      "percent": 93.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 91.2,
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/lesson-learned/SKILL.md",
+          "line": 23,
+          "evidence": "| Specific commit | `git show <sha>`; for a merge commit, `git show --first-parent <sha>` |",
+          "fix": "Cut the command rows the model already knows (`git show <sha>`, `git diff`, `git diff --cached`) down to the parts it would get wrong: the merge-commit `--first-parent` form, `??` paths and the three-dot base diff. That keeps the table to non-obvious choices."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/lesson-learned/SKILL.md",
+          "line": 38,
+          "evidence": "1. List the candidate causal changes.",
+          "fix": "Add a short heuristic for telling causal changes from incidental ones before ranking. For example: \"ignore formatting, lockfile and generated hunks; a candidate is a hunk whose removal would change behavior or a test outcome\". This turns step 1 into a method rather than a declaration."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/lesson-learned/SKILL.md",
+          "line": 28,
+          "evidence": "For a diff over 500 lines, read `--stat` first, then the high-signal hunks.",
+          "fix": "Add a Git gotcha: lockfiles, snapshots and generated output often make up most of a large diff's lines and `--stat` ranks them first. Exclude them with pathspecs (for example `git diff <base>...HEAD -- . ':!*.lock' ':!package-lock.json'`) before choosing high-signal hunks."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/lesson-learned/SKILL.md",
+          "line": 3,
+          "evidence": "description: \"Use when users ask what they learned, want an engineering takeaway, or reflect on recent commits, a branch diff, a specific commit, or staged/unstaged changes\u2014even without naming Git or a principle. ... Not for generic engineering tutorials, ordinary bug reviews, or implementing refactors.\"",
+          "fix": "Use when users ask what they learned, want an engineering takeaway or retrospective insight, or reflect on a finished PR, feature branch, refactor, debugging session, recent commits, a specific commit or staged, unstaged or untracked changes, even without naming Git or a software engineering principle. Grounds one lesson in the actual diff, with evidence and a next-time practice. Not for generic engineering tutorials, bug reviews, commit messages, release notes, postmortems or planning a refactor."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/lesson-learned/SKILL.md",
+          "line": 11,
+          "evidence": "Always read [the diff-signal lookup](references/se-principles.md); its evidence column is the check a principle name must pass.",
+          "fix": "Gate the lookup on scope: \"Read references/se-principles.md at step 5 of Select and verify, once change evidence exists. Do NOT load it when nothing is in scope.\" That way, no-change runs and quick questions without a diff do not spend context on it."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/lesson-learned/evals/evals.json",
+          "line": null,
+          "evidence": "Every eval supplies a pasted diff, log or status file; none exercises the scope table (base resolution via `git symbolic-ref`, the merge-commit `--first-parent` case or the default feature-branch scope)",
+          "fix": "Add an eval with a fixture repo, or a pasted `git log --graph` and status, for a feature branch off origin/main that contains a merge commit. Assert that the answer states the base it used and reads the merge with `--first-parent`. Also add a should-trigger query that names neither Git nor 'lesson' (for example 'that took way longer than it should have, anything I should do differently on the next ticket?')."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/lesson-learned/SKILL.md",
+          "line": 20,
+          "evidence": "Then `git log --oneline <base>..HEAD` and `git diff <base>...HEAD`. ... If nothing is in scope, say there is no change evidence and stop",
+          "fix": "Add a branch for a feature branch already merged into the base (the 'PR #217 just merged' case): when `<base>..HEAD` is empty but the branch has its own commits, find the merge with `git log --merges --first-parent <base> --grep=<branch>` or use `git reflog`/the PR's merge commit, and read it with `git show --first-parent <merge>`. Without this branch the skill stops with 'no change evidence' when the work is actually present."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/lesson-learned/SKILL.md",
+          "line": 56,
+          "evidence": "'NEVER cite a file, commit or line you did not read' restates baseline evidence hygiene; 'List the candidate causal changes' at line 39 likewise adds generic process rather than the specific scope and false-positive knowledge that distinguishes this skill.",
+          "fix": "Compress selection steps 1\u20133 into one instruction to rank causal changes by demonstrated consequence and defensible counterfactual. Fold source-location recording into verification step 4 instead of keeping the standalone generic citation reminder."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/lesson-learned/SKILL.md",
+          "line": 34,
+          "evidence": "'git show <merge> prints a combined diff that is empty for a clean merge' is too absolute: a conflict-free merge can have a nonempty combined diff when a file changed relative to both parents.",
+          "fix": "Replace the explanation with: 'Combined diffs show only files changed relative to every parent, so they can omit changes introduced by a merge, including clean merges. Use git show --first-parent <sha> to inspect what entered the first-parent branch.' Keep the existing first-parent command."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/lesson-learned/evals/evals.json",
+          "line": 5,
+          "evidence": "The six cases include 'extraction-adds-coupling', 'mechanical-rename', 'precise-range' and 'untracked-only', but no assertions verify base resolution, dirty-base scope selection or first-parent merge evidence. Supplied diffs and logs bypass most of the Git evidence-selection workflow.",
+          "fix": "Add reproducible repository-backed eval cases for feature-branch base selection, a dirty base branch and a merge commit. Assert the selected scope, inclusion or exclusion of working changes, and the changes introduced relative to the merge's first parent."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/lesson-learned/SKILL.md",
+          "line": 21,
+          "evidence": "'git symbolic-ref --short refs/remotes/origin/HEAD; if that fails, local main or master' does not handle a dangling origin/HEAD: symbolic-ref can return a branch name whose target does not exist, after which log and diff fail without reaching the documented fallback.",
+          "fix": "Validate each candidate base with git rev-parse --verify --quiet \"<base>^{commit}\" before using it. If the remote default does not resolve to a commit, try local main, then master, then the existing last-five-commits fallback, and state which scope was selected."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

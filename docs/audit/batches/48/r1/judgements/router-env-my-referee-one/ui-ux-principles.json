@@ -1,0 +1,59 @@
+{
+  "skill": "ui-ux-principles",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/ui-ux-principles/SKILL.md",
+      "line": 164,
+      "evidence": "The passing example includes familiar React scaffolding such as `const [orders, setOrders] = useState<Order[]>([]);` and `useEffect(load, []);`. Weighted by lines, this scaffold plus the standard tokens, accessible-name, keyboard and interaction reminders dilute the stronger source-versus-render decision rules and framework gotchas.",
+      "fix": "Keep the canonical rule criteria and framework gotchas, but shorten the React example to the non-obvious patterns: an initially empty, persistently mounted status region; a retry transition that clears the error; and a Skeleton wrapping the final row geometry. Omit conventional state/fetch/list scaffolding the model already knows."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/ui-ux-principles/SKILL.md",
+      "line": 51,
+      "evidence": "The source-only failure branch requires a declared `width` or `min-width` above 360 px to have `no max-width cap`. For `min-width: 960px; max-width: 100%` outside a scroll container, this condition is false, so the workflow falls through to `na`. CSS min-width wins over a conflicting max-width, so the cap does not prevent the proven overflow.",
+      "fix": "Separate width and min-width in the source decision branch. A max-width cap can constrain width, but must not exempt an effective min-width above the test viewport unless a breakpoint reduces that minimum or the element is inside an allowed scroll container. Include `min-width: 960px; max-width: 100%` as a worked failing case."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/ui-ux-principles/evals/evals.json",
+      "line": 41,
+      "evidence": "The fix-dashboard assertion says `After a successful delete, the order disappears from the list or a confirmation is shown`. Its other assertions check the success announcement, but none requires a confirmation before deletion or an undo afterward. An immediate irreversible DELETE followed by a status message can satisfy every assertion while violating the states rule.",
+      "fix": "Add an independent, verifiable fix-dashboard assertion requiring either explicit confirmation before the DELETE request is sent or an undo that restores the deleted order. Distinguish this safety check from post-delete success feedback."
+    }
+  ]
+}

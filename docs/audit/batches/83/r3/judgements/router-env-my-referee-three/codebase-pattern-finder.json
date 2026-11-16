@@ -1,0 +1,77 @@
+{
+  "skill": "codebase-pattern-finder",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 21,
+      "evidence": "Extract the smallest self-contained section that works, with where it is used.",
+      "fix": "Delete this opening clause. The model already extracts minimal snippets. Keep only the repository-specific rules that follow it: one example per distinct approach, at most three in file-path order, and the 'Additional approaches' overflow."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 19,
+      "evidence": "Cover the requested pattern types (feature, structural, integration, testing); if none is named, search one feature pattern plus Testing Patterns only.",
+      "fix": "Add a candidate-finding method before step 1. Start from a distinctive anchor (a decorator, base class, route string, config key or error message), grep its usages, then follow imports out from one known instance. Do not start from generic words, because they flood the results with unrelated hits."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 13,
+      "evidence": "Critique, label anti-patterns or code smells, explain why a pattern exists, or suggest improvements.",
+      "fix": "Give the reason for the 'explain why a pattern exists' ban, for example: 'a guessed rationale is read by the caller as documented intent and gets copied into commit messages and design decisions'."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 54,
+      "evidence": "quote its signature plus the essential lines and cite the full range, or exceed 40 with a one-line reason",
+      "fix": "Pick one default and give the exception: 'Default: quote the signature plus the essential lines and cite the full range. Exceed 40 lines only when removing lines would break the snippet as a copyable unit, and say why in one line.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 62,
+      "evidence": "A test that only mocks the pattern shows nothing about how it is used: cite it as a mock, not as usage.",
+      "fix": "Give the mock case a place in the Output Format template. For example, under '### Testing Patterns' add '**Mock only**: `path/to/test.ext:NN` - [what is mocked]' so the agent knows where a mock-only test goes."
+    }
+  ]
+}

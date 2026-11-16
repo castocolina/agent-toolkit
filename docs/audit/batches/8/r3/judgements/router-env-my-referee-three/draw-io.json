@@ -1,0 +1,77 @@
+{
+  "skill": "draw-io",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 30,
+      "evidence": "The Skeleton section spends about 27 lines on a full generic mxfile/mxGraphModel/root example, and its closing note explains that cells 0 and 1 are required. Current models already know this basic mxGraph structure.",
+      "fix": "Shrink the Skeleton to the parts the model gets wrong: the uncompressed form, `background` on `<mxGraphModel>`, `fontFamily` on every cell, and edges after vertices. Cut the explanation of cells 0 and 1 down to one clause."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 159,
+      "evidence": "`repos:\\n  - repo: local\\n    hooks:` is a standard pre-commit local-hook YAML block, followed by the generic `pre-commit run ... --files` and `mise exec --` usage. These are generic tool tutorials the model knows.",
+      "fix": "Keep only the parts specific to this skill: copy the script into the repo for a stable path, pass `--stage` only from the hook, and match `files: \\.drawio$`. Move the full YAML to README.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 26,
+      "evidence": "`3. **Write the skeleton**, then **containers before children**, then **edges last**` sets the write order, but there is no step to plan coordinates first. A grid, the placement direction and gutter widths are where hand-written XML usually goes wrong, and placement direction appears only in references/layout-guidelines.md.",
+      "fix": "Add a planning step before step 3: before writing XML, pick one flow direction (left to right by default, top to bottom for request-shaped stacks), lay nodes on a fixed grid (for example 160px columns with gutters of 40px or more for labels), and size each container from its children plus 30px margins. Then write the coordinates."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/draw-io/evals/evals.json",
+      "line": 17,
+      "evidence": "The quarto-aws-figure eval asks for a Quarto slide figure. Its assertions do not check the slide-specific rules in SKILL.md: a 16:9 canvas, about 18px text, and `auto-stretch: false`. Some trigger negatives are not near-misses either, for example \"Convert a PDF flowchart into a list of process steps.\"",
+      "fix": "Add an assertion to quarto-aws-figure: \"Text-bearing cells use fontSize 18 or more and the canvas fits 16:9 (or the answer mentions `auto-stretch: false` for Quarto revealjs)\". Replace the PDF-flowchart negative with a near-miss such as \"export this .vsdx Visio diagram to SVG\" or \"embed an existing PNG diagram into my Quarto slide\"."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 84,
+      "evidence": "In the Arrows table, `| Ends share an axis and nothing sits between them | straight line |` gives no style string, while the Otherwise row gives a full one. An agent following this branch has to guess the style, and draw.io's default edge style is not a plain straight line.",
+      "fix": "Give the straight-line row a concrete style: `edgeStyle=none;html=1;endArrow=block;endFill=1;` plus matching exitX/exitY and entryX/entryY on the shared axis."
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "design-system-starter",
+      "percent": 94.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.8,
+        "router-env-my-referee-one": 92.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 27,
+          "evidence": "Thresholds: 4.5:1 normal text, 3:1 large text and essential UI boundaries (input borders, focus rings).",
+          "fix": "Cut the WCAG AA threshold values, which the model already knows. Keep only the non-obvious part: input borders and focus rings are essential UI boundaries held to 3:1, and pass is never inferred from palette names."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/design-system-starter/evals/evals.json",
+          "line": 45,
+          "evidence": "\"files\": [ \"legacy-settings.html\" ] (also tokens.json and broken-tokens.json), while eval accessible-dark-tokens lists the skill's own templates/ and references/ files as inputs",
+          "fix": "List the eval inputs as evals/files/legacy-settings.html, evals/files/tokens.json and evals/files/broken-tokens.json. Remove the skill's own templates/ and references/ files from the accessible-dark-tokens files list, because they are skill resources and not user inputs. No scripts/ exists, so the 8/7 evals and trigger-query split applies."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 33,
+          "evidence": "Default: semantic CSS custom properties switched by a `data-theme` attribute.",
+          "fix": "Add one line that maps DTCG paths to CSS variable names (for example color.semantic.action.hover -> --color-action-hover). Say where the dark value set's variables are emitted (a [data-theme=\"dark\"] block built from the same paths), and name the default build tool (Style Dictionary 5.4+ for 2025.10 object values). Without this, an agent following the token-only branch has to guess how the template's paths become the --color-* roles used in references/component-examples.md."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/design-system-starter/references/component-examples.md",
+          "line": 10,
+          "evidence": "The light/dark sections repeat standard CSS-variable wiring such as \"--color-action: var(--brand-action-light);\" and \"--color-action: var(--brand-action-dark);\". This boilerplate adds little knowledge beyond the stronger state-contract, DTCG compatibility and adoption guidance.",
+          "fix": "Replace the duplicated light/dark property lists with a compact semantic-role/state table and one representative theme override. Preserve the state selectors and the non-obvious browser-validation guidance."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 37,
+          "evidence": "\"Move one consumer per release onto the new tokens while the deprecated aliases keep the rest working.\" This fixes migration batch size regardless of consumer independence, release cadence or validated migration tooling.",
+          "fix": "Make one consumer the initial migration default, then allow larger batches when pilot checks pass and consumer release constraints permit. Keep alias compatibility and the removal window mandatory."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/design-system-starter/references/component-examples.md",
+          "line": 39,
+          "evidence": "The error selector is \".field[aria-invalid=\"true\"]\", but the supplied FormField usage renders \"<input {...props} type=\"email\" />\" without a field class. Following both examples sets aria-invalid but never applies the semantic error-border rule.",
+          "fix": "Add className=\"field\" to the rendered input and include an example with an error prop, so the demonstrated control actually matches the error selector and uses --color-danger."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

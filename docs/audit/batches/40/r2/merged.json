@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "react-dev",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 97.6,
+        "router-env-my-referee-three": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/references/react-19-patterns.md",
+          "line": 13,
+          "evidence": "The ordinary Button and LibButton implementations in lines 10\u201320, including \"return <button ref={ref} data-variant={variant} {...rest} />;\", repeat familiar wrapper syntax after SKILL.md has already selected the ref strategy.",
+          "fix": "Condense these two standard wrapper implementations into a brief activation reminder. Preserve the React 18 peer-compatibility decision and the following generic forwardRef inference example, which adds the non-obvious knowledge."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 19,
+          "evidence": "The dirty-tree fallback says \"or run the codemods on a new branch, so the diff shows only codemod changes.\" Creating a branch in the same dirty worktree retains its uncommitted changes, so this branch does not provide the promised isolation.",
+          "fix": "Check the working tree before any dependency updates. If dirty, ask the user to commit or stash, or use a separate clean git worktree based on HEAD and perform all dependency updates and codemods there. Explicitly state that creating a branch in the existing worktree does not isolate uncommitted changes."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 63,
+          "evidence": "Activation checklist, no explanation needed: native props via `ComponentPropsWithoutRef<'button'>`, variants as a discriminated union, `children: ReactNode`, an explicit state type when the initializer is `null`, `[]` or one member of a literal union.",
+          "fix": "Keep only the item models often get wrong (an explicit useState type when the initializer is null, [] or one literal-union member) and delete the rest. Current models already write ComponentPropsWithoutRef, discriminated variant unions and children: ReactNode without prompting."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 16,
+          "evidence": "Migration target first: when the task is upgrading an app to React 19, the target is 19 regardless of what is installed. On a clean git tree:",
+          "fix": "Make the migration path its own checklist with an exit checkpoint, for example: '- [ ] tree clean - [ ] deps bumped together - [ ] type codemods run - [ ] diff reviewed - [ ] continue at step 2 to classify and load references'. Right now the migration procedure sits inside the version-pinning step and never says to come back to classification."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/react-dev/examples/server-components.md",
+          "line": 121,
+          "evidence": "Use the keyed storage hook in [hooks.md](../references/hooks.md#external-state-and-ssr)",
+          "fix": "Add a row to the SKILL.md load table instead, for example: 'Server Components plus browser storage in a client child: examples/server-components.md and references/hooks.md'. Then every reference loads one level deep from SKILL.md and no example file chains to another reference."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/react-dev/evals/evals.json",
+          "line": null,
+          "evidence": "11 evals cover refs, forms, generics, routers, SSR storage, optimistic and IME, but none covers the step-1 codemod migration path or Next.js 15 Promise params / use() in a client component",
+          "fix": "Add an eval that gives a React 18 package.json plus a component using useRef<number>() and an implicit-return ref callback, with this prompt: 'upgrade this to React 19'. Assert that it bumps react, react-dom, @types/react and @types/react-dom together, runs types-react-codemod preset-19 plus the two opt-in transforms, and runs the typecheck. Add a second eval for Next.js 15 page params typed as a Promise."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-dev/SKILL.md",
+          "line": 19,
+          "evidence": "3. Review `git diff`, then typecheck (step 5). If the tree was dirty before step 2, ask the user to commit or stash first, or run the codemods on a new branch",
+          "fix": "I followed the migration branch, and the dirty-tree check comes after step 1 has already bumped dependencies and step 2 has already run the codemods, so the check comes too late. Move it to a step 0: 'Run git status; if the tree is dirty, ask the user to commit or stash, or create a branch, before any change.' Also add the runtime codemod (`npx codemod@latest react/19/migration-recipe`) before the type codemods. The type codemods alone do not handle removed runtime APIs such as ReactDOM.render or string refs."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

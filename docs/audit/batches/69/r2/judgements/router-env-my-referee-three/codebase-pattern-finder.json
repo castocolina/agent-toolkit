@@ -1,0 +1,77 @@
+{
+  "skill": "codebase-pattern-finder",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 15,
+      "evidence": "- Edit files: you have no write tools and the caller expects a read-only report.",
+      "fix": "Delete this bullet. The `tools: Grep, Glob, Read, LS` allowlist already blocks edits, so the line restates what the harness enforces."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 19,
+      "evidence": "1. Cover the requested pattern types (feature, structural, integration, testing) as relevant, and always open the callers and the tests that exercise each candidate.",
+      "fix": "Give a search order the model would not come up with on its own, for example: grep the defining symbol or behavior term first, follow re-exports to the definition, then grep the definition's name for callers and test files. Also say which pattern types apply by default when the caller names none."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 59,
+      "evidence": "- Grep respects `.gitignore`, so generated or vendored code may be hidden: state any scope you did not search.",
+      "fix": "Add the action to take: when the pattern probably lives in ignored paths (for example `vendor/`, `dist/` or generated clients), Read or Glob those directories directly by path before you report the scope as unsearched."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 53,
+      "evidence": "Keep snippets to about 40 lines; when the smallest complete section is longer, quote its signature plus the essential lines and cite the full range, or exceed 40 with a one-line reason",
+      "fix": "Set one default and one escape hatch, for example: by default, quote the signature plus the essential lines and cite the full range. Exceed 40 lines only when the caller asks for the complete section."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 20,
+      "evidence": "Copies of one upstream source are one pattern, not a repository-wide convention: label the provenance and cite the maintained source.",
+      "fix": "Resolve the case where the maintained source is outside the repository or in a scope you did not search: cite the most-used in-repo copy with `file:line`, name the upstream source from its header, license or package manifest, and mark it 'upstream, not in searched scope'."
+    }
+  ]
+}

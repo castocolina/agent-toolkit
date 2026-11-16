@@ -1,0 +1,62 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "sync-branch",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 27,
+          "evidence": "Pass `\"$branch\"` quoted. Single quotes are needed only for a literal name you type containing `$` (`'feature/weird$name'`), which the shell would otherwise expand.",
+          "fix": "Delete this gotcha. Models already know how shell quoting works, and the steps already quote \"$branch\" everywhere. Use the line for a git-specific trap instead."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 19,
+          "evidence": "Step 3 puts a three-way choice in one prose paragraph: the fork-point --onto case, the old_base --onto case, and the plain `git rebase \"origin/$target\"` case.",
+          "fix": "Split step 3 into a numbered decision list (3a fork-point differs from merge-base, 3b old_base rewritten, 3c default). Give each case its condition, its command and a one-line reason. This keeps the Process pattern scannable at the riskiest step."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 19,
+          "evidence": "Compute `fork=$(git merge-base --fork-point \"origin/$target\" \"$branch\")` (reflog based, so it works even when `old_base` is set but stale)",
+          "fix": "Add a gotcha: --fork-point can silently drop feature commits. This happens when those commits once appeared in the origin/<target> reflog, for example after they were pushed to the target and then force-reverted. Before pushing, compare `git log --oneline \"$orig\"` with the rebased range and stop if a feature commit is missing."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 18,
+          "evidence": "`git log --merges \"origin/$target..$branch\"` not empty: the branch has merge commits that a plain rebase linearises; stop and ask.",
+          "fix": "Say what to ask and what each answer does. Example: ask 'Rebase with --rebase-merges to keep the merge commits, or stop?'. On 'keep', add --rebase-merges to the step 3 rebase command. On anything else, stop without changes."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

@@ -1,0 +1,13 @@
+Run log: command executed from the skill directory, stdout captured, stderr discarded.
+
+$ bash scripts/create_bug_report.sh --id 'BUG-CHK-5521' \
+  --title '[Checkout] Double order and charge when Pay is clicked twice' \
+  --description 'Clicking Pay twice quickly can create two orders and two charges; reproduced on staging in 2 of 10 attempts; support ticket #5521' \
+  --step 'Add one item to the cart' --step 'Go to checkout' --step 'Click Pay twice quickly' \
+  --expected 'One order and one charge' \
+  --actual 'In 2 of 10 attempts, two orders and two charges' \
+  --build '2.4.0-rc2' --rate '2/10' --severity 'critical' --priority 'P0' './bugs'
+
+exit code: 0
+stdout:
+{"status":"created","id":"BUG-CHK-5521","file":"./bugs/BUG-CHK-5521.md"}

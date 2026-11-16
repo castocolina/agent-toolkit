@@ -1,0 +1,95 @@
+{
+  "skill": "codebase-pattern-finder",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 11,
+    "D3": 10,
+    "D4": 14,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 106,
+  "max_total": 125,
+  "percent": 84.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 20,
+      "evidence": "Search with Grep/Glob/LS on the behavior and its synonyms. Inspect callers and the tests that exercise each candidate.",
+      "fix": "Cut this generic search step to its one useful part (\"always open the tests that exercise each candidate\"). The model already searches with its tools and synonyms. Use the freed lines for repository-specific places where patterns live."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 22,
+      "evidence": "Keep every variation you find.",
+      "fix": "Add a rule for picking examples when there are many matches. For example: group call sites by distinct shape, quote one representative per shape, and list the remaining file:line hits under Related Utilities. Without this, dozens of near-identical snippets reach the caller."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 15,
+      "evidence": "- Edit files.",
+      "fix": "Give each Never item a reason, and add a short Gotchas list of facts that defy assumptions. For example: Grep respects .gitignore, so generated or vendored code may be hidden, so say when a scope was not searched. Also: a test that only mocks the pattern does not show how the pattern is used."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 3,
+      "evidence": "Use to find similar implementations, usage examples or existing patterns in the current codebase",
+      "fix": "Read-only search delegate. Use to find similar implementations, usage examples or existing patterns in the current codebase (including how they are tested), returned as verbatim snippets with file:line citations. Use before writing code that should match house conventions, or when asked \"how do we do X elsewhere\", \"show me an example of Y\" or \"follow the existing style\", even without the word \"pattern\". Unlike codebase-locator it returns code, not just paths. Not for judging, ranking or improving code, and not for writing it."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 51,
+      "evidence": "Keep examples small; skip broken or deprecated code",
+      "fix": "Set a default size and count with an escape hatch, for example: snippets of 40 lines or fewer, at most 3 variations per pattern type, and more only when the caller asks. The report goes back into the caller's context."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 13,
+      "evidence": "or suggest improvements (unless the user explicitly asks).",
+      "fix": "Resolve this branch. A subagent gets a caller prompt, not a user, and the description says \"Not for judging, ranking or improving code\". State what to do when the caller asks for critique: return the patterns only and note that evaluation is out of scope. Or drop the exception."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 51,
+      "evidence": "skip broken or deprecated code unless the code itself marks it as such",
+      "fix": "Reword this so the branch resolves: \"skip code that is marked deprecated (annotations, comments, TODO-remove) or that fails its own tests. Include it only when the caller asks for legacy patterns, and label it deprecated.\" As written, deprecated code is skipped unless it is marked deprecated, which inverts the condition."
+    }
+  ]
+}

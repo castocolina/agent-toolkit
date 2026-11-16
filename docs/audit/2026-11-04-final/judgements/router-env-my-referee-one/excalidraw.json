@@ -1,0 +1,41 @@
+{
+  "skill": "excalidraw",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 123,
+  "max_total": 125,
+  "percent": 98.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/scripts/scene.py",
+      "line": 272,
+      "evidence": "`n.get(\"shape\", \"rectangle\")` passes an unchecked shape directly to node(). Following `new` with {\"nodes\":[{\"label\":\"DB\",\"shape\":\"hexagon\"}]} constructs an element with type `hexagon`; check() only requires a nonempty element type, so write() reports success. A subsequent summary omits that node because its type is outside SHAPES. The validation gate therefore permits an unsupported element instead of rejecting the spec.",
+      "fix": "Validate each node's shape against SHAPES before constructing elements. Raise SceneError with the supplied value and supported choices, leaving OUT unwritten. Add a regression test asserting that an unsupported shape returns a clear error and creates no output file."
+    }
+  ]
+}

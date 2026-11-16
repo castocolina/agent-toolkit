@@ -1,0 +1,153 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "mermaid-diagrams",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 95.2,
+        "router-env-my-referee-three": 88.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/references/class-diagrams.md",
+          "line": 27,
+          "evidence": "\"A member is a method only if it has `()`\" and \"`*` after a member marks abstract, `$` marks static\" recap routine Mermaid syntax. These and the routine syntax inventories elsewhere dilute the otherwise strong parser, semantic, and host-specific knowledge.",
+          "fix": "Trim routine member/static-marker explanations and basic syntax inventories. Retain the nested-generic renderer limitation, multiplicity and identifier traps, and examples that directly demonstrate non-obvious failures."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+          "line": 28,
+          "evidence": "\"Rendered height/width at or above 0.4, and height under about three screens. Outside that range, split it.\" This mandatory every-type aspect-ratio constraint can force fragmentation of an already legible, short diagram.",
+          "fix": "Make the aspect ratio a warning rather than a mandatory split condition. Base splitting on actual text readability at the target column width and excessive rendered height, with an explicit exception for concise wide diagrams."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/evals/evals.json",
+          "line": 15,
+          "evidence": "The login-sequence eval includes \"references/authoring-rules.md\" in `files`, and most other cases similarly include instructional references. A matched without-skill run receiving the same input files would therefore also receive part of the skill's guidance, contaminating the baseline.",
+          "fix": "Restrict `files` to task inputs such as `evals/files/*.mmd` and source fixtures; use an empty list or omit it for self-contained prompts. Supply instructional references only through skill activation, then compare with-skill and without-skill runs using identical task inputs."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+          "line": null,
+          "evidence": "Section 6 spends many lines on three classDef palettes (A/B/C) and generic accessibility advice (\"about 8% of men have a color-vision deficiency\", \"dark ink on light fills\")",
+          "fix": "Cut the generic colour-accessibility prose and keep one default palette plus the non-obvious facts (classDef does not reach edge labels, linkStyle index shift, white text fails contrast)."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 26,
+          "evidence": "Step 4 restates the validation loop (\"Fix the reported line and rerun until exit 0\") and the self-check in step 3 repeats section 7 content",
+          "fix": "Keep the mmdc command, the sandbox fallback and the three-round stop. Cut the generic fix-and-rerun wording and point step 3 to section 7 instead of listing its rules again."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 13,
+          "evidence": "Step 2 is a five-row routing table with section numbers; it is a lookup table, not a way of thinking. The only thinking prompt is in authoring-rules section 1 (\"what question does this diagram answer?\")",
+          "fix": "Add a short ask-yourself check to the workflow, for example: what question does this diagram answer, and would a reader get the answer in under 10 seconds? Move the 'which type' decision into SKILL.md, because it is the main expert judgement and currently only the reference file states it."
+        },
+        {
+          "id": "D2-2",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": null,
+          "evidence": "The skill combines a ~70-line navigation body with Tool-style per-type reference files, but the pattern is not applied cleanly: the flowchart has no type file and routes into sections 4-5 of authoring-rules.md",
+          "fix": "Give the flowchart its own short reference, or state at the top that authoring-rules.md is the flowchart reference. Either choice keeps the routing uniform."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 13,
+          "evidence": "The load rules sit in a dense table that cites sections by number and heading (\"sections 1-3 ... and 6-7 ... for a flowchart also 4-5\"), and authoring-rules.md is mandatory on every path even for a one-line parse repair",
+          "fix": "Split authoring-rules.md by job, for example repair-rules.md for section 7 and design-rules.md for sections 1-6. Then a parse repair would not load the palette and layout sections."
+        },
+        {
+          "id": "D5-2",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/references/advanced-features.md",
+          "line": null,
+          "evidence": "Reference files point back to SKILL.md (\"Version limits are in SKILL.md\", \"The Chromium sandbox fallback is in SKILL.md step 4\") and to other reference files, which makes cross-links between files",
+          "fix": "State each fact once in the file that owns it. If a pointer is needed, name the file in the sentence that triggers it, for example: if the render fails with a sandbox error, see SKILL.md step 4."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": null,
+          "evidence": "The Gotchas list holds eight NEVER items. Silent sequence traps (an alias creating a second participant, an unbalanced `+`/`-` activation) are only in references/sequence-diagrams.md, which is read after the type has been chosen",
+          "fix": "Add one Gotchas line for the sequence silent failures, and one for the pie negative-value parse error, matching how the other types are handled."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 3,
+          "evidence": "Description is valid and has WHAT, WHEN, keywords and boundaries, but it is dense (about 830 characters) and the near-miss exclusion does not cover requests that only edit a diagram's surrounding file, such as front matter",
+          "fix": "Tighten the description to: \"Create, edit and repair Mermaid diagrams (.mmd files or ```mermaid blocks in Markdown). Use when asked to diagram, visualize, model or map out sequence flows, class models, ER diagrams or database schemas, state machines, C4 or architecture-beta architecture (including terse requests such as 'architecture: mobile client, API, database, email provider'), Gantt schedules, pie splits or Git branch history, or when a Mermaid diagram fails to render or export (mmdc, GitHub), even without naming Mermaid. Pick the type from the question the diagram answers; flowchart is the last resort. Not for prose-only explanations, explaining an existing diagram without changing it, edits to a file that leave its mermaid block alone, PlantUML or draw.io work, matplotlib data charts, or interactive diagram-canvas components.\""
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+          "line": null,
+          "evidence": "Section 6 offers palettes A/B/C plus 'any other palette is fine when contrast is at least 4.5:1', and the architecture reference still has an optional custom icon-pack section",
+          "fix": "Pick palette A as the single default and mention B and C in one line each as alternatives. Drop the icon-pack install block, or reduce it to one line gated by 'only when the user names a renderer that registers the pack'."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/mermaid-diagrams/evals/evals.json",
+          "line": null,
+          "evidence": "The `files` arrays list the skill's own reference files (e.g. \"references/authoring-rules.md\") next to real inputs, so they do not match the 'input files' field in evaluating-skills.md. Eval `order-states` has no validation assertion, and trigger-queries.json has 10 should-trigger and 9 should-not-trigger queries with only a few near-misses about mermaid itself",
+          "fix": "Keep only real inputs under evals/files/ in each `files` array. Add the mmdc-or-unverified assertion to `order-states`. Add two or three more near-miss negatives, such as 'fix the Mermaid version pinned in package.json' or 'write the YAML front matter of a Mermaid docs page', and one casual should-trigger query with typos."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/SKILL.md",
+          "line": 13,
+          "evidence": "The fork table does not say what to do when a request mixes jobs (for example a semantic repair that also asks for new colors), or when the type is plausible but not obvious and unstyled",
+          "fix": "Add one sentence after the table, for example: for a mixed job, take the union of the Read cells and apply the broader Change cell."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

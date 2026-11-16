@@ -1,0 +1,68 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 23,
+      "evidence": "\"For each hot read, put the equality columns first, then the range or sort columns, and check whether an existing index already covers that prefix.\" The model already knows the equality-before-range rule for composite indexes and the standard EXPLAIN commands for each engine.",
+      "fix": "Shorten step 2 to the part the model lacks: \"Each index must name the hot read or FK path it serves; not adding one is a valid, documented decision. Verify with the engine's plan command on production-like row counts (see the EXPLAIN ANALYZE gotcha).\""
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 24,
+      "evidence": "\"3. **Migrations.** Start migration files from `assets/templates/migration-template.sql`.\" This step only points at a file. It gives no ordering decision, while the other workflow steps each ask a question first.",
+      "fix": "Turn step 3 into a decision: \"Before writing a migration, classify each statement: does it rewrite the table, which lock does it take, and must it run outside a transaction (CREATE INDEX CONCURRENTLY, NOT VALID then VALIDATE)? Split it into one migration file per phase, then start each file from the template.\""
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/evals/evals.json",
+      "line": null,
+      "evidence": "All five evals target PostgreSQL or MongoDB. None exercises the MySQL gotchas (no partial index, generated-column uniqueness, implicit DDL commit, ALGORITHM/LOCK) or the SQLite gotchas (PRAGMA foreign_keys, table rebuild, INTEGER money). Evals 3 and 5 also list skill reference files (\"references/migrations.md\") under \"files\", but those are not eval inputs.",
+      "fix": "Add an eval such as \"our MySQL 8 app soft-deletes users and re-signup with the same email fails; also need to make orders.total non-null on a 20M-row table\". Assert the generated-column unique key, explicit `ALGORITHM=INPLACE, LOCK=NONE` and one DDL statement per migration. Keep only files under evals/files/ in \"files\"."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 34,
+      "evidence": "Following the review branch on the production legacy schema leads to adding the cross-tenant fix to a live table. The skill covers \"add the FK `NOT VALID`, then run `VALIDATE CONSTRAINT`\". It does not cover adding the required `UNIQUE (organization_id, id)` without blocking writes. It also gives no step to find existing rows whose tasks.organization_id differs from their project's, so VALIDATE would fail with no fallback.",
+      "fix": "Add to migrations.md a 'Retrofit tenant composite FK on a live table' section with these steps: (1) `CREATE UNIQUE INDEX CONCURRENTLY projects_org_id_uq ON projects (organization_id, id);` (2) `ALTER TABLE projects ADD CONSTRAINT projects_org_id_uq UNIQUE USING INDEX projects_org_id_uq;` (3) find mismatches with `SELECT t.id FROM tasks t JOIN projects p ON p.id = t.project_id WHERE t.organization_id <> p.organization_id;` and fix them (4) `ADD FOREIGN KEY (organization_id, project_id) ... NOT VALID`, commit, then `VALIDATE CONSTRAINT` (5) drop the old single-column FK."
+    }
+  ]
+}

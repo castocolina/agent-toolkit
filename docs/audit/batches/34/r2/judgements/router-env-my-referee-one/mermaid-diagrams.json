@@ -1,0 +1,77 @@
+{
+  "skill": "mermaid-diagrams",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 15,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/mermaid-diagrams/references/other-diagrams.md",
+      "line": 65,
+      "evidence": "The `pie showData` example with Web, Mobile, and API slices spends nine lines demonstrating elementary syntax the model already knows; the slice-count cutoff below it adds more useful judgment.",
+      "fix": "Remove the elementary pie example and retain the slice-count cutoff. Keep optional references concentrated on host constraints, silent failures, and non-obvious decisions rather than basic syntax demonstrations."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+      "line": 81,
+      "evidence": "\u201cA labeled branch out of a rectangle, or a store that is not a cylinder, is wrong.\u201d This treats visual conventions as hard correctness rules: ordinary process-to-process edges can legitimately carry labels without representing decisions.",
+      "fix": "Present the shape table as a default convention. Require diamonds for actual decisions, allow labels on ordinary process transitions, and permit an established user or repository shape vocabulary."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/mermaid-diagrams/references/class-diagrams.md",
+      "line": 29,
+      "evidence": "\u201cNested generics such as `Box~List~int~~` fail to parse; flatten them.\u201d Mermaid supports nested tilde generics, so following this branch unnecessarily discards the nested type structure.",
+      "fix": "Preserve supported nested generics, for example `Box~List~int~~`. Recommend an explicit alias or simplification only when validation against the actual target renderer demonstrates an unsupported construct."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/mermaid-diagrams/references/erd-diagrams.md",
+      "line": 45,
+      "evidence": "\u201cMany-to-many has no drawing of its own: model the junction table as an entity with two identifying (`--`) relationships.\u201d The file itself demonstrates `TAG }o..o{ ARTICLE`. For a junction with a surrogate primary key, the unconditional identifying-line instruction also contradicts step 5's PK-based rule.",
+      "fix": "Allow direct many-to-many notation for conceptual ERDs. Show a junction entity when modeling an actual junction table, and select each relationship independently: use `--` when that foreign key participates in the child's primary key, otherwise `..`."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+      "line": 122,
+      "evidence": "\u201cThe saturated fills often seen (`#00b894`, `#fdcb6e`, `#ff6b6b`) fail contrast with dark text.\u201d All three exceed 4.5:1 against the supplied palette's `#111111` text, so the status-palette branch rejects accessible combinations for an incorrect reason.",
+      "fix": "Correct the warning to distinguish text colors: these fills fail normal-text contrast with white, not with `#111111`. Keep the lighter palette as an optional default and assess alternatives using measured text/fill contrast."
+    }
+  ]
+}

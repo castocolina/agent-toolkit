@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "qa-test-planner",
+      "percent": 96.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 123,
+          "evidence": "When a run log is supplied, do not run the script again. Report the logged exit code and the JSON fields verbatim (`status`, `id`, `file`, or `error`/`missing`)...",
+          "fix": "Shorten this to one clause folded into the Exit 0 bullet (\"if the command already ran, read its logged exit code and JSON line instead of rerunning\"). It is written for the eval harness rather than for real users, and it repeats the exit-code handling in the next bullet."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 37,
+          "evidence": "1. **Requirements:** number them `R1..` (or keep the requester's IDs).",
+          "fix": "Delete step 1. Section 2 (line 30) already sets the R/K/TC ID convention, and numbering requirements is something the model already does. Start the plan branch at the scope-by-evidence step."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 20,
+          "evidence": "| a defect, \"X sometimes fails\" | Bug report | `references/bug_report_templates.md` | `references/test_case_templates.md` |",
+          "fix": "Add a short bug-report branch beside sections 3 and 4: (1) keep the first failure's evidence; (2) rerun under the same conditions to measure the rate (n/10); (3) set severity by impact, then priority from the rate grid in references/bug_report_templates.md; (4) write every missing fact as Unknown under Open Questions. Right now this order is split across Gotchas and the reference file."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/qa-test-planner/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "Several queries are short and have no context, e.g. \"Run unit tests and fix failures.\", \"Assess security vulnerabilities in this code.\", \"Use skill to compare login page with Figma.\"",
+          "fix": "Rewrite at least 6 queries with realistic context (file paths, build numbers, casual phrasing, typos), e.g. \"hey can u check ~/designs/login-v3 against the staging login page, button looks off\" (should_trigger false, no skill name). Keep the 11/12 positive/negative balance."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 23,
+          "evidence": "Plan plus cases in one request: write the plan first and pass its step 4 gate, then write the cases, each citing its K risk.",
+          "fix": "Add the load trigger for the second deliverable: \"...then read `references/test_case_templates.md` and write the cases, each citing its K risk.\" Following the plan row (line 16) alone, that file is listed under Do NOT load, so a combined request never loads the case format."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 41,
+          "evidence": "The plan's exit gates require 'every critical requirement has an executed, passing case; no open P0', but section 6 says 'A P0 failure blocks release until the authorized owner accepts the risk in writing'. references/regression_testing.md explicitly keeps accepted failures reported as failing. The authorized-waiver branch therefore permits release while still failing the plan's mandatory exit gates.",
+          "fix": "Make the exit gates and release-decision branch use one exception rule: every critical requirement must have a passing executed case and every P0 must be resolved, except specific failures covered by a valid written acceptance from the authorized release-risk owner. Require the acceptance record fields from references/regression_testing.md and retain the original failing status and evidence."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 75,
+          "evidence": "The worked example gives only the requirement 'a coupon applies once per account', then prescribes that the second checkout 'shows the stated refusal and charges full price'. The requirement establishes neither a refusal message nor whether checkout proceeds at full price; an implementation that blocks checkout until the coupon is removed could satisfy the requirement but fail this oracle.",
+          "fix": "Make the example's oracle assert that a second discounted redemption cannot occur. Specify the refusal and subsequent checkout behavior only when requirements establish them; otherwise record those details as Unknown under Open Questions. Assert a full-price charge only in a separately specified flow where the user confirms the undiscounted purchase."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

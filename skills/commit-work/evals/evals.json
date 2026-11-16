@@ -6,19 +6,23 @@
       "prompt": "Please commit the intended fix. `git status` shows only `src/auth.ts` modified, and `git diff` shows the token-expiry correction. Conventional Commits required; propose the ordered command sequence and commit message, but do not claim execution.",
       "expected_output": "Proposed ordered status/diff/stage/cached-diff/commit commands scoped to src/auth.ts and a type(scope): subject message.",
       "assertions": [
-        "Shows ordered `git status`, `git diff`, `git add src/auth.ts` (or `git add -p`), `git diff --cached`, and `git commit` commands.",
+        "Shows ordered `git status`, `git diff`, `git add -- src/auth.ts`, `git diff --cached`, and `git commit` commands.",
         "Proposes a message matching `type(scope): subject`, such as `fix(auth): correct token expiry`.",
-        "Clearly presents commands as proposed, not executed."
+        "Clearly presents commands as proposed, not executed.",
+        "Verifies the staged change with a relevant check before committing, and captures `git write-tree` before `git commit` to compare with `git rev-parse 'HEAD^{tree}'` after it."
       ]
     },
     {
       "id": "split-mixed-work",
-      "prompt": "I have formatting changes in README.md, a production feature in src/api.ts, and tests in tests/api.test.ts. Help me organize these into reviewable commits.",
-      "expected_output": "Keeps the implementation and required tests together as one independently verifiable feature commit, while separating unrelated documentation formatting if appropriate.",
+      "prompt": "I have formatting changes in README.md, a new profile endpoint in src/api.ts, and its tests in the new file tests/api.test.ts (state in split-mixed.txt). Help me organize these into reviewable commits.",
+      "expected_output": "Two commits: the README formatting alone, and src/api.ts with tests/api.test.ts together, each staged by path and reviewed with git diff --cached.",
       "assertions": [
-        "Does not split required feature tests away from implementation solely because they are in a tests directory.",
-        "Separates unrelated README formatting only if independently reviewable.",
-        "Recommends selective staging and `git diff --cached` review for each commit."
+        "Puts README.md in a separate commit from src/api.ts and tests/api.test.ts.",
+        "Keeps src/api.ts and tests/api.test.ts in the same commit.",
+        "Stages each commit by path (`git add -- <paths>`), never `git add -A` or `git add .`, and reviews `git diff --cached` before each commit."
+      ],
+      "files": [
+        "evals/files/split-mixed.txt"
       ]
     },
     {
@@ -29,6 +33,100 @@
         "Checks or recognizes the clean working tree",
         "Does not invent files or create an empty commit",
         "Explains no commit can be made until intended changes exist"
+      ]
+    },
+    {
+      "id": "message-only",
+      "prompt": "write me a commit message for what i've staged (diff in staged-fix.txt). don't commit, i'll do that myself",
+      "files": [
+        "evals/files/staged-fix.txt"
+      ],
+      "expected_output": "A Conventional Commits message for the staged token-expiry fix and its test, with no index-changing or commit commands and no trailers.",
+      "assertions": [
+        "Proposes a header matching `type(scope): subject` that describes the token-expiry boundary fix, such as `fix(auth): treat a token at its expiry time as expired`.",
+        "Proposes or runs no git command at all (no `git add`, `git commit`, `git commit -F` or `git reset`); gives only the message text.",
+        "The message carries no `Co-Authored-By`, `Signed-off-by` or \"Generated with\" trailer."
+      ]
+    },
+    {
+      "id": "unrelated-staged",
+      "prompt": "Commit my token-expiry fix in src/auth.ts. config/settings.json is staged for something else I'm doing; leave it exactly as it is. Repo state is in unrelated-staged.txt. Propose the commands and the message; do not claim you ran them.",
+      "files": [
+        "evals/files/unrelated-staged.txt"
+      ],
+      "expected_output": "A temporary-index commit of src/auth.ts that never touches the user's staged config/settings.json, followed by a path-limited reset of src/auth.ts.",
+      "assertions": [
+        "Keeps config/settings.json out of the commit and proposes no `git stash`, no `git reset` or `git restore --staged` on it, and no path-less `git reset`.",
+        "Builds the commit in a temporary index: `git read-tree HEAD`, `git add -- src/auth.ts` (or `git add src/auth.ts`) and `git commit` all carry the same `GIT_INDEX_FILE=` path.",
+        "After the commit, proposes `git reset -q -- src/auth.ts` (path-limited) and removing only its own run directory (`rm -rf -- <run>`, created with `mktemp -d`).",
+        "Presents the commands as proposed, not executed."
+      ]
+    },
+    {
+      "id": "mixed-hunks",
+      "prompt": "Commit only the expiry fix in src/auth.ts. The console.debug line is my local debugging: keep it in my working copy, out of the commit. Nothing else is staged and this is a non-interactive shell. State is in mixed-hunks.txt.",
+      "files": [
+        "evals/files/mixed-hunks.txt"
+      ],
+      "expected_output": "A patch holding only the expiry hunk applied with git apply --cached, an index review, verification of the staged version, and the debug line left unstaged.",
+      "assertions": [
+        "Stages a patch holding only the `now >= token.expiresAt` hunk with `git apply --cached`, not `git add src/auth.ts` and not `git add -p`.",
+        "Reviews `git diff --cached` before committing and confirms the `console.debug` line is not in it.",
+        "Verifies the staged version rather than the working tree, for example by exporting the index with `git checkout-index -a --prefix=<dir>/` and running `vitest run` there, or reports the staged version as not verified.",
+        "Leaves the `console.debug` line unstaged in the working tree."
+      ]
+    },
+    {
+      "id": "hook-failure-retry",
+      "prompt": "my commit failed, output's in hook-failure.txt. just run the same commit again",
+      "files": [
+        "evals/files/hook-failure.txt"
+      ],
+      "expected_output": "No blind retry: report the failing test, inspect the index the hook restaged, and ask for direction before committing.",
+      "assertions": [
+        "Does not rerun the same `git commit` as its next step.",
+        "Inspects `git status` and `git diff --cached` again because the hook ran `git add` and the index may now differ from the reviewed 2-line change.",
+        "Reports the failing `tests/auth.test.ts` refresh test and asks for direction instead of retrying until it passes.",
+        "Does not propose or offer `--no-verify`, not even as one option among several."
+      ]
+    },
+    {
+      "id": "rebase-in-progress",
+      "prompt": "Commit my fix to src/auth.ts please. Here's git status: rebase-status.txt",
+      "files": [
+        "evals/files/rebase-status.txt"
+      ],
+      "expected_output": "Stop before staging or committing because an interactive rebase is in progress, explain the consequence, and ask.",
+      "assertions": [
+        "Stops before staging or committing and asks how to proceed.",
+        "Explains that a commit now would land inside the rebase on a detached HEAD rather than on the branch, and would be lost if the rebase were aborted.",
+        "Does not itself run or propose as its own next action `git rebase --continue`, `--abort` or `--skip`."
+      ]
+    },
+    {
+      "id": "stage-only-user-staged",
+      "prompt": "stage the auth fix so i can commit it later myself. config/settings.json is already staged for something else, keep it that way. state's in unrelated-staged.txt",
+      "files": [
+        "evals/files/unrelated-staged.txt"
+      ],
+      "expected_output": "src/auth.ts staged in the real index next to the user's staged config/settings.json, the new delta reviewed, the user's entry confirmed unchanged, and no commit.",
+      "assertions": [
+        "Stages src/auth.ts in the real index with `git add -- src/auth.ts`, without a `GIT_INDEX_FILE=` temporary index.",
+        "Runs or proposes no `git commit`.",
+        "Leaves config/settings.json staged as it was: no `git reset`, `git restore --staged` or `git stash` on it, and checks it is unchanged after staging (for example `git ls-files -s -- config/settings.json` before and after)."
+      ]
+    },
+    {
+      "id": "hook-reformat-success",
+      "prompt": "commit went through, output in hook-reformat-success.txt. all good? i'm about to push",
+      "files": [
+        "evals/files/hook-reformat-success.txt"
+      ],
+      "expected_output": "Flag the tree mismatch: the hook changed what was committed beyond the reviewed 2-line change; show the difference and ask before amending.",
+      "assertions": [
+        "Notices that the `git write-tree` ID differs from `HEAD^{tree}` (and the 9/8-line commit stat differs from the reviewed 2-line change) and says the hook changed what was committed.",
+        "Shows or proposes `git diff 5f3c9a1e8b7d6c4a2f0e9d8c7b6a5f4e3d2c1b0a HEAD` (the pre-commit tree against HEAD) to report the content difference.",
+        "Reports the mismatch and asks how to proceed before any amend or fix-up commit; it does not amend or add a commit on its own."
       ]
     }
   ]

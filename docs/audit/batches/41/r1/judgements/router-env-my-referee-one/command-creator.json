@@ -1,0 +1,50 @@
+{
+  "skill": "command-creator",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 52,
+      "evidence": "\"Before delegating any step, ask: what does a subagent give here that the main thread lacks: isolation from a large search, a specialized registered agent, or parallel work?\" This recaps familiar subagent capabilities rather than adding command-specific expertise.",
+      "fix": "Compress the general delegation discussion to a brief default: run directly unless isolation or parallelism is necessary. Retain the command-specific approval-gate distinction, registered-agent constraint and instruction to honor requests for no agents."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/command-creator/references/patterns.md",
+      "line": 14,
+      "evidence": "\"If `$base` is empty, use `main` when `git rev-parse -q --verify --end-of-options refs/heads/main` succeeds, else `master`.\" In a repository containing neither branch, such as a trunk-only repository, this branch selects an unverified `master` and proceeds to the tool call; the subsequent validation covers only explicitly supplied arguments. The same fallback appears in references/examples.md.",
+      "fix": "Check that `main` exists, otherwise check that `master` exists; if neither exists, stop and ask for an explicit base branch. Validate the selected default before invoking the tool, and apply the same correction to the codex-review example in references/examples.md."
+    }
+  ]
+}

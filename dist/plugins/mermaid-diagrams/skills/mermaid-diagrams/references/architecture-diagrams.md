@@ -1,187 +1,38 @@
-# Architecture Diagrams Reference
+# architecture-beta
 
-Architecture diagrams visualize cloud services, CI/CD deployments, and infrastructure relationships. Introduced in Mermaid v11.1.0.
-
-## Basic Syntax
+Version, icon, and edge-label limits are in SKILL.md ("Renderer and host constraints"). This file covers syntax only.
 
 ```mermaid
 architecture-beta
-    group public_api(cloud)[Public API]
-    service api1(server)[API Server] in public_api
-    service db(database)[Database]
+    group ci(cloud)[CI]
+    group prod(cloud)[Production]
 
-    api1:R --> L:db
+    service repo(disk)[Git repo] in ci
+    service runner(server)[Build runner] in ci
+    service registry(database)[Container registry] in prod
+    service cluster(server)[Production cluster] in prod
+    junction j1 in prod
+
+    repo:B --> T:runner
+    runner{group}:B --> T:j1
+    j1:L --> R:registry
+    j1:R --> L:cluster
 ```
 
-## Building Blocks
+## Syntax
 
-### Groups
+- `group id(icon)[Title] in parent?`, `service id(icon)[Title] in group?`, `junction id in group?`.
+- Edge: `a:R --> L:b`. Each side letter (`T`, `B`, `L`, `R`) names where the line leaves or enters a box; `-->`, `<--`, `<-->`, `--` set arrowheads.
+- `a{group}:B --> T:b` starts the edge at the boundary of `a`'s group instead of the service.
 
-Group related services together:
+## Layout traps
 
-```
-group {groupId}({icon})[{title}] (in {parentId})?
-```
+- Edge sides are the only layout lever: `a:R --> L:b` places `b` to the right of `a`, `a:B --> T:b` places it below. Plan a top-down chain with `B --> T` edges (authoring-rules.md section 2, "Direction and proportion").
+- A junction splits one edge into up to four branches without crossing lines.
 
-```mermaid
-architecture-beta
-    group public_api(cloud)[Public API]
-    group private_api(cloud)[Private API] in public_api
-```
+## Custom icon packs
 
-### Services
-
-Declare services (nodes):
-
-```
-service {serviceId}({icon})[{title}] (in {parentId})?
-```
-
-```mermaid
-architecture-beta
-    group api(cloud)[API tier]
-    service api_server(server)[API Server] in api
-    service cache(server)[Cache] in api
-    service db(database)[Database]
-
-    api_server:R --> L:db
-```
-
-### Edges
-
-Connect services with edges:
-
-```
-{serviceId}{{group}}?:{T|B|L|R} {<}?--{>}? {T|B|L|R}:{serviceId}{{group}}?
-```
-
-**Directions:** `T` (top), `B` (bottom), `L` (left), `R` (right)
-
-**Arrows:** `<` for incoming, `>` for outgoing
-
-```mermaid
-architecture-beta
-    service client(browser)[Client]
-    service api(server)[API]
-    service db(database)[Database]
-
-    client:B --> T:api
-    api:R --> L:db
-```
-
-### Junctions
-
-Create 4-way splits:
-
-```
-junction {junctionId} (in {parentId})?
-```
-
-```mermaid
-architecture-beta
-    service input(server)[Input]
-    service output1(server)[Output 1]
-    service output2(server)[Output 2]
-
-    junction j1
-
-    input:R --> L:j1
-    j1:T --> B:output1
-    j1:B --> T:output2
-```
-
-## Icons
-
-**Default icons:** `cloud`, `database`, `disk`, `internet`, `server`
-
-**Custom icons:** Use a custom icon only after registering its icon pack in the rendering host. Unregistered icons may render as missing glyphs; validate the diagram in the target renderer. Default examples above use built-in icons.
-
-### Using @iconify-json Icon Packs
-
-Use npm icon packs with Mermaid CLI for a wide variety of technology logos:
-
-```bash
-npm install @iconify-json/logos @mermaid-js/mermaid-cli
-mmdc --iconPacks @iconify-json/logos -i ./diagram.mmd -o ./output.svg
-```
-
-Use icons with the `logos:` prefix:
-
-```mermaid
-architecture-beta
-    service web(logos:docker)[Docker Container]
-    service k8s(logos:kubernetes)[Kubernetes Cluster]
-    service aws(logos:aws)[AWS Services]
-    service github(logos:github)[GitHub Actions]
-
-    web:R --> L:k8s
-    k8s:R --> L:aws
-    web:R --> L:github
-```
-
-**Popular icon packs:**
-
-| Icon Pack                    | Description                                   | Install                            |
-| ---------------------------- | --------------------------------------------- | ---------------------------------- |
-| `@iconify-json/logos`        | Technology brands (Docker, AWS, GitHub, etc.) | `npm i @iconify-json/logos`        |
-| `@iconify-json/bi`           | Bootstrap icons                               | `npm i @iconify-json/bi`           |
-| `@iconify-json/mdi`          | Material Design icons                         | `npm i @iconify-json/mdi`          |
-| `@iconify-json/simple-icons` | Simple icons                                  | `npm i @iconify-json/simple-icons` |
-
-Usage: `pack:icon-name` (e.g., `logos:docker`, `mdi:database`)
-
-## Complex Example
-
-```mermaid
-architecture-beta
-    group internet(cloud)[Internet]
-    group private_vpc(cloud)[Private VPC]
-
-    service lb(load_balancer)[Load Balancer] in internet
-    service api1(api)[API Server 1] in private_vpc
-    service api2(api)[API Server 2] in private_vpc
-    service db(database)[Primary Database] in private_vpc
-    service replica(database)[Read Replica] in private_vpc
-
-    lb:R --> L:api1
-    lb:R --> L:api2
-    api1:R --> L:db
-    api2:R --> L:db
-    db:R --> L:replica
-```
-
-## Edge Patterns
-
-| Pattern              | Description               |
-| -------------------- | ------------------------- |
-| `A:R -- L:B`         | Horizontal edge           |
-| `A:T -- B:B`         | Vertical edge (90 degree) |
-| `A:R --> L:B`        | Edge with arrow           |
-| `A:R <--> L:B`       | Bidirectional edge        |
-| `A{group}:R --> L:B` | Edge from group boundary  |
-
-## Group Edges
-
-Connect groups using the `{group}` modifier:
-
-```mermaid
-architecture-beta
-    group frontend(cloud)[Frontend]
-    group backend(cloud)[Backend]
-
-    service client(browser)[Client] in frontend
-    service api(server)[API] in backend
-
-    client{group}:B --> T:api{group}
-```
-
-## Best Practices
-
-1. Group services by environment (public/private) or layer (frontend/backend)
-2. Use consistent icons for service types
-3. Label edges with protocols (HTTPS, TCP, etc.)
-4. Use junctions for fan-out patterns
-5. Keep diagrams focused; split complex architectures into multiple views
+Only when the user names a renderer that registers the pack: Mermaid CLI takes it as `mmdc --iconPacks @iconify-json/logos ...`, a web page calls `mermaid.registerIconPacks`; then write `pack:icon-name` (`logos:docker`) and render in that host to confirm.
 
 ## Reference
 

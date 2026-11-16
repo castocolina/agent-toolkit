@@ -1,0 +1,135 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "design-system-starter",
+      "percent": 91.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8,
+        "router-env-my-referee-one": 90.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 34,
+          "evidence": "Step 8: \"Ship a component documentation guide: per component, purpose, props with types and defaults, states, accessibility notes, one usage example. Publish migration notes; deprecate old names, keep a compatibility window, state the removal version.\"",
+          "fix": "Cut this to the non-obvious rule, for example: \"Token meaning changes are major-only; keep deprecated names as aliases to the new path for the compatibility window.\" The model already knows the generic contents of a documentation guide and of semver deprecation."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 33,
+          "evidence": "\"Integrate into the pilot screen and the most constrained consumer.\"",
+          "fix": "Say how to pick it, for example: \"the most constrained consumer is the one with the oldest framework version, a non-React stack or a fixed release train. Pick it so that API gaps show up before wider adoption.\""
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 3,
+          "evidence": "The description has no implicit-intent trigger and no atomic-design keywords, although the trigger queries expect \"atoms, molecules, and organisms\" and \"standardize colors and spacing across three product teams\" to trigger the skill",
+          "fix": "Set up or evolve a shared design system: semantic design tokens (DTCG .tokens.json, CSS custom properties), light/dark token themes, reusable component APIs (atoms, molecules, organisms), contrast-checked token pairs, and versioned migration off scattered styles. Use when asked to create a design system or token file, convert raw values into semantic tokens, standardize colors, spacing or UI across apps or teams, define component library conventions, or version and deprecate shared tokens and components, even if the user never says \"design system\" or \"tokens\". Not for reviewing or fixing one screen or component against UI rules (ui-ux-principles), one-off pages, ARIA how-to questions in an existing form, Storybook stories for existing components, SVG icon optimization, logos, or marketing copy."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 34,
+          "evidence": "Step 8 never loads the checklist, although Resources says \"checklists/design-system-checklist.md: auditing an existing UI (step 1) or gating a release (step 8)\"",
+          "fix": "Add to step 8: \"Before publishing, load `checklists/design-system-checklist.md` and complete its Release gate section.\" The trigger then sits in the workflow step and not only in the Resources list."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 34,
+          "evidence": "\"deprecate old names, keep a compatibility window, state the removal version\": no default window",
+          "fix": "Give a default with an escape hatch, for example: \"Default: deprecated tokens and props keep working through the next major release and are removed in the one after; shorten this only when every consumer is in one repository.\""
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/design-system-starter/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "Several negatives are far-misses that test nothing (\"Review this logo concept for brand recognition.\", \"Give me a usability test script for our checkout flow.\", \"Build a landing page with a pricing table and hero copy.\"). Most queries also lack realistic context such as file paths or team names, and the casual-brand-kit eval has a vague expected_output (\"A practical starter covering foundational tokens...\")",
+          "fix": "Replace two or three far-misses with near-misses, for example \"rename the --blue-500 variable in src/app.css to --primary\" or \"generate a Figma variables export for our existing tokens\". Add file paths or personal context to positives, for example \"~/repo/packages/ui/theme.ts\". Make the casual-brand-kit expected_output name the deliverables the assertions check."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 24,
+          "evidence": "\"With a shell, run it on 6-digit hex values instead of doing the arithmetic by hand\": no path for 3-digit hex, alpha (#rrggbbaa, rgba) or non-sRGB colors (oklch, display-p3)",
+          "fix": "Add a fallback branch: \"Expand 3-digit hex first. For a token with alpha, composite it over its actual background before measuring. For oklch or display-p3, convert to sRGB hex (gamut-clipped) first and report the converted value with the ratio.\""
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/design-system-starter/templates/component-template.tsx",
+          "line": 23,
+          "evidence": "`onClick={loading ? (e) => e.preventDefault() : onClick}` suppresses activation only during loading. Following the inherited-props branch with `aria-disabled={true}` and `loading={false}` announces a disabled button but still invokes its click handler and permits default submission.",
+          "fix": "Compute an effective aria-disabled state from loading and the boolean/string aria-disabled prop. When that state is true, prevent default activation and do not invoke onClick; retain focusability for aria-disabled/loading and preserve native disabled behavior."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/design-system-starter/templates/component-template.tsx",
+          "line": 5,
+          "evidence": "The comment claims that appending className and excluding inline style means 'neither bypasses' focus and theme roles. The custom-class branch merely concatenates classes; a consumer class can still override outline, foreground, or background through the CSS cascade.",
+          "fix": "Do not claim class concatenation protects accessibility or token contracts. Prefer arbitrary layout classes on a documented outer wrapper or constrained slot. If root className remains, document its trust boundary and enforce prohibited focus/color overrides with tooling and rendered theme/focus checks."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 24,
+          "evidence": "The Workflow section mixes expert pilot-selection and alias-validation gates with familiar semantic-token, CSS-variable, and documentation guidance. In particular, 'linearize each sRGB channel' and the luminance/ratio derivation repeat standard WCAG mechanics already implemented by the command at line 27; the line-weighted body is not predominantly expert-only knowledge.",
+          "fix": "Remove the duplicated textbook contrast derivation while retaining the runnable command, thresholds, and blocking validation gate. Condense routine semantic-token, theming, and documentation reminders; preserve the pilot-selection rules and DTCG/toolchain/schema gotchas."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 31,
+          "evidence": "Step 5 says 'Do NOT load either ... for ... a non-React stack', including references/component-examples.md. Step 7 nevertheless directs any project with a browser test rig to run the theme-state check in that reference, and Resources also gates it on component-API work without a React restriction.",
+          "fix": "Apply the non-React prohibition only to templates/component-template.tsx. Explicitly allow the framework-independent CSS and browser-validation sections of references/component-examples.md for non-React work, while marking its React FormField example as React-only."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/design-system-starter/evals/evals.json",
+          "line": 10,
+          "evidence": "The small-app starter eval unconditionally asserts 'Outputs a component list with primitive, composed, and product levels'. The workflow instead defers hierarchy for an app without repeated patterns and permits product modules only where reuse exists; this assertion can penalize a correctly scoped starter.",
+          "fix": "Accept tokens plus two or three primitives when reuse is not established, and require composed/product levels only when justified by consumers. Add a separate multi-consumer prompt if the full hierarchy needs an unconditional assertion."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

@@ -1,1 +1,87 @@
-{"skill_name":"daily-meeting-update","evals":[{"id":"manual-standup","prompt":"Help me prepare for standup. Yesterday I fixed a checkout timeout and reviewed Dana's PR. Today I'll finish the retry logic. I'm blocked waiting on staging credentials, and I want to discuss the rollout date. No tools or integrations are available.","expected_output":"A concise Markdown daily update using supplied facts, with yesterday/today/blockers/discussion topics and no invented integration activity.","assertions":["Includes Yesterday, Today, Blockers, and Topics for Discussion sections","Mentions checkout timeout, retry logic, staging credentials, and rollout date accurately","Does not fabricate GitHub/Jira activity or ask integrations despite explicit no-tools context"]},{"id":"consented-integration","prompt":"I need a daily update. GitHub CLI is available, but don't access it unless I approve. For now use only: yesterday I investigated flaky tests; today I plan to stabilize CI; no blockers; I want to ask about release timing.","expected_output":"Generate an update from the provided manual input only, without accessing GitHub absent approval.","assertions":["Does not claim to have checked or pulled GitHub activity","Includes the four supplied standup points in a Markdown update","Does not invent PRs, commits, or tickets"]},{"id":"missing-interview-details","prompt":"Make my standup update. Yesterday I worked on a bug. Today is unclear; I have a blocker but can't remember what; no idea about discussion topics. Don't assume details.","expected_output":"Ask focused follow-up questions for missing meaningful context rather than inventing work, blocker, or topics; preserve known information.","assertions":["Does not invent the bug details, today's plan, or blocker","Asks follow-up questions to clarify missing today/blocker information","Addresses discussion topics instead of silently omitting the interview dimension"]}]}
+{
+  "skill_name": "daily-meeting-update",
+  "evals": [
+    {
+      "id": "manual-standup",
+      "prompt": "Help me prepare for standup. Yesterday I fixed a checkout timeout and reviewed Dana's PR. Today I'll finish the retry logic. I'm blocked waiting on staging credentials, and I want to discuss the rollout date. No tools or integrations are available.",
+      "expected_output": "A concise Markdown daily update using supplied facts, with yesterday/today/blockers/discussion topics and no invented integration activity.",
+      "assertions": [
+        "Includes Yesterday, Today, Blockers, and Topics for Discussion sections",
+        "Mentions checkout timeout, retry logic, staging credentials, and rollout date accurately",
+        "Does not fabricate GitHub/Jira activity or ask integrations despite explicit no-tools context"
+      ]
+    },
+    {
+      "id": "consented-integration",
+      "prompt": "I need a daily update. GitHub CLI is available, but don't access it unless I approve. For now use only: yesterday I investigated flaky tests; today I plan to stabilize CI; no blockers; I want to ask about release timing.",
+      "expected_output": "Generate an update from the provided manual input only, without accessing GitHub absent approval.",
+      "assertions": [
+        "Does not claim to have checked or pulled GitHub activity",
+        "Includes the four supplied standup points in a Markdown update",
+        "Does not invent PRs, commits, or tickets"
+      ]
+    },
+    {
+      "id": "missing-interview-details",
+      "prompt": "Make my standup update. Yesterday I worked on a bug. Today is unclear; I have a blocker but can't remember what; no idea about discussion topics. Don't assume details.",
+      "expected_output": "Ask focused follow-up questions for missing meaningful context rather than inventing work, blocker, or topics; preserve known information.",
+      "assertions": [
+        "Does not invent the bug details, today's plan, or blocker",
+        "Asks follow-up questions to clarify missing today/blocker information",
+        "Addresses discussion topics instead of silently omitting the interview dimension"
+      ]
+    },
+    {
+      "id": "approved-integration-merge",
+      "prompt": "Meeting date 2026-11-03, timezone UTC. Daily update please. I approved Claude Code history for yesterday and GitHub for acme/payments only. claude-digest.json is the digest output and gh-prs.json holds the authored and reviewed `gh search prs` results and `gh pr view` details for both PRs. Use sessions 1 and 3; session 2 is my personal blog, skip it. Today I'm pairing with Sam on the retry policy. No blockers. Topic: who owns the idempotency spike going forward?",
+      "files": [
+        "evals/files/claude-digest.json",
+        "evals/files/gh-prs.json"
+      ],
+      "expected_output": "A Markdown update in which the merged PR #412 and session a1b2c3d4 (same branch) form one Yesterday bullet, the idempotency spike is not presented as delivered, the blog session is absent, and today/blockers/topic come from the user's answers.",
+      "assertions": [
+        "Mentions the flaky checkout test fix as one work item with PR #412 and its title, not as separate session and PR bullets",
+        "Does not present the idempotency-keys spike (session c9d0e1f2 / draft PR #415) as completed; marks it in progress or asks whether it is done",
+        "Leaves out the blog session: no mention of blog, index.md or e5f6a7b8",
+        "Includes pairing with Sam on the retry policy, No blockers, and the idempotency spike ownership topic",
+        "Does not cite repositories other than acme/payments or claim to have run further commands",
+        "Does not list the approval of PR #420 (Bump card SDK to 5.2) under Yesterday: it was submitted on 2026-11-03, after the 2026-11-02 window"
+      ]
+    },
+    {
+      "id": "answer-contradicts-activity",
+      "prompt": "Standup in 10. I approved GitHub for acme/payments; gh-prs-open.json is what the skill's queries returned. Yesterday I finished the refund webhooks. Today I start on payout reports. No blockers. No topics.",
+      "files": [
+        "evals/files/gh-prs-open.json"
+      ],
+      "expected_output": "Before drafting a final update, the reply names both conflicts (refund webhooks reported finished while PR #508 is still open; no blockers while Dana requested changes on it) and asks the user to resolve them.",
+      "assertions": [
+        "Names the conflict that the refund webhooks are reported finished while PR #508 (Add refund webhook handler) is still open",
+        "Names the conflict between \"no blockers\" and Dana's requested changes on PR #508",
+        "Asks the user to resolve the conflicts instead of silently drafting the refund webhooks as completed"
+      ]
+    },
+    {
+      "id": "monday-window",
+      "prompt": "It's Monday morning. Make my daily update; you can check my Claude Code history for yesterday's work.",
+      "expected_output": "Asks which day counts as yesterday (for example Friday as the last working day) before running the digest or any query, then continues with the interview.",
+      "assertions": [
+        "Asks which day counts as yesterday (for example Friday) before running the digest or any other query",
+        "Does not report session or other activity before that question is answered"
+      ]
+    },
+    {
+      "id": "jira-resolution-window",
+      "prompt": "Meeting date 2026-11-03, timezone UTC, window 2026-11-02. I approved Jira project PAY; jira-issues.json is what the skill's JQL query returned. Today I'll pick up PAY-245. No blockers, no topics.",
+      "files": [
+        "evals/files/jira-issues.json"
+      ],
+      "expected_output": "Yesterday lists PAY-231 as done; PAY-240 appears only as a triage outcome (closed as duplicate), not as delivered work; PAY-219, resolved before the 2026-11-02 UTC window, is left out of Yesterday.",
+      "assertions": [
+        "Reports PAY-231 (Retry policy for card payments) as done yesterday",
+        "Reports PAY-240 (Duplicate refund emails) as a triage outcome such as closed as duplicate, never as completed or delivered work",
+        "Does not list PAY-219 (Payout CSV export) under Yesterday: its resolutiondate 2026-11-01T22:30:00Z is before the 2026-11-02 UTC window"
+      ]
+    }
+  ]
+}

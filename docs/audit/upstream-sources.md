@@ -54,3 +54,7 @@ These are proposals, not user-approved updates:
 - crafting-effective-readmes: review the upstream style guide change at `eb7b6b9a` (2026-08-11, multi-harness README rewrite and everyharness metadata) and compare the moved `crafting-effective-readmes/style-guide.md` before deciding what to port.
 
 The upstream audit command completed successfully after adding a Wikipedia User-Agent. No skill content was changed. The base-to-main repository compare reported `identical` (0 commits, 0 files), so there was no repo diff to review.
+
+## Review of 2026-11-04
+
+Every tracked row was re-reviewed on 2026-11-04 (plan 8 Task 6); decisions and statuses are in [2026-11-04/updates.md](2026-11-04/updates.md). Wikipedia:Signs of AI writing is pinned at revision 1383638008 (adapted). `hackergrrl/art-of-readme` is unreachable (404) and keeps its credit.

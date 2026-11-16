@@ -1,0 +1,86 @@
+{
+  "skill": "sync-branch",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 25,
+      "evidence": "Quote `\"$branch\"` and pass it after the remote: unquoted, `$` or `*` in a ref name is expanded by the shell.",
+      "fix": "Cut this to one clause, for example 'push `\"$branch\"` quoted'. The model already knows to quote shell variables, so the rest of the line spends tokens on generic shell advice."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 16,
+      "evidence": "If `origin/$branch` exists and `git merge-base --is-ancestor \"origin/$branch\" \"$orig\"` fails, the remote has commits the local branch lacks: stop",
+      "fix": "Add one decision check before step 3, matching the description's boundary 'Not for rebasing a branch others push to'. For example: 'If `git log --format=%ae \"origin/$target..origin/$branch\"` lists an author other than you, stop and ask before rewriting a shared branch.' The current ancestry check only catches remote commits that are not yet local. It misses a shared branch that is fully fetched."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 25,
+      "evidence": "unquoted, `$` or `*` in a ref name is expanded by the shell. Use single quotes for a literal name such as `'feature/weird$name'`.",
+      "fix": "Correct the stated reason. When a variable is expanded unquoted, a `$` inside its value is not expanded again; only word splitting and globbing apply. `git check-ref-format` already rejects `*`, `?`, `[` and spaces in ref names. Replace the line with: 'Pass `\"$branch\"` quoted. Single quotes are needed only when you type a literal name containing `$` (for example `'feature/weird$name'`), because the shell would expand `$name` in an unquoted or double-quoted literal.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 17,
+      "evidence": "If `old_base` is empty and the history looks rewritten, stop and report instead of guessing.",
+      "fix": "Make this branch resolvable by giving 'looks rewritten' a test. For example: 'If `old_base` is empty, compute `fork=$(git merge-base --fork-point \"origin/$target\" \"$branch\")`. If that is non-empty and differs from `git merge-base \"origin/$target\" \"$branch\"`, run `git rebase --onto \"origin/$target\" \"$fork\" \"$branch\"`. Otherwise run the normal rebase.' As written, the agent has to guess what 'looks rewritten' means."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 19,
+      "evidence": "Push the saved branch, quoted: `git push --force-with-lease origin \"$branch\"`.",
+      "fix": "In step 2, record `remote=$(git rev-parse --verify --quiet \"origin/$branch\")`. In step 5, push with an explicit lease: `git push --force-with-lease=\"refs/heads/$branch:$remote\" origin \"$branch\"`, or a plain `git push origin \"$branch\"` when `$remote` is empty. A background fetch between step 2 and step 5 still disarms a bare lease, so the ancestry check named in the Gotchas does not cover that window."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 19,
+      "evidence": "5. Push the saved branch ... If the lease is rejected, someone else pushed: stop, do not retry with `--force`.",
+      "fix": "Add a success outcome after the push. Report `git log --oneline \"origin/$target..$branch\"` (the replayed commits), the old SHA `$orig` and the new SHA, and say the PR now shows the rebased commits. Every failure branch has a defined report, but the success path ends without one."
+    }
+  ]
+}

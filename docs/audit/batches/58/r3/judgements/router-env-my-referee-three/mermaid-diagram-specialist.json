@@ -1,0 +1,86 @@
+{
+  "skill": "mermaid-diagram-specialist",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 12,
+    "D3": 12,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 111,
+  "max_total": 125,
+  "percent": 88.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 21,
+      "evidence": "3. Draft, then validate as the skill prescribes; on failure fix and re-validate.\n4. Report per the output contract.",
+      "fix": "Merge steps 3 and 4 into one line, such as '3. Run the skill's validation loop, then report.' The model already knows the generic draft-validate-fix loop, and the preloaded skill states it in full."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 14,
+      "evidence": "- new: pick the type from the question the diagram must answer, using the skill.",
+      "fix": "Add a delegate-level decision for new diagrams, such as: 'If the material answers more than one question (for example both data model and request flow), return one diagram per question rather than one combined diagram, and say which question each answers.' The procedure has no rule for scope or splitting."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 24,
+      "evidence": "## NEVER (four items, no Gotchas section)",
+      "fix": "Add a short Gotchas list of delegate-context facts. Example: 'The caller sees only your reply, not scratch .mmd/.svg files, so return the final source inline.' Example: 'A clean mmdc run does not prove that GitHub renders it, so name any version-specific construct.'"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 15,
+      "evidence": "then edit; a minimal diff beats a rewrite.",
+      "fix": "Add an escape hatch with a threshold, such as: 'Rewrite only when more than half the edges are wrong or the type itself is wrong, and say so in the change list.' Otherwise the agent cannot tell when a rewrite is allowed."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 19,
+      "evidence": "- restyle: change styling only; every node, edge and label stays.",
+      "fix": "Resolve the case where validation fails on a restyle-only request (step 3 says 'on failure fix'). For example: 'If the original fails to parse during a restyle, treat it as mixed: apply the minimal repair first, list it as a repair change, then restyle.' As written, step 3's fix conflicts with 'every label stays'."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 17,
+      "evidence": "- wrong meaning: compare each edge and cardinality with the source material, then list each corrected relationship.",
+      "fix": "Add an outcome for a wrong-meaning repair that comes with no source material, such as: 'If no source material was supplied, ask for it or return the specific relationships you could not verify, per step 2.' Without that, the comparison has nothing to check against."
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "skill": "command-creator",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 79,
+      "evidence": "NEVER stage with `git add .` or `git add -A` in a commit workflow: it sweeps in generated files, secrets and unrelated work.",
+      "fix": "Remove this gotcha because models already know this general git advice. The 'Stage named paths only' line in the side-effects skeleton in references/patterns.md already covers the rule for command bodies."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 8,
+      "evidence": "A command file is a prompt template: Claude Code substitutes the arguments, runs any `` !`cmd` `` lines, and hands the result to the model as the user's turn.",
+      "fix": "Keep only the order of operations that matters, in one clause: placeholders and `!` lines are resolved before the model reads the body. Drop the rest of the general explanation of what a command file is."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 16,
+      "evidence": "5. **Write frontmatter and arguments** (sections below).",
+      "fix": "Make step 5 a decision: 'Add disable-model-invocation if the body commits, pushes, publishes, deploys, sends or deletes. Declare `arguments:` for fixed-shape values and use `$ARGUMENTS` for free text. Add argument-hint exactly when the body reads arguments.' This puts the key choices in the workflow instead of pointing to the tables."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/command-creator/evals/evals.json",
+      "line": 22,
+      "evidence": "\"Specifies five frequent error types and honors the no-delegation constraint\"",
+      "fix": "Split this into two checkable assertions: 'The body returns exactly the five most frequent error types with counts' and 'The command has no `context: fork`, no `agent:` and no subagent step'. Also add an eval where a same-named skill exists in .claude/skills/, and assert that the response stops and offers a rename or an update."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 13,
+      "evidence": "or update the existing skill or command instead. Never write a shadowed command, and never overwrite an existing command file without the user's yes.",
+      "fix": "Add an update branch to the Workflow. When the target command file exists and the user approves updating it, read the file first. Keep its frontmatter fields unless the change requires editing them, change only the steps the user asked about, then run the checklist on the whole merged file before writing. As written, the description promises 'Create or update' but no steps cover updating."
+    }
+  ]
+}

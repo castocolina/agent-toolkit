@@ -1,0 +1,126 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "database-schema-designer",
+      "percent": 94.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6,
+        "router-env-my-referee-one": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 38,
+          "evidence": "Unique keys accept many NULLs in PostgreSQL, MySQL and SQLite. If a missing value must also be unique, use PostgreSQL 15+ `UNIQUE NULLS NOT DISTINCT` or make the column `NOT NULL`.",
+          "fix": "Cut this gotcha down to its expert part, the PostgreSQL 15+ `UNIQUE NULLS NOT DISTINCT` clause, or merge it into the soft-delete gotcha at line 39, which already depends on NULLs not colliding. The model knows that SQL unique keys accept many NULLs."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 44,
+          "evidence": "Never change what an existing column means in place. ... During a rolling deploy, old and new app versions read and write the same column, so an in-place change silently corrupts rows.",
+          "fix": "Shorten this to one activation line: list the risky value formats (enum codes, units, token or hash formats) and point to expand-contract in references/migrations.md. The rolling-deploy explanation is general knowledge and is already restated in migrations.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 24,
+          "evidence": "Before designing, answer four questions and act on each answer. Does any table already hold production data? ... In MongoDB, embed a child only when it is read with its parent, bounded in size, owned by that parent alone, and updated atomically with it. Reference it when ...",
+          "fix": "Split step 1 into a four-item sub-checklist with one line per question and its action: live data, tenant noun, atomic writes, hot reads. Move the MongoDB embed-or-reference rule into its own short decision list. The Process pattern needs checkpoints the agent can tick off, not a single seven-sentence paragraph."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 36,
+          "evidence": "Use one nullable FK per parent type plus `CHECK (num_nonnulls(article_id, photo_id) = 1)` on PostgreSQL, or a shared supertype table the FK can target.",
+          "fix": "Choose a default and give the condition for switching. For example: 'Default: one nullable FK per parent type plus the num_nonnulls CHECK. Switch to a shared supertype table when there are more than about three parent types, or when new parent types are added often.'"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/evals/evals.json",
+          "line": 32,
+          "evidence": "\"files\": [ \"references/migrations.md\" ] (also at lines 60, 81, 100 with references/schema-design-checklist.md and references/migrations.md)",
+          "fix": "Remove the skill's own reference files from each eval's `files` and keep only real user inputs under evals/files/. Passing references/*.md as input gives the without-skill baseline the skill's knowledge, so the with/without delta no longer measures the skill or tests whether it loads the reference at the right step."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/database-schema-designer/evals/evals.json",
+          "line": 36,
+          "evidence": "\"Mentions backward compatibility and a rollback or recovery consideration\"",
+          "fix": "Replace this with a check a grader can verify. For example: 'States that the PostgreSQL rollback is `ALTER TABLE users DROP CONSTRAINT users_phone_nn` or `ALTER COLUMN phone DROP NOT NULL`, a catalog-only change that loses no data, and keeps the NULL-tolerant code path until the constraint has held in production.' Also add an eval for a live MongoDB shape change, which follows the five-step order in the MongoDB gotcha."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 50,
+          "evidence": "| `references/migrations.md` | The change touches a table with production data | Greenfield design | conflicts with line 35: \"A type change, UNIQUE, PRIMARY KEY or FOREIGN KEY needs the 12-step rebuild in `references/migrations.md`.\"",
+          "fix": "Change the References row to: '`references/migrations.md` | The change touches a table with production data, or any SQLite change that ALTER TABLE cannot express (rebuild order) | Greenfield design on PostgreSQL, MySQL or MongoDB'. Without this, a SQLite type change on a dev database follows the 'Do not load' column and never reaches the rebuild order with the PRAGMA outside the transaction."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 66,
+          "evidence": "The SQLite rebuild proceeds from `INSERT INTO new_x (...) SELECT ... FROM x;` to `DROP TABLE x;` and eventually `COMMIT;`. Its only validation instruction is '`PRAGMA foreign_key_check;` must return no rows'; no failure branch is specified. A failed INSERT can abort only that statement, while a runner that continues executes the destructive statements. foreign_key_check also reports violations as rows rather than raising an error.",
+          "fix": "Specify an executable failure gate for SQLite rebuilds: stop on any statement error, verify the copied row count, inspect foreign_key_check results, and COMMIT only when all checks pass. Otherwise ROLLBACK and restore foreign_keys outside the transaction. Generated scripts should use an exception-handling driver or an equivalent fail-fast runner so DROP TABLE cannot execute after a failed copy."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/database-schema-designer/evals/evals.json",
+          "line": 32,
+          "evidence": "The unsafe-column-migration eval supplies `references/migrations.md` as an input file; the review, MySQL and SQLite evals likewise supply a skill reference. Under the specified with-skill/without-skill comparison, the baseline receives the procedural guidance whose added value the evaluation should measure.",
+          "fix": "Remove skill instruction references from the evals' files arrays. Supply only task data, such as the SQL fixtures under evals/files/, to both configurations. Let the with-skill run discover migrations.md and the checklist through SKILL.md, while the baseline receives neither instruction document."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 25,
+          "evidence": "Workflow step 2 says 'Each index names the hot read or FK path it serves'; step 1 already requires 'Each index you add must name one', step 4 repeats 'each index names its query', and the reference checklist repeats the requirement again.",
+          "fix": "Keep the query-to-index requirement and engine-specific plan commands together in workflow step 2. Shorten the other occurrences to a reference to that step, retaining the checklist's additional constraint-ownership and index-removal checks."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 11,
+          "evidence": "The skill requires 'state all four as `Assumption:` lines every time, scale included: either the default or the value the prompt gave.' This mandates the same output scaffolding even for a narrowly scoped migration or index question and labels explicitly supplied facts as assumptions.",
+          "fix": "Continue resolving all four context dimensions internally, but label only inferred values as Assumption lines. Treat user-supplied values as confirmed context, and allow concise answers to omit defaults that do not affect the requested decision or its safety."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

@@ -1,0 +1,95 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 38,
+      "evidence": "Unique keys accept many NULLs in PostgreSQL, MySQL and SQLite. If a missing value must also be unique, use PostgreSQL 15+ `UNIQUE NULLS NOT DISTINCT` or make the column `NOT NULL`.",
+      "fix": "Cut this gotcha down to its expert part, the PostgreSQL 15+ `UNIQUE NULLS NOT DISTINCT` clause, or merge it into the soft-delete gotcha at line 39, which already depends on NULLs not colliding. The model knows that SQL unique keys accept many NULLs."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 44,
+      "evidence": "Never change what an existing column means in place. ... During a rolling deploy, old and new app versions read and write the same column, so an in-place change silently corrupts rows.",
+      "fix": "Shorten this to one activation line: list the risky value formats (enum codes, units, token or hash formats) and point to expand-contract in references/migrations.md. The rolling-deploy explanation is general knowledge and is already restated in migrations.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 24,
+      "evidence": "Before designing, answer four questions and act on each answer. Does any table already hold production data? ... In MongoDB, embed a child only when it is read with its parent, bounded in size, owned by that parent alone, and updated atomically with it. Reference it when ...",
+      "fix": "Split step 1 into a four-item sub-checklist with one line per question and its action: live data, tenant noun, atomic writes, hot reads. Move the MongoDB embed-or-reference rule into its own short decision list. The Process pattern needs checkpoints the agent can tick off, not a single seven-sentence paragraph."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 36,
+      "evidence": "Use one nullable FK per parent type plus `CHECK (num_nonnulls(article_id, photo_id) = 1)` on PostgreSQL, or a shared supertype table the FK can target.",
+      "fix": "Choose a default and give the condition for switching. For example: 'Default: one nullable FK per parent type plus the num_nonnulls CHECK. Switch to a shared supertype table when there are more than about three parent types, or when new parent types are added often.'"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/evals/evals.json",
+      "line": 32,
+      "evidence": "\"files\": [ \"references/migrations.md\" ] (also at lines 60, 81, 100 with references/schema-design-checklist.md and references/migrations.md)",
+      "fix": "Remove the skill's own reference files from each eval's `files` and keep only real user inputs under evals/files/. Passing references/*.md as input gives the without-skill baseline the skill's knowledge, so the with/without delta no longer measures the skill or tests whether it loads the reference at the right step."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/database-schema-designer/evals/evals.json",
+      "line": 36,
+      "evidence": "\"Mentions backward compatibility and a rollback or recovery consideration\"",
+      "fix": "Replace this with a check a grader can verify. For example: 'States that the PostgreSQL rollback is `ALTER TABLE users DROP CONSTRAINT users_phone_nn` or `ALTER COLUMN phone DROP NOT NULL`, a catalog-only change that loses no data, and keeps the NULL-tolerant code path until the constraint has held in production.' Also add an eval for a live MongoDB shape change, which follows the five-step order in the MongoDB gotcha."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 50,
+      "evidence": "| `references/migrations.md` | The change touches a table with production data | Greenfield design | conflicts with line 35: \"A type change, UNIQUE, PRIMARY KEY or FOREIGN KEY needs the 12-step rebuild in `references/migrations.md`.\"",
+      "fix": "Change the References row to: '`references/migrations.md` | The change touches a table with production data, or any SQLite change that ALTER TABLE cannot express (rebuild order) | Greenfield design on PostgreSQL, MySQL or MongoDB'. Without this, a SQLite type change on a dev database follows the 'Do not load' column and never reaches the rebuild order with the PRAGMA outside the transaction."
+    }
+  ]
+}

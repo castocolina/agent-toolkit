@@ -1,0 +1,50 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 96,
+      "evidence": "'NEVER rerun a failed case until it passes and report the pass: the first failure is the evidence. Rerun under the same conditions only to measure the rate.' repeats the first-failure and rate instructions at lines 58\u201360; line 97 repeats the rate rule again. Missing-data instructions likewise recur at lines 31, 33, 127 and 136. These repeated activation reminders dilute otherwise useful task-specific procedures and oracles.",
+      "fix": "Consolidate first-failure preservation, safe reproduction and rate measurement in section 3b, retaining their rationale there; replace the repeated Gotchas bullets with one short cross-reference. Keep the missing-data policy in section 2 and its final validation check in section 8, shortening the intervening repetitions to references to that policy."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/scripts/generate_test_cases.sh",
+      "line": 223,
+      "evidence": "'|| fail 1 \"$OUTPUT_FILE already exists. Use --overwrite to replace it.\"' handles every noclobber creation failure as a collision. Following the branch with an existing but unwritable output directory produces an 'already exists' error even when the target is absent. Retrying with --overwrite reaches the unguarded redirection at line 220 and exits without the promised JSON manifest. create_bug_report.sh has the same failure path at lines 203\u2013207.",
+      "fix": "In both scripts, distinguish an existing target from permission or other I/O failures, and guard creation and writing so failures emit truthful structured errors. Extend SKILL.md section 7 with an I/O-error fallback that reports the failure and asks for a writable destination rather than suggesting --overwrite."
+    }
+  ]
+}

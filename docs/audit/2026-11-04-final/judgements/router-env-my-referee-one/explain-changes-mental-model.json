@@ -1,0 +1,50 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 71,
+      "evidence": "The instruction to \"page with `--stat` on the same source as step 1\" and \"read per-file diffs from that source with `-- <path>`\" repeats the large-diff procedure already given in section 1, steps 1\u20133.",
+      "fix": "Keep the truncation threshold and the warning against grouping unseen diffs, but replace the repeated paging commands with a reference to section 1's large-diff procedure."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 34,
+      "evidence": "\"Per group, read the per-file diffs (same source plus `-- <path>`)\" also applies after the preceding step selects a large PR. However, `gh pr diff` does not accept Git-style pathspec filtering, so that branch's prescribed command fails instead of retrieving the file's hunks.",
+      "fix": "Make paging source-specific: retain `-- <path>` for Git sources; for PRs, capture the complete `gh pr diff \"<pr>\" --color=never` output in a temporary file and read it in bounded sections by file; for custom patches, split the supplied text by file headers. If the complete patch cannot be obtained, request it from the user or use the stated provisional-report fallback."
+    }
+  ]
+}

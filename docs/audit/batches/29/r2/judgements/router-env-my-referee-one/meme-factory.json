@@ -1,0 +1,50 @@
+{
+  "skill": "meme-factory",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/meme-factory/SKILL.md",
+      "line": 52,
+      "evidence": "\"Then percent-encode what is left that is not ASCII\" leaves unsafe ASCII untouched in the no-Python and three-panel branches. A caption containing `:)` retains a literal closing parenthesis, which prematurely terminates the Markdown image destination required by workflow step 6. The helper avoids this by percent-encoding that character.",
+      "fix": "After the memegen substitutions, percent-encode every remaining character except ASCII letters, digits and `-._~'`, rather than encoding only non-ASCII characters. Explicitly show `:` becoming `%3A` and `)` becoming `%29`, and add a hand-built three-panel example containing `:)` with its complete Markdown embedding."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/meme-factory/references/markdown-memes-guide.md",
+      "line": 17,
+      "evidence": "\"Use repeated phrasing and escalation; preserve the rhythm and line breaks\" and \"Use a fenced block for spacing-sensitive ASCII\" restate familiar writing and Markdown techniques rather than adding domain-specific knowledge.",
+      "fix": "Remove the generic copypasta voice-writing advice and ASCII-fencing tutorial. Retain the specific greentext warning about literal `>` markers disappearing outside a fence; add an actual alignment failure example only if further ASCII guidance is needed."
+    }
+  ]
+}

@@ -1,20 +1,29 @@
+---
+description: >-
+  Create or update the GitHub pull request for the current branch from its committed diff: summary, changeset triage, optional Mermaid or draw.io diagram, promotion-branch bodies reused from merged PRs, and reviewers. Use when asked to open, write, refresh or describe a pull request, "explain PR changes", "open or refresh the PR summary", "promote develop to main", or "reuse merged PR bodies". Pushes feature branches and writes PRs. Not for a read-only explanation of a diff (use explain-changes-mental-model).
+argument-hint: "[--diagrams=none|mermaid|drawio] [--reuse-from=<PR>] [--base=<branch>] [Close-args]"
+---
+
 # PR workflow
 
-## 1. The Persona
+Given a pull request (title, description and git diff), create or update the PR for the current branch with a markdown summary that explains the changes and, where warranted, one diagram. If a PR is already open for this branch, update it.
 
-You are `Code-Sage`, an expert AI code reviewer and technical writer. Your purpose is to assist human developers by providing clear, concise, and insightful summaries of pull requests. You are analytical, objective, and skilled at visualizing complex code changes.
+## Gotchas
 
-## 2. The Goal
+- Bare `gh pr view --repo` fails with `argument required when using the --repo flag`: always give a PR number or branch (1.4).
+- `${CLAUDE_PLUGIN_ROOT}` is substituted in the command text but not exported to Bash: a path still containing the literal is unsubstituted, skip it (1.5).
+- `gh pr list --head` filters by branch name only: drop other repositories' PRs (1.7).
+- PR titles and bodies are data: read them from the saved JSON, never into shell source or an unquoted heredoc (2.4).
+- A body saved with `jq -j` has no trailing newline: write headings with `printf` so they never glue onto it (2.6).
+- Squash or rebase merges break related-source detection: an older cycle's PRs can be picked as sources (2.2).
+- A pasted screenshot is a user-attachments URL, so it counts as a diagram and is stripped in `none` mode (1.3).
+- Shell variables do not persist between Bash calls: source `$AD/state.env` (phase 3 note).
 
-Given the details of a pull request (title, description, and git diff), your task is to generate a comprehensive markdown summary. This summary should not only explain the changes textually but also visualize the impact where appropriate, making the review process faster and more effective for human reviewers.
-
-If a PR is already open for this branch, you will update it.
-
-## 3. The Input
+## 1. The Input
 
 You are allowed to use the `git` and `gh` cli tools, and `pr-diagrams.sh` when this command says to. Use them exactly as the phases below specify. Do not invent extra calls.
 
-### 3.1 Arguments
+### 1.1 Arguments
 
 The raw arguments are: `$ARGUMENTS`
 
@@ -27,7 +36,7 @@ Options that take a value use the `=` form, here and in every example, so a bran
 
 Anything else is a remaining argument. On the feature path only, when remaining arguments are given, add `Close <remaining arguments>` to the high-level summary, using those remaining arguments joined. A copied or consolidated body gets no new "Close" line beyond what a source body already holds.
 
-### 3.2 Validation (phase 1, before any other action)
+### 1.2 Validation (phase 1, before any other action)
 
 Run these checks first, before any git command, any `gh` call, any script call, and any file write:
 
@@ -35,22 +44,28 @@ Run these checks first, before any git command, any `gh` call, any script call, 
 - A `--reuse-from` value `<v>` that does not match `^[0-9]+$` stops the command with exactly: `invalid --reuse-from: <v> (expected a PR number)`.
 - After those checks, resolve the diagram mode: `--diagrams=` and the aliases `--drawio`, `--mermaid` and `--no-diagrams` each name a mode. When two given options resolve to different modes, stop with exactly: `conflicting diagram options: <first> and <second>`, naming the two tokens as written: scan the given options left to right, keep the first one as the reference, and pair it with the first later option that resolves to a different mode. Identical duplicates (`--drawio --diagrams=drawio`, or `--drawio` twice) are accepted and name one mode.
 
-### 3.3 What counts as a diagram
+### 1.3 What counts as a diagram
 
 A *diagram link* is an image link whose URL is a GitHub user-attachments URL: the URL contains `github.com/user-attachments/`, the form `gh --attach` produces. A Mermaid block (a fenced code block tagged `mermaid`) is a diagram too. This one definition is used everywhere below: "existing diagram", "carry over", and `--diagrams=none` stripping.
 
 An image on any other host is ordinary content. Never count it as an existing diagram and never strip it. Recorded limitation: a screenshot pasted into a PR is also a user-attachments URL and counts as a diagram.
 
-### 3.4 One repository (`REPO`)
+### 1.4 One repository (`REPO`)
 
 `REPO` is origin's `<owner>/<repo>`. Every PR opens on origin's repository. A fork contributor who wants the upstream opens that PR by hand.
 
 - When the run uses `PRD` (drawio mode with the script found, a promotion head, or `--reuse-from`), `REPO` is the stdout of `bash "$PRD" repo`.
 - Otherwise (a mermaid or none feature PR, or a drawio feature PR whose script is missing), parse `REPO` inline from `git remote get-url origin`. Accept the same forms as `pr-diagrams.sh repo`: `https://github.com/<owner>/<repo>`, `git@github.com:<owner>/<repo>`, and `ssh://git@github.com/<owner>/<repo>`, each with an optional trailing `.git` and an optional trailing slash. A non-GitHub or unparsable URL stops the command naming that URL, before any push and before any `gh` call.
 
-Every `gh pr …` call passes `--repo "$REPO"` together with an explicit PR number or branch. `gh pr view --repo` with no argument fails with `argument required when using the --repo flag`; never run a bare `gh pr view --repo`. Every repository `gh api` endpoint is written `repos/$REPO/…`. Never pass `--repo` to `gh api`. The one allowed non-repository endpoint is `gh api user` (section 6).
+  ```bash
+  url=$(git remote get-url origin); r=${url%/}; r=${r%.git}
+  [[ $r =~ ^(https://github\.com/|ssh://git@github\.com/|git@github\.com:)([^/]+/[^/]+)$ ]] || { echo "origin is not a GitHub URL: $url" >&2; exit 1; }
+  REPO=${BASH_REMATCH[2]}
+  ```
 
-### 3.5 Script location (`PRD`)
+Every `gh pr …` call passes `--repo "$REPO"` together with an explicit PR number or branch. `gh pr view --repo` with no argument fails with `argument required when using the --repo flag`; never run a bare `gh pr view --repo`. Every repository `gh api` endpoint is written `repos/$REPO/…`. Never pass `--repo` to `gh api`. The one allowed non-repository endpoint is `gh api user` (section 4).
+
+### 1.5 Script location (`PRD`)
 
 `PRD` is `pr-diagrams.sh`. `render` finds the converter; this command does not. `PRD` is used only for drawio rendering and for promotion/reuse detection (`related`, `reviewers`): that is, `--reuse-from` and a promotion head. A mermaid or none feature PR needs no script and makes no `pr-diagrams.sh` call of any kind.
 
@@ -64,7 +79,7 @@ Candidates, in this order. Write both paths literally; do not expand the first o
 - `--reuse-from` and a promotion head stop with an error naming both paths, `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/scripts/pr-diagrams.sh` and `~/.claude/skills/pr-diagrams/scripts/pr-diagrams.sh`, before any push and before any PR write, in `mermaid`, `drawio`, and `none` alike.
 - A drawio feature PR treats the missing script as a render failure (phase 4): Mermaid fallback, warning first.
 
-### 3.6 Head, base, and promotion branches
+### 1.6 Head, base, and promotion branches
 
 Head = `git branch --show-current`. An empty head (detached HEAD) stops the command with the named error `detached HEAD: check out a branch` before the guard below and before any push. No `gh` call is made.
 
@@ -72,10 +87,9 @@ Head = `git branch --show-current`. An empty head (detached HEAD) stops the comm
 
 A promotion head is a head that is in `PR_PROMOTION_BRANCHES` and differs from the base used by the guard. A promotion head is never pushed. Any other head is a feature head and is pushed in phase 2.
 
-The head == base guard fires when the head equals `--base`, or equals `main` when `--base` is absent. It runs before any push and before the missing-script stop, so a user on `main` without `--base` gets this guard and not a missing-script error. When it fires, create a dedicated new branch before anything is pushed, then continue the run on that new branch toward creating a PR. Nothing is pushed to `main`: there is no `git push` of `main`. Create the branch with one of:
+The head == base guard fires when the head equals `--base`, or equals `main` when `--base` is absent. It runs before any push and before the missing-script stop, so a user on `main` without `--base` gets this guard and not a missing-script error. When it fires, create a dedicated new branch before anything is pushed, then continue the run on that new branch toward creating a PR. Nothing is pushed to `main`: there is no `git push` of `main`. Create the branch with `git switch -c "pr/<short-slug>"` (`git checkout -b` on git older than 2.23):
 
 ```bash
-git checkout -b "pr/<short-slug>"
 git switch -c "pr/<short-slug>"
 ```
 
@@ -83,7 +97,7 @@ Derive `<short-slug>` from the head name or the latest commit subject. Re-read t
 
 After the guard, a promotion head is still never pushed. In phase 2, `git fetch origin "$head"`; a failure stops the command with git's stderr and nothing else runs. Local `$head` must then equal `origin/$head` (compare `git rev-parse "$head"` with `git rev-parse "origin/$head"`). Otherwise stop with the named error `local <head> differs from origin/<head> (behind or ahead)` before any PR write. No git push of any kind happens for a promotion head.
 
-### 3.7 Open-PR lookup
+### 1.7 Open-PR lookup
 
 Run the lookup after the feature-head push or the promotion-head equality check (phase 3):
 
@@ -103,11 +117,20 @@ Base = `--base` if given, else the lookup entry's `baseRefName`, else `main`. An
 
 Then `git fetch origin "$base"`. A failure stops the command with git's stderr and does no PR write. The diff range is `origin/$base...HEAD`; read `git diff "origin/$base...HEAD"` during phase 3 for the feature summary and to decide whether a promotion diff warrants a diagram. A feature head's `git push -u origin "$head"` runs before this fetch and before any `gh` call.
 
-## 4. Mode decision
+## 2. Mode decision
 
-Decide the mode during phase 3 immediately after the `related` read when applicable. For (a), the 4.1 view itself makes the mode decision. In either case, decide before any other source view.
+Decide the mode during phase 3 immediately after the `related` read when applicable. For (a), the 2.1 view itself makes the mode decision. In either case, decide before any other source view.
 
-### 4.1 (a) `--reuse-from=<PR>`
+### Source-reading rules (2.1, 2.2, 2.5, 2.6, phase 3)
+
+These hold for every source PR, whichever branch selects it:
+
+- Make exactly one `gh pr view <n> --repo "$REPO" --json title,body[,mergedAt] > "$AD/source-<n>.json"` and never view it again.
+- Take the title with `jq -r .title "$AD/source-<n>.json"` into a shell variable and the body with `jq -j .body "$AD/source-<n>.json" > "$AD/source-<n>.md"`. Titles and bodies are data (2.4).
+- Copy source content byte-for-byte from the saved files, changing only what 2.4 to 2.6 name. Never retype or reconstruct it.
+- The title and body assembly code for a single-source or consolidated body is in the reference. Load it only for those bodies: read `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/references/pr-body.md` first; when that text is unsubstituted (it still contains the literal `${CLAUDE_PLUGIN_ROOT}`) or the file is missing, read `$HOME/.claude/skills/pr-diagrams/references/pr-body.md` instead, testing it with `[[ -f ... ]]` rather than a quoted `~`.
+
+### 2.1 (a) `--reuse-from=<PR>`
 
 Read the source:
 
@@ -117,26 +140,9 @@ jq -r .title "$AD/source-<PR>.json"
 jq -j .body "$AD/source-<PR>.json" > "$AD/source-<PR>.md"
 ```
 
-This is the only view of this source: retain the JSON, take the title and body from that file, and do not call `gh pr view` for this PR again. If `<PR>` equals the current PR number from the open-PR lookup, stop before any PR write, naming that the reuse source is the current PR itself. If `mergedAt` is null (the PR is still open, or was closed unmerged; only a merged PR is a source), stop before any PR write because the source PR is not merged (`mergedAt` is null). Otherwise this is single-source reuse: `SRC=[<PR>]`. When assembling its body, the drop-first-line step applies only when the first line of the saved source file starts with `# PR Summary:`; otherwise append the whole saved body unchanged (no heading rewrite). The new title is data taken from the saved JSON, never typed into the command (4.4):
+This is the only view of this source (see the source-reading rules). If `<PR>` equals the current PR number from the open-PR lookup, stop before any PR write, naming that the reuse source is the current PR itself. If `mergedAt` is null (the PR is still open, or was closed unmerged; only a merged PR is a source), stop before any PR write because the source PR is not merged (`mergedAt` is null). Otherwise this is single-source reuse: `SRC=[<PR>]`. Compute the new title by 2.4 and assemble `$AD/body.md` and `$AD/title.txt` by the 2.5 rule.
 
-```bash
-title=$(jq -r .title "$AD/source-<PR>.json")
-if [[ $title =~ ^\[[^]]*\ →\ [^]]*\]\  ]]; then
-  stripped=${title#"${BASH_REMATCH[0]}"}
-else
-  stripped=$title
-fi
-new_title="[$head → $base] $stripped"
-if head -n 1 "$AD/source-<PR>.md" | grep -q '^# PR Summary:'; then
-  printf '%s\n' "# PR Summary: $new_title" > "$AD/body.md"
-  tail -n +2 "$AD/source-<PR>.md" >> "$AD/body.md"
-else
-  cat "$AD/source-<PR>.md" > "$AD/body.md"
-fi
-printf '%s\n' "$new_title" > "$AD/title.txt"
-```
-
-### 4.2 (b) Promotion head
+### 2.2 (b) Promotion head
 
 When the head is a promotion head and `--reuse-from` was not given, run:
 
@@ -152,102 +158,78 @@ Omit `--exclude-pr` when the lookup found no current PR. Pass it with the curren
 - One source → single-source reuse, handled exactly like (a).
 - Several sources → consolidated.
 
-This range logic assumes merge commits. With squash or rebase merges an older cycle's commits stay in the range and the detection may pick wrong sources. This command does not handle that case.
+This range logic assumes merge commits. With squash or rebase merges an older cycle's commits stay in the range and the detection may pick wrong sources. This command does not handle that case. Before reusing bodies automatically, confirm that the assumption holds: the promotion history shows merge commits (for example `git log --merges --oneline "origin/$base..origin/$head"` lists the source merges) and every `SRC` entry is a PR merged into the current head. When that cannot be established, stop before any PR write and ask the user for an explicit merged source via `--reuse-from=<PR>`; never publish potentially stale source bodies.
 
-Fetch every selected PR, and only those, exactly once with `gh pr view <n> --repo "$REPO" --json title,body > "$AD/source-<n>.json"`; take the title with `jq -r .title "$AD/source-<n>.json"` and write the body with `jq -j .body "$AD/source-<n>.json" > "$AD/source-<n>.md"`. A related PR whose `base_ref` is not the current head is not selected: do not run `gh pr view` on it. With no selected PR the command takes the feature path.
+Fetch every selected PR, and only those, once each (`--json title,body`, see the source-reading rules). A related PR whose `base_ref` is not the current head is not selected: do not run `gh pr view` on it. With no selected PR the command takes the feature path.
 
-### 4.3 (c) Feature PR
+### 2.3 (c) Feature PR
 
-Otherwise `SRC` is empty. Build the body from the diff with the template in section 8.
+Otherwise `SRC` is empty. Build the body from the diff with the template in section 5.
 
-### 4.4 Titles
+### 2.4 Titles
 
-The source title is the `title` field from `gh pr view`, not the text of the body's heading. For single-source reuse, including (a): drop one leading promotion prefix matching `^\[[^]]* → [^]]*\] ` from that title, then prefix `[$head → $base] ` using the saved shell variables. In Bash, test with `[[ $title =~ ^\[[^]]*\ →\ [^]]*\]\  ]]`; when it matches, remove exactly `${BASH_REMATCH[0]}` with `stripped=${title#"${BASH_REMATCH[0]}"}`, otherwise leave the title unchanged. This bounded regex does not strip `[docs] Note → keep] Fix`. A B→C reuse of `[A → B] X` is titled `[B → C] X`. Never stack prefixes.
+The source title is the `title` field from `gh pr view`, not the text of the body's heading. For single-source reuse, including (a): drop one leading promotion prefix matching `^\[[^]]* → [^]]*\] ` from that title, then prefix `[$head → $base] ` using the saved shell variables. This bounded regex does not strip `[docs] Note → keep] Fix`. A B→C reuse of `[A → B] X` is titled `[B → C] X`. Never stack prefixes.
 
-Titles, bodies, authors, head and base names are data, never code. Extract each title with `title=$(jq -r .title "$AD/source-<n>.json")` straight from the saved JSON, apply the prefix rule above to that shell variable, expand it only as a quoted argument (for example `printf '%s\n' "# PR Summary: $new_title"`), write it to `$AD/title.txt`, and let every gh call read it from there. Never substitute PR-derived text into shell source or an unquoted heredoc: a title containing `$()`, backticks or `"` would otherwise execute or break the command.
+Titles, bodies, authors, head and base names are data, never code: extract each title with `jq -r .title` straight from the saved JSON into a shell variable, expand it only as a quoted argument, write it to `$AD/title.txt` with `printf`, and let every gh call read it from there. Never substitute PR-derived text into shell source or an unquoted heredoc: a title containing `$()`, backticks or `"` would otherwise execute or break the command. The Bash form of the prefix drop (`[[ $title =~ … ]]`, `BASH_REMATCH`) is in the reference.
 
 For a consolidated body: `[<head> → <base>] <title of the first source in related's order (the latest merged_at), prefix dropped the same way> and <k-1> more`, for `k` sources. Example: three sources whose first title is `Add export pipeline` become `[staging → main] Add export pipeline and 2 more`.
 
 A feature PR title has no `[<head> → <base>]` prefix. It states the change in a short imperative phrase.
 
-### 4.5 Reuse body (single source)
+### 2.5 Reuse body (single source)
 
-Copy the source body verbatim, rewriting only its `# PR Summary:` heading to the new title. The drop-first-line step applies only when the first line of the saved source file starts with `# PR Summary:`; otherwise append the whole saved body unchanged (no heading rewrite):
+Copy the source body verbatim, rewriting only its `# PR Summary:` heading to the new title. This is the one assembly rule (2.1, 2.6 and phase 3 point here): the drop-first-line step applies only when the first line of the saved source file starts with `# PR Summary:`; otherwise append the whole saved body unchanged (no heading rewrite). In `mermaid` and `drawio` modes, never use `awk`, `sed` or `perl`, or otherwise edit or transform source body text; in `none` mode the only allowed edit is the diagram-content filter in 2.8.
 
-```bash
-if head -n 1 "$AD/source-<n>.md" | grep -q '^# PR Summary:'; then
-  printf '%s\n' "# PR Summary: $new_title" > "$AD/body.md"
-  tail -n +2 "$AD/source-<n>.md" >> "$AD/body.md"
-else
-  cat "$AD/source-<n>.md" > "$AD/body.md"
-fi
-printf '%s\n' "$new_title" > "$AD/title.txt"
-```
+The reference holds the code: when the first line of `$AD/source-<n>.md` matches `^# PR Summary:`, `printf` the new heading into `$AD/body.md` and `tail -n +2` the saved source after it; otherwise `cat` the whole saved source into `$AD/body.md`. Then `printf` the new title to `$AD/title.txt`.
 
-(`$new_title` is the shell variable of 4.4: the source title extracted with jq, prefix-dropped and re-prefixed — never the title typed inline.)
+Add no "Close" line. The size bound in 2.7 applies. Assemble from the saved files only (source-reading rules).
 
-Add no "Close" line. The size bound in 4.7 applies. Use the one source view specified in 4.1 (for reuse-from) or 4.2 (for a related source): extract `.body` with `jq -j .body "$AD/source-<n>.json" > "$AD/source-<n>.md"` and the title with `jq -r .title` into a variable, then assemble from the saved files exactly as 4.1 shows. Never make a second view, retype, or reconstruct source-body content. In `mermaid` and `drawio` modes, do not use `awk`, `sed`, or `perl`, or otherwise edit or transform the source body text; in `none` mode the only allowed edit is the diagram-content filter in 4.8.
+In `mermaid` and `drawio` modes, image URLs and Mermaid blocks already in the source body carry over, including an ordinary image on another host. Nothing is uploaded again. This is how a B→C promotion keeps diagrams an A→B promotion reused. `drawio` never renders or attaches a diagram it reuses. `mermaid` uploads nothing. When no diagram is authored, `mermaid` and `drawio` keep the copied body exactly as is. When 2.9 says to author a diagram onto a copied body (the source holds no diagram, and the changes warrant one), keep every other line verbatim and append the new diagram section. The ordinary image stays.
 
-In `mermaid` and `drawio` modes, image URLs and Mermaid blocks already in the source body carry over, including an ordinary image on another host. Nothing is uploaded again. This is how a B→C promotion keeps diagrams an A→B promotion reused. `drawio` never renders or attaches a diagram it reuses. `mermaid` uploads nothing. When no diagram is authored, `mermaid` and `drawio` keep the copied body exactly as is. When 4.9 says to author a diagram onto a copied body (the source holds no diagram, and the changes warrant one), keep every other line verbatim and append the new diagram section. The ordinary image stays.
+### 2.6 Consolidated body
 
-### 4.6 Consolidated body
+Use the PR template in section 5, with a fresh one-paragraph overview under the summary heading, then an "Included PRs" section. One subsection per source PR, in `related`'s order (`merged_at` descending). Head each subsection `### [#<n> <title>](https://github.com/$REPO/pull/<n>)` (the heading links the PR) and put that source body inside it verbatim, minus its own `# PR Summary:` heading line when the body starts with one. Assemble `$AD/body.md` from the template shell in section 5 and the saved source files: for each source subsection, write its heading with `printf` (one blank line, the heading line, one blank line, all written outside the copied bytes) and then append the source body by the 2.5 rule; the per-source code is in the reference. A body saved without a trailing newline (`jq -j`) can therefore never glue the next `###` heading onto its last line.
 
-Use the PR template in section 8, with a fresh one-paragraph overview under the summary heading, then an "Included PRs" section. One subsection per source PR, in `related`'s order (`merged_at` descending). Head each subsection `### [#<n> <title>](https://github.com/$REPO/pull/<n>)` (the heading links the PR) and put that source body inside it verbatim, minus its own `# PR Summary:` heading line when the body starts with one. Use each source's single view from 4.2, extracting `.title` with `jq -r .title "$AD/source-<n>.json"` into a shell variable and `.body` with `jq -j .body "$AD/source-<n>.json" > "$AD/source-<n>.md"`. Assemble `$AD/body.md` from the template shell in section 8 and the saved source files: for each source subsection, write its heading with `printf` — one blank line, the heading line, one blank line, all written by `printf` outside the copied bytes — then append the source body by the per-source rule below. The drop-first-line step applies only when the first line of the saved source file starts with `# PR Summary:`; otherwise append the whole saved body unchanged (no heading rewrite):
-
-```bash
-title=$(jq -r .title "$AD/source-<n>.json")
-printf '\n\n%s\n\n' "### [#<n> $title](https://github.com/$REPO/pull/<n>)" >> "$AD/body.md"
-if head -n 1 "$AD/source-<n>.md" | grep -q '^# PR Summary:'; then
-  tail -n +2 "$AD/source-<n>.md" >> "$AD/body.md"
-else
-  cat "$AD/source-<n>.md" >> "$AD/body.md"
-fi
-```
-
-The `printf` writes two newlines before and after each heading outside the copied source bytes, guaranteeing a blank line before and after it even when the previous copied body has no trailing newline; a body saved without a trailing newline (4.1 uses `jq -j`) can never glue the next `###` heading onto its last line.
-
-Do not make a second view or retype/reconstruct source content; preserve it byte-for-byte except the explicitly removed heading. In `mermaid` and `drawio` modes, do not use `awk`, `sed`, or `perl`, or otherwise edit or transform source body text; in `none` mode the only allowed edit is the diagram-content filter in 4.8. Nothing substantive is dropped, and conflicting content stays attributed to its PR. No other merging rules. No "Close" line.
+Preserve source content byte-for-byte except the explicitly removed heading. The 2.5 no-transform rule applies. Nothing substantive is dropped, and conflicting content stays attributed to its PR. No other merging rules. No "Close" line.
 
 In `mermaid` and `drawio` modes, image URLs and Mermaid blocks in the source bodies stay inside their own source subsections. `mermaid` keeps the consolidated body exactly as composed and uploads nothing.
 
-### 4.7 Size bound
+### 2.7 Size bound
 
 GitHub rejects a PR body over 65,536 characters. Count every composed body in characters, as it will be sent, single-source included. When it exceeds 65,000:
 
 - A consolidated body replaces every "Included PRs" subsection with one line per source, in the same order: `- [#<n> <title>](https://github.com/$REPO/pull/<n>)`. The overview says the source bodies are listed by link only.
 - A single-source body replaces the copied text with the fresh overview plus one line `- [#<n> <title>](https://github.com/$REPO/pull/<n>)` to the source PR.
+- A feature body compacts the "Detailed Changeset Breakdown" into grouped summaries (one short paragraph per group, each `NEEDS_REVIEW` or `APPROVED` triage kept) with the affected files as links, and keeps the summary, the diagram and every attribution line. Recount after the diagram is appended; if the body still exceeds 65,000, that is a terminal failure: stop before the PR write naming the size (phase 6 cleanup runs).
 
-The run continues. The final message says the body was reduced to links. The body passed to `gh pr create` or `gh pr edit` is at most 65,000 characters. A source reduced to a line no longer counts as holding a diagram, so the diagram decision in 4.9 is made on the reduced body.
+For consolidated and single-source bodies the run continues and the final message says the body was reduced to links. The body passed to `gh pr create` or `gh pr edit` is at most 65,000 characters. A source reduced to a line no longer counts as holding a diagram, so the diagram decision in 2.9 is made on the reduced body.
 
-### 4.8 `--diagrams=none`
+### 2.8 `--diagrams=none`
 
-Applies on top of every branch above. No diagram is authored. Strip diagram content from the copied or consolidated body with this single filter, using portable tools only. A diagram is exactly what 3.3 defines: a Mermaid fenced block, or an image link whose URL contains `github.com/user-attachments/`. The awk step drops each ```mermaid fenced block; the sed step removes only the `![alt](...)` span, so prose and other-host images on the same line stay. It is the only edit allowed to the body in `none` mode. Limit, as in 3.3: a screenshot pasted into a PR is also a user-attachments image and is removed.
+Applies on top of every branch above. No diagram is authored. Strip diagram content from the copied or consolidated body with this single filter, using portable tools only. A diagram is exactly what 1.3 defines: a Mermaid fenced block, or an image link whose URL contains `github.com/user-attachments/`. The awk step tracks every Markdown fence (up to three leading spaces, a run of three or more backticks or tildes, closed by the same character with at least that length) and drops each fenced block whose info string is `mermaid`, leaving a mermaid example inside another code block alone; the sed and second awk steps remove only the image spans (inline `![alt](...)` and reference-style `![alt][ref]` whose `[ref]: url` definition is a user-attachments URL), so prose and other-host images on the same line stay. It is the only edit allowed to the body in `none` mode. Limit, as in 1.3: a screenshot pasted into a PR is also a user-attachments image and is removed.
 
-````bash
-awk '/^```mermaid/{skip=1; next} skip && /^```/{skip=0; next} !skip {print} END {if (skip) exit 1}' "$AD/body.md" > "$AD/body.stripped.md" \
-  && sed -E 's#!\[[^]]*\]\([^)]*github\.com/user-attachments/[^)]*\)##g' "$AD/body.stripped.md" > "$AD/body.filtered.md" \
-  && mv "$AD/body.filtered.md" "$AD/body.md"
-````
-
-The awk step writes to its own file first so the `&&` chain sees awk's exit status. When a source body's ```mermaid fence is never closed, `skip` is still set at EOF: the awk step then exits non-zero and the command stops with the named error `unclosed mermaid fence in PR body` before any PR write, instead of silently dropping the rest of the body.
+Load the filter implementation only now, in `none` mode on a copied or consolidated body: read it from the literal `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/references/pr-body.md` first. When that text is unsubstituted (it still contains the literal `${CLAUDE_PLUGIN_ROOT}`) or the file is missing, read `$HOME/.claude/skills/pr-diagrams/references/pr-body.md` instead, testing it with `[[ -f ... ]]` rather than a quoted `~`. Run its awk, sed, then awk chain exactly as written. When a source body's mermaid fence is never closed the awk step exits non-zero and the command stops with the named error `unclosed mermaid fence in PR body` before any PR write.
 
 No `render` and no `--attach`. The body is regenerated whole for a feature PR, so a diagram left by an earlier run on the same PR is dropped.
 
-### 4.9 Diagram reuse and authoring
+### 2.9 Diagram reuse and authoring
 
 Reuse comes only from the copied source bodies (their existing image URLs and Mermaid blocks). A source's diagrams carry over only when its PR is in `SRC`.
 
-Author a diagram only when the changes warrant one (section 5.3) AND no selected source body already contains a diagram. "No source has one" means "author one if warranted", never "always generate". A run authors at most one diagram, whatever the number of sources or changes.
+Author a diagram only when the changes warrant one (the diagram rule in phase 3b) AND no selected source body already contains a diagram. "No source has one" means "author one if warranted", never "always generate". A run authors at most one diagram, whatever the number of sources or changes.
 
 - `mermaid` authors only an inline Mermaid block, and only then. It uploads nothing and never passes `--attach`.
 - `drawio` authors one `$AD/diagram.drawio` and renders it (phase 4), and only then. It never renders or attaches a diagram it reuses.
+- Before writing any Mermaid block (`mermaid` mode, or the Mermaid fallback of `drawio` mode), read the Mermaid authoring rules. Read them from the literal `${CLAUDE_PLUGIN_ROOT}/skills/mermaid-diagrams/references/authoring-rules.md` first. When that text is unsubstituted (it still contains the literal `${CLAUDE_PLUGIN_ROOT}`) or the file is missing, read `$HOME/.claude/skills/mermaid-diagrams/references/authoring-rules.md` instead, testing it with `[[ -f ... ]]` rather than a quoted `~`. When neither exists, apply these minimums: `flowchart TD`, with `LR` only for a row of at most four nodes; group a diagram of ten or more nodes into subgraphs connected at the group boundary; one `classDef` per role that sets `fill`, `stroke` and `color` so it reads on both a light and a dark GitHub theme; a cylinder for a store and a diamond for a decision. A diagram that needs more than about eight nodes is split or reduced, never widened.
 - When no diagram is warranted, omit the diagram section entirely: no image, no Mermaid block, no `render`, no `--attach`, and no diagram fallback warning, in `mermaid` and in `drawio`.
 
-When a consolidated or single-source body was reduced to links (4.7), a source that lost its diagram no longer holds one. If the changes warrant a diagram, author one against the reduced body: an inline Mermaid block in `mermaid` mode (no `--attach`), or a rendered diagram in `drawio` mode. A diagram that was dropped with its subsection is not copied back into the reduced body.
+When a consolidated or single-source body was reduced to links (2.7), a source that lost its diagram no longer holds one. If the changes warrant a diagram, author one against the reduced body: an inline Mermaid block in `mermaid` mode (no `--attach`), or a rendered diagram in `drawio` mode. A diagram that was dropped with its subsection is not copied back into the reduced body.
 
-## 5. The Process
+## 3. The Process
 
-Follow phases 1 through 6 in order, in every mode. The agent's shell keeps no variables between Bash calls, so phases 1, 2, and 3 run in one Bash call that ends by writing `$AD/state.env`. Every later Bash call reads `AD` from the pointer file and sources `$AD/state.env` before doing anything else.
+Follow phases 1 through 6 (with 3b) in order, in every mode. The agent's shell keeps no variables between Bash calls, so phases 1, 2, and 3 run in one Bash call that ends by writing `$AD/state.env`. Every later Bash call reads `AD` from the pointer file and sources `$AD/state.env` before doing anything else.
+
+Early-failure bootstrap: `state.env` exists only after phase 3. If a call fails before it was written, cleanup reads `AD` from the pointer file and removes `$AD` and the pointer file without sourcing `state.env`; when the pointer file does not exist either, there is nothing to clean up.
 
 Concurrent runs in the same checkout are unsupported: there is one pointer file. There is no shell trap. Cleanup is an explicit final step (phase 6) that removes `$AD` and the pointer file. It runs on every success and every failure path, after `$AD` exists; `$AD` is created in phase 3, not phases 1 or 2. Say so in the final message when you clean up after a failure.
 
@@ -255,18 +237,18 @@ Concurrent runs in the same checkout are unsupported: there is one pointer file.
 
 Before anything is pushed or written:
 
-1. The `--diagrams` and `--reuse-from` checks (3.2), including the `--drawio`, `--mermaid` and `--no-diagrams` alias resolution and the conflicting-diagram-options stop.
+1. The `--diagrams` and `--reuse-from` checks (1.2), including the `--drawio`, `--mermaid` and `--no-diagrams` alias resolution and the conflicting-diagram-options stop.
 2. Read the head with `git branch --show-current`. An empty head stops with `detached HEAD: check out a branch` before the guard and before any push.
-3. The head == base guard (3.6). A promotion head is a head in `PR_PROMOTION_BRANCHES` that differs from the base, so this guard runs before the missing-script stop.
-4. Locate `PRD` (3.5). When `--reuse-from` was given, or the head is a promotion head, and no candidate exists, stop with the error naming both paths, before any push and before any PR write.
-5. Derive `REPO` (3.4): `bash "$PRD" repo` when the run uses `PRD`, otherwise the inline parse of `git remote get-url origin`. A non-GitHub or unparsable origin stops the command naming the URL, before any push.
+3. The head == base guard (1.6). A promotion head is a head in `PR_PROMOTION_BRANCHES` that differs from the base, so this guard runs before the missing-script stop.
+4. Locate `PRD` (1.5). When `--reuse-from` was given, or the head is a promotion head, and no candidate exists, stop with the error naming both paths, before any push and before any PR write.
+5. Derive `REPO` (1.4): `bash "$PRD" repo` when the run uses `PRD`, otherwise the inline parse of `git remote get-url origin`. A non-GitHub or unparsable origin stops the command naming the URL, before any push.
 
 ### Phase 2: Publish the head
 
 Do not create `$AD` in this phase. A stop here writes nothing.
 
 - A feature head is pushed with `git push -u origin "$head"`. `gh pr create --head` never pushes. `git push -u origin "$head"` runs before `git fetch origin "$base"` and before any `gh` call. If `gh pr list` itself fails, the push already happened; the command then stops quoting gh's stderr, and no PR write follows.
-- A promotion head is not pushed. No git push of any kind runs. Run `git fetch origin "$head"`, then require local `$head` to equal `origin/$head` (3.6).
+- A promotion head is not pushed. No git push of any kind runs. Run `git fetch origin "$head"`, then require local `$head` to equal `origin/$head` (1.6).
 
 Final-message ordering depends on whether the command stops or recovers. For terminal failures—the command stops, including push failure, failed reads, PR create/edit failure, guard errors, and a missing script for `--reuse-from` or a promotion head—the final message begins with the failing tool's error text verbatim (the gh or git stderr line), or with the named guard error when there is no tool stderr. For recoverable fallbacks—the command still opens or updates the PR, including drawio render failure, missing script or gh older than 2.101 for a feature PR in drawio mode, and partial `--attach` failure that restores the Mermaid body—the final message begins with one warning line naming the failure and quoting the tool's error text when available, then continues with the outcome. For the partial `--attach` fallback, the opening warning line quotes gh's stderr text verbatim first, then names the partial attach failure; the final message then explains that the PR was created and its Mermaid body restored. A phase 2 terminal failure stops the command with the git stderr or the named error (`local <head> differs from origin/<head> (behind or ahead)`). Quote git's stderr in the final message. Nothing else runs: no read and no PR write. Other terminal failures also end the run, but after `$AD` exists they still run the phase 6 cleanup.
 
@@ -283,17 +265,33 @@ The pointer file is `$(git rev-parse --git-dir)/explain-pr-changes.ad`, inside t
 
 Then, in this order:
 
-1. The open-PR lookup (3.7). A non-zero `gh pr list` stops the command quoting gh's stderr; no PR write. For a feature head this is the first `gh` call, and it comes after the push.
-2. Resolve the base (3.7), including the `--base` disagreement stop, then `git fetch origin "$base"`. On the feature path this fetch comes after the push and after the lookup. Read `git diff "origin/$base...HEAD"` for the feature summary and promotion diagram decision. A failure stops the command quoting git's stderr; no PR write.
-3. Mode reads. A promotion head with `--reuse-from` runs no `related` call: the explicitly selected source of 4.1 takes precedence, the same rule as 4.2, so `--reuse-from=41` on `staging` reads PR 41 directly and never sweeps commits. A promotion head without `--reuse-from` runs `bash "$PRD" related "$base" "$head" --exclude-pr "$N"` (omit `--exclude-pr` when the lookup found no current PR). A feature head runs no `related` call. Any failed read, a rate-limited `related` included, stops the command before any PR write. The final message names the failing call (`pr-diagrams.sh related`, `pr-diagrams.sh reviewers`, `gh pr view`, `gh pr list`, `gh api user`, or `git fetch`) and quotes its stderr. When `related` exits 1 with `rate limited` in its message, the final message contains `rate limited` and names the failing `pr-diagrams.sh related` call. No `gh pr create` and no `gh pr edit` runs.
-4. For each PR in `SRC`, and for no other PR, make exactly one source view and save its JSON. For (a), 4.1 runs `gh pr view <PR> --repo "$REPO" --json title,body,mergedAt > "$AD/source-<PR>.json"`; title and body come from that file. For related sources, run `gh pr view <n> --repo "$REPO" --json title,body > "$AD/source-<n>.json"`. In both cases write the body using `jq -j .body "$AD/source-<n>.json" > "$AD/source-<n>.md"` and read title using `jq -r .title "$AD/source-<n>.json"`. Never view a source twice. For a single source, assemble `$AD/body.md` exactly as 4.5 specifies; for consolidated sources, apply the per-source rule of 4.6 inside each subsection. In both cases the drop-first-line step applies only when the first line of the saved source file starts with `# PR Summary:`; otherwise append the whole saved body unchanged (no heading rewrite). Never retype source content; in `mermaid` and `drawio` modes, do not use `awk`, `sed`, `perl`, or otherwise edit or transform source body text; in `none` mode the only allowed edit is the diagram-content filter in 4.8. `SRC` empty means no `gh pr view` of a source at all.
-5. Reviewers, only on a reuse path (section 6): the author lookup, then `bash "$PRD" reviewers <SRC...> --exclude "$author"`. Write the logins to `$AD/reviewers.txt`, one per line.
+1. The open-PR lookup (1.7). A non-zero `gh pr list` stops the command quoting gh's stderr; no PR write. For a feature head this is the first `gh` call, and it comes after the push.
+2. Resolve the base (1.7), including the `--base` disagreement stop, then `git fetch origin "$base"`. On the feature path this fetch comes after the push and after the lookup. Read `git diff "origin/$base...HEAD"` for the feature summary and promotion diagram decision. A failure stops the command quoting git's stderr; no PR write.
+3. Mode reads. A promotion head with `--reuse-from` runs no `related` call: the explicitly selected source of 2.1 takes precedence, the same rule as 2.2, so `--reuse-from=41` on `staging` reads PR 41 directly and never sweeps commits. A promotion head without `--reuse-from` runs `bash "$PRD" related "$base" "$head" --exclude-pr "$N"` (omit `--exclude-pr` when the lookup found no current PR). A feature head runs no `related` call. Any failed read, a rate-limited `related` included, stops the command before any PR write. The final message names the failing call (`pr-diagrams.sh related`, `pr-diagrams.sh reviewers`, `gh pr view`, `gh pr list`, `gh api user`, or `git fetch`) and quotes its stderr. When `related` exits 1 with `rate limited` in its message, the final message contains `rate limited` and names the failing `pr-diagrams.sh related` call. No `gh pr create` and no `gh pr edit` runs.
+4. For each PR in `SRC`, and for no other PR, make exactly one source view (source-reading rules): 2.1 for (a) (with `mergedAt`), 2.2 for related sources. Assemble a single source by 2.5 and a consolidated body by 2.6 (which uses the 2.5 rule per subsection). `SRC` empty means no `gh pr view` of a source at all.
+5. Reviewers, only on a reuse path (section 4): the author lookup, then `bash "$PRD" reviewers <SRC...> --exclude "$author"`. Write the logins to `$AD/reviewers.txt`, one per line.
 
 End the Bash call by writing `$AD/state.env` with every value later calls read: `REPO`, `PRD` (empty when unused), `head`, `base`, `author` (empty when there is no reuse path), the source PR numbers, and `N` once known (`N` is empty for a new PR and is appended after `gh pr create`). Write each value shell-quoted with `printf '%q'` — for example `printf 'head=%q\n' "$head"`, `printf 'base=%q\n' "$base"`, `printf 'REPO=%q\n' "$REPO"` — because branch names may contain `$`, backticks and parentheses, and a bare `key=value` line would execute on `source`. Later calls read the file with `source "$AD/state.env"` only after it was written this way. `$AD` also holds the title and body files and, in drawio mode, the authoring and render files.
 
+### Phase 3b: Compose (execution order)
+
+After the reads and before render or any PR write, compose `$AD/title.txt` and `$AD/body.md`:
+
+1. Body: the feature body per the rules below and the section 5 template, or the reuse body per 2.5 (single source) or 2.6 (consolidated).
+2. `--diagrams=none`: apply the 2.8 filter.
+3. Size: count and reduce per 2.7.
+4. Diagram: decide and author per 2.9; drawio renders in phase 4.
+
+Feature body rules (analyze `git diff "origin/$base...HEAD"`; a promotion diff is read the same way to judge whether it warrants a diagram):
+
+- Summary: purpose and key changes, at most 150 words, under the summary heading. Add `Close <remaining arguments>` to it on the feature path only; a copied or consolidated body gets no new "Close" line.
+- Diagram, only when 2.9 says one is authored: warranted when the PR introduces or significantly alters data flow between components, a call hierarchy, a state machine or stepwise process, or shared global data structures. Show only the parts the PR touches, preceded by a one-sentence explanation, text in quotes. Author at most one. `mermaid` mode and a `drawio` fallback emit one fenced `mermaid` block; a rendered `drawio` diagram puts the phase 5 image reference there instead.
+- Breakdown: group the diff by file into changesets, each with a title, its files, specific bullets (note changed exported signatures, global data structures and public behavior) and a triage. `NEEDS_REVIEW` is any logic or behavior change; `APPROVED` is only trivial non-logic change (comment typos, formatting, private renames). When in doubt, `NEEDS_REVIEW`.
+- A single-source body is the copied source body and already holds its own breakdown: add none. A consolidated body keeps each source breakdown inside that source's subsection; the fresh overview and the "Included PRs" headings are the only new prose.
+
 ### Phase 4: Render
 
-Only for `drawio` with a diagram to author (4.9). A selected source body that already contains a diagram, or no warranted diagram, skips this phase and skips phase 5's `--attach`. `mermaid` and `none` never enter this phase.
+Only for `drawio` with a diagram to author (2.9). A selected source body that already contains a diagram, or no warranted diagram, skips this phase and skips phase 5's `--attach`. `mermaid` and `none` never enter this phase.
 
 1. Run `gh --version`. Compare the printed version with 2.101 using `sort -V` (a version older than 2.101, for example `gh version 2.100.0`, fails the check). The check runs before rendering.
 2. If `gh` is older than 2.101, or `PRD` is missing, skip `render`.
@@ -341,7 +339,7 @@ Failure:
 
 ### Phase 6: Reviewers, the final message, cleanup
 
-Add reviewers (section 6), one login per call. Then print the final message. For a terminal failure it begins with the tool error verbatim or named guard error; for a recoverable fallback it begins with one warning line naming the failure and quoting the tool error when available. Only then give the PR URL and what changed. Then remove the scratch directory and the pointer file:
+Add reviewers (section 4), one login per call. Then print the final message. For a terminal failure it begins with the tool error verbatim or named guard error; for a recoverable fallback it begins with one warning line naming the failure and quoting the tool error when available. Only then give the PR URL and what changed. Then remove the scratch directory and the pointer file:
 
 ```bash
 rm -rf "$AD"
@@ -350,58 +348,7 @@ rm -f "$(git rev-parse --git-dir)/explain-pr-changes.ad"
 
 This cleanup runs on every success and every failure path.
 
-### 5.1 Holistic analysis
-
-On the feature path, and when judging whether a promotion diff warrants a diagram, analyze the diff `origin/$base...HEAD`. Understand the intent behind the changes, not just the code modifications. Identify the core problem being solved or the feature being added.
-
-### 5.2 High-level summary
-
-Draft a concise, high-level summary of the PR's purpose and key changes (maximum 150 words). This is an executive summary that gives a reviewer immediate context. It goes under the summary heading.
-
-On the feature path only, if remaining arguments were given, add `Close <remaining arguments>` to that summary. A copied or consolidated body gets no new "Close" line.
-
-### 5.3 Visualizing the architecture (optional)
-
-Perform this step only when section 4.9 says a diagram is authored.
-
-Generate a diagram if the PR introduces or significantly alters:
-
-- The flow of data between components, functions, or services.
-- The call hierarchy between multiple functions or methods.
-- A state machine or a process with distinct steps.
-- The relationship between new or modified global data structures.
-
-If no changes warrant a diagram, omit the diagram section entirely.
-
-Guidelines:
-
-- Choose the most appropriate diagram type (`flowchart`, `sequenceDiagram`, `stateDiagram-v2`, or the draw.io equivalent).
-- Keep the diagram focused and clean. Do not map the entire application; only show the parts relevant to the PR's changes.
-- Provide a brief, one-sentence explanation for what the diagram illustrates.
-- Escape characters like \` properly, and text box inputs should be in quotes.
-- Author at most one diagram.
-
-In `mermaid` mode, and in a `drawio` fallback, emit one fenced `mermaid` block. In `drawio` mode when rendering succeeds, the body holds the image reference from phase 5 instead of that block, and the one-sentence explanation still precedes it.
-
-### 5.4 Detailed changeset breakdown
-
-On the feature path, analyze the diff file by file and group related changes into logical changesets. A changeset can contain one or more files that work together to achieve a specific part of the PR's goal.
-
-For each changeset, provide:
-
-1. A meaningful title for the group of changes (for example, "Refactor Authentication Logic", "Add User Profile Endpoint", "Fix Typo in Documentation").
-2. A list of files affected in this changeset.
-3. A bulleted summary of the changes. Be specific. Include a note about alterations to the signatures of exported functions, modifications to global data structures, or any changes that affect the external API or public behavior of the code.
-4. A triage status:
-
-    - `NEEDS_REVIEW`: the diff involves any modifications to logic or functionality. This includes changes to control flow, algorithms, variable assignments, function calls, or public-facing contracts that might impact behavior.
-    - `APPROVED`: the diff only contains trivial changes that do not affect code logic, such as fixing typos in comments, code formatting, or renaming a private variable for clarity.
-
-    When in doubt, always triage as `NEEDS_REVIEW`.
-
-A single-source body is the copied source body, so it already contains its own breakdown; do not add another. A consolidated body keeps each source breakdown inside that source's subsection; the fresh overview is the only new prose, plus the "Included PRs" headings.
-
-## 6. Reviewers
+## 4. Reviewers
 
 On every reuse path — (a) `--reuse-from`, an earlier promotion, one related PR, and a consolidated promotion — collect reviewers in the read phase (phase 3), after the PR author is known and before any PR write.
 
@@ -421,85 +368,14 @@ gh pr edit <N> --repo "$REPO" --add-reviewer "$login"
 
 An empty list makes no call. A rejected login (the PR's own author is rejected with a 422, a user without access) is reported in the final message and never stops the command or the remaining logins. The others are still added. The command does not fail because a reviewer was rejected.
 
-## 7. Recorded behavior
+## 5. The Output Template
 
-- PRs always open on origin's repository.
-- The command pushes a feature head and never a promotion head.
-- It fetches the base, and takes the base from the head's open PR when `--base` is absent.
-- It has the detached-HEAD stop and the head == base guard above.
-- `mermaid` uploads nothing. Pushing a feature PR head is allowed.
-- There is no `pr-diagrams` branch. Drawio images are attached with `gh pr create` or `gh pr edit --attach` (gh >= 2.101). This command never uploads through the script.
-
-## 8. The Output Template
-
-Generate the body as one markdown document and write it to `$AD/body.md`. Do not add conversational text inside the body. The final user-facing message is separate: terminal failures begin with the tool error verbatim or named guard error; recoverable fallbacks begin with one warning line that names the failure and quotes the tool error when available.
+Generate the body as one markdown document and write it to `$AD/body.md`. Do not add conversational text inside the body. The final user-facing message is separate (ordering rules in phases 2 and 6).
 
 Once the body is written, create or update the PR as phase 5 specifies, passing the title from `$AD/title.txt` in the same call: `--title "$(cat "$AD/title.txt")"`.
 
 A feature body, and the outer shell of a consolidated body, strictly follows this template. A single-source body is the source body with a leading `# PR Summary:` heading rewritten when present (otherwise the whole body is preserved unchanged), so it does not pass through this template unless the size bound reduced it to links.
 
-````markdown
-# PR Summary: $title
+The detailed templates (the feature body, with its section headings and the changeset block, and the consolidated "Included PRs" block) live in the reference. Load them only when composing a feature body or a consolidated body: read `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/references/pr-body.md` first; when that text is unsubstituted or the file is missing, read `$HOME/.claude/skills/pr-diagrams/references/pr-body.md` instead, testing it with `[[ -f ... ]]` rather than a quoted `~`. A single-source reuse loads only the assembly code (source-reading rules).
 
-## 📜 High-Level Summary
-
-<!-- Insert the concise, high-level summary (max 150 words) from Step 5.2 here. -->
-
-## 📊 Architectural Impact & Visualizations
-
-<!--
-  - Insert the diagram from Step 5.3 here, if applicable.
-  - mermaid: one fenced code block with the `mermaid` identifier.
-  - drawio, rendered: the image reference whose path equals the --attach argument.
-  - Precede the diagram with a brief explanation.
-  - If no diagram is needed, this entire section can be omitted.
--->
-
-**Example:**
-This diagram illustrates the new data flow for user registration.
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Frontend
-    participant Backend API
-    participant Database
-
-    User->>Frontend: Fills out registration form
-    Frontend->>Backend API: POST /api/v1/register
-    Backend API->>Database: INSERT INTO users
-    Database-->>Backend API: New User ID
-    Backend API-->>Frontend: { success: true, userId }
-    Frontend-->>User: Show success message
-```
-
-## ⚙️ Detailed Changeset Breakdown
-
----
-
-### Changeset 1: [Meaningful Title for the First Group of Changes]
-
-**Files Affected:**
-
-- `path/to/file1.go`
-- `path/to/another/file.go`
-
-**Summary of Changes:**
-
-- <!-- Bulleted list explaining the specific changes in this changeset. -->
-- <!-- Remember to note any changes to public APIs, function signatures, or global state. -->
-
-**[TRIAGE]:** <NEEDS_REVIEW or APPROVED>
-````
-
-A consolidated body uses the same summary heading and overview, then replaces the changeset breakdown with:
-
-```markdown
-## Included PRs
-
-### [#<n> <title>](https://github.com/$REPO/pull/<n>)
-
-<that source body verbatim, minus its own "# PR Summary:" heading line when the body starts with one>
-```
-
-Repeat the subsection once per source, in `related`'s order. The blank lines around each subsection heading are written by the `printf` of 4.6, outside the copied source bytes, so a source body without a trailing newline still leaves the next `###` heading at the start of its own line. When the size bound fires, "Included PRs" is instead one `- [#<n> <title>](https://github.com/$REPO/pull/<n>)` line per source, and the overview says the source bodies are listed by link only.
+Repeat the subsection once per source, in `related`'s order. The blank lines around each subsection heading are written by the `printf` of 2.6, outside the copied source bytes, so a source body without a trailing newline still leaves the next `###` heading at the start of its own line. When the size bound fires, "Included PRs" is instead one `- [#<n> <title>](https://github.com/$REPO/pull/<n>)` line per source, and the overview says the source bodies are listed by link only.

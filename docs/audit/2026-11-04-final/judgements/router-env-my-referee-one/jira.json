@@ -1,0 +1,50 @@
+{
+  "skill": "jira",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/jira/references/mcp.md",
+      "line": 60,
+      "evidence": "The 400-error branch directs all field failures to \"Fix the named field from create metadata\". Create metadata does not describe an existing issue's edit screen or a transition's required fields. The transition recipe at line 41 also lists transitions without requesting their field metadata, leaving required-field transitions unresolved.",
+      "fix": "Route field errors by operation: use create metadata for creation, GET /rest/api/{v}/issue/{key}/editmeta for edits, and GET /rest/api/{v}/issue/{key}/transitions?expand=transitions.fields for transitions. Inspect transition-required fields before proposing the move, obtain missing values, and request approval for the complete revised payload. Stop and explain screen or permission constraints instead of retrying from create metadata."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/jira/references/story-anatomy.md",
+      "line": 60,
+      "evidence": "Sprint selection requires \"check the sprint's `originBoardId` matches the board before proposing it\". A sprint returned for the selected board can legitimately originate on another board because sprints can be shared across board filters; the procedure supplies no outcome for that case.",
+      "fix": "Explain that originBoardId identifies the board where the sprint was created, not every board on which it can appear. Validate candidates against the selected board's sprint results and, when the origin differs, disclose that it is a shared sprint and ask for confirmation rather than excluding it solely because the IDs differ."
+    }
+  ]
+}

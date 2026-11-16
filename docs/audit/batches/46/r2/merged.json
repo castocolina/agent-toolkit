@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "openapi-to-typescript",
+      "percent": 96.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0,
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 75,
+          "evidence": "| `format: date`, `date-time` | `string` | `JSON.parse` yields strings; `Date` would be a lie without a deserializer | (and the `format: int64` row after it)",
+          "fix": "Shorten these two activation-level rows to one line, for example 'date/date-time/int64 -> string/number (JSON.parse); report int64 ids over 2^53'. That frees the space for expert rows."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 3,
+          "evidence": "\"...(including FastAPI, springdoc or NestJS output)... Keywords: OpenAPI 3.0, components/schemas, types/api.ts, type guard.\" The Keywords line repeats terms already in the text, the length is close to the 1024 limit, and FastAPI is offered as a trigger even though its 0.99+ default (3.1) is refused",
+          "fix": "Convert OpenAPI 3.0.x JSON/YAML specs into TypeScript types for components/schemas and each operation's parameters, request body and responses, plus runtime type guards on request; Swagger 2.0 and OpenAPI 3.1 input (the FastAPI 0.99+ default) is detected and refused with the reason. Use when generating frontend or SDK types from openapi.yaml/openapi.json (springdoc, NestJS or 3.0 FastAPI output), typing the endpoints under paths, updating types/api.ts after the spec changed, or deciding how nullable, readOnly/writeOnly, oneOf/discriminator, allOf, additionalProperties or $ref map to TS, even when the user only says 'API types', 'typed responses' or 'type guard'. Not for standalone JSON Schema or Zod conversion, non-TypeScript targets, HTTP clients, mock servers, or validating a spec without emitting types."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/evals/evals.json",
+          "line": null,
+          "evidence": "11 output evals and 20 balanced trigger queries, but no eval covers the springdoc/NestJS `allOf: [{$ref: Base}]` + discriminator row (BaseVariant), the `openapi: 3.2.x`/missing `paths` stops, or updating an existing types/api.ts",
+          "fix": "Add an evals/files/inheritance.yaml eval with assertions for `Cat = Base & {...} & { kind: \"Cat\" }`, `BaseVariant = Cat | Dog` marked Approximate and used at other `$ref: Base` sites. Add an eval that regenerates an existing types/api.ts after a spec change."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 33,
+          "evidence": "\"Emit to the repository's existing API-types location if one exists, else `types/api.ts`\". The description promises 'updating types/api.ts after the spec changed', but nothing says how to detect the existing location, whether to overwrite the file or keep hand-written additions, or how to report removed and renamed exports that break consumers",
+          "fix": "Add an update branch to step 4. Find the existing location by grepping for a header marker or for exports of known schema names. If the file has a generated-file header, overwrite it whole; otherwise ask before replacing hand edits. Add a 'Removed/renamed exports: <names>' line to the report template."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 70,
+          "evidence": "The row maps an \"object with no `properties`\" to `Record<string, unknown>` without accounting for `required`. For `{type: object, required: [id]}`, that emitted type accepts `{}`, although the schema requires an `id` key.",
+          "fix": "Honor required names even when they have no entry in properties. For this example emit `{ id: unknown; [key: string]: unknown }`; when additionalProperties has a schema, use its value type for those required keys. Add an eval checking that an absent required key is rejected."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 159,
+          "evidence": "The worked report says \"no `Approximate` types\", but the displayed User interface has no index signature even though additionalProperties defaults to true. A fresh response literal `{ id: \"u\", email: \"e\", extra: 1 }` is valid under that response schema but fails assignment to the displayed User interface because of TypeScript excess-property checking.",
+          "fix": "For objects with fixed properties and additionalProperties absent, true or {}, include `[key: string]: unknown` to preserve their open shape. Alternatively, explicitly mark the compact interface Approximate and propagate that status into its containers and report. Add a positive eval using a fresh object literal with an additional key."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 52,
+          "evidence": "The naming rule says to add a media suffix \"only when one status has several media types with different schemas\". Following that rule for application/json and application/xml referencing the same object schema omits the suffix, although the bodies-and-responses rule emits an object type for JSON and string for XML.",
+          "fix": "Compare the effective emitted wire types after media handling, not merely the source schemas. Use media-specific names whenever those emitted types differ, for example GetReportResponse200Json and GetReportResponse200Xml even when both media entries reference the same schema."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

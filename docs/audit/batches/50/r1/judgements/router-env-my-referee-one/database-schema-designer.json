@@ -1,0 +1,68 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 66,
+      "evidence": "The SQLite rebuild proceeds from `INSERT INTO new_x (...) SELECT ... FROM x;` to `DROP TABLE x;` and eventually `COMMIT;`. Its only validation instruction is '`PRAGMA foreign_key_check;` must return no rows'; no failure branch is specified. A failed INSERT can abort only that statement, while a runner that continues executes the destructive statements. foreign_key_check also reports violations as rows rather than raising an error.",
+      "fix": "Specify an executable failure gate for SQLite rebuilds: stop on any statement error, verify the copied row count, inspect foreign_key_check results, and COMMIT only when all checks pass. Otherwise ROLLBACK and restore foreign_keys outside the transaction. Generated scripts should use an exception-handling driver or an equivalent fail-fast runner so DROP TABLE cannot execute after a failed copy."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/evals/evals.json",
+      "line": 32,
+      "evidence": "The unsafe-column-migration eval supplies `references/migrations.md` as an input file; the review, MySQL and SQLite evals likewise supply a skill reference. Under the specified with-skill/without-skill comparison, the baseline receives the procedural guidance whose added value the evaluation should measure.",
+      "fix": "Remove skill instruction references from the evals' files arrays. Supply only task data, such as the SQL fixtures under evals/files/, to both configurations. Let the with-skill run discover migrations.md and the checklist through SKILL.md, while the baseline receives neither instruction document."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 25,
+      "evidence": "Workflow step 2 says 'Each index names the hot read or FK path it serves'; step 1 already requires 'Each index you add must name one', step 4 repeats 'each index names its query', and the reference checklist repeats the requirement again.",
+      "fix": "Keep the query-to-index requirement and engine-specific plan commands together in workflow step 2. Shorten the other occurrences to a reference to that step, retaining the checklist's additional constraint-ownership and index-removal checks."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 11,
+      "evidence": "The skill requires 'state all four as `Assumption:` lines every time, scale included: either the default or the value the prompt gave.' This mandates the same output scaffolding even for a narrowly scoped migration or index question and labels explicitly supplied facts as assumptions.",
+      "fix": "Continue resolving all four context dimensions internally, but label only inferred values as Assumption lines. Treat user-supplied values as confirmed context, and allow concise answers to omit defaults that do not affect the requested decision or its safety."
+    }
+  ]
+}

@@ -1,54 +1,53 @@
 # Authoring rules
 
-Apply these before writing nodes. Syntax catalogs live in the type references. This file is the gate: diagram type, screen shape, connections, shapes, and color.
+The single source for the rules to apply before writing any Mermaid block. A new diagram reads sections 1-3 and 6-7 (only 1 and 7 when the type is obvious and the diagram unstyled), plus sections 4-5 only for a flowchart (they replace a separate flowchart reference). A repair reads section 7, and a semantic repair of a flowchart also section 4. Other files cite sections by number and heading, so keep both stable. Syntax details live in the type references.
 
-## 1. Classify the type first
+## 1. Choose the diagram type
 
-Do not start a `flowchart` because it is the familiar default. A flowchart is for a process a person or algorithm walks, with decisions. Most "how does this work" and "show the architecture" requests are a different type.
+Write one sentence: what question does this diagram answer? Pick the type that owns it. Two questions means two diagrams.
 
-Before the first node, write one sentence: what question does this diagram answer? Pick the type that owns that question. If the sentence has two questions, draw two diagrams.
-
-| Question | Type | Keyword |
+| Question the diagram answers | Draw | Request often wrongly drawn as a flowchart |
 |---|---|---|
-| Who calls whom, in what order? | Sequence | `sequenceDiagram` |
-| What types exist and how do they relate? | Class | `classDiagram` |
-| What tables, keys, and cardinality? | ERD | `erDiagram` |
-| What systems, containers, or components exist, and who uses them? | C4 | `C4Context` / `C4Container` / `C4Component` |
-| What states and legal transitions? | State | `stateDiagram-v2` |
-| How do branches diverge and merge? | Git | `gitGraph` |
-| When do tasks start and end? | Gantt | `gantt` |
-| What share of a whole? | Pie | `pie` |
-| What process does someone walk, with yes/no branches? | Flowchart | `flowchart` |
+| Who calls whom, in what order? | `sequenceDiagram` | "flowchart of our API", login, call chain |
+| What types exist and how do they relate? | `classDiagram` | domain model, "how the classes connect" |
+| What tables, keys, and cardinalities? | `erDiagram` | schema, "how the tables link" |
+| What software systems, containers, or components exist and who uses them? | C4 (`C4Container` by default) | "the architecture", system overview |
+| Which infrastructure pieces (cloud services, runners, registries, clusters) connect? | `architecture-beta` | infra map, deployment topology |
+| What states and legal transitions? | `stateDiagram-v2` | lifecycle, status workflow |
+| How did branches diverge and merge? | `gitGraph` | branching strategy, hotfix flow |
+| What runs when, and after what? | `gantt` | roadmap, sprint plan |
+| What share of a whole? | `pie` | breakdown, split |
+| What does someone or something walk step by step, with yes/no branches? | `flowchart` | none: use it only after every row above loses |
 
-Reject the flowchart when any of these is true:
+"Show the flow", "how does X work", and "flowchart of our API" are not evidence for a flowchart: an API call chain is a sequence. Honor an explicitly required diagram format (or ask before substituting), and use a flowchart for API routing, decisions or control flow when that is the question. "The architecture" is C4 unless the user asks for cloud or vendor icons or names `architecture-beta`.
 
-- The subject is an API, login, or call chain. That is a sequence.
-- The subject is a domain model or OOP structure. That is a class diagram.
-- The subject is a schema. That is an ERD.
-- The subject is "the system", "the architecture", or "what talks to what" without a walked procedure. That is C4.
-- The subject is a lifecycle. That is a state diagram.
+## 2. Direction and proportion (every type)
 
-Flowchart only after the other types lose. "Show the flow" is not evidence for a flowchart.
+- The reader is a Markdown column (GitHub, GitLab, docs) of about 900px; extra width is shrunk until the text is unreadable. Prefer top-down layouts; go left-to-right only for a row of three or four nodes. Never fix a cramped diagram by making it wider.
+- For a flowchart with many components use `flowchart TD`; choosing `LR` or another layout needs a stated reason.
+- Warning sign: a rendered height/width below 0.4. Split only when text becomes unreadable at the target column width (about 900px) or the diagram grows taller than about three screens; a short, wide diagram whose text stays readable is fine. One idea per diagram.
+- You cannot place nodes. The levers are the ones in section 3 ("Type-native controls") plus declaration order: declare in reading order and keep the main path monotonic.
 
-## 2. Screen and proportion
+## 3. Type-native controls
 
-The reader is a Markdown column (GitHub, GitLab, docs): about 900px, centered, scaled to fit. Extra width is shrunk, and the text drops below reading size. Do not fix a cramped diagram by making it wider or switching to `LR`.
+Shapes by role, subgraphs, and `classDef` palettes (sections 4-6) are flowchart rules; never force them onto another type. Every other type uses only its own levers:
 
-- Prefer `flowchart TD` (and top-down structure in other types). Use `LR` only for a short row of three or four nodes.
-- Rendered height/width must stay at or above 0.4. Flatter than that is too horizontal.
-- Rendered height must stay under about three viewport pages. Taller than that is a scroll, not a diagram. Split it.
-- One idea per diagram. Architecture plus sequence plus schema in one picture is the defect. Split.
+| Type | Layout levers | Styling and emphasis |
+|---|---|---|
+| `flowchart` | `TD`, subgraphs, per-subgraph `direction` | shapes by role, `classDef` palettes (sections 5-6) |
+| `sequenceDiagram` | participant declaration order, `box` groups | `rect rgb(...)` around a span, `Note over` |
+| `classDiagram` | `direction`, `namespace` | stereotypes (`<<interface>>`), `classDef` + `:::`, `style` |
+| `erDiagram` | `direction` | `classDef` + `:::` on recent Mermaid; theme only on older hosts |
+| C4 | `UpdateLayoutConfig($c4ShapeInRow, $c4BoundaryInRow)`, `Rel_U/D/L/R`, boundaries | `UpdateElementStyle`, `UpdateRelStyle` (label offsets) |
+| `architecture-beta` | groups, edge sides `T/B/L/R`, junctions | built-in icons only; no per-service styling |
+| `stateDiagram-v2` | `direction`, composite states | `classDef` + `class` (not on `[*]` or inside composite states) |
+| `gantt` | sections | task tags `crit`, `active`, `done`, `milestone` |
+| `gitGraph` | `gitGraph TB:`, branch creation order | `type: HIGHLIGHT`, `tag:`, theme variables `git0`-`git7` |
+| `pie` | slice order | `showData`, theme variables `pie1`-`pie12` |
 
-You cannot place nodes. The only levers are subgraphs, per-subgraph `direction`, and declaration order. Declare nodes in reading order. Keep the primary path monotonic.
+## 4. Subgraphs for grouping (flowchart only)
 
-## 3. Connections
-
-- Group related nodes into a `subgraph` once a flowchart has about ten or more nodes.
-- Connect groups at the boundary: subgraph to subgraph, or subgraph to an outside node. Do not draw an edge from a node buried in one subgraph to a node buried in another.
-- Reason: if any node inside a subgraph links outside, Mermaid ignores that subgraph's `direction` and inherits the parent's. No error is raised. You lose the layout you set.
-- Keep internal nodes internal. Wire the groups together.
-- A subgraph `direction` is valid only while none of its nodes link outside.
-- Name groups and nodes so membership is obvious: `SG_AUTH` / `NODE_AUTH_login`.
+Default: group related nodes into a `subgraph` once there are about ten or more; fewer nodes may stay flat, and a larger diagram that reads clearly in one column may skip groups if you say why. Connect groups at the boundary: subgraph to subgraph, or subgraph to an outside node. If any node inside a subgraph links outside it, Mermaid ignores that subgraph's `direction` and inherits the parent's, with no error. Name groups and nodes so membership is obvious: `SG_AUTH` / `NODE_AUTH_login`.
 
 ```mermaid
 flowchart TD
@@ -65,34 +64,28 @@ flowchart TD
     SG_AUTH --> SG_BILLING
 ```
 
-## 4. Shapes mean roles
+Broken: `NODE_AUTH_token --> NODE_BILLING_charge` makes both subgraphs drop `direction TB`. If that edge is essential, delete the `direction` lines and accept the parent layout.
 
-Reserve a shape for a role. Do not mix shapes for the same role, and do not invent a new shape per node.
+## 5. Shapes mean roles (flowchart only)
 
-| Role | Shape | Syntax |
-|---|---|---|
-| Step | Rectangle | `A[Step]` |
-| Decision (two or more outgoing branches) | Diamond | `A{Valid?}` |
-| Store / database / cache | Cylinder | `A[(Orders DB)]` |
-| Start or end | Stadium | `A([Start])` |
+Default convention: one shape per role (step `[ ]`, decision `{ }`, store `[( )]`, start/end `([ ])`, sub-process `[[ ]]`). An established shape vocabulary of the user or the repo wins over it. Do not mix shapes for the same role or invent a shape per node; more than four shapes with no role system is noise.
 
-A labeled branch drawn as a rectangle is wrong. A node whose name is a database, cache, queue, or store and is not a cylinder is wrong. More than four shapes with no role system is noise.
+Use a diamond for every real decision (a node whose outgoing edges are alternatives). A label on an ordinary step-to-step edge (`-->|retries 3x|`) is fine and needs no diamond. Draw stores as cylinders unless the house convention says otherwise.
 
-## 5. Palette
+Syntax trap: `A(Text)` is a rounded rectangle, `A([Text])` is the stadium.
 
-Six or more nodes with no `classDef` read as flat default gray. Give them a palette. More than six distinct fills is garish. Collapse to semantic classes.
+## 6. Contrast and classDef palette
 
-Color is by role, not by node. Same role, same class: `class NODE_AUTH_login,NODE_AUTH_token svc`.
+Every type:
 
-Red and green must not be the only channel. Pair color with shape or label so the diagram still reads in grayscale.
+- Host-themed diagrams (no custom colors) are fine whenever roles already read from shape and labels, or the audience's theme must win. Custom colors are a choice, not a requirement. When you set a fill, set its text color too (dark ink on light fills, light on dark). A transparent background must read on both a light and a dark page, or ask which one it sits on.
+- Never let color be the only channel (color-blind readers, grayscale prints): pair it with a label, stereotype, or shape.
 
-**Contrast is harmony of the whole diagram, not a fixed ink color.** Black, gray, or white can all be correct. What fails is a part that does not separate from what it sits on: text from its node fill, the node from its container, the container and the edges from the page.
+Flowchart palette (other types skip the rest of this section). Every `classDef` you write sets `fill`, `stroke`, and `color` together.
 
-The page background is the user's choice: transparent, light, dark, or another color. `#ffffff` and a dark plate are suggestions, not a closed default. If the background is transparent, the diagram must still read on both a light host and a dark host, or ask which theme it will sit on.
+Default: give a flowchart of six or more nodes with distinct roles a palette, since all-default gray hides the roles. More than six distinct fills is garish: collapse to semantic classes. Color by role, not by node: `class NODE_AUTH_login,NODE_AUTH_token svc`. Accent the 10-20% of nodes that matter; leave the rest neutral. `linkStyle 0 ...` styles the first declared link, and the indexes shift whenever a link is added above it, so restyle after every edit.
 
-Set `color` on every `classDef` so the host theme cannot leave a label in a low-contrast default. On a light fill use a dark ink. On a dark fill use a light ink. The `#111111` values in the palettes below are dark ink for those light fills, not the only legal text color.
-
-For a diagram embedded in Markdown, also set the theme text colors so edge labels and unclassed nodes follow the same ink. `classDef` does not cover them. Match the ink to the page the user chose. This example is dark ink on a light page:
+`classDef` does not reach edge labels or unclassed nodes, so for a diagram embedded in Markdown also set the theme text colors to the same ink. This block is dark ink for a light page; on a dark page use light ink on dark fills:
 
 ```mermaid
 ---
@@ -105,15 +98,13 @@ config:
     textColor: "#111111"
     lineColor: "#333333"
 ---
+flowchart TD
+    A --> B
 ```
 
-One accent family per diagram. Accent the 10–20% of nodes that matter. Leave the rest neutral.
+The blocks below are the default. Any other palette (the user's, the repo's, a brand's, or one suited to the audience) is fine when every text/fill pair keeps a contrast of at least 4.5:1 and the roles still differ in grayscale; check that before using it, never guess. Contrast stays strict whenever custom colors appear. Palette A is the default. Pick another block only by what the colors mean: A for architecture or service maps, B when the diagram shows status, C for before/after. Mixing two palettes in one diagram is an error: the reader cannot tell which meaning a color carries.
 
-Copy a block. Do not invent hex colors.
-
-### A. Structural / layer
-
-Architecture and service maps.
+A. Structure and services (architecture, service maps):
 
 ```
 classDef edge   fill:#e3f2fd,stroke:#1565c0,color:#111111
@@ -122,9 +113,7 @@ classDef data   fill:#e8f5e9,stroke:#2e7d32,color:#111111
 classDef extern fill:#eceff1,stroke:#455a64,color:#111111
 ```
 
-### B. Status
-
-Keep the names `success`, `warning`, and `error`. What changes is the fill: the old saturated hex (`#00b894`, `#fdcb6e`, `#ff6b6b`) fails contrast on a white canvas. Use these. Put the word in the label too, so red versus green is not the only signal.
+B. Status. Put the status word in the label too. The saturated fills often seen (`#00b894`, `#fdcb6e`, `#ff6b6b`) pass with `#111111` text (about 7.5, 12.5, and 6.8:1) but fail with white text (about 2.5, 1.5, and 2.8:1); either set works with `#111111` text, never with white. This lighter set is the default:
 
 ```
 classDef base    fill:#f5f5f5,stroke:#616161,color:#111111
@@ -133,19 +122,17 @@ classDef warning fill:#fff8e1,stroke:#b26a00,color:#111111
 classDef error   fill:#fdecea,stroke:#c62828,color:#111111
 ```
 
-### C. Old vs new
-
-Migration or before/after.
+C. Old versus new (migration, before/after):
 
 ```
 classDef old fill:#eceff1,stroke:#607d8b,color:#111111
 classDef new fill:#e8f5e9,stroke:#2e7d32,color:#111111
 ```
 
-## 6. Labels that break the parser
+## 7. Labels that break the parser
 
-- Quote labels that contain `( ) [ ] { } < > " | ; #`. `A[Deploy (prod)]` breaks. `A["Deploy (prod)"]` does not.
-- Line break inside a normal label is `<br/>`, not `\n`.
-- `end` in lowercase is reserved in flowcharts and subgraphs. Write `End` or quote it.
-- Node IDs are bare identifiers. Human text goes in the shape brackets.
-- In a Markdown mermaid fence, do not use HTML entities (`&quot;`, `&gt;`). They render literally.
+- **Unquoted delimiters in labels** - `[ ] ( ) { } < > |` delimit shapes and edge labels, so `A[Deploy (prod)]` opens a second shape and fails (`got 'PS'`). Quote the whole label: `A["Deploy (prod)"]`. Quote any label with `#` too.
+- **`#` and `;` in sequence text** - `#` silently drops the rest of a message and `;` ends the statement with a parse error. Write the entity codes `#35;` and `#59;`; HTML entities such as `&quot;` are not Mermaid syntax.
+- **Line breaks** - `<br/>` breaks a label on every renderer; `\n` works only on recent Mermaid and prints literally on older hosts, so replace `\n` with `<br/>` in any repair.
+- **Lowercase `end`** - as a flowchart node id or a sequence participant it closes a block and fails. Write `End` or rename the node; `end` inside quoted label text is fine.
+- **`o` or `x` right after a link** - `A---oB` draws a circle-ended edge to `B`, and `A---xB` a cross. That is valid when the circle or cross end is intended; when the target node's name starts with `o` or `x` (for example `orders`), put a space before it or rename it. Keep intended circle and cross edges in every repair or styling edit.

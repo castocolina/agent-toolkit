@@ -1,0 +1,59 @@
+{
+  "skill": "naming-analyzer",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 37,
+      "evidence": "The example '`expiresAt = 3600`, later `now + expiresAt`' concludes 'it is a duration, not an instant: `ttlSeconds`'. The arithmetic establishes a duration but does not establish seconds; the same expression could operate on milliseconds.",
+      "fix": "Make the outcome conditional on evidence about the time basis: use `ttlSeconds` only when `now` and the offset are established as seconds, or `ttlMs` when they are milliseconds. Otherwise mark the unit tentative and ask what unit `now` uses rather than asserting a seconds-suffixed name."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 12,
+      "evidence": "'every name you report still gets the full repo and string-literal search of step 1' requires repository-wide searches even for identifiers proven to be lexical locals, such as short-lived loop counters. Common names can produce extensive unrelated matches without improving compatibility evidence.",
+      "fix": "Keep repository-wide symbol and string searches mandatory for members, exported names and potential hidden contracts. Allow scope-local searches for identifiers whose definitions and uses establish that they cannot escape or participate in string-based access; require broader searches when that cannot be established."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/naming-analyzer/SKILL.md",
+      "line": 28,
+      "evidence": "The convention row teaches 'class `user_profile`, constant `max`' \u2192 '`UserProfile`, `MAX_RETRIES`'; the later advice to 'flip to positive polarity' likewise supplies familiar naming guidance. These are activation material rather than expert knowledge, unlike the ORM, serialization and queued-task failure cases.",
+      "fix": "Compress routine casing and positive-polarity examples into brief reminders rather than worked naming rules. Preserve the evidence-dependent decisions and hidden-consumer examples, which provide the substantive knowledge delta."
+    }
+  ]
+}

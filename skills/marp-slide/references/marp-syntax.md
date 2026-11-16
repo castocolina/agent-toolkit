@@ -1,256 +1,44 @@
-# Marp Basic Syntax Reference
+# Marp Directive and Built-in Theme Notes
 
-Basic Marp syntax based on official documentation.
+Only the semantics that are easy to get wrong. Full lists: https://marpit.marp.app/directives and https://github.com/marp-team/marp-core
 
-## Front Matter (Directives)
+## Directive scope
 
-### Basic Structure
+| Form | Scope |
+|---|---|
+| frontmatter `key: value` | whole deck from slide 1 |
+| `<!-- key: value -->` | this slide and every later slide (local directives only) |
+| `<!-- _key: value -->` | this slide only |
 
-```markdown
----
-marp: true
-theme: default
-paginate: true
----
-```
+- Global directives (`theme`, `style`, `headingDivider`, `lang`; Marp Core adds `size`, `math`) ignore the underscore and position: one value for the whole deck, the last definition wins.
+- Local directives: `paginate`, `header`, `footer`, `class`, `backgroundColor`, `backgroundImage`, `backgroundPosition`, `backgroundRepeat`, `backgroundSize`, `color`.
+- `<!-- _class: lead invert -->` sets several classes. `class` replaces the slide's classes rather than adding to them, so `<!-- _class: warm -->` after a `<!-- class: lead -->` drops `lead`.
+- `<!-- header: '' -->` clears a header from that slide onward; `<!-- _paginate: false -->` hides one page number.
+- `headingDivider: 2` starts a new slide at every `#` and `##`, so the deck needs no `---`; a manual `---` right before such a heading leaves an empty slide.
 
-### Main Global Directives
+## Content features (Marp Core)
 
-| Directive | Description | Example Values |
-|-----------|-------------|----------------|
-| `marp` | Enable Marp functionality | `true` |
-| `theme` | Specify theme | `default`, `gaia`, `uncover` |
-| `size` | Slide size (Marp Core extension) | `16:9`, `4:3`, `A4` |
-| `paginate` | Show page numbers | `true`, `false` |
-| `header` | Header for all slides | Any text |
-| `footer` | Footer for all slides | Any text |
-| `backgroundColor` | Background color | `#fff`, `white` |
-| `backgroundImage` | Background image | `url('image.png')` |
-| `color` | Text color | `#000`, `black` |
-| `class` | Apply CSS class | `lead`, `invert` |
+- Fit heading: `## <!-- fit --> Long title` scales one heading to the slide width. It works only in themes that declare `@auto-scaling` (all built-ins, so every bundled template); prefer a shorter heading.
+- Math: `$inline$` and `$$ block $$`, rendered by MathJax (default) or KaTeX via `math: katex`. Macros that MathJax accepts may fail under KaTeX.
+- Emoji shortcodes such as `:rocket:` render as emoji images; unknown shortcodes stay as text.
+- Speaker notes: any non-directive HTML comment.
 
-### Size Directive (Marp Core)
+## Built-in themes
 
-```markdown
----
-size: 16:9
----
-```
+Use these only when the user asks for a built-in theme instead of a bundled template.
 
-Available sizes:
-- `16:9` (1280x720, default)
-- `4:3` (960x720)
-- `A4` (210mm x 297mm)
+| Theme | Classes it defines | Look |
+|---|---|---|
+| `default` | `invert` | light, GitHub-like |
+| `gaia` | `lead`, `invert`, `gaia` (alternate color scheme) | warm light, larger type |
+| `uncover` | `invert` | minimal, centered |
 
-### Page-Specific Directives
+`lead` exists only in `gaia` among the built-ins; the bundled templates define their own `section.lead`. Recolor `gaia` through its CSS variables in a `<style>` block:
 
-To change settings per slide, use `<!-- directive_name: value -->` format:
-
-```markdown
-<!-- _class: lead -->
-<!-- _backgroundColor: black -->
-<!-- _color: white -->
-
-# Apply only to this slide
-```
-
-**Meaning of underscore `_`**:
-- Without `_`: Apply to all following slides
-- With `_`: Apply to current slide only
-
-## Slide Breaks
-
-```markdown
----
-
-# First Slide
-
----
-
-# Next Slide
-
----
-```
-
-`---` (horizontal rule) switches to a new slide.
-
-## Headers and Footers
-
-### Global Settings
-
-```markdown
----
-header: 'Lecture Name'
-footer: 'October 2024'
----
-```
-
-### Per-Slide Settings
-
-```markdown
-<!-- header: 'Section 1' -->
-<!-- footer: 'Page number display' -->
-```
-
-### Disable
-
-```markdown
-<!-- header: '' -->
-<!-- footer: '' -->
-```
-
-## Pagination (Page Numbers)
-
-```markdown
----
-paginate: true
----
-```
-
-Display position and style vary by theme.
-
-Hide on specific slide:
-```markdown
-<!-- paginate: false -->
-```
-
-Or:
-```markdown
-<!-- _paginate: false -->
-```
-
-## Inline Styles
-
-### Style Specification in Markdown
-
-```markdown
----
-marp: true
----
-
-<style>
+```css
 section {
-  background-color: #f0f0f0;
+  --color-background: #fff;
+  --color-foreground: #333;
+  --color-highlight: #c2255c;
 }
-
-h1 {
-  color: #333;
-}
-</style>
-
-# Slide
-```
-
-### Scoped Style
-
-Apply style to specific slide only:
-
-```markdown
-<style scoped>
-h1 {
-  color: red;
-}
-</style>
-
-# Red heading on this slide only
-```
-
-## Math Formulas (Marp Core Extension)
-
-Supports Pandoc-style math formulas:
-
-### Inline Math
-
-```markdown
-$E = mc^2$
-```
-
-### Block Math
-
-```markdown
-$$
-\frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
-$$
-```
-
-## Emoji (Marp Core Extension)
-
-```markdown
-:smile: :+1: :sparkles:
-```
-
-Supports GitHub Emoji notation.
-
-## Comments
-
-HTML comments are not rendered:
-
-```markdown
-<!-- This is a comment -->
-```
-
-Directives are also written in comment format:
-
-```markdown
-<!-- _class: lead -->
-```
-
-## Official Reference Links
-
-For details, refer to official documentation:
-
-- **Directives List**: https://marpit.marp.app/directives
-- **Marp Core Features**: https://github.com/marp-team/marp-core
-- **Theme CSS Specification**: https://marpit.marp.app/theme-css
-- **Official Site**: https://marp.app/
-
-## Common Configuration Examples
-
-### Basic Setup
-
-```markdown
----
-marp: true
-theme: default
-size: 16:9
-paginate: true
----
-```
-
-### Title Slide
-
-```markdown
----
-marp: true
-theme: default
----
-
-<!-- _class: lead -->
-<!-- _paginate: false -->
-
-# Presentation Title
-
-Presenter Name
-```
-
-### Section Breaks
-
-```markdown
-<!-- _class: lead -->
-
-# Chapter 2
-
-New Section
-
----
-
-## Regular Slide
-```
-
-### Custom Background Color
-
-```markdown
-<!-- _backgroundColor: #e3f2fd -->
-
-# Slide with Light Blue Background
 ```

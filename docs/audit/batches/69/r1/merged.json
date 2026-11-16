@@ -1,0 +1,81 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codebase-pattern-finder",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8,
+        "router-env-my-referee-one": 99.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 15,
+          "evidence": "- Edit files: you have no write tools and the caller expects a read-only report.",
+          "fix": "Delete this bullet. The `tools: Grep, Glob, Read, LS` allowlist already blocks edits, so the line repeats what the harness enforces."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 19,
+          "evidence": "1. Cover the requested pattern types (feature, structural, integration, testing) as relevant",
+          "fix": "Cut the generic taxonomy and keep only the non-obvious instruction: 'For each candidate, open its callers and the tests that exercise it before citing it.'"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 50,
+          "evidence": "Keep snippets to about 40 lines; when the smallest complete section is longer, quote its signature plus the essential lines ... Do not infer that code is broken or deprecated.",
+          "fix": "Move the snippet-length rule and the deprecated-code rule into Procedure step 3 (extraction) and step 2 (filtering). The process pattern then reads in order, and no extraction rules sit after the output template."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 56,
+          "evidence": "- Grep respects `.gitignore`, so generated or vendored code may be hidden: state any scope you did not search.",
+          "fix": "Add a gotcha: 'Grep output is capped (head_limit or a match cap), so a truncated hit list looks exhaustive. Narrow the path or glob and re-run before claiming that no other approach exists.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 21,
+          "evidence": "list any further distinct approaches by `file:line` under \"Additional approaches\" without expanding or ranking them",
+          "fix": "Add '### Additional approaches' (a `file:line` list) and a per-type no-match line ('No match for [Pattern Type] in <scope searched>') to the Output Format template. Step 3 and step 4 then lead to a slot in the template, so the agent does not have to invent where these go."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 15,
+          "evidence": "\"Edit files: you have no write tools and the caller expects a read-only report.\" This repeats the read-only boundary already stated in the description and enforced by the tools allowlist.",
+          "fix": "Remove this redundant bullet; retain the substantive source-verification, provenance and non-evaluation constraints."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

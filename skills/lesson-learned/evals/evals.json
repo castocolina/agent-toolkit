@@ -3,27 +3,84 @@
   "evals": [
     {
       "id": "casual-reflection",
-      "prompt": "I just finished splitting auth token validation out of the request handler into a dedicated module. What engineering lesson does that show?",
-      "expected_output": "One or two grounded lessons tied to the described change and practical takeaway; no invented repository evidence.",
+      "prompt": "quick one: I just split auth token validation out of the request handler into its own module. what's the lesson there?",
+      "files": [
+        "references/se-principles.md"
+      ],
+      "expected_output": "A short conversational answer that offers a lesson about the split, makes any modularity claim conditional on evidence not yet seen, and gives a next-time practice; no invented repository details.",
       "assertions": [
-        "Names a principle such as separation of concerns and ties it to token validation extraction.",
-        "Gives a concrete future takeaway.",
-        "Does not fabricate filenames, commits, or unprovided code details."
+        "Answers in one or two short paragraphs rather than a full report template.",
+        "Treats any modularity or separation-of-concerns benefit as conditional on evidence it has not seen (for example, whether the handler depends only on the new module's public function), instead of stating the improvement as fact.",
+        "Gives a concrete next-time practice.",
+        "Does not fabricate filenames, commits, or code details the user did not provide."
+      ]
+    },
+    {
+      "id": "extraction-adds-coupling",
+      "prompt": "Here's the commit where I pulled token validation out of the handler (extract-token-validation.diff). The message says it decouples them. What's the engineering lesson? Write it up so I can paste it into my notes.",
+      "files": [
+        "evals/files/extract-token-validation.diff",
+        "references/se-principles.md"
+      ],
+      "expected_output": "A written lesson that rejects the 'decoupled' claim: token.ts imports parseAuthHeader and SECRET from handler.ts while handler.ts imports validateToken and tokenCache from token.ts, so the modules now depend on each other and the handler still manages the token cache.",
+      "assertions": [
+        "Does not claim the change decoupled or improved the modularity of the two modules.",
+        "Cites the two-way import: src/auth/token.ts imports parseAuthHeader and SECRET from ./handler while src/auth/handler.ts imports from ./token.",
+        "Points out that handler.ts still manages the token cache (tokenCache.size / tokenCache.clear()), so cache knowledge is now split across both files.",
+        "Says the commit message's 'decouple' claim is contradicted by the code.",
+        "Uses the Lesson / What changed / Why it matters / Next time structure.",
+        "Gives one next-time practice rather than a step-by-step refactor plan."
+      ]
+    },
+    {
+      "id": "mechanical-rename",
+      "prompt": "This commit touched 12 files (rename-get-user.diff). Is that shotgun surgery? What should I learn from it?",
+      "files": [
+        "evals/files/rename-get-user.diff",
+        "references/se-principles.md"
+      ],
+      "expected_output": "Declines the shotgun-surgery diagnosis: the 12 files carry one identical mechanical rename of get_usr to get_user, not one policy change spread across modules. Says the lesson is small or thin rather than inventing one.",
+      "assertions": [
+        "Does not diagnose shotgun surgery or poor boundaries from the file count.",
+        "Identifies the change as a mechanical rename of get_usr to get_user (an import plus one call site per file, the definition in api/users.py).",
+        "Either declines to name a principle or names one only with a stated evidence check, and says the evidence for a deep lesson is thin.",
+        "Does not cite any file that is not in the diff."
       ]
     },
     {
       "id": "precise-range",
-      "prompt": "Reflect on HEAD~3..HEAD. The only known summary is that the commits add retry limits and jitter to the payment client; do not assume files beyond that.",
-      "expected_output": "A grounded analysis of the specified scope, acknowledging evidence limits and providing a practical lesson.",
+      "prompt": "Reflect on HEAD~3..HEAD. The log is in payment-retry-log.txt.",
+      "files": [
+        "evals/files/payment-retry-log.txt"
+      ],
+      "expected_output": "A lesson about bounded retries grounded in payments/client.py: the while True loop became a MAX_RETRIES loop that raises GatewayUnavailable, and test_charge_gives_up_after_max_retries pins the cap. Jitter is described as a change, not a verified improvement, because no test asserts it.",
       "assertions": [
-        "Connects retry limits and jitter to resilience or bounded retries.",
-        "Uses the stated range and does not invent files/commit hashes.",
-        "Provides an actionable takeaway."
+        "Cites payments/client.py and the change from the unbounded while True loop to a loop over MAX_RETRIES that raises GatewayUnavailable.",
+        "Cites test_charge_gives_up_after_max_retries (fake_gateway.calls == 3) as the evidence for the retry cap.",
+        "States that no test covers the jitter even though the test commit message says it does.",
+        "Does not invent files or commit hashes beyond those in the log.",
+        "Gives one actionable next-time practice."
+      ]
+    },
+    {
+      "id": "untracked-only",
+      "prompt": "git diff is empty but I did a bunch of work today. Anything to learn? Here's what I ran (untracked-status.txt) and the two new files.",
+      "files": [
+        "evals/files/untracked-status.txt",
+        "evals/files/untracked-rate_limit.py.txt",
+        "evals/files/untracked-test_rate_limit.py.txt"
+      ],
+      "expected_output": "Recognises the two ?? files as uncommitted new work that git diff does not show, and draws a lesson from them, such as the injected clock that lets the test cross the window boundary without sleeping.",
+      "assertions": [
+        "Does not report that there are no changes; treats the ?? paths as new-file evidence that git diff does not show.",
+        "Cites src/rate_limit.py or tests/test_rate_limit.py and a concrete detail from them (for example the injected clock parameter or the window-boundary assertion).",
+        "Does not use the last commit (e41b7c2 feat(api): add /search endpoint) as the subject of the lesson.",
+        "Gives one actionable next-time practice."
       ]
     },
     {
       "id": "no-changes",
-      "prompt": "What lesson can I learn from these changes? There is no diff and no commits in scope.",
+      "prompt": "What lesson can I learn from these changes? git status --short prints nothing and there are no commits in scope.",
       "expected_output": "Acknowledges insufficient evidence and does not force a generic lesson.",
       "assertions": [
         "Explicitly states there is no change evidence to analyze.",

@@ -1,0 +1,59 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 22,
+      "evidence": "\"Is there a tenant noun? If yes, every tenant-owned child gets the composite-FK gotcha.\" Following this branch for a multi-tenant MongoDB design requires composite foreign keys that MongoDB cannot enforce. The review workflow likewise requires corrected DDL without distinguishing MongoDB.",
+      "fix": "Gate composite-FK requirements and SQL migration templates to relational engines. Add a MongoDB branch that requires tenant-scoped reference validation and authorization, explains the absence of database-enforced foreign keys, and defines the required atomicity boundary. For MongoDB reviews, provide executable MongoDB commands or application changes rather than requiring SQL DDL."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/references/migrations.md",
+      "line": 53,
+      "evidence": "\"Recreate the saved indexes, triggers and views.\" The preceding DROP TABLE removes associated indexes and triggers but does not remove dependent views. Replaying saved CREATE VIEW statements therefore encounters existing views; the procedure supplies no explicit view-drop ordering.",
+      "fix": "Separate dependent-view handling from automatically removed indexes and triggers. Save affected view definitions, explicitly drop those views inside the rebuild transaction before dropping the old table, and recreate them after the replacement table has its original name. Retain the foreign_key_check gate before committing."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/database-schema-designer/references/schema-design-checklist.md",
+      "line": 3,
+      "evidence": "\"either a SKILL.md gotcha or a section of `migrations.md`\" uses a reference-directory-relative filename; the live-change check repeats \"Answer each from `migrations.md`.\" The specification requires file references relative to the skill root, where that filename does not exist.",
+      "fix": "Replace both bare `migrations.md` references with `references/migrations.md`, preserving the existing live-schema loading condition."
+    }
+  ]
+}

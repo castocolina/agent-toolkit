@@ -1,0 +1,117 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "commit-work",
+      "percent": 94.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8,
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 29,
+          "evidence": "Never `git add -A` or `git add .`: they sweep in untracked artifacts. ... (line 30) `git add -p` needs an interactive terminal.",
+          "fix": "Cut these two reminders down to bare clauses or delete them. Current models already know these git facts, and the routing table and the patch procedure already enforce path-scoped, non-interactive staging."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 25,
+          "evidence": "Step 3 packs the run directory, cleanup, index choice, overlap check, temporary-index setup, whole-file staging and hunk staging into one numbered step of about 6 dense paragraphs",
+          "fix": "Split step 3 into labelled sub-steps (3a run directory, 3b pick the index plus overlap check, 3c stage whole files or hunks) with a short progress checklist. This makes the Process pattern's checkpoints visible and the easy-to-miss steps hard to skip."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 34,
+          "evidence": "run `git status` and `git diff --cached` again (hooks reformat and restage files)",
+          "fix": "Add a Gotcha that explains the cause: formatter hooks such as `prettier --write $(git diff --cached --name-only) && git add ...` restage the whole working-tree file. This pulls the unstaged hunks of a partially staged file into the commit even when the hook succeeds, so the tree comparison in step 7 is mandatory after any hook."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 3,
+          "evidence": "Use when asked to commit, check in or save work to git, stage selected files or hunks, split a mixed tree into commits, review what is staged, or draft a commit message.",
+          "fix": "Stage and commit Git changes so each commit holds only the approved change, leaving content the user already staged untouched, splitting mixed hunks without an interactive terminal, verifying the staged version rather than the working tree, and writing Conventional Commits messages. Use when asked to commit, check in, wrap up or save work to git, stage selected files or hunks, split a mixed tree into commits, review what is staged, draft a commit message, or handle a commit that a pre-commit hook failed or rewrote, even if the user never says 'commit'. Not for rebasing, squashing, amending or force-pushing history, resolving merge conflicts, opening pull requests, or code review unrelated to a commit."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/commit-work/evals/evals.json",
+          "line": null,
+          "evidence": "No output eval covers the 'review what is staged' route, partial staging of an untracked file, or HEAD moving while a temporary index is in use",
+          "fix": "Add an eval for the review-only route ('look over what I staged before I push', with a fixture holding a staged .env or lockfile churn), asserting that the index and tree stay unchanged. Add a second eval with an untracked file whose hunks must be split, asserting that the agent asks instead of building a patch from /dev/null."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 31,
+          "evidence": "For stage-only, ... confirm the user's own entries are unchanged: `git ls-files -s -- <their paths>` before and after staging must match.",
+          "fix": "Move the 'before' snapshot into step 1 or the start of step 3: run `git ls-files -s -- <their paths> > <run>/before.txt` before staging. Step 4 runs after staging, so an agent following the steps in order has no 'before' value left to compare."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 14,
+          "evidence": "Route table rows: draft a message / review what is staged / stage changes / commit, with no row for checking a commit that already ran (hook-reformat-success eval)",
+          "fix": "Add a route row 'check a commit that just ran (hook output, user about to push)': run step 7's tree comparison against the user's recorded `git write-tree` ID and report it. Never amend."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/commit-work/references/commit-message-template.md",
+          "line": 23,
+          "evidence": "The reference repeats familiar Conventional Commits syntax: \"`!` sits immediately before the colon\" and, at line 25, \"Footers start one blank line after the body\". These are basic conventions current models already know, rather than the repository-specific constraints and non-obvious Git safeguards that provide this skill's strongest knowledge delta.",
+          "fix": "Omit the basic explanations of exclamation-mark placement and the blank line before footers. Retain the less-obvious footer-token rules, repository overrides, and all source/version credits."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 35,
+          "evidence": "\"Repeat steps 3-7 until the approved set is committed\" precedes the temporary-index reconciliation, \"run `git reset -q -- <committed paths>`\". If two planned commits select different hunks of the same file while an unrelated path is user-staged, the first temporary-index commit leaves that file showing a staged reverse in the real index. On the second iteration, step 3's real-index overlap check sees this unapproved staged reverse and mandates stopping, blocking the planned split.",
+          "fix": "After each successful temporary-index commit whose tree matches the reviewed tree, reconcile only that commit's paths in the real index before starting the next iteration. Preserve unrelated staged entries and distinguish the workflow's own stale-index reverses from pre-existing user-staged changes."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 34,
+          "evidence": "Step 3 explicitly supports an unborn repository with \"`read-tree --empty` instead when `git rev-parse --verify -q HEAD` prints nothing\", but step 7 then requires confirming that \"`git rev-parse HEAD` is still the commit you read the tree from\". There is no such commit on this branch, and the unguarded command fails.",
+          "fix": "Record either the initial HEAD object ID or an explicit unborn-state sentinel when initializing the temporary index. Before committing, compare the recorded object ID for an existing HEAD; for the unborn branch, verify HEAD is still absent. If HEAD has appeared, rebuild and review against it before proceeding."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

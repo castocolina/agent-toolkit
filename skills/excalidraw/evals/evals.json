@@ -3,32 +3,96 @@
   "evals": [
     {
       "id": "casual-flow-create",
-      "prompt": "Could you sketch an Excalidraw flow for password reset: request link, verify token, set new password, done?",
-      "expected_output": "A plan for an editable Excalidraw flowchart with labeled steps, directional connectors, and a concise text-only description of output.",
+      "prompt": "Could you sketch an Excalidraw flow for password reset: request link, verify token, set new password, done? Save it as docs/password-reset.excalidraw.",
+      "expected_output": "A `new` spec with the four steps as nodes and three ordered edges, the `new ... -o docs/password-reset.excalidraw` command, and a text description of the result; no hand-written element JSON.",
       "assertions": [
-        "Includes request-link, token verification, new-password, and completion steps",
-        "Connects the steps in the correct order with directional arrows",
-        "Describes an editable Excalidraw artifact rather than a static-only image"
+        "Includes request-link, token verification, new-password, and completion steps as nodes",
+        "Connects the steps in that order (request link -> verify token -> set new password -> done) as directed edges",
+        "Builds the file with the bundled `scene.py new` command and a nodes/edges spec, writing to docs/password-reset.excalidraw, rather than writing raw element JSON by hand"
       ]
     },
     {
-      "id": "architecture-delegate",
-      "prompt": "For architecture.excalidraw.json, add a Redis cache connected to the existing API service. Follow the skill’s isolation rule and report only a concise text summary, not raw diagram JSON.",
-      "expected_output": "The response delegates file reading/editing to an isolated worker, requests minimal text-only reporting, and does not include raw JSON.",
+      "id": "architecture-add-redis",
+      "prompt": "For architecture.excalidraw.json, add a Redis cache connected to the existing API service. Report only a concise text summary, not raw diagram JSON.",
+      "files": [
+        "evals/files/architecture.excalidraw.json"
+      ],
+      "expected_output": "Uses `scene.py edit` with --add-node \"Redis Cache\" (placed near API Service) and --connect \"API Service->Redis Cache\" written to a new file, runs `diff` against the original before replacing it, expects exactly one added shape and one added connection with nothing removed, and reports in prose.",
       "assertions": [
-        "Explicitly keeps the main agent from reading/parsing Excalidraw JSON directly",
-        "Requests delegation for modifying the existing diagram",
-        "Requests a text-only summary and no raw JSON"
+        "Addresses the existing box by its label from the file, 'API Service', and does not invent other existing components",
+        "Uses `scene.py edit` with `--add-node` for the Redis box and `--connect` from API Service to it, rather than hand-editing the JSON",
+        "Writes the edit to a new path and runs `scene.py diff` against the original before replacing it, expecting one added shape, one added connection and nothing removed or relabelled",
+        "Reports the change as a text summary and does not print scene JSON"
       ]
     },
     {
       "id": "small-file-exception",
-      "prompt": "This is just a tiny .excalidraw file with one box. Read it here and tell me the label; it’s too small to need delegation.",
-      "expected_output": "A refusal to inspect the diagram directly in main context and a recommendation to delegate text extraction despite the file being small.",
+      "prompt": "This is just a tiny .excalidraw file with one box (box.excalidraw, attached). Read it here and tell me the label; it's too small to need any tooling.",
+      "expected_output": "Declines to read or print the raw JSON even for a tiny file, runs `scene.py summary box.excalidraw` and reports the label 'Billing' from its `shapes` output, with a one-clause reason.",
       "assertions": [
-        "Does not offer to read or parse the Excalidraw file in the main context",
-        "States that even small-file inspection must be delegated",
-        "Asks the delegate for extracted labels or a concise summary, not full JSON"
+        "Does not read, cat or print the raw Excalidraw JSON in the main context",
+        "Uses `scene.py summary` on box.excalidraw to get the label",
+        "Reports the box label as 'Billing'",
+        "Gives a reason the size does not change the rule (for example that a one-box scene is still about 80 lines of JSON while summary returns only the label)"
+      ],
+      "files": [
+        "evals/files/box.excalidraw"
+      ]
+    },
+    {
+      "id": "repair-one-sided-binding",
+      "prompt": "My worker moved the Redis box and its check failed. Here is its report. What exactly should it change, and what does it do after that?",
+      "files": [
+        "evals/files/worker-check-report.txt"
+      ],
+      "expected_output": "Tells the worker to append {\"type\": \"arrow\", \"id\": \"yOmLTG8sjdUnzshSz9HJ\"} to the boundElements of API Service (S52mYK85Ko7R7X60yTzt), rerun check, then run diff against the original before replacing it; keeps the original untouched until check passes.",
+      "assertions": [
+        "Identifies the fix as adding the arrow yOmLTG8sjdUnzshSz9HJ to the boundElements of element S52mYK85Ko7R7X60yTzt (API Service)",
+        "Says to rerun `scene.py check` after the fix and only proceed when it passes",
+        "Says to run `scene.py diff` against the original before replacing it, and that the original stays untouched until then",
+        "Mentions that a move by editing x/y also requires moving bound text and recomputing the arrow's endpoints"
+      ]
+    },
+    {
+      "id": "embedded-png-rename",
+      "prompt": "In docs/login-flow.excalidraw.png, rename the 'Auth' step to 'Identity'. Can you just patch the PNG?",
+      "expected_output": "Refuses to patch or re-encode the PNG, explains that re-encoding drops the embedded scene, asks for the .excalidraw source or for the user to open the PNG in excalidraw.com and save it as .excalidraw, then edits with --relabel \"Auth=Identity\" and reminds the user to re-export with Embed scene ticked.",
+      "assertions": [
+        "Does not edit, re-encode or run an image tool on the PNG, and explains that doing so loses the embedded editable scene",
+        "Asks for the .excalidraw source or for the user to open the PNG in Excalidraw and save it as .excalidraw",
+        "Plans the rename with `scene.py edit ... --relabel \"Auth=Identity\"` on the .excalidraw file",
+        "Reminds the user to re-export the PNG with 'Embed scene' enabled"
+      ]
+    },
+    {
+      "id": "compare-two-versions",
+      "prompt": "Compare infra-v1.excalidraw and infra-v2.excalidraw (attached) and tell me what changed between them.",
+      "expected_output": "Runs `scene.py diff infra-v1.excalidraw infra-v2.excalidraw` and reports in prose: Payments relabelled to Payments API, Gateway -> Inventory added, Orders -> Inventory removed, no shapes added or removed.",
+      "assertions": [
+        "Uses `scene.py diff` with infra-v1 as OLD and infra-v2 as NEW",
+        "Reports that the 'Payments' box was relabelled to 'Payments API'",
+        "Reports the added connection Gateway -> Inventory and the removed connection Orders -> Inventory",
+        "Does not report Orders -> Payments as removed or added, and reports no added or removed shapes",
+        "Does not paste either scene's JSON into the answer"
+      ],
+      "files": [
+        "evals/files/infra-v1.excalidraw",
+        "evals/files/infra-v2.excalidraw"
+      ]
+    },
+    {
+      "id": "relabel-arrow",
+      "prompt": "in architecture.excalidraw.json the arrow from Web Client to API Service says HTTPS, change it to 'HTTPS (TLS 1.3)'. then tell me what the diff says changed",
+      "files": [
+        "evals/files/architecture.excalidraw.json"
+      ],
+      "expected_output": "Runs `scene.py edit architecture.excalidraw.json -o NEW --relabel \"HTTPS=HTTPS (TLS 1.3)\"`, then `diff` against the original, and reads the removed 'Web Client -> API Service [HTTPS]' plus added 'Web Client -> API Service [HTTPS (TLS 1.3)]' pair as the expected result of an arrow relabel, not a bug.",
+      "assertions": [
+        "Uses `scene.py edit` with `--relabel \"HTTPS=HTTPS (TLS 1.3)\"` written to a new path, not a hand edit",
+        "Runs `scene.py diff` of the original against the new file before replacing the original",
+        "Explains that the diff shows one removed connection 'Web Client -> API Service [HTTPS]' and one added 'Web Client -> API Service [HTTPS (TLS 1.3)]'",
+        "States that this removed/added pair is the expected result of relabelling an arrow, not an unintended change",
+        "Does not print scene JSON"
       ]
     }
   ]

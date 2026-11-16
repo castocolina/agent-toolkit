@@ -1,0 +1,217 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codebase-pattern-finder",
+      "percent": 86.0,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 84.8,
+        "router-env-my-referee-one": 87.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 20,
+          "evidence": "Search with Grep/Glob/LS on the behavior and its synonyms. Inspect callers and the tests that exercise each candidate.",
+          "fix": "Cut this generic search step to its one useful part (\"always open the tests that exercise each candidate\"). The model already searches with its tools and synonyms. Use the freed lines for repository-specific places where patterns live."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 22,
+          "evidence": "Keep every variation you find.",
+          "fix": "Add a rule for picking examples when there are many matches. For example: group call sites by distinct shape, quote one representative per shape, and list the remaining file:line hits under Related Utilities. Without this, dozens of near-identical snippets reach the caller."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 15,
+          "evidence": "- Edit files.",
+          "fix": "Give each Never item a reason, and add a short Gotchas list of facts that defy assumptions. For example: Grep respects .gitignore, so generated or vendored code may be hidden, so say when a scope was not searched. Also: a test that only mocks the pattern does not show how the pattern is used."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 3,
+          "evidence": "Use to find similar implementations, usage examples or existing patterns in the current codebase",
+          "fix": "Read-only search delegate. Use to find similar implementations, usage examples or existing patterns in the current codebase (including how they are tested), returned as verbatim snippets with file:line citations. Use before writing code that should match house conventions, or when asked \"how do we do X elsewhere\", \"show me an example of Y\" or \"follow the existing style\", even without the word \"pattern\". Unlike codebase-locator it returns code, not just paths. Not for judging, ranking or improving code, and not for writing it."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 51,
+          "evidence": "Keep examples small; skip broken or deprecated code",
+          "fix": "Set a default size and count with an escape hatch, for example: snippets of 40 lines or fewer, at most 3 variations per pattern type, and more only when the caller asks. The report goes back into the caller's context."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 13,
+          "evidence": "or suggest improvements (unless the user explicitly asks).",
+          "fix": "Resolve this branch. A subagent gets a caller prompt, not a user, and the description says \"Not for judging, ranking or improving code\". State what to do when the caller asks for critique: return the patterns only and note that evaluation is out of scope. Or drop the exception."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 51,
+          "evidence": "skip broken or deprecated code unless the code itself marks it as such",
+          "fix": "Reword this so the branch resolves: \"skip code that is marked deprecated (annotations, comments, TODO-remove) or that fails its own tests. Include it only when the caller asks for legacy patterns, and label it deprecated.\" As written, deprecated code is skipped unless it is marked deprecated, which inverts the condition."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 20,
+          "evidence": "'Search with Grep/Glob/LS on the behavior and its synonyms' and 'Read each promising file' restate native navigation and ordinary code-search procedures. Much of the procedure is activation rather than expert knowledge; the upstream-copy provenance check is its principal non-obvious insight.",
+          "fix": "Compress the generic navigation in steps 1, 2 and 4 into one instruction: 'Find behavior-equivalent candidates in the requested runtime/layer, inspect their callers/tests and extract minimal source-read sections with usage context.' Preserve the provenance check, factual reporting constraints and explicit no-match fallback."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 22,
+          "evidence": "'Keep every variation you find' requires exhaustive inclusion without a report-size boundary or escape hatch, even when a large repository contains many equivalent variants.",
+          "fix": "Default to one source-verified example per materially distinct approach. Group equivalent variants and list their additional paths without ranking them; expand those groups only when the caller requests exhaustive coverage."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 51,
+          "evidence": "'skip broken or deprecated code unless the code itself marks it as such' reverses the useful evidence condition: explicitly marked broken/deprecated code is exempted from skipping, while excluding unmarked code requires the agent to evaluate it despite the documentary-only role.",
+          "fix": "Replace this with: 'Do not infer that code is broken or deprecated. Skip examples explicitly marked broken or deprecated unless the caller requests historical examples; when included, quote the marking and label their status. If excluding them leaves no eligible examples, report that limitation and the searched scope.'"
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/codebase-pattern-finder.md",
+          "line": 13,
+          "evidence": "'suggest improvements (unless the user explicitly asks)' permits an evaluation branch that conflicts with line 12's unconditional prohibition on recommendations and line 8's 'never evaluate it.' A mixed request for examples and improvements has contradictory outcomes.",
+          "fix": "Remove the evaluation exception and state the handoff explicitly: 'Do not critique, label anti-patterns/code smells, infer rationale or suggest improvements. If the request also asks for evaluation, return the factual examples and identify evaluation as work for the caller or a separate reviewer.'"
+        }
+      ]
+    },
+    {
+      "name": "sync-skills-readme",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 91.2,
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/sync-skills-readme.md",
+          "line": 46,
+          "evidence": "Gotcha 'Folded or literal descriptions: reading only the first line truncates the summary to `>` or `|`.' repeats step 1 line 11: 'Descriptions may be folded (`>`) or literal (`|`) YAML: join their lines with single spaces.'",
+          "fix": "Keep one copy. Leave the instruction in step 1 and either delete the gotcha or cut step 1 to 'join folded/literal lines (see Gotchas)'."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/sync-skills-readme.md",
+          "line": 32,
+          "evidence": "'Summary: an action-oriented phrase of about 50 characters or fewer, built only from facts in that description'",
+          "fix": "Add a short shortening procedure: drop the 'Use when...' trigger clause, keep the leading verb and object, join two capabilities with '&', and cut qualifiers until the text is 50 characters or fewer."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/sync-skills-readme.md",
+          "line": 50,
+          "evidence": "'Do not use Grep to parse frontmatter; read the file.' gives no reason, and there is no gotcha for hyphenated keywords that can never match a single token",
+          "fix": "Add the reason, e.g. 'Grep returns one line per match, so it misses folded descriptions and matches `name:` in body text'. Add a gotcha: 'Hyphenated keywords (command-creator, web-to-markdown, c4-architecture) never equal a single token; match them against the whole name instead.'"
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/sync-skills-readme.md",
+          "line": 2,
+          "evidence": "'Regenerate the \"Available Skills\" table in the root README.md from skills/*/SKILL.md. Use after adding, removing, renaming or re-describing a skill, or when the table is stale.' has no casual user-intent phrasings",
+          "fix": "Regenerate the \"Available Skills\" table in the root README.md from each skills/*/SKILL.md name and description. Use after adding, removing, renaming or re-describing a skill, when the skills list or table in the README is stale or missing an entry, or when asked to update or sync the README skill list, even without the word \"table\". Not for editing any other README section or for a skill's own README.md."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-skills-readme.md",
+          "line": 33,
+          "evidence": "'Save a copy of README.md (`cp README.md \"$(mktemp)\"`)' throws away the temp path, so step 5 ('`diff` the saved copy against README.md' and 'restore the copy') has no file to diff or restore",
+          "fix": "Use `backup=$(mktemp) && cp README.md \"$backup\"` in step 4, `diff \"$backup\" README.md` in step 5, and `cp \"$backup\" README.md` on a mismatch."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-skills-readme.md",
+          "line": 14,
+          "evidence": "'take the first category whose keyword equals a hyphen-separated token of the skill name' conflicts with the hyphenated keywords 'command-creator', 'web-to-markdown', 'c4-architecture', 'game-changing', 'soft-skill' and 'pull-request', which can never equal one token, so those branches never resolve",
+          "fix": "State the rule as: 'a keyword matches when its hyphen-separated tokens appear as a contiguous run of the name's tokens (trailing s ignored)'. Alternatively, split the hyphenated keywords into single tokens."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "commands/sync-skills-readme.md",
+          "line": 29,
+          "evidence": "\u201cTo pin a skill, add its name as a keyword to the category you want\u201d conflicts with step 2's requirement that a keyword equal \u201ca hyphen-separated token of the skill name.\u201d A complete hyphenated name cannot equal one of its individual tokens, so the documented pinning branch does not work. Multi-token keywords such as `c4-architecture` likewise cannot match during the name pass.",
+          "fix": "In step 2, check each category's keywords against both the complete skill name and its individual hyphen-separated tokens, retaining the existing category precedence and name-before-description ordering. This makes full-name pins effective when placed before any competing match."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-skills-readme.md",
+          "line": 33,
+          "evidence": "\u201cSave a copy of README.md (`cp README.md \"$(mktemp)\"`)\u201d does not retain or display the temporary filename, but the next step requires agents to \u201cdiff the saved copy\u201d and restore it on a mismatch. Following the supplied command leaves no recorded backup path for those operations.",
+          "fix": "Capture and display the backup path, for example `backup=$(mktemp) && cp README.md \"$backup\" && printf '%s\\n' \"$backup\"`, and stop before editing if backup creation or copying fails. Use the recorded path for both the verification diff and restoration."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

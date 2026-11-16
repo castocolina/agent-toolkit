@@ -1,0 +1,65 @@
+openapi: 3.0.3
+info:
+  title: Shapes
+  version: "1.0"
+paths: {}
+components:
+  schemas:
+    Animal:
+      oneOf:
+        - $ref: "#/components/schemas/Cat"
+        - $ref: "#/components/schemas/Dog"
+      discriminator:
+        propertyName: petType
+        mapping:
+          cat: "#/components/schemas/Cat"
+    Cat:
+      type: object
+      required: [petType, livesLeft]
+      properties:
+        petType:
+          type: string
+        livesLeft:
+          type: integer
+    Dog:
+      type: object
+      required: [petType, bark]
+      properties:
+        petType:
+          type: string
+        bark:
+          type: string
+    Shape:
+      oneOf:
+        - $ref: "#/components/schemas/Circle"
+        - $ref: "#/components/schemas/Square"
+    Circle:
+      type: object
+      required: [radius]
+      properties:
+        radius:
+          type: number
+    Square:
+      type: object
+      required: [side]
+      properties:
+        side:
+          type: number
+    TreeNode:
+      type: object
+      required: [value]
+      properties:
+        value:
+          type: string
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/TreeNode"
+    Metadata:
+      type: object
+      required: [version]
+      properties:
+        version:
+          type: integer
+      additionalProperties:
+        type: string

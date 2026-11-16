@@ -1,0 +1,68 @@
+{
+  "skill": "plugin-forge",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 24,
+      "evidence": "The workflow explicitly supports 'Plugins kept outside `<root>/plugins/`, or a remote source' at line 20, but then requires 'Run `bump_version.py` once per release'. That script only reads `<root>/plugins/<name>/.claude-plugin/plugin.json`; validation and several test/publish commands also assume that layout. Following the nonstandard-source branch therefore reaches commands targeting the wrong location.",
+      "fix": "Carry the resolved plugin location and source type through versioning, validation, testing, and publishing. Use bump_version.py only for the supported standard layout. For another local layout, update the actual plugin manifest and marketplace entry together and validate the actual plugin path. For remote sources, work in the source checkout and update any pinned marketplace ref or sha as appropriate; provide corresponding test and publish instructions."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/plugin-forge/scripts/create_plugin.py",
+      "line": 110,
+      "evidence": "`marketplace_data[\"plugins\"].append(plugin_entry)` executes after the plugin directories, plugin.json, and README have been written. With an existing manifest such as `{\"name\":\"team\",\"owner\":{\"name\":\"Dana\"},\"plugins\":{}}`, the earlier duplicate-check loop performs no iterations, then append raises an uncaught AttributeError. The command leaves a partial scaffold and exits 1, contradicting the documented 'exit ... 2 on bad input with nothing written'; --dry-run also incorrectly reports success for this input.",
+      "fix": "Validate the marketplace object, required fields, plugins array, and entry object types before either the dry-run response or any filesystem writes. Raise a handled ValueError for malformed shapes so the CLI exits 2 without creating anything. Add regression tests asserting unchanged marketplace bytes and no plugin directory for malformed manifests."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/plugin-forge/scripts/create_plugin.py",
+      "line": 18,
+      "evidence": "The name guard only checks `[a-z0-9]+(?:-[a-z0-9]+)*`, so names such as `claude-tools` pass and produce a successful scaffold. However, references/plugin-structure.md states that names beginning with `claude-`, `anthropic-`, or `cc-plugin-` fail plugin validation. Scaffold-only requests are explicitly told not to load references, leaving this known invalid-name case unchecked.",
+      "fix": "Reject the documented reserved prefixes before dry-run output or writes, return the documented exit code with an actionable naming error, and include the restriction in the main script contract. Add a test showing that a reserved-prefix name leaves both the marketplace and filesystem unchanged."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/plugin-forge/evals/trigger-queries.json",
+      "line": 39,
+      "evidence": "The positive query 'Set up plugin manifest and metadata fields.' contains no Claude Code or marketplace context and could equally describe an unrelated extension system. Several other positives are similarly terse and explicitly plugin-focused, so the suite weakly tests indirect user intent and includes ambiguous positive labels.",
+      "fix": "Replace ambiguous positives with contextual requests that identify Claude Code through concrete files, namespaced commands, or team-distribution needs. Include casual requests that describe packaging or sharing capabilities without saying 'plugin', and retain contrasting negatives for runtime-framework plugins and IDE extensions."
+    }
+  ]
+}

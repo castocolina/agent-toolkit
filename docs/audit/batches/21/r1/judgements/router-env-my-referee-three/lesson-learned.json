@@ -1,0 +1,104 @@
+{
+  "skill": "lesson-learned",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 13,
+    "D4": 14,
+    "D5": 14,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 111,
+  "max_total": 125,
+  "percent": 88.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/lesson-learned/SKILL.md",
+      "line": 21,
+      "evidence": "Then `git log --oneline <base>..HEAD` and `git diff <base>...HEAD`. ... | Working changes | `git diff`, `git diff --cached`, and every `??` path from `git status` |",
+      "fix": "Shorten the scope table to the choices the model would get wrong: base detection order, `--first-parent` for merges and three-dot diffs. Drop the standard `git log`/`git diff` invocations the model already knows. The Git gotchas section already explains why those choices matter."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/lesson-learned/SKILL.md",
+      "line": 39,
+      "evidence": "2. Rank them by observable consequence and evidence strength; a demonstrated trade-off beats a neat principle match.",
+      "fix": "Add a tie-break rule for the common case where a diff shows both a success and a cost. For example: 'When a benefit and a newly introduced cost are both evidenced, lead with the cost no test protects, because it is the one the user will hit next time.' This ties the ranking step to the anti-patterns load trigger on line 13."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/lesson-learned/SKILL.md",
+      "line": 56,
+      "evidence": "## NEVER (three items: commit message vs code, uncited files, bug review drift)",
+      "fix": "Move the most frequent false positive from references/se-principles.md into the NEVER list so the agent sees it before it opens the lookup: 'NEVER diagnose shotgun surgery, coupling or modularity from file count or line count alone: mechanical renames and API migrations look the same on the surface, and extraction can add a two-way import.'"
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/lesson-learned/SKILL.md",
+      "line": 3,
+      "evidence": "Use when users ask what they learned, want an engineering takeaway, or reflect on recent commits, a branch diff, a specific commit, or staged/unstaged changes",
+      "fix": "Use when the user wants an engineering lesson, takeaway or retrospective from their own recent work: what they learned from a PR, feature branch, refactor, debugging fix, specific commit, last N commits, or staged, unstaged or untracked changes, even if they never mention Git or a design principle. Grounds one lesson in the actual diff and tests, names a principle only when the evidence supports it, and ends with a next-time practice. Not for generic engineering tutorials, bug or code reviews, commit messages, or planning a refactor."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/lesson-learned/SKILL.md",
+      "line": 12,
+      "evidence": "Always read [the diff-signal lookup](references/se-principles.md); its evidence column is the check a principle name must pass.",
+      "fix": "Load the lookup only when it is needed: 'Read references/se-principles.md at step 5, once there is change evidence and a candidate principle. Do NOT load it when status is empty and you stop.'"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/lesson-learned/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "\"query\": \"what engineering takeaway is hiding in my recent refactor\" ... every query is terse, with no paths, branch names, typos or backstory",
+      "fix": "Rewrite about half the queries with realistic context, for example 'just merged feat/retry-cap into main, 4 commits touching payments/client.py \u2014 anything worth remembering for next time?'. Add 2-3 positives that never say lesson or takeaway, and near-miss negatives such as 'write release notes from my last 5 commits'."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/lesson-learned/evals/evals.json",
+      "line": null,
+      "evidence": "\"id\": \"casual-reflection\", ... \"files\": [\"references/se-principles.md\"]",
+      "fix": "List only eval inputs under evals/files/ in `files`. The skill's own reference is loaded by the skill and is not a test input, so drop it from casual-reflection, extraction-adds-coupling and mechanical-rename."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/lesson-learned/SKILL.md",
+      "line": 21,
+      "evidence": "| Feature branch (default off the base branch) | ... Then `git log --oneline <base>..HEAD` and `git diff <base>...HEAD`. |",
+      "fix": "Cover the common mixed case. The table only uses working changes when no commits are in scope, so on a feature branch with commits ahead of base plus uncommitted or `??` work, the uncommitted work is silently skipped. Add: 'If git status also shows working or untracked changes, include them in the evidence and say so, unless the user named a commit or range.'"
+    }
+  ]
+}

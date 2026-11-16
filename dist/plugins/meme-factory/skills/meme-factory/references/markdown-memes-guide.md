@@ -10,7 +10,7 @@ Use these when the joke depends on typography or voice rather than an image. Pre
 >tests were already green
 ```
 
-Keep each `>` as a literal line prefix. Use a fenced text block when Markdown rendering might interpret the lines.
+Always put greentext in a fenced ```text block. Outside a fence, Markdown turns the `>` lines into a blockquote and the prefixes disappear.
 
 ## Copypasta
 
@@ -19,5 +19,3 @@ Use repeated phrasing and escalation; preserve the rhythm and line breaks. Avoid
 ## ASCII / formatting memes
 
 Use a fenced block for spacing-sensitive ASCII. Verify monospaced alignment and avoid relying on runs of spaces outside a code fence.
-
-For text-only requests, return the formatted text directly—no image URL or generation request.

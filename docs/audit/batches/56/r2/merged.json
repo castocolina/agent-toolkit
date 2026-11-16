@@ -1,0 +1,208 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "sync-branch",
+      "percent": 93.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8,
+        "router-env-my-referee-one": 93.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 25,
+          "evidence": "Quote `\"$branch\"` and pass it after the remote: unquoted, `$` or `*` in a ref name is expanded by the shell.",
+          "fix": "Cut this to one clause, for example 'push `\"$branch\"` quoted'. The model already knows to quote shell variables, so the rest of the line spends tokens on generic shell advice."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 16,
+          "evidence": "If `origin/$branch` exists and `git merge-base --is-ancestor \"origin/$branch\" \"$orig\"` fails, the remote has commits the local branch lacks: stop",
+          "fix": "Add one decision check before step 3, matching the description's boundary 'Not for rebasing a branch others push to'. For example: 'If `git log --format=%ae \"origin/$target..origin/$branch\"` lists an author other than you, stop and ask before rewriting a shared branch.' The current ancestry check only catches remote commits that are not yet local. It misses a shared branch that is fully fetched."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 25,
+          "evidence": "unquoted, `$` or `*` in a ref name is expanded by the shell. Use single quotes for a literal name such as `'feature/weird$name'`.",
+          "fix": "Correct the stated reason. When a variable is expanded unquoted, a `$` inside its value is not expanded again; only word splitting and globbing apply. `git check-ref-format` already rejects `*`, `?`, `[` and spaces in ref names. Replace the line with: 'Pass `\"$branch\"` quoted. Single quotes are needed only when you type a literal name containing `$` (for example `'feature/weird$name'`), because the shell would expand `$name` in an unquoted or double-quoted literal.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 17,
+          "evidence": "If `old_base` is empty and the history looks rewritten, stop and report instead of guessing.",
+          "fix": "Make this branch resolvable by giving 'looks rewritten' a test. For example: 'If `old_base` is empty, compute `fork=$(git merge-base --fork-point \"origin/$target\" \"$branch\")`. If that is non-empty and differs from `git merge-base \"origin/$target\" \"$branch\"`, run `git rebase --onto \"origin/$target\" \"$fork\" \"$branch\"`. Otherwise run the normal rebase.' As written, the agent has to guess what 'looks rewritten' means."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 19,
+          "evidence": "Push the saved branch, quoted: `git push --force-with-lease origin \"$branch\"`.",
+          "fix": "In step 2, record `remote=$(git rev-parse --verify --quiet \"origin/$branch\")`. In step 5, push with an explicit lease: `git push --force-with-lease=\"refs/heads/$branch:$remote\" origin \"$branch\"`, or a plain `git push origin \"$branch\"` when `$remote` is empty. A background fetch between step 2 and step 5 still disarms a bare lease, so the ancestry check named in the Gotchas does not cover that window."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 19,
+          "evidence": "5. Push the saved branch ... If the lease is rejected, someone else pushed: stop, do not retry with `--force`.",
+          "fix": "Add a success outcome after the push. Report `git log --oneline \"origin/$target..$branch\"` (the replayed commits), the old SHA `$orig` and the new SHA, and say the PR now shows the rebased commits. Every failure branch has a defined report, but the success path ends without one."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "high",
+          "file": "commands/sync-branch.md",
+          "line": 23,
+          "evidence": "\u201cA background `git fetch` (IDE, cron) moves the remote-tracking ref and silently disarms a bare lease; the step 2 ancestry check is what guards against that\u201d",
+          "fix": "The ancestry check does not protect against a background fetch after that check: the bare lease can then accept an unseen collaborator commit and overwrite it. After the foreground fetch, save origin/$branch's OID as expected, perform the ancestry check against that saved OID, and push with `git push --force-with-lease=\"refs/heads/$branch:$expected\" origin \"$branch\"`. Use an empty expected value when the remote branch was absent, requiring it still to be absent. Replace the claim that the ancestry check alone guards against background fetches."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "commands/sync-branch.md",
+          "line": 18,
+          "evidence": "\u201cIf `git rev-parse --git-path rebase-merge` or `rebase-apply` exists, it is a conflict\u201d",
+          "fix": "Distinguish an active rebase from a merge conflict. A signing failure, for example, can leave rebase state present without any unmerged paths; the current branch incorrectly reports conflicts and offers conflict-resolution instructions. Inspect the actual error and `git diff --name-only --diff-filter=U`: give conflict instructions only when unmerged paths exist; otherwise report the actual paused-rebase failure, preserve state, explain how to address that error and continue or abort, and never push."
+        }
+      ]
+    },
+    {
+      "name": "explain-changes-mental-model",
+      "percent": 91.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 88.8,
+        "router-env-my-referee-one": 93.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 8,
+          "evidence": "Invoked as `/explain-changes-mental-model` (project install) or `/command-explain-changes-mental-model:explain-changes-mental-model` (this repository's plugin). followed by a 6-line usage block (lines 10-17) that repeats the source table in section 1",
+          "fix": "Cut the invocation sentence, because the harness already shows slash-command names. Shrink the usage block to the two non-obvious cases: `HEAD~3` is one commit, and `custom` waits for a pasted diff. The other cases are already covered by the rules in section 1."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 34,
+          "evidence": "Group files by purpose (not by directory), one group per reviewable idea.",
+          "fix": "Add an expert grouping heuristic: 'Before grouping, split mechanical changes (renames, moves, pure refactors, signature-only updates at call sites) from behavior changes, and give each its own group so the reviewer can skim the mechanical one. When the patch shows no import, caller or contract linking two groups, mark them Independent rather than inventing an order.'"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 66,
+          "evidence": "## Gotchas has three items; there are none for file references or for non-text changes",
+          "fix": "Add gotchas with reasons, for example: 'Line numbers in a hunk header (`@@ -a,b +c,d @@`) refer to the post-image. Cite `+c` lines for new code, not working-tree lines.' 'Binary files, submodule pointer bumps and mode-only changes (`old mode 100644 / new mode 100755`) show almost no diff text but can be the real change. Name them as their own group.' 'NEVER describe a file from its name alone when its hunk was truncated by a large-diff `--stat`. Say it was not read.'"
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 2,
+          "evidence": "Explain a git diff, commit, branch, range, PR or pasted patch ... Not for ... the PR-workflow command explain-pr-changes.",
+          "fix": "description: Explain a git diff, commit, branch, range or pasted patch (including a PR's diff pasted or checked out as a branch) as dependency-ordered logical groups with file references and a review sequence. Use when the user wants to understand, onboard onto or walk through a changeset, asks what changed or what to read first, even without saying 'mental model'. Not for editing code, a defect-focused code review, or fetching and explaining a PR by number (explain-pr-changes)."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 25,
+          "evidence": "3. Contains `..` (covers `...`): `git diff \"<arg>\" --no-color`.",
+          "fix": "Give the range branch the same failure path as rule 4: 'If git diff exits non-zero (for example `main..typo` gives `fatal: ambiguous argument`), report its stderr, suggest `git branch -a`, and stop. Never invent changes.' Otherwise a bad range endpoint leaves the agent with no defined outcome."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 27,
+          "evidence": "base is the first that exists of `main`, `master`, `origin/main`, `origin/master`, else ask the user for a base; then `git diff \"<base>...<arg>\" --no-color`.",
+          "fix": "Handle the case where the argument is the base itself, for example `/explain-changes-mental-model main`: 'If <arg> resolves to the same commit as <base>, say that the branch is the base and ask which branch or range to compare.' Without this, the agent reports the misleading 'No changes found'. Also add a one-line self-check before output: every 'Depends on' must name an earlier group."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 57,
+          "evidence": "The template requests both \"### Change Groups (in review order)\" and \"### Review Sequence\", repeating the dependency-ordered list rather than adding another expert decision.",
+          "fix": "Put the reason for each group's review position in its numbered group entry and remove the duplicate Review Sequence section; retain the summary, dependency evidence and gotchas."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 23,
+          "evidence": "\"With no commits yet ... use `git diff --cached --no-color` instead of the `HEAD` diff.\" A newly staged file that is subsequently edited is tracked, so neither this cached diff nor the untracked-file scan includes its unstaged edits.",
+          "fix": "For an unborn HEAD, collect both `git diff --cached --no-color` and `git diff --no-color`, reconcile their staged and unstaged changes before explaining the final worktree state, and retain the untracked-file scan."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 26,
+          "evidence": "The description promises \"commit, branch, range, PR or pasted patch\", but the ordered source selector sends a PR URL or `#123` to \"Otherwise verify first: `git rev-parse --verify \"<arg>^{commit}\"`\", which fails and stops instead of obtaining the PR patch.",
+          "fix": "Recognize explicit PR numbers and URLs before generic revision verification. Obtain their patch with `gh pr diff \"<pr>\" --color=never`; if GitHub tooling or access is unavailable, request a pasted patch and resume analysis from it."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 25,
+          "evidence": "\"Contains `..` (covers `...`): `git diff \"<arg>\" --no-color`.\" Unlike the single-ref branch, this branch specifies no failure outcome for an invalid range; the later \"Empty diff\" rule does not distinguish an unsuccessful command from a successful empty patch.",
+          "fix": "Check the exit status of ordinary diff commands before applying the empty-diff rule. On failure, report stderr and stop or request a valid range/base; apply this to branch comparisons with no merge base as well, while preserving the documented `--no-index` exit-1 exception."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

@@ -1,460 +1,64 @@
-# MCP Reference
-
-Complete reference for Atlassian Jira operations via MCP.
-
-## MCP Tool Reference
-
-### Search Operations
-
-#### `mcp__atlassian__searchJiraIssuesUsingJql`
-Search Jira using JQL (Jira Query Language).
-
-**Parameters:**
-- `jql` (required): JQL query string
-- `maxResults`: Maximum results (default: 50)
-- `startAt`: Pagination offset
-- `fields`: Comma-separated fields to return
-
-**Example:**
-```
-mcp__atlassian__searchJiraIssuesUsingJql(jql: "project = PROJ AND status = 'In Progress'")
-```
-
-### Issue Operations
-
-#### `mcp__atlassian__getJiraIssue`
-Retrieve full issue details by key.
-
-**Parameters:**
-- `issueKey` (required): Issue key (e.g., "PROJ-123")
-- `expand`: Additional data (changelog, transitions, renderedFields)
-
-**Example:**
-```
-mcp__atlassian__getJiraIssue(issueKey: "PROJ-123")
-```
-
-#### `mcp__atlassian__createJiraIssue`
-Create a new issue.
-
-**Parameters:**
-- `projectKey` (required): Target project
-- `issueType` (required): Issue type (Story, Bug, Task, Epic, etc.)
-- `summary` (required): Issue title
-- `description`: Detailed description
-- `assignee`: Account ID (use lookupJiraAccountId first)
-- `priority`: Priority name (Highest, High, Medium, Low, Lowest)
-- `labels`: Array of labels
-- `components`: Array of component names
-- Custom fields as needed
-
-**Example:**
-```
-mcp__atlassian__createJiraIssue(
-  projectKey: "PROJ",
-  issueType: "Story",
-  summary: "Implement user authentication",
-  description: "Add OAuth2 authentication flow...",
-  labels: ["backend", "security"]
-)
-```
-
-#### `mcp__atlassian__editJiraIssue`
-Update an existing issue.
-
-**Parameters:**
-- `issueKey` (required): Issue to update
-- Any field to update (summary, description, assignee, etc.)
-
-**Example:**
-```
-mcp__atlassian__editJiraIssue(
-  issueKey: "PROJ-123",
-  description: "Updated description with more details..."
-)
-```
-
-### Transition Operations
-
-#### `mcp__atlassian__getTransitionsForJiraIssue`
-Get available status transitions for an issue.
-
-**Parameters:**
-- `issueKey` (required): Issue key
-
-**Returns:** List of available transitions with IDs and names.
-
-#### `mcp__atlassian__transitionJiraIssue`
-Change issue status.
-
-**Parameters:**
-- `issueKey` (required): Issue key
-- `transitionId` (required): Transition ID from getTransitions
-- `comment`: Optional comment for the transition
-
-**Workflow:**
-1. Get transitions: `getTransitionsForJiraIssue("PROJ-123")`
-2. Find desired transition ID from results
-3. Execute: `transitionJiraIssue(issueKey: "PROJ-123", transitionId: "31")`
-
-### Comment Operations
-
-#### `mcp__atlassian__addCommentToJiraIssue`
-Add a comment to an issue.
-
-**Parameters:**
-- `issueKey` (required): Issue key
-- `body` (required): Comment text (supports Jira markdown)
-
-### User Operations
-
-#### `mcp__atlassian__lookupJiraAccountId`
-Find user account ID for assignments.
-
-**Parameters:**
-- `query` (required): Search by display name, email, or username
-
-**Example:**
-```
-mcp__atlassian__lookupJiraAccountId(query: "user@example.com")
-```
-
-**Usage:** Always look up account IDs before assigning issues.
-
-### Project Operations
-
-#### `mcp__atlassian__getVisibleJiraProjects`
-List available Jira projects.
-
-**Parameters:**
-- `maxResults`: Maximum results
-
-#### `mcp__atlassian__getJiraProjectIssueTypesMetadata`
-Get issue types and required fields for a project.
-
-**Parameters:**
-- `projectKey` (required): Project key
-
-**Usage:** Call before creating issues to understand required fields.
-
-#### `mcp__atlassian__getJiraIssueTypeMetaWithFields`
-Get detailed field metadata for an issue type.
-
-**Parameters:**
-- `projectKey` (required): Project key
-- `issueTypeId` (required): Issue type ID
-
----
-
-## JQL (Jira Query Language) Reference
-
-### Basic Syntax
-
-```
-field operator value [AND|OR field operator value]
-```
-
-### Common Fields
-
-| Field | Description | Example |
-|-------|-------------|---------|
-| `project` | Project key | `project = "PROJ"` |
-| `issuetype` | Issue type | `issuetype = Bug` |
-| `status` | Issue status | `status = "In Progress"` |
-| `assignee` | Assigned user | `assignee = currentUser()` |
-| `reporter` | Issue creator | `reporter = "jobarksdale"` |
-| `priority` | Priority level | `priority = High` |
-| `labels` | Issue labels | `labels = "backend"` |
-| `component` | Components | `component = "API"` |
-| `created` | Creation date | `created >= -30d` |
-| `updated` | Last update | `updated >= -7d` |
-| `resolved` | Resolution date | `resolved >= startOfMonth()` |
-| `sprint` | Sprint name/ID | `sprint in openSprints()` |
-| `epic` | Parent epic | `"Epic Link" = PROJ-100` |
-| `parent` | Parent issue | `parent = PROJ-50` |
-| `text` | Full-text search | `text ~ "authentication"` |
-| `summary` | Title search | `summary ~ "login"` |
-| `description` | Description search | `description ~ "OAuth"` |
-
-### Operators
-
-| Operator | Meaning | Example |
-|----------|---------|---------|
-| `=` | Exact match | `status = Done` |
-| `!=` | Not equal | `status != Closed` |
-| `~` | Contains (text) | `summary ~ "auth*"` |
-| `!~` | Does not contain | `summary !~ "test"` |
-| `>` `>=` `<` `<=` | Comparisons | `priority >= High` |
-| `IN` | Multiple values | `status IN (Open, "In Progress")` |
-| `NOT IN` | Exclude values | `status NOT IN (Done, Closed)` |
-| `IS` | Null check | `assignee IS EMPTY` |
-| `IS NOT` | Not null | `assignee IS NOT EMPTY` |
-| `WAS` | Historical value | `status WAS "In Progress"` |
-| `CHANGED` | Field changed | `status CHANGED` |
-
-### Functions
-
-| Function | Description | Example |
-|----------|-------------|---------|
-| `currentUser()` | Logged-in user | `assignee = currentUser()` |
-| `now()` | Current timestamp | `created <= now()` |
-| `startOfDay()` | Midnight today | `updated >= startOfDay()` |
-| `startOfWeek()` | Start of week | `created >= startOfWeek()` |
-| `startOfMonth()` | Start of month | `created >= startOfMonth()` |
-| `endOfDay()` | End of today | `due <= endOfDay()` |
-| `openSprints()` | Active sprints | `sprint in openSprints()` |
-| `closedSprints()` | Completed sprints | `sprint in closedSprints()` |
-| `linkedIssues()` | Linked issues | `issue in linkedIssues("PROJ-123")` |
-
-### Relative Dates
-
-```jql
-# Days
-created >= -7d    # Last 7 days
-updated >= -30d   # Last 30 days
-
-# Weeks
-created >= -2w    # Last 2 weeks
-
-# Months
-created >= -1M    # Last month
-
-# Specific date
-created >= "2024-01-01"
-```
-
-### Ordering
-
-```jql
-# Order by priority, highest first
-project = PROJ ORDER BY priority DESC
-
-# Multiple sort fields
-project = PROJ ORDER BY status ASC, created DESC
-```
-
-### Complex Query Examples
-
-```jql
-# My open issues, high priority
-assignee = currentUser() AND status NOT IN (Done, Closed) AND priority >= High
-
-# Bugs created this week
-issuetype = Bug AND created >= startOfWeek() ORDER BY priority DESC
-
-# Epics in progress with stories (ScriptRunner required)
-# `issueFunction` / `hasLinks()` are ScriptRunner extensions, not native JQL.
-issuetype = Epic AND status = "In Progress" AND issueFunction in hasLinks("is parent of")
-
-# Issues updated by a resolved user recently (updatedBy() is a JQL function)
-issuekey in updatedBy("account-id-or-username") AND updated >= -7d ORDER BY updated DESC
-
-# Blocked issues
-status = Blocked OR "Flagged" = "Impediment"
-
-# Issues linked to specific epic
-"Epic Link" = PROJ-100 AND status != Done
-
-# Sprint backlog items
-sprint in openSprints() AND status = "To Do" ORDER BY rank ASC
-
-# Unassigned high-priority bugs
-issuetype = Bug AND assignee IS EMPTY AND priority >= High
-
-# Issues I'm watching
-watcher = currentUser()
-
-# Recently resolved by team
-resolved >= -7d AND project = PROJ ORDER BY resolved DESC
-```
-
----
-
-## JQL extension limits
-
-The `issueFunction in hasLinks(...)` examples require ScriptRunner. Native JQL has no general equivalent for querying arbitrary link descriptions such as "is parent of"; use native `linkedIssues(issueKey)` when querying links to a known issue, or report that the requested relationship query needs an extension.
-
-## Issue Linking
-
-### Limitation
-The Jira MCP operation list here has no issue-link creation tool. If an approved link is needed, use the documented Jira REST API only when an authorized REST client and credentials are already configured; otherwise report linking unavailable and provide a setup handoff. Do not route to an absent helper.
-
-### Link Types
-
-| Link Type | Inward | Outward | Use Case |
-|-----------|--------|---------|----------|
-| Depends On | is dependency of | depends on | Task dependencies |
-| Blocks | is blocked by | blocks | Blocking relationships |
-| Relates To | relates to | relates to | General relationships |
-| Clones | is cloned by | clones | Cloned issues |
-| Duplicates | is duplicated by | duplicates | Duplicate issues |
-
-### REST request when configured
-
-After approval and confirming the link type, submit `POST $JIRA_BASE_URL/rest/api/3/issueLink` with JSON `{"type":{"name":"Blocks"},"inwardIssue":{"key":"PROJ-100"},"outwardIssue":{"key":"PROJ-200"}}`. Use the instance's actual link type name and direction; never print credentials. If authorized REST access is not configured, stop and provide a setup handoff.
-
-### Finding Link Types
-Query the Jira API to get available link types:
-```bash
-curl -s -u "$JIRA_USER:$JIRA_API_TOKEN" \
-  "$JIRA_BASE_URL/rest/api/3/issueLinkType" | jq '.issueLinkTypes[].name'
-```
-
-Required environment variables:
-- `JIRA_BASE_URL`: Your Atlassian instance (e.g., `https://yourcompany.atlassian.net`)
-- `JIRA_USER`: Your email address
-- `JIRA_API_TOKEN`: API token from Atlassian account settings
-
----
-
-## Description Formatting
-
-### Jira Markup (Wiki Style)
-
-```
-h1. Heading 1
-h2. Heading 2
-h3. Heading 3
-
-*bold text*
-_italic text_
--strikethrough-
-+underline+
-
-{code:java}
-public class Example {
-    // code here
-}
-{code}
-
-{quote}
-Quoted text here
-{quote}
-
-* Bullet list
-** Nested bullet
-# Numbered list
-## Nested number
-
-[Link text|https://example.com]
-[Issue link|PROJ-123]
-
-||Header 1||Header 2||
-|Cell 1|Cell 2|
-
-{panel:title=Panel Title}
-Panel content here
-{panel}
-```
-
-### Atlassian Document Format (ADF)
-
-For createJiraIssue, descriptions may use ADF format:
-```json
-{
-  "type": "doc",
-  "version": 1,
-  "content": [
-    {
-      "type": "paragraph",
-      "content": [
-        {"type": "text", "text": "Description text"}
-      ]
-    }
-  ]
-}
-```
-
----
-
-## Error Handling
-
-### Common Errors
-
-| HTTP Code | Error | Cause | Resolution |
-|-----------|-------|-------|------------|
-| 400 | Bad Request | Invalid field values | Check required fields for issue type |
-| 401 | Unauthorized | Invalid credentials | Run `/mcp` to reconnect |
-| 403 | Forbidden | Insufficient permissions | Check project permissions |
-| 404 | Not Found | Issue/project doesn't exist | Verify key is correct |
-| 422 | Unprocessable | Validation failed | Check field constraints |
-
-### Authentication Issues
-
-If MCP tools return authentication errors:
-1. Run `/mcp` to check connection status
-2. Reconnect the Atlassian MCP service if disconnected
-3. Verify API token permissions in Atlassian settings
-
-### Field Validation
-
-Before creating issues:
-1. Get project metadata: `getJiraProjectIssueTypesMetadata`
-2. Check required fields for the issue type
-3. Look up user account IDs for assignee fields
-4. Verify custom field IDs and valid values
-
----
-
-## Common Workflows
-
-### Move Ticket to Done
-
-```
-1. Get available transitions:
-   mcp__atlassian__getTransitionsForJiraIssue(issueKey: "PROJ-123")
-   → Returns list with transition IDs
-
-2. Find "Done" transition ID from response
-
-3. Execute transition:
-   mcp__atlassian__transitionJiraIssue(
-     issueKey: "PROJ-123",
-     transitionId: "done_id"
-   )
-
-4. Do not add a comment unless the user requested one. If requested, derive its text from verified context, include the exact comment in the approved changes, then verify both the transitioned issue and comment after execution.
-```
-
-### Create and Assign Issue
-
-```
-1. Look up user account ID:
-   mcp__atlassian__lookupJiraAccountId(query: "john@example.com")
-   → Returns account ID
-
-2. Create issue with assignment:
-   mcp__atlassian__createJiraIssue(
-     projectKey: "PROJ",
-     issueType: "Task",
-     summary: "Implement feature X",
-     description: "Details here...",
-     assignee: "account_id_from_step_1"
-   )
-```
-
-### List My In-Progress Issues
-
-```
-mcp__atlassian__searchJiraIssuesUsingJql(
-  jql: "assignee = currentUser() AND status = 'In Progress' ORDER BY updated DESC"
-)
-```
-
-### Get Project Info Before Creating
-
-```
-1. List available projects:
-   mcp__atlassian__getVisibleJiraProjects()
-
-2. Get issue types for project:
-   mcp__atlassian__getJiraProjectIssueTypesMetadata(projectKey: "PROJ")
-
-3. Create issue with correct type:
-   mcp__atlassian__createJiraIssue(
-     projectKey: "PROJ",
-     issueType: "Story",
-     summary: "...",
-     description: "..."
-   )
-```
+# Atlassian MCP and REST reference
+
+Load when the step runs through the Atlassian MCP server or REST, or needs non-trivial JQL. Evidence tags: VERIFIED (official docs or OpenAPI spec read 2026-11), SOURCED (Atlassian community or KB snippet), UNVERIFIED (test on the instance).
+
+## MCP tool names
+
+Bind every call to the schemas the session actually exposes (the prefix depends on the server name, often `mcp__atlassian__`). Atlassian's supported-tools page lists the v2 names below and says they exist only on MCP v2 (VERIFIED, support.atlassian.com/atlassian-rovo-mcp-server/docs/supported-tools). Older v1 servers use the v1 names; v1 had no link or attachment tool (UNVERIFIED). Many tools take a `cloudId` from an accessible-resources tool (UNVERIFIED; read the schema).
+
+| Intent | v2 name | v1 name |
+|---|---|---|
+| Get issue | `getJiraIssue` | same |
+| JQL search | `searchJiraIssuesUsingJql` | same |
+| Create / edit | `createJiraIssue` / `editJiraIssue` | same |
+| Issue types of a project | `listJiraProjectIssueTypesMetadata` | `getJiraProjectIssueTypesMetadata` |
+| Fields of one issue type (required, allowed values) | `getJiraIssueTypeMetaWithFields` | same |
+| Available transitions | `listJiraIssueTransitions` | `getTransitionsForJiraIssue` |
+| Transition (v2 can also set sprint or backlog) | `transitionJiraIssue` | same |
+| Comment | `addOrEditJiraIssueComment` | `addCommentToJiraIssue` |
+| Account id by name or email | `lookupJiraAccountId` | same |
+| Current user | `getJiraCurrentUser` | `atlassianUserInfo` (UNVERIFIED) |
+| Link types / create link | `listJiraIssueLinkTypes` / `createJiraIssueLink` | none |
+| Remote (web) link | `createJiraIssueRemoteIssueLink` | none |
+| Attachment upload | `uploadAttachmentToJiraIssue` | none |
+| Boards / sprints of a board | `listJiraBoards` / `listJiraBoardSprints` (active, future or closed) | none |
+| Create, populate, start or close a sprint | `manageJiraSprint` | none |
+
+Description format: deployment table in SKILL.md (the markdown claim is SOURCED from Atlassian developer community thread 101278, which reports raw ADF dropped on edit).
+
+## REST fallback
+
+Use REST only when credentials already exist on the machine (jira-cli's config, or variables the user names); never ask the user to paste a token into chat and never echo it. First make one authenticated read (`GET /rest/api/{v}/myself` or the requested issue); give setup advice only if it fails. jira-cli setups keep the server URL and login in the `jira init` config and the token in `JIRA_API_TOKEN` (Cloud: basic auth with email and API token; DC: basic with password, or a personal access token as Bearer when `JIRA_AUTH_TYPE=bearer`; VERIFIED, jira-cli README).
+
+`{v}` is `3` on Cloud and `2` on Data Center (Cloud also serves v2, which takes wiki markup instead of ADF). Paths are VERIFIED in the Cloud OpenAPI specs; DC parity is UNVERIFIED where marked.
+
+| Purpose | Call |
+|---|---|
+| Current user | `GET /rest/api/{v}/myself` (Cloud `accountId`; DC `name`) |
+| Field ids (Sprint, Epic Link, story points) | `GET /rest/api/{v}/field` |
+| Issue types, then required fields | `GET /rest/api/{v}/issue/createmeta/{project}/issuetypes`, then `.../issuetypes/{issueTypeId}`: each field has `required`, `allowedValues`, `hasDefaultValue`. The old `GET /rest/api/3/issue/createmeta` is deprecated on Cloud. DC: UNVERIFIED (exists from Jira 8.4 in practice) |
+| Create / edit | `POST /rest/api/{v}/issue` / `PUT /rest/api/{v}/issue/{key}` with `{"fields":{...}}` |
+| Transitions | `GET /rest/api/{v}/issue/{key}/transitions?expand=transitions.fields` (lists each transition's required fields), then `POST` the same path with `{"transition":{"id":"31"}}` plus any required `fields`. Obtain missing values and get approval for the full payload first. An empty list means no transition is available from the current status |
+| Edit-screen fields | `GET /rest/api/{v}/issue/{key}/editmeta` |
+| Link types / link | `GET /rest/api/{v}/issueLinkType`; `POST /rest/api/{v}/issueLink` with `{"type":{"name":"Blocks"},"inwardIssue":{"key":"A"},"outwardIssue":{"key":"B"}}` |
+| Remote link | `POST /rest/api/{v}/issue/{key}/remotelink` with `{"object":{"url":"https://...","title":"..."}}`; a repeated `globalId` updates instead of duplicating |
+| Attachment | `POST /rest/api/{v}/issue/{key}/attachments`, multipart field `file`, header `X-Atlassian-Token: no-check` (blocked without it) |
+| Boards / future sprints | `GET /rest/agile/1.0/board?projectKeyOrId=KEY`; `GET /rest/agile/1.0/board/{id}/sprint?state=future` |
+| Move to sprint / epic | `POST /rest/agile/1.0/sprint/{id}/issue` or `/rest/agile/1.0/epic/{key}/issue` with `{"issues":["KEY"]}`, max 50 each; the epic call does not work for team-managed epics |
+
+## JQL that is not obvious
+
+- Epic children: on Cloud use `parent = EPIC-1`; it works in company-managed and team-managed projects. `"Epic Link" = EPIC-1` (quoted, two words) is the DC form; Atlassian kept it in Cloud JQL when it deprecated the REST field, but team-managed projects never had it (VERIFIED, deprecation notice 54048).
+- Prefer `statusCategory = "In Progress"` or `statusCategory != Done` over workflow status names, which differ per project.
+- Cloud JQL user clauses take account ids or `currentUser()`, not usernames.
+- Custom fields by id: `cf[10020] = 41`, with the id from `/field`.
+- `issueFunction in hasLinks(...)` and other `issueFunction` clauses need ScriptRunner. Native: `issue in linkedIssues("KEY")` or `issue in linkedIssues("KEY", "is blocked by")`.
+
+## Errors
+
+| Response | Usual cause | Do |
+|---|---|---|
+| 400 with an `errors` map | A field is required, not on the screen, or in the wrong format (for example a plain string as a v3 `description`) | Look up the named field by operation: create metadata for create, `editmeta` for edit, `transitions?expand=transitions.fields` for a transition. Fix it and re-confirm the payload; on a screen or permission limit, stop and explain instead of retrying from create metadata |
+| 401 | Expired token or disconnected MCP | Report it; the user reconnects (`/mcp`) or refreshes the token. Never run `jira init` |
+| 403 | Missing project permission (edit, transition, link) | Report the missing permission |
+| 404 | Wrong key, or no Browse permission: Jira answers 404 for issues you cannot see | Say both are possible |

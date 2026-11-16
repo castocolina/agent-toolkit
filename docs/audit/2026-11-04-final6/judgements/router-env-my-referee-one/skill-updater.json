@@ -1,0 +1,59 @@
+{
+  "skill": "skill-updater",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 28,
+      "evidence": "The fallback queries commits with 'since=<last_reviewed>T00:00:00Z'. However, step 3 records persistent retrieval failures as 'unreachable', and track advances last_reviewed even for those unsuccessful reviews. When such a row has no last_upstream_sha, its next successful review excludes changes predating the failed review, although those changes were never inspected.",
+      "fix": "When last_upstream_sha is absent, compare the complete current upstream content against the artifact rather than treating last_reviewed as a successful-review boundary. Establish and record a SHA only after completing that comparison; explicitly cover recovery from unreachable reviews and dates advanced by sibling-row tracking."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 28,
+      "evidence": "The compare command projects '.files[] | select(.filename | startswith(\"<path>\")) | .patch', while the tree command projects '.tree[] | .path'. These projections do not establish completeness: compare file lists and patch bodies can be limited, and recursive trees can report truncated=true. A successful response can therefore hide changes or matching relocation candidates despite the instruction to stop when retrieval is cut short.",
+      "fix": "Retain and inspect response metadata before projecting patches or tree paths. Detect compare file limits and missing patches, falling back to complete per-commit or current-content reads; check tree.truncated and traverse subtrees when necessary. If completeness cannot be established, mark the review unresolved and issue no track call for any row of the artifact."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/skill-updater/evals/evals.json",
+      "line": 7,
+      "evidence": "The relocation expectation says 'Exactly one candidate, the directory skills/writing, so the status is path-moved.' Both registry-moved-path and contents-404-moved expect tracking, but their fixtures supply candidate paths and commit SHAs without a completed content comparison, and their assertions do not enforce step 5's content-review prerequisite.",
+      "fix": "Add candidate content plus the local comparison baseline, or an explicit completed-comparison result, to both relocation fixtures. Assert that content review and adopt/adapt/ignore reasoning precede tracking. Add a negative case where relocation is confirmed but content retrieval remains incomplete, requiring no track call for any sibling row."
+    }
+  ]
+}

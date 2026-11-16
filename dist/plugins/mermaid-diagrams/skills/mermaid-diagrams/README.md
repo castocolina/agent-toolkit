@@ -27,7 +27,7 @@ The skill activates when you mention:
 
 ## How It Works
 
-1. **Classify the diagram type first** - Do not default to a flowchart. Sequence, C4, class, and ERD come first when they answer the question. See SKILL.md.
+1. **Classify the diagram type first** - Do not default to a flowchart. Choose by the question the diagram answers; the table is in `references/authoring-rules.md` section 1 ("Choose the diagram type").
 2. **Start with core elements** - entities, actors, or components
 3. **Add relationships** - connections, flows, interactions
 4. **Refine incrementally** - add details, styling, notes
@@ -180,25 +180,26 @@ C4Context
 ## Getting Started
 
 1. **Identify what you need to communicate** - Architecture? Flow? Data model?
-2. **Choose the appropriate diagram type** - See "Diagram Type Selection Guide" in SKILL.md
+2. **Choose the appropriate diagram type** - See `references/authoring-rules.md` section 1, "Choose the diagram type" (SKILL.md step 2 routes there)
 3. **Start simple** - Add core entities/components first
 4. **Add relationships** - Connect elements with appropriate connectors
 5. **Refine and style** - Add details, notes, and custom theming
-6. **Validate** - Test in [Mermaid Live Editor](https://mermaid.live)
+6. **Validate** - Run `npx -y @mermaid-js/mermaid-cli -i in.mmd -o out.svg` (SKILL.md step 4); preview in [Mermaid Live Editor](https://mermaid.live)
 7. **Embed or export** - Use in Markdown, export as image, or integrate
 
 ## Detailed References
 
 For comprehensive syntax and advanced features, see:
 
-- **[SKILL.md](SKILL.md)** - Quick start guide and diagram selection
+- **[SKILL.md](SKILL.md)** - Workflow (parse repair, semantic repair, new diagram), type-file routing, renderer constraints, gotchas
 - **[references/class-diagrams.md](references/class-diagrams.md)** - Relationships, multiplicity, methods
 - **[references/sequence-diagrams.md](references/sequence-diagrams.md)** - Messages, activations, loops, alt blocks
-- **[references/flowcharts.md](references/flowcharts.md)** - Node shapes, decision logic, subgraphs
+- **[references/authoring-rules.md](references/authoring-rules.md)** - Type choice, direction, flowchart subgraphs and shapes, classDef palettes, label rules (read before drawing)
 - **[references/erd-diagrams.md](references/erd-diagrams.md)** - Cardinality, keys, attributes
 - **[references/c4-diagrams.md](references/c4-diagrams.md)** - Context, container, component levels
 - **[references/architecture-diagrams.md](references/architecture-diagrams.md)** - Cloud services, infrastructure, CI/CD deployments
-- **[references/advanced-features.md](references/advanced-features.md)** - Themes, styling, configuration
+- **[references/other-diagrams.md](references/other-diagrams.md)** - State, Git, Gantt, and Pie
+- **[references/advanced-features.md](references/advanced-features.md)** - Frontmatter themes, interaction, export
 
 ## Best Practices
 
@@ -208,7 +209,7 @@ For comprehensive syntax and advanced features, see:
 4. **Comment liberally** - Use `%%` to explain non-obvious relationships
 5. **Version control** - Store `.mmd` files with code, update as system evolves
 6. **Add context** - Include titles and notes explaining diagram purpose
-7. **Validate syntax** - Test in Mermaid Live before committing
+7. **Validate syntax** - Render with mermaid-cli before committing (SKILL.md step 4)
 8. **Keep it readable** - Don't overcrowd; split into multiple diagrams if needed
 
 ## Common Use Cases

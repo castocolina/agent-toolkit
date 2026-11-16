@@ -1,0 +1,126 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "plugin-forge",
+      "percent": 94.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8,
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 39,
+          "evidence": "## References section repeats load triggers already given in Workflow steps 1, 2 and 5 (\"Read `references/plugin-structure.md` for layout...\", \"Read `references/workflows.md`\")",
+          "fix": "Delete the References list, or cut it to the one file with no inline trigger (marketplace-schema.md) and add its condition there"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 24,
+          "evidence": "\"3. **Version.** Run `bump_version.py` once per release, after the component changes are done.\"",
+          "fix": "Add a decision step before the bump: ask whether hosted users must receive this change (bump) or whether the plugin uses SHA versioning (no `version` in either file, so do not run bump_version.py), and map new components to minor, fixes to patch and removed or renamed components to major"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/plugin-forge/scripts/create_plugin.py",
+          "line": 118,
+          "evidence": "`json.dump(marketplace_data, f, indent=2)` rewrites the whole marketplace.json (re-indents it and drops the trailing newline), and the Gotchas section does not mention it",
+          "fix": "Add a gotcha: create_plugin.py reserializes all of marketplace.json with 2-space indentation and no trailing newline, so review `git diff .claude-plugin/marketplace.json` and restore the repository's formatting before committing"
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 20,
+          "evidence": "`references/marketplace-schema.md` loads inline only for \"Plugins kept outside `<root>/plugins/`, or a remote source\". Edits to an existing marketplace.json (category, strict, owner, team distribution), which the description names as a trigger, have no inline load condition",
+          "fix": "Add a workflow branch: \"Editing marketplace.json fields other than the version or name (owner, strict, component fields, extraKnownMarketplaces): read `references/marketplace-schema.md`; do NOT load `workflows.md` for that.\""
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/plugin-forge/evals/trigger-queries.json",
+          "line": 3,
+          "evidence": "Most should-trigger queries are terse, telegraphic phrases with no context (\"Scaffold Claude Code marketplace plugin for release workflow.\", \"Bump plugin to next patch release; command?\"). \"Install existing marketplace from CLI.\" is labelled should_trigger false, but the skill covers install testing",
+          "fix": "Rewrite the positives as realistic messages with paths and backstory, including ones that do not name the domain (e.g. \"my teammates' /lint-kit commands vanished after I moved the folder under tools/, here's marketplace.json\"), and relabel or replace the ambiguous install query with a clearer near-miss"
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/plugin-forge/evals/evals.json",
+          "line": 21,
+          "evidence": "\"Plugin docs-kit 1.4.2 has backward-compatible feature. Command and versions?\" (the eval prompts are compressed rather than casual or precise user phrasing). tests/skills/plugin-forge/test_create_plugin.py has no --help test",
+          "fix": "Rephrase eval prompts as a real user would type them (paths, the marketplace root, personal context), and add a create_plugin.py --help test that checks for \"JSON\" and \"exit 2\" as test_bump_version.py does"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/plugin-forge/scripts/bump_version.py",
+          "line": 56,
+          "evidence": "`old_version = plugin_data.get(\"version\", \"0.0.0\")`: a plugin that follows the gotcha \"omit `version` from both files so the commit SHA becomes the version\" gets a pinned 0.0.1/0.1.0/1.0.0 written silently, which contradicts the contract line \"requires a plain `MAJOR.MINOR.PATCH`\"",
+          "fix": "Make bump_version.py exit 2 with \"plugin.json has no version (SHA-versioned); add one explicitly or skip the bump\" when `version` is missing, and add to SKILL.md step 3: \"SHA-versioned plugin (no `version` in either file): skip this step.\""
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 24,
+          "evidence": "The workflow explicitly supports 'Plugins kept outside `<root>/plugins/`, or a remote source' at line 20, but then requires 'Run `bump_version.py` once per release'. That script only reads `<root>/plugins/<name>/.claude-plugin/plugin.json`; validation and several test/publish commands also assume that layout. Following the nonstandard-source branch therefore reaches commands targeting the wrong location.",
+          "fix": "Carry the resolved plugin location and source type through versioning, validation, testing, and publishing. Use bump_version.py only for the supported standard layout. For another local layout, update the actual plugin manifest and marketplace entry together and validate the actual plugin path. For remote sources, work in the source checkout and update any pinned marketplace ref or sha as appropriate; provide corresponding test and publish instructions."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/plugin-forge/scripts/create_plugin.py",
+          "line": 110,
+          "evidence": "`marketplace_data[\"plugins\"].append(plugin_entry)` executes after the plugin directories, plugin.json, and README have been written. With an existing manifest such as `{\"name\":\"team\",\"owner\":{\"name\":\"Dana\"},\"plugins\":{}}`, the earlier duplicate-check loop performs no iterations, then append raises an uncaught AttributeError. The command leaves a partial scaffold and exits 1, contradicting the documented 'exit ... 2 on bad input with nothing written'; --dry-run also incorrectly reports success for this input.",
+          "fix": "Validate the marketplace object, required fields, plugins array, and entry object types before either the dry-run response or any filesystem writes. Raise a handled ValueError for malformed shapes so the CLI exits 2 without creating anything. Add regression tests asserting unchanged marketplace bytes and no plugin directory for malformed manifests."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/plugin-forge/scripts/create_plugin.py",
+          "line": 18,
+          "evidence": "The name guard only checks `[a-z0-9]+(?:-[a-z0-9]+)*`, so names such as `claude-tools` pass and produce a successful scaffold. However, references/plugin-structure.md states that names beginning with `claude-`, `anthropic-`, or `cc-plugin-` fail plugin validation. Scaffold-only requests are explicitly told not to load references, leaving this known invalid-name case unchecked.",
+          "fix": "Reject the documented reserved prefixes before dry-run output or writes, return the documented exit code with an actionable naming error, and include the restriction in the main script contract. Add a test showing that a reserved-prefix name leaves both the marketplace and filesystem unchanged."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/plugin-forge/evals/trigger-queries.json",
+          "line": 39,
+          "evidence": "The positive query 'Set up plugin manifest and metadata fields.' contains no Claude Code or marketplace context and could equally describe an unrelated extension system. Several other positives are similarly terse and explicitly plugin-focused, so the suite weakly tests indirect user intent and includes ambiguous positive labels.",
+          "fix": "Replace ambiguous positives with contextual requests that identify Claude Code through concrete files, namespaced commands, or team-distribution needs. Include casual requests that describe packaging or sharing capabilities without saying 'plugin', and retain contrasting negatives for runtime-framework plugins and IDE extensions."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

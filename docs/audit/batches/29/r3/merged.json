@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "meme-factory",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 13,
+          "evidence": "First answer three questions. Who will see it: team Slack, a PR, or a public post? Who is the butt of the joke ... Which channel, and does its tone allow it?",
+          "fix": "Replace the three audience questions, which restate social sense the model already has, with one line: \"Aim the joke at the situation or tool, never a named person, and match the channel's tone.\" Keep the payoff-first rule and the character limits."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 11,
+          "evidence": "Captions travel in the URL to a public third-party service, which logs them ... Replace customer names, tokens or credentials, internal URLs or hostnames",
+          "fix": "Add a Gotcha: \"Never pass an internal or signed image URL to --background or --style. memegen.link fetches it from the public internet, so a private URL either fails or leaks a signed link into the meme URL and the service's logs. Ask for a public image URL instead.\""
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/meme-factory/evals/evals.json",
+          "line": 10,
+          "evidence": "\"Uses a failure-appropriate template such as `fine` and concise text.\" (precise-meme has the same wording: \"Uses concise captions\"), and text-only-greentext lists the skill's own references/markdown-memes-guide.md under files instead of an input file",
+          "fix": "Make the assertions countable, for example \"each caption is 30 characters or fewer before escaping\" and \"template id is one of fine, buzz\". Remove the skill's own reference from `files`, or replace it with a real input under evals/files/."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 15,
+          "evidence": "python3 scripts/meme_generator.py generate <id> '<caption>'...",
+          "fix": "Add a note: \"Single quotes break when a caption has an apostrophe (I don't always, it's fine). Use double quotes for those captions, or write ' as '\\''. The helper keeps ' raw in the URL.\" Also mention that --alt text with ] or ) breaks the Markdown image, because the helper does not escape it."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/meme-factory/references/markdown-memes-guide.md",
+          "line": 17,
+          "evidence": "\"Use repeated phrasing and escalation; preserve the rhythm and line breaks.\" This describes familiar copypasta conventions rather than adding expert knowledge.",
+          "fix": "Remove the generic explanation of repetition and escalation; retain the concrete formatting and privacy constraints."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/meme-factory/scripts/meme_generator.py",
+          "line": 177,
+          "evidence": "The branch \"if outcomes:\" followed by \"return \\\"success\\\"\" makes suggest('tests should pass') return success: 'should' is neither an uncertainty token nor a negation, while 'pass' is a success token. This treats an expected outcome as confirmed, despite the workflow's conservative-outcome guidance.",
+          "fix": "Treat modal, future and aspirational outcome statements such as 'should pass', 'could work' and 'hoping it works' as unconfirmed and return fry. Reserve success suggestions for explicitly confirmed outcomes."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/meme-factory/scripts/meme_generator.py",
+          "line": 209,
+          "evidence": "\"return f'<img src=\\\"{url}\\\" alt=\\\"{alt_text}\\\" width=\\\"{width}\\\"/>'\" interpolates unescaped alt text. With width=500 and alt_text='Dog says \"this is fine\"', the embedded quotes terminate the alt attribute. The adjacent Markdown branch also interpolates unmatched brackets without escaping.",
+          "fix": "HTML-escape attribute values in the width branch. In the Markdown branch, escape backslashes and brackets in alt text so ordinary joke punctuation cannot break the image syntax."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

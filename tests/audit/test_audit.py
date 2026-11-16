@@ -420,6 +420,18 @@ class ValidateEntryTests(Base):
             with self.subTest(key=key, value=value):
                 self.assertIsNone(audit.validate_entry(self.root, self.four(**{key: value})))
 
+    def test_credit_validates_on_non_repo_non_local_rows_only(self):
+        # Break: a bad or misplaced credit is stored and the check then compares against nothing.
+        self.skill("x")
+        self.assertIsNone(audit.validate_entry(self.root, self.four(credit="@a")))
+        for bad in ("", None, 3):
+            with self.subTest(bad=bad):
+                self.assertIsNotNone(audit.validate_entry(self.root, self.four(credit=bad)))
+        repo = {"skill": None, "kind": "repo", "source": "o/r", "ref": "main", "credit": "@a"}
+        self.assertIsNotNone(audit.validate_entry(self.root, repo))
+        local = {"skill": "x", "kind": "local", "source": "", "ref": "", "credit": "@a"}
+        self.assertIsNotNone(audit.validate_entry(self.root, local))
+
     def test_each_optional_key_fails_when_malformed(self):
         # Break: a bad date or a status that is really a kind is stored as review state.
         self.skill("x")
@@ -798,6 +810,30 @@ class CheckTests(Base):
         self.skill()
         self.write("skills/x/evals/evals.json", "[" * 200000)
         self.assertIn("missing_evals", self.codes())
+
+    def credit_codes(self, credit, skill_text="", readme_text="", registry=True):
+        self.skill()
+        with open(self.root / "skills/x/SKILL.md", "a") as f:
+            f.write(skill_text)
+        self.write("skills/x/README.md", readme_text)
+        if registry:
+            self.write("docs/audit/upstream-sources.json", json.dumps([
+                {"skill": "x", "kind": "unversioned", "source": "s", "ref": None, "credit": credit}]))
+        return self.codes()
+
+    def test_check_flags_missing_credit(self):
+        self.assertIn("missing_credit", self.credit_codes("@blader"))
+
+    def test_check_credit_found_in_readme_or_skill_md(self):
+        self.assertNotIn("missing_credit", self.credit_codes("@blader", readme_text="by @blader"))
+        self.assertNotIn("missing_credit", self.credit_codes("@blader", skill_text="by @blader\n"))
+
+    def test_check_credit_found_in_a_reference_file(self):
+        self.write("skills/x/references/guide.md", "> Source: art by @blader\n")
+        self.assertNotIn("missing_credit", self.credit_codes("@blader"))
+
+    def test_check_without_registry_has_no_credit_issue(self):
+        self.assertNotIn("missing_credit", self.credit_codes("@blader", registry=False))
 
     def test_check_flags_missing_readme(self):
         self.skill(readme=False)
@@ -2331,8 +2367,10 @@ def alive(pid):
         os.kill(pid, 0)
     except ProcessLookupError:
         return False
-    stat = Path(f"/proc/{pid}/stat")
-    return not (stat.exists() and stat.read_text().rsplit(")", 1)[1].split()[0] == "Z")
+    try:  # the process can exit between the kill probe and the read
+        return Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[0] != "Z"
+    except (FileNotFoundError, ProcessLookupError):
+        return False
 
 
 def evals_file(skill="s", evals=None):
@@ -2988,6 +3026,12 @@ class GraderTests(EvalBase):
 
 
 class TriggerTests(EvalBase):
+    def test_parse_trigger_accepts_prose_then_the_object_on_the_last_line(self):
+        self.assertEqual(audit.parse_trigger('It belongs to draw-io.\n\n{"skill":"draw-io"}', "t"), {"skill": "draw-io"})
+        for bad in ("It belongs to draw-io.", 'Prose\n{"skill":"x","why":"y"}', '{"skill":"x"}\nThanks'):
+            with self.subTest(bad=bad), self.assertRaises(audit.HarnessError):
+                audit.parse_trigger(bad, "t")
+
     Q = [{"query": "q", "should_trigger": True}]
 
     def trig(self, *extra, skills="s"):
@@ -3048,6 +3092,12 @@ class TriggerTests(EvalBase):
             with self.subTest(bad=bad):
                 self.raw_answer("trigger", "s/q0", bad)
                 self.assertEqual(self.trig("--runs", "1")[0], 2)
+
+    def test_trigger_retries_a_non_json_answer_once(self):
+        self.mk(triggers=self.Q)
+        self.answer("trigger", "s/q0", "Sure, it is s.", '{"skill":"s"}')
+        code, res, _ = self.trig("--runs", "1")
+        self.assertEqual((code, len(self.calls())), (0, 2))
 
     def test_trigger_file_invalid_exits_2(self):
         for bad in ([], [{"query": "", "should_trigger": True}], [{"query": "q", "should_trigger": "yes"}], {"a": 1}):
@@ -3339,6 +3389,37 @@ class ArtifactListTests(Base):
         self.write("commands/c.md", "---\ndescription: # TODO\n---\n")
         self.assertEqual([c for c, _ in audit.flat_issues(self.root, "command", "c")], ["missing_description"])
 
+    def test_frontmatter_yaml_plain_scalar(self):
+        # Break: 'description: Do X: then Y' passes although a YAML parser rejects it.
+        codes = lambda t: [c for c, _ in audit.yaml_issues(t)]
+        self.assertEqual(codes("---\nname: foo\ndescription: Do X: then Y\n---\n"), ["frontmatter_yaml"])
+        self.assertEqual(codes("---\ndescription: @x\n---\n"), ["frontmatter_yaml"])
+        self.assertEqual(codes('---\nname: foo\ndescription: "Do X: then Y"\n---\n'), [])
+        self.assertEqual(codes("---\ndescription: >-\n  Do X: then Y\n---\n"), [])
+        for bad in ("[--a] [--b]", "[a", "{x: 1} y", "[a]#x"):
+            self.assertEqual(codes(f"---\nargument-hint: {bad}\n---\n"), ["frontmatter_yaml"], bad)
+        for ok in ("[target]", "[a, b]", "{x: 1}", "[a] # note", "['a]', b]"):
+            self.assertEqual(codes(f"---\nargument-hint: {ok}\n---\n"), [], ok)
+        self.write("commands/c.md", "---\ndescription: Do X: then Y\n---\n")
+        code, res = self.check_kind("command", "c", "--strict")
+        self.assertEqual((code, [i["code"] for i in res["issues"]]), (1, ["frontmatter_yaml"]))
+        self.skill("s", desc="Do X: then Y")
+        self.assertIn("frontmatter_yaml", [c for c, _ in audit.skill_issues(self.root, "s", set())])
+
+    def test_frontmatter_yaml_comments_and_multiline_flow(self):
+        # Break: a ': ' inside a trailing '# comment' or a multiline [..] flow list is flagged as invalid YAML.
+        codes = lambda t: [c for c, _ in audit.yaml_issues(t)]
+        self.assertEqual(codes("---\nname: foo # note: x\n---\n"), [])
+        self.assertEqual(codes("---\nname: Do X: y # note\n---\n"), ["frontmatter_yaml"])
+        self.assertEqual(codes('---\ndescription: "a # b: c"\n---\n'), [])
+        self.assertEqual(codes("---\nallowed-tools: [\n  Read,\n  Bash\n]\n---\n"), [])
+        self.assertEqual(codes("---\nallowed-tools: [\n  Read,\n  Bash\n---\n"), ["frontmatter_yaml"])
+        self.assertEqual(codes("---\nallowed-tools: [a\nname: x\n---\n"), ["frontmatter_yaml"])
+        # Break: a '#'-commented bracket closes the list, so an unclosed multiline list passes.
+        self.assertEqual(codes("---\nallowed-tools: [\n  Read\n  # ]\n---\n"), ["frontmatter_yaml"])
+        self.assertEqual(codes("---\nallowed-tools: [ # tools\n  Read, # main\n  Bash\n] # end\n---\n"), [])
+        self.assertEqual(codes("---\nargument-hint: [a] [b]\n---\n"), ["frontmatter_yaml"])
+
     def test_flat_uncontained_symlink_fails_strict_check(self):
         # Break: a commands/ symlink to a file outside the repo is dropped silently and --strict passes.
         outside = Path(tempfile.mkdtemp()) / "x.md"
@@ -3404,6 +3485,229 @@ class ArtifactListTests(Base):
         self.skill("g")
         self.write("agents/g.md", "---\nname: g\ndescription: d\n---\n")
         self.assertEqual(self.run_cli("artifacts")[0], 2)
+
+
+def bfind(i, sev="medium", dim="D7", file="SKILL.md", fix=None, line=3):
+    return {"id": f"{dim}-{i}", "severity": sev, "dimension": dim, "file": file, "line": line,
+            "evidence": "e", "fix": fix or f"fix {dim} {i}"}
+
+
+class BatchTests(Base):
+    def setUp(self):
+        super().setUp()
+        self.out = self.root / "docs" / "audit"
+        self.mpath = self.root / "m.json"
+
+    def merged(self, entries, name="m.json"):
+        full = [{"name": n, "percent": pc, "synced": sy, "findings": f} for n, pc, f, *r in entries
+                for sy in [r[0] if r else False]]
+        for e in full:
+            if not (self.root / "skills" / e["name"]).exists():
+                self.skill(e["name"])
+        p = self.root / name
+        p.write_text(json.dumps({"skills": full, "junk": 1}))
+        return str(p)
+
+    def run_b(self, *argv, merged=None, out=True):
+        args = ["--root", str(self.root), "batches", *argv]
+        if out:
+            args += ["--out", str(self.out)]
+        if merged:
+            args += ["--merged", merged]
+        err, o = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stderr(err), contextlib.redirect_stdout(o):
+            code = audit.main(args)
+        return code, o.getvalue(), err.getvalue()
+
+    def gen(self, m, *extra):
+        return self.run_b("generate", "--max-artifacts", "3", "--max-findings", "15", *extra, merged=m)[0]
+
+    def queue(self):
+        return json.loads((self.out / "batches.json").read_text())
+
+    def test_batches_json_write_is_atomic(self):
+        # Break: a failed write truncates batches.json or leaves a temp file behind.
+        self.out.mkdir(parents=True)
+        target = self.out / "batches.json"
+        audit.save_queue(self.out, [{"id": 1}])
+        with mock.patch.object(audit.os, "replace", side_effect=OSError("boom")):
+            with self.assertRaises(OSError):
+                audit.save_queue(self.out, [{"id": 2}])
+        self.assertEqual(json.loads(target.read_text()), [{"id": 1}])
+        self.assertEqual([p.name for p in self.out.iterdir()], ["batches.json"])
+        audit.save_queue(self.out, [{"id": 3}])
+        self.assertEqual(json.loads(target.read_text()), [{"id": 3}])
+
+    def fixture(self):
+        return [
+            ("low89", 89.9, [bfind(1, "low")]), ("high90", 90.0, [bfind(1, "high")]),
+            ("med90", 90.0, [bfind(1, "medium")]), ("clean95", 95.0, []),
+            ("synced", 50.0, [bfind(1)], True), ("excl", 40.0, [bfind(1)]),
+            ("null", None, []), ("low70", 70.0, [bfind(1, "low", "D1"), bfind(2, "medium", "D2")]),
+        ]
+
+    def names(self, q):
+        return [[a["name"] for a in b["artifacts"]] for b in q]
+
+    def test_relative_out_writes_briefs(self):
+        m = self.merged(self.fixture())
+        cwd = os.getcwd()
+        os.chdir(self.root)
+        try:
+            code, _, err = self.run_b("generate", "--out", "docs/audit", merged=m, out=False)
+        finally:
+            os.chdir(cwd)
+        self.assertEqual((code, err), (0, ""))
+        self.assertTrue(all((self.root / b["brief"]).is_file() for b in self.queue()))
+
+    def test_a_predicate_b_order_d_exclusions(self):
+        self.assertEqual(self.gen(self.merged(self.fixture()), "--exclude", "excl"), 0)
+        q = self.queue()
+        flat = [n for b in self.names(q) for n in b]
+        self.assertEqual(flat, ["null", "low70", "low89", "high90"])  # ascending, null first
+        self.assertEqual(self.names(q), [["null", "low70", "low89"], ["high90"]])
+        self.assertEqual(q[0]["artifacts"][1], {"kind": "skill", "name": "low70", "percent": 70.0,
+                         "findings": {"critical": 0, "high": 0, "medium": 1, "low": 1}})
+        self.assertEqual((q[0]["status"], q[0]["rounds"], q[0]["requeues"], q[0]["waived"]), ("queued", 0, 0, []))
+
+    def test_c_caps(self):
+        ents = [("big", 10.0, [bfind(i) for i in range(20)]),
+                ("mix", 20.0, [bfind(i) for i in range(10)] + [bfind(i + 10, "low") for i in range(6)])]
+        ents += [(f"s{i}", 30.0 + i, [bfind(1, "low")] * 2) for i in range(7)]
+        self.gen(self.merged(ents))
+        q = self.queue()
+        self.assertEqual(self.names(q)[:2], [["big"], ["mix"]])
+        for b in q:
+            self.assertLessEqual(len(b["artifacts"]), 3)
+            if len(b["artifacts"]) > 1:  # an artifact over the cap is alone in its batch
+                self.assertLessEqual(sum(sum(a["findings"].values()) for a in b["artifacts"]), 15)
+        self.assertEqual(self.names(q)[2:], [["s0", "s1", "s2"], ["s3", "s4", "s5"], ["s6"]])
+
+    def test_e_brief_holds_every_finding_with_labels(self):
+        ents = [("p", 10.0, [bfind(1, "high", fix="X"), bfind(2, "low", "D3", "f.md", line=None)]),
+                ("q", 20.0, [bfind(1, "high", fix="X")])]
+        self.gen(self.merged(ents))
+        brief = (self.root / self.queue()[0]["brief"]).read_text()
+        self.assertRegex(self.queue()[0]["brief"], r"docs/audit/batches/01-p-q\.md$")
+        for label in ("p#D7-1", "p#D3-2", "q#D7-1"):
+            self.assertEqual(brief.count(label), 1, label)
+        self.assertIn("SKILL.md:3", brief)
+        self.assertIn("f.md\n", brief)
+        self.assertEqual(brief.count("- fix: X"), 2)
+        self.assertNotEqual(audit.finding_key("p", bfind(1, fix="X")), audit.finding_key("q", bfind(1, fix="X")))
+        self.assertEqual(audit.finding_key("p", bfind(1, fix="AbC")), ("p", "D7", "SKILL.md", "abc"))
+
+    def test_f_set(self):
+        self.gen(self.merged(self.fixture()))
+        self.assertEqual(self.run_b("set", "--id", "1", "--status", "open")[0], 0)
+        self.assertEqual(self.queue()[0]["status"], "open")
+        self.assertEqual(self.run_b("set", "--id", "9", "--status", "open")[0], 2)
+        self.assertEqual(self.run_b("set", "--id", "1", "--status", "bogus")[0], 2)
+
+    def closed(self, ents, **waive):
+        m = self.merged(ents)
+        self.gen(m)
+        self.run_b("set", "--id", "1", "--status", "closed")
+        return m
+
+    def chk(self, m):
+        return self.run_b("check", merged=m)
+
+    def test_g_check(self):
+        m = self.closed([("p", 50.0, [bfind(1, "medium", fix="F"), bfind(2, "low", "D2", fix="L")]),
+                         ("q", 60.0, [bfind(1, "medium", fix="F")])])
+        better = lambda f: self.merged([("p", 95.0, f), ("q", 95.0, [])], "n.json")
+        self.assertEqual(self.chk(better([bfind(1, fix="F")]))[0], 1)
+        code, o, _ = self.run_b("waive", "--id", "1", "--artifact", "p", "--dimension", "D7", "--file", "SKILL.md",
+                                "--reason", "ok", merged=better([bfind(1, fix="F")]))
+        self.assertEqual(code, 0)
+        w = self.queue()[0]["waived"]
+        self.assertEqual(w, [{"artifact": "p", "dimension": "D7", "file": "SKILL.md", "fix": "F", "reason": "ok"}])
+        low = [bfind(3, "low", "D2", fix="L")]
+        code, o, _ = self.chk(self.merged([("p", 95.0, [bfind(3, fix="F")] + low), ("q", 95.0, [])], "r.json"))
+        self.assertEqual(code, 0)  # renumbered D7-1 -> D7-3, same key
+        self.assertIn("residual low", o)
+        self.assertEqual(self.chk(self.merged([("p", 95.0, []), ("q", 95.0, [bfind(1, fix="F")])], "o.json"))[0], 1)
+        self.assertEqual(self.chk(self.merged([("p", 95.0, [])], "x.json"))[0], 1)  # q has no verdict
+        self.assertEqual(self.chk(self.merged([("p", 89.0, []), ("q", 95.0, [])], "y.json"))[0], 1)
+        self.run_b("set", "--id", "1", "--status", "open")
+        self.assertEqual(self.chk(self.merged([("p", 10.0, [bfind(1, "high")])], "z.json"))[0], 0)
+
+    def test_h_idempotent_and_preserving(self):
+        ents = self.fixture()
+        m = self.merged(ents)
+        self.gen(m)
+        first = (self.out / "batches.json").read_bytes()
+        self.gen(m)
+        self.assertEqual((self.out / "batches.json").read_bytes(), first)
+        self.run_b("set", "--id", "1", "--status", "closed")
+        self.run_b("waive", "--id", "1", "--artifact", "low70", "--dimension", "D2", "--file", "SKILL.md",
+                   "--reason", "r", merged=m)
+        before = self.queue()[0]
+        briefb = (self.root / before["brief"]).read_bytes()
+        m2 = self.merged(ents + [("fresh", 5.0, [bfind(1)])], "m2.json")
+        self.gen(m2)
+        q = self.queue()
+        self.assertEqual(q[0], before)
+        self.assertEqual((self.root / before["brief"]).read_bytes(), briefb)
+        self.assertEqual((len(q), q[-1]["id"], self.names(q)[-1]), (3, 3, ["fresh"]))
+
+    def test_i_requeue_and_j_limits(self):
+        ents = [("p", 10.0, [bfind(1)]), ("q", 20.0, [bfind(1)])] + [(f"s{i}", 30.0 + i, [bfind(1)]) for i in range(4)]
+        m = self.merged(ents)
+        self.gen(m)
+        self.run_b("set", "--id", "2", "--status", "open")
+        self.run_b("set", "--id", "1", "--status", "open")
+        code = self.run_b("requeue", "--id", "1", "--artifact", "p", merged=m)[0]
+        self.assertEqual(code, 0)
+        q = self.queue()
+        self.assertEqual([b["id"] for b in q], [1, 2, 3])  # no queued entry: appended
+        self.assertEqual((q[2]["rounds"], q[2]["requeues"], q[2]["status"], self.names(q)[2]), (0, 1, "queued", ["p"]))
+        self.assertTrue((self.root / q[2]["brief"]).is_file())
+        self.run_b("set", "--id", "2", "--status", "queued")
+        self.assertEqual(self.run_b("requeue", "--id", "3", "--artifact", "p", merged=m)[0], 0)
+        q = self.queue()
+        self.assertEqual([(b["id"], b["status"]) for b in q], [(1, "open"), (4, "queued"), (2, "queued"), (3, "requeued")])
+        self.assertEqual(q[1]["requeues"], 2)
+        self.run_b("set", "--id", "1", "--status", "closed")
+        better = self.merged([("q", 95.0, []), ("s0", 95.0, [])], "b.json")
+        self.assertEqual(self.chk(better)[0], 0)  # p was removed from batch 1
+        snap = (self.out / "batches.json").read_bytes()
+        self.assertEqual(self.run_b("requeue", "--id", "4", "--artifact", "p", merged=m)[0], 3)
+        self.assertEqual((self.out / "batches.json").read_bytes(), snap)
+        self.assertEqual(self.run_b("requeue", "--id", "99", "--artifact", "p", merged=m)[0], 2)
+        self.assertEqual(self.run_b("requeue", "--id", "1", "--artifact", "nope", merged=m)[0], 2)
+
+    def test_k_waive_rejections(self):
+        m = self.merged([("p", 10.0, [bfind(1)])])
+        self.gen(m)
+        base = ["waive", "--id", "1", "--artifact", "p"]
+        self.assertEqual(self.run_b(*base, "--dimension", "D7", "--file", "SKILL.md", "--reason", "", merged=m)[0], 2)
+        self.assertEqual(self.run_b(*base, "--dimension", "D1", "--file", "SKILL.md", "--reason", "r", merged=m)[0], 2)
+        self.assertEqual(self.run_b(*base, "--dimension", "D7", "--file", "other", "--reason", "r", merged=m)[0], 2)
+        self.assertEqual(self.queue()[0]["waived"], [])
+
+    def test_generate_from_merge_verdicts(self):
+        self.skill("x")
+        inp = Path(self._tmp.name) / "in"
+        v = make_verdict(skill="x", total=60, findings=[
+            {"id": "D7-1", "severity": "high", "dimension": "D7", "file": "SKILL.md", "line": 2,
+             "evidence": "e", "fix": "Do it"}])
+        self.write("../in/j1/x.json", json.dumps(v))
+        mo = Path(self._tmp.name) / "mo"
+        with contextlib.redirect_stderr(io.StringIO()):
+            audit.main(["--root", str(self.root), "merge", "--in", str(inp), "--out", str(mo), "--judges", "j1",
+                        "--skills", "x"])
+        self.assertEqual(self.gen(str(mo / "merged.json")), 0)
+        q = self.queue()
+        self.assertEqual(q[0]["artifacts"][0]["findings"]["high"], 1)
+        self.assertIn("x#D7-1", (self.root / q[0]["brief"]).read_text())
+
+    def test_unknown_artifact_is_an_error(self):
+        p = self.root / "u.json"
+        p.write_text(json.dumps({"skills": [{"name": "ghost", "percent": 1.0, "synced": False, "findings": []}]}))
+        self.assertEqual(self.gen(str(p)), 2)
+        self.assertFalse((self.out / "batches.json").exists())
 
 
 if __name__ == "__main__":

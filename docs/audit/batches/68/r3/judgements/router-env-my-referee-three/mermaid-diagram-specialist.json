@@ -1,0 +1,68 @@
+{
+  "skill": "mermaid-diagram-specialist",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 34,
+      "evidence": "The caller sees only your reply, not scratch `.mmd`/`.svg` files: return the final source inline.",
+      "fix": "Shorten this to 'Return the final source inline.' A subagent already knows that only its reply reaches the caller, so keep the instruction and drop the explanation."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 21,
+      "evidence": "2. If asked for a non-Mermaid format, say so and stop. If the supplied material cannot support a diagram, return the specific missing facts and stop.",
+      "fix": "Move this check to step 1, before 'Name the task kind'. As written, the agent picks a diagram type or starts a repair before it checks whether the request is for Mermaid at all and whether the material can support a diagram."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 35,
+      "evidence": "A clean validator run does not prove GitHub renders it: name any version-specific construct.",
+      "fix": "Name the constructs that usually break, for example the `architecture-beta` diagram type and C4 diagrams, which may validate locally but not render in GitHub's pinned Mermaid version. Then the agent knows which constructs to flag."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/mermaid-diagram-specialist.md",
+      "line": 15,
+      "evidence": "repair: decide first whether it fails to parse or renders with wrong meaning, then edit",
+      "fix": "Add a branch for a diagram that has both problems: 'If it both fails to parse and has wrong meaning, fix parsing first, then check meaning against the source material, and report both change lists.' The current branch treats the two cases as mutually exclusive."
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "commit-work",
+      "percent": 94.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-one": 94.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 23,
+          "evidence": "1. Read `git status`, `git diff --cached` and `git diff`. ... Step 6: \"Write the message in Conventional Commits 1.0.0; the body says why\"",
+          "fix": "Replace the generic read-the-diff opener and the body-says-why rule with what only this skill adds, for example: \"Stop when git status reports a merge, rebase, cherry-pick or revert in progress\". The model and the commit helpers in its harness already inspect status and diffs and know the Conventional Commits basics."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 33,
+          "evidence": "Never propose `--no-verify`, not even as an option ... Never amend or add a fix-up commit without the user's say-so",
+          "fix": "Shorten these to one clause each. Harnesses such as Claude Code already ban --no-verify and amend in their own git safety rules. Keep only the non-obvious reason: a fix-up commit splits one approved change across two commits."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 25,
+          "evidence": "Step 3 packs the run-directory setup, the choice between the real and the temporary index, the read-tree bootstrap, whole-file staging and hunk splitting into one step with four sub-bullets",
+          "fix": "Split step 3 into 3a 'Create run directory', 3b 'Pick index (decision)' and 3c 'Stage (whole file / hunks / untracked)'. Each checkpoint can then be followed and checked on its own, which matches the Process pattern more closely."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/commit-work/evals/evals.json",
+          "line": null,
+          "evidence": "No eval covers the temporary index in a repository with no commits (`read-tree --empty`), an untracked file that needs partial approval, or `git apply --cached --check` failing; the 'no-changes' assertions are soft (\"Explains no commit can be made until intended changes exist\")",
+          "fix": "Add an eval with a fixture for a repo with no HEAD where the user has staged content and asks for a temporary-index commit, with the assertion \"Uses `GIT_INDEX_FILE=<run>/index git read-tree --empty`\". Tighten no-changes with \"Runs no `git add` or `git commit --allow-empty`\"."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 29,
+          "evidence": "then `git apply --cached --check` and `git apply --cached` on the pick file",
+          "fix": "Add a fallback for the failing branch: \"If `--check` fails (hand-edited hunk header or whitespace drift), regenerate all.diff, delete whole hunks again without touching the @@ lines, and if it still fails ask the user instead of staging the whole file\"."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 19,
+          "evidence": "\u201cWhen the user asks for proposed commands, label them as proposed and do not claim they ran.\u201d Together with \u201cPlan each commit as paths, plus hunks for a mixed file,\u201d this adds generic presentation and planning reminders rather than commit-specific expertise.",
+          "fix": "Remove these generic reminders or fold them into the intent-routing table; retain the non-obvious temporary-index, staged-verification, hook and shared-state safeguards."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 26,
+          "evidence": "\u201cIf an approved path already holds user-staged content, stop and ask.\u201d This unconditional gate also stops a straightforward request to commit an explicitly approved staged diff, despite step 1 already requiring approval for that content.",
+          "fix": "Allow an already-staged path when the user explicitly approved its staged diff. Preserve that exact staged version rather than restaging the whole working-tree file; ask only when approval or the intended hunk selection is ambiguous."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/commit-work/SKILL.md",
+          "line": 23,
+          "evidence": "\u201cAnything staged before you started is the user's; it enters a commit only if the user says so, and until they say, commit nothing.\u201d For an approved auth fix with unrelated staged config explicitly excluded, this says to commit nothing, while step 3 and the unrelated-staged eval prescribe proceeding with a temporary index.",
+          "fix": "Replace the blanket stop with: \u201cNever include pre-existing staged content without the user's approval. When only other paths are approved and the existing staged content must remain excluded, continue using the temporary-index branch in step 3.\u201d"
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

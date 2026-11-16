@@ -1,0 +1,12 @@
+# Contents of the untracked file tests/test_rate_limit.py
+from src.rate_limit import SlidingWindowLimiter
+
+
+def test_blocks_after_limit_and_recovers_after_window():
+    t = [0.0]
+    limiter = SlidingWindowLimiter(limit=2, window_s=10, clock=lambda: t[0])
+    assert limiter.allow("ip-1")
+    assert limiter.allow("ip-1")
+    assert not limiter.allow("ip-1")
+    t[0] = 10.0
+    assert limiter.allow("ip-1")

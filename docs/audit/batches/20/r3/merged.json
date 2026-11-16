@@ -1,0 +1,117 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "domain-name-brainstormer",
+      "percent": 94.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8,
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 36,
+          "evidence": "Under ICANN's UDRP, the holder of a mark can have a domain cancelled or transferred if it is confusingly similar to the mark, the registrant has no legitimate interest in it, and it was registered and is used in bad faith.",
+          "fix": "Shorten the UDRP explanation to one clause, for example 'a UDRP complaint by a mark holder can take the domain', because the model already knows the three-part test. Keep the instruction to never call a near-match safe."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 17,
+          "evidence": "Spread candidates across distinct naming directions (compound, affix, evocative real word, coined blend)",
+          "fix": "Add one or two generation heuristics that experience teaches and the model would not apply by default. For example, give the TLD-scarcity trade-off as a rule: for .com, coined blends and two-word compounds beat single dictionary words, which are almost always registered. Ideation should get the same depth of guidance as screening."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 38,
+          "evidence": "Gotchas cover availability wording, pricing, homographs and HSTS, but none covers restricted ccTLD/gTLD eligibility",
+          "fix": "Add a gotcha: some TLDs have registrant eligibility rules (for example .eu needs EU residence or citizenship, .us needs US nexus, .ca needs Canadian presence). Never suggest them as a top pick without checking the user's location, because they cannot be registered or kept without eligibility."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/evals/evals.json",
+          "line": null,
+          "evidence": "Four evals cover ideation, bilingual screening, availability honesty and pasted RDAP; none exercises step 4 (first choice taken) or step 6 (budget cap)",
+          "fix": "Add an eval whose .com is taken by a competitor, with an assertion that the agent recommends a new name rather than a different TLD. Add another with a budget cap and no registrar quote, with an assertion that budget fit is marked `unverified` and the agent asks for first-year and renewal prices."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 47,
+          "evidence": "the full `https://rdap.org/domain/<name>` URL in every row whether or not it was checked",
+          "fix": "For TLDs without RDAP (.io, .co, .de, .es, .mx per step 5), put the registry WHOIS server or a registrar search link in the row instead of the rdap.org URL. Followed through, the current branch sends the user to a 'No RDAP service is available' 404."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 34,
+          "evidence": "`.io`, `.co`, `.de`, `.es`, `.mx` had none in IANA's bootstrap file `https://data.iana.org/rdap/dns.json` in October 2026",
+          "fix": "Tell the agent to treat this list as a snapshot. The rdap.org no-service 404 row in the table is the authoritative signal to fall back to WHOIS, so a TLD that gains RDAP later is not sent to WHOIS without need."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 36,
+          "evidence": "\"Registering a domain grants no trademark right. Under ICANN's UDRP...\" introduces a general legal overview the model already knows, unlike the specific lookup and registry-response guidance.",
+          "fix": "Condense this step to the operational safeguards: require trademark screening in the relevant jurisdictions and product classes before purchase, and never infer legal safety from domain registration or a near-match. Omit the general UDRP primer."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 47,
+          "evidence": "\"Group candidates by naming direction, then give a ranked table\" applies the brainstorming format unconditionally, although the description also supports a direct single-domain registration-status question.",
+          "fix": "Scope naming-direction groups and the full ranked table to brainstorming requests. For a single-domain status request, default to the status, lookup evidence, source and UTC time, plus purchase and legal caveats; generate alternatives only when requested."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/evals/evals.json",
+          "line": 32,
+          "evidence": "\"Does not assert current availability without a live check\" would pass an answer that calls BrightNest.com available after an RDAP lookup, contradicting the skill's unconditional prohibition on that claim.",
+          "fix": "Replace this assertion with one requiring that the response never calls the domain available, even after a lookup; uses the defined registration-status labels; and supplies the source and UTC check time whenever a lookup supports the classification."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 22,
+          "evidence": "\"WHOIS returned a record with a creation date\" is the only positive WHOIS classification rule, while line 34 makes every other reply unverified. The advertised .de fallback therefore cannot recognize a registered DENIC record containing \"Domain:\" and \"Status: connect\" but no creation date.",
+          "fix": "Allow explicit, authoritative registry-specific registration records without requiring a creation date. Document the .de branch: a matching Domain field with Status: connect means registered; Status: free means not found in registry; restricted, throttled or otherwise inconclusive replies remain unverified."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

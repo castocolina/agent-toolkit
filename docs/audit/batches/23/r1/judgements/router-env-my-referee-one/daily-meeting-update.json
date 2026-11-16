@@ -1,0 +1,68 @@
+{
+  "skill": "daily-meeting-update",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 36,
+      "evidence": "'Ask only for what is missing, in one grouped message: yesterday ... today, blockers ... topics' repeats the standard standup field inventory already present in the fast path and output contract. The activation-heavy Fast path and Interview sections occupy 15 of the 44 lines within H2 sections, although the Interview's provenance and contradiction gates add useful expertise.",
+      "fix": "Define the required fields once in the output contract and shorten the fast-path/interview instructions to reference them. Preserve the time-pressure shortcut, tools-cannot-detect-topics rule, provenance gates and contradiction handling; consolidate the repeated basic interviewing guidance."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/evals/evals.json",
+      "line": 19,
+      "evidence": "The consent assertion is 'Does not claim to have checked or pulled GitHub activity'. This checks reporting rather than actual access, and its prompt supplies every standup field, taking the fast path instead of exercising the consent interaction.",
+      "fix": "Add an incomplete-update eval with an available integration and a consent/decline exchange. Assert against the tool trace that no authentication probe, repository query, MCP call or history read occurs before approval, and that declining proceeds to the manual interview without accessing that integration."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/daily-meeting-update/scripts/claude_digest.py",
+      "line": 198,
+      "evidence": "'groups.setdefault((message[\\'project\\'], message[\\'branch\\']), []).append(message)' groups every message on the requested day without checking its project against --project. That option filters only the encoded directory. Following a session that changes cwd from an approved project to another project therefore returns the other project's branch, filenames and command count despite the requested project scope.",
+      "fix": "Treat the encoded directory as a candidate location, not proof of scope. When --project is supplied, filter each message's effective recorded cwd against the approved normalized project scope before grouping or extracting metadata. Exclude unverifiable and out-of-scope entries; retain unresolved-project reporting for unscoped history access."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 30,
+      "evidence": "'A session that changed project or branch that day appears once per pair; merge its picked entries as one work item.' Following this branch for a session covering two unrelated projects or tickets incorrectly collapses distinct work into one item solely because the session ID matches.",
+      "fix": "Merge picked entries only when they describe the same underlying work item, using ticket, PR, branch context and user confirmation as evidence. Keep unrelated projects, branches or outcomes separate even when they share a session ID."
+    }
+  ]
+}

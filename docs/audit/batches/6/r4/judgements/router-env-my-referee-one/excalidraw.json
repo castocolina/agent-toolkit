@@ -1,0 +1,68 @@
+{
+  "skill": "excalidraw",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 57,
+      "evidence": "\"When `check` passes, run `diff ORIGINAL COPY`; if anything outside the task changed, go back to step 2.\" However, scene.py's diff compares only shape labels and connection tuples. An unrelated geometry, styling, seed, metadata or standalone-text change can pass both checks unnoticed, defeating the worker's preservation gate.",
+      "fix": "Keep the label-level diff for reporting, but add a preservation validator that compares complete elements by ID and top-level scene data against an explicit allowlist of permitted changes. Require that validator to pass before replacement, returning only a structured summary rather than scene JSON."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/scripts/scene.py",
+      "line": 142,
+      "evidence": "\"return {(*ends[c[\\\"id\\\"]], c[\\\"label\\\"]): ...}\" keys connections solely by endpoints and label. Parallel arrows with identical labels collapse: adding a second identical connection, or removing one of two, produces no reported connection change.",
+      "fix": "Preserve connection multiplicity, using multisets of endpoint-and-label tuples or stable arrow IDs with an appropriate comparison fallback. Report additions and removals when parallel-arrow counts change."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/scripts/scene.py",
+      "line": 179,
+      "evidence": "\"s = min(box[\\\"width\\\"] / 2 / abs(dx) ... , box[\\\"height\\\"] / 2 / abs(dy) ...)\" always intersects a rectangular boundary. Following the documented decision/fan-out branch with a diamond at (0,0) and a target at (280,140) starts the arrow at (170,80), outside the diamond's visible boundary. Diagonal ellipse connections have the same problem, and check does not reject them.",
+      "fix": "Calculate boundary intersections according to the element type: rectangular, elliptical or diamond. Account for rotation when connecting existing shapes, or explicitly route unsupported geometry to the worker instead of generating detached endpoints."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/scripts/scene.py",
+      "line": 160,
+      "evidence": "\"cx, cy = container[\\\"x\\\"] + container[\\\"width\\\"] / 2, container[\\\"y\\\"] + container[\\\"height\\\"] / 2\" also positions arrow labels. Arrow width and height are absolute, while points may be negative. A labelled Postgres->API Service connection in the supplied architecture fixture gets its text centered at x=610 although the arrow midpoint is x=510.",
+      "fix": "For arrow containers, position bound text from the actual points translated by the arrow's x/y, rather than from its unsigned width/height. Preserve box-centering behavior for node labels and verify labelled connections pointing left and upward."
+    }
+  ]
+}

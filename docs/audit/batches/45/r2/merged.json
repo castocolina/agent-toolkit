@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "openapi-to-typescript",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.8,
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 38,
+          "evidence": "**PascalCase:** split on non-alphanumerics and lower-to-upper boundaries, capitalise each part, keep the rest: `listPets`, `list_pets` \u2192 `ListPets`.",
+          "fix": "Cut this to the non-obvious rule only: keep the `Schema`/`Operation` prefix for names that are empty or start with a digit. The model already knows how to PascalCase."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 3,
+          "evidence": "Use when generating frontend or SDK types from openapi.yaml/openapi.json (including FastAPI, springdoc or NestJS output)",
+          "fix": "Convert OpenAPI 3.0.x JSON/YAML specs into TypeScript types for components/schemas and for each operation's parameters, request body and responses, plus runtime type guards on request; Swagger 2.0 and OpenAPI 3.1 input (including FastAPI 0.99+ default output) is detected and refused with the reason. Use when generating frontend or SDK types from openapi.yaml/openapi.json (springdoc, NestJS or other 3.0 generators), typing the endpoints under paths, updating types/api.ts after the spec changed, or deciding how nullable, readOnly/writeOnly, oneOf/discriminator, allOf, additionalProperties or $ref map to TS, even when the user only says 'API types' or 'typed responses'. Keywords: OpenAPI 3.0, components/schemas, types/api.ts, type guard. Not for standalone JSON Schema or Zod conversion, non-TypeScript targets, HTTP clients, mock servers, or validating a spec without emitting types."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/evals/evals.json",
+          "line": 9,
+          "evidence": "\"files\": [\"evals/files/pets-min.json\", \"references/guards.md\"]",
+          "fix": "List only eval inputs from evals/files/ in `files`, for both spec-types and shapes-guards. references/guards.md is part of the skill, not an input, so listing it here hides whether the skill's own loading trigger works."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 155,
+          "evidence": "If it is listed, run `npx tsc --noEmit -p tsconfig.json`.",
+          "fix": "After the project check, also run `npx tsc --noEmit --strict --target es2022 <out>`, or add `--strict` when the project tsconfig has `strict` or `strictNullChecks` off. A non-strict project config hides `| null` and optional-property errors, so the validation loop can pass types that fail for strict consumers. The worked example also claims it passes `tsc --strict`."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 76,
+          "evidence": "The section beginning \"Input (condensed):\" occupies 75 of the 162 H2-section lines. Its projection, ignored-ref-sibling and collision examples add value, but much of the surrounding document and interface scaffolding is familiar activation material rather than additional expertise.",
+          "fix": "Condense the inline example to the schema and output deltas demonstrating readOnly/writeOnly projections, ignored nullable siblings and operation-name collisions. Keep the complete document in an eval fixture or a conditionally loaded worked-example reference."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 30,
+          "evidence": "\"Any other local pointer whose target exists ... inline the target's type at the use site\" classifies references by their target path rather than their use-site object kind. A Response Object reference to #/paths/~1pets/get/responses/200 falls into this schema-inlining branch, although its target must be substituted as a Response Object and its content inspected. A Path Item reference to #/paths/~1pets has the same problem.",
+          "fix": "Resolve references according to the expected object kind at the use site. Substitute Path Item, Parameter, Request Body, Response and Header objects regardless of where their targets reside; apply named-type versus inline-schema rules only at Schema Object positions. Add examples covering a response reference outside components.responses and a referenced Path Item."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/openapi-to-typescript/references/guards.md",
+          "line": 14,
+          "evidence": "The guard rule \"nullable: true | null, or the non-null schema\" is unconditional, unlike SKILL.md's mapping rules. Following it for {type: string, nullable: true, enum: [\"x\"]} accepts null even though the emitted type is \"x\". It also permits null when nullable appears without an explicit same-schema type, where the main mapping correctly says nullable has no effect.",
+          "fix": "Define guard nullability from the effective OpenAPI 3.0 schema: nullable adds null only with an explicit type in the same Schema Object, enum constraints must still admit null, and nullable beside a Reference Object is ignored. Accept null only after these conditions hold. Add mutation tests for a nullable enum excluding null and nullable without a same-schema type."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

@@ -1,0 +1,50 @@
+{
+  "skill": "skill-updater",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 12,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/skill-updater/SKILL.md",
+      "line": 28,
+      "evidence": "The branch without last_upstream_sha enumerates commits with \"gh api 'repos/<o>/<r>/commits?path=<path>&sha=<ref>&since=<last_reviewed>T00:00:00Z' --jq '.[].sha'\", without pagination. When more than GitHub's default 30 commits match, older changes are omitted, yet line 29 advances --sha to the newest commit read, leaving those omitted changes behind the next review's comparison base.",
+      "fix": "Enumerate all matching commits using gh api --paginate with per_page=100. Require successful retrieval and inspection of every page and relevant patch before advancing last_upstream_sha; if retrieval is incomplete, report the review as unresolved and leave the comparison base unchanged."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/skill-updater/evals/evals.json",
+      "line": 22,
+      "evidence": "registry-current expects \"The upstreams row has stale false and error null, so the status is current.\" kept-new-path repeats that inference at line 118. Neither fixture supplies upstream contents or a comparison result, and their assertions accept current without checking the content inspection required by SKILL.md line 27.",
+      "fix": "Supply upstream-content or comparison-result fixtures for both current cases and assert that content inspection precedes recording current. Add a stale:false case where an unrelated newer local commit masks a substantive upstream change, and require adopt/adapt/ignore classification rather than automatically recording current."
+    }
+  ]
+}

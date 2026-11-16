@@ -1,0 +1,144 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "explain-pr-changes",
+      "percent": 81.6,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 80.8,
+        "router-env-my-referee-one": 82.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 179,
+          "evidence": "\"The drop-first-line step applies only when the first line of the saved source file starts with `# PR Summary:`; otherwise append the whole saved body unchanged\" appears almost word for word at lines 124, 179, 199 and 304. The ban on awk, sed and perl is also repeated at lines 193, 213 and 304.",
+          "fix": "State the drop-first-line rule and the no-transform rule once, in 4.5. Replace the other copies with \"apply the 4.5 assembly rule\". This keeps the expert content and removes roughly 40 lines of duplicates."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 370,
+          "evidence": "\"Understand the intent behind the changes, not just the code modifications. Identify the core problem being solved or the feature being added.\"",
+          "fix": "Delete the generic advice in 5.1, which the model already follows. Keep only the scope rule (feature path, and judging whether a promotion diagram is warranted, on origin/$base...HEAD)."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 11,
+          "evidence": "Numbering starts at \"## 3. The Input\". Sections 5.1-5.4, which compose the feature body, come after \"### Phase 6: Reviewers, the final message, cleanup\" (line 357). The content order does not match the phase order.",
+          "fix": "Renumber from 1. Move 5.1-5.4 into a \"Compose the body\" step between Phase 3 and Phase 5, so the Process pattern reads in execution order."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": null,
+          "evidence": "There is no Gotchas or NEVER section. Hard-won facts are scattered through the prose: \"gh pr view --repo with no argument fails with `argument required when using the --repo flag`\" (3.4), \"`${CLAUDE_PLUGIN_ROOT}` ... is not exported to Bash tool calls\" (3.5), \"`--head` filters by branch name only\" (3.7), and the squash-merge limitation (4.2).",
+          "fix": "Add a short \"## Gotchas\" section near the top that collects these items, each with its reason. Leave a one-line pointer where each item applies."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 5,
+          "evidence": "argument-hint: [--diagrams=none|mermaid|drawio] [--reuse-from=<PR>] [--base=<branch>] [Close-args]. It leaves out the accepted aliases --drawio, --mermaid and --no-diagrams.",
+          "fix": "argument-hint: [--diagrams=none|mermaid|drawio | --drawio | --mermaid | --no-diagrams] [--reuse-from=<PR>] [--base=<branch>] [Close-args]. The hint the user sees at invocation then shows every accepted option."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 226,
+          "evidence": "The command file is 521 lines. The Mermaid and draw.io authoring rules are loaded by explicit path from bundled skills, but the 4.8 awk/sed diagram filter, the 4.7 size-bound rules, the reuse and consolidation assembly code (4.1, 4.5, 4.6) and the section 8 template are all still inline.",
+          "fix": "Move the none-mode filter and the reuse and consolidated body-assembly snippets into a script or reference in the bundled pr-diagrams skill (for example a `pr-diagrams.sh assemble`/`strip` subcommand or references/body-assembly.md). Load that file only on reuse or none paths, and keep the command under about 200 lines of routing and phase order."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 79,
+          "evidence": "\"Create the branch with one of: git checkout -b \\\"pr/<short-slug>\\\" / git switch -c \\\"pr/<short-slug>\\\"\" offers a menu of two equivalent commands at a step the command otherwise pins down exactly.",
+          "fix": "Give one default, `git switch -c \"pr/<short-slug>\"`, and mention `git checkout -b` only as the fallback for git versions older than 2.23."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 326,
+          "evidence": "Phase 5 says \"Write the composed title to `$AD/title.txt` and the composed body to `$AD/body.md`\". No phase owns composing the feature body (5.1-5.4), applying the 4.7 size-bound check, or authoring the 4.9 diagram. Phases 1-3 end in one Bash call, so where these steps run is never stated.",
+          "fix": "Add an explicit \"Phase 3b: Compose\" step: (1) write the feature body per 5.1-5.4 or assemble the reuse body per 4.5/4.6; (2) apply the 4.8 filter in none mode; (3) apply the 4.7 size bound; (4) decide and author the diagram per 4.9. Add a checklist line for each step."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "high",
+          "file": "commands/explain-pr-changes.md",
+          "line": 2,
+          "evidence": "The unquoted description contains \"committed diff: summary\", which is invalid in a YAML plain scalar. Line 3 also supplies multiple adjacent unquoted bracket expressions: \"argument-hint: [--diagrams=none|mermaid|drawio] [--reuse-from=<PR>] [--base=<branch>] [Close-args]\". The host consequently loads the command body without these metadata fields.",
+          "fix": "Repair YAML parsing with a block scalar for the description and a quoted argument hint. The command still loads without valid metadata, but its listing loses the intended description and hint. Use:\n---\ndescription: >-\n  Create or update the GitHub pull request for the current branch from its committed diff: summary, optional Mermaid or draw.io diagram, promotion-branch bodies reused from merged PRs, and reviewers. Use when asked to \"explain PR changes\", \"open or refresh the PR summary\", \"promote develop to main\", or \"reuse merged PR bodies\". Pushes feature branches and writes PRs. Not for a read-only explanation of a diff (use explain-changes-mental-model).\nargument-hint: \"[--diagrams=none|mermaid|drawio] [--reuse-from=<PR>] [--base=<branch>] [Close-args]\"\n---"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 369,
+          "evidence": "\"Understand the intent behind the changes, not just the code modifications. Identify the core problem being solved or the feature being added.\" Section 5.4 similarly explains ordinary diff summarization: \"analyze the diff file by file and group related changes into logical changesets.\" These restate capabilities current models and native PR helpers already provide.",
+          "fix": "Condense the generic analysis and changeset-writing guidance into the required report fields. Retain the command-specific triage policy, source-selection rules, byte-preservation constraints, public-contract reporting requirements and diagram decisions."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 264,
+          "evidence": "\"Every later Bash call reads AD from the pointer file and sources $AD/state.env before doing anything else.\" However, line 306 writes state.env only at the end of phase 3. A failed gh pr list or git fetch in that phase stops before the file exists, while failure cleanup must still run in a later call.",
+          "fix": "Define an explicit early-failure cleanup bootstrap: read AD from the pointer file and clean up without sourcing state.env when that file does not exist. Alternatively, initialize a minimal shell-quoted state.env immediately after creating AD, before fallible reads. Preserve the original failing tool's error rather than introducing a secondary missing-state-file error."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 218,
+          "evidence": "\"Count every composed body in characters, as it will be sent, single-source included. When it exceeds 65,000:\" is followed only by consolidated-body and single-source reductions. A feature PR with a large Detailed Changeset Breakdown has no corresponding reduction branch, despite the requirement that every submitted body be at most 65,000 characters.",
+          "fix": "Add an oversized feature-body branch that compacts the detailed breakdown into grouped summaries and file links while preserving attribution. Recount the final body, including any appended diagram, and stop before the PR write if it still exceeds 65,000 characters."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 447,
+          "evidence": "The command is 520 lines. Although Mermaid and draw.io authoring rules are conditionally loaded from bundled skills, \"## 8. The Output Template\" still occupies the final 74 lines, alongside extensive inline reuse, consolidation and filtering implementations in section 4.",
+          "fix": "Move the detailed body-assembly rules, diagram-stripping implementation and output templates into explicitly named references under the bundled skills/pr-diagrams skill. Keep the ordered phases and routing in the command, with conditional reads for feature-body generation, source reuse, consolidation and none-mode filtering."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

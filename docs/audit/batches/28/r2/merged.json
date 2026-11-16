@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "jira",
+      "percent": 95.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4,
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/jira/SKILL.md",
+          "line": 32,
+          "evidence": "Intent table rows such as \"View / search | `jira issue view KEY`, `jira issue list -q\"JQL\"` | `getJiraIssue`, `searchJiraIssuesUsingJql`\" repeat syntax that references/commands.md and references/mcp.md already hold.",
+          "fix": "Keep only the Transition row, which carries the non-obvious fact that the CLI cannot list transitions, and the MCP v1/v2 naming note. Point to commands.md and mcp.md for the rest."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/jira/SKILL.md",
+          "line": 39,
+          "evidence": "\"## 3. Procedure for every change\" gives the fetch, show, approve, apply and read-back steps only as prose, with no worked example in SKILL.md.",
+          "fix": "Add one compact worked example of a transition: fetch the transitions, show the transition id and side effects, get approval, run `transitionJiraIssue` or the REST POST, then re-read the status. The Tool pattern then has a concrete template the agent can copy."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/jira/SKILL.md",
+          "line": 51,
+          "evidence": "The Gotchas list does not mention that `jira issue list -q\"...\"` is scoped to the configured project. That fact appears only in references/commands.md (\"raw JQL, scoped to the configured project\").",
+          "fix": "Add this gotcha: \"`jira issue list -q` adds the configured project to your JQL, so a cross-project query silently returns only one project's issues. Use MCP `searchJiraIssuesUsingJql` or REST `/search` for cross-project JQL.\""
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/jira/SKILL.md",
+          "line": 63,
+          "evidence": "\"`references/mcp.md`: MCP tool names (v1 and v2), REST calls with credentials, JQL pitfalls, error meanings\" lists the contents but gives no condition for loading it for JQL or errors on the CLI path. Only mcp.md itself says \"or needs non-trivial JQL\".",
+          "fix": "Change the bullet to: \"`references/mcp.md`: load when a step runs through MCP or REST, when writing JQL beyond a single project and status filter, or when Jira returns a 4xx error.\""
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/jira/evals/trigger-queries.json",
+          "line": 15,
+          "evidence": "\"move PROJ-27 to done after checking its available transitions\" and \"update the summary of PROJ-18 after fetching its current details\" copy the skill's own procedure into the prompt. Real users do not phrase requests this way, so these positives test little.",
+          "fix": "Rewrite them as realistic requests without the skill's procedure, for example \"PROJ-27 is shipped, close it out\" and \"rename PROJ-18 to 'Express shipping timeout on checkout'\"."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/jira/SKILL.md",
+          "line": 36,
+          "evidence": "\"`jira issue move KEY \"Status\"` (cannot list transitions)\" together with step 1 of section 3, which requires the available transitions for a move. On a CLI-only setup with no MCP, the agent has to infer that the REST fallback can reuse jira-cli's JIRA_API_TOKEN. That fact appears only in mcp.md, so following the branch may end at \"stop and name the missing capability\".",
+          "fix": "Add this to step 2 of section 2: \"CLI-only setups: list transitions via REST `GET /rest/api/{v}/issue/KEY/transitions` with the jira-cli server, login and `JIRA_API_TOKEN` (mcp.md, REST fallback) before running `jira issue move`.\""
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/jira/evals/evals.json",
+          "line": 36,
+          "evidence": "The standalone follow-up says the approved description is 'the reproduction plus expected-versus-actual text', but neither that text nor the prior approved draft is supplied. The attached fixture contains field metadata, not the approved description.",
+          "fix": "Supply the complete approved draft and approval context in the prompt or an eval input file. Assert that the proposed template preserves that exact description while requesting approval for the newly required component."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/jira/evals/evals.json",
+          "line": 46,
+          "evidence": "The read-back assertion accepts 'jira issue view KEY or the --raw output' without distinguishing a fresh issue read from the creation response. Creation output alone cannot establish that Jira retained the submitted fields.",
+          "fix": "Require a separate jira issue view NEW_KEY command or authenticated GET after creation, with --raw optionally applied to that read. Explicitly exclude jira issue create --raw output as sufficient verification."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/jira/SKILL.md",
+          "line": 41,
+          "evidence": "When the target status is unavailable, the procedure says to 'find the path through intermediate statuses, show every hop for one approval'. The documented transition lookup exposes only transitions from the current state; no workflow-graph source or fallback is provided for discovering later hops before changing state.",
+          "fix": "Require a trusted workflow graph before proposing and approving a complete multi-hop route. When no graph is accessible, show the currently offered transitions, ask the user to approve an acceptable next hop, apply and verify it, then fetch transitions again and obtain approval for further hops. Never infer undiscovered transitions."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

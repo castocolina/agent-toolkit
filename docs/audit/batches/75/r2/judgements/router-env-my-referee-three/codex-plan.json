@@ -1,0 +1,86 @@
+{
+  "skill": "codex-plan",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 49,
+      "evidence": "Plan structure: Overview, Prerequisites, Phases with tasks, Testing Strategy, Dependency Graph, Risks, Rollback",
+      "fix": "Shorten this list to the parts the model would not add by default: Dependencies as task IDs for parallel work, Complexity 1-10, and Test-First Approach per task. Drop the generic section names the model already uses in any plan."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 27,
+      "evidence": "The ```bash fences under steps 5 and 6 and the paragraphs after them (\"Add `--skip-git-repo-check`...\", \"Ask the user to send you...\") are not indented, so they break out of the numbered list",
+      "fix": "Indent the code fences and the follow-up paragraphs under steps 5 and 6 by three spaces. That keeps steps 5 to 7 as one ordered phase list with visible checkpoints."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 35,
+      "evidence": "codex exec ... \"$(cat prompt_to_codex.md)\"",
+      "fix": "Add a gotcha: on Linux a single argv string is capped at 128 KiB (MAX_ARG_STRLEN). A large prompt passed through $(cat ...) fails with 'Argument list too long'. For large prompts, show `codex exec ... - < prompt_to_codex.md` so the prompt is read from stdin."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 24,
+      "evidence": "On failure report the exact error, give the prompt inline or ask for a writable directory",
+      "fix": "Pick a default: 'ask for a writable directory and, in the same message, give the prompt inline so the user can save it themselves'. Do not leave two equal options."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 21,
+      "evidence": "Ask the blocking decisions with AskUserQuestion, one batch, only what the request and repo do not already answer.",
+      "fix": "Resolve the branch where the user does not answer or declines a blocking question. Add: 'If a blocking decision stays unanswered, pick the most conservative option, record it as a labelled assumption in the prompt, and tell the user which plan sections depend on it.'"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 28,
+      "evidence": "{ git status --porcelain=v1 -uall; git diff HEAD | sha256sum; ... } > \"<literal path>\"",
+      "fix": "The group's exit status comes from xargs, and `git diff HEAD | sha256sum` hides a failing git diff (for example an unborn HEAD). So the 'if the command fails' branch never fires. Run `git rev-parse --verify HEAD` first, and say change verification is limited when it fails."
+    }
+  ]
+}

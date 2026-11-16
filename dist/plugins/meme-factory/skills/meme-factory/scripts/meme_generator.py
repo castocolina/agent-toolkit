@@ -15,6 +15,7 @@ Or import as a module:
 """
 
 import argparse
+import re
 import urllib.parse
 
 
@@ -23,44 +24,46 @@ class MemeGenerator:
 
     BASE_URL = "https://api.memegen.link"
 
-    # Popular templates with their use cases
+    # Verified against https://api.memegen.link/templates/ (id: use case).
     TEMPLATES = {
         "buzz": "X, X everywhere (Buzz Lightyear)",
-        "drake": "Comparing two options (Drake Hotline Bling)",
-        "success": "Celebrating wins (Success Kid)",
-        "fine": "Things going wrong (This is Fine Dog)",
-        "fry": "Uncertainty (Futurama Fry)",
-        "changemind": "Controversial opinions (Change My Mind)",
-        "distracted": "Priorities/distractions (Distracted Boyfriend)",
+        "drake": "Reject top option, prefer bottom (Drakeposting)",
+        "success": "Clear win (Success Kid)",
+        "fine": "Things going wrong (This is Fine)",
+        "fry": "Not sure if X or Y (Futurama Fry)",
+        "cmm": "Hot take, one line only (Change My Mind)",
+        "db": "Priority conflict, three lines (Distracted Boyfriend)",
         "yodawg": "Yo dawg, I heard you like X (Xzibit)",
         "interesting": "I don't always X (Most Interesting Man)",
         "mordor": "One does not simply X (Boromir)",
         "yuno": "Y U NO (Y U NO Guy)",
         "doge": "Much X, very Y (Doge)",
         "wonka": "Condescending statements (Wonka)",
-        "ancient": "Aliens/conspiracy (Ancient Aliens Guy)",
-        "skeptical": "Skeptical reactions (Third World Skeptical Kid)",
-        "awesome": "Good/bad situations (Awesome/Awkward Penguin)",
+        "aag": "Aliens/conspiracy (Ancient Aliens Guy)",
+        "sk": "Skeptical reactions (Skeptical Third World Kid)",
+        "awesome": "Small social win (Socially Awesome Penguin)",
         "rollsafe": "Can't X if Y (Roll Safe)",
-        "surprised": "Surprised reactions (Surprised Pikachu)",
-        "thinking": "Thinking/pondering (Thinking Guy)",
-        "boardroom": "Bad suggestions (Boardroom Meeting)",
     }
 
-    # Context-based template suggestions
-    CONTEXT_MAP = {
-        "success": ["success", "awesome"],
-        "failure": ["fine", "yuno"],
-        "comparison": ["drake", "awesome", "distracted"],
-        "uncertainty": ["fry", "suspicious"],
-        "statement": ["buzz", "yodawg", "interesting", "mordor", "changemind"],
-        "reaction": ["success", "fine", "surprised", "thinking"],
-        "humor": ["doge", "wonka", "ancient", "rollsafe"],
-        "deployment": ["success", "fine", "interesting"],
-        "testing": ["success", "fry", "interesting"],
-        "debugging": ["fine", "fry", "buzz"],
-        "documentation": ["yodawg", "buzz", "wonka"],
+    # Topic keyword -> template, used after outcome words are resolved.
+    TOPIC_TEMPLATES = {
+        "comparison": "drake",
+        "versus": "drake",
+        "vs": "drake",
+        "opinion": "cmm",
+        "debugging": "fine",
+        "documentation": "yodawg",
+        "conspiracy": "aag",
     }
+    # Topics whose outcome is unknown unless an outcome word says so.
+    OUTCOME_TOPICS = {"deploy", "deployment", "release", "rollout", "build", "test", "tests", "testing"}
+    NEGATIONS = {"not", "no", "never", "without", "cannot", "can't", "didn't", "doesn't",
+                 "don't", "isn't", "wasn't", "won't", "hasn't", "haven't"}
+    UNCERTAIN = {"maybe", "might", "unsure", "unclear", "unknown", "pending", "whether", "perhaps"}
+    FAILURE_TERMS = {"fail", "fails", "failed", "failing", "failure", "error", "errors", "broken",
+                     "broke", "crash", "crashed", "outage", "down", "unsuccessful"}
+    SUCCESS_TERMS = {"success", "successful", "succeed", "succeeded", "pass", "passed", "passing",
+                     "works", "worked", "working", "fixed", "shipped"}
 
     def __init__(self) -> None:
         """Initialize the meme generator."""
@@ -75,50 +78,55 @@ class MemeGenerator:
             "%": "~p",
             "#": "~h",
             "/": "~s",
+            "&": "~a",
+            "\\": "~b",
+            "<": "~l",
+            ">": "~g",
+            "\n": "~n",
             '"': "''",
         }
 
         escaped = "".join(replacements.get(char, char) for char in text)
 
-        # Percent-encode any remaining reserved characters while preserving
-        # memegen's escape sequences and allowed characters.
-        return urllib.parse.quote(escaped, safe="-_~")
+        # Percent-encode the rest (emoji, accents); memegen's POST /images
+        # canonical URLs keep ' raw, so it stays unescaped too.
+        return urllib.parse.quote(escaped, safe="-_~'")  # also keeps A-Z a-z 0-9 .
 
     def generate(  # noqa: PLR0913
         self,
         template: str,
-        top_text: str = "",
-        bottom_text: str = "",
+        *lines: str,
         extension: str = "png",
         width: int | None = None,
         height: int | None = None,
         layout: str | None = None,
         style: str | None = None,
         font: str | None = None,
+        background: str | None = None,
     ) -> str:
         """Generate a meme URL.
 
         Args:
             template: Template name (e.g., 'buzz', 'drake')
-            top_text: Text for the top of the meme
-            bottom_text: Text for the bottom of the meme
+            lines: Caption per template line, top to bottom ("" for a blank line)
             extension: Image format ('png', 'jpg', 'webp', 'gif')
             width: Optional width in pixels
             height: Optional height in pixels
-            layout: Optional layout ('top', 'bottom', 'default')
-            style: Optional style or custom background URL
-            font: Optional font name
+            layout: Optional layout ('default' or 'top')
+            style: Optional template style name or overlay image URL
+            font: Optional font id (see /fonts/)
+            background: Optional background image URL (use template 'custom')
 
         Returns:
             URL to the generated meme
 
         """
         # Format text
-        top = self._format_text(top_text) if top_text else "_"
-        bottom = self._format_text(bottom_text) if bottom_text else "_"
+        # One path segment per caption; a blank caption must be "_", never empty.
+        path = "/".join(self._format_text(line) if line else "_" for line in lines or ("",))
 
         # Build base URL
-        url = f"{self.BASE_URL}/images/{template}/{top}/{bottom}.{extension}"
+        url = f"{self.BASE_URL}/images/{template}/{path}.{extension}"
 
         # Add query parameters
         params = {}
@@ -132,6 +140,8 @@ class MemeGenerator:
             params["style"] = style
         if font:
             params["font"] = font
+        if background:
+            params["background"] = background
 
         if params:
             query_string = urllib.parse.urlencode(params)
@@ -149,24 +159,29 @@ class MemeGenerator:
             Suggested template name
 
         """
-        context_lower = context.lower()
-
-        # Resolve outcomes before topics so "deployment failed" cannot be
-        # classified as deployment success merely because deployment matches.
-        failure_terms = ("failure", "failed", "failing", "error", "broken")
-        success_terms = ("success", "successful", "succeeded", "passed", "working")
-        if any(term in context_lower for term in failure_terms):
-            return self.CONTEXT_MAP["failure"][0]
-        if any(term in context_lower for term in success_terms):
-            return self.CONTEXT_MAP["success"][0]
-
-        # Ambiguous outcomes use a neutral reaction rather than implying success.
-        for key, templates in self.CONTEXT_MAP.items():
-            if key in context_lower and key not in {"deployment", "testing"}:
-                return templates[0]
-        if "deployment" in context_lower or "testing" in context_lower:
+        tokens = re.findall(r"[a-z]+(?:'[a-z]+)?", context.lower())
+        if self.UNCERTAIN & set(tokens) or "not sure" in " ".join(tokens):
             return "fry"
 
+        # Word matches, not substrings: "unsuccessful" is not "success",
+        # "download" is not "down". A negated outcome word ("did not fail")
+        # is ambiguous, so it gets the neutral template instead of a verdict.
+        outcomes = []
+        for i, token in enumerate(tokens):
+            if token in self.FAILURE_TERMS or token in self.SUCCESS_TERMS:
+                if self.NEGATIONS & set(tokens[max(0, i - 3):i]):
+                    return "fry"
+                outcomes.append(token)
+        if any(t in self.FAILURE_TERMS for t in outcomes):
+            return "fine"
+        if outcomes:
+            return "success"
+
+        for token in tokens:
+            if token in self.TOPIC_TEMPLATES:
+                return self.TOPIC_TEMPLATES[token]
+        if self.OUTCOME_TOPICS & set(tokens):
+            return "fry"
         return "buzz"
 
     def list_templates(self) -> dict[str, str]:
@@ -205,15 +220,18 @@ def main() -> None:
     # Generate command
     generate_parser = subparsers.add_parser("generate", help="Generate a meme")
     generate_parser.add_argument("template", help="Template name (e.g., buzz, drake)")
-    generate_parser.add_argument("top", help="Top text")
-    generate_parser.add_argument("bottom", nargs="?", default="", help="Bottom text")
+    generate_parser.add_argument("captions", nargs="*", help="One caption per template line, top to bottom")
     generate_parser.add_argument(
         "--extension", "-e", default="png", help="Image format (png, jpg, webp, gif)"
     )
     generate_parser.add_argument("--width", "-w", type=int, help="Image width")
     generate_parser.add_argument("--height", type=int, help="Image height")
-    generate_parser.add_argument("--layout", "-l", help="Layout (top, bottom, default)")
+    generate_parser.add_argument("--layout", "-l", help="Layout: default or top")
+    generate_parser.add_argument("--font", help="Font id from https://api.memegen.link/fonts/")
+    generate_parser.add_argument("--style", help="Template style name or overlay image URL")
+    generate_parser.add_argument("--background", help="Background image URL (template 'custom')")
     generate_parser.add_argument("--markdown", "-m", action="store_true", help="Output as markdown")
+    generate_parser.add_argument("--alt", default="Meme", help="Alt text for --markdown (describe picture and joke)")
 
     # List templates command
     subparsers.add_parser("list-templates", help="List all available templates")
@@ -227,16 +245,18 @@ def main() -> None:
 
     if args.command == "generate":
         url = generator.generate(
-            template=args.template,
-            top_text=args.top,
-            bottom_text=args.bottom,
+            args.template,
+            *args.captions,
             extension=args.extension,
             width=args.width,
-            height=getattr(args, "height", None),
+            height=args.height,
             layout=args.layout,
+            style=args.style,
+            font=args.font,
+            background=args.background,
         )
         if args.markdown:
-            print(generator.get_markdown_image(url))
+            print(generator.get_markdown_image(url, alt_text=args.alt))
         else:
             print(url)
 

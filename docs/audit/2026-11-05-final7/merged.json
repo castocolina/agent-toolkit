@@ -1,0 +1,63 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "draw-io",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+          "line": 123,
+          "evidence": "The validator checks `if b\"IDAT\" not in kinds` but never decompresses or validates the image payload. Static tracing shows that a CRC-correct, zero-length IDAT chunk with otherwise accepted metadata reaches `mv -f`, overwriting the previous PNG despite containing no image data.",
+          "fix": "Before replacing the previous PNG, validate the concatenated IDAT stream with a PNG decoder that fully loads the pixels, or implement equivalent IHDR-aware decompression and scanline validation. Add regression cases for CRC-correct empty and corrupt IDAT payloads and require preservation of the previous PNG."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 20,
+          "evidence": "The compressed-input branch runs `timeout 120 drawio --disable-update -x -f xml -u ...` without a kill-after bound or gtimeout fallback. Unlike the converter, this can wait indefinitely when drawio ignores SIGTERM\u2014the skill explicitly describes that condition\u2014and fails on systems providing only gtimeout.",
+          "fix": "Apply the converter's timeout policy to decoding: select timeout or gtimeout, use `-k 5 120`, and report the coreutils prerequisite when neither is available. Preserve the existing temporary-file validation, failure cleanup and original-file protection."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/draw-io/evals/evals.json",
+          "line": 67,
+          "evidence": "The refactor eval requires every edge to have `edgeStyle=orthogonalEdgeStyle`, although its prompt does not request that style and SKILL.md explicitly permits a straight line when endpoints share an unobstructed axis. A compliant straight-edge implementation can therefore fail this assertion.",
+          "fix": "Accept straight edges for unobstructed, axis-aligned endpoints and require orthogonal routing for other cases. Alternatively, explicitly request orthogonal styling in this eval's prompt if that is the capability being tested."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/draw-io/SKILL.md",
+          "line": 160,
+          "evidence": "`Regenerate PNGs on commit with a pre-commit hook` introduces a standard local-hook YAML recipe and a `pre-commit run ... --files ...` example. Most of this segment repeats ordinary tool usage rather than adding draw.io expertise.",
+          "fix": "Keep the converter-specific stable-path requirement and --stage safety guidance in the body; move the standard pre-commit configuration and invocation examples to README.md."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

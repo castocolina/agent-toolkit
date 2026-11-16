@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "gemini",
+      "percent": 96.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/gemini/SKILL.md",
+          "line": 14,
+          "evidence": "`--approval-mode default`. Headless, a tool call that needs approval is denied, not prompted ... That is the read-only review.",
+          "fix": "The approval-mode table row for `default` and the Gotchas entry 'Denied tools fail silently' already say this. Cut the bullet to '`--approval-mode default` (see table)' so the denial behaviour is stated once."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/gemini/evals/evals.json",
+          "line": null,
+          "evidence": "Seven evals cover proposal, yolo, interactive, stdin plan, verification, timeout and untrusted workspace, but none covers the step 2 secret-file check ('Any hit: narrow the scope to exclude it, or ask the user. Never send it.')",
+          "fix": "Add an eval with an input tree under evals/files/ that contains a `.env` or `*.pem` inside the review scope. Assert that the agent runs the find check, reports the hit, and does not launch Gemini with that file readable."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/gemini/evals/trigger-queries.json",
+          "line": 67,
+          "evidence": "\"query\": \"summarize this one short source file\"",
+          "fix": "Replace this easy negative with a near-miss that shares keywords, for example 'can you do a second pass over the diff yourself, no other models'. Also give the positive queries more realistic context, such as file paths and backstory."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/gemini/SKILL.md",
+          "line": 36,
+          "evidence": "   ``` When only proposing, say the command was not run and give no findings.",
+          "fix": "Put the closing fence on its own line and move 'When only proposing, say the command was not run and give no findings.' to the next line. As written, the fence does not close, so the instruction is read as part of the bash block and may be copied into the command."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/gemini/SKILL.md",
+          "line": 31,
+          "evidence": "Any hit: narrow the scope to exclude it, or ask the user. Never send it.",
+          "fix": "Say how to exclude the file. Gemini can read its whole cwd plus the included directories, so leaving a path out of the prompt does not stop it from being read. Add: 'run from a cwd that does not contain the file, or add its pattern to `.geminiignore`; then re-run the find check against Gemini's actual workspace (cwd plus every --include-directories path)'."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/gemini/SKILL.md",
+          "line": 27,
+          "evidence": "(repeat the flag or comma-separate, 5 at most)",
+          "fix": "Add a fallback for scopes that need more than 5 extra directories, for example 'run from their common parent, or split into several runs and merge the verified findings'."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/gemini/SKILL.md",
+          "line": 27,
+          "evidence": "The workflow states, \"Gemini can read only its cwd plus `--include-directories`\", but line 22 permits shell-enabled `yolo` \"in a throwaway clone or with `-s` sandbox\". Following the authorized-yolo branch with only a throwaway clone leaves shell commands able to read outside those workspace roots; a clone does not isolate the host filesystem.",
+          "fix": "Qualify the cwd/include-directories boundary as applying to workspace-constrained file tools, not unrestricted shell commands. Require a verified sandbox or a genuinely isolated disposable container/VM without sensitive host mounts or credentials for yolo; do not treat a throwaway clone alone as isolation. Retain default approval mode when isolation cannot be established."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

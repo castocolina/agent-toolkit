@@ -1,0 +1,38 @@
+$ git status --short
+ M README.md
+ M src/api.ts
+?? tests/api.test.ts
+
+$ git diff --cached
+$ git diff
+diff --git a/README.md b/README.md
+index 3e1a9c2..b74d0f8 100644
+--- a/README.md
++++ b/README.md
+@@ -3,2 +3,3 @@
+-## Install
+-Run `npm install`  and then `npm start`.
++## Install
++
++Run `npm install`, then `npm start`.
+diff --git a/src/api.ts b/src/api.ts
+index 91c2e4b..d05f7a1 100644
+--- a/src/api.ts
++++ b/src/api.ts
+@@ -20,1 +20,7 @@ export const router = Router();
+ router.get("/users/:id", getUser);
++
++router.get("/users/:id/profile", async (req, res) => {
++  const profile = await loadProfile(req.params.id);
++  if (!profile) return res.status(404).end();
++  res.json(profile);
++});
+
+$ cat tests/api.test.ts
+import { request } from "./helpers";
+
+describe("GET /users/:id/profile", () => {
+  it("returns 404 for an unknown user", async () => {
+    expect((await request("/users/nope/profile")).status).toBe(404);
+  });
+});

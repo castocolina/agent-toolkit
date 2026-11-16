@@ -1,0 +1,81 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "qa-test-planner",
+      "percent": 95.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 106,
+          "evidence": "Two full example commands (lines 106-118) followed by a table listing every flag of both scripts (lines 120-124), while each script's --help already documents the same flags, defaults and examples",
+          "fix": "Keep one short example per script and only the required flags plus the --type enum in the table; point to `bash scripts/<name>.sh --help` for the full optional-flag list, keeping the non-obvious rules (single quotes, never zero field flags, exact source values)"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 40,
+          "evidence": "\"4. **The release gate** (the plan's exit gates and every release decision use this one rule)\" sits inside the test-plan branch, but the routing table sends release decisions there as \"section 3, step 4\", and sections 6 and 8 refer back to it as well",
+          "fix": "Move the release gate and its waiver exception into its own numbered section (for example '## 5. Release gate'), route the release-decision row and the plan's exit gates to it, and leave plan step 4 as a one-line pointer, so the Process pattern has one branch per deliverable"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/evals/evals.json",
+          "line": 23,
+          "evidence": "Several assertions are too vague to grade: \"Preconditions/data for each\" (line 23), \"Specific checkout title\" (line 37), \"Identifies expiry and one-time risks\" (line 10)",
+          "fix": "Make them checkable: 'Each case lists a seeded account or data item in its preconditions'; 'Title names the checkout submit action and the no-op symptom (e.g. [Checkout] Submit click does nothing)'; 'Has a K risk for link use after 30 minutes with a boundary case on both sides (29:59 / 30:01) and a K risk for link reuse whose case asserts the password is unchanged'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 129,
+          "evidence": "\"Exit 0 (if a run log is supplied, do not rerun: report its exit code and JSON fields verbatim and check its command against the rules above): parse the JSON line, read the `file` it names, quote each supplied field's actual value back...\" packs the run-log branch, about seven post-run steps and the exit 2 and exit 1 branches into one bullet",
+          "fix": "Split it into a short exit-code decision list (0 / 2 / 1 'does not exist' / 1 'already exists'), with the run-log case as its own first bullet, and turn the exit-0 follow-up into a numbered checklist: read file, quote supplied values, confirm Unknowns, run section 8, edit, ask the user for each Open Question"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/SKILL.md",
+          "line": 96,
+          "evidence": "'NEVER rerun a failed case until it passes and report the pass: the first failure is the evidence. Rerun under the same conditions only to measure the rate.' repeats the first-failure and rate instructions at lines 58\u201360; line 97 repeats the rate rule again. Missing-data instructions likewise recur at lines 31, 33, 127 and 136. These repeated activation reminders dilute otherwise useful task-specific procedures and oracles.",
+          "fix": "Consolidate first-failure preservation, safe reproduction and rate measurement in section 3b, retaining their rationale there; replace the repeated Gotchas bullets with one short cross-reference. Keep the missing-data policy in section 2 and its final validation check in section 8, shortening the intervening repetitions to references to that policy."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/qa-test-planner/scripts/generate_test_cases.sh",
+          "line": 223,
+          "evidence": "'|| fail 1 \"$OUTPUT_FILE already exists. Use --overwrite to replace it.\"' handles every noclobber creation failure as a collision. Following the branch with an existing but unwritable output directory produces an 'already exists' error even when the target is absent. Retrying with --overwrite reaches the unguarded redirection at line 220 and exits without the promised JSON manifest. create_bug_report.sh has the same failure path at lines 203\u2013207.",
+          "fix": "In both scripts, distinguish an existing target from permission or other I/O failures, and guard creation and writing so failures emit truthful structured errors. Extend SKILL.md section 7 with an I/O-error fallback that reports the failure and asks for a writable destination rather than suggesting --overwrite."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

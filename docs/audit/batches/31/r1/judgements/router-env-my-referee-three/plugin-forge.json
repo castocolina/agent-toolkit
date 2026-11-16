@@ -1,0 +1,95 @@
+{
+  "skill": "plugin-forge",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 39,
+      "evidence": "## References section repeats load triggers already given in Workflow steps 1, 2 and 5 (\"Read `references/plugin-structure.md` for layout...\", \"Read `references/workflows.md`\")",
+      "fix": "Delete the References list, or cut it to the one file with no inline trigger (marketplace-schema.md) and add its condition there"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 24,
+      "evidence": "\"3. **Version.** Run `bump_version.py` once per release, after the component changes are done.\"",
+      "fix": "Add a decision step before the bump: ask whether hosted users must receive this change (bump) or whether the plugin uses SHA versioning (no `version` in either file, so do not run bump_version.py), and map new components to minor, fixes to patch and removed or renamed components to major"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/plugin-forge/scripts/create_plugin.py",
+      "line": 118,
+      "evidence": "`json.dump(marketplace_data, f, indent=2)` rewrites the whole marketplace.json (re-indents it and drops the trailing newline), and the Gotchas section does not mention it",
+      "fix": "Add a gotcha: create_plugin.py reserializes all of marketplace.json with 2-space indentation and no trailing newline, so review `git diff .claude-plugin/marketplace.json` and restore the repository's formatting before committing"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/plugin-forge/SKILL.md",
+      "line": 20,
+      "evidence": "`references/marketplace-schema.md` loads inline only for \"Plugins kept outside `<root>/plugins/`, or a remote source\". Edits to an existing marketplace.json (category, strict, owner, team distribution), which the description names as a trigger, have no inline load condition",
+      "fix": "Add a workflow branch: \"Editing marketplace.json fields other than the version or name (owner, strict, component fields, extraKnownMarketplaces): read `references/marketplace-schema.md`; do NOT load `workflows.md` for that.\""
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/plugin-forge/evals/trigger-queries.json",
+      "line": 3,
+      "evidence": "Most should-trigger queries are terse, telegraphic phrases with no context (\"Scaffold Claude Code marketplace plugin for release workflow.\", \"Bump plugin to next patch release; command?\"). \"Install existing marketplace from CLI.\" is labelled should_trigger false, but the skill covers install testing",
+      "fix": "Rewrite the positives as realistic messages with paths and backstory, including ones that do not name the domain (e.g. \"my teammates' /lint-kit commands vanished after I moved the folder under tools/, here's marketplace.json\"), and relabel or replace the ambiguous install query with a clearer near-miss"
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/plugin-forge/evals/evals.json",
+      "line": 21,
+      "evidence": "\"Plugin docs-kit 1.4.2 has backward-compatible feature. Command and versions?\" (the eval prompts are compressed rather than casual or precise user phrasing). tests/skills/plugin-forge/test_create_plugin.py has no --help test",
+      "fix": "Rephrase eval prompts as a real user would type them (paths, the marketplace root, personal context), and add a create_plugin.py --help test that checks for \"JSON\" and \"exit 2\" as test_bump_version.py does"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/plugin-forge/scripts/bump_version.py",
+      "line": 56,
+      "evidence": "`old_version = plugin_data.get(\"version\", \"0.0.0\")`: a plugin that follows the gotcha \"omit `version` from both files so the commit SHA becomes the version\" gets a pinned 0.0.1/0.1.0/1.0.0 written silently, which contradicts the contract line \"requires a plain `MAJOR.MINOR.PATCH`\"",
+      "fix": "Make bump_version.py exit 2 with \"plugin.json has no version (SHA-versioned); add one explicitly or skip the bump\" when `version` is missing, and add to SKILL.md step 3: \"SHA-versioned plugin (no `version` in either file): skip this step.\""
+    }
+  ]
+}

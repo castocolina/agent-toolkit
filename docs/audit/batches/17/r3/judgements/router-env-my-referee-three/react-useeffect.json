@@ -1,0 +1,77 @@
+{
+  "skill": "react-useeffect",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/react-useeffect/SKILL.md",
+      "line": 8,
+      "evidence": "\"An Effect synchronizes a component with a system outside React.\" and routing row \"Derived value, or work a user action caused ... Render ... or that event handler\" (line 14) restate react.dev guidance that current models already know",
+      "fix": "Reduce line 8 to the actionable test (\"Name the external system first; if there is none, use render or a handler\") and shorten row 14 to its non-obvious part (useMemo only for measured cost), so the remaining lines are the expert edge cases"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/react-useeffect/SKILL.md",
+      "line": 33,
+      "evidence": "\"If step 1 names no external system, stop: delete the Effect and route the logic with the table above.\" appears after steps 2-6, so an agent reading in order may run the dependency, cleanup and test steps before reaching the exit",
+      "fix": "Fold the exit into step 1: \"Write the invariant ... If you cannot name system Y, stop here, delete the Effect and use the routing table.\" Keep line 33 only for the 'fix the failing step and repeat from step 2' loop-back"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/react-useeffect/SKILL.md",
+      "line": 3,
+      "evidence": "The description triggers on useLayoutEffect, but the NEVER list (lines 37-46) has no item on useLayoutEffect",
+      "fix": "Add a NEVER item such as: \"NEVER use useLayoutEffect for work that does not measure or mutate layout before paint: it runs synchronously and blocks paint. Reserve it for measure-then-set (tooltip position) and keep everything else in useEffect.\""
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/react-useeffect/evals/evals.json",
+      "line": null,
+      "evidence": "The six output evals cover derived state, fetch races, widget sync, Strict Mode, init and partial reset, but none covers useSyncExternalStore getSnapshot caching or useEffectEvent / non-reactive reads. trigger-queries.json has 11 positive and 13 negative queries, and no positive query mentions useLayoutEffect or useEffectEvent, although the description names both",
+      "fix": "Add an output eval in which a store hook returns a new object from getSnapshot (assert that the snapshot is cached and subscribe is hoisted) and one that needs a theme read without re-running a connection Effect (assert useEffectEvent on 19.2+ or the ref fallback). Add should-trigger queries for useLayoutEffect and useEffectEvent, and trim the negatives to 10"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/react-useeffect/SKILL.md",
+      "line": 31,
+      "evidence": "Step 6: \"resolve the old request after the new one (deferred promises inside act) ... assert the newest result wins\". I followed the widget/zoom branch (row 18, then steps 1-6). Step 6 tells the agent to test a request race the Effect does not have, and the branch gives no test for synchronous setup",
+      "fix": "Split step 6: \"All Effects: render in <StrictMode>, rerender with a new dependency, unmount; assert cleanup ran once per setup. Async Effects only: also resolve the old request after the new one inside act and assert the newest result wins with no obsolete error.\""
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "skill": "humanizer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/humanizer/SKILL.md",
+      "line": 17,
+      "evidence": "Gate: count distinct cues per paragraph; with fewer than three, fix only the evidence and inflation cues and skip the style pass. (line 30 adds: 'Never replace every em dash or flagged word mechanically' and lists cues not to 'edit for them alone')",
+      "fix": "Add an override to step 3: 'An explicit user request for a style cue (for example em-dash overuse or \"it's not X, it's Y\") puts that cue in scope regardless of the gate; edit only the requested cue and vary the fix.' Without it, the description's own trigger 'remove ... em-dash overuse' leads to a branch that skips the style pass the user asked for."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/humanizer/SKILL.md",
+      "line": 15,
+      "evidence": "Brief: take audience, genre, stance, house style and edit depth from the request and source; ask only for missing information that changes the edit.",
+      "fix": "Shorten to the non-obvious part only: 'When depth is unspecified, default to the minimal consequential edit and state that scope in the change note.' The model already gathers audience and genre from the request."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/humanizer/evals/evals.json",
+      "line": null,
+      "evidence": "No eval covers the file-input branch (SKILL.md line 48: edit in place with Edit, diff summary, never Write) or a request scoped to one mechanics cue; 'files' lists references/pattern-catalog.md, a skill file, not an eval input",
+      "fix": "Add an eval with an input file under evals/files/ (for example evals/files/launch_post.md) and the prompt 'fix the em dashes in evals/files/launch_post.md', with assertions that the file is edited in place, unchanged sentences stay byte-identical and the reply contains a per-sentence diff summary. Move the catalog out of 'files', or replace it with real input files."
+    }
+  ]
+}

@@ -1,187 +1,44 @@
-# Plugin Development Workflows
+# Test and Publish Workflows
 
-## Creating a New Plugin
+Source: https://code.claude.com/docs/en/plugins/create-marketplace and https://code.claude.com/docs/en/plugins/cli-reference (checked 2026-11-04). Run the `claude plugin ...` commands in a shell; `/...` commands run inside a Claude Code session.
 
-### 1. Create Plugin Directory Structure
+## Local install test
 
-```bash
-mkdir -p plugins/plugin-name/.claude-plugin
-mkdir -p plugins/plugin-name/commands
-mkdir -p plugins/plugin-name/skills
-```
-
-### 2. Create Plugin Manifest
-
-Create `plugins/plugin-name/.claude-plugin/plugin.json`:
-
-```json
-{
-  "name": "plugin-name",
-  "version": "0.1.0",
-  "description": "Plugin description",
-  "author": {
-    "name": "Your Name",
-    "email": "your.email@example.com"
-  },
-  "keywords": ["keyword1", "keyword2"]
-}
-```
-
-### 3. Add Plugin to Marketplace
-
-Update `.claude-plugin/marketplace.json` by adding entry to `plugins` array:
-
-```json
-{
-  "name": "plugin-name",
-  "source": "./plugins/plugin-name",
-  "description": "Plugin description",
-  "version": "0.1.0",
-  "keywords": ["keyword1", "keyword2"],
-  "category": "productivity"
-}
-```
-
-### 4. Add Plugin Components
-
-Create commands, skills, agents, or hooks as needed in their respective directories.
-
-## Version Bumping
-
-When making changes to a plugin, update version in **both** locations:
-
-1. `plugins/<plugin-name>/.claude-plugin/plugin.json`
-2. `.claude-plugin/marketplace.json` (matching plugin entry)
-
-**Semantic versioning:**
-
-- **Major (x.0.0)**: Breaking changes
-- **Minor (0.x.0)**: New features, refactoring
-- **Patch (0.0.x)**: Bug fixes, documentation only
-
-## Local Testing Workflow
-
-### Initial Setup
+Run after `bump_version.py` and a clean `claude plugin validate` (SKILL.md steps 3-4):
 
 ```bash
-# Add marketplace
-/plugin marketplace add /path/to/marketplace-root
-
-# Install plugin
-/plugin install plugin-name@marketplace-name
+claude plugin marketplace add <root>                  # prints: Successfully added marketplace: <marketplace>
+claude plugin install <plugin>@<marketplace>          # <plugin> is the entry name
+claude plugin list                                    # shows <plugin>@<marketplace> with Status: enabled
+claude plugin details <plugin>                        # loaded version and component inventory
 ```
 
-### Iterative Testing
+Then, in a new session:
 
-After making changes to a plugin:
+1. Confirm the loaded version is the one you bumped to, from `claude plugin details <plugin>`. Do not trust the `version` in `claude plugin list --json` for a local-path marketplace: it is recorded at install, while `folderVersion` is what sessions load.
+2. Run every new skill and command by its namespaced name (rules in `plugin-structure.md`), and give each new agent a task. Type `/<plugin>:` to list them: `claude plugin details` omits commands in `commands/` subdirectories.
+3. Trigger each hook event the plugin handles and call one tool from each MCP server. Check the `/plugin` Errors tab for `path not found` or `path escapes plugin directory`.
+4. After editing files, run `/reload-plugins`. A local-path marketplace loads the plugin in place, so no reinstall or bump is needed while iterating.
+
+For a single-session check without installing: `claude --plugin-dir <plugin-dir>` (standard layout: `<root>/plugins/<plugin>`).
+
+To start over: `claude plugin marketplace remove <marketplace>` removes the marketplace and uninstalls its plugins.
+
+## Publish
+
+Only when the user asked to publish, and only through the repository's own flow:
+
+1. Stage only `<plugin-dir>` and `.claude-plugin/marketplace.json` (standard: `git add plugins/<plugin> .claude-plugin/marketplace.json`; a remote plugin's directory is committed in its own repository, not here), never `git add .`, which sweeps in unrelated work. Review `git diff --cached`.
+2. Commit, then push the branch or open a pull request the way the repository releases (protected default branch, release branch, PR review). Never push to the default branch unless the user asked for exactly that.
+3. Optional: `claude plugin tag <plugin-dir> --dry-run`, then without `--dry-run`, creates the tag `<plugin>--v<version>`. It refuses when `plugin.json` and the marketplace entry disagree on the version, or when the working tree is dirty.
+
+## How users install and update
 
 ```bash
-# Uninstall
-/plugin uninstall plugin-name@marketplace-name
-
-# Reinstall
-/plugin install plugin-name@marketplace-name
-
-# Restart Claude Code to load changes
+claude plugin marketplace add owner/repo              # or a git URL, or an absolute local path
+claude plugin install <plugin>@<marketplace>
+claude plugin marketplace update <marketplace>        # fetch the new catalog
+claude plugin update <plugin>@<marketplace>           # loads in the next session or after /reload-plugins
 ```
 
-**Note:** Claude Code caches plugin files, so restart may be required for changes to take effect.
-
-## Publishing Workflow
-
-### 1. Commit Changes
-
-Use conventional commits:
-
-```bash
-git add .
-git commit -m "feat: add new plugin"
-git commit -m "fix: correct plugin manifest"
-git commit -m "docs: update plugin README"
-```
-
-### 2. Push to Repository
-
-```bash
-git push origin main
-```
-
-### 3. Distribution
-
-**GitHub-hosted marketplace:**
-
-Users add via:
-
-```bash
-/plugin marketplace add owner/repo
-/plugin install plugin-name@marketplace-name
-```
-
-**Local marketplace:**
-
-Users add via absolute path:
-
-```bash
-/plugin marketplace add /path/to/marketplace
-```
-
-## Command Naming Convention
-
-Commands are invoked with the installed plugin's namespace, for example `/plugin-name:simple`. Discover installed command names after installation; do not infer the namespace solely from nested command directories. Nested command paths may affect the command name, so verify them through installed command discovery.
-
-**Examples:**
-
-- `commands/prime/vue.md` → discover the installed command name (for example `/plugin-name:vue`)
-- `commands/docs/generate.md` → discover the installed command name (for example `/plugin-name:generate`)
-- `commands/simple.md` → `/plugin-name:simple`
-
-## Common Plugin Patterns
-
-### Framework Plugin
-
-Structure for framework-specific guidance (React, Vue, Nuxt, etc.):
-
-```
-plugins/framework-name/
-├── .claude-plugin/plugin.json
-├── skills/
-│   └── framework-name/
-│       ├── SKILL.md              # Quick reference
-│       └── references/           # Library-specific patterns
-├── commands/
-│   └── prime/                    # Namespace for loading patterns
-│       ├── components.md
-│       └── framework.md
-└── README.md
-```
-
-### Utility Plugin
-
-Structure for tools and utilities:
-
-```
-plugins/utility-name/
-├── .claude-plugin/plugin.json
-├── commands/
-│   ├── action1.md
-│   └── action2.md
-└── README.md
-```
-
-### Domain Plugin
-
-Structure for domain-specific knowledge:
-
-```
-plugins/domain-name/
-├── .claude-plugin/plugin.json
-├── skills/
-│   └── domain-name/
-│       ├── SKILL.md
-│       ├── references/
-│       │   ├── schema.md
-│       │   └── policies.md
-│       └── scripts/
-│           └── automation.py
-└── README.md
-```
+If `claude plugin update` prints `already at the latest version`, the plugin's `version` was not bumped before publishing (see the SKILL.md gotchas).

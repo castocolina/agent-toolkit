@@ -1,0 +1,76 @@
+{
+  "skill_name": "sync-branch",
+  "subject": "commands/sync-branch.md",
+  "evals": [
+    {
+      "id": "default-target-main",
+      "prompt": "Scenario: current branch is `feature/login-form`, the working tree is clean, no argument is given. The branch is already on origin and the user says it is theirs alone. Show the exact ordered git commands you run, with the literal branch and target names. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "`git fetch origin --prune` runs before any rebase",
+        "The rebase command is exactly `git rebase origin/main` (default target main)",
+        "The push is `git push --force-with-lease=\"refs/heads/feature/login-form:<sha>\" origin feature/login-form`, where `<sha>` is the remote tip recorded before the rebase (explicit lease), and comes last"
+      ]
+    },
+    {
+      "id": "explicit-target-develop",
+      "prompt": "Scenario: current branch is `feature/login-form`, clean tree, the argument is `develop` (so the target is develop, not main). The branch is already on origin and the user says it is theirs alone. Show the exact ordered git commands. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The rebase command is `git rebase origin/develop`",
+        "No command rebases onto `origin/main` and no command contains an unbound or empty target variable (`origin/` followed by nothing, or a literal `${target`)",
+        "The fetch is `git fetch origin --prune`"
+      ]
+    },
+    {
+      "id": "fetch-before-rebase-order",
+      "prompt": "Scenario: current branch `fix/typo`, clean tree, no argument. The branch is already on origin and the user says it is theirs alone. List the git commands in the exact order they run. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "`git fetch origin --prune` is listed before `git rebase origin/main`",
+        "The rebase targets the remote ref `origin/main`, not a local `main`",
+        "No `git pull` and no `git merge` appears"
+      ]
+    },
+    {
+      "id": "conflict-stops",
+      "prompt": "Scenario: current branch `feature/login-form`, clean tree, no argument. `git rebase origin/main` exits 1 with `CONFLICT (content): Merge conflict in src/app.ts` and the rebase is paused. Show the commands you run next and the final user-facing message. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "No `git push` of any kind runs after the conflict",
+        "The final message names the conflicting file `src/app.ts` and says the rebase stopped on conflicts",
+        "The final message tells the user to resolve and run `git rebase --continue` (or `git rebase --abort`) and says nothing was pushed"
+      ]
+    },
+    {
+      "id": "push-lease-quoted-branch",
+      "prompt": "Scenario: `git branch --show-current` prints `feature/weird$name`, clean tree, no argument, the rebase succeeds. The branch is already on origin and the user says it is theirs alone. Show the push command. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The push uses `--force-with-lease` and never a bare `--force` or `-f`",
+        "The branch name is passed quoted, as `\"$(git branch --show-current)\"`, `\"$branch\"` or the literal `'feature/weird$name'` in single quotes",
+        "The push names the remote `origin` explicitly"
+      ]
+    },
+    {
+      "id": "detached-head-refuses",
+      "prompt": "Scenario: `git branch --show-current` prints an empty line (detached HEAD). No argument. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The command stops with an error that names the detached HEAD",
+        "No `git rebase` and no `git push` runs"
+      ]
+    },
+    {
+      "id": "on-target-branch-refuses",
+      "prompt": "Scenario: `git branch --show-current` prints `main` and no argument is given, so the current branch is the target. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The command stops with a message that the current branch is the target branch `main` and nothing is rebased",
+        "No `git rebase` and no `git push` runs"
+      ]
+    },
+    {
+      "id": "dirty-tree-stops",
+      "prompt": "Scenario: current branch `feature/login-form`, no argument. `git status --porcelain` prints ` M src/app.ts`. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The dirty working tree is checked (`git status --porcelain` or equivalent) before `git rebase` runs",
+        "No `git rebase`, no `git push` and no automatic stash runs",
+        "The final message names the uncommitted change and tells the user to commit or stash first"
+      ]
+    }
+  ]
+}

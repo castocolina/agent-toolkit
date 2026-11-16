@@ -1,0 +1,68 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 41,
+      "evidence": "Configuration or migrations go first when later behavior needs them, not last by category. Independent groups: contracts first, tests and docs last.",
+      "fix": "Remove the generic ordering rule 'contracts first, tests and docs last', which the model already applies. Keep only the non-obvious override that configuration and migrations go first when later behaviour depends on them."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 39,
+      "evidence": "Group files by purpose (not by directory), one group per reviewable idea. ... merge groups that cannot be understood apart.",
+      "fix": "Add 2-3 decision questions for unclear dependency direction, for example: 'When a refactor and a feature change the same call site, ask which one a reviewer needs first to read the other; a test changed with its implementation joins that group unless it tests a contract other groups also use.'"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 75,
+      "evidence": "State only what the patch proves. Mark author intent that you infer as inferred; the diff does not show why.",
+      "fix": "Make this a concrete gotcha. For example: 'A deleted function plus a new function with a similar body is not proof of a rename (check callers); a moved file shown as delete+add without -M is still a move; say so instead of describing it as new code.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 23,
+      "evidence": "reply \"Please paste or describe the changes you want me to analyze in your next message.\" and wait.",
+      "fix": "Add the follow-up branch: if the user describes changes instead of pasting a patch, say the report rests on the description, skip the size check and the manifest check (there are no `diff --git` headers), and mark every group as described rather than proved by a patch. If the pasted text has no `diff --git` headers, ask once for a unified diff."
+    }
+  ]
+}

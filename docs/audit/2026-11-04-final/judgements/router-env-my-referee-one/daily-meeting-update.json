@@ -1,0 +1,41 @@
+{
+  "skill": "daily-meeting-update",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 123,
+  "max_total": 125,
+  "percent": 98.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/scripts/claude_digest.py",
+      "line": 190,
+      "evidence": "'d.name == n or d.name.startswith(n + '-')' restricts candidate session directories before recorded message cwd values are examined. With --project /home/user/api, a session launched under /home/user/workspace and later recording cwd /home/user/api is excluded entirely, silently omitting approved activity despite the script's support for project changes within sessions.",
+      "fix": "Make scoped discovery account for sessions launched outside the requested project that later enter it, using a consented metadata index or explicitly approved broader history scan. Preserve per-message in_scope filtering. Add a regression test with a session stored under -home-user-workspace, an in-window message recording cwd /home/user/api, and --project /home/user/api; verify that the matching activity is included."
+    }
+  ]
+}

@@ -12,14 +12,4 @@
 
 ## Gotchas
 
-- A `<style>` element rendered by a component is not scoped: `input, button { ... }` in one form restyles every input and button in the document.
 - MUI: if both `palette` and `colorSchemes` are set, `palette` wins, so the dark scheme you added is ignored. `useColorScheme` returns an undefined mode on the first render, so a toggle that reads it then shows the wrong state. SSR needs CSS variables with `InitColorSchemeScript`.
-- A dark theme made by inverting the light values often drops input borders and focus rings under 3:1 (the a11y row).
-
-## Fix pattern
-
-```css
-:root { --color-primary: #1d4ed8; --color-on-primary: #fff; }
-@media (prefers-color-scheme: dark) { :root { --color-primary: #93b4ff; --color-on-primary: #0b1b4d; } }
-.btn { background: var(--color-primary); color: var(--color-on-primary); }
-```

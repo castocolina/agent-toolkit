@@ -1,0 +1,86 @@
+{
+  "skill": "compose-email",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 12,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 111,
+  "max_total": 125,
+  "percent": 88.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 23,
+      "evidence": "Organize ask or impact first, then reason, then next action and owner (no visible labels).",
+      "fix": "Cut ask-first email structure that the model already uses (bottom-line-up-front, a closing next action). Keep only the non-obvious rules, such as never manufacturing an ask for an FYI and the 'No response needed' close. Use the freed lines for project-specific conventions."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 39,
+      "evidence": "`/command-compose-email:compose-email <context or pasted draft>`.",
+      "fix": "Replace the placeholder invocation with one short input-to-subject-line example, such as an extension request becoming 'Subject: Approve API v2 migration move to 21 Nov (proposed)'. That example shows the subject rule, which the bare syntax does not."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 18,
+      "evidence": "Pick the strategy by underlying purpose. ... Anything else (announcement, thank-you, introduction) uses Status or FYI.",
+      "fix": "Add one expert thinking prompt before the branch list. For example: 'Before drafting, ask: what will the reader do in the first 10 seconds, and what would make them reply with a question instead of a decision?' Without such a prompt, the purpose branches are a checklist the model would follow anyway and do not shape its judgment."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/compose-email.md",
+      "line": 32,
+      "evidence": "NEVER put the ask only in the subject line: many clients truncate subjects on mobile and the reader misses it.",
+      "fix": "Replace this widely known item with a learned-the-hard-way gotcha. For example: 'NEVER reply-all to a forwarded thread draft without checking who was dropped or added upstream; a rewrite can silently change the audience the facts were written for.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 22,
+      "evidence": "Leadership: decision in the first sentence, at most 5 sentences.",
+      "fix": "Leadership is an audience, not a purpose, so an escalation or approval request to leadership matches two branches. The 5-sentence cap also conflicts with the mixed-audience gotcha (line 35), which adds a technical paragraph. Make it a modifier: 'Leadership audience (applies on top of the purpose strategy): decision in the first sentence, at most 5 sentences; for mixed audiences, the optional technical paragraph does not count toward the cap.'"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/compose-email.md",
+      "line": 24,
+      "evidence": "every source fact kept ... any length limit met. Fix and recheck.",
+      "fix": "Add a fallback for when keeping every fact cannot meet the user's word limit: 'If every source fact cannot fit within the limit, keep the facts, report the word count over the limit, and name which fact the user could drop.' As written, this validation loop has no exit for that case."
+    }
+  ]
+}

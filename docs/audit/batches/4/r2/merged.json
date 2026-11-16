@@ -1,0 +1,71 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "naming-analyzer",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 54,
+          "evidence": "**Go visibility and tags:** changing the first letter's case (`userID` to `UserID`) exports or unexports the symbol, and `encoding/json` uses the Go field name as the key unless a `json:\"...\"` tag is set.",
+          "fix": "Shorten this bullet to one clause, such as \"Go: first-letter case is visibility; untagged fields are JSON keys\". The model already knows Go export rules, so it only needs the reminder that both behaviors are hidden consumers."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 30,
+          "evidence": "3. **Rate** confidence and compatibility from the evidence you actually gathered, using the scales below, then **report**.",
+          "fix": "Add a cost-versus-benefit check before reporting. Example: \"Before proposing a rename that is only less clear (not misleading), ask: does the clarity gain justify churn at this compatibility level? For `hidden` or `contract` names that are only unclear, prefer a comment, type annotation or local alias over a rename.\""
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 32,
+          "evidence": "Anti-patterns are spread across the Decide table (\"Never rename to match one caller: that hides the bug\"), the Cases table and the Scales (\"never a plain rename\"). There is no NEVER or Gotchas section that collects them.",
+          "fix": "Add a short `## NEVER` list near the end. Each item gets its reason: never rename to match one caller (it hides the unit bug); never plain-rename a contract name (external clients break silently); never trust symbol search or IDE rename alone (string-keyed and reflective consumers miss it); never edit files (the user approves the table first)."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/naming-analyzer/evals/evals.json",
+          "line": null,
+          "evidence": "Six evals cover getters that write, units, conflicting callers, name-only input, serialized contracts and conventional names. None tests the step-0 rule for folder-wide requests (cap the report at 10 and give the remaining count), the no-edit rule, or an ORM or DI hidden consumer such as a Django field or a pytest fixture.",
+          "fix": "Add an eval with a multi-file fixture over 10 candidates. Assert that it reports at most 10, ranked by the Decide order, gives the remaining count and edits no file. Add a Django-model eval asserting it warns that `makemigrations --noinput` emits RemoveField+AddField and proposes `db_column`."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 28,
+          "evidence": "| Otherwise | Role plus unit |",
+          "fix": "Add a Decide row above `Otherwise`: \"Violates the project (or language) convention for its kind (class `user_profile`, constant `max`) | Rename to the convention's form; compatibility as rated\". Without it, a casing-only issue such as `user_profile` \u2192 `UserProfile` (the python-evidence eval) falls into \"Role plus unit\", which does not apply to it."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "jira",
+      "percent": 94.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.8,
+        "router-env-my-referee-three": 91.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/jira/SKILL.md",
+          "line": 18,
+          "evidence": "Selects the CLI \"when `jira me` succeeds\", but references/commands.md:16 describes that command as printing \"the login saved by jira init\". A locally configured CLI can pass this check with expired credentials or an unreachable server, routing a live request to an unusable backend even when MCP is available.",
+          "fix": "Treat `jira me` as a local login lookup, not an authenticated connectivity check. Establish CLI usability with an authenticated read against the intended site, such as fetching the requested issue or calling `/rest/api/{v}/myself` with existing credentials. On authentication or connectivity failure, check the available MCP backend before reporting that Jira cannot be reached."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/jira/references/story-anatomy.md",
+          "line": 60,
+          "evidence": "The sprint procedure runs \"jira board list\" and then \"jira sprint list --state future --table --plain --columns id,name,start,state\" without binding the second command to the selected board. references/commands.md:20 states that sprint listing covers \"only the board set in the CLI config\". When the requested board differs from that configuration, this branch can select another board's sprint.",
+          "fix": "Bind the future-sprint lookup explicitly to the selected board. Use a board-selection CLI option verified through its help, or the documented `GET /rest/agile/1.0/board/{id}/sprint?state=future` endpoint. Verify the selected sprint belongs to the intended board before proposing or applying the change."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/jira/evals/evals.json",
+          "line": 26,
+          "evidence": "The no-backend prompt says \"assume neither jira CLI nor Atlassian MCP is available\", while the expected output requires \"no backend is available\". This leaves the skill's third backend\u2014REST using existing credentials\u2014unspecified, so a valid REST fallback can contradict the expected result.",
+          "fix": "Explicitly state in this test that no usable REST credentials are available. Add a separate REST-only case with existing credentials whose assertions require attempting the appropriate authenticated read before offering backend setup guidance."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/jira/SKILL.md",
+          "line": 41,
+          "evidence": "1. **Read the context** the user points to (code, PR, other tickets) before drafting.",
+          "fix": "Delete this step because the model already reads the context it is given. Start the procedure at the Jira-specific fetch of live state (current issue, transitions, required create fields)."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/jira/SKILL.md",
+          "line": 42,
+          "evidence": "the available transitions for a move (names and ids differ per workflow, and the target may need an intermediate status)",
+          "fix": "Add a short decision rule for multi-hop moves. If the target status is not in the transition list, find the path through intermediate statuses, show every hop with its side effects for one approval, then apply and verify each hop in order and stop at the first hop that is not available."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/jira/SKILL.md",
+          "line": 3,
+          "evidence": "draft or create a Jira story or task",
+          "fix": "Work with live Jira issues through the jira CLI, Atlassian MCP or REST: view, search with JQL, create, edit, comment, transition, link, and set epic, sprint and assignee on Jira Cloud or Data Center. Use when asked to act on an issue, ticket or bug (keys like PROJ-123), query Jira, file a Jira bug, draft or create a Jira story or task, or plan what goes into a Jira sprint, even if the user only says 'ticket'; also for clearly fictional Jira or JQL examples for a tutorial, without accessing Jira. Not for summarizing pasted Jira text with no Jira operation, user stories meant for other tools, generic estimation, GitHub or Linear issues, Jira administration or MCP server setup, or conceptual workflow discussion."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/jira/references/story-anatomy.md",
+          "line": 49,
+          "evidence": "confirm they are on the create screen with the create-field metadata (mcp.md)",
+          "fix": "Put the createmeta and /field calls this step needs inline in story-anatomy.md, or move the pointer into SKILL.md's story step ('for a story create through MCP or REST, also read references/mcp.md'), so the reference chain stays one level deep from SKILL.md."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/jira/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "Queries are terse and artificial ('Design a Jira workflow policy in prose without accessing an instance', 'configure an Atlassian MCP server'). None has file paths, personal context or typos, and every positive names Jira or a key outright. evals.json has no MCP-backend or Data Center CLI case.",
+          "fix": "Rewrite several queries with realistic context, for example 'my lead wants the checkout timeout logged before standup, can you file it in our board?' with no word 'Jira'. Use casual near-miss negatives with typos. Add one output eval where only the Atlassian MCP is connected, checking that the agent calls listJiraIssueTransitions before transitionJiraIssue."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/jira/SKILL.md",
+          "line": 59,
+          "evidence": "SKILL.md: 'jira-cli `edit -C` replaces all components'. references/commands.md line 42: 'On edit, `-l` appends labels; a leading minus (`--label -old`, `--component -BE`) removes one.' These conflict.",
+          "fix": "Check jira-cli's edit behaviour for components and make both files agree. If components are added and removed one at a time like labels, change the gotcha to cover only the full-description replacement and show `--component -OLD --component NEW`. If -C replaces them all, remove `--component -BE` from commands.md."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

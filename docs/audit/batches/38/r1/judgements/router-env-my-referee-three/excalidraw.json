@@ -1,0 +1,59 @@
+{
+  "skill": "excalidraw",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 88,
+      "evidence": "Gotcha 'Bump `version` on every element you change.' repeats worker contract step 3 (line 57) 'On each changed element, bump `version` and set a new random `versionNonce`', and the `edit --relabel` sentence on line 85 repeats line 43's command note",
+      "fix": "Keep the full rule in one place: leave the reason (collaboration sync keeps the higher version) in the Gotchas and shorten worker step 3 to 'Follow the version/seed/id gotchas below for every changed or new element'"
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 3,
+      "evidence": "The route table handles `.excalidraw.md` (Obsidian plugin) files, but the description never names them, so a request about an Obsidian Excalidraw drawing will not trigger the skill",
+      "fix": "Create, inspect, edit and compare Excalidraw diagrams (.excalidraw, .excalidraw.json) through a bundled script that keeps scene JSON out of context - label and connection summaries, add/rename/remove boxes and arrows, binding and ID validation, label-level diffs. Use when the user names an Excalidraw file, asks to change labels or connections in one, compares two, or wants a flowchart or architecture sketch in Excalidraw, even for a tiny file; also covers .excalidraw.png and .excalidraw.svg files with an embedded scene and Obsidian .excalidraw.md drawings. Not for Mermaid, draw.io, PlantUML, Graphviz, ordinary PNG edits or text-only architecture explanations."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 20,
+      "evidence": "'New diagram | write a spec, `new SPEC -o OUT`': write() in scene.py replaces OUT unconditionally (tmp.replace(out)). If the user names an existing file for a 'new' diagram, it is silently overwritten, and the skill says nothing about where to put the spec file or whether to delete it",
+      "fix": "Add to the `new` bullet (line 42): 'If OUT already exists, ask before overwriting it, or write to a new name and `diff` it against the existing file. Write SPEC to a temporary path and delete it after `new` succeeds.'"
+    }
+  ]
+}

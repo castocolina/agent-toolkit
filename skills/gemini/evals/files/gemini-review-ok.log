@@ -1,0 +1,7 @@
+$ timeout --kill-after=10s 300 gemini -m gemini-3-pro-preview --approval-mode default -p "Review src/ for security issues. Report findings only; change nothing. For each: severity, file:line, evidence, uncertainty."
+
+1. HIGH - src/session.py:16 - Session tokens are compared with `==`, which is not constant-time and leaks timing information. Evidence: `return token == stored`. Uncertainty: low.
+2. MEDIUM - src/session.py:31 - `refresh_session()` issues a new token without invalidating the old one, so stolen tokens stay valid. Evidence: `refresh_session` returns `create_session(...)` and never deletes the previous entry. Uncertainty: low.
+3. LOW - src/cache.py:8 - Cache keys embed the user's email address, which ends up in debug logs. Evidence: `key = f"user:{email}"`. Uncertainty: medium.
+
+exit=0

@@ -1,0 +1,59 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/commit-work/references/commit-message-template.md",
+      "line": 23,
+      "evidence": "The reference repeats familiar Conventional Commits syntax: \"`!` sits immediately before the colon\" and, at line 25, \"Footers start one blank line after the body\". These are basic conventions current models already know, rather than the repository-specific constraints and non-obvious Git safeguards that provide this skill's strongest knowledge delta.",
+      "fix": "Omit the basic explanations of exclamation-mark placement and the blank line before footers. Retain the less-obvious footer-token rules, repository overrides, and all source/version credits."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 35,
+      "evidence": "\"Repeat steps 3-7 until the approved set is committed\" precedes the temporary-index reconciliation, \"run `git reset -q -- <committed paths>`\". If two planned commits select different hunks of the same file while an unrelated path is user-staged, the first temporary-index commit leaves that file showing a staged reverse in the real index. On the second iteration, step 3's real-index overlap check sees this unapproved staged reverse and mandates stopping, blocking the planned split.",
+      "fix": "After each successful temporary-index commit whose tree matches the reviewed tree, reconcile only that commit's paths in the real index before starting the next iteration. Preserve unrelated staged entries and distinguish the workflow's own stale-index reverses from pre-existing user-staged changes."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 34,
+      "evidence": "Step 3 explicitly supports an unborn repository with \"`read-tree --empty` instead when `git rev-parse --verify -q HEAD` prints nothing\", but step 7 then requires confirming that \"`git rev-parse HEAD` is still the commit you read the tree from\". There is no such commit on this branch, and the unguarded command fails.",
+      "fix": "Record either the initial HEAD object ID or an explicit unborn-state sentinel when initializing the temporary index. Before committing, compare the recorded object ID for an existing HEAD; for the unborn branch, verify HEAD is still absent. If HEAD has appeared, rebuild and review against it before proceeding."
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "skill": "openapi-to-typescript",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/openapi-to-typescript/references/guards.md",
+      "line": 103,
+      "evidence": "\"NEVER count matching branches of a discriminated oneOf\" calls { petType: \"cat\", livesLeft: 9, bark: \"x\" } valid. In shapes.yaml, Cat and Dog both declare petType as string and allow additional properties, so this value matches both branches. The supplied isAnimal switch accepts it, but oneOf requires exactly one matching schema; a discriminator does not remove that requirement.",
+      "fix": "Use the discriminator to select a candidate, but still enforce exactly-one matching branch unless the original schemas demonstrably make the branches disjoint through required literal or enum constraints. Correct the overlapping-value example and add it as a rejection mutation test. Mark the generated union Approximate when TypeScript cannot preserve exclusivity."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 37,
+      "evidence": "\"component schema names never change\" conflicts with normalizing every component key to PascalCase. Valid keys pet-status and pet_status both become PetStatus, with no permitted collision recovery. A digit-leading key such as 123Pet also produces an invalid declaration identifier.",
+      "fix": "Build a source-key-to-valid-unique-TypeScript-name table before allocating operation names. Prefix empty or digit-leading identifiers, resolve normalized component collisions with deterministic suffixes, and rewrite all references and request projections through that table. Report these renames rather than prohibiting them."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/openapi-to-typescript/references/guards.md",
+      "line": 13,
+      "evidence": "\"optional property | absent (undefined) or its full schema valid\" conflates absence with a present undefined value. The isPet pattern consequently accepts { id: \"1\", name: \"N\", tag: undefined }. With exactOptionalPropertyTypes enabled in the existing repository tsconfig, that object does not satisfy tag?: string | null, so the predicate can return true for a value outside its declared type.",
+      "fix": "Distinguish property absence from a present value. For the example, check `if (\"tag\" in value && value.tag !== null && typeof value.tag !== \"string\") return false;` and apply equivalent presence-aware validation to other optional properties. Add a check using exactOptionalPropertyTypes and present-undefined mutations."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/openapi-to-typescript/SKILL.md",
+      "line": 68,
+      "evidence": "\"## Worked example\" occupies lines 68\u2013159, over half the body, and includes repeated ordinary declarations such as \"export interface UpdateUserPathParams { id: string; }\". The surrounding sections supply substantial expert rules, but this long example dilutes them with basic interface, array and response-envelope repetition.",
+      "fix": "Condense the example around the non-obvious deltas: shared path parameters, request/response projections, ignored ref siblings and operation-name collisions. Retain enough context to demonstrate those decisions, but trim repeated ordinary declarations and response envelopes."
+    }
+  ]
+}

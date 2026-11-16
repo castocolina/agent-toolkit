@@ -1,0 +1,81 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "design-system-starter",
+      "percent": 94.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6,
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 27,
+          "evidence": "Thresholds: 4.5:1 normal text, 3:1 large text and essential UI boundaries (input borders, focus rings).",
+          "fix": "Shorten the line to the parts the model gets wrong: \"WCAG AA; non-text 3:1 includes input borders and focus rings; report each failing pair with its replacement value\". Do the same for the generic \"keyboard and 200%-zoom pass\" wording in step 7 (line 34), keeping only the per-theme focus-ring and hover-role breaks."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 35,
+          "evidence": "8. **Adopt without breaking consumers.** ... Keep deprecated tokens and props as aliases to the new path; default window: ...",
+          "fix": "Add the migration sequence the description promises (\"versioned migration off scattered styles\"): rank consumers by the step 1 value inventory, migrate one consumer per release behind the alias, add a lint or grep check that blocks new raw values in migrated files, and remove an alias only after the inventory shows no remaining uses."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/design-system-starter/evals/evals.json",
+          "line": 28,
+          "evidence": "\"files\": [\"templates/design-tokens-template.json\", \"templates/component-template.tsx\", \"references/component-examples.md\"]",
+          "fix": "Remove the skill's own templates and references from the accessible-dark-tokens eval inputs. They give the without-skill baseline the skill's content, so the comparison measures nothing. Use no input files, or add a project fixture under evals/files/ (for example an existing dashboard CSS file)."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/design-system-starter/references/token-checks.md",
+          "line": 47,
+          "evidence": "Hex as `#rgb`, `#rrggbb`, `#rgba` or `#rrggbbaa`.",
+          "fix": "Add the conversion for DTCG 2025.10 object colors that have no optional `hex` field: map `components` floats to hex with `'#' + ''.join(f'{round(c*255):02x}' for c in components)`, and append `alpha` when it is present. Say that a non-srgb colorSpace goes through the wide-gamut step first."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/design-system-starter/SKILL.md",
+          "line": 31,
+          "evidence": "\u201cProps: semantic props (`intent`, `size`, `disabled`) only where consumers need them\u201d overlaps with line 41, \u201cNever expose primitive palette names as component props.\u201d Likewise, the per-state role contract at line 23 is repeated in lines 39\u201340. These repetitions, together with familiar hierarchy and contrast-threshold reminders, leave a meaningful activation-only share despite the strong toolchain-specific gotchas.",
+          "fix": "Consolidate the semantic-prop and per-state-role rules into one concise contract, retaining their reasons once. Keep the distinctive pilot-selection, compatibility-window, DTCG/Style Dictionary and schema-validation guidance."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/design-system-starter/references/token-checks.md",
+          "line": 64,
+          "evidence": "\u201cprint(round((hi + 0.05) / (lo + 0.05), 2))\u201d discards precision before the agent determines pass/fail. With foreground #767776 and background #ffffff, the actual ratio is approximately 4.49617:1, but the script prints 4.5, making failing normal-text contrast appear to meet the workflow's 4.5:1 threshold.",
+          "fix": "Compare the unrounded ratio against the applicable threshold before rounding. Emit the raw ratio, threshold and pass/fail result, with a separately rounded display ratio, so borderline failures cannot become passes."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

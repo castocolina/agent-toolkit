@@ -1,0 +1,81 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "command-creator",
+      "percent": 95.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4,
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 86,
+          "evidence": "Encode the value as one single-quoted shell word: wrap it in `'...'` and write each `'` inside it as `'\\''`. So `it's` becomes `'it'\\''s'`, and `a; rm -rf ~` becomes `'a; rm -rf ~'` (inert text).",
+          "fix": "Cut the POSIX quoting tutorial, which the model already knows, to one line: \"the body must name the encoding: one single-quoted word, `'` as `'\\''`\". Keep the non-obvious rule that the body has to spell it out, and keep the `--end-of-options` note for git rev-parse."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 15,
+          "evidence": "2. **Command or skill?** Since commands were merged into skills, both create `/name`. ... Before writing, look for `<name>` in `.claude/skills/<name>/`, `~/.claude/skills/<name>/` and the target commands directory.",
+          "fix": "Split step 2 into two checkpoints: (a) decide command or skill, (b) run the name-collision check and use the reply template. Right now the Process pattern hides a hard stop gate inside a scoping decision."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/command-creator/evals/evals.json",
+          "line": null,
+          "evidence": "\"Uses valid command markdown frontmatter with a concise description\" and expected_output \"A global command file design with required argument hint and explicit autonomous workflow/tool constraints.\"",
+          "fix": "Replace the vague assertions with checks a grader can verify. Examples: \"`---` is on line 1 and the YAML parses with a `description` key\". For project-ci-command: \"runs a baseline check before the first fix\" and \"caps attempts at 5\". For global-argument-command: \"stops when `$0`/the file argument is empty or the file does not exist\"."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 118,
+          "evidence": "4. Run `git tag -a 'v\\$version' -m 'Release \\$version' TARGET`, then `git push origin 'refs/tags/v\\$version'`.",
+          "fix": "Add a branch to step 5 for this case: the remote has no tag and the user declines a retry, or the query state is unknown. In that branch, report that the local tag `v$version` still exists and offer `git tag -d 'v$version'`. The reason: rerunning the command now stops at step 2, which checks that `refs/tags/v$version` finds nothing locally, and the user gets no recovery path."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 52,
+          "evidence": "\"Before delegating any step, ask: what does a subagent give here that the main thread lacks: isolation from a large search, a specialized registered agent, or parallel work?\" This recaps familiar subagent capabilities rather than adding command-specific expertise.",
+          "fix": "Compress the general delegation discussion to a brief default: run directly unless isolation or parallelism is necessary. Retain the command-specific approval-gate distinction, registered-agent constraint and instruction to honor requests for no agents."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/references/patterns.md",
+          "line": 14,
+          "evidence": "\"If `$base` is empty, use `main` when `git rev-parse -q --verify --end-of-options refs/heads/main` succeeds, else `master`.\" In a repository containing neither branch, such as a trunk-only repository, this branch selects an unverified `master` and proceeds to the tool call; the subsequent validation covers only explicitly supplied arguments. The same fallback appears in references/examples.md.",
+          "fix": "Check that `main` exists, otherwise check that `master` exists; if neither exists, stop and ask for an explicit base branch. Validate the selected default before invoking the tool, and apply the same correction to the codex-review example in references/examples.md."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

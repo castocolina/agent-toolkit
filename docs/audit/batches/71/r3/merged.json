@@ -1,0 +1,62 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "ascii-ui-mockup-generator",
+      "percent": 92.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 23,
+          "evidence": "list states the ASCII cannot show (hover, empty, error, loading), note the responsive behavior the chosen width implies, and give build priorities",
+          "fix": "Shorten step 6 to the handoff parts the model would not produce unprompted, such as mapping each ASCII label to a component name and using the user's stack. Drop the standard list of UI states and build priorities, which the model already includes in any handoff."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 18,
+          "evidence": "Rank the user tasks; list the content every alternative must show.",
+          "fix": "Add a ranking rule. Example: 'Rank by how often the task is done and what an error costs; when the user gives neither, rank the task named first in the request highest and state that assumption above mockup 1.' This gives step 3's 'dominant task' a repeatable input."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 35,
+          "evidence": "Keep comparison fields aligned across repeated records (tables, lists of the same shape); reserve stacked layouts for items scanned independently.",
+          "fix": "Replace this general UI advice with an ASCII-specific gotcha the model gets wrong. Example: 'NEVER put a label wider than its column inside a table row: the border on the right shifts and every later row looks misaligned in the fence. Truncate with ...> first.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "agents/ascii-ui-mockup-generator.md",
+          "line": 22,
+          "evidence": "then state which one you recommend for the top-ranked task and why, and ask which to pick, numbered.",
+          "fix": "Resolve the ask branches for a subagent, which cannot wait for a reply mid-run. Add: 'Questions in steps 1 and 5 end the run; return them to the caller with the mockups. When re-invoked with a pick or answers, resume at step 6 or redraw.' Also say what 'if unanswered' in step 1 means: no answer in the delegating prompt."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

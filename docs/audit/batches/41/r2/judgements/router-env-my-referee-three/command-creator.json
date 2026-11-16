@@ -1,0 +1,77 @@
+{
+  "skill": "command-creator",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 98,
+      "evidence": "## Worked example (about 35 lines, roughly a fifth of the body) repeats the 'Workflow with side effects' skeleton in references/patterns.md and the timeout-retry gotcha",
+      "fix": "Move the full release-tag example into references/examples.md as a 'Workflow with side effects' section. In SKILL.md, keep only the expert parts in two or three lines: check the remote tag with ls-remote and the peeled ^{} line, compare it to the recorded TARGET, and never overwrite a conflicting tag."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 15,
+      "evidence": "\"Write a command for a single prompt the user starts. If the workflow needs bundled scripts or reference files, say a skill fits better\"",
+      "fix": "Add the decisive question: 'Should Claude ever start this on its own from context? If yes, and it has no side effects, a skill with a trigger description fits better; if only the user should start it, write a command.' This gives the command-or-skill choice a real expert framework instead of a single file-count rule."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/command-creator/evals/evals.json",
+      "line": null,
+      "evidence": "No eval covers the Location table's conflict row (\"for my team\" with no repository open, so the skill should ask) or a user-supplied attempt cap overriding the default of 5",
+      "fix": "Add an eval whose prompt is \"make a /lint-fix command for my team, max 3 tries\" run outside a git repository. Assert that the skill asks which location to use before writing and caps the loop at 3 attempts."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/command-creator/references/patterns.md",
+      "line": 19,
+      "evidence": "\"3. Run `<tool> <encoded value>` (same encoding) and show its output unchanged.\" has no `--` option terminator, which contradicts SKILL.md Gotcha step 3. The codex-review example in references/examples.md copies the gap: `scripts/codex-review.py <encoded branch>`",
+      "fix": "Change the step to \"3. Run `<tool> -- <encoded value>` (same encoding; use the tool's own end-of-options form if it has one) and show its output unchanged.\" Apply the same change to the codex-review script call in examples.md."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 120,
+      "evidence": "Worked example step 5: \"It succeeds with no output: the tag is not on the remote. Show the push error and ask before one retry.\" No branch says what to do if that one approved retry also fails or times out",
+      "fix": "Add a sub-bullet to step 5: \"If the approved retry fails or times out, run the same ls-remote check once more and follow its outcome. Never retry a second time; report the state and the local-tag options.\""
+    }
+  ]
+}

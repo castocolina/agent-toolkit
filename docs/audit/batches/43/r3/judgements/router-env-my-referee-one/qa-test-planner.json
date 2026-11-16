@@ -1,0 +1,59 @@
+{
+  "skill": "qa-test-planner",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 59,
+      "evidence": "The bug-report branch says \"Rerun under the same conditions only to measure the rate (n/10)\" before assessing severity. For a production double-charge or destructive-data defect, this branch provides no safety gate before repeating the harmful operation. The disposable-data restriction appears in the separate cases branch.",
+      "fix": "Assess potential money, data and security harm before reproducing a bug. Require authorized disposable data and a safe environment for potentially harmful reruns; if those prerequisites are unavailable, preserve the existing evidence and observed rate, record an unmeasured rate as Unknown or a single unreproduced occurrence, and request the missing prerequisites. Keep the original environment distinct from any later sandbox reproduction."
+    },
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/qa-test-planner/SKILL.md",
+      "line": 61,
+      "evidence": "\"Write every missing fact as `Unknown` and list it under Open Questions\" repeats the global output rule at line 31 and the delivery check at line 136. This branch-level repetition adds no new QA decision or exception.",
+      "fix": "Remove the duplicate missing-fact instruction from the bug-report branch, retaining the global output convention and the final validation check. Keep branch-specific guidance focused on evidence preservation, safe reproduction and triage."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/qa-test-planner/evals/evals.json",
+      "line": 89,
+      "evidence": "The script-bug-file assertion checks \"the observed rate 2/10 and the build 2.4.0-rc2\" but not the known environment. Its source notes say \"on staging build 2.4.0-rc2\", while both the logged command's description and the saved report omit staging. All listed assertions can pass despite losing this supplied fact, contrary to the skill's preservation rule.",
+      "fix": "Add an assertion that every supplied reproduction-context fact, including staging, survives in the command and saved report. Update the logged --description and report fixture to retain staging without altering the exact build value, or explicitly make the omission a defect the evaluator must detect and report."
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 12,
+    "D3": 12,
+    "D4": 14,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 113,
+  "max_total": 125,
+  "percent": 90.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 8,
+      "evidence": "Invoked as `/explain-changes-mental-model` (project install) or `/command-explain-changes-mental-model:explain-changes-mental-model` (this repository's plugin).",
+      "fix": "Delete the invocation sentence. The harness already handles slash-command discovery and naming, and the model never needs this to do the task. Keep the usage block only if it shows how arguments are classified."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 10,
+      "evidence": "/explain-changes-mental-model feature/x       # branch vs main",
+      "fix": "Trim the usage block to the cases section 1 does not already make clear (`HEAD~3` as one commit, `#123`). Every other example repeats a numbered rule in section 1."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 36,
+      "evidence": "Group files by purpose (not by directory), one group per reviewable idea.",
+      "fix": "Add a self-check before the output step: 'Before writing the report, compare the groups against `git diff --stat` (or the patch's file list). Every changed file appears in exactly one group, and every Depends on names a group that comes earlier in the review order. Fix the grouping and check again until both hold.' This turns the Process pattern into a checkpointed workflow."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 26,
+      "evidence": "3. Contains `..` (covers `...`): `git diff \"<arg>\" --no-color`.",
+      "fix": "Add a gotcha: '`git diff A..B` is the same as `git diff A B`, not log-range semantics. It includes changes made on A since the branches split, and those appear as reversed hunks. If the user means the changes on the branch only, use `A...B` and say which form you used.' Models routinely assume `..` in diff means what it means in `git log`."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 3,
+      "evidence": "argument-hint: [commit|branch|range|custom]",
+      "fix": "argument-hint: [commit|branch|range|#PR|custom] (the hint is shown at invocation; without it users cannot see that the command supports the PR path in step 4)"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 29,
+      "evidence": "base is the first that exists of `main`, `master`, `origin/main`, `origin/master`, else ask the user for a base; then `git diff \"<base>...<arg>\" --no-color`.",
+      "fix": "Handle the branch that resolves to the base and the remote branch. If <arg> is itself the chosen base (for example `/explain-changes-mental-model main`), `main...main` is empty and the command wrongly reports 'No changes found'. In that case explain the tip commit as in step 7, or ask for a base. For a `refs/remotes/<arg>` branch, prefer the matching remote base (`origin/main`), because local `main` may be stale."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "skill": "plugin-forge",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 123,
+  "max_total": 125,
+  "percent": 98.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/plugin-forge/scripts/create_plugin.py",
+      "line": 42,
+      "evidence": "The check `or \"source\" not in entry` verifies only that the key exists. An existing entry such as {\"name\":\"broken\",\"source\":null} passes validate_marketplace; dry-run reports success, and a normal run creates files and rewrites the marketplace despite the contract requiring a well-formed manifest and promising no writes on bad input.",
+      "fix": "Validate existing entries' source values before any filesystem mutation: require a valid local-source string or a supported source object with its required fields, rejecting null, numeric values and malformed objects. Extend test_create_plugin.py to verify that these inputs return exit 2 with empty stdout and unchanged files in both dry-run and normal modes."
+    }
+  ]
+}

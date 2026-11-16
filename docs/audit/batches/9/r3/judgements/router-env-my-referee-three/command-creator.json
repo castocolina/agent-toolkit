@@ -1,0 +1,77 @@
+{
+  "skill": "command-creator",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 15,
+      "evidence": "\"the file stem is the command name (`fix-ci.md` is `/fix-ci`); there is no `name` field. Use kebab-case.\"",
+      "fix": "Cut the stem-equals-name and kebab-case parts, which the model already knows. Keep only the namespace rule (a subfolder gives `/group:name`), which it does not."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 119,
+      "evidence": "Checklist: \"The user's steps are all present, in their order\" while line 125 requires \"Read-only checks come before every side effect\"",
+      "fix": "Add a rule to Workflow step 1: when the user's manual order puts a side effect before a read-only check (for example publishing before running tests), point out the reordering, propose the safe order and ask before changing it. Do not silently keep or silently change the user's order."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 21,
+      "evidence": "\"Read [examples](references/examples.md) only when the user asks for a worked example or the chosen pattern needs a full model body.\"",
+      "fix": "Make the second condition concrete, for example: \"or when the command maps several failing checks to fixes, or needs fixed SUCCESS and STUCK report formats\". Add: \"Do NOT load it when the skeleton in patterns.md already covers the body.\""
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/command-creator/evals/evals.json",
+      "line": 7,
+      "evidence": "\"expected_output\": \"A focused command draft or requirements-driven creation plan using a project-level command...\"",
+      "fix": "Replace the vague either-or with one observable outcome: \"Writes `.claude/commands/fix-ci.md` with a description, no argument-hint, a baseline check, a max of 5 attempts, a stuck rule and SUCCESS/STUCK reports.\" Also add a should-trigger query that hides the domain, for example a buried multi-step chain."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 108,
+      "evidence": "Worked example: \"Run `git tag -a 'v$version' -m 'Release $version' TARGET`, then `git push origin 'refs/tags/v$version'`\" has no `--`, but checklist line 124 requires every argument \"after `--` or `--end-of-options`\"",
+      "fix": "Make the example pass its own checklist, or narrow the checklist item to: \"...after `--` or `--end-of-options` unless a strict pattern such as `^[0-9]+\\.[0-9]+\\.[0-9]+$` was already validated, which rules out a leading `-`\". Then an agent walking step 6 does not reject the canonical example."
+    }
+  ]
+}

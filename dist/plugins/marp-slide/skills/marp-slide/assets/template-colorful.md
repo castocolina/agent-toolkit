@@ -10,10 +10,10 @@ paginate: true
 :root {
   --color-background: #fff5f7;
   --color-foreground: #2d2d2d;
-  --color-heading: #ff6b9d;
+  --color-heading: #c2255c;
   --color-accent-1: #ffd93d;
   --color-accent-2: #6bcf7f;
-  --color-accent-3: #4d96ff;
+  --color-accent-3: #1a56c4;
   --font-default: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
 }
 
@@ -30,7 +30,7 @@ section {
   padding: 56px;
 }
 
-section:last-of-type {
+section.final {
   border-bottom: none;
 }
 
@@ -147,6 +147,8 @@ Colorful & Pop
 - Topic3
 
 ---
+
+<!-- _class: final -->
 
 ## Slide
 

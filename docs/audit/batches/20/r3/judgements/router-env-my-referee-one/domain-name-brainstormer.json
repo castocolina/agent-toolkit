@@ -1,0 +1,68 @@
+{
+  "skill": "domain-name-brainstormer",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 36,
+      "evidence": "\"Registering a domain grants no trademark right. Under ICANN's UDRP...\" introduces a general legal overview the model already knows, unlike the specific lookup and registry-response guidance.",
+      "fix": "Condense this step to the operational safeguards: require trademark screening in the relevant jurisdictions and product classes before purchase, and never infer legal safety from domain registration or a near-match. Omit the general UDRP primer."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 47,
+      "evidence": "\"Group candidates by naming direction, then give a ranked table\" applies the brainstorming format unconditionally, although the description also supports a direct single-domain registration-status question.",
+      "fix": "Scope naming-direction groups and the full ranked table to brainstorming requests. For a single-domain status request, default to the status, lookup evidence, source and UTC time, plus purchase and legal caveats; generate alternatives only when requested."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/evals/evals.json",
+      "line": 32,
+      "evidence": "\"Does not assert current availability without a live check\" would pass an answer that calls BrightNest.com available after an RDAP lookup, contradicting the skill's unconditional prohibition on that claim.",
+      "fix": "Replace this assertion with one requiring that the response never calls the domain available, even after a lookup; uses the defined registration-status labels; and supplies the source and UTC check time whenever a lookup supports the classification."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 22,
+      "evidence": "\"WHOIS returned a record with a creation date\" is the only positive WHOIS classification rule, while line 34 makes every other reply unverified. The advertised .de fallback therefore cannot recognize a registered DENIC record containing \"Domain:\" and \"Status: connect\" but no creation date.",
+      "fix": "Allow explicit, authoritative registry-specific registration records without requiring a creation date. Document the .de branch: a matching Domain field with Status: connect means registered; Status: free means not found in registry; restricted, throttled or otherwise inconclusive replies remain unverified."
+    }
+  ]
+}

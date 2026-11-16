@@ -1,0 +1,31 @@
+{
+  "findings": [
+    {
+      "severity": "medium",
+      "file": "scripts/audit/audit.py",
+      "line": 223,
+      "summary": "The YAML check treats colons inside valid trailing comments as syntax errors.",
+      "failure_scenario": "A command with frontmatter `description: Review changes # owner: team` now fails `check --kind command --strict` with `frontmatter_yaml`, although the YAML is valid and the pre-change check accepted it.",
+      "fix": "Exclude YAML comment text before checking plain scalars for forbidden colon sequences, while preserving hashes inside quoted and block values. Add a regression test containing a colon in a trailing comment."
+    },
+    {
+      "severity": "medium",
+      "file": "scripts/audit/audit.py",
+      "line": 221,
+      "summary": "Valid multiline YAML flow collections are rejected because only their opening line is checked.",
+      "failure_scenario": "A command with a valid description and `allowed-tools: [Read,` followed by an indented `Grep]` now fails strict checking because `bad_flow_collection` cannot see the closing bracket on the continuation line.",
+      "fix": "Accumulate continuation lines before validating a flow collection, or exclude multiline collections from this explicitly line-based heuristic. Add a strict-check regression test for multiline allowed-tools."
+    },
+    {
+      "severity": "medium",
+      "file": "scripts/audit/audit.py",
+      "line": 2038,
+      "summary": "Queue updates can destroy the existing resume state when an in-place write fails.",
+      "failure_scenario": "With an existing `batches.json`, a `batches set` or `batches waive` operation encounters ENOSPC after `Path.write_text` truncates the file; the command exits 2 but leaves empty or partial JSON, so subsequent operations cannot load the previous queue and waivers.",
+      "fix": "Write the serialized queue to a temporary file under the output directory and atomically replace `batches.json` only after writing and closing succeed. Preserve the containment checks and remove the temporary file on failure."
+    }
+  ],
+  "verdict": "approve",
+  "lane": "router-env/my-referee-one",
+  "base": "49e83ff"
+}

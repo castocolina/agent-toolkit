@@ -1,0 +1,50 @@
+{
+  "skill": "commit-work",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 34,
+      "evidence": "Step 8 instructs temporary-index runs to execute \"git reset -q -- <committed paths>\". If a file contains an excluded, previously staged hunk and a separate approved hunk, the temporary-index patch procedure can commit only the approved hunk, but this path-wide reset then removes the user's excluded hunk from the real index.",
+      "fix": "Before staging, detect whether excluded pre-existing staged content shares any approved path. For that overlap, stop and ask rather than using the current temporary-index cleanup. Restrict the path-wide reset to committed paths proven not to contain excluded user-staged content; supporting overlapping paths requires preserving and reconciling those staged changes against the new HEAD."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/commit-work/SKILL.md",
+      "line": 27,
+      "evidence": "The instruction to \"put that same GIT_INDEX_FILE= prefix on every git command of steps 3-7\" also encompasses step 3's source read, \"git diff --cached --binary -- <path> > <run>/staged.diff\". In the branch with an approved staged path and another excluded staged path, reading the newly initialized temporary index instead of the real index produces an empty patch and cannot copy the approved staged version.",
+      "fix": "Explicitly capture approved staged patches from the real index before initializing the temporary index, with no temporary GIT_INDEX_FILE prefix on those source reads. Exempt those reads from the blanket prefix rule; retain the prefix on temporary-index staging, review, verification and commit commands."
+    }
+  ]
+}

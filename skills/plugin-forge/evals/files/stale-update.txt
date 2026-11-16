@@ -1,0 +1,25 @@
+$ cat plugins/lint-kit/.claude-plugin/plugin.json
+{
+  "name": "lint-kit",
+  "version": "1.2.0",
+  "description": "Lint helpers",
+  "author": {"name": "Sam Ortiz"}
+}
+
+$ jq '.plugins[] | select(.name=="lint-kit")' .claude-plugin/marketplace.json
+{
+  "name": "lint-kit",
+  "source": "./plugins/lint-kit",
+  "version": "1.2.0"
+}
+
+$ git log --oneline -3 -- plugins/lint-kit
+9f3c2d1 feat(lint-kit): add /lint-kit:fix-imports skill
+4b7a0e2 fix(lint-kit): correct hook matcher
+1d2e3f4 chore(lint-kit): release 1.2.0
+
+# Teammate's machine, after the commits above were pushed to the GitHub marketplace:
+$ claude plugin marketplace update team-tools
+Successfully updated marketplace: team-tools
+$ claude plugin update lint-kit@team-tools
+lint-kit is already at the latest version (1.2.0).

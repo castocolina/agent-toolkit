@@ -1,0 +1,77 @@
+{
+  "skill": "database-schema-designer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 44,
+      "evidence": "\"For instants (created_at, paid_at), PostgreSQL `timestamptz` stores UTC and converts on output by the session `TimeZone`. Plain `timestamp` silently drops the offset... For civil dates (birthday, due date) use `DATE`.\"",
+      "fix": "Cut the parts the model already knows (timestamptz vs timestamp, DATE for civil dates) to one clause, and keep the non-obvious parts: local timestamp plus IANA zone for future events, and the MySQL TIMESTAMP 2038 limit with a pinned session time_zone"
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 38,
+      "evidence": "\"**MySQL ignores foreign keys on MyISAM without a warning.** Check `ENGINE=InnoDB` before relying on one.\"",
+      "fix": "Fold this widely known fact into the FK-indexing gotcha as a short clause, or keep it only in checklist check 2, so it does not take a standalone gotcha slot"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 26,
+      "evidence": "Workflow step 1 sets boundaries with \"Atomic writes?\" and gives embed-or-reference rules for MongoDB, but it has no relational rule for deliberate duplication, although the trigger queries include \"customer addresses are copied into orders, invoices and shipments. Can you clean that up?\"",
+      "fix": "Add a fifth question to step 1: \"Duplicated column? Keep the copy when it is a point-in-time snapshot (order shipping address, unit price at purchase), because normalizing it rewrites history. Otherwise reference the source row and remove the copy with expand-contract.\""
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 40,
+      "evidence": "\"Use one nullable FK per parent type plus `CHECK (num_nonnulls(article_id, photo_id) = 1)` on PostgreSQL, or a shared supertype table the FK can target.\"",
+      "fix": "Make the default explicit: \"Default to one nullable FK per parent type while the parent types are few and fixed. Switch to a shared supertype table when new parent types are added often.\" Also give the MySQL/SQLite form of the CHECK, which lacks num_nonnulls, for example `CHECK ((article_id IS NOT NULL) + (photo_id IS NOT NULL) = 1)`"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/database-schema-designer/SKILL.md",
+      "line": 13,
+      "evidence": "\"PostgreSQL 15 or later, unless an engine is named; label any dialect-specific syntax.\" The branch for a named engine outside PostgreSQL, MySQL, SQLite and MongoDB (SQL Server, Oracle, DynamoDB) has no outcome: the gotchas and migration rules give no fallback.",
+      "fix": "Add a line under Defaults: \"For another named engine (SQL Server, Oracle, a key-value store), apply the workflow questions and the engine-neutral gotchas (tenant composite FKs, soft-delete uniqueness, money, column meaning), and state in an `Assumption:` line that lock and online-DDL behaviour must be checked in that engine's documentation.\""
+    }
+  ]
+}

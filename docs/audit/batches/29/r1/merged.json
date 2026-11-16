@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "meme-factory",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 91.2,
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 25,
+          "evidence": "Template rows such as \"| `buzz` | 2 | X, X everywhere |\", \"| `success` | 2 | A confirmed win |\" and \"| `mordor` | 2 | \\\"One does not simply...\\\" |\" restate meme meanings the model already knows",
+          "fix": "Keep the expert columns (verified ID and line count) and the non-obvious notes (fry for unconfirmed outcomes, cmm one line only, db needs a hand-built URL). Cut the 'Use for' text to a 1-3 word name for the well-known memes."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 13,
+          "evidence": "\"4. **Write the joke:** name the contrast, write the payoff (last line) first, then the setup. Keep each line to about 6 words.\"",
+          "fix": "Make step 4 a short decision framework. Before writing, ask: who will see it (team Slack, public post, PR), who the butt of the joke is (never a named teammate or customer), and which line count the joke really needs. Then pick the template from that answer, not from a keyword."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 64,
+          "evidence": "\"**Never say a deploy or test run succeeded unless the user confirmed it.** Use `fry` while the outcome is unknown.\" gives no reason, unlike the other gotchas",
+          "fix": "Add the reason: a meme posted to Slack or a PR is read as a status report, so a premature 'success' meme can tell the team that a broken release is fine."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/meme-factory/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "The queries are short and context-free, for example \"make a meme with custom top and bottom text for Slack\" and \"create a logo for our developer team\". None has a file path, an image URL, personal backstory or a typo, and the hardest positive (captions on a user-supplied image URL, template custom) is missing.",
+          "fix": "Rewrite 5-6 queries with realistic context: casual typos, a concrete image URL to caption (should trigger), a pasted incident summary that asks for 'something funny for #eng-random' without saying 'meme' (should trigger), and a near-miss negative that asks to caption a local photo.jpg with no URL."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 17,
+          "evidence": "Step 6 requires \"a Markdown image whose alt text describes both the picture and the joke\", but the `--markdown` flag in step 5 calls get_markdown_image(url) with no alt argument, so scripts/meme_generator.py always prints ![Meme](...)",
+          "fix": "Add `--alt TEXT` to the generate subparser and pass it to get_markdown_image. Until then, tell the agent in step 5 to drop `--markdown` and write `![<picture and joke>](<url>)` itself."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 19,
+          "evidence": "\"`python3 scripts/meme_generator.py suggest \\\"<situation>\\\"`\" does not mention the script's top-level `--json` flag, which argparse only accepts before the subcommand (`--json suggest ...`)",
+          "fix": "Document `python3 scripts/meme_generator.py --json suggest \"<situation>\"` and `--json list-templates`, and note that `--json` must come before the subcommand."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 17,
+          "evidence": "\"If a line would wrap past two rows or get cropped, shorten it and regenerate once.\" An agent that cannot view the image cannot check this.",
+          "fix": "Give a checkable proxy, for example: if any caption line is over about 30 characters (about 20 for 3-line templates), shorten it before building the URL. Check the render visually only when you can view images."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/meme-factory/evals/trigger-queries.json",
+          "line": 3,
+          "evidence": "\"make a meme about bugs everywhere in our release\" exemplifies the positive queries: all explicitly name memes, greentext, memegen.link or a template. None tests the description's implicit reaction-image or image-URL captioning triggers, and none supplies a custom background URL.",
+          "fix": "Replace two explicit positives with realistic implicit requests: a contextual Slack comparison-image request without the word 'meme', and a request to caption a supplied public image URL at specified dimensions. Keep the balanced positive/negative set and existing near-miss negatives."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/meme-factory/SKILL.md",
+          "line": 16,
+          "evidence": "\"No Python? Send POST https://api.memegen.link/images with JSON {\\\"template_id\\\": \\\"<id>\\\", \\\"text\\\": [\\\"<top>\\\", \\\"<bottom>\\\"]}\" omits the selected background and rendering options. Following this fallback for the advertised custom-image branch loses the user's background instead of producing the requested image.",
+          "fix": "Route no-Python requests through the documented hand-built URL procedure, preserving one path segment per caption and all selected query parameters. Explicitly require the percent-encoded background parameter for custom images and preserve width, height, layout, font and style when supplied."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

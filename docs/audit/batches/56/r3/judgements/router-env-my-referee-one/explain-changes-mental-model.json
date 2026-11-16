@@ -1,0 +1,50 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 45,
+      "evidence": "The 28-line Output section includes familiar reporting scaffolding: '### High-Level Summary', '[2-3 sentences: goal and approach]', '**Why this matters:** [context]' and '**Key changes:** [change and why]'. Unlike the expert source-selection, grouping and Gotchas sections, much of this section activates ordinary reporting behavior rather than adding knowledge.",
+      "fix": "Condense the generic summary, concepts and explanatory fields into a short output instruction. Retain the distinctive requirements: dependency-ordered groups, file references, concrete dependency evidence, enables relationships, review sequence and the single-group exception."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 32,
+      "evidence": "'only a successful empty output is an empty diff' does not resolve the verified empty-commit branch: line 30 uses 'git show \"<arg>\" --no-color', which prints commit metadata even when the commit contains no patch. The command therefore misses its stated no-changes stopping condition for an empty commit.",
+      "fix": "For non-merge commits and tags, obtain patch-only output with `git show --format= --no-color \"<arg>^{commit}\"`, fetching metadata separately if needed. Preserve the first-parent diff for merges, and apply the no-changes stopping condition to patch content rather than metadata-bearing stdout."
+    }
+  ]
+}

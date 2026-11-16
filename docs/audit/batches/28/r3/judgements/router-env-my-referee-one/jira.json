@@ -1,0 +1,50 @@
+{
+  "skill": "jira",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/jira/evals/evals.json",
+      "line": 47,
+      "evidence": "The assertion accepts \"jira issue view KEY or the --raw output\" as a read-back. The create command's --raw response supplies the new key, but does not independently verify the saved fields, so this assertion can pass without the required post-create read.",
+      "fix": "Require a separate post-create jira issue view KEY or authenticated issue GET and verification of the saved summary, description, priority and component. Explicitly reject treating the create command's --raw response alone as a read-back."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/jira/references/mcp.md",
+      "line": 41,
+      "evidence": "The REST transition branch specifies \"GET /rest/api/{v}/issue/{key}/transitions\" followed by a POST containing only {\"transition\":{\"id\":\"31\"}}. It does not discover required transition-screen fields; if Resolution or another field is mandatory, this branch fails. The 400 handler further directs the agent to \"Fix the named field from create metadata\", which is not transition metadata.",
+      "fix": "Fetch transitions with ?expand=transitions.fields, inspect the selected transition's required fields and allowed values, and include needed fields in the exact proposal before approval. POST the approved transition id together with its fields. Route transition-related 400 errors back to transition metadata rather than create metadata, and seek renewed approval if the payload changes."
+    }
+  ]
+}

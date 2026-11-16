@@ -1,3 +1,4 @@
+import json
 import subprocess
 import tempfile
 import unittest
@@ -24,6 +25,15 @@ class ListHandoffsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             result = subprocess.run(["python3", str(SCRIPT), tmp], text=True, capture_output=True, check=True)
             self.assertIn("No handoffs found", result.stdout)
+
+    def test_json_lists_newest_first(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            handoffs = Path(tmp) / ".claude/handoffs"
+            handoffs.mkdir(parents=True)
+            (handoffs / "2025-01-01-120000-old.md").write_text("# Handoff: Old\n")
+            (handoffs / "2025-02-01-120000-new.md").write_text("# Handoff: New\n")
+            result = subprocess.run(["python3", str(SCRIPT), "--json", tmp], text=True, capture_output=True, check=True)
+            self.assertEqual([h["filename"] for h in json.loads(result.stdout)], ["2025-02-01-120000-new.md", "2025-01-01-120000-old.md"])
 
 
 if __name__ == "__main__":

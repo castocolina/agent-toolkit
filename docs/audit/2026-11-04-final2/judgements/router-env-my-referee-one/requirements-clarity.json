@@ -1,0 +1,59 @@
+{
+  "skill": "requirements-clarity",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 13,
+    "D8": 15
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/requirements-clarity/SKILL.md",
+      "line": 21,
+      "evidence": "\"Ask the 2\u20133 questions whose answers could change scope, an irreversible decision, or an acceptance test\"; line 54 also requires \"the next 2\u20133 questions.\" This leaves no allowance for a below-threshold request with exactly one consequential decision still open.",
+      "fix": "Allow 1\u20133 focused questions per round, bounded by the number of consequential unresolved decisions. Explicitly permit a single question rather than requiring another question merely to satisfy the minimum."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/requirements-clarity/evals/evals.json",
+      "line": 67,
+      "evidence": "\"Footer has Document version 1.0, Created 2026-11-03, Clarification rounds 3 and an Advisory clarity score of at least 90/100 from its own rubric rescore; if that score differs from the stated 92, both are shown\" fixes the creation date without fixing the evaluation clock and requires both scores even when the rescore is at least 90, beyond the body's conditional requirement.",
+      "fix": "Supply an explicit document-creation date or fixed test clock, or check the creation date against the evaluation run date. Require both scores only under the condition specified in SKILL.md, or explicitly add the broader reporting requirement to the skill."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/requirements-clarity/evals/evals.json",
+      "line": 62,
+      "evidence": "\"Shows the full PRD content with that path and does not claim a save it did not make\" requires the full document in the response for the saved-file case, whereas workflow step 7 requires reporting the path, version, advisory score, rounds, and open questions.",
+      "fix": "For successful saves, inspect the generated PRD file to grade its content and check the response for the required save summary. Require the full PRD in chat only for chat-only requests or failed writes."
+    }
+  ]
+}

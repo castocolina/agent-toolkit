@@ -1,0 +1,86 @@
+{
+  "skill": "viral-tweet",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 113,
+  "max_total": 125,
+  "percent": 90.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/viral-tweet.md",
+      "line": 36,
+      "evidence": "Add hashtag stacks, \"link in bio\", or unrelated @mentions or links.",
+      "fix": "Cut the generic social-media hygiene the model already follows. Keep only the non-obvious part: keep a link only when it backs up the claim, and count it as 23."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/viral-tweet.md",
+      "line": 17,
+      "evidence": "Before recommending, check the candidate against the objective: replies needs one specific question ... If it fails, revise it or pick another variant.",
+      "fix": "Move the objective check from step 2, which runs before any variant exists, into step 5 ('Recommend one'). Step 2 then only picks the objective, and step 5 checks the candidate, revises it and recommends."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/viral-tweet.md",
+      "line": 29,
+      "evidence": "## Gotchas has only two items (compression falsifies qualifiers; Unicode fancy text)",
+      "fix": "Add platform-specific gotchas taken from observed failures. For example, a link in a standalone post turns into a card that pushes the text down. Another: a thread's first post must stand alone, because readers often see only that post."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/viral-tweet.md",
+      "line": 20,
+      "evidence": "When an estimate is within 15 of the limit, trim further or tell the user to confirm in X's composer.",
+      "fix": "Give one default with an escape hatch: 'trim to at least 15 under the limit; only if trimming would drop a supplied fact or qualifier, keep it and tell the user to confirm the count in X's composer.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/viral-tweet.md",
+      "line": 17,
+      "evidence": "If the user states none: ... sensitive posts -> clarity",
+      "fix": "Resolve what happens when the user asks for replies or reposts on a sensitive post. Step 3 forbids any question or call to action there. Add: 'For sensitive posts, clarity overrides a stated objective; say so in ANALYSIS and offer a question only if the user confirms.'"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/viral-tweet.md",
+      "line": 48,
+      "evidence": "**THREAD (only when chosen or offered):** numbered posts `1/n ...`, each with its weighted count",
+      "fix": "Step 4 can return three alternative threads, one per VERSION, but the Output template has no place for them. Add: 'When step 4 returns three threads, each VERSION block holds its thread as numbered posts with per-post weighted counts, and the THREAD section is omitted.'"
+    }
+  ]
+}

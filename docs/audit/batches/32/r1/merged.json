@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "humanizer",
+      "percent": 91.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 90.4,
+        "router-env-my-referee-one": 92.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 27,
+          "evidence": "\"**Promotion:** seamless, powerful, innovative, vibrant, nestled, stacked praise.\" Current models already treat these words as press-release clich\u00e9s.",
+          "fix": "Shorten the word list to one example. Keep the expert part: blatant press-release tone is an older-model signal, and current output promotes through award and coverage lists."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 17,
+          "evidence": "\"Diagnose in priority order: evidence risks ... first, then inflation and promotion, then structure, then vocabulary and mechanics.\" The process skill has no inline worked example of this ordering.",
+          "fix": "Add one short before/after pair under Workflow. It should show a vague attribution cut back to its supported claim before any vocabulary is touched, so the agent sees the evidence-first ordering applied."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 30,
+          "evidence": "The over-correction gotcha (\"Replacing every dash with commas and periods produces the over-uniform short-sentence rhythm that is itself a current cue\") exists only in references/pattern-catalog.md. That file is not loaded for narrow edits.",
+          "fix": "Add one line to the 'Not tells' paragraph: 'Never mechanically replace every em dash or flagged word; uniform 8-20-word sentences are themselves a current cue, so vary the fix or keep the original.'"
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 5,
+          "evidence": "\"Use when a draft sounds robotic or the user asks to humanize text or remove AI writing patterns.\" It has no trigger for requests that never mention AI (salesy, breathless, clich\u00e9-heavy copy) and few keywords.",
+          "fix": "Edit existing drafts to remove formulaic AI-like prose, promotional filler, vague attributions, inflated significance and repetitive sentence patterns while preserving facts, quotations, author voice and house style. Use when a draft sounds robotic, generic, salesy or breathless, or the user asks to humanize text, make it sound natural, or remove AI writing patterns, chatbot phrasing, clich\u00e9s or em-dash overuse, even without the word 'AI'. Not for authorship detection, factual research, translation, spelling-only proofreading, or writing from scratch."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/humanizer/evals/trigger-queries.json",
+          "line": 3,
+          "evidence": "\"make this paragraph sound more natural and human\". All 21 queries are terse one-liners with no file paths, personal context or typos. Neither evals.json nor the trigger queries covers the reference-loading path (chatbot correspondence, disclaimers) or protected code identifiers.",
+          "fix": "Rewrite about half the queries with realistic context, for example 'my manager says ~/drafts/launch_post.md reads like ChatGPT wrote it, can u fix it'. Add an evals.json case with a chatbot wrapper plus an inline API identifier, asserting that the wrapper is deleted and the identifier stays character-identical."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/humanizer/SKILL.md",
+          "line": 44,
+          "evidence": "\"Check before returning: every factual claim in the revision appears in the source; ...\" The check has no failure branch. Separately, \"Only a dense cluster of cues counts\" (line 30) gives no threshold. For a paragraph with only 'serves as' and 'pivotal', the decision whether to edit is left to guesswork.",
+          "fix": "Add: 'If any check fails, revert that sentence to the original or cut the unsupported part, then re-run the check.' Define a cluster, for example: three or more distinct cues from different diagnostic groups in one paragraph, or one evidence risk alone."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/humanizer/references/pattern-catalog.md",
+          "line": 11,
+          "evidence": "Familiar cues such as \"Certainly!\" and \"I hope this helps\" receive a separate before/after block; later sections similarly illustrate ordinary stacked hedging and list familiar substitutions such as \"In order to\" \u2192 \"to\" (lines 63\u201373). These passages add basic copyediting reminders rather than substantial expert knowledge.",
+          "fix": "Compress the familiar wrapper, stacked-hedge and wordiness examples into brief activation reminders. Retain their contextual safeguards, the era-specific distinctions, the evidence-preservation rules and the non-obvious mechanics trade-offs; leave attribution and license content intact."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/humanizer/references/pattern-catalog.md",
+          "line": 31,
+          "evidence": "The corrective-framing example changes \"the available information does not establish when the shop opened\" into \"The shop's opening date is unknown.\" Following this example removes the limitation to available evidence and produces a broader claim, contrary to the Deliver requirement that \"qualifiers survive\".",
+          "fix": "Replace the after-text with: \"The listing is a local directory entry, not an official registry. The available information does not establish the shop's opening date.\" Preserve the scope of available evidence whenever simplifying negative-evidence language."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/humanizer/evals/trigger-queries.json",
+          "line": 3,
+          "evidence": "The 21 trigger queries are uniformly terse standalone requests, such as \"make this paragraph sound more natural and human\" and \"edit this release note to remove promotional chatbot language\". They provide useful positive/negative coverage but no context-heavy or multi-step cases testing activation when the editing need is embedded in a larger task.",
+          "fix": "Replace several repetitive queries with contextual variants containing draft snippets, file paths, protected wording and multi-step requests. For example, add a positive query asking to edit ~/docs/release.md while preserving its quoted error strings and then summarize the edits; pair it with a near-miss asking only to verify that the same quoted strings match the implementation. Keep the existing balanced positive/negative coverage."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

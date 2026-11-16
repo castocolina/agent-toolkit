@@ -1,0 +1,81 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "database-schema-designer",
+      "percent": 97.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 97.6,
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 25,
+          "evidence": "\"Each index names the hot read or FK path it serves\" repeats step 1 (\"Each index you add must name one\") and step 4 (\"each index names its query\")",
+          "fix": "Keep the rule once, in step 1. Start step 2 with \"Verify with the engine's plan command...\", and in step 4 keep only the check \"each index names its query\"."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/database-schema-designer/evals/evals.json",
+          "line": 31,
+          "evidence": "\"files\": [\"references/migrations.md\"] lists a skill reference as an eval input file, and the same happens in three other evals",
+          "fix": "Limit `files` to real inputs under `evals/files/`, and drop `files` from evals that have none (unsafe-column-migration). If you need to check that the reference was loaded, write that as an assertion instead."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 12,
+          "evidence": "\"Contract: stop writing the old column, and only in a later deploy drop the old column in a later deploy, after checking...\"",
+          "fix": "Change the line to: \"6. Contract: stop writing the old column. In a later deploy, after checking views, triggers, replicas and reports that still read it, drop the old column.\""
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 31,
+          "evidence": "The MySQL recovery example \"ALTER TABLE orders MODIFY total DECIMAL(12,2) NULL\" sits in a section whose worked example is users.phone, so it looks copied from the eval prompt",
+          "fix": "Use the section's own example: \"ALTER TABLE users MODIFY phone VARCHAR(32) NULL, ALGORITHM=INPLACE, LOCK=NONE; (repeat the column's full existing definition, changing only NULL)\"."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 43,
+          "evidence": "The live MySQL branch says to fix orphan rows until the query returns zero, then add the FK with \"SET SESSION foreign_key_checks = 0\". Concurrent writes can invalidate that preflight before enforcement begins; the procedure also never explicitly restores foreign_key_checks. Re-enabling checks does not validate rows admitted while enforcement was absent.",
+          "fix": "Require a coordinated writer fence covering the zero-orphan preflight, FK installation and final orphan check. Save the original session foreign_key_checks value, disable checks only in the migration session, and restore the original value on both success and failure. Release the fence only after the final check returns zero. If writers cannot be fenced, use checked ALGORITHM=COPY in an approved maintenance window rather than presenting unchecked online installation as sufficient."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/database-schema-designer/references/schema-design-checklist.md",
+          "line": 11,
+          "evidence": "\"Are credentials and API tokens stored only as hashes?\" incorrectly treats recoverable credentials, such as upstream OAuth refresh tokens, like authentication verifiers. Following this check literally makes those credentials unusable when the application must present their original values.",
+          "fix": "Distinguish non-recoverable verifiers from recoverable secrets: require password KDFs for passwords and cryptographic hashes for locally verified high-entropy API tokens; require authenticated encryption with externally managed keys and restricted access for upstream credentials the application must recover. Retain the personal-data identification and retention checks."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

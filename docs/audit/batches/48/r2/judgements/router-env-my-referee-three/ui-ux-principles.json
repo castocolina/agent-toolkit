@@ -1,0 +1,86 @@
+{
+  "skill": "ui-ux-principles",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/ui-ux-principles/SKILL.md",
+      "line": 87,
+      "evidence": "\"every control has a non-empty accessible name (icon-only included) ...; every action works by keyboard; WCAG AA contrast in every theme the screen ships\": the model already knows these WCAG basics; only the fail lines (24 px targets, 3:1 non-text including focus rings, SC 2.5.3 label-in-name) are new to it",
+      "fix": "Cut the a11y Rule to the non-obvious fail lines: 'Fail: an accessible name that drops the visible word (SC 2.5.3); non-text contrast under 3:1 in any shipped theme (input borders, icons, focus rings); targets under 24x24 CSS px (44 is a design target, not the fail line).' Leave the generic WCAG duties to the model."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/ui-ux-principles/SKILL.md",
+      "line": 23,
+      "evidence": "\"**Review and fix**: Review steps, then Build steps on the failed rows.\": nothing says which failed rows to fix first when several fail and some fixes change the layout that other fixes sit on",
+      "fix": "Add one ordering line: 'Fix failed rows in this order: states and loading (they change the layout), then responsive, tokens and consistency, then hierarchy, a11y and interaction; re-check earlier rows after each layout change.'"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/ui-ux-principles/SKILL.md",
+      "line": 77,
+      "evidence": "\"Pass: no color, type, spacing, radius or shadow literal in a component\": no gotcha says whether `0`, `100%`, `transparent`, `currentColor` or `inherit` count as literals, so two reviewers can split on the tokens row",
+      "fix": "Add a Gotcha: 'Tokens exempts `0`, percentages, `auto`, `inherit`, `currentColor` and `transparent`: they encode no brand value, so a rebrand or dark theme never needs to change them.'"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/ui-ux-principles/SKILL.md",
+      "line": 197,
+      "evidence": "\"load the file for each rule ... whose verdict turns on an exception there (2.5.8 target exceptions, container queries, worked hierarchy calls)\": the agent cannot tell whether a verdict depends on an exception it has not read yet, so this trigger is circular",
+      "fix": "Name concrete triggers: 'Read references/rules/a11y.md when a target under 24 px might be inline text or spaced from its neighbours; responsive.md when a container query sets the width; hierarchy.md when two filled buttons may sit in separate panels or a repeated list.'"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/ui-ux-principles/SKILL.md",
+      "line": 69,
+      "evidence": "\"on a tie, fill the one Enter triggers (the form submit), else the first in reading order\": a fixed tie-breaker for a product-emphasis call, with no fallback to asking the user or following product intent",
+      "fix": "Keep it as the default and add an escape hatch: '...else the first in reading order, unless the user or product brief names the preferred action; state the choice in the hand-over.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/ui-ux-principles/SKILL.md",
+      "line": 163,
+      "evidence": "\"a MUI `Button` already has one, so add none\": followed through on the review-dashboard eval, the interaction row should pass for an MUI `IconButton`. The skill names only `Button`, and the verdict table says a `:focus-visible` ring is established by source, so an agent could leave the IconButton row as na",
+      "fix": "Extend the gotcha: 'MUI `Button`, `IconButton` and other ButtonBase controls ship a focus-visible ripple/ring; in source they establish interaction unless `disableRipple` or `disableFocusRipple` removes it with no replacement.'"
+    }
+  ]
+}

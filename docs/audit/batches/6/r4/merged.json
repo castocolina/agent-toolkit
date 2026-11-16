@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "excalidraw",
+      "percent": 95.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 95.2,
+        "router-env-my-referee-three": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 57,
+          "evidence": "\"When `check` passes, run `diff ORIGINAL COPY`; if anything outside the task changed, go back to step 2.\" However, scene.py's diff compares only shape labels and connection tuples. An unrelated geometry, styling, seed, metadata or standalone-text change can pass both checks unnoticed, defeating the worker's preservation gate.",
+          "fix": "Keep the label-level diff for reporting, but add a preservation validator that compares complete elements by ID and top-level scene data against an explicit allowlist of permitted changes. Require that validator to pass before replacement, returning only a structured summary rather than scene JSON."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/excalidraw/scripts/scene.py",
+          "line": 142,
+          "evidence": "\"return {(*ends[c[\\\"id\\\"]], c[\\\"label\\\"]): ...}\" keys connections solely by endpoints and label. Parallel arrows with identical labels collapse: adding a second identical connection, or removing one of two, produces no reported connection change.",
+          "fix": "Preserve connection multiplicity, using multisets of endpoint-and-label tuples or stable arrow IDs with an appropriate comparison fallback. Report additions and removals when parallel-arrow counts change."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/excalidraw/scripts/scene.py",
+          "line": 179,
+          "evidence": "\"s = min(box[\\\"width\\\"] / 2 / abs(dx) ... , box[\\\"height\\\"] / 2 / abs(dy) ...)\" always intersects a rectangular boundary. Following the documented decision/fan-out branch with a diamond at (0,0) and a target at (280,140) starts the arrow at (170,80), outside the diamond's visible boundary. Diagonal ellipse connections have the same problem, and check does not reject them.",
+          "fix": "Calculate boundary intersections according to the element type: rectangular, elliptical or diamond. Account for rotation when connecting existing shapes, or explicitly route unsupported geometry to the worker instead of generating detached endpoints."
+        },
+        {
+          "id": "D8-4",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/excalidraw/scripts/scene.py",
+          "line": 160,
+          "evidence": "\"cx, cy = container[\\\"x\\\"] + container[\\\"width\\\"] / 2, container[\\\"y\\\"] + container[\\\"height\\\"] / 2\" also positions arrow labels. Arrow width and height are absolute, while points may be negative. A labelled Postgres->API Service connection in the supplied architecture fixture gets its text centered at x=610 although the arrow midpoint is x=510.",
+          "fix": "For arrow containers, position bound text from the actual points translated by the arrow's x/y, rather than from its unsigned width/height. Preserve box-centering behavior for node labels and verify labelled connections pointing left and upward."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 43,
+          "evidence": "\"`edit` and `new` write through a `.tmp` file and refuse to write if `check` fails, so the original survives a bad edit.\" repeats line 26: \"the commands ... refuse to write a scene that fails `check`\"",
+          "fix": "Merge the two statements: keep the refusal guarantee once, in line 26 or line 43, and add the `.tmp` detail to it."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 41,
+          "evidence": "The new-diagram route gives only the geometry (\"boxes are 180x80; gaps 100 horizontal, 60 vertical\") and \"give each branch an explicit `y`\", with no method for laying out a non-linear flow",
+          "fix": "Add a short layout procedure before the spec: put the main path on y=0 left to right, offset each decision branch by \u00b1140 in y at the decision node's x plus 280, and run `summary` on OUT to confirm every edge before reporting."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "tests/skills/excalidraw/test_scene.py",
+          "line": null,
+          "evidence": "No test or eval exercises the \"refusing to write an invalid scene\" branch caused by an already-broken original (SKILL.md line 44), or relabelling an arrow label, although SKILL.md documents both paths",
+          "fix": "Add a test that edits a fixture with a pre-existing dangling binding and asserts exit 1, the 'refusing to write an invalid scene' message and no output file. Add an eval prompt that asks to rename an arrow label and asserts that the agent uses `--relabel` and reads the resulting diff correctly."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 47,
+          "evidence": "\"Anything in `removed_*` or `relabelled` that the user did not ask for is a bug: discard NEW and redo the edit\". diff keys connections by (start, end, label), so a requested `--relabel` of an arrow label shows up as one removed and one added connection, not under `relabelled`",
+          "fix": "Add: \"Relabelling an arrow shows in diff as one removed and one added connection between the same two boxes; that pair is expected, not a bug.\""
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 41,
+          "evidence": "\"`new` and `edit --add-node` refuse a duplicate\". In scene.py the duplicate check uses labels(scene), which includes arrow labels, so `--add-node \"HTTPS\"` is refused when an arrow is labelled HTTPS",
+          "fix": "Document it: \"`--add-node` also refuses a label that an existing arrow already uses; pick a different box label.\" Or limit the check in scene.py to labels whose container is a shape."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

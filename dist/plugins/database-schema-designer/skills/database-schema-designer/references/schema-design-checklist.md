@@ -1,116 +1,17 @@
-# Database Schema Design Checklist
+# Schema review checklist
 
-Complete checklist for designing and reviewing database schemas.
+Use this for an existing schema or a final design. Each check asks a question and points to its rule, either a SKILL.md gotcha or a section of `references/migrations.md`; the rules are not restated here. Mark any check that does not apply as `n/a` with a reason. Never leave a check silently unanswered.
 
----
+## Checks, highest risk first
 
-## Pre-Design
+1. **Tenant isolation.** Can any reference point at another tenant's row? On MongoDB, apply the MongoDB gotcha instead of composite FKs. Every child of a tenant-owned parent needs the tenant column inside a composite FK (gotcha: cross-tenant references). Check `ON DELETE SET NULL` on those FKs too (gotcha: composite SET NULL).
+2. **Integrity.** Does every relationship the app relies on have an enforced FK, on an engine and connection that enforce it (gotchas: MyISAM, SQLite)? Is each `ON DELETE` a deliberate choice? A `CASCADE` from a high-fanout parent can delete millions of rows in one transaction.
+3. **Uniqueness.** Do nullable unique columns and soft-deleted rows behave as the domain needs (gotchas: unique NULLs, soft delete)? Is there a natural key that should be unique per tenant, `UNIQUE (organization_id, slug)`, rather than globally?
+4. **Types.** Is each time column an instant, a civil date or a local wall time, and is its type right (gotcha: time types)? Does money use an exact type with a currency (gotcha: money)? Are any IDs or tokens whose format the app depends on about to change (gotcha: column meaning)?
+5. **Secrets and personal data.** Classify each secret column. Is it a verifier the app only compares against? Then a password uses a password KDF (argon2id, scrypt or bcrypt), and a high-entropy API token verified locally uses a cryptographic hash such as SHA-256, optionally an HMAC with a pepper. Is it a secret the app must use later, such as an OAuth refresh token or a third-party API key? Then encrypt it with a managed key: hashing it makes it unusable, and plaintext leaks it. Are personal-data columns identified, so retention and deletion can be applied?
+6. **Index coverage.** For each index, name the query or FK path it serves. An index whose columns are a leading prefix of another index is only a candidate for removal. Before removing it, compare constraint ownership (an index backing a PRIMARY KEY, UNIQUE or exclusion constraint stays unless an equivalent constraint remains enforced), uniqueness, partial predicates, expressions, operator classes, collation and sort order. Then confirm with the workload's plans. For each FK, record either the index that covers it or why none is needed (gotcha: FK indexing). For each hot query, check that equality columns lead and range or sort columns follow, and confirm with the plan command from SKILL.md workflow step 2.
+7. **Live-change safety** (live schemas only). For every planned DDL statement, what is its lock and does it rewrite the table? How do writes that arrive during the backfill reach the new column? What is the recovery path, and what data would it lose? Answer each from `references/migrations.md`.
 
-- [ ] **Requirements Gathered**: Understand data entities and relationships
-- [ ] **Access Patterns Identified**: Know how data will be queried
-- [ ] **SQL vs NoSQL Decision**: Chosen appropriate database type
-- [ ] **Scale Estimate**: Expected data volume and growth rate
-- [ ] **Read/Write Ratio**: Understand if read-heavy or write-heavy
+## Report format
 
----
-
-## Normalization (SQL)
-
-- [ ] **1NF**: Atomic values, no repeating groups
-- [ ] **2NF**: No partial dependencies on composite keys
-- [ ] **3NF**: No transitive dependencies
-- [ ] **Denormalization Justified**: If denormalized, reason documented
-
----
-
-## Table Design
-
-### Primary Keys
-
-- [ ] **Primary Key Defined**: Every table has primary key
-- [ ] **Key Type Chosen**: INT auto-increment or UUID
-- [ ] **Meaningful Keys Avoided**: Not using email/username as PK
-
-### Data Types
-
-- [ ] **Appropriate Types**: Correct data types for each column
-- [ ] **String Sizes**: VARCHAR sized appropriately
-- [ ] **Numeric Precision**: DECIMAL for money, INT for counts
-- [ ] **Dates in UTC**: TIMESTAMP for datetime columns
-
-### Constraints
-
-- [ ] **NOT NULL**: Required columns marked NOT NULL
-- [ ] **Unique Constraints**: Unique columns (email, username)
-- [ ] **Check Constraints**: Validation rules (price >= 0)
-- [ ] **Default Values**: Sensible defaults where appropriate
-
----
-
-## Relationships
-
-### Foreign Keys
-
-- [ ] **Foreign Keys Defined**: All relationships have FK constraints
-- [ ] **ON DELETE Strategy**: CASCADE, RESTRICT, SET NULL chosen
-- [ ] **ON UPDATE Strategy**: Usually CASCADE
-- [ ] **Indexes on Foreign Keys**: All FKs are indexed
-
-### Relationship Types
-
-- [ ] **One-to-Many**: Modeled correctly
-- [ ] **Many-to-Many**: Junction table created
-- [ ] **Self-Referencing**: Parent-child relationships handled
-- [ ] **Polymorphic**: Strategy chosen (separate FKs or type+id)
-
----
-
-## Indexing
-
-### Index Strategy
-
-- [ ] **Primary Key Indexed**: Automatic, verify
-- [ ] **Workload Fit**: Check existing leading-prefix coverage and equality/range/order requirements against representative queries
-- [ ] **Foreign-Key Costs**: Evaluate join and parent-delete costs, engine behavior, and write amplification before adding indexes
-- [ ] **Composite Order**: Choose column order from predicates, ordering, and representative execution plans; selectivity alone is insufficient
-
-### Index Limits
-
-- [ ] **Not Over-Indexed**: Only necessary indexes
-- [ ] **Index Maintenance**: Aware of write impact
-
----
-
-## Performance
-
-- [ ] **Joins Optimized**: N+1 queries avoided
-- [ ] **SELECT * Avoided**: Only fetch needed columns
-- [ ] **Pagination**: LIMIT/OFFSET or cursor-based
-- [ ] **Aggregations**: Pre-calculated for expensive queries
-
----
-
-## Migrations
-
-- [ ] **Backward Compatible**: New columns nullable initially
-- [ ] **Up and Down**: Rollback scripts provided
-- [ ] **Data Migrations Separate**: Schema vs data separated
-- [ ] **Tested on Staging**: Migrations tested
-
----
-
-## Security
-
-- [ ] **Least Privilege**: Minimal database permissions
-- [ ] **Separate Accounts**: Read-only vs read-write
-- [ ] **Sensitive Data**: Passwords hashed, PII encrypted
-- [ ] **Parameterized Queries**: SQL injection prevented
-
----
-
-## Documentation
-
-- [ ] **ERD Created**: Entity-relationship diagram
-- [ ] **Schema Documented**: Column descriptions
-- [ ] **Indexes Documented**: Why each index exists
-- [ ] **Migration History**: Changelog of changes
+Order findings by severity: data corruption or cross-tenant leak, then integrity gap, then performance, then hygiene. Every finding gives the table and column, the failure it causes, and its own complete corrected DDL. Write every statement in full with this finding's names. If you offer alternative paths, each path also writes every statement in full; otherwise offer only one path. A finding that depends on another finding's DDL, such as an index, repeats that statement instead of writing "needs F10's index". Never write "same pattern as F7", and never shorten a list to "then: DROP TRIGGER, DROP FUNCTION, ...", because each finding may be applied, reverted or ticketed separately. A finding that is not a schema change, such as a cleanup or retention job, a backfill or a role grant, gives the exact SQL statement to run instead of advice. A finding with no runnable fix is incomplete. End with every `Assumption:` used and each trade-off left open.

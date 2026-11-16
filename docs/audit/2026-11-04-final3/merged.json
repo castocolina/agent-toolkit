@@ -1,0 +1,382 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": false,
+  "skills": [
+    {
+      "name": "react-useeffect",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 92.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/react-useeffect/references/anti-patterns.md",
+          "line": 9,
+          "evidence": "The catalog repeats standard React guidance already present in the mandatory routing table, including \"`useEffect(() => setX(f(a, b)), [a, b])`\" becoming \"`const x = f(a, b)`\" and \"Call `onChange` in the same handler that sets state, or make the component controlled\". These repeated recipes, together with standard subscription boilerplate, leave a substantial activation/tutorial share by line count despite the stronger async and initialization material.",
+          "fix": "Collapse the duplicated derived-state, event-handler and full-key-reset rows into a short pointer to SKILL.md. Keep the reference focused on non-obvious partial resets, guarded async error/finally writes, request identity, retries and initialization lifetimes; shorten ordinary listener boilerplate without removing its snapshot and hydration constraints."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/react-useeffect/evals/evals.json",
+          "line": 2,
+          "evidence": "The six output cases cover \"derived-name\", \"query-race\", \"external-widget\", \"strict-mode-fetch-errors\", \"init-runs-twice\" and \"partial-reset-casual\", but none exercises the external-store snapshot or React-version-dependent non-reactive-read branches.",
+          "fix": "Add output cases for an uncached object snapshot with server hydration and for a non-reactive read on React 18 versus React 19.2. Assert snapshot stability, matching server/hydration values, correct dependency retention and the appropriate Effect Event or committed-ref implementation."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/react-useeffect/SKILL.md",
+          "line": 18,
+          "evidence": "The routing table sends \"Widget, browser API, connection, analytics on display\" to \"`useEffect` with cleanup that undoes this setup\", and the correctness loop universally requires cleanup to reverse setup. However, references/anti-patterns.md says \"A doubled analytics call in development is expected; react.dev recommends leaving it.\" A new analytics task is therefore routed to an irreversible operation while being required to undo it.",
+          "fix": "Separate disposable-resource synchronization from fire-and-forget display analytics in the routing table. Qualify the cleanup invariant as applying when setup acquires a reversible resource, and state inline that sent analytics cannot be undone and development replay duplication is expected rather than something to suppress with a ref guard."
+        }
+      ]
+    },
+    {
+      "name": "mermaid-diagrams",
+      "percent": 97.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+          "line": 19,
+          "evidence": "\"What share of a whole? | `pie` | breakdown, split\" is one of several elementary type-purpose mappings in the selection table; the state, Git and Gantt rows likewise repeat familiar format knowledge.",
+          "fix": "Condense the familiar state, Git, Gantt and pie mappings into one short reminder. Preserve the valuable decision rules distinguishing API interactions from control flow, C4 from infrastructure diagrams, and inferred preferences from explicitly required formats."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/mermaid-diagrams/evals/evals.json",
+          "line": 300,
+          "evidence": "\"States an expected rendered height-to-width ratio of 0.4 or more, or says the diagram was checked against that ratio\" requires a particular reporting detail, while authoring-rules.md treats 0.4 as a warning sign and explicitly permits readable short, wide diagrams.",
+          "fix": "Replace this assertion with a readability check at the target column width, accepting a ratio below 0.4 when the text remains readable. Require splitting only when the documented readability limits fail, and accept an explicit inability to verify dimensions when rendering is unavailable."
+        }
+      ]
+    },
+    {
+      "name": "naming-analyzer",
+      "percent": 97.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 41,
+          "evidence": "The boolean example recommends changing `disableRetry = false` to positive polarity (`retryEnabled`), while the introduction routes approved renames through an IDE rename or codemod. A symbol-only rename produces `retryEnabled = false`, reversing the original meaning.",
+          "fix": "Distinguish the spelling-only rename `isNotHidden` \u2192 `isVisible` from the semantic inversion `disableRetry` \u2192 `retryEnabled`. Require the report to state `retryEnabled = !disableRetry` and identify the necessary inversions of defaults, reads, writes and tests; explicitly say this is not safe as a symbol-only IDE rename. Preserve external contract semantics through mappings where applicable."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/naming-analyzer/SKILL.md",
+          "line": 40,
+          "evidence": "For a `tempDir` that is never deleted and is reused across runs, the prescribed verdict is \"it is a cache: `cacheDir` (its lifecycle is the meaning)\". Persistence alone does not establish that the contents are disposable or reconstructible; the directory could contain durable application state or a persistent workspace.",
+          "fix": "Require evidence that the contents are disposable or reconstructible before recommending `cacheDir`. When only persistence is established, ask what the directory stores or give tentative alternatives such as `stateDir` or `workspaceDir`, each tied to the evidence that would establish its meaning."
+        }
+      ]
+    },
+    {
+      "name": "plugin-forge",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 28,
+          "evidence": "\"For a scaffold-only or bump-only request, the contract above is enough; do not load the references.\" This blanket exception conflicts with step 1, which requires plugin-structure.md and marketplace-schema.md when scaffolding outside the standard directory or in a remote repository.",
+          "fix": "Limit the no-reference exception to standard-layout scaffold-only requests and bump-only requests already covered by the contract. Explicitly retain the required reference reads for other-local and remote scaffolding."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/plugin-forge/SKILL.md",
+          "line": 25,
+          "evidence": "\"<plugin-dir> is the entry's ./ path, or a local checkout of the remote repository\" does not resolve a git-subdir source's path within that checkout. For an entry with path tools/release-kit, this directs validation at the repository root rather than the plugin directory. The subsequent workflows.md also hardcodes standard-layout paths in its --plugin-dir, staging and tagging examples despite accepting other-local and remote sources.",
+          "fix": "Define the resolved plugin directory during source routing: marketplace-root plus resolved source for local plugins, repository checkout root for whole-repository sources, and checkout root plus source.path for git-subdir. Use that directory consistently for validation, --plugin-dir and tagging. Branch publication instructions so other-local paths are staged correctly and remote plugin changes are committed in their source repository separately from marketplace.json."
+        }
+      ]
+    },
+    {
+      "name": "session-handoff",
+      "percent": 97.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/session-handoff/scripts/check_staleness.py",
+          "line": 359,
+          "evidence": "The SLIGHTLY_STALE branch instructs 'Read the listed commits and changed files, then resume', but the default text report prints only \"Files changed: {result.get('files_changed_count', 0)}\" and never lists changed paths. The JSON result also truncates files_changed to ten paths without an explicit truncation notice.",
+          "fix": "Print changed-file paths in the default report. When the list is truncated, identify that explicitly and provide `git diff --name-only '<baseline>' HEAD` plus `git status --short --untracked-files=all` to inspect the complete committed and working-tree changes. Require that review before the SLIGHTLY_STALE branch resumes."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/session-handoff/SKILL.md",
+          "line": 59,
+          "evidence": "'UNKNOWN by cause (the report\u2019s Issues line says which)' covers a non-ancestor baseline, an absent baseline and a non-git project. However, check_staleness.py:289-293 also returns UNKNOWN for a missing timestamp or failed git comparison, combining those causes into 'Missing timestamp/baseline commit or git comparison unavailable'. Neither additional cause has a recovery branch.",
+          "fix": "Distinguish UNKNOWN causes in the script report and add recovery entries for missing or invalid Created timestamps and failed Git comparisons. Restore timestamps only from trustworthy evidence; otherwise require manual verification of relevant files, assumptions, blockers and next steps. For failed comparisons, diagnose and retry the read-only Git operation, or explicitly use manual verification before resuming."
+        }
+      ]
+    },
+    {
+      "name": "jira",
+      "percent": 98.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 98.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/jira/evals/evals.json",
+          "line": 54,
+          "evidence": "The post-create-dropped-field case supplies only \"evals/files/create-response.json\" and \"evals/files/readback-proj-88.json\", but asserts \"Identifies that the requested priority High was silently dropped and the issue has Medium.\" Neither input nor its prompt establishes the approved priority, so an isolated run cannot verify that High was requested.",
+          "fix": "Add evals/files/approved-draft-proj-bug.md to this case's files, or explicitly state the approved priority in its prompt. If using that draft, also align the read-back summary with it or assert detection of the summary mismatch, so the expected report accounts for all supplied evidence."
+        }
+      ]
+    },
+    {
+      "name": "pr-diagrams",
+      "percent": 96.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/pr-diagrams/SKILL.md",
+          "line": 10,
+          "evidence": "\u201cA harness that does not substitute `${CLAUDE_SKILL_DIR}` uses `bash ~/.claude/skills/pr-diagrams/scripts/pr-diagrams.sh`.\u201d This fallback assumes a Claude user-level installation; it does not resolve project-local installations, plugin installations, or other harnesses' skill directories.",
+          "fix": "Resolve scripts/pr-diagrams.sh relative to the SKILL.md actually loaded. Use CLAUDE_SKILL_DIR when available; otherwise use that skill's resolved absolute directory rather than assuming ~/.claude/skills."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+          "line": 65,
+          "evidence": "`git fetch origin \"$base\" \"$head\"` is followed by `shas=$(git rev-list --reverse \"origin/$base..origin/$head\")`. In a single-branch clone whose remote fetch mapping includes only the base branch, fetching the head this way does not establish origin/<head>, so discovery fails despite a successful fetch.",
+          "fix": "Fetch both branches with explicit destination refspecs, such as \"+refs/heads/$base:refs/remotes/origin/$base\" and \"+refs/heads/$head:refs/remotes/origin/$head\", before computing the range. Add a regression test with a narrow remote.origin.fetch mapping and no existing head tracking ref."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+          "line": 217,
+          "evidence": "The command dispatch accepts only `repo`, `related`, `reviewers`, and `render`; `--help` falls through to `die \"usage: pr-diagrams.sh repo|related|reviewers|render ...\"`, exiting 1 without documenting arguments or flags.",
+          "fix": "Add -h/--help handling that exits 0 and documents subcommand arguments, exclusion flags, environment overrides, prerequisites, and output formats. Add a smoke test for the help interface."
+        }
+      ]
+    },
+    {
+      "name": "react-dev",
+      "percent": null,
+      "grade": "UNJUDGED",
+      "judges": {},
+      "missing_judges": [
+        "router-env-my-referee-one",
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": []
+    },
+    {
+      "name": "skill-updater",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 27,
+          "evidence": "\"`stale: false` is `current`.\" The referenced audit.py computes stale solely as source_updated > ours_updated. An unrelated local SKILL.md commit newer than an unreviewed upstream change therefore takes this branch and records current without inspecting that change, even when last_upstream_sha identifies an older reviewed revision.",
+          "fix": "Treat the timestamp result as a preliminary signal, not proof of currency. Compare the applicable current upstream revision with last_upstream_sha and inspect unreviewed changes even when stale is false; when no verified review base exists, compare the current source against the artifact before recording current."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 38,
+          "evidence": "\"A row that already has `new_path` gets `--new-path <that value>` on every call unless the user corrected the source.\" If an already-moved path moves again, step 5 confirms a replacement candidate, but this later instruction requires passing the previous new_path because source has not changed.",
+          "fix": "Preserve an existing new_path only when the review has not confirmed a replacement. Explicitly require a newly confirmed candidate to replace the previous new_path on a path-moved call, while leaving source unchanged pending the user's decision."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 22,
+          "evidence": "For an invalid entry, the procedure says \"give no `track` command for it\", while step 7 still requests one call per other source row. audit.py track updates last_reviewed and reviewed_for_model across every row of the artifact and validates rewritten siblings, so tracking a valid source can fail because another source row is malformed.",
+          "fix": "Before issuing any track call, check all registry rows belonging to the artifact. If any source row is malformed, defer tracking the entire artifact, propose the correction in updates.md, and rerun the review after the registry is corrected."
+        },
+        {
+          "id": "D8-4",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 39,
+          "evidence": "\"Judge the artifact with `skill-judge` when its content changed; the commit must touch `SKILL.md` or `references/` (step 3).\" The skill also supports commands/<name>.md and agents/<name>.md, whose legitimate content changes do not touch either skill-specific path.",
+          "fix": "Scope the SKILL.md/references history requirement to upstream-tracked skills. For changed commands and agents, judge the corresponding commands/<name>.md or agents/<name>.md and allow the commit to touch that artifact without requiring unrelated skill-file changes."
+        }
+      ]
+    },
+    {
+      "name": "ui-ux-principles",
+      "percent": null,
+      "grade": "UNJUDGED",
+      "judges": {},
+      "missing_judges": [
+        "router-env-my-referee-one",
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": []
+    },
+    {
+      "name": "writing-clearly-and-concisely",
+      "percent": null,
+      "grade": "UNJUDGED",
+      "judges": {},
+      "missing_judges": [
+        "router-env-my-referee-one",
+        "router-env-my-referee-two",
+        "router-env-my-referee-three"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": []
+    }
+  ],
+  "needs_update": true
+}

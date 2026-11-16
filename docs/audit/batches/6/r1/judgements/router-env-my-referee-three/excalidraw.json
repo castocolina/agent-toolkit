@@ -1,0 +1,68 @@
+{
+  "skill": "excalidraw",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 8,
+      "evidence": "Scene files are mostly noise: every element carries 20+ styling and geometry fields... A 14-element scene is about 4k tokens, a 79-element one about 22k.",
+      "fix": "Shorten this paragraph to one clause, for example 'labels and connections are under 10% of a scene file', because line 10 already gives the agent the reason it needs (80 lines of JSON against 12 from summary). The token measurements stay in README.md, which already holds them."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/excalidraw/evals/evals.json",
+      "line": null,
+      "evidence": "'small-file-exception' (notes/box.excalidraw), 'compare-two-versions' (infra-v1/infra-v2.excalidraw) and 'embedded-png-rename' (docs/login-flow.excalidraw.png) name input files but have no 'files' entry, and none of these files exists in evals/files/",
+      "fix": "Add evals/files/box.excalidraw (one labelled box), infra-v1.excalidraw and infra-v2.excalidraw (one relabel, one added and one removed connection), and a small .excalidraw.png with an embedded scene. List each in the eval's 'files' array, then assert the exact label and the exact diff entries the agent must report."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 12,
+      "evidence": "All commands run from this skill's directory: `python3 scripts/scene.py <command>`",
+      "fix": "Replace with: 'Run `python3 <skill-dir>/scripts/scene.py <command>` from the user's working directory, or pass absolute paths for FILE, SPEC and -o.' Under the current wording, the relative paths in the examples (architecture.excalidraw.json, docs/...) and in worker step 4 resolve against the skill directory and fail with 'not readable JSON'."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/excalidraw/SKILL.md",
+      "line": 42,
+      "evidence": "Nodes default to a left-to-right row; a node may be `{\"label\", \"x\", \"y\", \"shape\"}`",
+      "fix": "Add one line on branching diagrams, for example: 'For a decision or fan-out, give each branch an explicit y offset (box 180x80, gaps 100 horizontal and 60 vertical); node labels must be unique, because edges resolve nodes by label.' Without it, the `new` route is a straight row and leaves the agent guessing coordinates."
+    }
+  ]
+}

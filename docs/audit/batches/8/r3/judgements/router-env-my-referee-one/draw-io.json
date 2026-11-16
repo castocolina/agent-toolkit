@@ -1,0 +1,59 @@
+{
+  "skill": "draw-io",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 190,
+      "evidence": "'NEVER rely on `defaultFontFamily`: the export ignores it' repeats the explanation at line 138. The container-parent and edge-paint-order explanations similarly recur at lines 99/188 and 118/189. Line-weighted review finds predominantly expert content, but these repeated explanations add little knowledge.",
+      "fix": "Retain the concise Gotchas warnings and the worked examples. Reduce line 138 to the actionable per-cell fontFamily instruction, and consolidate the duplicated parent and paint-order rationale so each explanation appears once."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "line": 123,
+      "evidence": "'if b\"IDAT\" not in kinds ...' checks that an IDAT chunk exists, but its contents are never decoded. A PNG with valid chunk CRCs, valid embedded XML, and an invalid zlib stream in IDAT passes this gate and reaches 'mv -f', replacing the previous PNG with an image that cannot render.",
+      "fix": "Fully decode the temporary PNG before replacing the destination, using a PNG decoder with declared dependencies or complete IDAT/scanline validation. Treat decoding failures as per-file failures that preserve the previous PNG; add a CRC-correct but undecodable-IDAT regression case."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "line": 126,
+      "evidence": "'doc.tag == \"mxfile\" and doc.find(\"diagram\") is not None' accepts an embedding such as '<mxfile><diagram>not-base64</diagram></mxfile>'. The outer XML parses, but compressed diagram contents are never decoded or checked, so the script can report an editable PNG whose embedded diagram cannot open.",
+      "fix": "Validate the embedded graph rather than only its wrapper. For each mxfile diagram, require a structurally valid inline mxGraphModel or base64-decode, raw-DEFLATE-decompress, URL-decode, and parse the compressed page. Reject empty or undecodable diagrams before replacing the previous PNG."
+    }
+  ]
+}

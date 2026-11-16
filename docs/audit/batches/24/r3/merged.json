@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "gemini",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6,
+        "router-env-my-referee-one": 98.4
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/gemini/SKILL.md",
+          "line": 43,
+          "evidence": "## Command shapes repeats the `timeout --kill-after=10s 300 gemini -m gemini-3-pro-preview --approval-mode default -p` invocation already given at line 33, which spends about 20 lines on near-duplicate commands",
+          "fix": "Keep the two shapes that teach something new (the --include-directories form and the stdin plan form). Replace the third with one line pointing to the step 3 command, and keep the interactive shape only for its `--foreground` difference."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/gemini/SKILL.md",
+          "line": 25,
+          "evidence": "1. **Scope.** Name the target paths and criteria. A plan review with no plan text or path: ask for it; do not launch.",
+          "fix": "Add a short framework before launching. Ask what question Gemini should answer that the current agent cannot answer alone, which should usually be the cross-directory or >200k-token view. If the scope is too large even for Gemini, split it into passes by directory with the same criteria and merge the verified findings afterwards."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/gemini/SKILL.md",
+          "line": 62,
+          "evidence": "`timeout --foreground --kill-after=10s 1800 gemini ...` uses 1800 s, but Defaults (line 14) gives only 300 and 900 and never explains 1800",
+          "fix": "Add to Defaults: 'Interactive sessions: 1800 s with --foreground, because the user is driving the session.' Otherwise use 300 or 900 in the interactive example so the timeout default stays a single rule."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/gemini/evals/evals.json",
+          "line": null,
+          "evidence": "No eval covers the step 2 secret-file scan, the >5 --include-directories limit or an exit-0-with-empty-response run. The seven evals cover proposal, yolo, interactive, stdin, verification, timeout and trust.",
+          "fix": "Add an eval whose target contains a `.env` fixture in `evals/files/` and assert that the agent lists it and either isolates the target or asks before launching. Add a second eval with seven target directories and assert that it does not pass more than 5 --include-directories."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/gemini/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "Several queries are terse and have no context, e.g. \"write a Python script to scan our repository\" and \"make a small code change in this repository yourself\". These are weak negatives with little keyword overlap.",
+          "fix": "Replace the weak negatives with near-misses that include realistic context, for example \"~/proj/.gemini/settings.json has a bad MCP entry, can you fix the config?\" or \"get codex to review src/auth before I merge\". Add file paths to the terse positives."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/gemini/SKILL.md",
+          "line": 26,
+          "evidence": "\"--include-directories (repeat the flag or comma-separate, 5 at most)\" and \"Any hit: keep it out as the workspace gotcha says\". There is no branch for more than six targets and no concrete command for the isolated copy.",
+          "fix": "Add two fallbacks. With more than 6 targets, cd to their common parent if it holds no secrets, or split the targets into several runs. When the secret scan finds a file, give the exact isolation step, for example `rsync -a --exclude='.env*' --exclude='*.pem' <target>/ \"$(mktemp -d)\"/`, then cd into the copy."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/gemini/SKILL.md",
+          "line": 27,
+          "evidence": "\"Rule: `cd` into the first target and pass every other target with `--include-directories`.\" This has no branch for source-file targets: reviewing /work/app/src/auth.ts would attempt to change into a file, failing before Gemini launches.",
+          "fix": "Distinguish file targets from directory targets before constructing the command. For a source file, change into its repository root or containing directory and name the file in the prompt; pass only directories through `--include-directories`. Retain the stdin route for external standalone files, and perform the secret scan against the resulting workspace."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

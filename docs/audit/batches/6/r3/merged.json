@@ -1,0 +1,72 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "excalidraw",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-one",
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 53,
+          "evidence": "1. Copy the original; edit the copy only.",
+          "fix": "Fold this generic safe-edit step into step 5 (\"replace the original only after check and diff pass\"). The model already knows to work on a copy; the Excalidraw-specific part is the check and diff gate."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 82,
+          "evidence": "Move bound text by the same offset and recompute arrow endpoints, or the drawing shows detached lines.",
+          "fix": "Add a short move procedure to the worker contract, since moving a shape is the most common worker task: for a shift (dx, dy), add it to the shape's x/y and to its bound text's x/y. For each bound arrow, shift the arrow's x/y when the shape is its start, or add (dx, dy) to the last point in `points` when the shape is its end. Then bump `version` on every element you touched."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 44,
+          "evidence": "`edit` refuses with `refusing to write an invalid scene` and the errors are not from your change",
+          "fix": "Add an output eval to evals/evals.json that uses an input file with an existing dangling binding. It should assert that the agent runs `check`, repairs only the named errors on a copy, and then reruns the same `edit`. Add a second eval for a `.excalidraw.md` file that asserts the agent asks for a plain `.excalidraw` export."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 41,
+          "evidence": "Node labels must be unique, because edges resolve nodes by label.",
+          "fix": "Make the rule enforced, not just stated. Today scripts/scene.py new_scene silently overwrites `boxes[norm(label)]`, so a duplicate label sends edges to the last box with that label. Raise SceneError(\"duplicate node label ...\") in new_scene and note in SKILL.md that `new` rejects duplicate labels."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/excalidraw/SKILL.md",
+          "line": 12,
+          "evidence": "(stdlib only, JSON on stdout, exit 1 on any error)",
+          "fix": "Change to \"exit 1 on errors, 2 on bad usage (argparse)\" to match the script's docstring and behaviour, so an agent does not misread exit code 2."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

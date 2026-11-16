@@ -1,0 +1,108 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "daily-meeting-update",
+      "percent": 92.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 91.2,
+        "router-env-my-referee-one": 93.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 41,
+          "evidence": "Ask only for the required answers still missing, in one grouped message.",
+          "fix": "Cut this generic interview advice, which the model already follows, and keep only the non-obvious part: 'Ask for topics even when tools found plenty: no tool can detect them.'"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 30,
+          "evidence": "## Gotchas sits between '## 2. Optional integrations' and '## 3. Interview', splitting the numbered process flow",
+          "fix": "Move the Gotchas section after step 4, or nest it as a step-2 subsection. Also add a one-line checklist (fast path \u2192 consent \u2192 queries \u2192 gates \u2192 render) so the Process pattern has explicit checkpoints."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 23,
+          "evidence": "`gh search prs ... --updated \">=DATE\"` while the digest filters by local calendar day",
+          "fix": "Add a gotcha saying that GitHub search date qualifiers are evaluated in UTC while claude_digest.py uses the local day. Late-evening work can land on the wrong day, so widen DATE by one day and confirm borderline items with the user."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/evals/evals.json",
+          "line": 36,
+          "evidence": "gh-prs.json is `gh pr list --repo acme/payments --author @me --state all --json number,title,state,isDraft,headRefName,mergedAt`",
+          "fix": "Regenerate evals/files/gh-prs.json in the output shape of the skill's own `gh search prs` queries (authored and reviewed). Add an eval where a PR and a session must be merged without a headRefName field, so the eval exercises the commands the skill actually prescribes."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 45,
+          "evidence": "Merge only the same work item: entries become one bullet when they share a ticket key, a PR (or its head branch)... \u2014 but the step-2 query requests only `--json number,title,state,isDraft,url`",
+          "fix": "Followed the branch 'digest session on branch X + authored PR': the prescribed `gh search prs` output has no head branch, so this merge condition cannot fire. For each PR you plan to merge, add `gh pr view NUMBER --repo OWNER/REPO --json headRefName` to the table, or change the gate to merge on PR number or ticket key and otherwise ask the user."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 25,
+          "evidence": "Jira (MCP first, CLI only without it) | JQL `assignee = currentUser() AND updated >= \"DATE\"`",
+          "fix": "Name the MCP operation to call, for example the Atlassian MCP JQL search tool with this JQL. State the fallback when neither MCP nor `jira` is present: skip Jira in one line and continue to the interview."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 25,
+          "evidence": "The prescribed JQL is `assignee = currentUser() AND updated >= \"DATE\"`. Although step 2 obtains approval for specific Jira projects, this query has no project restriction and can retrieve tickets from unapproved projects.",
+          "fix": "Include the approved project keys in every MCP and CLI query: `project IN (\"APPROVED_KEY\") AND assignee = currentUser() AND updated >= \"DATE\"`. Require a confirmed project scope before querying, and never fall back to an account-wide query when a scoped request fails."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 32,
+          "evidence": "The gotcha says '`gh search prs` reports `state` as `open`, `merged` or `closed`'. GitHub search results report open/closed, not a separate merged state. The prescribed search fields also omit merge timestamps and head branches, leaving the terminal-outcome and branch-based deduplication gates without the metadata used by the supplied integration eval.",
+          "fix": "Correct the search-state guidance. For relevant results, fetch scoped details with `gh pr view NUMBER --repo OWNER/REPO --json number,title,state,mergedAt,headRefName,url`. Use confirmed merge status and timing to establish yesterday's completed work, and headRefName to associate sessions with PRs. Never equate closed with merged; if details cannot be retrieved, ask the user rather than infer completion."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 55,
+          "evidence": "'Never report an investigation or an open PR as delivered' repeats the Interview provenance gate, which already says files, command counts, commits and open PRs are activity rather than outcomes. The related activity-versus-intent principle is restated again at line 57.",
+          "fix": "Consolidate the provenance rule and its planning consequence into one authoritative gate, and reference that gate elsewhere. Preserve the distinct comment-only-update caveat, session privacy rules and project/branch handling, which add information rather than repeat the principle."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

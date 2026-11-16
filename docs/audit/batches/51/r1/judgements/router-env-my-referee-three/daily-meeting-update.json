@@ -1,0 +1,59 @@
+{
+  "skill": "daily-meeting-update",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 82,
+      "evidence": "Never let tool activity replace the why, the blockers or the plans: tools show motion, not intent or impediments.",
+      "fix": "Delete this line. Step 3 already makes the same point with a concrete action on line 42 (\"Ask for topics even when tools found plenty\") and in the Provenance gate, so this generic reminder only uses context."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/evals/evals.json",
+      "line": null,
+      "evidence": "Six evals cover the manual, GitHub, digest, contradiction and Monday paths, but none uses Jira input",
+      "fix": "Add an eval with an evals/files/jira-issues.json fixture holding one ticket resolved as Won't Do and one as Done yesterday. Assert that the Won't Do ticket is reported as a triage outcome and not as delivered, and that only the Done ticket whose resolutiondate falls in the window appears under Yesterday."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 19,
+      "evidence": "On Monday or after leave, ask which day counts before querying.",
+      "fix": "Add what to do when the user names a span of days (for example Friday to Sunday): \"If the window covers several days, run `claude_digest.py --date D --format json` once per day and merge the sessions by id. Use the first day as DATE for the gh and Jira queries, and keep only events whose own time falls inside the span.\" The digest accepts only a single --date, so this path is undefined today."
+    }
+  ]
+}

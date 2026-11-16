@@ -1,0 +1,90 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "database-schema-designer",
+      "percent": 96.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0,
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 41,
+          "evidence": "**Money.** On PostgreSQL and MySQL use fixed-scale `NUMERIC`/`DECIMAL`, never floating point.",
+          "fix": "Delete the PostgreSQL/MySQL 'never floating point' clause, because the model already knows it. Keep the expert parts: SQLite DECIMAL affinity storing 0.1 as REAL, INTEGER minor units with a CHECK, Decimal128 on MongoDB and the currency column."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 42,
+          "evidence": "Shape changes happen in place, in this order: (1) deploy readers that accept both shapes everywhere; (2) deploy writers ... (5) only then tighten the validator with `collMod`.",
+          "fix": "Move the five-step MongoDB shape-change procedure into a '## MongoDB shape change' section of references/migrations.md. Keep only the one-line gotcha (no FKs, tenantId in every filter and reference, collMod does not re-check existing docs) in SKILL.md. Then the Gotchas list stays facts, and the procedures stay in the Process layer."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/database-schema-designer/evals/evals.json",
+          "line": null,
+          "evidence": "\"files\": [\"references/migrations.md\"] (also in review-legacy-tenant-schema, mysql-soft-delete-and-not-null, sqlite-price-to-cents-rebuild)",
+          "fix": "Remove the skill's own reference files from each eval's `files` list and keep only user inputs under evals/files/. Add an assertion that the run read references/migrations.md, or references/schema-design-checklist.md for the review eval. That tests whether the skill's loading triggers fire rather than handing the reference to the agent."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 12,
+          "evidence": "Contract: stop writing the old column, and only in a later deploy drop the old column in a later deploy, after checking views, triggers, replicas and reports that still read it.",
+          "fix": "Rewrite as: 'Contract: stop writing the old column; in a later deploy, after checking views, triggers, replicas and reports that still read it, drop the old column.'"
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 31,
+          "evidence": "Rolling back is another rebuild, `ALTER TABLE orders MODIFY total DECIMAL(12,2) NULL, ALGORITHM=INPLACE, LOCK=NONE;`",
+          "fix": "Use the section's running example so that the forward and recovery steps match: give the MySQL forward statement `ALTER TABLE users MODIFY phone VARCHAR(32) NOT NULL, ALGORITHM=INPLACE, LOCK=NONE;` and the rollback `ALTER TABLE users MODIFY phone VARCHAR(32) NULL, ALGORITHM=INPLACE, LOCK=NONE;`. Note that the column's full type and attributes must be restated."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/database-schema-designer/references/migrations.md",
+          "line": 31,
+          "evidence": "The MySQL recovery example says `ALTER TABLE orders MODIFY total DECIMAL(12,2) NULL, ALGORITHM=INPLACE, LOCK=NONE;` \"keeps every other column attribute as it was.\" MySQL MODIFY does not preserve omitted column-definition attributes. For an existing total column with DEFAULT 0.00 or a COMMENT, this rollback loses those attributes; the supplied fixture's DEFAULT NULL does not expose the problem.",
+          "fix": "Replace the preservation claim with a warning that MODIFY requires the complete column definition. Require SHOW CREATE TABLE before forward and recovery statements, then repeat the existing type and all attributes except the nullability being changed. For example, preserve an existing DEFAULT 0.00 with `ALTER TABLE orders MODIFY COLUMN total DECIMAL(12,2) NULL DEFAULT 0.00, ALGORITHM=INPLACE, LOCK=NONE;`, also carrying forward any existing COMMENT or other attributes."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/database-schema-designer/SKILL.md",
+          "line": 20,
+          "evidence": "\"Include every named entity as its own table or collection unless you explain the equivalent representation\" restates basic entity-modeling coverage rather than adding expert knowledge.",
+          "fix": "Remove that generic sentence while retaining the specific users-versus-membership guard and the workflow's concrete MongoDB embedding criteria."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

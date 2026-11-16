@@ -21,7 +21,7 @@ cp -r skills/skill-updater ~/.claude/skills/
 | path missing, and exactly one new path confirmed | `path-moved` |
 | path missing, several candidate paths | nothing; the candidates are listed and the user picks |
 | auth, rate-limit or network error, or no candidate path | `unreachable` |
-| a command or agent (no source rows), after the model probe | `current` on its `local` row |
+| an artifact with no source row (every command and agent), after the model probe | `current` on its `local` row |
 
 A rule written to counter a model behavior is checked with a probe before anyone proposes removing it. Nothing is edited unless you ask for the update itself.
 

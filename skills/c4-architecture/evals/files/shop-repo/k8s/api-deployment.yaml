@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-api
+  namespace: shop
+spec:
+  replicas: 3
+  selector:
+    matchLabels: { app: shop-api }
+  template:
+    metadata:
+      labels: { app: shop-api }
+    spec:
+      containers:
+        - name: api
+          image: registry.example.com/shop/api:1.12.0
+          ports: [{ containerPort: 4000 }]
+          envFrom: [{ secretRef: { name: shop-api-env } }]

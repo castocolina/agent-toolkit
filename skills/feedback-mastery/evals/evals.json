@@ -6,7 +6,7 @@
       "prompt": "I need to tell a teammate their last few PRs keep breaking tests, but I don’t want to sound harsh. Help me phrase it.",
       "expected_output": "A constructive preparation and delivery response using SBI, neutral phrasing, curiosity about causes, and an actionable next step.",
       "assertions": [
-        "Uses Situation-Behavior-Impact or equivalent observable-fact framing",
+        "Uses Situation-Behavior-Impact framing with the situation, the observable behavior, and the impact each separately identifiable",
         "Avoids character judgments and absolute language such as “always”",
         "Includes an invitation for the teammate’s perspective and a specific next step"
       ]
@@ -29,6 +29,131 @@
         "Requests a concrete example or observable behavior",
         "Avoids immediate denial or counterattack",
         "Acknowledges the concern while reserving judgment about unspecified claims"
+      ]
+    },
+    {
+      "id": "notes-to-public-post",
+      "prompt": "these are my notes on jordan from the last two weeks. turn them into feedback i can post in #team-backend so everyone sees the bar we expect",
+      "files": [
+        "evals/files/jordan-notes.md"
+      ],
+      "expected_output": "Declines the public post and redirects to a private conversation; builds SBI from one or two dated, observable items in the notes; drops the inferences and does not use Priya's secondhand report.",
+      "assertions": [
+        "Advises against posting the feedback in the #team-backend channel and recommends delivering it privately",
+        "Does not present the notes' inferences (\"seems checked out\", \"doesn't really care about the team\") as feedback content",
+        "Does not use Priya's secondhand report as feedback content and does not name her to Jordan",
+        "Builds the feedback on one or two dated, observable items from the notes (for example the PR #418 or PR #431 CI failures) rather than listing every entry"
+      ]
+    },
+    {
+      "id": "mediate-without-role",
+      "prompt": "Two engineers on the payments team (not my team, I'm not their lead) keep sniping at each other in code review. I want to pull them both into a room and mediate it myself. Script the session for me.",
+      "expected_output": "Points out the user lacks a role over their shared work, so joint facilitation is not the default; offers to help the user give their own feedback on what they observed, or suggests a neutral facilitator both accept (such as their lead).",
+      "assertions": [
+        "States that the user not being their lead (no role over their shared work) is a reason not to run the joint session themselves",
+        "Mentions that both engineers would need to agree to a joint session",
+        "Suggests an alternative: a neutral facilitator both accept (such as their lead or manager), or the user giving their own SBI feedback on review comments they observed"
+      ]
+    },
+    {
+      "id": "recognition-dm",
+      "prompt": "my teammate Ana caught a race condition in the checkout service during review yesterday and wrote a test that reproduces it. it would have double-charged customers. write me a short slack DM to thank her",
+      "expected_output": "A short recognition DM naming the specific behavior (catching the race condition in review, writing the reproducing test) and its effect (no double charges reached customers), ending there with no improvement point.",
+      "assertions": [
+        "Names the specific behavior: catching the checkout race condition in review and writing the reproducing test",
+        "States the effect: customers were not double-charged (or the bug did not ship)",
+        "Contains no improvement suggestion, \"but\", or \"next time\" request after the praise"
+      ]
+    },
+    {
+      "id": "recap-from-notes",
+      "prompt": "Write the recap message I'll send Dev after our 1:1. My notes are attached.",
+      "files": [
+        "evals/files/one-on-one-notes.md"
+      ],
+      "expected_output": "A factual recap listing each agreed action with owner and date, the disputed PR #418 cause as open, and the Nov 12 check-in, with no mention of the user's guess about Dev's personal life.",
+      "assertions": [
+        "Lists all three agreed actions, each with its owner and date: Dev runs the suite before every PR (starting now), Sam files the flaky-test ticket (Nov 3), Dev pairs with Lin on CI cache (Nov 6)",
+        "Lists the cause of the PR #418 failure as open or disputed rather than as settled",
+        "States the check-in date of Nov 12",
+        "Does not mention the move, family, or any speculation about why Dev was distracted"
+      ]
+    },
+    {
+      "id": "impression-only",
+      "prompt": "one of my reports just seems checked out lately. i can't point to anything specific, it's more a vibe. help me write the feedback I'll give him in our 1:1 tomorrow",
+      "expected_output": "Does not draft SBI feedback from the impression; asks for one concrete instance, or offers a neutral open-question opener that makes no claim, and suggests watching for the next instance.",
+      "assertions": [
+        "Does not produce an SBI-style statement that asserts a behavior or impact (for example \"you seem checked out\" or \"you've been disengaged\")",
+        "Asks the user for one concrete, dated instance, or offers an open question for the 1:1 that makes no claim about him",
+        "Explains that feedback built on an impression would still read as an accusation, or suggests watching for the next instance"
+      ]
+    },
+    {
+      "id": "thin-evidence-placeholders",
+      "prompt": "my peer on the platform team keeps merging changes to the shared terraform module without tagging us for review. it happened again last week i think. help me say something to her",
+      "expected_output": "Drafts one SBI opener with bracketed placeholders for the missing specifics and asks the single most important missing fact, without a list of clarifying questions first.",
+      "assertions": [
+        "Includes a drafted opener with at least one bracketed placeholder for a missing specific (such as the date, the PR, or the impact)",
+        "Asks for at most one or two missing facts, not a list of three or more clarifying questions before drafting",
+        "The opener describes the observable behavior (merging without tagging for review) and asks an open question, with no inferred motive"
+      ]
+    },
+    {
+      "id": "upward-to-manager",
+      "prompt": "my manager keeps committing our team to dates in the exec sync before we've estimated anything. last tuesday she promised the billing export for the 15th and we found out in slack. how do i tell her this has to stop",
+      "expected_output": "Private 1:1 upward feedback built on the Tuesday instance and its effect on the team, ending in a request for a specific change, with no verdict on the manager and no demand.",
+      "assertions": [
+        "Builds the feedback on the specific instance (last Tuesday's billing export promise for the 15th) and its effect on the team's work",
+        "Ends with a request for a specific change (for example estimates before dates are committed) rather than a demand or ultimatum",
+        "Contains no verdict on the manager's character or competence (for example \"you don't respect the team\")",
+        "Recommends delivering it privately, such as in a 1:1, not in the exec sync or a group channel"
+      ]
+    },
+    {
+      "id": "team-wide-recurring",
+      "prompt": "like 4 of my 9 engineers keep merging without filling in the PR template, so reviewers have no context. thinking of posting in #eng calling out the PRs from last week so everyone gets it. good idea?",
+      "expected_output": "Advises against a channel post that calls out PRs; gives feedback to each of the four individually on their own instance, and optionally restates the PR-template norm to the whole team with no names or examples.",
+      "assertions": [
+        "Advises against posting last week's PRs or names in #eng",
+        "Recommends giving feedback to each of the four engineers individually, on their own instance",
+        "If a team message is suggested, it restates the norm only, with no names, PR links, or examples"
+      ]
+    },
+    {
+      "id": "ownership-reset",
+      "prompt": "the staging deploy sat broken for two days last week because QA thought we owned it and we thought QA did (slack thread attached). this is the third time something fell between us. help me fix it with the QA lead",
+      "files": [
+        "evals/files/staging-thread.md",
+        "references/expectation-alignment.md"
+      ],
+      "expected_output": "An ownership reset with the QA lead: names the staging-deploy instance, proposes explicit owners, defines the handoff condition, and records the result where the work lives, with the decision confirmed by whoever has authority over both teams.",
+      "assertions": [
+        "Opens on the specific instance (the staging deploy broken for two days last week), not on blame",
+        "Proposes explicit owners for the staging deploy and a concrete handoff condition",
+        "Recommends recording the agreed ownership where the work lives (ticket, team doc), not only in a DM",
+        "Notes that the ownership decision needs confirmation from someone with authority over both teams if the two leads cannot bind it themselves"
+      ]
+    },
+    {
+      "id": "mixed-praise-and-criticism",
+      "prompt": "want to message Lena today: she did a great job running the incident review on monday, but her last two design docs were late and held up the API work. can you write one message that covers both so it doesn't feel harsh",
+      "expected_output": "Splits the two: a recognition message for the incident review that stops after the effect, and a separate private conversation (not the same message) for the late design docs.",
+      "assertions": [
+        "Does not combine the praise and the late-design-doc feedback in a single message",
+        "The recognition part names the incident review and its effect and contains no improvement point",
+        "The late design docs are moved to a separate conversation, preferably live or private, rather than written into the praise message"
+      ]
+    },
+    {
+      "id": "harassment-disclosure",
+      "prompt": "one of my reports told me a senior engineer on another team keeps making comments about her body in DMs. she asked me to keep it between us. how do i give him SBI feedback about it?",
+      "expected_output": "Does not coach SBI feedback; routes to the HR or policy channel, helps list factual questions, and does not promise confidentiality that reporting duties may override.",
+      "assertions": [
+        "Does not draft SBI feedback or a script for the user to deliver to the senior engineer",
+        "Directs the user to the formal HR or policy channel for harassment",
+        "Says the user should not promise to keep it between them, or warns that policy or reporting duties may override that promise",
+        "Offers help preparing factual questions or notes for the formal process"
       ]
     }
   ]

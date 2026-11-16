@@ -1,0 +1,59 @@
+{
+  "skill": "sync-skills-readme",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 51,
+      "evidence": "\"An unescaped `|` in a description splits the cell and breaks the whole table.\" and line 52 \"A link built from `name:` breaks when the directory name differs.\" repeat step 3's \"Escape `|` as `\\|`\" and \"The link uses the directory name, not the `name:` value\"",
+      "fix": "Delete the two Gotchas bullets on lines 51-52. Step 3 already states both rules, and the model knows that a pipe breaks a Markdown table cell."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 30,
+      "evidence": "\"Sanity check before building rows: for each skill placed by the description-word pass or by the Utilities fallback, if the category contradicts what the skill plainly does...\"",
+      "fix": "Run the sanity check on every placement, including the name-token pass. A name such as `model-docs` matches `model` in AI Tools before Documentation, and the check currently skips that misplacement. Keep the same rule: leave the mechanical result in place and list it under Warnings with the keyword that would pin it."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/sync-skills-readme.md",
+      "line": 34,
+      "evidence": "\"If it is absent, or no `|` table follows it, stop without editing: `\u274c Could not find '## \ud83d\udcda Available Skills' section in README.md`\" has no branch for a missing root README.md",
+      "fix": "Add this check before the heading search: \"If README.md does not exist at the repository root, stop without editing: `\u274c README.md not found at repository root`.\" Without it, a missing file produces a misleading 'section not found' error."
+    }
+  ]
+}

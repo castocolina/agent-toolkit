@@ -1,0 +1,86 @@
+{
+  "skill": "codex-plan",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 19,
+      "evidence": "Start with the manifest (`package.json`, `pyproject.toml`), the schema or models, the entry points and middleware the topic touches, and `.env.example`",
+      "fix": "Cut the generic list of files to read, because the model already reads manifests and entry points first. Keep only the non-obvious rules: the cap of about 10 files, preferring files a task would edit, and the rule that `## Files to Read for Context` lists only paths verified with ls or Read."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 35,
+      "evidence": "When the plan arrives, first re-run the baseline command (or ask the user to) and compare: flag any difference other than the chosen plan file, then check that every confirmed requirement maps to a task with acceptance criteria, list gaps, and do not implement unless asked.",
+      "fix": "Turn the review after the plan arrives into numbered step 6 with sub-steps: (a) re-run the baseline and diff it, (b) map each confirmed requirement to a task with acceptance criteria, (c) report the gaps, (d) stop unless the user asks for implementation. That way the Process pattern keeps a checkpoint at every phase."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 28,
+      "evidence": "codex exec -s workspace-write -c model_reasoning_effort=high [-m <id>] \"$(cat prompt_to_codex.md)\"",
+      "fix": "Add a gotcha: when the prompt file is very large or the shell mangles argv, pipe the file through stdin (`codex exec ... - < prompt_to_codex.md`) instead of passing the whole prompt as one argv string."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 15,
+      "evidence": "if no id follows, or the next token reads like part of the topic, ask for the id with AskUserQuestion or drop the flag",
+      "fix": "Pick one default and give one escape hatch, for example: 'ask for the id with AskUserQuestion; if the user gives none, drop the flag and use Codex's configured default.' Don't offer two equal options."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 33,
+      "evidence": "Before handoff, record a baseline: `git status --short` or, outside git, a file list with mtimes (`find . -type f -printf '%p %T@\\n'`)",
+      "fix": "Make the baseline numbered step 5, ahead of 'Show the command, then stop', because right now it comes after the stop instruction. Write the baseline to a file outside the workspace (for example `${TMPDIR:-/tmp}/codex-plan-baseline.txt`) so it does not flood the context and does not show up as a change in the diff. `-printf` is GNU-only and fails on macOS/BSD find, so add a portable fallback such as `find . -type f -newer prompt_to_codex.md` for the check after the run."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 35,
+      "evidence": "If Codex fails or wrote no file, ask for its output; do not rerun it yourself.",
+      "fix": "Finish this branch: after you get Codex's output, say what to do next. Examples: fix the prompt and rewrite the file, then show the command again; or, for a sandbox or auth error, point the user to the right flag or `codex login`. Then wait again."
+    }
+  ]
+}

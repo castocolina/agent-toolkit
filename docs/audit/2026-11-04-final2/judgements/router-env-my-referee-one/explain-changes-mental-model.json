@@ -1,0 +1,50 @@
+{
+  "skill": "explain-changes-mental-model",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 27,
+      "evidence": "Branch detection uses `git show-ref --verify --quiet \"refs/heads/<arg>\"` or `refs/remotes/<arg>`. For a valid fully qualified argument such as `refs/remotes/origin/feature/x`, both probes prepend another refs prefix and fail. The argument consequently falls through to rule 7's single-commit explanation instead of the branch changeset.",
+      "fix": "Handle arguments already starting with refs/heads/ or refs/remotes/ by verifying that exact ref with `git show-ref --verify --quiet \"$arg\"` before attempting the shorthand probes. Route confirmed branch refs through rule 6 and preserve the remote-base preference for refs/remotes/ arguments."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/explain-changes-mental-model.md",
+      "line": 34,
+      "evidence": "The large-PR branch says to run `gh pr diff \"<pr>\" --color=never > \"$(mktemp)\"` and then read the saved patch in sections. The temporary pathname is neither retained nor printed, so the next read has no known path.",
+      "fix": "Retain and expose the pathname, for example `patch=$(mktemp) && gh pr diff \"<pr>\" --color=never > \"$patch\" && printf '%s\\n' \"$patch\"`. Check the command's status and use the printed absolute path for subsequent section reads."
+    }
+  ]
+}

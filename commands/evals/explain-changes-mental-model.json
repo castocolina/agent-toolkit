@@ -1,0 +1,52 @@
+{
+  "skill_name": "explain-changes-mental-model",
+  "subject": "commands/explain-changes-mental-model.md",
+  "evals": [
+    {
+      "id": "range-dependency-order",
+      "prompt": "Scenario: the argument is `main..HEAD`. The diff adds `src/types/auth.ts` (new `TokenPayload` type), `src/utils/jwt.ts` (imports `TokenPayload`), `src/middleware/auth.ts` (calls `verifyToken` from jwt.ts) and `tests/auth.test.ts`. Show the git command you run and the mental-model report you produce. You cannot run commands or ask questions. Write the complete commands and output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The diff command is `git diff main..HEAD` (range used as given, quoted or not) with `--no-color`",
+        "The change groups are ordered types first, then jwt utilities, then middleware, so that every group comes after the group it depends on",
+        "Each group lists its files and states a concrete reason for its dependency (for example jwt.ts imports TokenPayload)",
+        "The report ends with a Review Sequence and a Gotchas section"
+      ]
+    },
+    {
+      "id": "invalid-ref-diagnostic",
+      "prompt": "Scenario: the argument is `feature/typo-branch`; no such branch, tag or commit exists, so `git rev-parse --verify` fails with `fatal: Needed a single revision`. Show the commands you run and the final user-facing message. You cannot run commands or ask questions. Write the complete commands and output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The reference is verified with `git rev-parse --verify` (or equivalent) before any diff or show is run",
+        "No mental-model report and no change groups are produced",
+        "The final message reports the git error for `feature/typo-branch` and suggests checking the name or listing branches"
+      ]
+    },
+    {
+      "id": "head-tilde-single-commit",
+      "prompt": "Scenario: the argument is `HEAD~3` and it resolves to a valid commit. Show the git commands you run to get the changes. You cannot run commands or ask questions. Write the complete commands and output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "`HEAD~3` is treated as a commit-ish: the commands use `git show` on it, not `git diff` against main",
+        "The reference is verified before the full diff is read",
+        "No comparison against `main` or `master` is performed"
+      ]
+    },
+    {
+      "id": "custom-waits-for-input",
+      "prompt": "Scenario: the argument is `custom`. Show the commands you run and the final user-facing message. You cannot run commands or ask questions. Write the complete commands and output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "No git command runs",
+        "The final message asks the user to paste or describe the changes in the next message",
+        "No mental-model report is produced yet"
+      ]
+    },
+    {
+      "id": "empty-diff",
+      "prompt": "Scenario: no argument is given, `git diff HEAD` prints nothing and `git ls-files --others --exclude-standard` prints nothing. Show the commands and the final user-facing message. You cannot run commands or ask questions. Write the complete commands and output exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The command run is `git diff HEAD`",
+        "The final message says there are no uncommitted changes to analyze",
+        "No change groups or invented changes are produced"
+      ]
+    }
+  ]
+}

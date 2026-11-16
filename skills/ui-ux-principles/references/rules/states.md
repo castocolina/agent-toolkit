@@ -11,25 +11,6 @@
 
 ## Gotchas
 
-- `fetch` resolves on HTTP 404 and 500. A `.catch` alone misses them; check `response.ok`, or a server error reaches the empty branch as "no results".
-- `.finally(() => setLoading(false))` with no error branch drops a failure into the empty list. That is the commonest way an error looks like an empty state.
 - `role="alert"` interrupts; use it for errors. Use `role="status"` for confirmations (SC 4.1.3 AA). A toast that disappears in seconds can be missed by assistive tech; keep an inline confirmation for important actions. How long it should stay is UNVERIFIED.
-- A retry button must reset the error before it refetches, or the error stays on screen over fresh data.
 
-## Fix pattern
-
-```tsx
-if (status === 'error') return (
-  <div role="alert">
-    <p>We could not load your orders. Check your connection.</p>
-    <button onClick={refetch}>Try again</button>
-  </div>
-);
-if (orders.length === 0) return (
-  <div>
-    <h2>No orders yet</h2>
-    <p>Orders appear here once a customer checks out.</p>
-    <a href="/products">View products</a>
-  </div>
-);
-```
+Fix pattern: the passing example in `SKILL.md`.

@@ -1,0 +1,77 @@
+{
+  "skill": "viral-tweet",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/viral-tweet.md",
+      "line": 28,
+      "evidence": "## Voice and tone: 'High-arousal framing (surprise, urgency, a hot take) is optional even for promotional posts. For grief, reflection, apology or factual updates keep the author's emotion, favour sincerity and clarity, and never add anger, FOMO or controversy.'",
+      "fix": "Delete the Voice and tone section. Step 3's sensitive-post branch (line 18), step 2's clarity objective (line 17) and the ragebait NEVER item (line 41) already cover this, and the model already knows to avoid outrage in a grief post."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/viral-tweet.md",
+      "line": 18,
+      "evidence": "Step 3 packs the three levers, the shorten-only branch, 'A discussion prompt wins when the author wants feedback or community; a standalone statement wins for reach beyond followers.' and the sensitive-post replacement into one paragraph",
+      "fix": "Split step 3 into sub-bullets: 3a the three levers, 3b the shorten-only case, 3c the sensitive-post quiet variants. Delete the 'discussion prompt wins / standalone statement wins' sentence, because steps 2 and 5 already choose the winner from the objective, and two selection rules can disagree."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/viral-tweet.md",
+      "line": 32,
+      "evidence": "The Gotchas section has only two items ('Compression can falsify...', 'Unicode bold/italic \"fancy text\" costs 2 per glyph...')",
+      "fix": "Add thread-specific gotchas learned from failures. For example: 'In a thread, never split a number from its baseline or qualifier across posts, because readers see post 1 alone in the timeline and post 1 must stand without post 2.'"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/viral-tweet.md",
+      "line": 22,
+      "evidence": "'4c. Within 15 of the limit: trim further, or tell the user to confirm the count in X's composer.'",
+      "fix": "Give a default with an escape hatch: 'Within 15 of the limit: trim to 265 or fewer. Only if trimming would drop a supplied fact or qualifier, keep the text and add \"confirm the count in X's composer\" under BEFORE POSTING.'"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/viral-tweet.md",
+      "line": 57,
+      "evidence": "Line 53 says that in the three-thread case 'each VERSION block holds its thread', and line 57 adds 'THREAD (only when chosen or offered)'. In that case a thread is offered, so it is unclear whether THREAD repeats a thread. Line 24 'plus any hybrid' has no defined format.",
+      "fix": "State: 'In the three-thread case omit THREAD; RECOMMENDED names the chosen VERSION's thread. Use THREAD only when a single-post run turns into a thread.' Also define the hybrid as one extra draft with its count under RECOMMENDED, or drop 'plus any hybrid'."
+    }
+  ]
+}

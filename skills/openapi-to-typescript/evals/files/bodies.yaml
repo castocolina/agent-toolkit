@@ -1,0 +1,34 @@
+openapi: 3.0.3
+info:
+  title: Notes
+  version: "1.0"
+paths:
+  /notes:
+    post:
+      operationId: createNote
+      requestBody:
+        content:
+          application/json: {}
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              example:
+                id: n1
+  /notes/{id}:
+    get:
+      operationId: getNoteText
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The note as plain text
+          content:
+            text/plain:
+              schema:
+                type: string

@@ -1,0 +1,68 @@
+{
+  "skill": "daily-meeting-update",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 44,
+      "evidence": "\"Report something as done only when the user says so or the evidence is terminal (merged PR, closed ticket)\" permits a closed Jira ticket to establish completion. A ticket closed as Duplicate, Cancelled, or Won't Do is terminal without establishing that the underlying work was delivered.",
+      "fix": "Require a project-specific successful resolution or user confirmation before treating a closed ticket as completed work. Preserve cancelled or duplicate tickets as triage outcomes, and ask when the status or resolution does not establish delivery."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 23,
+      "evidence": "The yesterday query uses \"--updated \">=DATE\"\"; Jira likewise uses \"updated >= \\\"DATE\\\"\". Neither has a reporting-window gate. Following this branch, a PR merged today satisfies both the search and the terminal-evidence rule and can be incorrectly placed under Yesterday.",
+      "fix": "Define the reporting interval and timezone before classifying activity. Treat updated-time searches as discovery only; verify completion and review events against that interval using mergedAt, review timestamps, or Jira transition/resolution timestamps. Ask when event timing is unavailable, and keep today's events out of Yesterday."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/scripts/claude_digest.py",
+      "line": 187,
+      "evidence": "\"project_dirs = [projects_dir / n for n in sorted(names) if (projects_dir / n).is_dir()]\" searches only directories encoding the exact supplied or resolved project path. With --project /repo, a session launched in /repo/subdir is stored under a different encoded directory and is never considered, despite its cwd passing the subtree scope rule.",
+      "fix": "Discover log directories belonging to the approved project subtree, including sessions launched from descendant directories, while retaining per-message cwd filtering and avoiding unrelated projects. Add a regression where the only session is stored under an encoded child-directory path and --project names its parent."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/daily-meeting-update/evals/trigger-queries.json",
+      "line": 2,
+      "evidence": "The positive query \"Let's prepare for the team meeting. Pull context only if I approve, then interview me.\" supplies no daily cadence or yesterday/today intent; it could equally describe an excluded agenda or weekly-report task.",
+      "fix": "Give this positive query explicit daily-sync or yesterday/today context, and add an otherwise similar weekly-meeting or agenda request labelled false so the pair tests the intended routing boundary."
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "sync-branch",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 94.4,
+        "router-env-my-referee-one": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 25,
+          "evidence": "Pass `\"$branch\"` quoted. Single quotes are needed only for a literal name you type containing `$` (`'feature/weird$name'`), which the shell would otherwise expand.",
+          "fix": "Cut this to one clause or delete it. The model already knows how shell quoting works, and step 5 already quotes \"$branch\"."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 16,
+          "evidence": "If `$remote` is set and `git merge-base --is-ancestor \"$remote\" \"$orig\"` fails, the remote has commits the local branch lacks: stop",
+          "fix": "Add one decision check before any mutation: 'Before rebasing, ask whether anyone else pushes to this branch. If `git log --format=%ae \"origin/$target..$remote\"` shows authors other than the user, stop.' The description excludes shared branches, but the body never tells the agent how to spot one. Right now it only notices a shared branch when the remote has diverged."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/sync-branch.md",
+          "line": 21,
+          "evidence": "## Gotchas lists three items, one of which (line 25) is generic shell quoting",
+          "fix": "Replace the quoting item with a gotcha from real use, for example: 'Stacked branches: rebasing a branch that other local branches build on leaves them on the old SHAs. Pass `--update-refs` (git 2.38+) or tell the user which dependent branches need rebasing.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/sync-branch.md",
+          "line": 19,
+          "evidence": "If the lease is rejected, someone else pushed: stop, do not retry with `--force`.",
+          "fix": "Finish the lease-rejected branch: 'Report that the local branch is already rebased and was not pushed. Give the pre-rebase tip `$orig` and the recovery command `git reset --hard $orig`. Then list the new remote commits with `git fetch origin && git log --oneline \"$branch..origin/$branch\"`.' The agent should not leave the user with no next step."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "commands/sync-branch.md",
+          "line": 17,
+          "evidence": "\"If `old_base` is empty, use `fork=$(git merge-base --fork-point \"origin/$target\" \"$branch\")`\" restricts fork-point discovery to a missing tracking ref. If an IDE or user already fetched an upstream force-push before invocation, `old_base` equals the rewritten tip and its ancestry check passes. The command therefore selects normal explicit-upstream rebase, which defaults to no fork-point detection and can replay retired upstream commits alongside feature commits despite a usable reflog fork point.",
+          "fix": "Compute the reflog fork point even when `old_base` is set, before selecting normal rebase. When it is non-empty and differs from the ordinary merge base, use `git rebase --onto \"origin/$target\" \"$fork\" \"$branch\"`. Retain the pre-fetch-base fallback for rewrites detected during this fetch; stop for clarification if a known rewrite has no trustworthy cutoff."
+        }
+      ]
+    },
+    {
+      "name": "explain-changes-mental-model",
+      "percent": 91.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 90.4,
+        "router-env-my-referee-one": 92.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 8,
+          "evidence": "Invoked as `/explain-changes-mental-model` (project install) or `/command-explain-changes-mental-model:explain-changes-mental-model` (this repository's plugin).",
+          "fix": "Delete the invocation sentence. The harness already handles slash-command discovery and naming, and the model never needs this to do the task. Keep the usage block only if it shows how arguments are classified."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 10,
+          "evidence": "/explain-changes-mental-model feature/x       # branch vs main",
+          "fix": "Trim the usage block to the cases section 1 does not already make clear (`HEAD~3` as one commit, `#123`). Every other example repeats a numbered rule in section 1."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 36,
+          "evidence": "Group files by purpose (not by directory), one group per reviewable idea.",
+          "fix": "Add a self-check before the output step: 'Before writing the report, compare the groups against `git diff --stat` (or the patch's file list). Every changed file appears in exactly one group, and every Depends on names a group that comes earlier in the review order. Fix the grouping and check again until both hold.' This turns the Process pattern into a checkpointed workflow."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 26,
+          "evidence": "3. Contains `..` (covers `...`): `git diff \"<arg>\" --no-color`.",
+          "fix": "Add a gotcha: '`git diff A..B` is the same as `git diff A B`, not log-range semantics. It includes changes made on A since the branches split, and those appear as reversed hunks. If the user means the changes on the branch only, use `A...B` and say which form you used.' Models routinely assume `..` in diff means what it means in `git log`."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 3,
+          "evidence": "argument-hint: [commit|branch|range|custom]",
+          "fix": "argument-hint: [commit|branch|range|#PR|custom] (the hint is shown at invocation; without it users cannot see that the command supports the PR path in step 4)"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 29,
+          "evidence": "base is the first that exists of `main`, `master`, `origin/main`, `origin/master`, else ask the user for a base; then `git diff \"<base>...<arg>\" --no-color`.",
+          "fix": "Handle the branch that resolves to the base and the remote branch. If <arg> is itself the chosen base (for example `/explain-changes-mental-model main`), `main...main` is empty and the command wrongly reports 'No changes found'. In that case explain the tip commit as in step 7, or ask for a base. For a `refs/remotes/<arg>` branch, prefer the matching remote base (`origin/main`), because local `main` may be stale."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 45,
+          "evidence": "The 28-line Output section includes familiar reporting scaffolding: '### High-Level Summary', '[2-3 sentences: goal and approach]', '**Why this matters:** [context]' and '**Key changes:** [change and why]'. Unlike the expert source-selection, grouping and Gotchas sections, much of this section activates ordinary reporting behavior rather than adding knowledge.",
+          "fix": "Condense the generic summary, concepts and explanatory fields into a short output instruction. Retain the distinctive requirements: dependency-ordered groups, file references, concrete dependency evidence, enables relationships, review sequence and the single-group exception."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-changes-mental-model.md",
+          "line": 32,
+          "evidence": "'only a successful empty output is an empty diff' does not resolve the verified empty-commit branch: line 30 uses 'git show \"<arg>\" --no-color', which prints commit metadata even when the commit contains no patch. The command therefore misses its stated no-changes stopping condition for an empty commit.",
+          "fix": "For non-merge commits and tags, obtain patch-only output with `git show --format= --no-color \"<arg>^{commit}\"`, fetching metadata separately if needed. Preserve the first-parent diff for merges, and apply the no-changes stopping condition to patch content rather than metadata-bearing stdout."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

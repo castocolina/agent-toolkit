@@ -1,0 +1,63 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "marp-slide",
+      "percent": 95.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2
+      },
+      "missing_judges": [
+        "router-env-my-referee-one",
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/marp-slide/SKILL.md",
+          "line": 68,
+          "evidence": "Write to the requested path; else next to the user's existing deck, else a workspace path such as `slides/<topic>.md`. ... If writing is impossible, return the Markdown inline and never claim a save.",
+          "fix": "Agents already choose save locations this way. Cut the Save section to the one fact they would miss: use `/mnt/user-data/outputs/` only if it exists, and report whether the deck was rendered or only linted."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/marp-slide/SKILL.md",
+          "line": 26,
+          "evidence": "Outline claim, evidence, action toward what the audience must decide or learn. Never reuse a template's sample narrative.",
+          "fix": "Expand the outline step into a short expert framework: a rough slide budget per talk length (for example about one content slide per 1-2 minutes), where section dividers go, and when to move detail into speaker notes instead of splitting slides."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/marp-slide/evals/evals.json",
+          "line": null,
+          "evidence": "casual-slides assertion: \"Content headings are concise and slides have at most five bullets each.\"; expected_output: \"suitable technical theme\"",
+          "fix": "Make the assertions in casual-slides checkable: \"Every `##` heading is at most 45 characters\", \"Keeps `theme: default` and the tech template's `<style>` block\" and \"Contains no `Topic1`/`Point1` placeholders\"."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/marp-slide/SKILL.md",
+          "line": 53,
+          "evidence": "marp --no-stdin deck.md --images png -o /tmp/deck/slide.png    # one PNG per slide, needs a browser",
+          "fix": "Add the missing branch to Validate: if Marp CLI runs but no browser is found and `--browser-path`/`CHROME_PATH` cannot be set, run the HTML parse check plus the lint list, then tell the user the deck was parsed but not visually checked."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

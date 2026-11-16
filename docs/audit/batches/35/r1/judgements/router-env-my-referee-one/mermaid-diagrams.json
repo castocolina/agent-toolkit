@@ -1,0 +1,59 @@
+{
+  "skill": "mermaid-diagrams",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 14,
+    "D8": 15
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/references/class-diagrams.md",
+      "line": 27,
+      "evidence": "\"A member is a method only if it has `()`\" and \"`*` after a member marks abstract, `$` marks static\" recap routine Mermaid syntax. These and the routine syntax inventories elsewhere dilute the otherwise strong parser, semantic, and host-specific knowledge.",
+      "fix": "Trim routine member/static-marker explanations and basic syntax inventories. Retain the nested-generic renderer limitation, multiplicity and identifier traps, and examples that directly demonstrate non-obvious failures."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/references/authoring-rules.md",
+      "line": 28,
+      "evidence": "\"Rendered height/width at or above 0.4, and height under about three screens. Outside that range, split it.\" This mandatory every-type aspect-ratio constraint can force fragmentation of an already legible, short diagram.",
+      "fix": "Make the aspect ratio a warning rather than a mandatory split condition. Base splitting on actual text readability at the target column width and excessive rendered height, with an explicit exception for concise wide diagrams."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/mermaid-diagrams/evals/evals.json",
+      "line": 15,
+      "evidence": "The login-sequence eval includes \"references/authoring-rules.md\" in `files`, and most other cases similarly include instructional references. A matched without-skill run receiving the same input files would therefore also receive part of the skill's guidance, contaminating the baseline.",
+      "fix": "Restrict `files` to task inputs such as `evals/files/*.mmd` and source fixtures; use an empty list or omit it for self-contained prompts. Supply instructional references only through skill activation, then compare with-skill and without-skill runs using identical task inputs."
+    }
+  ]
+}
