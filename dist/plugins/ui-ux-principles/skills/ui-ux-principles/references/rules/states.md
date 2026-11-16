@@ -13,4 +13,59 @@
 
 - `role="alert"` interrupts; use it for errors. Use `role="status"` for confirmations (SC 4.1.3 AA). A toast that disappears in seconds can be missed by assistive tech; keep an inline confirmation for important actions. How long it should stay is UNVERIFIED.
 
-Fix pattern: the passing example in `SKILL.md`.
+## Fix pattern
+
+One request with its pending, empty, error (with retry) and success branches; the `OrderRow` and skeleton rows are in `loading.md`, and the three fragments in `SKILL.md` Patterns come from this shape:
+
+```tsx
+type Status = 'loading' | 'error' | 'success';
+
+function Orders() {
+  const [status, setStatus] = useState<Status>('loading');
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [notice, setNotice] = useState('');   // the live region starts empty
+
+  const load = () => {
+    fetch('/api/orders')
+      .then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+      .then((data) => { setOrders(data); setStatus('success'); })
+      .catch(() => setStatus('error'));
+  };
+  const retry = () => { setStatus('loading'); load(); };   // clears the error before refetching
+  useEffect(load, []);
+
+  const remove = (id: string) => {
+    if (!window.confirm('Delete this order?')) return;   // the confirm step, or offer an undo
+    fetch(`/api/orders/${id}`, { method: 'DELETE' })
+      .then((r) => { if (!r.ok) throw new Error(String(r.status)); })
+      .then(() => { setOrders((o) => o.filter((x) => x.id !== id)); setNotice('Order deleted'); })
+      .catch(() => setNotice('Order not deleted. Try again.'));
+  };
+
+  return (
+    <section aria-busy={status === 'loading'}>
+      <p role="status">{notice}</p>
+      {status === 'loading' && <ul aria-label="Orders">{/* skeleton rows */}</ul>}
+      {status === 'error' && (
+        <div role="alert">
+          <p>The orders did not load. Your filters are kept.</p>
+          <button type="button" onClick={retry}>Try again</button>
+        </div>
+      )}
+      {status === 'success' && orders.length === 0 && (
+        <p>No orders yet. <a href="/orders/new">Create an order</a></p>
+      )}
+      {status === 'success' && orders.length > 0 && (
+        <ul aria-label="Orders">
+          {orders.map((o) => (
+            <li key={o.id}>
+              {o.customer}
+              <button type="button" aria-label={`Delete order for ${o.customer}`} onClick={() => remove(o.id)}>Delete</button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+```

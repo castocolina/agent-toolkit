@@ -4,7 +4,7 @@
 
 | state | requirement | source |
 |-------|-------------|--------|
-| hover | Pointer devices only; carries no essential information | Tailwind wraps `hover:` in `@media (hover: hover)` |
+| hover | Pointer devices only; carries no essential information | Tailwind v4 wraps `hover:` in `@media (hover: hover)` |
 | focus-visible | Visible on keyboard focus, at least 3:1 against adjacent colors; restyle it, never delete it | MDN `:focus-visible`, web.dev Focus, SC 1.4.11, 2.4.7 |
 | active | Every custom button has a press state, or it "can feel unresponsive" | Apple HIG Buttons |
 | disabled | Looks inert and is inert | practice, no fetched source |

@@ -13,4 +13,4 @@
 - An inner scroll for a table, map or code block passes only when the page itself does not scroll sideways at the same width.
 - A sticky header that covers the focused control at a narrow width fails SC 2.4.11; add `scroll-margin` or `scroll-padding`.
 - Grow touch padding under `@media (any-pointer: coarse)` instead of enlarging the icon (web.dev).
-- Disabling zoom (`user-scalable=no`, `maximum-scale=1`) blocks the 200% resize (UNVERIFIED: inferred from SC 1.4.4, not stated in the pages read).
+- Disabling zoom (`user-scalable=no`, `maximum-scale=1`) blocks zooming, which SC 1.4.4 needs: web.dev says `minimum-scale`, `maximum-scale` and `user-scalable` "can block zooming and cause accessibility problems" (https://web.dev/articles/responsive-web-design-basics, checked 2026-11-15).
