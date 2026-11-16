@@ -1,0 +1,34 @@
+{
+  "skill": "dependency-updater",
+  "mode": "output",
+  "pass_rate": 0.8889,
+  "passed": 40,
+  "total": 45,
+  "failures": [
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Leaves `lodash` (the exact version 4.17.20) unchanged and says it stays unless the user asks to move it",
+      "evidence": "The output says \u201cLeave unchanged: exact-pinned, even if the audit reports a vulnerability,\u201d but does not say it can be moved if the user asks."
+    },
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Plans to stop and restore the snapshot of that cohort if its install, test, type check, build or audit step fails, and to report the failing command before going on",
+      "evidence": "The output says \u201cOn a failed install/check or a new or worsened finding, stop and restore the two snapshotted files,\u201d but does not say to report the failing command."
+    },
+    {
+      "eval": "failed-cohort-restore",
+      "assertion": "Stops at the failing gate and reports the exact failing command (`npm test`) and the failing test from test-output.txt (GET /orders/:id formats the order date)",
+      "evidence": "The output says \"The failing command was `npm test`: the date-formatting test expected `2026-03-01` but got `Invalid Date`\" but does not name `GET /orders/:id formats the order date`."
+    },
+    {
+      "eval": "python-audit-plan",
+      "assertion": "Includes a vulnerability audit step and an install/consistency check (`pip check` or the owner's equivalent) plus the project's tests after the lockfile update",
+      "evidence": "The output includes \u201cpoetry check --lock,\u201d \u201cpoetry install,\u201d tests and an audit, but no check equivalent to `pip check` for the installed environment."
+    },
+    {
+      "eval": "unattended-candidate-scan",
+      "assertion": "Hands the candidates to the user as a list to approve afterwards and applies none of them",
+      "evidence": "The output says, \"No targets have been approved or applied,\" but does not propose presenting a candidate list for approval afterwards."
+    }
+  ]
+}

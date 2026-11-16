@@ -1,0 +1,77 @@
+{
+  "skill": "dependency-updater",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": null,
+      "evidence": "The dbff837f digest says \"removed units (96, showing 40)\"; the other 56 units are not available in the prompt.",
+      "fix": "Provide the complete digest and review every omitted removal against the current files and docs/audit/recovery/dependency-updater/record.md."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/dependency-updater/evals/evals.json",
+      "line": 123,
+      "evidence": "The scoped-taze-write assertion accepts a response that merely \"warns that --write/-w can also rewrite GitHub Actions workflows and Node version files\" instead of requiring both exclusion flags.",
+      "fix": "Require both --no-github-actions and --no-node-version in the scoped write, require the write to run in a disposable copy, and assert that only mapped entries are copied back."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/dependency-updater/evals/evals.json",
+      "line": 37,
+      "evidence": "The auto-apply-cohorts assertion accepts `taze minor --write --include express,dayjs` for both a minor target and a patch-only target, without requiring the resulting versions to match the target map.",
+      "fix": "Require direct exact-target edits or separate suitable taze modes, and verify the disposable-copy diff matches every mapped version before copying entries back."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 24,
+      "evidence": "The workflow says to \"run the security audit once on the unchanged state as the baseline\" but does not say to stop before writing if that baseline scan fails.",
+      "fix": "Require a successful, comparable baseline audit before the first write; if the scanner is unavailable or errors, report the blocker and stop rather than applying a cohort without a baseline."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 28,
+      "evidence": "On a failed install or test the workflow says to \"restore the snapshot of that cohort\", while step 5 snapshots only the manifest and lockfile; an install may already have changed the working dependency environment.",
+      "fix": "After restoring manifest and lockfile, explicitly identify the possibly changed installed environment, preserve any user-owned state, and provide a manager-specific recovery or user-approved reinstall procedure; report if the environment cannot be restored."
+    }
+  ]
+}

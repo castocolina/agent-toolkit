@@ -1,0 +1,86 @@
+{
+  "skill": "dependency-updater",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 7
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": null,
+      "evidence": "Previous-version digest: \"removed units (96, showing 40)\".",
+      "fix": "Provide the complete digest so the remaining removal items can be checked against current destinations and docs/audit/recovery/dependency-updater/record.md."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/dependency-updater/evals/evals.json",
+      "line": 129,
+      "evidence": "The unattended scan requests \"Run a non-interactive scan\" but expects \"A plan, since the model cannot run commands\".",
+      "fix": "Make the expected outcome match the execution environment: either ask for a plan explicitly or provide a controlled taze shim and assert the actual non-mutating scan and JSON result."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/references/managers.md",
+      "line": 3,
+      "evidence": "\"Select and approve exact targets before invoking update commands\" contradicts SKILL.md's automatic application of qualifying stable minor and patch cohorts.",
+      "fix": "Distinguish the shown exact-target map for auto-apply cohorts from explicit per-target approval for the ask-per-target set, retaining the resolver and diff checks."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/references/python.md",
+      "line": 12,
+      "evidence": "\"update one approved package at a time\" conflicts with the main policy's auto-application of qualifying stable, unpinned targets.",
+      "fix": "Say to update one mapped target at a time, requiring explicit approval only when the target belongs to the ask-per-target set, while retaining the lock-owner and verification rules."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/references/node.md",
+      "line": 23,
+      "evidence": "\"Without `--write` (`-w`) nothing is changed\" contradicts scripts/run-taze.sh, which classifies `--update`, `--install` and `--interactive` as potentially mutating.",
+      "fix": "Limit the non-writing claim to the documented discovery invocations and warn that update, install and interactive flags can mutate or prompt even without --write; confirm behavior against the installed taze help."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 53,
+      "evidence": "The recommended unattended scan is `scripts/run-taze.sh [-r] [taze arguments]`; with no mode it invokes plain taze, while references/node.md says plain taze reports only in-range bumps and recommends `taze major` to discover broader candidates.",
+      "fix": "Make the default general candidate scan pass the major discovery mode to the wrapper, reserving the no-mode invocation for an explicitly in-range-only request; preserve the non-writing and confirmed-workspace safeguards."
+    }
+  ]
+}

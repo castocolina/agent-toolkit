@@ -1,0 +1,86 @@
+{
+  "skill": "dependency-updater",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 7
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": null,
+      "evidence": "The dbff837f digest lists 96 removed units but shows only 40.",
+      "fix": "Provide the complete digest so the remaining removals can be checked against their current destinations and the recovery record."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/dependency-updater/evals/evals.json",
+      "line": 18,
+      "evidence": "For an update request, the assertion says \u201ca plan is enough, no run results are expected\u201d.",
+      "fix": "Add execution-oriented evals that verify actual manifest and lockfile changes, baseline and per-cohort gates, and rollback in isolated fixture projects; retain the planning cases."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 13,
+      "evidence": "The compatibility check offers `npm install --dry-run`, `poetry update <pkg> --dry-run` or `uv lock --dry-run` before applying a target, without requiring the proposed target to be present in the dry-run inputs.",
+      "fix": "Require a target-specific dry run against a disposable copy with the proposed manifest constraints, or a resolver command that explicitly selects the target; if that cannot establish compatibility, ask per target."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 19,
+      "evidence": "Diagnosis-only requests must \u201cwrite nothing\u201d, but Recovery and security says to \u201cthen change the named package's version in a targeted way\u201d.",
+      "fix": "Make the recovery branch intent-aware: for diagnosis-only requests, explain the conflict and propose a targeted change without writing; perform it only when the user requests or approves a fix."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/references/node.md",
+      "line": 36,
+      "evidence": "The Node audit choices include `yarn npm audit` for Yarn Berry but give no audit command or fallback for Yarn Classic.",
+      "fix": "Add a Yarn Classic audit branch, checked against its official documentation or installed help, and report scanner unavailability without substituting a different lockfile owner."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/references/managers.md",
+      "line": 13,
+      "evidence": "Gradle is supported via its configured wrapper and catalog, but the ecosystem-specific security scanner list supplies Maven and no Gradle audit path.",
+      "fix": "Add an actionable Gradle audit branch using the repository's configured scanner or plugin, with a checked invocation and a stop-and-report fallback when none is configured."
+    }
+  ]
+}

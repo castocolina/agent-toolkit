@@ -1,0 +1,77 @@
+{
+  "skill": "dependency-updater",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 12,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": null,
+      "evidence": "Previous-version digest: \"removed units (96, showing 40)\".",
+      "fix": "Provide the complete digest so the remaining 56 removed units can be checked against the current files and recovery record."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/dependency-updater/evals/evals.json",
+      "line": 18,
+      "evidence": "The update assertion says \"a plan is enough, no run results are expected\".",
+      "fix": "Add an execution-focused eval with disposable project fixtures that verifies the actual manifest and lockfile diff, baseline audit, per-cohort gates, and restoration on failure; retain the planning cases."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/dependency-updater/scripts/run-taze.sh",
+      "line": 52,
+      "evidence": "The wrapper passes `--interactive` and `-I` through to taze as write-mode arguments.",
+      "fix": "Reject interactive options with a structured error for unattended use, and add a regression test proving taze is not invoked for either form."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 13,
+      "evidence": "The target-specific compatibility check gives `poetry update <pkg> --dry-run` and `uv lock --upgrade-package <pkg> --dry-run` as examples of commands that name the target.",
+      "fix": "Require the proposed version or constraint in a disposable manifest or in a version-qualified resolver argument before running the dry run. Explain that a package-only update can select a different version and cannot establish compatibility of the mapped target; ask per target if the exact target cannot be checked."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 29,
+      "evidence": "Finalize says to \"run the install command and the security audit on the final state\" even if no cohort was applied.",
+      "fix": "Skip the final install when no update was applied, including when every proposed target was declined. When an install is needed, keep it inside the snapshot and validation workflow and report any failure without silently changing user-owned state."
+    }
+  ]
+}

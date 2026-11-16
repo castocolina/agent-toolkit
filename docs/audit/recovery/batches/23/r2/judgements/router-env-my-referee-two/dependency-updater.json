@@ -1,0 +1,122 @@
+{
+  "skill": "dependency-updater",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 13,
+    "D6": 12,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 108,
+  "max_total": 125,
+  "percent": 86.4,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 1,
+      "evidence": "Digest cut list at dbff837f: removed units (96, showing 40). The shown units are explained by record rows or by their section ids in docs/audit/recovery/dependency-updater/sections.json (s026 through s055, including s032 for para:5eb1f34c and s033 for para:7c0e4d89) and the 56 omitted units were not enumerated, so they cannot be matched to a destination or a row.",
+      "fix": "Re-run the digest with the full removed-unit list, or add one record row per omitted para id in docs/audit/recovery/dependency-updater/record.md; restore any omitted unit that is a procedure, rule or template into references/."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/dependency-updater/README.md",
+      "line": 227,
+      "evidence": "### Do\n- **Commit lock files** - Always commit package-lock.json, yarn.lock, go.sum, etc.\n- **Review major updates** - Check changelogs before approving major version bumps\n- **Run tests after updates** - Verify your application still works",
+      "fix": "The model produces these unprompted. Delete the Do and Avoid lists and record each paragraph in docs/audit/recovery/dependency-updater/record.md; keep the version-range example only if a user asks for it, in references/."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 18,
+      "evidence": "## Constraint-first procedure\n1. Inspect the worktree; preserve unrelated edits. Identify the manifest, owning resolver, lockfile, runtime/toolchain envelope, and workspace topology.",
+      "fix": "Add one decision question before step 4: before sorting a target into the auto-apply set, ask whether its resolver output shows a peer, ABI or runtime-floor conflict and whether the version is 0.x or a prerelease, and name which answer sends it to step 6 instead."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 38,
+      "evidence": "## Non-obvious failure modes\n- npm overrides require a compatible npm version and can still leave direct-dependency peer contracts unsatisfied",
+      "fix": "Rename this heading to Gotchas and keep the five environment-specific facts there; the NEVER list already has the reasons, and the spec's gotchas test is the heading an agent scans for."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 15,
+      "evidence": "The table of update types and actions is in [update policy](references/update-policy.md); load it at step 4, when classifying scan results.",
+      "fix": "Step 4 (line 22) repeats the classification without pointing at the file. Add there: load references/update-policy.md while sorting targets, and do not load references/node.md, references/python.md or references/managers.md for that classification step."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 48,
+      "evidence": "Order for a Node write: by default edit the target versions directly in the manifest. Alternatively run a scoped taze write, only in a disposable copy of the project: `taze minor --write --include <the scanned candidate names>`",
+      "fix": "Make the direct manifest edit the only default, and name the disposable-copy taze write as the escape hatch for one case: a confirmed workspace where the same package is declared in more than one package.json. One default, not two equal write paths."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/dependency-updater/evals/evals.json",
+      "line": 1,
+      "evidence": "\"prompt\": \"my deps are kinda old (see evals/files/casual-safe-updates/), can you update the safe ones and flag anything risky?\"",
+      "fix": "Add one assertion to casual-safe-updates that the plan stops and restores the snapshot when the cohort's install, test or audit command fails, and one to python-audit-plan that a 0.x or prerelease target is asked per target rather than auto-applied. The eight prompts, the 21 trigger queries (11 should, 10 should-not, with Renovate and runtime-upgrade near-misses) and the smoke tests in tests/skills/dependency-updater/ already cover the other branches."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/dependency-updater/README.md",
+      "line": 208,
+      "evidence": "- `pip-review` is a lightly maintained tool: its last release is 1.3.0 (2022-11-29) and its README asks for a new maintainer ... Its `--auto` flag upgrades every outdated package, which the skill's one-package-at-a-time rule forbids",
+      "fix": "That rule is gone: SKILL.md step 5 auto-applies a stable, unpinned patch or minor cohort. Change the note to say `pip-review --auto` upgrades every outdated package, including majors, 0.x and pins, so it is never the apply command; use `pip list --outdated` and update one mapped target at a time."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/dependency-updater/references/managers.md",
+      "line": 13,
+      "evidence": "Security scanners are ecosystem-specific: `govulncheck ./...`, `cargo audit`, `bundle-audit check`, `mvn org.owasp:dependency-check-maven:check`, or `dotnet list package --vulnerable`.",
+      "fix": "README.md line 45 names the Ruby audit tool `bundle audit` while managers.md names `bundle-audit check`. State one command, `bundle-audit check`, in both files, and note that the `bundle audit` shim exists only when Bundler exposes the plugin."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/dependency-updater/references/python.md",
+      "line": 5,
+      "evidence": "Resolver-specific single-package updates (checked 2026-11-15; confirm flags with each tool's `--help`):",
+      "fix": "The Poetry, Pipenv and uv command flags are version-sensitive and the cited pages (https://python-poetry.org/docs/cli/#update, https://pipenv.pypa.io/en/latest/commands.html, https://docs.astral.sh/uv/concepts/projects/sync/#upgrading-locked-package-versions) have no row under skill dependency-updater in docs/audit/upstream-sources.json. Add one unversioned row per page; do not remove the commands."
+    }
+  ]
+}

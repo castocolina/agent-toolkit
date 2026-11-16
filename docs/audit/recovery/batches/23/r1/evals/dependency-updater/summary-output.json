@@ -1,0 +1,69 @@
+{
+  "skill": "dependency-updater",
+  "mode": "output",
+  "pass_rate": 0.6923,
+  "passed": 27,
+  "total": 39,
+  "failures": [
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Identifies the project as npm (package.json with package-lock.json) and proposes a non-mutating scan or explain step to find candidates before any write",
+      "evidence": "The output proposes a scan but only says that package-lock.json\u2019s presence \u201csuggests npm\u201d and that \u201cownership ... still need[s] confirmation.\u201d"
+    },
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Treats `react` and `react-dom` (^17.0.2) and the 0.x `axios` (~0.21.4) as needing an individual approval, not as safe updates, noting that even a nominal minor update of a 0.x version can break compatibility",
+      "evidence": "The output requires approval for Axios changes and React major targets, but says only \u201cit\u2019s a 0.x dependency\u201d without noting that a 0.x minor update can break compatibility."
+    },
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Applies the stable, unpinned minor and patch targets (for example `express` ^4.17.1 and `eslint` ^8.0.0) without asking per package, but only after showing the package-to-exact-target map and taking a recoverable snapshot of package.json and package-lock.json",
+      "evidence": "The output says it will produce the \u201cpackage \u2192 exact target\u201d map once scan results are available, but provides no exact targets or update commands."
+    },
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Updates manifest and lockfile together with npm for that cohort and runs the install, the project's tests, type checks, build and `npm audit` for it, stopping and restoring the snapshot if one fails",
+      "evidence": "The output promises to \u201cupdate through the confirmed owning resolver\u201d and run checks, but provides no npm update or cohort validation commands."
+    },
+    {
+      "eval": "auto-apply-cohorts",
+      "assertion": "Runs the install, `npm test`, `npm run typecheck`, `npm run build` and `npm audit` for that cohort and reports what was applied",
+      "evidence": "Although the commands are shown, the output states, \u201cNo updates, tests, or audits have been run.\u201d"
+    },
+    {
+      "eval": "zero-x-prerelease-asked",
+      "assertion": "Does not auto-apply `reflect-metadata` 0.1.13 to 0.2.2, explaining that a 0.x change can break compatibility even when the scanner labels it MINOR, and asks about it per target",
+      "evidence": "The output says \u201cAsk: this is a 0.x change, even though the scanner calls it minor\u201d and requests approval, but does not explain that the change can break compatibility."
+    },
+    {
+      "eval": "failed-cohort-restore",
+      "assertion": "Asks the user before proceeding and does not claim success; the report says the snapshot was restored",
+      "evidence": "Although it asks \u201cMay I proceed after the restore,\u201d the output says \u201cI would run\u201d the restore commands rather than reporting that the snapshot was restored."
+    },
+    {
+      "eval": "python-audit-plan",
+      "assertion": "Updates one approved package at a time with the owning resolver (`poetry update <package>`, optionally with --dry-run; `pipenv update <pkg>` or `uv lock --upgrade-package <pkg>` are accepted for those lock owners) and not a bare `poetry update` or an environment-only `pip install --upgrade`",
+      "evidence": "Although the scratch example uses `poetry update django`, the real-application instruction says to \u201capply only a reviewed cohort using Poetry,\u201d without requiring one approved package per update."
+    },
+    {
+      "eval": "conflicting-node-deps",
+      "assertion": "Starts with the owning manager's explain command (`npm explain react`, `npm explain react-beautiful-dnd`, or `pnpm why` for pnpm) before any change, and reads the peer requirement from the fixture to name `react-beautiful-dnd` as the package that does not accept react ^18",
+      "evidence": "The investigation lists `git status --short`, toolchain checks, and `npm ls --package-lock --all` before `npm explain react`, although it correctly identifies `react-beautiful-dnd@13.1.1` as accepting only React 16 or 17."
+    },
+    {
+      "eval": "conflicting-node-deps",
+      "assertion": "Proposes a targeted version change for the named package (for example a release that supports React 18, or a replacement the user approves) and verifies it with the owning manager's install, the tests and a lockfile diff review",
+      "evidence": "The output proposes \"migrating to a maintained alternative such as `@hello-pangea/dnd`\" and running \"the applicable install\" and \"tests,\" but does not specify an npm install command or a lockfile diff review."
+    },
+    {
+      "eval": "unattended-candidate-scan",
+      "assertion": "Proposes checking the prerequisite first with `scripts/check-tool.sh taze` (or handles the JSON error it prints when taze is missing)",
+      "evidence": "The proposed commands go directly from `cd evals/files/unattended-candidate-scan/ || exit 1` to `bash \"$SKILL_DIR/scripts/run-taze.sh\"`, with no prerequisite check."
+    },
+    {
+      "eval": "unattended-candidate-scan",
+      "assertion": "Says the candidates come back in the `candidates` field of the JSON (or the `output` text fallback) and reports them for approval without applying any of them",
+      "evidence": "The output says candidates appear in `candidates` or `output` and that the scan does not apply targets, but does not propose reporting them for approval."
+    }
+  ]
+}

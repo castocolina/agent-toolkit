@@ -1,0 +1,160 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "dependency-updater",
+      "percent": 89.6,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 92.0,
+        "router-env-my-referee-two": 87.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest at dbff837f: removed units (96, showing 40).",
+          "fix": "Review the remaining 56 digest items against the current files and docs/audit/recovery/dependency-updater/record.md; restore or record any unexplained removals."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/dependency-updater/evals/evals.json",
+          "line": 20,
+          "evidence": "Plans to stop and restore the snapshot of that cohort if its install, test, type check, build or audit step fails.",
+          "fix": "Make the assertion distinguish pre-existing audit findings from new or worsened findings, and test an unavailable scanner separately, consistent with the workflow's baseline comparison."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 19,
+          "evidence": "For an audit-only, diagnosis-only or outdated-list request, do steps 1 to 4 as non-mutating discovery, report the findings and candidates, and write nothing.",
+          "fix": "Add an audit-only branch that runs the appropriate ecosystem security scanner in non-mutating mode and reports its findings and scanner errors without entering the update workflow."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 25,
+          "evidence": "Auto-apply each safe cohort: before the first write run the security audit once on the unchanged state as the baseline.",
+          "fix": "Make the baseline audit an explicit prerequisite for every update path, including when there is no auto-apply cohort and the first write is an approved major or other ask-per-target change."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 28,
+          "evidence": "If the scanner could not run, stop and report that; never treat it as a pass.",
+          "fix": "Specify whether to restore the current cohort snapshot when its required post-update scanner cannot run, and require an explicit user decision before retaining an unverified change or proceeding."
+        },
+        {
+          "id": "D8-4",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/references/node.md",
+          "line": 27,
+          "evidence": "Keep the write to the manifest with `--no-github-actions --no-node-version` (or `--include`).",
+          "fix": "Remove the claim that `--include` alone prevents non-manifest side effects; require both exclusion flags for the disposable-copy taze write, matching SKILL.md, and keep the diff review."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/dependency-updater/README.md",
+          "line": 292,
+          "evidence": "Use version ranges appropriately - `^` for active libraries, `~` for stable ones, exact for critical dependencies, plus the critical-lib/stable-lib/modern-lib JSON block",
+          "fix": "Move the caret/tilde strategy block from README Best Practices and Version Range Strategy into references/update-policy.md as a user-requested template, and record the move in docs/audit/recovery/dependency-updater/record.md; SKILL.md step 2 already forbids inferring pins from ^ or ~"
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/dependency-updater/README.md",
+          "line": 124,
+          "evidence": "The skill automatically identifies your project by scanning for common package files: package.json, go.mod, Cargo.toml, Gemfile, pom.xml, *.csproj",
+          "fix": "Keep one detection pointer in SKILL.md step 1; the repeated file-to-language list is generic model knowledge, so move the README Language-Agnostic Detection list to references/ only if users ask for it and record the removal"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 60,
+          "evidence": "A lockfile generated by another package manager or version may silently alter the resolved graph and make builds irreproducible",
+          "fix": "Drop this bullet from Non-obvious failure modes: the NEVER list already states the same rule with its reason, and the remaining four bullets carry the environment-specific gotchas"
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 3,
+          "evidence": "description names Node, Python, Go, Rust, Ruby, Java, and .NET but not the manifest keywords package.json, pyproject.toml, go.mod, Cargo.toml, Gemfile, pom.xml or csproj",
+          "fix": "Audit, diagnose, and conservatively update project dependencies and lockfiles for Node (package.json), Python (pyproject.toml, requirements.txt, Pipfile), Go (go.mod), Rust (Cargo.toml), Ruby (Gemfile), Java (pom.xml, build.gradle), and .NET (csproj). Auto-applies safe minor and patch updates after a recoverable snapshot, with tests and a security audit per cohort, and asks before every major, 0.x or prerelease change. Use when asked to update dependencies, update the safe ones automatically, find outdated packages, resolve dependency conflicts, or remediate vulnerable packages, even when the user only names a lockfile or a failing install. Not for runtime upgrades, package publishing, or Renovate configuration."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "skills/dependency-updater/README.md",
+          "line": 216,
+          "evidence": "\"$SKILL/scripts/run-taze.sh\" and \"Run in monorepo mode ... run-taze.sh -r\" with no --include or workspace confirmation",
+          "fix": "Point the README Node.js example at SKILL.md's scoped order: a scan is scripts/run-taze.sh major, and a write needs --include plus --no-github-actions --no-node-version, with -r only after the workspace is confirmed; keep the skill-directory resolution note"
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 68,
+          "evidence": "By default edit the target versions directly in the manifest. Alternatively run a scoped taze write, only in a disposable copy",
+          "fix": "Make the direct manifest edit the only default for an exact target map, and gate the disposable-copy taze write on the case where the mode's latest version equals that map; the current or leaves two equal write paths for a fragile lockfile change"
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/dependency-updater/evals/trigger-queries.json",
+          "line": 1,
+          "evidence": "11 should-trigger and 10 should-not-trigger queries, but the negatives are easy neighbours (Renovate, Node.js itself, publish to npm) and none is a near-miss such as adding one named dependency or editing an application that merely imports a package",
+          "fix": "Replace four weak negatives with near-misses that mention a manifest or a package but ask for a feature, a new dependency, or a code fix, and add one casual should-trigger query that names only a failing lockfile"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/dependency-updater/references/managers.md",
+          "line": 14,
+          "evidence": "Security scanners are ecosystem-specific: govulncheck ./..., cargo audit, bundle-audit check ... mvn org.owasp:dependency-check-maven:check",
+          "fix": "Split the scanner sentence into one invocation per ecosystem and say each is run only after that ecosystem is confirmed, matching the Node and Python commands already gated in their own files; an agent on a Go task otherwise has five unrelated commands in one line"
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/dependency-updater/README.md",
+          "line": 338,
+          "evidence": "Originally from softaworks/agent-toolkit by @leonardocouy",
+          "fix": "Keep the credit line as written and add @leonardocouy to the existing dependency-updater row in docs/audit/upstream-sources.json (skill dependency-updater, source softaworks/agent-toolkit:skills/dependency-updater); do not shorten or remove the credit"
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

@@ -1,0 +1,86 @@
+{
+  "skill": "dependency-updater",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 14,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": null,
+      "evidence": "Previous-version digest at dbff837f: \"removed units (96, showing 40)\".",
+      "fix": "Review the complete digest against the current files and docs/audit/recovery/dependency-updater/record.md; restore or record any remaining unexplained removals."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 13,
+      "evidence": "\"whose update breaks no peer, ABI or runtime-floor constraint (checked from the resolver output)\"",
+      "fix": "Define a fail-closed branch for checks the resolver cannot establish: inspect package metadata and supported runtimes where available; if compatibility remains unknown, ask per target rather than treating absence of a resolver error as proof."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/dependency-updater/evals/evals.json",
+      "line": 1,
+      "evidence": "The auto-apply and rollback assertions accept \"a plan or a report template\" and say \"no run results are expected\".",
+      "fix": "Add execution-backed cases that verify the actual manifest and lockfile diff, a failed-gate restore, and preservation of unrelated edits; retain the existing plan-only cases."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 21,
+      "evidence": "The general procedure says to scan and then \"Auto-apply each safe cohort\", while the description also triggers for audits and finding outdated packages; only the Node scan script explicitly exempts scan-only requests.",
+      "fix": "Branch on user intent before the update procedure: for audit-only, diagnosis-only, or outdated-list requests, run non-mutating discovery and report without applying changes; enter the write workflow only when updates are requested."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 26,
+      "evidence": "\"Run ... security audit for each cohort. On a failure stop, restore the snapshot of that cohort\".",
+      "fix": "Establish the baseline audit and distinguish scanner execution errors, pre-existing findings, and newly introduced or worsened findings. Stop and report unavailable audits; restore a cohort when its changes cause an unacceptable regression, rather than automatically undoing a vulnerability fix because unrelated findings remain."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/references/node.md",
+      "line": 17,
+      "evidence": "\"After updating only approved manifest entries ... Confirm every resolved target matches the approved package-to-target map exactly\" conflicts with SKILL.md's auto-apply policy, under which safe targets need no individual approval.",
+      "fix": "Change the Node workflow to refer to the shown target map, requiring explicit approval only for ask-per-target changes; retain exact diff verification for both auto-applied and approved cohorts."
+    }
+  ]
+}

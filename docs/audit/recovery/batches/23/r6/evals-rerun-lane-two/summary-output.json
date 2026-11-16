@@ -1,0 +1,19 @@
+{
+  "skill": "dependency-updater",
+  "mode": "output",
+  "pass_rate": 0.9556,
+  "passed": 43,
+  "total": 45,
+  "failures": [
+    {
+      "eval": "auto-apply-cohorts",
+      "assertion": "Says the final report will list each applied package with its exact version (a report template is enough)",
+      "evidence": "The output only notes expected lockfile entries during verification (\"node_modules/express: 4.21.2, node_modules/dayjs: 1.11.13\") but never states that a final report will list each applied package with its exact version, nor provides a report template."
+    },
+    {
+      "eval": "python-audit-plan",
+      "assertion": "Checks that the poetry.lock diff changes only the approved package and its dependencies and that no major version moved without approval",
+      "evidence": "The output's verification gates after each update are only 'poetry check --lock', 'poetry run pytest', and 'pip-audit', with 'lockfile diff summary' listed merely as report content and no stated step checking that the poetry.lock diff is limited to the approved package(s) and their dependencies with no unapproved major moves."
+    }
+  ]
+}
