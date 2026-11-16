@@ -1,0 +1,77 @@
+{
+  "skill": "pr-diagrams",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 40,
+      "evidence": "\"A promotion copies the image URLs already in the source PR bodies. It does not render or attach again.\" The Reuse workflow is a two-sentence rule with no steps for fetching the source bodies or assembling the promoted body",
+      "fix": "Add the sequence: fetch each source PR body (gh pr view <n> --json body), keep every image reference verbatim, apply the one-prefix title rule, then assemble; or route to the title/body assembly sections of references/pr-body.md"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 22,
+      "evidence": "\"The `explain-pr-changes` command loads `references/pr-body.md` (none-mode diagram filter and PR body templates) on demand.\" The only load trigger names another command, so a standalone promotion-body request following SKILL.md never loads the reference",
+      "fix": "Add a scenario trigger inside the Reuse workflow, e.g. \"Read references/pr-body.md when assembling or filtering a promotion PR body outside the explain-pr-changes command; do NOT load it for plain attach or publish runs.\""
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/pr-diagrams/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "21 queries with 12 marked should_trigger true against 9 false, while the pinned guidance is about 20 queries with 8-10 should-trigger and 8-10 should-not-trigger; several positives name the branch or skill literally and so barely test the description",
+      "fix": "Rebalance to 8-10 positives (drop near-certain positives such as the entry literally running \"pr-diagrams related main develop --exclude-pr 40\") or add stronger near-miss negatives"
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+      "line": 346,
+      "evidence": "*) die \"usage: pr-diagrams.sh repo|related|reviewers|render|capability|publish ...\" \u2014 usage text appears only on error paths (exit 1 or 2); --help is not a first-class flag and flags, env overrides and exit codes are not documented in one place",
+      "fix": "Handle --help/-h explicitly: print the six subcommands with their arguments and flags (--exclude-pr, --exclude), the env overrides (PR_DIAGRAMS_MODE, DRAWIO_CONVERTER, PR_DIAGRAMS_PROBE_TIMEOUT) and the exit codes, then exit 0"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 31,
+      "evidence": "gh pr create --repo \"$REPO\" --base \"$BASE\" --head \"$HEAD\" --title \"$TITLE\" ... \u2014 $REPO, $BASE, $HEAD and $TITLE are used in the exact commands but never defined for standalone use; only $AD is glossed as \"the caller's scratch directory\", which presumes an explain-pr-changes caller exists",
+      "fix": "Add one sentence before the Attach commands: standalone, $AD is a fresh scratch directory (mktemp -d), $REPO comes from pr-diagrams.sh repo, and $BASE/$HEAD are the target and source branches of the PR being created or edited"
+    }
+  ]
+}

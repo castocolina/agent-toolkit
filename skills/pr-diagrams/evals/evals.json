@@ -67,6 +67,70 @@
         "Drops the review with a null user and the Bot in requested reviewers",
         "Drops the excluded login case-insensitively"
       ]
+    },
+    {
+      "id": "single-branch-name",
+      "prompt": "branch-names.txt lists candidate branch names. Which one may you create to publish the diagram of PR 41, and where does the PNG go? What about the others?",
+      "files": [
+        "evals/files/branch-names.txt"
+      ],
+      "expected_output": "Only pr-diagrams is allowed, with the PNG under 41/ (41/diagram.drawio.png). pr-diagrams/41, pr-diagrams-41 and diagrams/41 are refused.",
+      "assertions": [
+        "Names only pr-diagrams as the branch that may be created",
+        "Puts the file in the 41/ folder on that branch",
+        "Refuses pr-diagrams/41, pr-diagrams-41 and diagrams/41"
+      ]
+    },
+    {
+      "id": "ghe-old-gh-uses-publish",
+      "prompt": "ghe-gh-version.txt shows the gh version and origin host. I want the diagram in the PR body for PR 41. Which mode and command do you use?",
+      "files": [
+        "evals/files/ghe-gh-version.txt"
+      ],
+      "expected_output": "capability reports branch (non-github.com host, gh 2.98.0 below 2.101). Use pr-diagrams.sh publish 41 <png>, which commits to the single pr-diagrams branch under 41/, and reference the printed URL. Do not use --attach.",
+      "assertions": [
+        "Chooses branch mode and pr-diagrams.sh publish",
+        "Publishes to the single pr-diagrams branch, not a per-PR branch",
+        "Does not use --attach"
+      ]
+    },
+    {
+      "id": "refuse-branch-per-pr",
+      "prompt": "Create a branch per PR for the diagrams so each PR has its own pr-diagrams-<N> branch.",
+      "expected_output": "Refuses the per-PR branch. Offers the single pr-diagrams branch with one folder per PR number (<N>/diagram.png).",
+      "assertions": [
+        "Refuses to create a branch per PR",
+        "Offers the single pr-diagrams branch with a folder named by the PR number"
+      ]
+    },
+    {
+      "id": "github-new-gh-uses-attach",
+      "prompt": "The remote is github.com and gh --version prints gh version 2.101.0. Attach the PNG /tmp/ad/diagram.drawio.png to a new PR. Which mode and flag?",
+      "expected_output": "capability prints attach, so use gh pr create with --attach /tmp/ad/diagram.drawio.png. No branch is pushed.",
+      "assertions": [
+        "Chooses attach mode and uses --attach",
+        "Does not push to or create any branch"
+      ]
+    },
+    {
+      "id": "branch-mode-new-pr-order",
+      "prompt": "capability printed branch. There is no PR yet for this head, and /tmp/ad/diagram.drawio.png is rendered. List the calls in order to open the PR with the diagram.",
+      "expected_output": "gh pr create with --body-file /tmp/ad/body-fallback.md and no --attach; take N from the printed URL; bash \"$PRD\" publish \"$N\" /tmp/ad/diagram.drawio.png; put the printed url in body.md; exactly one gh pr edit \"$N\" --body-file body.md, with no --attach.",
+      "assertions": [
+        "Creates the PR first with the fallback body and without --attach",
+        "Takes N from the URL that gh pr create prints and only then runs publish with that N",
+        "Updates the body with exactly one gh pr edit that has no --attach"
+      ]
+    },
+    {
+      "id": "partial-attach-no-second-create",
+      "prompt": "gh pr create --attach /tmp/ad/diagram.drawio.png exited 1 but printed https://github.com/acme/widgets/pull/42 before the upload error. What next?",
+      "expected_output": "This is a partial attach and PR 42 exists. Do not run gh pr create again. Take N=42 from the URL, publish the PNG through the pr-diagrams branch and edit the body with the url; if publish fails, restore body-fallback.md with one gh pr edit. Quote gh's stderr.",
+      "assertions": [
+        "Does not run a second gh pr create",
+        "Takes N=42 from the printed URL",
+        "Recovers through publish to the pr-diagrams branch, falling back to body-fallback.md if publish fails"
+      ]
     }
   ]
 }

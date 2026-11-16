@@ -1,0 +1,86 @@
+{
+  "skill": "pr-diagrams",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 15,
+    "D4": 13,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 45,
+      "evidence": "\"(conversion runs on a scratch copy, then the PNG is copied back). The PNG is non-empty, starts with the PNG signature ...\" and line 57 \"`repo` prints `<owner>/<repo>` parsed from `origin` (https, `git@github.com:` and `ssh://`, optional `.git` or trailing slash)\"",
+      "fix": "Remove the script internals the agent does not act on (scratch copy, signature check, list of parsed URL forms). Keep only the stdout contract, the PNG location, the -e embed fact and the failure meanings. The internals stay documented in README.md and the tests."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 31,
+      "evidence": "\"the same prose with an inline Mermaid block in place of the PNG reference (omit the diagram only when it has no Mermaid equivalent)\"",
+      "fix": "Add a one-line decision rule for the fallback: flowcharts and sequence diagrams map to Mermaid flowchart or sequenceDiagram. Free-form layouts (network maps, UI mockups) get no Mermaid; use a one-sentence description of the diagram instead. That way the agent does not have to invent its own criterion."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 3,
+      "evidence": "The description opens \"Render draw.io diagrams to PNGs with the diagram embedded\" but sets no boundary against rendering outside a PR, while trigger-queries.json expects \"convert architecture.drawio to a transparent PNG for the slides\" not to trigger",
+      "fix": "Use this skill to get a rendered draw.io diagram into a pull request body: render the .drawio to a PNG with the diagram embedded, attach it with gh --attach (github.com, gh 2.101+) or, on GitHub Enterprise or older gh, publish it to the single pr-diagrams branch. Also finds the merged source PRs a promotion PR (staging \u2192 production, develop \u2192 main) should reuse, copies their diagram image URLs and requests their human reviewers. Use when attaching or hosting a diagram image in a PR body, choosing where diagram images live, promoting a branch and reusing earlier PR diagrams or reviewers, even if the user never says \"pr-diagrams\". Not for exporting a .drawio to PNG/SVG outside a PR (slides, docs), drawing or editing draw.io XML (draw-io), creating a PR without a diagram, or listing reviewers already requested on a PR (gh pr view)."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/pr-diagrams/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "12 should-trigger vs 9 should-not-trigger queries; most are terse one-liners (\"create a pull request\", \"draw a diagram of this module\") with no file paths, PR numbers or personal context",
+      "fix": "Rebalance to about 10/10 and rewrite several queries with realistic context. Examples: \"my manager wants the arch diagram in docs/arch.drawio to show up in PR #212 on our GHE instance\" (should trigger) and \"export docs/arch.drawio as SVG for the wiki page\" (near-miss, should not trigger)."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 55,
+      "evidence": "\"Request them with `gh pr edit \"$N\" --repo \"$REPO\" --add-reviewer <login>,...`\" does not show how to turn the JSON array into the comma list, and there is no branch for an empty array `[]`",
+      "fix": "Add: `R=$(bash \"$PRD\" reviewers ... | jq -r 'join(\",\")')`, and run `gh pr edit \"$N\" --repo \"$REPO\" --add-reviewer \"$R\"` only when `$R` is non-empty. When it is empty, say that no human reviewers were found and skip the call."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 25,
+      "evidence": "\"`related` and `reviewers` support github.com only, so promotion reuse is unavailable on GHE.\" gives no next action",
+      "fix": "Add a GHE fallback: ask the user for the source PR numbers (the command's --reuse-from=<PR>), read each with `gh pr view <pr> --repo \"$REPO\" --json title,body,reviews`, copy the image references byte for byte and request the listed human reviewers by hand."
+    }
+  ]
+}

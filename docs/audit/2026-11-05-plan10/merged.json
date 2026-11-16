@@ -1,0 +1,231 @@
+{
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "explain-pr-changes",
+      "percent": 90.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 93.6,
+        "router-env-my-referee-three": 87.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 132,
+          "evidence": "Load it only for those bodies: read `${CLAUDE_PLUGIN_ROOT}/skills/pr-diagrams/references/pr-body.md` first; when that text is unsubstituted ... read `$HOME/...` instead, testing it with `[[ -f ... ]]` rather than a quoted `~` \u2014 the same two-candidate fallback instruction is restated at lines 132, 214, 225, 299 and 384 for pr-body.md, authoring-rules.md and draw-io/SKILL.md, after 1.5 already teaches the pattern for the script",
+          "fix": "State the two-candidate rule once (for example in 1.5: 'resolve any bundled path by the rule here: try the literal ${CLAUDE_PLUGIN_ROOT} path, skip it when the text is still unsubstituted, else $HOME/.claude/... tested with [[ -f ]]') and shorten the five later occurrences to 'load <path> by the 1.5 two-candidate rule'"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 254,
+          "evidence": "Final-message ordering depends on whether the command stops or recovers. For terminal failures\u2014the command stops, including push failure, failed reads, PR create/edit failure, guard errors, and a missing script for `--reuse-from` or a promotion head\u2014the final message begins with ... \u2014 a 130-word run-on that enumerates every failure kind again although phase 6 already states the same rule",
+          "fix": "Replace the paragraph with the two-line rule ('terminal failure: begin with the tool error or named guard error verbatim; recoverable fallback: begin with one warning line quoting the tool error, then the outcome') and keep the case enumeration only in phase 6"
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 254,
+          "evidence": "385 lines with templates, the none-mode filter and authoring rules already split into skills/pr-diagrams/references/pr-body.md, skills/mermaid-diagrams/references/authoring-rules.md and skills/draw-io/SKILL.md loaded by explicit path \u2014 but the final-message ordering enumeration (line 254) and the fivefold repeated two-candidate load instructions (lines 132, 214, 225, 299, 384) remain in the command file",
+          "fix": "Move the phase-2 final-message ordering enumeration and the reusable two-candidate path-resolution rule into skills/pr-diagrams/references/pr-body.md (or a short new reference section) and load them by explicit path at the steps that need them, bringing the command under 200 lines"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 237,
+          "evidence": "Phase 1 items 1-5 restate sections 1.2, 1.4, 1.5 and 1.6 ('The `--diagrams` and `--reuse-from` checks (1.2)... A promotion head is a head in `PR_PROMOTION_BRANCHES` that differs from the base'). Section 4 repeats the reviewer rule from Phase 3 item 5, and generic facts the model knows are spelled out ('`git checkout -b` on git older than 2.23', 'The command does not fail because a reviewer was rejected')",
+          "fix": "Keep each rule once. Make Phase 1 and Phase 3 short ordered pointers to the numbered sections ('1. Validate (1.2). 2. Head and guard (1.6)...'), and delete the generic git fallback and the repeated restatements of the reviewer outcome"
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 231,
+          "evidence": "Rules are split between declarative sections (1.x, 2.x) and an ordered phase list that keeps pointing back ('(1.6)', '(2.7)', 'per 2.9'). At 386 lines this goes well past the ~200-line Process pattern",
+          "fix": "Make the six phases the spine. Put each rule inside the phase that runs it, and keep only definitions (1.3 diagram, 1.4 REPO, 1.5 PRD) as standalone sections, so the agent reads the steps in order and does not jump between sections"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 20,
+          "evidence": "'never create `pr-diagrams/<N>` or `pr-diagrams-<N>` (phase 5)': the gotcha says what not to do but not why",
+          "fix": "Add the reason. For example: a per-PR branch name collides with the single `pr-diagrams` ref namespace (a branch `pr-diagrams` blocks `pr-diagrams/<N>`) and leaves orphan branches that `publish` never cleans up"
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 132,
+          "evidence": "The command is 386 lines. The same plugin-root fallback paragraph ('read `${CLAUDE_PLUGIN_ROOT}/...` first; when that text is unsubstituted ... read `$HOME/.claude/...` instead, testing it with `[[ -f ... ]]` rather than a quoted `~`') appears at lines 132, 212, 224, 299, 336 and 384. The long final-message ordering paragraph (line 254) and the 2.8 filter description also stay inline",
+          "fix": "Define the resolution rule once (for example 'Resolve <rel> = first existing of ${CLAUDE_PLUGIN_ROOT}/<rel>, $HOME/.claude/<rel>') and cite it at each load point. Move the final-message ordering rules and the 2.8 filter prose into skills/pr-diagrams/references/pr-body.md, loaded on the failure or none-mode path"
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "commands/explain-pr-changes.md",
+          "line": 97,
+          "evidence": "'Derive `<short-slug>` from the head name or the latest commit subject.' This gives two options and no default, and on this guard the head name is always the base (`main`)",
+          "fix": "Give one default: 'Derive `<short-slug>` from the latest commit subject (lowercase, hyphenated, at most 40 characters); fall back to `pr/<yyyymmdd-hhmm>` when the subject is empty.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 231,
+          "evidence": "'phases 1, 2, and 3 run in one Bash call that ends by writing `$AD/state.env`'. Phase 3 still needs agent judgment between reads: choosing SRC by `base_ref`, the merge-commit check in 2.2 ('stop before any PR write and ask the user'), and the mode decision from the 2.1 view. A single non-interactive Bash call cannot pause for those, so the branch has no clear outcome",
+          "fix": "Allow several Bash calls in phase 3. Write `$AD/state.env` progressively (append each value with `printf '%q'` as soon as it is known), and have every call after the first source it, so judgment steps can run between reads"
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/explain-pr-changes.md",
+          "line": 384,
+          "evidence": "The feature and consolidated templates, the assembly code and the none-mode filter live only in pr-body.md ('read `${CLAUDE_PLUGIN_ROOT}/...pr-body.md` first; ... read `$HOME/.claude/...pr-body.md` instead'). No outcome is given when both candidates are missing, unlike the Mermaid rules, which have stated minimums. The same gap exists for draw-io/SKILL.md at line 299",
+          "fix": "Add the missing branch: 'When neither pr-body.md exists, stop before any PR write with `pr-body.md not found at <both paths>` (phase 6 cleanup runs)'. For draw-io/SKILL.md, treat a missing file as a render failure (Mermaid fallback, warning first)"
+        }
+      ]
+    },
+    {
+      "name": "pr-diagrams",
+      "percent": 94.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 95.2,
+        "router-env-my-referee-three": 92.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/pr-diagrams/SKILL.md",
+          "line": 40,
+          "evidence": "\"A promotion copies the image URLs already in the source PR bodies. It does not render or attach again.\" The Reuse workflow is a two-sentence rule with no steps for fetching the source bodies or assembling the promoted body",
+          "fix": "Add the sequence: fetch each source PR body (gh pr view <n> --json body), keep every image reference verbatim, apply the one-prefix title rule, then assemble; or route to the title/body assembly sections of references/pr-body.md"
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/pr-diagrams/SKILL.md",
+          "line": 22,
+          "evidence": "\"The `explain-pr-changes` command loads `references/pr-body.md` (none-mode diagram filter and PR body templates) on demand.\" The only load trigger names another command, so a standalone promotion-body request following SKILL.md never loads the reference",
+          "fix": "Add a scenario trigger inside the Reuse workflow, e.g. \"Read references/pr-body.md when assembling or filtering a promotion PR body outside the explain-pr-changes command; do NOT load it for plain attach or publish runs.\""
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/pr-diagrams/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "21 queries with 12 marked should_trigger true against 9 false, while the pinned guidance is about 20 queries with 8-10 should-trigger and 8-10 should-not-trigger; several positives name the branch or skill literally and so barely test the description",
+          "fix": "Rebalance to 8-10 positives (drop near-certain positives such as the entry literally running \"pr-diagrams related main develop --exclude-pr 40\") or add stronger near-miss negatives"
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/pr-diagrams/scripts/pr-diagrams.sh",
+          "line": 346,
+          "evidence": "*) die \"usage: pr-diagrams.sh repo|related|reviewers|render|capability|publish ...\" \u2014 usage text appears only on error paths (exit 1 or 2); --help is not a first-class flag and flags, env overrides and exit codes are not documented in one place",
+          "fix": "Handle --help/-h explicitly: print the six subcommands with their arguments and flags (--exclude-pr, --exclude), the env overrides (PR_DIAGRAMS_MODE, DRAWIO_CONVERTER, PR_DIAGRAMS_PROBE_TIMEOUT) and the exit codes, then exit 0"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/pr-diagrams/SKILL.md",
+          "line": 31,
+          "evidence": "gh pr create --repo \"$REPO\" --base \"$BASE\" --head \"$HEAD\" --title \"$TITLE\" ... \u2014 $REPO, $BASE, $HEAD and $TITLE are used in the exact commands but never defined for standalone use; only $AD is glossed as \"the caller's scratch directory\", which presumes an explain-pr-changes caller exists",
+          "fix": "Add one sentence before the Attach commands: standalone, $AD is a fresh scratch directory (mktemp -d), $REPO comes from pr-diagrams.sh repo, and $BASE/$HEAD are the target and source branches of the PR being created or edited"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/pr-diagrams/SKILL.md",
+          "line": 45,
+          "evidence": "\"(conversion runs on a scratch copy, then the PNG is copied back). The PNG is non-empty, starts with the PNG signature ...\" and line 57 \"`repo` prints `<owner>/<repo>` parsed from `origin` (https, `git@github.com:` and `ssh://`, optional `.git` or trailing slash)\"",
+          "fix": "Remove the script internals the agent does not act on (scratch copy, signature check, list of parsed URL forms). Keep only the stdout contract, the PNG location, the -e embed fact and the failure meanings. The internals stay documented in README.md and the tests."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/pr-diagrams/SKILL.md",
+          "line": 31,
+          "evidence": "\"the same prose with an inline Mermaid block in place of the PNG reference (omit the diagram only when it has no Mermaid equivalent)\"",
+          "fix": "Add a one-line decision rule for the fallback: flowcharts and sequence diagrams map to Mermaid flowchart or sequenceDiagram. Free-form layouts (network maps, UI mockups) get no Mermaid; use a one-sentence description of the diagram instead. That way the agent does not have to invent its own criterion."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "skills/pr-diagrams/SKILL.md",
+          "line": 3,
+          "evidence": "The description opens \"Render draw.io diagrams to PNGs with the diagram embedded\" but sets no boundary against rendering outside a PR, while trigger-queries.json expects \"convert architecture.drawio to a transparent PNG for the slides\" not to trigger",
+          "fix": "Use this skill to get a rendered draw.io diagram into a pull request body: render the .drawio to a PNG with the diagram embedded, attach it with gh --attach (github.com, gh 2.101+) or, on GitHub Enterprise or older gh, publish it to the single pr-diagrams branch. Also finds the merged source PRs a promotion PR (staging \u2192 production, develop \u2192 main) should reuse, copies their diagram image URLs and requests their human reviewers. Use when attaching or hosting a diagram image in a PR body, choosing where diagram images live, promoting a branch and reusing earlier PR diagrams or reviewers, even if the user never says \"pr-diagrams\". Not for exporting a .drawio to PNG/SVG outside a PR (slides, docs), drawing or editing draw.io XML (draw-io), creating a PR without a diagram, or listing reviewers already requested on a PR (gh pr view)."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/pr-diagrams/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "12 should-trigger vs 9 should-not-trigger queries; most are terse one-liners (\"create a pull request\", \"draw a diagram of this module\") with no file paths, PR numbers or personal context",
+          "fix": "Rebalance to about 10/10 and rewrite several queries with realistic context. Examples: \"my manager wants the arch diagram in docs/arch.drawio to show up in PR #212 on our GHE instance\" (should trigger) and \"export docs/arch.drawio as SVG for the wiki page\" (near-miss, should not trigger)."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/pr-diagrams/SKILL.md",
+          "line": 55,
+          "evidence": "\"Request them with `gh pr edit \"$N\" --repo \"$REPO\" --add-reviewer <login>,...`\" does not show how to turn the JSON array into the comma list, and there is no branch for an empty array `[]`",
+          "fix": "Add: `R=$(bash \"$PRD\" reviewers ... | jq -r 'join(\",\")')`, and run `gh pr edit \"$N\" --repo \"$REPO\" --add-reviewer \"$R\"` only when `$R` is non-empty. When it is empty, say that no human reviewers were found and skip the call."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/pr-diagrams/SKILL.md",
+          "line": 25,
+          "evidence": "\"`related` and `reviewers` support github.com only, so promotion reuse is unavailable on GHE.\" gives no next action",
+          "fix": "Add a GHE fallback: ask the user for the source PR numbers (the command's --reuse-from=<PR>), read each with `gh pr view <pr> --repo \"$REPO\" --json title,body,reviews`, copy the image references byte for byte and request the listed human reviewers by hand."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

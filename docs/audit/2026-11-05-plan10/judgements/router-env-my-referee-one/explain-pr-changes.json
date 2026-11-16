@@ -1,0 +1,50 @@
+{
+  "skill": "explain-pr-changes",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 4,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 10,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "commands/explain-pr-changes.md",
+      "line": 334,
+      "evidence": "The command remains 391 lines despite splitting templates, assembly code and the filter into a bundled reference. Detailed publication and recovery recipes remain inline, beginning: \"In `branch` mode with a rendered PNG, no call passes `--attach`.\"",
+      "fix": "Move the detailed repository/lookup recipes, source-body assembly explanations, and drawio attach/branch recovery recipes into references bundled under skills/pr-diagrams/. Keep concise invariants and the ordered phase routing in the command, with explicit conditions for loading each recipe."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/explain-pr-changes.md",
+      "line": 50,
+      "evidence": "\"A *diagram link* is an image link whose URL is a GitHub user-attachments URL: the URL contains `github.com/user-attachments/`, the form `gh --attach` produces.\" Phase 5 also publishes diagrams through URLs such as https://github.com/acme/widgets/blob/pr-diagrams/42/diagram.drawio.png?raw=true. Following that output into promotion reuse, the published image fails this definition: none mode retains it, while mermaid or drawio mode can author another diagram beside it.",
+      "fix": "Extend the shared diagram definition, reuse detection, and none-mode filter in skills/pr-diagrams/references/pr-body.md to recognize this repository's exact published pr-diagrams/<PR>/ image URLs, including reference-style images. Preserve unrelated ordinary images. Add regression scenarios that reuse a branch-published image in none, mermaid and drawio modes, verifying removal in none and no additional authoring in the other modes."
+    }
+  ]
+}
