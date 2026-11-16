@@ -18,6 +18,8 @@
 | 10 | [pr-diagrams branch and CI triggers](2026-10-30-10-pr-diagrams-branch.md) | 8 Task 4 | single `pr-diagrams` branch fallback, CI on any PR base |
 | 11 | [Scheduled audit Phase 2](2026-10-30-11-scheduled-audit-phase2.md) | 5 merged, tokens set by the user | draft, own review after #8 merges. Copilot spike, Phase 2 cut to the keyless decision protocol, first real run |
 | 9 | [CI artifact flow](2026-10-30-09-ci-artifact-flow.md) | 5 merged, 6, 7, 11 | draft, own review after #8 merges. Two-stage CI: refresh the judge, then review every artifact in rotation |
+| 13 | [Judge preservation](2026-11-06-13-judge-preservation.md) | PRs #15 and #16 | draft (added 2026-11-06 by user ruling). Rubric v5 and a previous-version digest make skill-judge flag unexplained removals, collateral deletions included, and check sources on every judgment; fixer rules and the record format; the scheduled audit defers the removal check per artifact until its recovery closes; registry rows for commands and agents |
+| 14 | [Content recovery](2026-11-06-14-content-recovery.md) | 13 | draft (split from 13 on 2026-11-06). Every pre-October artifact gets its lost guidance and files triaged and restored, and every artifact gets its sources and version-sensitive facts re-verified, in batches of at most 3 |
 
 PRs are stacked as in the first roadmap. The ledger of problems is [2026-10-30-00-known-issues.md](2026-10-30-00-known-issues.md): the 26 high findings are skill content issues, so they belong to plan 8, not to plan 5.
 
