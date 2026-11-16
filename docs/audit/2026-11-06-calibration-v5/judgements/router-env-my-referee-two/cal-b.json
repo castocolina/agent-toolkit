@@ -1,0 +1,203 @@
+{
+  "skill": "cal-b",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 4,
+    "D2": 5,
+    "D3": 5,
+    "D4": 7,
+    "D5": 4,
+    "D6": 6,
+    "D7": 8,
+    "D8": 6
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 45,
+  "max_total": 125,
+  "percent": 36.0,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 40,
+      "evidence": "\"## Commit type reference\" spends ~130 of ~224 lines restating conventional-commit basics (\"Use `feat` for a new feature.\") with placeholder examples the model reliably produces unprompted",
+      "fix": "Delete the section and record the removal; if users ask for it by name, move it into a skill the plugin bundles and load it by explicit path only when the notes step needs it"
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 9,
+      "evidence": "\"A release is a version of the software that is given to users.\" \u2014 a What-is-X section explaining releases, git, tags and semver",
+      "fix": "Delete the section and record the removal; the model already knows what a release, a tag and semantic versioning are"
+    },
+    {
+      "id": "D1-3",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 17,
+      "evidence": "\"To see the history run `git log`. ... Always write clean code and good commit messages.\" \u2014 a git tutorial plus generic advice",
+      "fix": "Delete the section and record the removal; git basics and 'write clean code' are model knowledge, not release expertise"
+    },
+    {
+      "id": "D1-4",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/cal-b.md",
+      "line": 174,
+      "evidence": "Five near-identical placeholder blocks (\"- First change in 1.0.0\", \"- First change in 1.1.0\", ...) add nothing over one example",
+      "fix": "Keep one example as the output template, remove the other four and record the removal"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 23,
+      "evidence": "\"1. Run the tests and make sure they pass, but do not run the tests because they are slow\" \u2014 mechanical checkbox steps with no reasoning or thinking framework behind them",
+      "fix": "Add the expert judgment each step encodes (why the last CI run replaces running tests, what makes good release notes, when to stop) so the procedure generalises"
+    },
+    {
+      "id": "D2-2",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/cal-b.md",
+      "line": 174,
+      "evidence": "Structure mixes a tutorial, a step list, a reference dump and example outputs with no coherent pattern and no checkpoints between phases",
+      "fix": "Restructure as a short Process-pattern command: verify CI, draft notes, approval gate, tag and push, with the reference and example material moved out"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 34,
+      "evidence": "\"7. Be careful and consider edge cases.\" \u2014 a vague warning with no content",
+      "fix": "Replace with specific NEVER items with reasons, e.g. 'NEVER move an already-pushed tag with `git tag -f`: consumers may have fetched it and a moved tag breaks their clones'"
+    },
+    {
+      "id": "D3-2",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 29,
+      "evidence": "\"Never push anything before the release notes are approved by the user.\" \u2014 the one specific NEVER carries no reason, and there is no Gotchas section for tag or CI edge cases",
+      "fix": "Add the why (a pushed tag is public and hard to retract) and a Gotchas list of environment facts, e.g. what to do when the tag exists or CI has no run for this commit"
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 1,
+      "evidence": "Frontmatter has no `description`; the host falls back to the first body line \"# Release helper\", which names no trigger scenario, keywords or boundaries",
+      "fix": "Add `description: Cut a git release: confirm the last CI run is green, draft three-sentence release notes from the commit messages, get user approval, then tag v<version> and push branch and tag. Use when asked to release, cut, ship or tag a version such as 1.2.3, even without the word 'release'. Not for CI setup or full changelog generation.`"
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/cal-b.md",
+      "line": 2,
+      "evidence": "\"name: cal-b\" \u2014 `name` is not an accepted command field; the command name is the file name",
+      "fix": "Remove the `name` field; the host already names the command cal-b from commands/cal-b.md"
+    },
+    {
+      "id": "D4-3",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/cal-b.md",
+      "line": 3,
+      "evidence": "\"tags: git, release\" \u2014 `tags` is not in the accepted command field list; the host ignores it",
+      "fix": "Remove `tags`, or move it under `metadata:` (a free-form map the frontmatter accepts)"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 40,
+      "evidence": "~224-line command with nothing split out: the ~130-line \"## Commit type reference\" and the ~50-line \"## Example outputs\" sit inline in the command file",
+      "fix": "Move the commit-type reference and the example outputs into a skill the plugin bundles, loaded by explicit path only when the notes step needs them (a command cannot ship its own references/), or delete them as model-known and record the removals"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 32,
+      "evidence": "\"Clean up old tags and branches as needed. Use force if something is in the way, and fix whatever is broken.\" \u2014 maximum freedom granted to destructive remote operations",
+      "fix": "Give cleanup exact guarded commands (list what will be deleted and confirm with the user before any `git push --delete` or forced update), or drop cleanup from this command; destructive git operations need low freedom"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "commands/evals/cal-b.json",
+      "line": 5,
+      "evidence": "\"id\": \"release-1-2-0\" is the only scenario: green CI, absent tag, argument 1.2.0 \u2014 the main path alone",
+      "fix": "Add a failure path (last CI run red: assert the command stops before tagging; tag v1.2.0 already exists: assert the stated fallback runs) and an edge case (/cal-b with no version argument: assert it asks for the version instead of tagging literally), each with verifiable assertions"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 30,
+      "evidence": "\"If the tag already exists, follow the steps in section \\\"Existing tag\\\" and then continue with step 9.\" \u2014 no section \"Existing tag\" exists and the list has seven steps, not nine",
+      "fix": "Write the actual existing-tag handling (compare `git rev-parse` of the tag with HEAD; if it points elsewhere, stop and ask) and fix the continuation step number, or delete the branch"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 26,
+      "evidence": "\"git tag v$1\" \u2014 `$N` placeholders are 0-based ($0 is the first argument), so with /cal-b 1.2.0 `$1` is a missing index and stays literal: the command would tag v$1",
+      "fix": "Use `v$0` (or declare `arguments: version` and write `v$version`) so /cal-b 1.2.0 produces `git tag v1.2.0`"
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/cal-b.md",
+      "line": 29,
+      "evidence": "\"Never push anything before the release notes are approved by the user.\" contradicts step 2, which pushes the branch and tag before the notes are written in step 3",
+      "fix": "Reorder the steps: draft the notes and pass the approval gate before any push; move step 2's `git push` commands after approval"
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/cal-b.md",
+      "line": 181,
+      "evidence": "Example output \"- First change in 1.0.0\" (three bullets) contradicts step 3's \"exactly three sentences, each starting with a verb\", which the eval asserts",
+      "fix": "Make the kept example match the required three-sentence format, or change step 3 to the bullet format \u2014 one of the two must give"
+    },
+    {
+      "id": "D8-5",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/cal-b.md",
+      "line": 24,
+      "evidence": "\"just check that the last CI run is green\" \u2014 no stated outcome when the last CI run is red or missing",
+      "fix": "State the fallback: if CI is red or has no run for this commit, stop and report the failing job instead of releasing"
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "skill-judge",
+      "percent": 96.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 98.4,
+        "router-env-my-referee-three": 95.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 3,
+          "evidence": "description says 'improve a SKILL.md' while the body says 'You report and never edit' and 'Not for writing a new skill from scratch'",
+          "fix": "Score an Agent Skill, or a slash-command or subagent .md file, against the pinned Agent Skills spec and best practices. Use when asked to judge, review, audit, grade, compare or recommend fixes for a SKILL.md, a skill directory, a command or an agent file, or when a skill never triggers, feels bloated, wastes tokens on what the model already knows, or the user asks if it is ready to publish, even without the word \"judge\". Returns percent, grade, per-dimension scores and fixes, or a machine-readable verdict line; it reports fixes and never edits files. Not for writing a new skill from scratch, and not for refreshing the rubric from agentskills.io (agentskills-research)."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 47,
+          "evidence": "Output contract rule 1 fires when the prompt comes from references/judge-prompt.md, but that file's text never appears in the judge's prompt, so the only reliable match is 'the request asks for only the verdict or JSON line'",
+          "fix": "Rule 1: the request asks for only the verdict or JSON line, or it says the prompt comes from references/judge-prompt.md (the judge sees that file's filled text, not the filename)."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 12,
+          "evidence": "## Responsibilities restates rules that references/rubric.md \u00a7 Removals and sources already holds: 'content that exists only to satisfy a dimension or an eval earns no credit' and 'Every removed rule, step, fact ... needs a recorded reason'. The rubric is read in full on every run, so these lines are activation content loaded twice.",
+          "fix": "Keep the three guard names (Purpose, Content, Care) with one clause each and a pointer to references/rubric.md \u00a7 Removals and sources. Keep the longer wording in the rubric, which already holds it, and add a record row for each shortened sentence in docs/audit/recovery/skill-judge/record.md."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 82,
+          "evidence": "The NEVER list covers polish, basics, invented facts and editing. It has no item for the removal-check traps this skill adds: accepting a record row only because it exists, or treating a missing sections.json as an unreadable file.",
+          "fix": "Add: 'NEVER accept a record row only because it exists: check its (fate, value, decision) against docs/audit/fixer-rules.md and rate a drop row's content, because an allowed-looking row can still hide a substantive loss.'"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 27,
+          "evidence": "Step 4 is one paragraph of about 250 words with nested parentheses. It branches on inline digest vs digest file, record present, sections.json present, audit.py present, a command tool available, the digest-dir output (file, note or neither) and a judge-prompt origin. To follow a single branch you have to re-parse the whole paragraph.",
+          "fix": "Split step 4 into labelled sub-bullets: (a) digest supplied: required reads (digest, record, fixer-rules.md, optional sections.json); (b) direct request with no digest and audit.py plus a command tool available: the judge-prompt command and its three outcomes; (c) otherwise: say 'removal check not run'; (d) prompt from judge-prompt.md with no digest: nothing more. Keep every existing clause."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/skill-judge/README.md",
+          "line": 3,
+          "evidence": "Credits the upstream 'pinned [Agent Skills](https://github.com/agentskills/agentskills) specification' (CC-BY-4.0 copies in references/agentskills/), but docs/audit/upstream-sources.json has no row whose skill is skill-judge",
+          "fix": "Add a registry row for skill-judge (kind github, source agentskills/agentskills, credit copied verbatim from the README credit). Keep the credit line unchanged."
+        }
+      ]
+    },
+    {
+      "name": "skill-updater",
+      "percent": 98.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-two": 99.2,
+        "router-env-my-referee-three": 97.6
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 24,
+          "evidence": "Step 4 says a contents check 'Not Found (HTTP 404)' means moved and step 5, but audit.py fetch_source_updated treats an empty commits array as IndexError and reports error 'list index out of range', so a deleted path never reaches error null",
+          "fix": "In the step-3 table, keep 'list index out of range' on a github-path row as the only path-gone signal and send it to step 5. In step 4, use the contents check to confirm the stored path still exists before classifying a row whose error is already null; do not say a contents 404 is how a deleted path is detected."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/skill-updater/evals/evals.json",
+          "line": null,
+          "evidence": "No eval covers the step-4 branch 'Page or patch retrieval that fails or is cut short: the review is unresolved. Make no track call for this artifact, on any row'. Getting it wrong stamps last_reviewed on sibling rows and corrupts the next diff base. trigger-queries.json also has 11 should-not-trigger queries against the guide's 8-10.",
+          "fix": "Add an eval whose upstreams row is stale true with no last_upstream_sha and whose commits page fails partway. Assert that no track command is given for any row and that updates.md logs the review as unresolved. Optionally fold one negative trigger query into a near-miss positive to reach 10/10."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 26,
+          "evidence": "The skill hardcodes gh CLI flags ('gh api --silent', '--paginate', '--jq') with no live read and no source URL or date. Flags of a vendor's CLI are version-sensitive. Only audit.py gets a live read ('Flags: python3 scripts/audit/audit.py track --help').",
+          "fix": "Add a line before step 3: 'Confirm gh flags with `gh api --help` before the first call'. Or cite https://cli.github.com/manual/gh_api with the date checked."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/skill-updater/SKILL.md",
+          "line": 28,
+          "evidence": "The skill hardcodes GitHub REST endpoints with no source URL or date: 'repos/<o>/<r>/compare/<last_upstream_sha>...<ref>', 'repos/<o>/<r>/commits?path=...&since=...', 'repos/<o>/<r>/contents/<path>?ref=<ref>' and 'git/trees/<ref>?recursive=1'. API endpoints are version-sensitive facts.",
+          "fix": "Cite the official GitHub REST docs (https://docs.github.com/en/rest/commits/commits, /rest/repos/contents, /rest/git/trees) with the date checked, in a one-line Sources note at the end of the Procedure."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

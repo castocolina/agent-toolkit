@@ -1,0 +1,68 @@
+{
+  "skill": "cal-g",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/cal-g/SKILL.md",
+      "line": 31,
+      "evidence": "Never write \"human error\" as a root cause: it ends the analysis where it should start.",
+      "fix": "Models already know this rule from blameless-postmortem practice, but they may not apply it unprompted. Merge it into the line-30 item as one sentence (\"Never name a person or 'human error' as the cause: write the action and the condition that made it reasonable, because blame stops reporting and ends the analysis\"). This keeps both reasons and drops nothing."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/cal-g/evals/evals.json",
+      "line": null,
+      "evidence": "No eval covers the rule 'When a metric and a log disagree, show both, take the log time for the event and the metric time for impact' (SKILL.md line 26). The conflicting-times eval only tests two exports of the same chat.",
+      "fix": "Add an eval with a deploy log and a metrics CSV that disagree by a few minutes. Assert that the output shows both times, uses the log time for the event row and the metric time for impact, and marks the claim reported."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/cal-g/SKILL.md",
+      "line": 22,
+      "evidence": "7. **Self-check before output:** every row has a UTC time, a source and a status; ... every reported claim is in the unverified list.",
+      "fix": "Close the loop: \"If any check fails, fix the row, figure or list it names and run the whole check again; output only when every check passes.\""
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/cal-g/SKILL.md",
+      "line": 18,
+      "evidence": "Step 3: \"confirmed\" (two independent sources, or a log line). Line 26: when a metric and a log disagree ... mark the claim \"reported\" until a third source settles it.",
+      "fix": "Add an exception to step 3 so the two rules agree: \"... or a log line, unless a metric contradicts it (see Conflicting timestamps).\""
+    }
+  ]
+}

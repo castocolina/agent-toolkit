@@ -1,0 +1,167 @@
+{
+  "skill": "cal-d",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 3,
+    "D2": 3,
+    "D3": 3,
+    "D4": 4,
+    "D5": 2,
+    "D6": 7,
+    "D7": 6,
+    "D8": 3
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 31,
+  "max_total": 125,
+  "percent": 24.8,
+  "grade": "F",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 10,
+      "evidence": "\"A unit test is a small piece of code that checks that another piece of code works. A test suite is a collection of tests... Mocking replaces a dependency with a fake one. Coverage tells you how much of the code ran.\"",
+      "fix": "The model reliably knows what unit tests, suites, mocking and coverage are: delete this Background section and record the removal"
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 17,
+      "evidence": "\"Create a file named `test_something.py`. Import the module. Write a function that starts with `test_`. Use `assert` to compare values.\"",
+      "fix": "Step-by-step pytest tutorial the model already knows: delete the section and record the removal; keep only repo-specific conventions"
+    },
+    {
+      "id": "D1-3",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 35,
+      "evidence": "Fifteen near-identical subsections (\"### unit tests\" through \"### payment tests\"), each repeating \"Repeat the arrange, act and assert pattern for every <kind> test you write.\" with a trivial placeholder example \u2014 ~197 of 231 lines restate one naming rule the model can derive",
+      "fix": "Collapse to one rule (\"Name tests test_<kind>_<behavior> in tests/<kind>/ for kind in unit, integration, api, cli, database, auth, billing, search, upload, export, email, cache, queue, payment\") plus one example, and move the full per-kind detail into a skill this plugin bundles, preloaded via skills:"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 33,
+      "evidence": "\"6. Do your best and make sure everything works.\" \u2014 the procedure list carries no thinking framework and no domain sequence beyond run/fix genericities",
+      "fix": "Replace generic steps 5-6 with the reasoning an expert applies, e.g. \"before fixing, ask whether the intended behavior changed (fix the test) or the code regressed (fix the code); order: reproduce, diagnose, fix, re-run the targeted tests\""
+    },
+    {
+      "id": "D2-2",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 23,
+      "evidence": "File mixes a definitions tutorial (line 10), a pytest tutorial (line 17), a contradictory 6-step list (line 23) and a padded reference (line 35) \u2014 no coherent pattern for a testing agent",
+      "fix": "Restructure as a short process agent: role, one naming rule, an ordered test workflow with checkpoints; delete the tutorials (record removals) and split the reference to a bundled skill"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 30,
+      "evidence": "\"4. Fix the code or the test, whichever is easier. Delete tests that get in the way.\" \u2014 enshrines the cardinal anti-pattern of deleting failing tests to go green",
+      "fix": "Replace with a NEVER with reason: \"NEVER delete or skip a failing test to make the suite pass; decide code-vs-test from whether the intended behavior changed, and only remove tests that duplicate coverage or test deleted behavior, saying why\""
+    },
+    {
+      "id": "D3-2",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 32,
+      "evidence": "\"5. Be careful, think about edge cases and write good tests.\" \u2014 vague warning, no specific edge cases or landmines",
+      "fix": "List concrete cases this repo's tests must cover (empty input, boundary values, error paths, network/db fixtures) instead of the generic admonition"
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 1,
+      "evidence": "Frontmatter (lines 1-6) carries name, permissionMode, tools and model but no description \u2014 the agent cannot be routed to",
+      "fix": "Add a description: \"Writes and fixes this repository's tests: names tests test_<kind>_<behavior> under tests/<kind>/ (unit, integration, api, cli, database, auth, billing, search, upload, export, email, cache, queue, payment), diagnoses failures, and decides code-vs-test fixes. Use when asked to add, update, debug or reorganize tests, when a suite fails after a change, or when the user mentions pytest, mocking, coverage or flaky tests, even without the word 'test'. Not for running CI pipelines or writing benchmarks.\""
+    },
+    {
+      "id": "D4-2",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "agents/cal-d.md",
+      "line": 3,
+      "evidence": "\"permissionMode: bypassPermissions\" \u2014 this agent ships in a plugin, where the host ignores permissionMode",
+      "fix": "Remove the field from the agent frontmatter; if bypass permissions is required, configure it at plugin/session level instead"
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 28,
+      "evidence": "\"follow the steps in the section \\\"Recovery\\\"\" \u2014 no Recovery section exists anywhere in the file; the reference does not resolve",
+      "fix": "Either add a \"## Recovery\" section holding the failure-recovery steps, or rewrite step 3 to point at steps that exist"
+    },
+    {
+      "id": "D5-2",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 35,
+      "evidence": "231-line agent with no skills: preload; \"## Test naming reference\" alone spans lines 35-231 with nothing split out of the body",
+      "fix": "Move the per-kind naming rules into a bundled skill preloaded via skills:, keeping routing and the workflow in the agent file (or collapse the repetition to bring the file under 200 lines)"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 30,
+      "evidence": "\"Fix the code or the test, whichever is easier.\" \u2014 menu of equal options with no default and no criteria for a decision with real consequences",
+      "fix": "Give a default with an escape hatch: \"Default to fixing the code when the failure reproduces in the changed behavior; fix the test only when the intended contract changed \u2014 state which and why\""
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "agents/cal-d.md",
+      "line": 23,
+      "evidence": "The Instructions never state when the task is done (\"6. Do your best and make sure everything works.\" is not a completion condition) and no output format is defined",
+      "fix": "Add a sentence such as: \"Done when the targeted tests pass and any full-suite run you made is green; report in a list: tests added, fixed or deleted, the failing-to-passing change, and the final pytest summary line\""
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 25,
+      "evidence": "\"1. Always run the whole test suite before you change anything.\" directly contradicts \"2. Never run the whole test suite, because it is slow; run only the test file that you changed.\" \u2014 the branch cannot resolve",
+      "fix": "Merge into one conditional rule, e.g. \"Run the tests covering the code you are about to change before editing; run the full suite before declaring the task done\""
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "agents/cal-d.md",
+      "line": 29,
+      "evidence": "\"go on to step 12.\" \u2014 the numbered list ends at step 6; following step 3's branch reaches no outcome",
+      "fix": "Renumber step 3 to an existing step (e.g. \"then continue with step 4\") or add the missing steps 7-12 including the recovery path"
+    }
+  ]
+}

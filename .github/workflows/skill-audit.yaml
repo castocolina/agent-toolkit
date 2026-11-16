@@ -340,6 +340,15 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/trusted"
           cp -a .github/audit/scope-check.py .github/audit/render-prompt.py .github/audit/git-state.sh "$RUNNER_TEMP/trusted/"
+      - name: Render the judge prompt
+        env:
+          MODEL: ${{ matrix.model }}
+          SKILLS: ${{ needs.detect.outputs.skills }}
+        run: |
+          set -euo pipefail
+          SLUG=$(python3 scripts/audit/audit.py slug "$MODEL")
+          mapfile -t ARTS < <(jq -r '.[] | "--artifact=skills/\(.)/SKILL.md"' <<<"$SKILLS")
+          python3 scripts/audit/audit.py judge-prompt --kind skill "${ARTS[@]}" --judge "$SLUG" --recovery-gate docs/audit/recovery/batches.json --digest-dir digests > "$RUNNER_TEMP/judge-prompt.md"
       - name: Apply the rubric repairs within the audited scope
         run: |
           set -euo pipefail
@@ -361,8 +370,6 @@ jobs:
           echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
           mkdir -p verdicts
           PROMPT="$RUNNER_TEMP/judge-prompt.md"
-          SKILLS_CSV=$(jq -r 'join(",")' <<<"$SKILLS")
-          sed -e "s|{ROOT}|$GITHUB_WORKSPACE|g" -e "s|{JUDGE}|$SLUG|g" -e "s|{SKILLS}|$SKILLS_CSV|g" skills/skill-judge/references/judge-prompt.md > "$PROMPT"
           for attempt in 1 2; do
             if copilot -p "$(<"$PROMPT")" -s --no-ask-user --model="$MODEL" --allow-tool=read | python3 scripts/audit/audit.py split-verdicts --judge "$MODEL" --out verdicts; then
               if python3 scripts/audit/audit.py validate-verdict "verdicts/$SLUG"/*.json; then break; fi
@@ -652,16 +659,18 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/trusted"
-          cp -a .github/audit/scope-check.py .github/audit/render-prompt.py .github/audit/git-state.sh "$RUNNER_TEMP/trusted/"
+          cp -a .github/audit/scope-check.py .github/audit/render-prompt.py .github/audit/git-state.sh scripts/audit/audit.py "$RUNNER_TEMP/trusted/"
       - name: Apply the rubric repairs within the audited scope
         run: |
           set -euo pipefail
+          : > .audit-evidence/repairs.patch
           if [ -s "$RUNNER_TEMP/rubric/repairs.patch" ]; then
             # Reject out-of-scope repairs before anything is applied: the
             # numstat list carries the paths, the patch adds symlink and
             # mode-change detection. The scope gate comes from the trusted copy.
             git apply --numstat "$RUNNER_TEMP/rubric/repairs.patch" | python3 "$RUNNER_TEMP/trusted/scope-check.py" repairs --format numstat --patch "$RUNNER_TEMP/rubric/repairs.patch"
             git apply --index "$RUNNER_TEMP/rubric/repairs.patch"
+            cp "$RUNNER_TEMP/rubric/repairs.patch" .audit-evidence/repairs.patch
           fi
       - name: Render fixer prompt and apply decision
         env:
@@ -678,9 +687,19 @@ jobs:
             --path CHECK_JSON=.audit-evidence/check.json \
             --path SPEC_DIFF=.audit-evidence/spec.diff \
             --path APPROVED_EVIDENCE=.audit-evidence/approved-evidence \
+            --path REPAIRS_PATCH=.audit-evidence/repairs.patch \
             --text TARGETS="$TARGETS"
           bash "$RUNNER_TEMP/trusted/git-state.sh" snapshot "$RUNNER_TEMP/git-state"
           cat "$RUNNER_TEMP/fix-prompt.rendered.md" | .github/audit/copilot-agent.sh
+          # Record pass: digest of this checkout against HEAD (the staged repairs and the
+          # fixer's edits); the agent writes a record row for each item, ids copied from it.
+          # audit.py runs from the trusted copy: no repository code runs before the scope check.
+          mapfile -t ARTS < <(jq -r '.[] | select(. != "skill-judge" and . != "agentskills-research") | "--artifact=skills/\(.)/SKILL.md"' <<<"$TARGETS")
+          python3 "$RUNNER_TEMP/trusted/audit.py" --root . judge-prompt --kind skill "${ARTS[@]}" --artifact=skills/skill-judge/SKILL.md --artifact=skills/agentskills-research/SKILL.md --judge fixer --previous HEAD --digest-dir .audit-evidence/digests > /dev/null
+          python3 "$RUNNER_TEMP/trusted/render-prompt.py" .github/audit/record-prompt.md "$RUNNER_TEMP/record-prompt.rendered.md" \
+            --path DIGESTS=.audit-evidence/digests \
+            --path REPAIRS_PATCH=.audit-evidence/repairs.patch
+          cat "$RUNNER_TEMP/record-prompt.rendered.md" | .github/audit/copilot-agent.sh
       - name: Verify git state after the fixer model step
         run: bash "$RUNNER_TEMP/trusted/git-state.sh" verify "$RUNNER_TEMP/git-state"
       - name: Scope-check the fixer changes before any repository code runs

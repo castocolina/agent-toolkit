@@ -1,0 +1,59 @@
+{
+  "skill": "cal-e",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/cal-e/SKILL.md",
+      "line": 38,
+      "evidence": "\"If the skill reports that a file it needs is missing, it was installed without its folder: copy the whole directory to ~/.claude/skills/cal-e/.\" \u2014 the body references no bundled file (no references/, no scripts/), so this Gotcha item can never fire for this skill as shipped; it pads the Gotchas list the task never meets",
+      "fix": "Tie it to the purpose or remove it with a record row: replace it with a failure that can occur, e.g. \"If the PR list comes back empty, re-check the range before reporting that nothing shipped: an inverted or wrong tag pair returns zero PRs that look like a quiet release\", or delete the item and record the removal; keep the labels Gotcha that follows it"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/cal-e/evals/evals.json",
+      "line": 1,
+      "evidence": "No eval covers the dual-merge dedupe rule (\"A PR merged to a release branch and to the main branch appears twice in a range: dedupe by PR number\"), the docs-only PR rule, or the long-range handoff of step 7, so three of the skill's own rules are untested",
+      "fix": "Add a fifth eval whose range contains the same PR number twice (merged to release/4.2 and to main) plus a docs-only PR, with assertions such as \"Each PR number appears in exactly one entry\" and \"The docs-only PR is left out\""
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/cal-e/SKILL.md",
+      "line": 10,
+      "evidence": "\"Get the merged PRs of the range with the `gh` CLI or read the list the user pasted.\" \u2014 no branch for when gh is not installed, not authenticated, or the repo is hosted outside GitHub (GitLab, Gitea), which is the main approach failing with no fallback",
+      "fix": "Add one fallback sentence: \"If `gh` is unavailable or the repo is not on GitHub, ask the user to paste `git log <start>..<end> --merges --oneline` output or the PR list, and derive PR numbers from the squash-merge subjects.\""
+    }
+  ]
+}

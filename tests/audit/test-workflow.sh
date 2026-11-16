@@ -558,5 +558,49 @@ for path in merge_scan:
         if term in body:
             fail(f"{path.relative_to(ROOT)} contains the merge path {term!r}")
 
+# Plan 13: the research judge prompt comes from judge-prompt (recovery gate, digest files), and the
+# apply job hands the fixer the repairs patch, then runs a record pass over the digest of its changes.
+research_steps = jobs["research"][1]
+research_names = [step_name(s) for s in research_steps]
+for needed in ("Render the judge prompt", "Apply the rubric repairs within the audited scope"):
+    if needed not in research_names:
+        fail(f"research lacks the step {needed!r}")
+render_step = research_steps[research_names.index("Render the judge prompt")]
+for marker in ("audit.py judge-prompt", "--recovery-gate docs/audit/recovery/batches.json", "--digest-dir"):
+    if marker not in render_step:
+        fail(f"research 'Render the judge prompt' lacks {marker!r}")
+if research_names.index("Render the judge prompt") > research_names.index("Apply the rubric repairs within the audited scope"):
+    fail("research renders the judge prompt after applying the rubric repairs")
+for s in research_steps:
+    if re.search(r"\bsed\b.*judge-prompt\.md", s):
+        fail(f"research step {step_name(s)!r} still runs sed on judge-prompt.md")
+
+apply_text = "\n".join(apply_steps)
+repairs_step = next(s for s in apply_steps if step_name(s) == "Apply the rubric repairs within the audited scope")
+if ".audit-evidence/repairs.patch" not in repairs_step:
+    fail("apply repairs step does not write .audit-evidence/repairs.patch")
+fixer_render = next(s for s in apply_steps if step_name(s) == "Render fixer prompt and apply decision")
+if "--path REPAIRS_PATCH=.audit-evidence/repairs.patch" not in fixer_render:
+    fail("fixer render does not pass --path REPAIRS_PATCH=.audit-evidence/repairs.patch")
+first_agent = fixer_render.index("copilot-agent.sh")
+for marker in ('"$RUNNER_TEMP/trusted/audit.py"', "judge-prompt", "--previous HEAD",
+               "--digest-dir .audit-evidence/digests", ".github/audit/record-prompt.md",
+               "--path DIGESTS=.audit-evidence/digests"):
+    if marker not in fixer_render:
+        fail(f"fixer step lacks the record pass marker {marker!r}")
+    if fixer_render.index(marker) < first_agent:
+        fail(f"record pass marker {marker!r} comes before the first copilot-agent.sh call")
+trust = next(s for s in apply_steps if step_name(s) == "Trust scope and render tooling before the repairs")
+if "scripts/audit/audit.py" not in trust:
+    fail("apply trust step does not copy scripts/audit/audit.py")
+fix_prompt = (ROOT / ".github/audit/fix-prompt.md").read_text(encoding="utf-8")
+for marker in ("docs/audit/fixer-rules.md", "{{REPAIRS_PATCH}}"):
+    if marker not in fix_prompt:
+        fail(f"fix-prompt.md lacks {marker!r}")
+record_prompt = (ROOT / ".github/audit/record-prompt.md").read_text(encoding="utf-8")
+for marker in ("{{DIGESTS}}", "{{REPAIRS_PATCH}}"):
+    if marker not in record_prompt:
+        fail(f"record-prompt.md lacks {marker!r}")
+
 print("PASS workflow structure: token isolation, scope checks, prompts, evidence and pins")
 PY

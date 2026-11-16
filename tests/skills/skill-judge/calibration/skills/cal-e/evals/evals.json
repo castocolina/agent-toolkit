@@ -1,0 +1,46 @@
+{
+  "skill_name": "cal-e",
+  "evals": [
+    {
+      "id": "mixed-range",
+      "prompt": "can you write the release notes for these merged PRs? #101 'refactor retry loop' (body: retries now stop after 3 attempts instead of 10, set RETRY_MAX to restore the old value), #102 'add dark mode toggle', #103 'fix crash on empty cart' , #104 'bump lodash' (bot), #105 'Revert \"add export button\"', #99 'add export button' (same range)",
+      "expected_output": "Notes with a Breaking entry for #101 that says who is affected and shows the RETRY_MAX before and after, an Added entry for #102, a Fixed entry for #103, no entry for the bot bump #104, and nothing for #99 and #105 because the PR and its revert cancel.",
+      "assertions": [
+        "Lists #101 under Breaking with an instruction to set RETRY_MAX and a before and after line",
+        "Lists #102 under Added and #103 under Fixed, each ending with its PR number",
+        "Leaves out #104 as an internal bot bump",
+        "Leaves out both #99 and #105 because they cancel each other",
+        "Orders the headings Breaking, Added, Changed, Fixed with empty categories omitted"
+      ]
+    },
+    {
+      "id": "missing-range",
+      "prompt": "write the changelog for the next release",
+      "expected_output": "Asks for the two tags or dates that bound the release instead of guessing the last tag, and does not draft any notes yet.",
+      "assertions": [
+        "Asks for a start and an end tag or date",
+        "Does not assume the newest tag is the previous release",
+        "Does not invent entries"
+      ]
+    },
+    {
+      "id": "breaking-without-migration",
+      "prompt": "PR #210 renames the --out flag to --output in our CLI and the body only says 'cleanup'. Put it in the notes for release 4.",
+      "expected_output": "Does not guess a migration. Lists #210 under Could not classify with the reason that it looks breaking but has no migration text, and says the rename needs a before and after line from the author.",
+      "assertions": [
+        "Lists #210 under Could not classify, not under Breaking",
+        "States that the PR has no migration text and does not invent one",
+        "Does not copy the word cleanup as the entry text"
+      ]
+    },
+    {
+      "id": "flagged-feature",
+      "prompt": "Notes for #301 'add team dashboards behind the team_dash flag (off by default)' and #305 'turn on team_dash for everyone'.",
+      "expected_output": "Treats #301 as internal until the flag flips and writes one Added entry that mentions the flag and lists both numbers.",
+      "assertions": [
+        "Produces one Added entry for team dashboards that lists both #301 and #305",
+        "Mentions that the feature is turned on by default by #305"
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
-rubric_version: 4
+rubric_version: 5
 spec_sha: 69ef37e9424c0a7ea9dd2293b559e43ec8176379
 
-# Skill Judge Rubric v4
+# Skill Judge Rubric v5
 
 Eight dimensions, 125 points. Grades use the percentage of the total, so the total can change in a later rubric version without touching the grade bands. The `source` column lists the pinned Agent Skills spec sections each dimension derives from; read them in full before scoring.
 
@@ -21,7 +21,7 @@ Eight dimensions, 125 points. Grades use the percentage of the total, so the tot
 - Score integers only, 0 to the dimension max. Quote evidence (file and line) for every score below max; each such score needs at least one finding.
 - Judge only what the files show. Never credit a claim the skill makes about itself ("tested", "production-ready").
 - Total = D1..D8. Percent = round(total / max_total * 100, 1). Grade: A at 90 or more, B at 80, C at 70, D at 60, otherwise F.
-- Finding severity: critical = the skill will not load or will never trigger; high = a wrong or harmful instruction, or a dimension scored in its bottom band; medium = a measurable weakness; low = polish.
+- Finding severity: critical = the skill will not load or will never trigger; high = a wrong or harmful instruction, a dimension scored in its bottom band, or a case `## Removals and sources` names as high (an unexplained removal among them); medium = a measurable weakness; low = polish.
 
 ## Repository files that are never deductions
 
@@ -33,7 +33,7 @@ Does the skill add expert knowledge the agent lacks? Value = expert-only knowled
 
 - Expert: the model genuinely does not know it. Keep.
 - Activation: the model knows it but may not think of it. Keep if brief.
-- Redundant: the model certainly knows it. Delete; it wastes shared context.
+- Redundant: the model certainly knows it. Move it to `references/` when users ask for it by name or it is a reusable template; delete only what the model reliably produces unprompted, and record the removal.
 
 Good ratio: more than 70% expert, under 20% activation, under 10% redundant.
 
@@ -115,6 +115,8 @@ Three layers: metadata (name and description, about 100 tokens), SKILL.md body (
 
 Loading criteria apply to optional references only. A reference that the skill's own protocol requires on every run (for example a judge that must read its rubric and the spec files the rubric cites) is read unconditionally by design; such reads are required, are not a trigger-quality problem and never lower D5. For optional references, the best triggers state the scenario and, where over-loading is a real risk, name the files not to load for it ("Do NOT Load `x.md` for this task"). A skill with no optional references needs no such guidance. Judge simple skills (no references, under 100 lines) on conciseness and self-containment.
 
+A template, example or reference block kept in `references/` and read at the workflow step that needs it is a loading trigger, not a defect, whatever its length: never lower D5 for it, and never advise moving it back inline, because § Removals and sources sends such content there.
+
 ## D6: Freedom Calibration (15)
 
 Does specificity match fragility? Ask: if the agent errs, what is the consequence? High consequence means low freedom (exact scripts, exact steps); low consequence means high freedom (principles, not steps). Creative work gets principles; file-format operations and destructive actions get exact commands; reviews get prioritised criteria. Prefer a clear default with an escape hatch over a menu of equal options.
@@ -146,16 +148,29 @@ Can an agent act on this skill without guessing?
 
 Check: decision trees for multi-path scenarios, code examples that actually work, fallbacks when the main approach fails, realistic edge cases, validation loops and checklists for multi-step work, and immediate actionability. Mentally run each decision tree to see whether it reaches the right choice.
 
+## Removals and sources (every judgment)
+
+- **Scope.** This section applies to every artifact kind, skills, commands and agents alike. For a command or agent, its D1, D5 and D8 deductions are subtracted from the score the profile gives those dimensions (its D5 length ladder, its D8 list); a profile section that "replaces only the skill-only part" of a dimension never removes them.
+- **Removal check.** The prompt may carry a previous-version digest per artifact (inline, or as a file path to read). The items are its `para:` and `file:` lines; its `sections:` list is context and never an item by itself. An item is explained when the judge finds the content in a named destination in the current files, or when the record it names has a valid row for it: a `para:<id>` or `file:<path>` row, or, for a `para:` item, a row whose `item` starts with a section id whose `units` in `docs/audit/recovery/<name>/sections.json` list that id. The judge judges the row, not only that it exists: a row explains nothing when its (fate, value, decision) combination is not one `docs/audit/fixer-rules.md` allows, or when it is a `drop` row and either the judge rates the content substantive (a template, procedure, rule or fact a user would miss) or its reason class is `generic-model-knowledge` for content the model does not reliably produce unprompted. A `drop` row whose reason is "user accepted the drop (<date>)" (the record format's accepted-drop rewrite) stands either way: the user decided it. Each unexplained item is one finding: `dimension` D1, `severity` high, `evidence` the digest line (and the rejected row, when there is one), `fix` "restore it (into `references/` when it is domain-specific, a template users ask for or a tested example; into the main file only when the procedure depends on it) or add a row for it to `docs/audit/recovery/<name>/record.md`"; each costs 2 points of D1 (D1 does not go below 0). This covers collateral deletions next to an intended edit. A cut list (`showing <shown>` below `<total>`) is reported as one medium D1 finding. Without a digest there is no removal finding.
+- **Purpose fidelity.** Every part of the artifact serves its stated purpose (its `description` and the task its body sets). Content that exists only to satisfy this rubric or an eval, and does nothing for that purpose, earns no credit in the dimension it targets and is one D1 finding, severity medium (1 point of D1): for example a boilerplate section, a NEVER or Gotchas list padded with items the task never meets, an eval or trigger query that tests nothing the artifact does, or keywords stuffed into the description. The fix ties the content to the purpose or removes it with a record row; it never removes content that does serve the purpose. Meeting a dimension by a change that fits the artifact's purpose is always the expected fix.
+- **Advice on removals.** A finding whose fix removes a rule, step, fact, template or example names where the content goes, or tells the author to record the removal. Redundant content is moved to `references/` when users ask for it by name or it is a reusable template, and deleted only when the model reliably produces it unprompted; for a command or agent, the destination is a skill its plugin bundles (profile D5).
+- **Source check.**
+  1. Every reference to the artifact's own bundled files (its `references/`, `scripts/`, `evals/` and sections) and to the repository's own scripts and paths resolves under the root and says what the artifact claims. Out of scope, with no deduction: paths in the user's project or home (`.claude/handoffs/`, `~/.claude/skills/`), install destinations (`/mnt/skills/user/<name>/...`, the house convention for script paths), and external CLIs (`gh`, `codex`); their flags fall under (2) only when they are version-sensitive. A reference that does not resolve is the protocol's unreadable file, D5 high (the same severity `SKILL.md` gives "a file you need cannot be read"); a reference that contradicts the artifact's instruction is D8 high.
+  2. A version-sensitive fact is a value a vendor changes between releases: model IDs and default models, prices, quotas and rate limits, API endpoints, minimum versions, and the flags and defaults of a vendor's own CLI or API. Not version-sensitive: POSIX, coreutils and git flags, language syntax, frontmatter fields that D4 validates (a `model:` alias such as `sonnet` included), and the repository's own scripts and paths (part (1) covers those). Each version-sensitive fact either is read live by an instruction (`--help`, a catalog endpoint) or carries its source URL and the date checked: neither is D8 medium; a cited source that is not the vendor's official documentation or the tool's own output is D8 medium; a value contradicted by a source the judge read is D8 high. A judge with a web fetch tool checks each such fact against the official page it cites; a judge without one does not deduct for that and says "facts not verified online" where its output allows text.
+  3. A credit line or named upstream with no row for this artifact in `docs/audit/upstream-sources.json`, when that file exists under the root, is D8 low; the fix is the row, never removing the credit.
+- **Source-check costs.** One finding per reference or fact, deducted once (protocol step 6, "Deduct each defect once"): high costs 2 points of its dimension, medium 1, low 0 (the finding still stands); no dimension goes below 0.
+- **Status.** This section is a repository rule with no spec source; a spec refresh (`agentskills-research`) leaves it unchanged, and `rubric-check` fails when its heading is missing.
+
 ## Common failure patterns
 
-1. The Tutorial: explains basics the model knows. Fix: delete; keep expert decisions and anti-patterns.
+1. The Tutorial: explains basics the model knows. Fix: move what users ask for by name or reuse as a template to `references/`; delete only what the model reliably produces unprompted and record it; keep expert decisions and anti-patterns.
 2. The Dump: SKILL.md of 800+ lines. Fix: routing and decision trees in SKILL.md, detail in `references/`.
 3. The Orphan References: reference files nothing loads. Fix: add a scenario-triggered read ("read X when Y") at the workflow step that needs it; add "Do NOT Load" only where an optional file would waste context for that scenario.
 4. The Checkbox Procedure: mechanical steps with no reasoning. Fix: "before X, ask yourself", decision principles.
 5. The Vague Warning: "be careful", "avoid errors". Fix: specific NEVER items with non-obvious reasons.
 6. The Invisible Skill: good body, vague description. Fix: WHAT, WHEN, KEYWORDS in the description.
 7. The Wrong Location: "when to use" section in the body only. Fix: move trigger information to the description.
-8. The Redundant Extras: `CHANGELOG.md`, `INSTALLATION_GUIDE.md`, `CONTRIBUTING.md` and similar files that duplicate or document the skill without helping the agent. The repository-required `README.md`, `evals/`, `references/` bundled files and `SOURCE.json` are never part of this pattern. Fix: delete the extras.
+8. The Redundant Extras: `CHANGELOG.md`, `INSTALLATION_GUIDE.md`, `CONTRIBUTING.md` and similar files that duplicate or document the skill without helping the agent. The repository-required `README.md`, `evals/`, `references/` bundled files and `SOURCE.json` are never part of this pattern. Fix: move any part the agent needs into `references/`, then delete the rest of each extra file and record each removal (a `file:` row for a non-markdown file; for a markdown file, a row for each `para:` item the digest lists from it).
 9. The Freedom Mismatch: rigid scripts for creative tasks, vague guidance for fragile ones. Fix: match freedom to fragility.
 
 ## Quick checklist
@@ -168,3 +183,4 @@ Check: decision trees for multi-path scenarios, code examples that actually work
 - D6: freedom matches fragility; defaults over menus.
 - D7: evals.json, trigger-queries.json in `evals/`; script smoke test in `tests/skills/<name>/` when scripts exist.
 - D8: decision trees, working examples, fallbacks, edge cases.
+- Every judgment: digest items explained; content serves the artifact's purpose, not the rubric; references resolve; facts read live or sourced and dated; credits have registry rows.

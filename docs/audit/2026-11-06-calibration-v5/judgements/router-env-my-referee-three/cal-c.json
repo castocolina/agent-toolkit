@@ -1,0 +1,77 @@
+{
+  "skill": "cal-c",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/cal-c.md",
+      "line": 12,
+      "evidence": "Start from the earliest of `Error`, `FAILED`, `Traceback`, `exit code`, `npm ERR!`, `##[error]`; these are hints, not a complete list.",
+      "fix": "The model already knows the common CI error markers, so this is activation content. Keep the non-obvious rule (earliest failure first, then the failed-step summary as a fallback) and shorten the marker list to the two CI-specific ones (`##[error]`, the failed-step summary). Record the trimmed markers as a row in docs/audit/recovery/cal-c/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 15,
+      "evidence": "Environment (check first, cheapest to confirm), Test (name the test, expected and actual), Build (name the file and line).",
+      "fix": "Say what evidence counts as Environment, since it is checked first and wins ties: for example \"Environment: a missing secret or env variable, a runner image or tool-version mismatch, a dependency registry or network error, or a full disk or OOM kill in the failed step.\""
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 31,
+      "evidence": "Tests that expect a failure print error-like text (`Error:`, stack traces) while passing.",
+      "fix": "Add a gotcha for interleaved output: \"In parallel or matrix jobs, and in test runners with multiple workers, log lines from different workers interleave. The first error by line number may not be the first in time, or may come from another shard. Match the error to the failed job or worker ID before you take it as the first failure.\""
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 16,
+      "evidence": "Otherwise report the failure as observed.",
+      "fix": "Map this branch to one of the five Class values, because \"as observed\" is not one: \"Otherwise classify it as Environment, Test or Build from its evidence, and write 'flake not ruled out' in **Confidence** when the failure looks transient.\""
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/cal-c.md",
+      "line": 18,
+      "evidence": "verify the run's commit against the checkout before claiming a revision mismatch. If the commit cannot be verified, say source correlation is unconfirmed.",
+      "fix": "The agent only has `tools: Read, Grep, Glob` (no git) and the output has no field for this note. Say how to check and where to report it: \"Read `.git/HEAD` and the ref it points to, then compare with the SHA in the log's checkout step. If either one is missing, put 'source correlation unconfirmed' in **Confidence** and set it no higher than medium.\""
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "skill": "cal-f",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 12,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 111,
+  "max_total": 125,
+  "percent": 88.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "skills/cal-f/SKILL.md",
+      "line": 15,
+      "evidence": "Unexplained removal (no record): para:cce2d6bf skills/cal-f/SKILL.md: ```text | Time (UTC) | Source | Event | Status | |---|---|---|---| | 14:02 | alert tool | Error-rate alert fired for checkout | confirmed | | 14:09 | chat export | On-call acknowledged the page and opened a bridge | reported | ```. The worked timeline template appears nowhere in the current files; step 4 now only names the columns in prose. (The other two removed units, the template's intro line and the old step 4, have been reworded into the current step 4 and count as explained.)",
+      "fix": "Restore it (into `references/` when it is domain-specific, a template users ask for or a tested example; into the main file only when the procedure depends on it) or add a row for it to `docs/audit/recovery/cal-f/record.md`. Suggested: put the template back under a `## Timeline template` section, or in `references/timeline-template.md`, and have step 4 say 'Build the timeline rows with the template in references/timeline-template.md'."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/cal-f/SKILL.md",
+      "line": 15,
+      "evidence": "4. Build the timeline rows with the columns time, source, event and status, one row per event.",
+      "fix": "Step 4 is the only step with no reasoning, and the Process pattern has no checkpoint before output. Add one before ## Output: 'Before writing the summary, check that every row is in UTC, names its source, carries a status from step 3, and that the three anchor times from step 2 appear as rows. Fix any row that fails and check again.'"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/cal-f/SKILL.md",
+      "line": 25,
+      "evidence": "## Gotchas has two items, both about clocks; nothing covers alert or metric semantics that defy assumptions",
+      "fix": "Add a gotcha: 'An alert's fire time comes after its evaluation window (often 5-15 minutes of sustained errors), so a start of impact taken from the alert alone is late by up to that window. Read the rule's window, or use the metric graph.'"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/cal-f/evals/evals.json",
+      "line": null,
+      "evidence": "Four evals cover zone conversion, blame, conflicting times and owners, but none tests the daylight-saving gotcha or a source whose time zone is unknown",
+      "fix": "Add an eval whose incident spans a DST change (for example a local-zone deploy log on the night clocks change), with an assertion that the converted UTC times are offset by the correct hour on each side of the change."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/cal-f/SKILL.md",
+      "line": 14,
+      "evidence": "Mark each claim \"confirmed\" (two independent sources, or a log line) \u2014 traced the conflicting-times branch: Alice's and Bob's exports are two sources, so the rule reads as confirmed, but evals.json expects 'reported'",
+      "fix": "Define independence: 'Two chat exports of the same thread count as one source. Confirmed needs a system log, an alert or metric record, or two different tools.'"
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/cal-f/SKILL.md",
+      "line": 12,
+      "evidence": "never merge two sources before their zones are stated \u2014 no fallback when a source's zone cannot be determined",
+      "fix": "Add: 'If a source's zone is unknown, ask the user for it. If no answer comes, keep that source's times in a separate list marked \"zone unknown\" and leave them out of the UTC ordering.'"
+    }
+  ]
+}

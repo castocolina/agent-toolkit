@@ -1,0 +1,86 @@
+{
+  "skill": "cal-e",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/cal-e/SKILL.md",
+      "line": 40,
+      "evidence": "Gotcha: \"If the skill reports that a file it needs is missing, it was installed without its folder: copy the whole directory to `~/.claude/skills/cal-e/`.\" The skill ships no references/, scripts/ or assets/, so this gotcha never applies to drafting release notes.",
+      "fix": "Move the install note to README.md, which already has an Installation section, and record the move. In its place, add a gotcha about drafting release notes, such as how squash merges and merge commits change how a tag range maps to PR numbers."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/cal-e/SKILL.md",
+      "line": 12,
+      "evidence": "\"Get the merged PRs of the range with the `gh` CLI or read the list the user pasted.\" The step that turns a tag range into a PR list, the main domain procedure here, is left to the model.",
+      "fix": "State the procedure: list the commits between the two tags (git log <from>..<to> --merges, or first-parent for squash merges), pull the PR numbers out of them, then fetch each PR's body and labels with gh. Note that a PR's merge date does not match tag membership on release branches."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/cal-e/SKILL.md",
+      "line": 41,
+      "evidence": "The Gotchas section has only one domain fact (\"Labels such as `bug` are set by authors and are wrong often enough...\"). The other entry is about installation.",
+      "fix": "Add environment facts that defy assumptions, for example: a gh search by merge date includes PRs merged to other branches that are not in the tag range, and cherry-picked backports keep the original PR number but sit in a different range."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/cal-e/SKILL.md",
+      "line": 12,
+      "evidence": "\"Get the merged PRs of the range with the `gh` CLI\" has high freedom for a fragile step. A wrong range silently adds or drops entries, and gh pr list has no tag-range filter.",
+      "fix": "Give one default command sequence for tag ranges, a git log between the tags mapped to PR numbers and then fetched with gh, and keep the pasted list as the fallback. Tell the agent to stop and ask when a commit has no PR number instead of guessing one."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/cal-e/evals/trigger-queries.json",
+      "line": 17,
+      "evidence": "Negatives such as \"explain what the retry loop in this file does\" and \"rebase my branch onto main and fix the conflicts\" share no intent with release notes, so they test nothing. No output eval covers the release-branch dedupe or the long-range handoff.",
+      "fix": "Replace the two easy negatives with near-misses, for example \"write the commit message for this squash merge\" and \"generate the migration guide doc for v4\". Add an eval in which the same PR number appears twice in a range and check that it is listed once."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/cal-e/SKILL.md",
+      "line": 22,
+      "evidence": "Edge case: \"A PR behind a feature flag that is off by default is Internal until the flag flips; mention the flag in the entry that turns it on.\" This conflicts with step 5 (\"Several PRs that ship one feature in parts become one entry that lists every number\"). Following both, it is unclear whether the Internal PR #301 appears in the #305 entry. The flagged-feature eval expects it to.",
+      "fix": "Add to the edge case: \"The entry that turns the flag on lists the numbers of the earlier flagged PRs too, because together they ship one feature.\" With that, both branches lead to the same output."
+    }
+  ]
+}

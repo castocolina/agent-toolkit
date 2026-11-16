@@ -1,0 +1,85 @@
+{
+  "skill_name": "cal-g",
+  "evals": [
+    {
+      "id": "chat-and-alerts",
+      "prompt": "write up the incident from these files: the chat export (my local time, UTC+2), the alert timeline, the deploy log and the metrics csv",
+      "files": [
+        "evals/files/checkout-chat-export.txt",
+        "evals/files/checkout-alerts.txt",
+        "evals/files/checkout-deploy.log",
+        "evals/files/checkout-metrics.csv"
+      ],
+      "expected_output": "A summary whose timeline is in UTC: start of impact 19:01 from the metrics, the chat message at 19:12, the alert at 19:05 as detection, the metric recovery at 19:38 as resolution, the rollback finishing at 19:40, each row with a source and a confirmed or reported status. Duration is about 37 minutes from the metrics; affected customer counts are stated as not measured because only an error rate was supplied.",
+      "assertions": [
+        "Converts the chat time 9:12 PM at UTC+2 to 19:12 UTC",
+        "Uses 19:01 from the metrics as start of impact, before the 19:05 alert",
+        "Uses the 19:05 alert as detection, not the chat message",
+        "Uses the 19:38 metric recovery as resolution, not the 19:40 rollback or the 19:41 alert resolve",
+        "Does not estimate affected customer counts",
+        "Every timeline row has a source and a status"
+      ]
+    },
+    {
+      "id": "blame-in-source",
+      "prompt": "postmortem draft please, the pager thread is attached",
+      "files": [
+        "evals/files/config-push-thread.txt"
+      ],
+      "expected_output": "A blameless summary that describes the config push and the missing staging check without naming Dave as the cause, and without the phrase human error. Claims that rest only on the thread are marked reported.",
+      "assertions": [
+        "Does not name Dave as the cause",
+        "Does not use human error as a root cause",
+        "Describes the config push and the missing staging check as the condition",
+        "Marks the 14:02 push time reported, since only one recollection supports it"
+      ]
+    },
+    {
+      "id": "conflicting-times",
+      "prompt": "summarize the outage. Alice's export and Bob's export disagree on when the page came in",
+      "files": [
+        "evals/files/alice-export.txt",
+        "evals/files/bob-export.txt"
+      ],
+      "expected_output": "Shows both 03:10 and 03:14, treats the two exports as one source, says which time it trusts and why (the earlier, since delay only adds), and marks the page reported because no log line confirms it.",
+      "assertions": [
+        "Shows both 03:10 and 03:14",
+        "Treats the two exports of the same chat as one source, not as confirmation",
+        "States which timestamp it trusted and the reason",
+        "Marks the page event reported",
+        "Lists the page time among the unverified claims"
+      ]
+    },
+    {
+      "id": "no-followup-owner",
+      "prompt": "Add follow-ups to the incident summary draft. Nobody has picked these up yet.",
+      "files": [
+        "evals/files/postmortem-draft.md"
+      ],
+      "expected_output": "Lists both follow-ups with the word unassigned as the owner and no date for each, with no invented names or dates.",
+      "assertions": [
+        "Lists improve alerting and add a canary stage",
+        "Marks both owners as unassigned",
+        "Marks both dates as no date",
+        "Does not invent an owner or a date"
+      ]
+    },
+    {
+      "id": "dst-shifted-logs",
+      "prompt": "what happened here? the deploy log is in the runner's zone and I only have the alert timeline in UTC, no metrics",
+      "files": [
+        "evals/files/dst-chat-export.txt",
+        "evals/files/dst-deploy.log",
+        "evals/files/dst-alerts.txt"
+      ],
+      "expected_output": "Notes that Europe/Berlin changed to summer time at 01:00 UTC on 2026-03-29, so the deploy at 01:58 local is 00:58 UTC and the rollback at 03:05:30 local is 01:05:30 UTC, about 7 minutes apart and not 67. States start of impact unknown with the earliest evidence 01:00 UTC from the alert tool, listed among the unverified claims.",
+      "assertions": [
+        "Identifies the daylight-saving change inside the window",
+        "Converts 01:58 Berlin to 00:58 UTC and 03:05:30 Berlin to 01:05:30 UTC",
+        "Writes start of impact unknown with the earliest evidence and its source",
+        "Lists the start of impact among the unverified claims",
+        "Does not treat the rollback or the 03:09 chat message as resolution, since no metric confirms recovery"
+      ]
+    }
+  ]
+}

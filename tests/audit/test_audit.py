@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts" / "audit"
 import audit  # noqa: E402
 
 SHA = "a" * 40
-RUBRIC = "rubric_version: 1\nspec_sha: {sha}\n\n| id | name | max | source |\n|----|------|-----|--------|\n{rows}\n"
+RUBRIC = "rubric_version: 1\nspec_sha: {sha}\n\n| id | name | max | source |\n|----|------|-----|--------|\n{rows}\n\n## Removals and sources (every judgment)\n"
 ROWS = "\n".join(f"| D{i} | n | {m} | s |" for i, m in enumerate([20, 15, 15, 15, 15, 15, 15, 15], 1))
 C5 = "Validation failed for /t/s:\n  - Unexpected fields in frontmatter: {f}. Only ['allowed-tools', 'compatibility', 'description', 'license', 'metadata', 'name'] are allowed.\n"
 
@@ -466,6 +466,19 @@ class ValidateEntryTests(Base):
             with self.subTest(bad=bad):
                 self.assertIsNotNone(audit.validate_entry(self.root, bad))
 
+    def test_artifact_kind_validates_on_github_and_unversioned_rows_but_not_repo(self):
+        # Break: a command or agent row with an upstream source is rejected, so detect stops on it.
+        self.write("commands/c.md", "# c\n")
+        self.write("agents/a.md", "# a\n")
+        for kind, source, ref in (("github", "o/r", "main"), ("unversioned", "citation", None)):
+            for artifact_kind, name in (("command", "c"), ("agent", "a")):
+                row = {"skill": name, "kind": kind, "source": source, "ref": ref, "artifact_kind": artifact_kind}
+                with self.subTest(kind=kind, artifact_kind=artifact_kind):
+                    self.assertIsNone(audit.validate_entry(self.root, row))
+                    self.assertIsNotNone(audit.validate_entry(self.root, {**row, "skill": "missing"}))
+        repo = {"skill": None, "kind": "repo", "source": "o/r", "ref": "main", "artifact_kind": "command"}
+        self.assertIsNotNone(audit.validate_entry(self.root, repo))
+
     def test_new_path_only_on_github_path_and_rejects_slashes_and_dotdot(self):
         # Break: new_path rewrites a non-path source or walks out of the repository.
         self.skill("x")
@@ -511,6 +524,33 @@ class TrackTests(UpstreamsTests):
         rows = json.loads(registry.read_text(encoding="utf-8"))
         self.assertEqual([(r["skill"], r["kind"], r["artifact_kind"]) for r in rows],
                          [("plan-it", "local", "command"), ("reviewer", "local", "agent")])
+
+    def test_ours_updated_reads_the_command_and_agent_files(self):
+        # Break: a command row reads skills/<name>/ and fails upstreams with "no local commit".
+        self._git_init(self.root)
+        self._commit(self.root, "commands/c.md", "# c\n", "2025-01-01T00:00:00+00:00")
+        self._commit(self.root, "agents/a.md", "# a\n", "2025-01-02T00:00:00+00:00")
+        for artifact_kind, name, day in (("command", "c", "2025-01-01"), ("agent", "a", "2025-01-02")):
+            row = {"skill": name, "kind": "github", "source": "o/r", "ref": "main", "artifact_kind": artifact_kind}
+            self.assertTrue(audit.ours_updated(self.root, row).startswith(day), artifact_kind)
+        path = self.setup_registry([{"skill": "c", "kind": "unversioned", "source": "citation", "ref": None,
+                                     "artifact_kind": "command"}])
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            code = audit.main(["--root", str(self.root), "upstreams", "--registry", str(path)])
+        self.assertEqual((code, json.loads(out.getvalue())[0]["error"]), (0, None))
+
+    def test_track_updates_a_github_row_of_a_command(self):
+        # Break: validation of the rewritten row rejects artifact_kind, so the review is never recorded.
+        self.write("commands/c.md", "# c\n")
+        row = {"skill": "c", "kind": "github", "source": "o/r", "ref": "main", "artifact_kind": "command"}
+        registry = self.registry([row])
+        code, _, err, _, _ = self.track(registry, "--artifact", "c", "--artifact-kind", "command",
+                                        "--source", "o/r", "--status", "current", "--today", "2026-11-06")
+        self.assertEqual(code, 0, err)
+        saved = json.loads(registry.read_text(encoding="utf-8"))[0]
+        self.assertEqual((saved["status"], saved["last_reviewed"], saved["artifact_kind"]),
+                         ("current", "2026-11-06", "command"))
 
     def test_blank_new_path_is_invalid(self):
         # Break: a whitespace-only new_path validates and is then silently ignored by the query.
@@ -1135,6 +1175,15 @@ class RubricTests(Base):
         code, err = self.run_rubric()
         self.assertEqual(code, 1)
         self.assertIn("cannot read sha", err)
+
+    def test_rubric_check_requires_removals_section(self):
+        path = self.root / "skills/skill-judge/references/rubric.md"
+        path.write_text(path.read_text().replace(audit.REMOVALS_HEADING + "\n", ""))
+        code, err = self.run_rubric()
+        self.assertEqual(code, 1)
+        self.assertIn("missing section: ## Removals and sources (every judgment)", err)
+        path.write_text(path.read_text() + audit.REMOVALS_HEADING + "\n")
+        self.assertEqual(self.run_rubric(), (0, ""))
 
     def test_rubric_check_rejects_stale_spec_sha(self):
         (self.root / "skills/skill-judge/references/rubric.md").write_text(RUBRIC.format(sha="b" * 40, rows=ROWS))
@@ -3264,6 +3313,451 @@ class JudgePromptTests(Base):
         self.assertEqual(code, 2)
         self.assertEqual(out, "")
         self.assertIn("plugin", err)
+
+
+GIT_ENV = {**os.environ, "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull, "GIT_CONFIG_NOSYSTEM": "1"}
+PARA_P = "Always restore the original template before shipping the release."
+PARA_Q = "Never skip the final verification of every generated artifact today."
+PARA_KEEP = "This paragraph stays in every version of the skill file."
+
+
+def md(*paras: str) -> str:
+    return "\n\n".join(paras) + "\n"
+
+
+class DigestTests(Base):
+    """judge-prompt previous-version digest: units, files, snapshots, defaults and the recovery gate."""
+
+    def setUp(self):
+        super().setUp()
+        self.template = (audit.default_root() / "skills" / "skill-judge" / "references" / "judge-prompt.md").read_text()
+        self.write("skills/skill-judge/references/judge-prompt.md", self.template)
+        for kind in ("command", "agent"):
+            self.write(f"skills/skill-judge/references/profiles/{kind}.md", f"# {kind} profile\n\nPROFILE-{kind.upper()}-MARKER\n")
+        self.n = 0
+
+    def git(self, *args):
+        r = subprocess.run(["git", "-C", str(self.root), "-c", "user.name=t", "-c", "user.email=t@example.com", *args],
+                           capture_output=True, text=True, env=GIT_ENV)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return r.stdout.strip()
+
+    def commit(self, msg="c"):
+        self.git("add", "-A")
+        self.git("commit", "-q", "-m", msg)
+        return self.git("rev-parse", "HEAD")
+
+    def prev_dir(self, files):
+        self.n += 1
+        d = Path(self._tmp.name) / f"prev{self.n}"
+        for rel, text in files.items():
+            (d / rel).parent.mkdir(parents=True, exist_ok=True)
+            (d / rel).write_bytes(text if isinstance(text, bytes) else text.encode())
+        return d
+
+    def prompt(self, *argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            try:
+                code = audit.main(["--root", str(self.root), "judge-prompt", *argv])
+            except SystemExit as e:
+                code = e.code if isinstance(e.code, int) else 2
+        return code, out.getvalue(), err.getvalue()
+
+    def judge(self, *extra, name="x"):
+        return self.prompt("--artifact", str(self.root / "skills" / name / "SKILL.md"), "--judge", "j", *extra)
+
+    def items(self, out):
+        return [line for line in out.splitlines() if line.startswith("- para:") or line.startswith("- file:")]
+
+    def note(self, name, src):
+        return f"no previous version available for {name} at {src}; the removal check was not run for it"
+
+    # (a)
+    def test_digest_units_split_and_skip(self):
+        text = ("# Title\n\nFirst paragraph line one\ncontinues here.\n\n- item one has words\n  continuation line\n- item two has words\n\n"
+                "| a | b | c |\n|---|---|---|\n| x y z | w v u | t s r |\n\n```py\ncode block here\n```\n\ntwo words\n\n## Next\n")
+        self.assertEqual(audit.digest_units(text), [
+            "First paragraph line one\ncontinues here.", "- item one has words\n  continuation line", "- item two has words",
+            "| a | b | c |", "| x y z | w v u | t s r |", "```py\ncode block here\n```"])
+
+    def test_digest_units_fence_keeps_blank_lines_and_hash_lines(self):
+        text = "```\n# not a heading\n\nstill code\n```\n"
+        self.assertEqual(audit.digest_units(text), [text.rstrip("\n")])
+
+    # (c)
+    def test_unit_id_stable_across_whitespace_and_case(self):
+        a = audit.unit_id("Use  the   Template\nnow")
+        self.assertRegex(a, r"^para:[0-9a-f]{8}$")
+        self.assertEqual(a, audit.unit_id("use the template now"))
+        self.assertNotEqual(a, audit.unit_id("use the template later"))
+
+    def test_norm_tokens_and_shingles(self):
+        self.assertEqual(audit.norm_tokens("Hello, World_1!"), ["hello", "world_1"])
+        self.assertEqual(audit.shingles("a b c d e f"), {("a", "b", "c", "d", "e"), ("b", "c", "d", "e", "f")})
+        self.assertEqual(audit.shingles("a b c"), set())
+
+    # (b)
+    def test_removed_units_reworded_kept(self):
+        prev = {"s.md": b"alpha beta gamma delta epsilon zeta eta theta iota kappa\n"}
+        cur = {"s.md": b"alpha beta gamma delta epsilon zeta eta theta lambda mu\n"}
+        self.assertEqual(audit.removed_units(prev, cur), [])
+        cur = {"s.md": b"alpha beta gamma delta epsilon one two three four five\n"}
+        self.assertEqual([u["text"] for u in audit.removed_units(prev, cur)], [prev["s.md"].decode().strip()])
+
+    def test_removed_units_deleted_list_item_and_collateral_paragraph(self):
+        prev = {"s.md": ("## A\n\n- keep the first item stable here\n- drop this second item right now\n- keep the third item stable here\n\n"
+                         "## B\n\nThe sentence that will change completely soon.\n\nThe next paragraph that gets deleted by accident.\n").encode()}
+        cur = {"s.md": ("## A\n\n- keep the first item stable here\n- keep the third item stable here\n\n"
+                        "## B\n\nA wholly different sentence stands here instead now.\n").encode()}
+        texts = [u["text"] for u in audit.removed_units(prev, cur)]
+        self.assertIn("- drop this second item right now", texts)
+        self.assertIn("The next paragraph that gets deleted by accident.", texts)
+        self.assertNotIn("- keep the first item stable here", texts)
+
+    def test_removed_units_short_unit_needs_text_gone_and_union_counts(self):
+        prev = {"s.md": b"one two three four\n\nsix seven eight\n\nnine ten eleven twelve thirteen fourteen\n"}
+        cur = {"s.md": b"intro\n", "references/t.txt": b"see one two three four here\nnine ten eleven twelve thirteen fourteen\n"}
+        self.assertEqual([u["text"] for u in audit.removed_units(prev, cur)], ["six seven eight"])
+        self.assertEqual(audit.removed_units(prev, {"s.md": b"x\n", "o.md": b"x one two three fourteen\n"})[0]["path"], "s.md")
+
+    def test_removed_units_uncapped_longest_first_and_ids(self):
+        prev = {"s.md": md("aa bb cc dd ee ff", *[f"w{i} x{i} y{i} z{i} q{i} r{i} extra words {i}" for i in range(50)]).encode()}
+        got = audit.removed_units(prev, {"s.md": b"nothing\n"})
+        self.assertEqual(len(got), 51)
+        self.assertEqual(got[-1]["text"], "aa bb cc dd ee ff")
+        self.assertEqual(got[0]["id"], audit.unit_id(got[0]["text"]))
+        self.assertEqual(set(got[0]), {"id", "path", "text"})
+
+    # (d)
+    def test_removed_files_deleted_changed_binary_and_threshold(self):
+        ten = "".join(f"line{i}\n" for i in range(10)).encode()
+        prev = {"a.css": b"a {\n}\n\n", "d.json": ten, "e.json": ten, "b.bin": b"\xff\xfe\x00", "c.bin": b"\xff\x00", "k.bin": b"\xff\x01", "n.md": b"x\n"}
+        cur = {"d.json": b"line0\nline1\nline2\nline3\nnew\nnew2\n", "e.json": b"".join(f"line{i}\n".encode() for i in range(6)) + b"x\n",
+               "c.bin": b"\xff\x02", "k.bin": b"\xff\x01"}
+        self.assertEqual(audit.removed_files(prev, cur), [
+            {"path": "a.css", "status": "deleted", "lines": 2, "kept": 0},
+            {"path": "b.bin", "status": "deleted", "lines": None, "kept": None},
+            {"path": "c.bin", "status": "changed", "lines": None, "kept": None},
+            {"path": "d.json", "status": "changed", "lines": 10, "kept": 4}])
+        got = audit.removed_files({"e.json": ten}, cur, threshold=1.0)
+        self.assertEqual(got, [{"path": "e.json", "status": "changed", "lines": 10, "kept": 6}])
+
+    # snapshots
+    def test_snapshot_skill_command_agent_and_exclusions(self):
+        self.write("skills/x/SKILL.md", "s\n")
+        self.write("skills/x/references/r.md", "r\n")
+        self.write("skills/x/evals/evals.json", "{}")
+        self.write("commands/ship.md", "c\n")
+        self.write("agents/bot.md", "a\n")
+        self.assertEqual(audit.artifact_snapshot(self.root, "skill", "x", None),
+                         {"skills/x/SKILL.md": b"s\n", "skills/x/references/r.md": b"r\n"})
+        self.assertEqual(audit.artifact_snapshot(self.root, "command", "ship", None), {"commands/ship.md": b"c\n"})
+        self.assertEqual(audit.artifact_snapshot(self.root, "agent", "bot", None), {"agents/bot.md": b"a\n"})
+        self.assertIsNone(audit.artifact_snapshot(self.root, "skill", "nope", None))
+        self.assertIsNone(audit.artifact_snapshot(self.root, "command", "nope", None))
+
+    def test_snapshot_from_ref_and_directory(self):
+        self.write("skills/x/SKILL.md", "s\n")
+        self.write("skills/x/evals/evals.json", "{}")
+        self.write("commands/ship.md", "c\n")
+        self.git("init", "-q", "-b", "main")
+        sha = self.commit()
+        self.write("skills/x/SKILL.md", "changed\n")
+        self.assertEqual(audit.artifact_snapshot(self.root, "skill", "x", sha), {"skills/x/SKILL.md": b"s\n"})
+        self.assertEqual(audit.artifact_snapshot(self.root, "command", "ship", sha), {"commands/ship.md": b"c\n"})
+        self.assertIsNone(audit.artifact_snapshot(self.root, "skill", "late", sha))
+        self.assertIsNone(audit.artifact_snapshot(self.root, "skill", "x", "nonesuch"))
+        d = self.prev_dir({"SKILL.md": "p\n", "evals/e.json": "{}"})
+        self.assertEqual(audit.artifact_snapshot(self.root, "skill", "x", str(d)), {"skills/x/SKILL.md": b"p\n"})
+        c = self.prev_dir({"ship.md": "pc\n"})
+        self.assertEqual(audit.artifact_snapshot(self.root, "command", "ship", str(c)), {"commands/ship.md": b"pc\n"})
+        self.assertIsNone(audit.artifact_snapshot(self.root, "command", "other", str(c)))
+        self.assertIsNone(audit.artifact_snapshot(self.root, "skill", "x", str(self.prev_dir({"notes.md": "n\n"}))))
+        self.assertIsNone(audit.artifact_snapshot(self.root, "skill", "x", str(self.prev_dir({}))))
+
+    def test_snapshot_without_git_repository_and_ref_is_none(self):
+        self.write("skills/x/SKILL.md", "s\n")
+        self.assertIsNone(audit.artifact_snapshot(self.root, "skill", "x", "main"))
+
+    # (e)
+    def test_rendered_block(self):
+        long_unit = " ".join(f"w{i:03d}" for i in range(80))
+        filler = [f"filler{i} alpha{i} beta{i} gamma{i} delta{i} epsilon{i}" for i in range(44)]
+        prev = self.prev_dir({"SKILL.md": "# Demo\n\nIntro line of the skill.\n\n## Steps\n\n" + md(long_unit, *filler),
+                              "style.css": "a {}\nb {}\n"})
+        self.write("skills/demo/SKILL.md", "# Demo\n\nIntro line of the skill.\n\n## Steps\n")
+        code, out, err = self.judge("--previous", str(prev), name="demo")
+        self.assertEqual((code, err), (0, ""))
+        golden = fill_judge_prompt(self.template, str(self.root.resolve()), "j", "demo")
+        self.assertTrue(out.startswith(golden.rstrip("\n") + "\n\n=== previous-version digest: demo at "))
+        self.assertIn(f"=== previous-version digest: demo at {prev} ===\nsections:\n"
+                      f"- skills/demo/SKILL.md: # Demo | Intro line of the skill.\n"
+                      f"- skills/demo/SKILL.md: ## Steps | {long_unit[:120]}\n"
+                      "removed units (45, showing 40):\n", out)
+        paras = [line for line in out.splitlines() if line.startswith("- para:")]
+        self.assertEqual(len(paras), 40)
+        self.assertRegex(paras[0], r"^- para:[0-9a-f]{8} skills/demo/SKILL\.md: ")
+        self.assertTrue(paras[0].startswith(f"- {audit.unit_id(long_unit)} skills/demo/SKILL.md: "))
+        self.assertEqual(paras[0].split(": ", 1)[1], long_unit[:300])
+        self.assertIn("removed or reduced files:\n- file:skills/demo/style.css deleted (2 lines)\nrecord: none\n", out)
+        rec = self.write("docs/audit/recovery/demo/record.md", "| item |\n")
+        out = self.judge("--previous", str(prev), name="demo")[1]
+        self.assertTrue(out.endswith(f"record: {rec.resolve()}\n"))
+
+    def test_empty_lists_print_none(self):
+        prev = self.prev_dir({"SKILL.md": "Same text stays put here.\n"})
+        self.write("skills/demo/SKILL.md", "Same text stays put here.\n")
+        out = self.judge("--previous", str(prev), name="demo")[1]
+        self.assertIn("sections:\n- none\nremoved units (0, showing 0):\n- none\nremoved or reduced files:\n- none\nrecord: none\n", out)
+
+    def test_binary_file_lines_and_changed_line_counts_in_block(self):
+        prev = self.prev_dir({"SKILL.md": "Same text stays put here.\n", "d.bin": b"\xff\x00", "j.json": "".join(f"l{i}\n" for i in range(10)),
+                              "g.bin": b"\xff\x01"})
+        self.write("skills/demo/SKILL.md", "Same text stays put here.\n")
+        self.write("skills/demo/j.json", "l0\nl1\nl2\nl3\nq\n")
+        self.write("skills/demo/g.bin", b"\xff\x02")
+        out = self.judge("--previous", str(prev), name="demo")[1]
+        self.assertIn("- file:skills/demo/d.bin deleted (binary)\n", out)
+        self.assertIn("- file:skills/demo/g.bin changed (binary)\n", out)
+        self.assertIn("- file:skills/demo/j.json changed (4/10 lines kept)\n", out)
+
+    def test_command_digest_follows_the_profile(self):
+        self.write("commands/ship.md", "# Ship\n")
+        prev = self.prev_dir({"ship.md": "# Ship\n\nRun the release checks before you ship.\n"})
+        code, out, err = self.prompt("--kind", "command", "--artifact", str(self.root / "commands" / "ship.md"), "--judge", "j",
+                                     "--previous", str(prev))
+        self.assertEqual((code, err), (0, ""))
+        self.assertIn("PROFILE-COMMAND-MARKER\n\n=== previous-version digest: ship at ", out)
+        self.assertIn("- para:", out)
+        self.assertIn(" commands/ship.md: Run the release checks before you ship.\n", out)
+
+    # (f)
+    def test_previous_ref_applies_to_every_artifact(self):
+        self.git("init", "-q", "-b", "main")
+        for n in ("a", "b"):
+            self.write(f"skills/{n}/SKILL.md", md(f"# {n}", PARA_KEEP, PARA_P if n == "a" else PARA_Q))
+        self.commit()
+        for n in ("a", "b"):
+            self.write(f"skills/{n}/SKILL.md", md(f"# {n}", PARA_KEEP))
+        code, out, err = self.prompt("--artifact", str(self.root / "skills/a/SKILL.md"), "--artifact", str(self.root / "skills/b/SKILL.md"),
+                                     "--judge", "j", "--previous", "HEAD")
+        self.assertEqual((code, err), (0, ""))
+        self.assertIn("=== previous-version digest: a at HEAD ===", out)
+        self.assertIn("=== previous-version digest: b at HEAD ===", out)
+        self.assertIn(f"skills/a/SKILL.md: {PARA_P}\n", out)
+        self.assertIn(f"skills/b/SKILL.md: {PARA_Q}\n", out)
+        self.assertNotIn(f"skills/a/SKILL.md: {PARA_Q}", out)
+
+    def test_previous_several_srcs_in_order(self):
+        self.write("skills/x/SKILL.md", "# x\n")
+        d1 = self.prev_dir({"SKILL.md": md("# x", PARA_P)})
+        d2 = self.prev_dir({"SKILL.md": md("# x", PARA_Q)})
+        out = self.judge("--previous", str(d2), "--previous", str(d1))[1]
+        self.assertLess(out.index(f"at {d2} ==="), out.index(f"at {d1} ==="))
+
+    def test_previous_directory_needs_exactly_one_artifact(self):
+        self.write("skills/a/SKILL.md", "# a\n")
+        self.write("skills/b/SKILL.md", "# b\n")
+        d = self.prev_dir({"SKILL.md": "# a\n"})
+        code, out, err = self.prompt("--artifact", str(self.root / "skills/a/SKILL.md"), "--artifact", str(self.root / "skills/b/SKILL.md"),
+                                     "--judge", "j", "--previous", str(d))
+        self.assertEqual((code, out), (2, ""))
+        self.assertIn(str(d), err)
+
+    # (g)
+    def repo_with_removal(self, branch="main"):
+        self.git("init", "-q", "-b", branch)
+        self.write("skills/x/SKILL.md", md("# x", PARA_KEEP, PARA_P, PARA_Q))
+        first = self.commit("first")
+        self.write("skills/x/SKILL.md", md("# x", PARA_KEEP, PARA_Q))
+        self.commit("removes P")
+        self.write("other.txt", "unrelated\n")
+        self.commit("unrelated")
+        return first
+
+    def test_default_on_main_is_parent_of_newest_artifact_commit(self):
+        first = self.repo_with_removal()
+        code, out, err = self.judge()
+        self.assertEqual((code, err), (0, ""))
+        self.assertIn(f"=== previous-version digest: x at {first} ===", out)
+        self.assertIn(f"skills/x/SKILL.md: {PARA_P}\n", out)
+        self.assertNotIn(f"SKILL.md: {PARA_Q}", out)
+
+    def test_default_on_branch_without_own_commits_takes_parent_rule(self):
+        first = self.repo_with_removal()
+        self.git("checkout", "-q", "-b", "feature")
+        out = self.judge()[1]
+        self.assertIn(f"digest: x at {first} ===", out)
+        self.assertIn(f"skills/x/SKILL.md: {PARA_P}\n", out)
+
+    def test_default_on_branch_with_commits_is_merge_base(self):
+        self.repo_with_removal()
+        base = self.git("rev-parse", "HEAD")
+        self.git("checkout", "-q", "-b", "feature")
+        self.write("skills/x/SKILL.md", md("# x", PARA_KEEP))
+        self.commit("removes Q")
+        out = self.judge()[1]
+        self.assertIn(f"digest: x at {base} ===", out)
+        self.assertIn(f"skills/x/SKILL.md: {PARA_Q}\n", out)
+        self.assertNotIn(f"SKILL.md: {PARA_P}", out)
+
+    def test_default_uses_origin_main_when_no_local_main(self):
+        first = self.repo_with_removal(branch="trunk")
+        self.git("update-ref", "refs/remotes/origin/main", first)
+        out = self.judge()[1]
+        self.assertIn(f"digest: x at {first} ===", out)
+        self.assertIn(f"skills/x/SKILL.md: {PARA_P}\n", out)
+
+    def test_default_without_main_takes_parent_rule(self):
+        first = self.repo_with_removal(branch="trunk")
+        out = self.judge()[1]
+        self.assertIn(f"digest: x at {first} ===", out)
+        self.assertIn(f"skills/x/SKILL.md: {PARA_P}\n", out)
+
+    # (h)
+    def test_note_artifact_missing_in_directory_and_ref(self):
+        self.write("skills/late/SKILL.md", "# late\n")
+        d = self.prev_dir({"other.md": "x y z\n"})
+        code, out, err = self.judge("--previous", str(d), name="late")
+        self.assertEqual((code, err), (0, ""))
+        self.assertTrue(out.rstrip("\n").endswith(self.note("late", d)))
+        self.assertNotIn("=== previous-version digest", out)
+        self.git("init", "-q", "-b", "main")
+        first = self.commit()
+        self.write("skills/later/SKILL.md", "# later\n")
+        code, out, err = self.judge("--previous", first, name="later")
+        self.assertEqual((code, err), (0, ""))
+        self.assertTrue(out.rstrip("\n").endswith(self.note("later", first)))
+
+    def test_note_artifact_without_commit_and_root_commit(self):
+        self.git("init", "-q", "-b", "main")
+        self.write("other.txt", "o\n")
+        self.commit()
+        self.write("skills/new/SKILL.md", "# new\n")
+        code, out, err = self.judge(name="new")
+        self.assertEqual((code, err), (0, ""))
+        self.assertIn("no previous version available for new at ", out)
+        self.assertIn("; the removal check was not run for it", out)
+        self.commit("adds new")
+        self.git("checkout", "-q", "--orphan", "fresh")
+        self.git("rm", "-rfq", ".")
+        self.write("skills/root/SKILL.md", "# root\n")
+        self.write("skills/skill-judge/references/judge-prompt.md", self.template)
+        self.commit("root commit")
+        code, out, err = self.judge(name="root")
+        self.assertEqual((code, err), (0, ""))
+        self.assertIn("no previous version available for root at ", out)
+        self.assertNotIn("=== previous-version digest", out)
+
+    # (h1)
+    def test_unresolvable_previous_exits_2(self):
+        self.write("skills/x/SKILL.md", "# x\n")
+        for git_root in (False, True):
+            if git_root:
+                self.git("init", "-q", "-b", "main")
+                self.commit()
+            with self.subTest(git_root=git_root):
+                code, out, err = self.judge("--previous", "nonesuch")
+                self.assertEqual((code, out), (2, ""))
+                self.assertIn("--previous nonesuch does not resolve", err)
+
+    # (h2)
+    def test_non_git_root_without_previous_is_byte_identical(self):
+        self.write("skills/x/SKILL.md", "# x\n")
+        code, out, err = self.judge()
+        self.assertEqual((code, err), (0, ""))
+        self.assertEqual(out, fill_judge_prompt(self.template, str(self.root.resolve()), "j", "x"))
+
+    # (i)
+    def queue(self, status, name="x", bid=1):
+        return json.dumps([{"id": bid, "artifacts": [{"kind": "skill", "name": name}], "status": status}])
+
+    GATE = ("--recovery-gate", "docs/audit/recovery/batches.json")
+
+    def test_gate_absent_queue_defers(self):
+        self.repo_with_removal()
+        code, out, err = self.judge(*self.GATE)
+        self.assertEqual((code, err), (0, ""))
+        self.assertTrue(out.rstrip("\n").endswith(
+            "removal check deferred for x: its content recovery has not closed (docs/audit/recovery/batches.json)"))
+        self.assertNotIn("=== previous-version digest", out)
+
+    def test_gate_open_batch_defers_and_unlisted_artifact_gets_default(self):
+        first = self.repo_with_removal()
+        self.write("docs/audit/recovery/batches.json", self.queue("queued"))
+        out = self.judge(*self.GATE)[1]
+        self.assertIn("removal check deferred for x: its content recovery has not closed", out)
+        self.write("docs/audit/recovery/batches.json", self.queue("queued", name="other"))
+        out = self.judge(*self.GATE)[1]
+        self.assertIn(f"digest: x at {first} ===", out)
+
+    def test_gate_closed_batch_floors_default_at_close_commit(self):
+        first = self.repo_with_removal()
+        self.write("docs/audit/recovery/batches.json", self.queue("queued"))
+        self.commit("queue queued")
+        self.write("docs/audit/recovery/batches.json", self.queue("closed"))
+        close = self.commit("queue closed")
+        self.write("unrelated2.txt", "u\n")
+        self.commit("later")
+        out = self.judge(*self.GATE)[1]
+        self.assertIn(f"digest: x at {close} ===", out)
+        self.assertIn("sections:\n- skills/x/SKILL.md: # x |", out)
+        self.assertIn("removed units (0, showing 0):\n- none\n", out)
+        out = self.judge(*self.GATE, "--previous", first)[1]
+        self.assertIn(f"skills/x/SKILL.md: {PARA_P}\n", out)
+        self.write("skills/x/SKILL.md", md("# x", PARA_KEEP))
+        out = self.judge(*self.GATE)[1]
+        self.assertIn(f"skills/x/SKILL.md: {PARA_Q}\n", out)
+        self.assertNotIn(f"SKILL.md: {PARA_P}", out)
+
+    def test_gate_outside_root_exits_2(self):
+        self.write("skills/x/SKILL.md", "# x\n")
+        code, out, err = self.judge("--recovery-gate", "../queue.json")
+        self.assertEqual((code, out), (2, ""))
+        self.assertIn("--recovery-gate ../queue.json is outside the root", err)
+
+    def test_gate_is_ignored_with_explicit_previous(self):
+        self.write("skills/x/SKILL.md", "# x\n")
+        prev = self.prev_dir({"SKILL.md": md("# x", PARA_P)})
+        code, out, err = self.judge("--recovery-gate", "../queue.json", "--previous", str(prev))
+        self.assertEqual((code, err), (0, ""))
+        self.assertIn("previous-version digest: x at", out)
+
+    # (j)
+    def test_digest_dir_holds_blocks_and_prompt_holds_one_line(self):
+        prev = self.prev_dir({"SKILL.md": md("# Demo", PARA_P)})
+        self.write("skills/demo/SKILL.md", "# Demo\n")
+        target = Path(self._tmp.name) / "out" / "digests"
+        code, out, err = self.judge("--previous", str(prev), "--digest-dir", str(target), name="demo")
+        self.assertEqual((code, err), (0, ""))
+        self.assertTrue(out.rstrip("\n").endswith(f"previous-version digest for demo: {target.resolve() / 'demo.md'}"))
+        self.assertNotIn("=== previous-version digest", out)
+        block = (target / "demo.md").read_text()
+        self.assertTrue(block.startswith(f"=== previous-version digest: demo at {prev} ==="))
+        self.assertIn(f"skills/demo/SKILL.md: {PARA_P}\n", block)
+
+    # (k)
+    def test_skill_judge_snapshot_leaves_out_vendored_mirror(self):
+        self.write("skills/skill-judge/SKILL.md", "# Judge\n")
+        self.write("skills/skill-judge/references/agentskills/page.md", "a vendored page\n")
+        snap = audit.artifact_snapshot(self.root, "skill", "skill-judge", None)
+        self.assertIn("skills/skill-judge/references/rubric.md", snap)
+        self.assertFalse([p for p in snap if "references/agentskills/" in p])
+        self.write("skills/x/SKILL.md", "# x\n")
+        self.write("skills/x/references/agentskills/p.md", "t\n")
+        self.assertIn("skills/x/references/agentskills/p.md", audit.artifact_snapshot(self.root, "skill", "x", None))
+
+    def test_skill_judge_cut_in_mirror_draws_no_item_but_rubric_does(self):
+        self.write("skills/skill-judge/SKILL.md", "# Judge\n")
+        prev = self.prev_dir({"SKILL.md": "# Judge\n", "references/agentskills/page.md": md(PARA_P), "references/agentskills/old.css": "a\nb\n",
+                              "references/rubric.md": md(PARA_Q)})
+        code, out, err = self.judge("--previous", str(prev), name="skill-judge")
+        self.assertEqual((code, err), (0, ""))
+        got = self.items(out)
+        self.assertEqual(len(got), 1)
+        self.assertIn(f"skills/skill-judge/references/rubric.md: {PARA_Q}", got[0])
+        self.assertNotIn("agentskills/page.md", out)
 
 
 class CommandAgentMergeTests(MergeTests):

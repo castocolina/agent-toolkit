@@ -239,6 +239,110 @@
         "No finding says name or description is missing, and D5 is not scored down for being under 200 lines with no references",
         "The response does not say it loaded references/profiles/command.md"
       ]
+    },
+    {
+      "id": "removed-template",
+      "prompt": "Judge the skill in evals/files/removed-template/SKILL.md.txt with judge slug test; print only the verdict line. Its previous-version digest is evals/files/removed-template.digest.md: run the removal check on it.",
+      "expected_output": "One verdict JSON line for removed-template with a high D1 finding that names the removed changelog template (para:7f0c3909), which no record explains.",
+      "files": [
+        "references/rubric.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/removed-template/SKILL.md.txt",
+        "evals/files/removed-template.digest.md"
+      ],
+      "assertions": [
+        "Output is exactly one line holding one JSON object",
+        "Exactly one finding has dimension D1 and severity high and its evidence names `para:7f0c3909` (the removed changelog template)",
+        "That finding's fix says to restore the template or add a row to the removal record",
+        "The digest says `record: none`, so no finding treats the removal as explained"
+      ]
+    },
+    {
+      "id": "recorded-removal",
+      "prompt": "Judge the skill in evals/files/removed-template/SKILL.md.txt with judge slug test; print only the verdict line. Its previous-version digest is evals/files/recorded-removal.digest.md: run the removal check on it. The fixer rules are evals/files/fixer-rules.md.",
+      "expected_output": "One verdict JSON line for removed-template with no D1 removal finding: the record row for para:7f0c3909 (removed-on-merit, low, intended-change) is an allowed combination and explains the removal.",
+      "files": [
+        "references/rubric.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/removed-template/SKILL.md.txt",
+        "evals/files/recorded-removal.digest.md",
+        "evals/files/recorded-removal/record.md",
+        "evals/files/fixer-rules.md"
+      ],
+      "assertions": [
+        "Output is exactly one line holding one JSON object",
+        "No finding with dimension D1 reports `para:7f0c3909` or the changelog template as an unexplained removal",
+        "No finding reports a missing or unreadable `sections.json`"
+      ]
+    },
+    {
+      "id": "moved-template",
+      "prompt": "Judge the skill in evals/files/moved-template/SKILL.md.txt with judge slug test; print only the verdict line. Its previous-version digest is evals/files/moved-template.digest.md: run the removal check on it.",
+      "expected_output": "One verdict JSON line for moved-template with no removal finding: the changelog template now lives in references/template.md.",
+      "files": [
+        "references/rubric.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/moved-template/SKILL.md.txt",
+        "evals/files/moved-template/references/template.md",
+        "evals/files/moved-template.digest.md"
+      ],
+      "assertions": [
+        "Output is exactly one line holding one JSON object",
+        "No finding with dimension D1 reports a removed or lost template, paragraph or file",
+        "No finding says references/template.md cannot be read"
+      ]
+    },
+    {
+      "id": "collateral-paragraph",
+      "prompt": "Judge the skill in evals/files/collateral-paragraph/SKILL.md.txt with judge slug test; print only the verdict line. Its previous-version digest is evals/files/collateral-paragraph.digest.md: run the removal check on it.",
+      "expected_output": "One verdict JSON line for collateral-paragraph with a high D1 finding for the deleted Rollback paragraph (para:d822fccf), the paragraph that sat next to an intended rewording.",
+      "files": [
+        "references/rubric.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/collateral-paragraph/SKILL.md.txt",
+        "evals/files/collateral-paragraph.digest.md"
+      ],
+      "assertions": [
+        "Output is exactly one line holding one JSON object",
+        "A finding has dimension D1 and severity high and its evidence names `para:d822fccf` (the deleted paragraph about paging the database on-call and keeping the old secret version)",
+        "No finding reports the reworded Restore sentence as a removal"
+      ]
+    },
+    {
+      "id": "unsourced-fact",
+      "prompt": "Judge the skill in evals/files/unsourced-fact/SKILL.md.txt with judge slug test; print only the verdict line.",
+      "expected_output": "One verdict JSON line for unsourced-fact with a D8 finding that the hardcoded default model ID claude-3-5-sonnet-20241022 has no source URL, date or live read.",
+      "files": [
+        "references/rubric.md",
+        "references/agentskills/specification.md",
+        "references/agentskills/best-practices.md",
+        "references/agentskills/evaluating-skills.md",
+        "references/agentskills/optimizing-descriptions.md",
+        "references/agentskills/using-scripts.md",
+        "evals/files/unsourced-fact/SKILL.md.txt"
+      ],
+      "assertions": [
+        "Output is exactly one line holding one JSON object",
+        "A finding has dimension D8 and its evidence quotes the line naming the default model `claude-3-5-sonnet-20241022`",
+        "That finding says the model ID has no official source URL, no date checked and no live read, and proposes reading the model list live or adding the vendor source and date",
+        "No finding says the model ID is wrong or deprecated as a verified fact"
+      ]
     }
   ]
 }
