@@ -1,14 +1,14 @@
 # Dependency Updater
 
-Smart dependency management for any programming language with automatic detection and approval-gated updates.
+Smart dependency management for any programming language with automatic detection and guarded, snapshot-backed updates.
 
 ## Purpose
 
 The Dependency Updater skill provides intelligent, language-agnostic dependency management that:
 
 - **Auto-detects your project type** by scanning for package files (package.json, go.mod, Cargo.toml, etc.)
-- **Asks for approval per target version** before any write; minor and patch updates are not applied automatically, because even a nominal minor update can break compatibility
-- **Prompts for major updates individually** to prevent breaking changes
+- **Applies safe updates automatically** (minor and patch versions of stable, unpinned dependencies) after showing the package-to-exact-target map and taking a recoverable snapshot of the manifest and lockfile, then runs the tests and security audit per cohort and restores the snapshot if one fails
+- **Prompts for major updates individually** to prevent breaking changes; every 0.x or prerelease change, and any update that fails a peer, ABI or runtime check, is asked per target too, because even a nominal minor update can break compatibility there
 - **Respects intentionally pinned versions** by skipping fixed dependencies
 - **Runs security audits** to identify vulnerabilities
 - **Diagnoses and fixes** common dependency issues
@@ -32,7 +32,7 @@ Use this skill when you want to:
 update my dependencies
 ```
 
-The skill will auto-detect your project type and propose updates for your approval.
+The skill will auto-detect your project type, apply the safe minor and patch updates after a snapshot, and ask before any major, 0.x or prerelease update. Say "ask first" to be asked about every target.
 
 ## Supported Languages
 
@@ -44,16 +44,17 @@ The skill will auto-detect your project type and propose updates for your approv
 | Rust | Cargo.toml | `cargo update -p crate --precise version` | `cargo audit` |
 | Ruby | Gemfile | set the Gemfile constraint, then `bundle update --conservative gem` | `bundle audit` |
 | Java | pom.xml, build.gradle | `mvn versions:*` | `mvn org.owasp:dependency-check-maven:check` |
-| .NET | *.csproj | `dotnet add package PackageName --version approved-version` (`dotnet outdated` only as optional discovery) | `dotnet list package --vulnerable` |
+| .NET | *.csproj | `dotnet add <project> package PackageName --version approved-version` (`<project>` is the project directory or the owning `*.csproj` path; `dotnet outdated` only as optional discovery) | `dotnet list package --vulnerable` |
 
 ## How It Works
 
-The skill follows a constraint-first 6-step workflow (the full rules are in SKILL.md):
+The skill follows a constraint-first workflow that auto-applies safe cohorts with guardrails (the full rules are in SKILL.md):
 
 ```
-1. INSPECT AND DETECT
+1. DETECT AND CHECK PREREQUISITES
    Preserve unrelated edits; identify the manifest, owning package manager,
-   lockfile, runtime and workspace layout
+   lockfile, runtime and workspace layout; verify the required tools are
+   installed and suggest the install command if one is missing
 
 2. CLASSIFY CONSTRAINTS
    Use the manager's own constraint grammar; exact pins stay unchanged
@@ -61,26 +62,40 @@ The skill follows a constraint-first 6-step workflow (the full rules are in SKIL
 3. FORM COMPATIBLE COHORTS
    Group coupled workspace packages and peer/runtime constraints
 
-4. SCAN AND ASK
-   Scan candidates, read release notes, and apply only target versions the
-   user approved (every breaking target needs approval)
+4. SCAN AND CATEGORIZE
+   Scan candidates, read release notes, and sort every target: PATCH and
+   MINOR of stable, unpinned dependencies are auto-applied; MAJOR, 0.x,
+   prerelease and failed peer/ABI/runtime checks are asked per target
 
-5. UPDATE MANIFEST AND LOCKFILE TOGETHER
-   Use the owning package manager only
+5. AUTO-APPLY SAFE COHORTS
+   Show the package-to-exact-target map, snapshot the manifest and lockfile,
+   update both together with the owning package manager, then run install,
+   tests, type checks, build and security audit for the cohort; on a failure
+   restore the snapshot, report the failing command and ask; report what
+   was applied
 
-6. VERIFY
-   Run install, tests, type checks, build and security audit after each
-   cohort; stop on the first failure and ask
+6. PROMPT FOR MAJOR UPDATES
+   Ask about each MAJOR (and each 0.x or prerelease) update individually,
+   showing current to new version
+
+7. APPLY APPROVED UPDATES
+   Update only the approved packages, with the same snapshot and checks
+
+8. FINALIZE
+   Run the install command and the security audit on the final state
 ```
 
 ### Update Classification
 
 | Update Type | Version Change | Action |
 |-------------|----------------|--------|
-| **Fixed** | Exact constraint by ecosystem: npm and pnpm an exact version string (`1.2.3`, no range operator); Cargo `=1.2.3`; Python `==1.2.3`; Go modules use minimum version selection, so a `go.mod` requirement is a deliberate pin only when the user or a comment says so (https://go.dev/ref/mod#minimal-version-selection, checked 2026-11-15) | Skip (intentionally pinned); a Go requirement nobody marked as a pin needs approval for a proposed upgrade like any other |
-| **PATCH** | `1.2.3` to `1.2.4` | Propose; apply only after approval of the target version |
-| **MINOR** | `1.2.3` to `1.3.0` | Propose; apply only after approval (a 0.x or prerelease minor can still break) |
+| **Fixed** | Exact constraint by ecosystem: npm and pnpm an exact version string (`1.2.3`, no range operator); Cargo `=1.2.3`; Python `==1.2.3`; Go modules use minimum version selection, so a `go.mod` requirement is a deliberate pin only when the user or a comment says so (https://go.dev/ref/mod#minimal-version-selection, checked 2026-11-15) | Skip (intentionally pinned); a Go requirement nobody marked as a pin is a minimum, not a pin, and is classified by the change size like any other |
+| **PATCH** | `1.2.3` to `1.2.4` | Auto-apply (stable, unpinned dependency, no peer, ABI or runtime conflict) after the snapshot; tests and audit per cohort |
+| **MINOR** | `1.2.3` to `1.3.0` | Auto-apply under the same conditions |
 | **MAJOR** | `1.2.3` to `2.0.0` | Prompt user individually |
+| **0.x or prerelease** | `0.21.4` to `0.22.0`, `2.0.0-rc.1` | Ask per target, never auto-applied: a 0.x or prerelease minor can still break |
+
+The full table, with the rule for each row, is in `references/update-policy.md`.
 
 ## Key Features
 
@@ -98,8 +113,8 @@ The skill automatically identifies your project by scanning for common package f
 
 ### Safe-by-Default Updates
 
-- Every update needs approval of its target version; minor and patch updates are not applied automatically
-- Major updates require explicit approval (may contain breaking changes)
+- Minor and patch updates of stable, unpinned dependencies are applied automatically, after a recoverable snapshot of the manifest and lockfile, and verified per cohort (install, tests, type checks, build, security audit); a failure restores the snapshot and stops
+- Major updates, 0.x and prerelease changes require explicit approval per target (may contain breaking changes)
 - Fixed/pinned versions are never modified
 
 ### Security Auditing
@@ -126,7 +141,7 @@ Troubleshoots common issues:
 update my dependencies
 ```
 
-The skill will scan your project, propose candidate updates, and apply only the target versions you approve.
+The skill will scan your project, apply the safe minor and patch updates after a snapshot, and prompt for each major, 0.x or prerelease update, applying only the targets you approve.
 
 ### Security-Focused Audit
 
@@ -161,6 +176,8 @@ The scripts live in this skill's directory, not in your project: resolve them fr
 
 A candidate scan (no `--write`) prints `{"status":"ok","candidates":<taze JSON>}`; a write run, or taze output that is not valid JSON, prints the text report in an `output` field instead.
 
+Both run commands above are scans that write nothing: add `-r` only after the workspace scope is confirmed, and add the `major` mode (`run-taze.sh major`) to also report out-of-range and major candidates. A write follows the scoped order in SKILL.md: `--include` naming the packages in the target map plus `--no-github-actions --no-node-version`, in a disposable copy of the project.
+
 ## Prerequisites
 
 ### General Requirements
@@ -190,7 +207,7 @@ For the best experience, install these optional but recommended tools:
 
 Notes (checked 2026-11-15):
 
-- `pip-review` is a lightly maintained tool: its last release is 1.3.0 (2022-11-29) and its README asks for a new maintainer (https://pypi.org/pypi/pip-review/json, https://github.com/jgonggrijp/pip-review). Its `--auto` flag upgrades every outdated package, which the skill's one-package-at-a-time rule forbids; prefer `pip list --outdated` and update one approved package at a time.
+- `pip-review` is a lightly maintained tool: its last release is 1.3.0 (2022-11-29) and its README asks for a new maintainer (https://pypi.org/pypi/pip-review/json, https://github.com/jgonggrijp/pip-review). Its `--auto` flag upgrades every outdated package, majors and 0.x versions included, so it is never the apply command; prefer `pip list --outdated` and update one mapped target at a time.
 - `safety scan` is the current Safety CLI command (it needs a login); `safety check` is the legacy command (https://github.com/pyupio/safety). `pip-audit` needs no account.
 
 ## Output
@@ -198,8 +215,8 @@ Notes (checked 2026-11-15):
 ### Update Summary
 
 After running, you will see:
-- Candidate updates with the target version proposed for each
-- The approval requested for each target, with every major update asked individually
+- List of auto-applied minor/patch updates with the exact version of each, and any snapshot restored after a failed check
+- Candidate updates that need approval (major, 0.x, prerelease), each with the target version proposed and asked individually
 - Final package count and versions
 - Security audit results
 
@@ -277,7 +294,8 @@ go mod tidy
 After running updates, verify:
 
 - [ ] Updates scanned without errors
-- [ ] Every applied update matches an approved target version
+- [ ] Every applied update matches the target map shown before the write (approved by you for majors, 0.x and prerelease)
+- [ ] A snapshot of the manifest and lockfile was taken before each write
 - [ ] Major updates prompted individually
 - [ ] Fixed versions remained untouched
 - [ ] Lock file updated
@@ -317,6 +335,16 @@ Tool commands and flags were checked on 2026-11-15 against the official document
 - dotnet-outdated: dotnet-outdated contributors, https://github.com/dotnet-outdated/dotnet-outdated
 - Safety CLI: Safety Cybersecurity, https://github.com/pyupio/safety
 - pip-review: Joris Gonggrijp, https://github.com/jgonggrijp/pip-review
+- Semantic Versioning 2.0.0, item 4 (major version zero): Tom Preston-Werner, https://semver.org/#spec-item-4
+- packageManager field: Node.js (Corepack), https://github.com/nodejs/corepack
+- uv lock (CLI reference): Astral, https://docs.astral.sh/uv/reference/cli/
+- uv, upgrading locked package versions: Astral, https://docs.astral.sh/uv/concepts/projects/sync/#upgrading-locked-package-versions
+- Poetry update: Poetry, https://python-poetry.org/docs/cli/#update
+- pipenv update: Pipenv (Python Packaging Authority), https://pipenv.pypa.io/en/latest/commands.html
+- Yarn Classic audit: Yarn, https://classic.yarnpkg.com/en/docs/cli/audit
+- npm install and config (dry-run): npm (GitHub), https://docs.npmjs.com/cli/commands/npm-install
+- Go minimal version selection: The Go Authors, https://go.dev/ref/mod#minimal-version-selection
+- dependency-check Gradle plugin: OWASP, https://dependency-check.github.io/DependencyCheck/dependency-check-gradle/
 
 ## License
 

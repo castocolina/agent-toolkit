@@ -28,6 +28,10 @@ check no_here_string "$(grep -c '<<<' "$SCRIPT")" 0
 check scan_rc "$rc" 0; check scan_args "$(cat "$ROOT/argv")" '-r --json'
 check scan_candidates "$(python3 -c 'import json,sys; d=json.load(sys.stdin); print(d["candidates"]["packages"][0]["name"], "output" in d)' < "$ROOT/scan.out")" 'left-pad False'
 : > "$ROOT/argv"
+(cd "$ROOT/work" && PATH="$ROOT/bin:/usr/bin:/bin" TAZE_LOG="$ROOT/argv" TAZE_OUT='{"packages":[{"name":"left-pad"}]}' "$BASH" "$SCRIPT" -r major) >"$ROOT/major.out" 2>&1; rc=$?
+check major_scan_rc "$rc" 0; check major_scan_args "$(cat "$ROOT/argv")" '-r major --json'
+check major_scan_candidates "$(python3 -c 'import json,sys; d=json.load(sys.stdin); print(d["candidates"]["packages"][0]["name"], "output" in d)' < "$ROOT/major.out")" 'left-pad False'
+: > "$ROOT/argv"
 (cd "$ROOT/work" && PATH="$ROOT/bin:/usr/bin:/bin" TAZE_LOG="$ROOT/argv" TAZE_OUT='left-pad 1.0.0 -> 1.1.0' "$BASH" "$SCRIPT") >"$ROOT/text.out" 2>&1; rc=$?
 check text_rc "$rc" 0
 check text_fallback "$(python3 -c 'import json,sys; d=json.load(sys.stdin); print(d["output"].strip(), "candidates" in d)' < "$ROOT/text.out")" 'left-pad 1.0.0 -> 1.1.0 False'

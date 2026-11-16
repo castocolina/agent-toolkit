@@ -1,0 +1,44 @@
+{
+  "skill": "dependency-updater",
+  "mode": "output",
+  "pass_rate": 0.8205,
+  "passed": 32,
+  "total": 39,
+  "failures": [
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Treats `react` and `react-dom` (^17.0.2) and the 0.x `axios` (~0.21.4) as needing an individual approval, not as safe updates, noting that even a nominal minor update of a 0.x version can break compatibility",
+      "evidence": "The output says axios needs \u201capproval per target\u201d and that \u201cMajor updates\u201d would be \u201cflagged individually rather than applied,\u201d but does not explicitly require individual approval for React and React DOM."
+    },
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Plans to update manifest and lockfile together with npm for that cohort and to run the install, the project's tests, type checks, build and `npm audit` for it, stopping and restoring the snapshot if one fails; naming these steps or commands is enough, no run results are expected",
+      "evidence": "The output promises \u201cinstall, applicable checks and audit\u201d with restoration on failure, but does not commit to running the project's tests, type checks and build."
+    },
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Does not write any change for `react`, `react-dom` or `axios` before the user approves each target version",
+      "evidence": "The output says \u201creact, react-dom\u201d have \u201cstable minor or patch targets\u201d that \u201cmay be eligible for automatic updates.\u201d"
+    },
+    {
+      "eval": "auto-apply-cohorts",
+      "assertion": "Lists the commands for that cohort in this order: the npm install, `npm test`, `npm run typecheck`, `npm run build`, `npm audit`; and says the report will list the applied packages with their exact versions (a plan or a report template is enough, no run results are expected)",
+      "evidence": "Although the gates are listed in order, the output says only that it would \u201creport the actual lockfile diff, gate results, any vulnerabilities, and any restored snapshot,\u201d not that the report will list applied packages with exact versions."
+    },
+    {
+      "eval": "conflicting-node-deps",
+      "assertion": "Proposes a targeted version change for the named package (for example a release that supports React 18, or a replacement the user approves) and verifies it with the owning manager's install, the tests and a lockfile diff review",
+      "evidence": "The output proposes evaluating \u201ca replacement such as `@hello-pangea/dnd`\u201d and running \u201cthe applicable install, tests, build, and audit,\u201d but does not specify a lockfile diff review."
+    },
+    {
+      "eval": "scoped-taze-write",
+      "assertion": "Uses -r only after confirming the workspace scope from pnpm-workspace.yaml, and notes that react is declared in both apps/web and packages/ui",
+      "evidence": "The output lists React in both manifests and proposes `cat pnpm-workspace.yaml`, but does not explicitly confirm the workspace scope before running `taze major --write -r`."
+    },
+    {
+      "eval": "unattended-candidate-scan",
+      "assertion": "Says the candidates come back in the `candidates` field of the JSON (or the `output` text fallback) and reports them for approval without applying any of them",
+      "evidence": "The output says `candidates appear in `candidates`, or in `output` as a text fallback` and that the scan `does not approve or apply them`, but it does not propose reporting them for approval."
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "skill": "dependency-updater",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 13,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 21,
+      "evidence": "1. Inspect the worktree; preserve unrelated edits.",
+      "fix": "Keep the domain-specific sentence that follows (manifest, owning resolver, lockfile, toolchain envelope, workspace topology). Move the generic worktree-hygiene reminder to README.md Best Practices, or delete it and add a row to docs/audit/recovery/dependency-updater/record.md; the model already preserves unrelated edits unprompted."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 49,
+      "evidence": "NEVER let another manager regenerate a lockfile: the resolved graph changes silently and builds stop being reproducible.",
+      "fix": "Keep the three non-obvious NEVER items. This fourth one restates the failure mode three bullets later and step 7; drop the duplicate and add a record row, or merge its reason into that failure-mode bullet so the list stays the landmines an expert learned the hard way."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/dependency-updater/references/update-policy.md",
+      "line": 3,
+      "evidence": "Load this when you classify scan results (procedure step 4 of SKILL.md).",
+      "fix": "Change this line to the same trigger SKILL.md states: load it at step 4 when sorting scan targets into the auto-apply or ask-per-target set, and also at step 2 for the Fixed row. The two files currently disagree about when the table is needed."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 13,
+      "evidence": "read the owning resolver's dry-run or explain output, for example `npm explain <package>`, `poetry update <pkg> --dry-run` or `uv lock --dry-run`",
+      "fix": "Name one default compatibility check per owning resolver and keep the others as escape hatches: for npm, `npm install --dry-run` (the eval fixtures already use it) plus the package's declared engines range; `npm explain` only shows why a package is installed. For Poetry and uv keep the dry-run forms. A failed or inconclusive check stays ask-per-target."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/dependency-updater/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "\"query\": \"Can you check whether my Rust crates need updates and tell me what to do?\"",
+      "fix": "Add about two more should-not-trigger near-misses so the set reaches the 8-10 negatives the spec asks for: one that only adds a brand-new dependency, and one that asks to change a version range in a manifest without scanning or updating. The 21 queries are otherwise realistic and the negatives already cover Renovate, runtime upgrades and publishing."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/dependency-updater/evals/evals.json",
+      "line": 3,
+      "evidence": "\"id\": \"casual-safe-updates\"",
+      "fix": "Add one eval whose fixture is a real Go, Cargo, Bundler, Maven or .NET manifest and whose assertions check the exact apply command in references/managers.md. All eight current evals are Node or Poetry, so the manager table is untested."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 13,
+      "evidence": "whose update breaks no peer, ABI or runtime-floor constraint (read the owning resolver's dry-run or explain output, for example `npm explain <package>`",
+      "fix": "Replace `npm explain <package>` as the compatibility example. It prints the chain that installed a package and does not preview an update; the Node check is `npm install --dry-run` (or the resolver diff of a disposable copy) read together with the engines range the package declares. Leave `poetry update <pkg> --dry-run` and `uv lock --dry-run`, which do preview."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/dependency-updater/references/node.md",
+      "line": 27,
+      "evidence": "then confirm with `git diff --stat` in that copy that only the intended `package.json` files changed and copy only the entries that match the approved map to the real manifest.",
+      "fix": "Say the map is the shown package-to-target map: approved explicitly for ask-per-target changes and shown, not approved, for an auto-apply cohort. The paragraph above already makes that distinction; this bullet still says \"approved names\" and \"approved map\", which would block the auto-apply cohort the policy allows."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/dependency-updater/references/managers.md",
+      "line": 9,
+      "evidence": "`dotnet add package PackageName --version approved-version`",
+      "fix": "State the project directory or the owning `*.csproj` path in the command (`dotnet add <project> package PackageName --version <target>`). Run from a solution directory, `dotnet add package` refuses to guess which project to edit, so the agent cannot complete the .NET branch as written."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/dependency-updater/evals/files/scoped-taze-write/packages/ui/package.json",
+      "line": 5,
+      "evidence": "\"peerDependencies\": { \"react\": \"^17.0.2\", \"react-dom\": \"^17.0.2\" }",
+      "fix": "Either change the eval so the approved react target stays inside the peer range, or add an assertion that the agent reports the peer-range mismatch and asks before writing. The approved target ^18.3.1 is outside the package's own peer range, while node.md says an auto-apply write never moves peerDependencies and SKILL.md makes a failed peer check ask-per-target."
+    }
+  ]
+}

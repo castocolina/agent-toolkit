@@ -1,0 +1,77 @@
+{
+  "skill": "dependency-updater",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": null,
+      "evidence": "The dbff837f digest says 'removed units (95, showing 40)'; the remaining 55 items are not available for individual review.",
+      "fix": "Provide the complete digest so every omitted removal can be checked against the current files and recovery record."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/dependency-updater/scripts/run-taze.sh",
+      "line": 52,
+      "evidence": "The wrapper accepts '--interactive' and '-I' and passes them through as write-mode arguments.",
+      "fix": "Reject interactive arguments with a structured error instead of invoking taze, and update tests/skills/dependency-updater/test-run-taze.sh to verify that taze is not run for those arguments."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 13,
+      "evidence": "'read a target-specific dry run' is offered as the check that an update 'breaks no peer, ABI or runtime-floor constraint'.",
+      "fix": "Separate resolver and declared-runtime checks from ABI verification: inspect applicable native-binary and runtime compatibility evidence, and ask per target when ABI compatibility cannot be established. Update the eval that treats an npm dry run and engines range alone as an ABI check."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 24,
+      "evidence": "'If the scanner is unavailable or errors ... stop before any write' does not distinguish scanner failure from a nonzero exit caused by vulnerability findings.",
+      "fix": "For each supported scanner, interpret its documented exit status together with its structured output: record valid vulnerability findings as the baseline, and stop only when the scan itself could not produce a usable result."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 28,
+      "evidence": "After a failed cohort, the procedure says to 'reinstall with the owning manager from the restored lockfile', although step 7 explicitly permits projects without a lockfile.",
+      "fix": "Add a no-lockfile rollback branch: restore the manifest, preserve user-owned environment state, explain that an exact dependency graph may not be reproducible, and ask before a best-effort reinstall or other environment changes."
+    }
+  ]
+}

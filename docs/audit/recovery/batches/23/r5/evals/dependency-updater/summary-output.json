@@ -1,0 +1,54 @@
+{
+  "skill": "dependency-updater",
+  "mode": "output",
+  "pass_rate": 0.8,
+  "passed": 36,
+  "total": 45,
+  "failures": [
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Leaves `lodash` (the exact version 4.17.20) unchanged and says it stays unless the user asks to move it",
+      "evidence": "The output says \"`lodash` stays at the exact pin `4.17.20`\" and keeps that specifier, but it never says lodash stays unless the user asks to move it."
+    },
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Plans to update manifest and lockfile together with npm for that cohort and to run the install, the project's tests, type checks, build and `npm audit` for it; naming each of these steps or commands is enough, no run results are expected",
+      "evidence": "The output plans `npm install` and `npm audit` after editing the manifest, but says \"There is no test, typecheck, or build script in this tree, so those gates do not exist\" instead of planning to run them."
+    },
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Plans to stop and restore the snapshot of that cohort if its install, test, type check or build step fails or its audit shows a new or worsened finding compared with the baseline (a finding already in the baseline is only reported), and to report the failing command before going on",
+      "evidence": "The output says \"On a new or worsened finding, or a failed install, restore the snapshot and reinstall from it,\" but it does not cover test, type check, or build failures or say to report the failing command."
+    },
+    {
+      "eval": "auto-apply-cohorts",
+      "assertion": "Says the final report will list each applied package with its exact version (a report template is enough)",
+      "evidence": "It gives \"Auto-apply map: `express@4.21.2`, `dayjs@1.11.13`\" and says \"I am not claiming those gates passed,\" but never says the final report will list each applied package with its exact version."
+    },
+    {
+      "eval": "python-audit-plan",
+      "assertion": "Updates one mapped target at a time with the owning resolver (`poetry update <package>`, optionally with --dry-run; `pipenv update <pkg>` or `uv lock --upgrade-package <pkg>` are accepted for those lock owners) and not a bare `poetry update` or an environment-only `pip install --upgrade`",
+      "evidence": "Although it forbids a bare `poetry update`, the apply step batches targets with \"poetry update django requests pydantic pytest\" instead of one mapped package at a time."
+    },
+    {
+      "eval": "python-audit-plan",
+      "assertion": "Checks that the poetry.lock diff changes only the approved package and its dependencies and that no major version moved without approval",
+      "evidence": "The finish step only says to \"report: ... lock diff\" and never checks that the diff changes only the approved package and its dependencies or that no major moved without approval."
+    },
+    {
+      "eval": "conflicting-node-deps",
+      "assertion": "Verifies that change with the owning manager's install, the tests and a review of the lockfile diff",
+      "evidence": "It stops at \"No write, snapshot, or audit baseline, because this request stops at diagnosis\" and never runs the owning install, tests, or a lockfile diff review."
+    },
+    {
+      "eval": "scoped-taze-write",
+      "assertion": "Compares the resulting manifest diff with the approved targets and runs `pnpm install` (the owning manager) rather than npm or yarn, then reviews the lockfile diff",
+      "evidence": "It compares manifests with \u201cgit diff -- package.json apps/web/package.json packages/ui/package.json\u201d and runs \u201cpnpm install\u201d plus \u201cpnpm audit\u201d (\u201ccompare the audit to the baseline\u201d), but never reviews a lockfile diff."
+    },
+    {
+      "eval": "unattended-candidate-scan",
+      "assertion": "Hands the candidates to the user as a list to approve afterwards and applies none of them",
+      "evidence": "It applies nothing (\u201cNothing is written\u201d; \u201cI do not have a shell here, so I am not inventing versions\u201d) but calls approval sorting \u201cnot for this scan-only reply\u201d and never hands the candidates over as a list to approve."
+    }
+  ]
+}

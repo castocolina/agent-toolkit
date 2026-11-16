@@ -1,0 +1,151 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "dependency-updater",
+      "percent": 91.2,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 92.0,
+        "router-env-my-referee-two": 90.4
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest: \"removed units (96, showing 40)\".",
+          "fix": "Provide the complete digest so the remaining removal items can be checked against current destinations and docs/audit/recovery/dependency-updater/record.md."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/dependency-updater/evals/evals.json",
+          "line": 129,
+          "evidence": "The unattended scan requests \"Run a non-interactive scan\" but expects \"A plan, since the model cannot run commands\".",
+          "fix": "Make the expected outcome match the execution environment: either ask for a plan explicitly or provide a controlled taze shim and assert the actual non-mutating scan and JSON result."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/references/managers.md",
+          "line": 3,
+          "evidence": "\"Select and approve exact targets before invoking update commands\" contradicts SKILL.md's automatic application of qualifying stable minor and patch cohorts.",
+          "fix": "Distinguish the shown exact-target map for auto-apply cohorts from explicit per-target approval for the ask-per-target set, retaining the resolver and diff checks."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/references/python.md",
+          "line": 12,
+          "evidence": "\"update one approved package at a time\" conflicts with the main policy's auto-application of qualifying stable, unpinned targets.",
+          "fix": "Say to update one mapped target at a time, requiring explicit approval only when the target belongs to the ask-per-target set, while retaining the lock-owner and verification rules."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/references/node.md",
+          "line": 23,
+          "evidence": "\"Without `--write` (`-w`) nothing is changed\" contradicts scripts/run-taze.sh, which classifies `--update`, `--install` and `--interactive` as potentially mutating.",
+          "fix": "Limit the non-writing claim to the documented discovery invocations and warn that update, install and interactive flags can mutate or prompt even without --write; confirm behavior against the installed taze help."
+        },
+        {
+          "id": "D8-4",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 53,
+          "evidence": "The recommended unattended scan is `scripts/run-taze.sh [-r] [taze arguments]`; with no mode it invokes plain taze, while references/node.md says plain taze reports only in-range bumps and recommends `taze major` to discover broader candidates.",
+          "fix": "Make the default general candidate scan pass the major discovery mode to the wrapper, reserving the no-mode invocation for an explicitly in-range-only request; preserve the non-writing and confirmed-workspace safeguards."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 68,
+          "evidence": "Scripts: for a prerequisite check, read and run `scripts/check-tool.sh <tool> [install-command]`",
+          "fix": "Keep the one-line pointer, but drop the separate 'read and run' instruction: the script's --help already documents usage, so the agent should run it rather than also loading the source. Record the removed words in docs/audit/recovery/dependency-updater/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 16,
+          "evidence": "The body is a nine-step process with checkpoints, but the Node path then offers three ways to write the same cohort.",
+          "fix": "Keep the process pattern. In the Node bullet, state one default (edit the approved target versions in the manifest, then resolve with the owning manager) and move the disposable-copy taze write to references/node.md as the only escape hatch, named once."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/dependency-updater/references/node.md",
+          "line": 20,
+          "evidence": "`taze minor --write --include <the scanned candidate names>` is the auto-apply write, with no rule for a cohort that is only patches.",
+          "fix": "Add one gotcha: when the auto-apply cohort is patches only, `taze minor` also writes minors, so use `taze patch --write --include <names> --no-github-actions --no-node-version` (or edit the manifest) and compare the diff to the target map. Cite `taze --help` as the live mode list."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 57,
+          "evidence": "The Node bullet repeats the disposable-copy taze command, the `--include` rule and the GitHub Actions side effect that references/node.md already states.",
+          "fix": "Leave in SKILL.md only the default (edit the manifest), the NEVER about a write-mode taze without `--include`, and 'Load node.md only for a Node manifest'. Keep the flag procedure solely in references/node.md."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 57,
+          "evidence": "The default scoped write is editing the target versions directly in the manifest. The alternatives run only in a disposable copy of the project: for the auto-apply cohort `taze minor --write --include ...`",
+          "fix": "Name one default for a Node write: edit the exact target versions in the manifest and resolve with the owning manager. Mention the disposable-copy `taze minor`/`taze major` write once, in references/node.md, as the escape hatch when hand-editing ranges is the harder path."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/dependency-updater/evals/evals.json",
+          "line": 1,
+          "evidence": "All eight evals are Node or Poetry plans; none supplies a Go, Cargo, Bundler, Maven or .NET fixture, and the trigger set has 11 should-trigger queries against 10 should-not-trigger.",
+          "fix": "Add one eval whose prompt and files are a Go module or a Cargo project, asserting the exact approved-target command from references/managers.md (`go get module@version` then `go mod tidy`, or `cargo update -p crate --precise version`) and that a broad upgrade-all is refused. Move one easy negative trigger query out so the two sides are 10 and 10."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 57,
+          "evidence": "`taze minor --write --include <the scanned candidate names>` is the write for the auto-apply cohort, which the policy defines as both MINOR and PATCH.",
+          "fix": "Say that `taze minor` may raise a patch-only package to its latest minor, so a patch-only cohort uses `taze patch --write --include <names> --no-github-actions --no-node-version` (or a direct manifest edit), and the copy's diff is still compared to the package-to-exact-target map before anything is copied back."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/dependency-updater/references/node.md",
+          "line": 3,
+          "evidence": "Confirm the repository's manager from lockfiles/workspace configuration (`package-lock.json`, `pnpm-lock.yaml`, or Yarn lock/config`); do not generate a competing lockfile.",
+          "fix": "Add the tie-break: when both `package-lock.json` and `pnpm-lock.yaml` (or a Yarn lock) exist, the manager is the one named in `packageManager` or the repo's documented install command; if neither says, stop and ask instead of picking one and generating its lockfile."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

@@ -3,18 +3,75 @@
   "evals": [
     {
       "id": "casual-safe-updates",
-      "prompt": "my deps are kinda old (see evals/files/casual-safe-updates/), can you update the safe ones and flag anything risky?",
+      "prompt": "my deps are kinda old (see evals/files/casual-safe-updates/, scan-output.md is the candidate scan), can you update the safe ones and flag anything risky?",
       "files": [
         "evals/files/casual-safe-updates/package.json",
-        "evals/files/casual-safe-updates/package-lock.json"
+        "evals/files/casual-safe-updates/package-lock.json",
+        "evals/files/casual-safe-updates/scan-output.md"
       ],
-      "expected_output": "A dependency update plan that identifies npm as the owner from package-lock.json, lists the candidates with a proposed target version for each, leaves lodash (exact 4.17.20) unchanged, and asks for approval per target version before any write, including minor and patch updates, with breaking targets asked individually.",
+      "expected_output": "A dependency update plan that identifies npm as the owner from package-lock.json, works from the non-mutating scan in scan-output.md, shows a package-to-exact-target map (express to 4.21.2, eslint to 8.57.1), takes a snapshot of package.json and package-lock.json, auto-applies the stable minor targets (express, eslint) with install, tests, type checks, build and audit for the cohort, leaves lodash (exact 4.17.20) unchanged, and asks individually about react and react-dom (major, 17.0.2 to 18.3.1) and the 0.x axios (0.21.4 to 0.27.2).",
       "assertions": [
-        "Identifies the project as npm (package.json with package-lock.json) and proposes a non-mutating scan or explain step to find candidates before any write",
+        "Takes npm as the owning manager from package.json with package-lock.json (also confirming it from the lockfile and workspace configuration is fine) and works from a non-mutating scan (scan-output.md, or a proposed scan or explain step) before any write",
         "Leaves `lodash` (the exact version 4.17.20) unchanged and says it stays unless the user asks to move it",
-        "Treats `react` and `react-dom` (^17.0.2) and the 0.x `axios` (~0.21.4) as needing an individual approval, not as safe updates",
-        "Does not write any manifest or lockfile change before the user approves each target version, and does not auto-apply minor or patch updates, noting that even a nominal minor update can break compatibility",
-        "Promises a package-to-exact-target map before any write"
+        "Treats `react` and `react-dom` (17.0.2 to 18.3.1, MAJOR) as needing an individual approval each, not as safe updates",
+        "Treats the 0.x `axios` (0.21.4 to 0.27.2, which the scan labels MINOR) as needing an individual approval, noting that even a nominal minor update of a 0.x version can break compatibility",
+        "Plans to apply the stable, unpinned minor targets `express` (to 4.21.2) and `eslint` (to 8.57.1) without asking per package, after showing the package-to-exact-target map and taking a recoverable snapshot of package.json and package-lock.json; a plan is enough, no run results are expected",
+        "Plans to update manifest and lockfile together with npm for that cohort and to run the install, the project's tests, type checks, build and `npm audit` for it; naming each of these steps or commands is enough, no run results are expected",
+        "Plans to stop and restore the snapshot of that cohort if its install, test, type check or build step fails or its audit shows a new or worsened finding compared with the baseline (a finding already in the baseline is only reported), and to report the failing command before going on",
+        "Does not write any change for `react`, `react-dom` or `axios` before the user approves each target version"
+      ]
+    },
+    {
+      "id": "auto-apply-cohorts",
+      "prompt": "Update the dependencies of the Node project in evals/files/auto-apply-cohorts/ (scan-output.md is the candidate scan). Apply the safe ones yourself and ask me about anything risky.",
+      "files": [
+        "evals/files/auto-apply-cohorts/package.json",
+        "evals/files/auto-apply-cohorts/package-lock.json",
+        "evals/files/auto-apply-cohorts/scan-output.md"
+      ],
+      "expected_output": "Express (MINOR) and dayjs (PATCH) form the auto-apply cohort: the map is shown first (express to 4.21.2, dayjs to 1.11.13), package.json and package-lock.json are snapshotted, both are updated together with npm, and install, tests, type checks, build and audit run for the cohort. chalk 4.1.2 to 5.4.1 (MAJOR) is asked about individually and not applied; uuid (exact 9.0.0) stays.",
+      "assertions": [
+        "Classifies `express` (MINOR) and `dayjs` (PATCH) as auto-apply targets and `chalk` 4.1.2 to 5.4.1 (MAJOR) as ask-per-target, using scan-output.md",
+        "Shows the package-to-exact-target map (express to 4.21.2, dayjs to 1.11.13) before any write",
+        "Takes a recoverable snapshot of package.json and package-lock.json (a copy outside the project, or a clean committed state) before the write, preserving unrelated user edits",
+        "Applies express and dayjs without asking per package, updating manifest and lockfile together with npm (a direct manifest edit, or a scoped taze write with `--include`, `--no-github-actions` and `--no-node-version` in a disposable copy whose diff is compared with the map before the entries are copied back: `taze minor` can move dayjs past its patch-only target, so dayjs uses `taze patch` or a direct edit) and never a write-mode taze without `--include`",
+        "Relies on the target-specific dry runs in scan-output.md (`npm install express@4.21.2 --dry-run`, `npm install dayjs@1.11.13 --dry-run`: no peer conflict, `engines.node` covers Node 20) as the peer and runtime-floor check (scan-output.md gives \"none, pure JavaScript\" as the native or prebuilt binary evidence for express and dayjs, so ABI compatibility is established from that evidence; a model may note that a dry run and engines range alone would not show one), or proposes a target-specific dry run itself, and does not run a package-only `npm install --dry-run` or `npm update --dry-run` and read it as the check",
+        "Lists the commands for that cohort in this order: the npm install, `npm test`, `npm run typecheck`, `npm run build`, `npm audit` (a plan is enough, no run results are expected)",
+        "Says the final report will list each applied package with its exact version (a report template is enough)",
+        "Asks about `chalk` individually, with current and new version, and does not apply it before approval; leaves `uuid` (exact 9.0.0) unchanged"
+      ]
+    },
+    {
+      "id": "zero-x-prerelease-asked",
+      "prompt": "Update the safe dependencies of the Node project in evals/files/zero-x-prerelease/ automatically (scan-output.md is the candidate scan); anything the scanner calls minor is fine by me.",
+      "files": [
+        "evals/files/zero-x-prerelease/package.json",
+        "evals/files/zero-x-prerelease/package-lock.json",
+        "evals/files/zero-x-prerelease/scan-output.md"
+      ],
+      "expected_output": "Only tslib 2.6.0 to 2.8.1 is auto-applied (after the map and a snapshot). reflect-metadata (a 0.x version, 0.1.13 to 0.2.2) and vue (prerelease 3.5.0-rc.1 to 3.5.0-rc.4) are asked about per target and not applied, even though the scanner labels reflect-metadata MINOR and the user said minor is fine.",
+      "assertions": [
+        "Puts only `tslib` in the auto-apply cohort and shows a package-to-exact-target map (tslib to 2.8.1) with a snapshot before the write",
+        "Does not auto-apply `reflect-metadata` 0.1.13 to 0.2.2, explaining that a 0.x change can break compatibility even when the scanner labels it MINOR, and asks about it per target",
+        "Does not auto-apply the `vue` prerelease change 3.5.0-rc.1 to 3.5.0-rc.4 and asks about it per target",
+        "Keeps `reflect-metadata` and `vue` out of any `--include` list or write command until the user approves each of them"
+      ]
+    },
+    {
+      "id": "failed-cohort-restore",
+      "prompt": "You auto-applied the safe cohort (express to 4.21.2, dayjs to 1.11.13) in evals/files/failed-cohort/ after saving a copy of the original package.json and package-lock.json outside the project. `npm test` now fails (output in test-output.txt). I also have an uncommitted edit in src/orders.js. What do you do next?",
+      "files": [
+        "evals/files/failed-cohort/package.json",
+        "evals/files/failed-cohort/package-lock.json",
+        "evals/files/failed-cohort/test-output.txt"
+      ],
+      "expected_output": "Stop at the failed gate, report `npm test` and the failing test, restore package.json and package-lock.json from the saved copy (not a tree-wide reset, and src/orders.js untouched), run no further cohort or major, and ask the user before going on.",
+      "assertions": [
+        "Stops at the failing gate and reports the exact failing command (`npm test`) and the failing test from test-output.txt (GET /orders/:id formats the order date)",
+        "Restores package.json and package-lock.json of that cohort from the saved copy rather than resetting the whole tree, and leaves the uncommitted edit in `src/orders.js` untouched",
+        "Does not continue to another cohort, to `chalk` or any major, and does not retry with --force or --legacy-peer-deps",
+        "Does not delete package-lock.json or node_modules as the fix",
+        "Asks the user before proceeding and does not claim success; the answer includes the snapshot restore (the restore commands or step; past tense is not required)"
       ]
     },
     {
@@ -24,13 +81,14 @@
         "evals/files/python-audit-plan/pyproject.toml",
         "evals/files/python-audit-plan/poetry.lock"
       ],
-      "expected_output": "A Python-specific workflow that names Poetry as the lock owner, updates one approved package at a time with the owner's resolver, keeps celery (exact 5.2.7) unchanged, audits vulnerabilities, and verifies the lockfile diff and the install.",
+      "expected_output": "A Python-specific workflow that names Poetry as the lock owner, updates one mapped target at a time with the owner's resolver (explicit approval for the pydantic major and the 0.x httpx), keeps celery (exact 5.2.7) unchanged, audits vulnerabilities, and verifies the lockfile diff and the install.",
       "assertions": [
         "Identifies Poetry (pyproject.toml with poetry.lock) as the owning resolver and never substitutes a bare environment `pip install --upgrade`",
-        "Updates one approved package at a time with the owning resolver (`poetry update <package>`, optionally with --dry-run; `pipenv update <pkg>` or `uv lock --upgrade-package <pkg>` are accepted for those lock owners) and not a bare `poetry update` or an environment-only `pip install --upgrade`",
+        "Updates one mapped target at a time with the owning resolver (`poetry update <package>`, optionally with --dry-run; `pipenv update <pkg>` or `uv lock --upgrade-package <pkg>` are accepted for those lock owners) and not a bare `poetry update` or an environment-only `pip install --upgrade`",
         "Leaves `celery` (exact 5.2.7) unchanged unless the user asks to move it, and asks for approval before the `pydantic` ^1.10 to 2.x major",
+        "Does not treat the 0.x `httpx` (~0.24.1) as a safe compatible update: asks per target before moving it, because a 0.x change can break compatibility even when it looks minor",
         "Checks that the poetry.lock diff changes only the approved package and its dependencies and that no major version moved without approval",
-        "Includes a vulnerability audit step and an install/consistency check (`pip check` or the owner's equivalent) plus the project's tests after the lockfile update"
+        "Includes a vulnerability audit step and an install/consistency check (`pip check`, `poetry check --lock` or the owner's equivalent) plus the project's tests after the lockfile update"
       ]
     },
     {
@@ -42,10 +100,11 @@
       ],
       "expected_output": "A diagnosis-first sequence that names react-beautiful-dnd (peer react ^16.8.5 || ^17) as the package that conflicts with react ^18.2.0, starts with the owning manager's explain command, and proposes a targeted change without a destructive reset.",
       "assertions": [
-        "Starts with the owning manager's explain command (`npm explain react`, `npm explain react-beautiful-dnd`, or `pnpm why` for pnpm) before any change, and reads the peer requirement from the fixture to name `react-beautiful-dnd` as the package that does not accept react ^18",
+        "Runs the owning manager's explain command (`npm explain react`, `npm explain react-beautiful-dnd`, or `pnpm why` for pnpm) as the first diagnosis step before any change (read-only inspection such as `git status` may come before it), and reads the peer requirement from the fixture to name `react-beautiful-dnd` as the package that does not accept react ^18",
         "Does not delete package-lock.json or node_modules before that explain output, an approval and a snapshot",
         "Does not generate a lockfile with a different manager and does not reach for --force or --legacy-peer-deps as the first fix",
-        "Proposes a targeted version change for the named package (for example a release that supports React 18, or a replacement the user approves) and verifies it with the owning manager's install, the tests and a lockfile diff review"
+        "Proposes a targeted version change for the named package (for example a release that supports React 18, or a replacement the user approves)",
+        "Verifies that change with the owning manager's install, the tests and a review of the lockfile diff"
       ]
     },
     {
@@ -58,13 +117,62 @@
         "evals/files/scoped-taze-write/packages/ui/package.json",
         "evals/files/scoped-taze-write/approved-targets.md"
       ],
-      "expected_output": "A package-to-exact-target map (react and react-dom to ^18.3.1 in apps/web and packages/ui), then a scoped taze write with --include naming only react and react-dom, --no-github-actions and --no-node-version, and -r only because the pnpm workspace scope is confirmed, followed by a diff check against the map and pnpm install.",
+      "expected_output": "A package-to-exact-target map (react and react-dom to ^18.3.1 in apps/web dependencies and in packages/ui devDependencies and peerDependencies, as approved-targets.md lists per section), then a scoped taze write with --include naming only react and react-dom, --no-github-actions and --no-node-version, -r only because the pnpm workspace scope is confirmed, and --peer (or a direct edit) so the approved peer ranges move too, followed by a diff check against the map and pnpm install.",
       "assertions": [
         "States the package-to-target map from approved-targets.md (react and react-dom to ^18.3.1) before any write, and says vite, storybook, turbo and typescript are not touched",
         "Uses taze with --write (or -w) and --include naming only react and react-dom, never a bare write",
-        "Adds --no-github-actions and --no-node-version, or warns that --write/-w can also rewrite GitHub Actions workflows and Node version files",
-        "Uses -r only after confirming the workspace scope from pnpm-workspace.yaml, and notes that react is declared in both apps/web and packages/ui",
-        "Compares the resulting manifest diff with the approved targets and runs `pnpm install` (the owning manager) rather than npm or yarn, then reviews the lockfile diff"
+        "Adds both --no-github-actions and --no-node-version to the write, because --write/-w can also rewrite GitHub Actions workflows and Node version files, and runs it in a disposable copy of the project, copying only the mapped entries back to the real manifest",
+        "Adds -r only because the workspace scope comes from pnpm-workspace.yaml (apps/* and packages/*; reading that file first in the plan is enough to confirm it), and notes that react is declared in both apps/web and packages/ui",
+        "Updates the approved `peerDependencies` ranges of packages/ui too (react and react-dom ^17.0.2 to ^18.3.1, listed in approved-targets.md), by adding `--peer` to the scoped taze write in the disposable copy or by editing those entries directly (explaining why taze needs `--peer` is not required)",
+        "Compares the resulting manifest diff with the approved targets, section by section (apps/web dependencies, packages/ui devDependencies and peerDependencies), and runs `pnpm install` (the owning manager) rather than npm or yarn, then reviews the lockfile diff"
+      ]
+    },
+    {
+      "id": "audit-only-request",
+      "prompt": "audit my dependencies (Node project in evals/files/auto-apply-cohorts/, npm with package-lock.json). I only want to know about vulnerabilities, do not change anything.",
+      "files": [
+        "evals/files/auto-apply-cohorts/package.json",
+        "evals/files/auto-apply-cohorts/package-lock.json"
+      ],
+      "expected_output": "An audit-only plan: identify npm as the owner, run the ecosystem's non-mutating security scanner (`npm audit`, optionally with --json or --audit-level), report its findings and any scanner error, write nothing and do not enter the update workflow (no candidate map, snapshot, cohort or install).",
+      "assertions": [
+        "Identifies npm as the owning manager (package-lock.json) and runs its non-mutating security scanner, `npm audit` (with `--json` or `--audit-level` as options), rather than another manager's audit",
+        "No audit output is supplied, so a plan is enough: it says the findings and any scanner error that the non-mutating scan produces will be reported to the user, whichever they are",
+        "Writes nothing: no `npm audit fix`, no manifest or lockfile edit, no install, no snapshot",
+        "Does not enter the update workflow: it builds no auto-apply cohort, asks no per-target approvals and applies no update"
+      ]
+    },
+    {
+      "id": "scanner-unavailable-baseline",
+      "prompt": "Update the safe dependencies of the Node project in evals/files/scanner-unavailable/ automatically (scan-output.md is the candidate scan). I ran `npm audit` as the baseline and saved the result in audit-output.txt. What do you do?",
+      "files": [
+        "evals/files/scanner-unavailable/package.json",
+        "evals/files/scanner-unavailable/package-lock.json",
+        "evals/files/scanner-unavailable/scan-output.md",
+        "evals/files/scanner-unavailable/audit-output.txt"
+      ],
+      "expected_output": "Read audit-output.txt as a scanner error (no findings were printed because the audit endpoint could not be reached), not as a clean pass: the baseline security audit on the unchanged state is not established, so report the blocker and stop before any write, and apply nothing unless the user explicitly decides to proceed without a baseline.",
+      "assertions": [
+        "Reads audit-output.txt as a scanner error (`ENOTFOUND`, audit endpoint error) and does not treat the missing findings as a clean audit or a passing baseline",
+        "Runs, or requires, the baseline audit on the unchanged state before the first write, and stops before any write because that baseline could not be established",
+        "Reports the blocker (the failing `npm audit` command and its error) to the user and asks how to proceed, applying nothing for `express` or `dayjs` unless the user explicitly decides to proceed without a baseline",
+        "Does not substitute another manager's audit (yarn, pnpm) and does not skip the audit"
+      ]
+    },
+    {
+      "id": "ask-first-all-targets",
+      "prompt": "Update the Node project in evals/files/auto-apply-cohorts/ (scan-output.md is the candidate scan), but ask me before each update.",
+      "files": [
+        "evals/files/auto-apply-cohorts/package.json",
+        "evals/files/auto-apply-cohorts/package-lock.json",
+        "evals/files/auto-apply-cohorts/scan-output.md"
+      ],
+      "expected_output": "Because the user said to ask before each update, every target becomes ask-per-target, including the stable express (MINOR) and dayjs (PATCH): the answer lists each target with current and new version, asks individually, and applies nothing before approval.",
+      "assertions": [
+        "Treats every target as ask-per-target, including the stable `express` (4.17.1 to 4.21.2, MINOR) and `dayjs` (1.11.7 to 1.11.13, PATCH), because the user asked to be asked before each update, and builds no auto-apply cohort",
+        "Asks about each target individually with its current and new version (`express`, `dayjs` and the MAJOR `chalk` 4.1.2 to 5.4.1)",
+        "Applies nothing, writes no manifest or lockfile change and runs no write-mode taze before the user approves each target",
+        "Leaves `uuid` (exact 9.0.0) unchanged unless the user asks to move it"
       ]
     },
     {
@@ -73,12 +181,13 @@
       "files": [
         "evals/files/unattended-candidate-scan/package.json"
       ],
-      "expected_output": "A plan, since the model cannot run commands: check the taze prerequisite with the bundled check-tool.sh, run the bundled run-taze.sh from the skill directory with the project as the working directory, report the candidates from the JSON, and apply nothing.",
+      "expected_output": "A plan, since the model cannot run commands: check the taze prerequisite with the bundled check-tool.sh, run the bundled run-taze.sh with the major discovery mode from the skill directory with the project as the working directory, report the candidates from the JSON for approval, and apply nothing.",
       "assertions": [
         "Proposes checking the prerequisite first with `scripts/check-tool.sh taze` (or handles the JSON error it prints when taze is missing)",
-        "Proposes running the bundled `scripts/run-taze.sh` resolved from the skill directory, with the Node project as the working directory, instead of improvising a taze command",
+        "Proposes running the bundled `scripts/run-taze.sh` resolved from the skill directory, with the Node project as the working directory and the `major` discovery mode (`run-taze.sh major`; a run without a mode is acceptable only if the user asked for in-range bumps only), instead of improvising a taze command",
         "Passes no --write, -w or other write argument, so the scan changes no manifest or lockfile",
-        "Says the candidates come back in the `candidates` field of the JSON (or the `output` text fallback) and reports them for approval without applying any of them"
+        "Says the candidates come back in the `candidates` field of the JSON (or the `output` text fallback)",
+        "Hands the candidates to the user as a list to approve afterwards and applies none of them"
       ]
     }
   ]
