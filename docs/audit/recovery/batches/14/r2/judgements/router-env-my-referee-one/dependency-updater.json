@@ -1,0 +1,95 @@
+{
+  "skill": "dependency-updater",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 8
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 54,
+      "evidence": "Summarize candidates and approvals, changed packages and exact versions, lockfile changes, commands and gate results",
+      "fix": "Keep the dependency-specific reporting requirements but compress the generic reporting instructions; record any removed text in docs/audit/recovery/dependency-updater/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": null,
+      "evidence": "Previous-version digest: removed units (89, showing 40).",
+      "fix": "Review the 49 undisplayed removed units against the current files and record each removal or restoration in docs/audit/recovery/dependency-updater/record.md."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/dependency-updater/evals/evals.json",
+      "line": 6,
+      "evidence": "The five evals provide prompts and assertions but no input files, including the pnpm monorepo and Poetry lockfile cases.",
+      "fix": "Add representative manifest and lockfile fixtures under evals/files/ and reference them from the relevant evals so changes, resolver ownership, and preservation of unrelated dependencies can be verified."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/references/node.md",
+      "line": 23,
+      "evidence": "taze moves a package to the latest version its mode allows, which may differ from the approved target: compare the manifest diff with the approved package-to-target map and edit the entry by hand if it differs.",
+      "fix": "Run floating taze writes only in a disposable worktree; inspect the proposed diff against the approved exact targets before touching the real project. Apply exact approved versions directly in the real manifest, then resolve and verify the lockfile."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/README.md",
+      "line": 80,
+      "evidence": "Go requires an exact version by design | Skip (intentionally pinned)",
+      "fix": "Distinguish Go module requirements and their minimum-version-selection behavior from deliberate policy pins. Allow proposed Go module upgrades when the user requests dependency updates, subject to target approval, and do not classify every go.mod requirement as an intentional pin."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/scripts/run-taze.sh",
+      "line": 34,
+      "evidence": "only the exact flags --write, -w and --json are recognised, so a combined short flag such as -rw counts as a scan",
+      "fix": "Reject ambiguous combined short options or parse them correctly before invoking taze; never classify a potentially mutating invocation as a candidate scan. Add a regression test for -rw and document the accepted arguments."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/dependency-updater/references/node.md",
+      "line": 19,
+      "evidence": "plain `taze` only reports bumps inside the ranges already written in the manifest; `taze minor` also shows minor updates beyond the range, and `taze major` includes major updates.",
+      "fix": "For requests to discover all outdated candidates, explicitly run the appropriate non-writing broader scan, such as the installed taze version's major discovery mode, while keeping the default in-range scan for requests limited to current constraints."
+    }
+  ]
+}

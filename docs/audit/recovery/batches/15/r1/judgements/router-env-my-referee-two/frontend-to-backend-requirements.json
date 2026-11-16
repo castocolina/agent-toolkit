@@ -1,0 +1,122 @@
+{
+  "skill": "frontend-to-backend-requirements",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 13,
+    "D3": 13,
+    "D4": 14,
+    "D5": 14,
+    "D6": 14,
+    "D7": 11,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 107,
+  "max_total": 125,
+  "percent": 85.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/frontend-to-backend-requirements/SKILL.md",
+      "line": 1,
+      "evidence": "dbff837f digest: removed units (44, showing 40). The record covers the SKILL.md sections those units belong to, but the cut list itself is reported as one finding.",
+      "fix": "No further restore: each shown unit sits in a recorded section (s016-s031). Keep this cut-list note; do not drop more to shorten the skill."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/frontend-to-backend-requirements/SKILL.md",
+      "line": 11,
+      "evidence": "Gather requirements restates the obvious capture list (purpose, audience, displayed information, actions, loading/empty/error/success) that the model already produces for a requirements brief; the non-obvious parts are the outcome and concurrency rules that follow.",
+      "fix": "Keep the non-obvious rules (unknown/rejected/conflict outcomes, server-side authorization, freshness/order asked rather than assumed). Move the generic capture checklist to templates/backend-requirements.md, which already has those fields, and add a row to docs/audit/recovery/frontend-to-backend-requirements/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/frontend-to-backend-requirements/SKILL.md",
+      "line": 7,
+      "evidence": "The body is a short process (gather, classify, write-and-check) but the decision of what to ask versus what to leave open is declared in one paragraph rather than a branch the agent follows.",
+      "fix": "Before Classify uncertainty, add three questions the agent answers per action: what the user must see to recognize completion, what the UI shows when the outcome is unknown or rejected, and which guarantee (order, freshness, authorization) is unstated. Keep the existing NEVER list."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/frontend-to-backend-requirements/SKILL.md",
+      "line": 27,
+      "evidence": "NEVER items name the failure (locking a poor API, happy-path-only lists, assumed guarantees, reporting unknown as success) but there is no Gotchas section for environment-specific facts.",
+      "fix": "Add a short Gotchas list grounded in this task: a disabled button is not authorization; a timeout is not success; pagination and sort are agreements, not UI defaults. Do not pad it with generic 'be careful' items."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/frontend-to-backend-requirements/SKILL.md",
+      "line": 3,
+      "evidence": "Description has WHAT, WHEN and a Not-for boundary, but keywords are thin: it never names the phrases 'backend requirements', 'API requirements', or 'what data do I need' that the old description and the README use as triggers.",
+      "fix": "Document frontend data needs, user actions, UI states, permissions, and unresolved business rules as a backend-requirements brief, without prescribing the API. Use when a team asks for backend requirements, API requirements, what data a screen needs, or what the backend should provide, even if they only describe a UI. Not for endpoint design, OpenAPI or JSON schemas, database tables, or implementing frontend or backend code."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/frontend-to-backend-requirements/SKILL.md",
+      "line": 31,
+      "evidence": "The template load is gated to the write step, but the instruction does not say to skip it when the user only wants a clarifying question or an inline preview of one screen.",
+      "fix": "Load templates/backend-requirements.md only when writing or updating the requirements file. Do not load it when answering a clarifying question or giving the brief chat confirmation the opening allows."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/frontend-to-backend-requirements/SKILL.md",
+      "line": 9,
+      "evidence": "The default path is clear, but 'honor an explicitly requested destination or inline preview' does not say which wins when the user asks for both a file and an inline preview.",
+      "fix": "Default to writing .claude/docs/ai/<feature>/backend-requirements.md. If the user asks for an inline preview and a file, write the file and then show the preview. If they ask for only a preview, do not create the file."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/frontend-to-backend-requirements/evals/evals.json",
+      "line": 1,
+      "evidence": "Three evals have realistic prompts and verifiable assertions, but none supplies an input file under evals/files/, and no eval checks the blocking-versus-provisional classification or the preserve-discussion-history rule.",
+      "fix": "Add evals/files/ with one existing requirements note that already has a Discussion Log, plus a fourth eval whose prompt updates that file and asserts the prior log line is kept and each unknown is marked blocking or safe provisional."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/frontend-to-backend-requirements/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "20 queries, 10 should-trigger and 10 should-not-trigger, with near-misses (OpenAPI, REST design, field names). Several positives name the skill almost verbatim ('document backend requirements', 'frontend data-needs brief'), so they do not test a non-obvious trigger.",
+      "fix": "Replace three explicit positives with prompts that describe a screen and ask what to tell backend, without saying 'requirements' or 'data needs', and keep the existing near-miss negatives."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/frontend-to-backend-requirements/SKILL.md",
+      "line": 31,
+      "evidence": "Write and check says to resolve feature identity from the request or repo and ask if ambiguous, but gives no fallback when the repo has several features and the user names none, and the checklist does not say what to do when a screen has no stated error outcome.",
+      "fix": "If the feature name is ambiguous, list the candidate screens you found and ask once; do not invent a path. On the pre-report check, any action with no rejected, timeout, or conflict outcome is explicitly unresolved, not silently marked success."
+    }
+  ]
+}

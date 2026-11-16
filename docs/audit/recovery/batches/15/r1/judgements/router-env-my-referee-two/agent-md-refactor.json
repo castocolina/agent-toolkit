@@ -1,0 +1,113 @@
+{
+  "skill": "agent-md-refactor",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 13,
+    "D4": 14,
+    "D5": 14,
+    "D6": 14,
+    "D7": 11,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 112,
+  "max_total": 125,
+  "percent": 89.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/agent-md-refactor/SKILL.md",
+      "line": 1,
+      "evidence": "previous-version digest at dbff837f is a cut list (showing 40 of 74 removed units); every shown para id is a unit of a section in docs/audit/recovery/agent-md-refactor/sections.json and each of those sections has an allowed record row",
+      "fix": "No content restore: the shown units are covered by section rows. Replace the truncated digest with the full unit list, or add one record note that the unshown 34 units belong to the same section rows, so the cut is closed."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/agent-md-refactor/SKILL.md",
+      "line": 24,
+      "evidence": "Gotchas cover scope flattening, safety overrides, precedence reversal and .claude/rules launch loading, but not the harness-loading fact that an @path import loads eagerly and so does not cut context cost",
+      "fix": "Add one Gotcha: an @path import loads eagerly with the importing file, so it organises the file but does not cut its context cost; use a plain link with a read condition when the goal is progressive disclosure (the detail stays in references/harness-loading.md)."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/agent-md-refactor/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "Should-trigger query 'Please review this COPILOT.md for contradictory agent instructions before refactoring' uses a file the skill says Copilot does not read",
+      "fix": "Refactor existing bloated, conflicting, or repetitive AGENTS.md, CLAUDE.md, .github/copilot-instructions.md, and similar coding-agent instruction files into a minimal root plus focused, conditionally loaded topic documents. Use when instructions are too long, inconsistent, hard to maintain, or need progressive disclosure, even when asked to clean up agent config or to refactor a file named COPILOT.md. Not for READMEs, general developer documentation, or creating a new instruction system from scratch."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/agent-md-refactor/SKILL.md",
+      "line": 19,
+      "evidence": "Step 5 says to read references/harness-loading.md before choosing a location, but never says not to load references/templates.md for that decision",
+      "fix": "In step 5, add: read references/harness-loading.md before choosing where a topic file lives; do not load references/templates.md for that decision."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/agent-md-refactor/references/harness-loading.md",
+      "line": 12,
+      "evidence": "AGENTS.md is read by Claude Code only when no CLAUDE.md, .claude/CLAUDE.md or CLAUDE.local.md exists (v2.1.277 or later per the page)",
+      "fix": "Keep the verify-on-the-live-page instruction and drop the pinned version from the sentence the agent acts on, or add the date that exact version threshold was checked beside the URL already cited."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/agent-md-refactor/evals/evals.json",
+      "line": 1,
+      "evidence": "Four evals have realistic prompts and verifiable assertions, but no evals/files/ input and no assertion that a directory-scoped exception keeps its scope",
+      "fix": "Add evals/files/ with a short AGENTS.md fixture that includes a directory-scoped exception, and one assertion that the exception is not flattened into global guidance."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/agent-md-refactor/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "20 queries, 10 should-trigger and 10 should-not-trigger, but one positive still names COPILOT.md and the negatives are easy (README, standup, commit) rather than near-misses such as writing a new AGENTS.md from scratch",
+      "fix": "Replace the COPILOT.md query with a .github/copilot-instructions.md phrasing, and replace two easy negatives with near-misses: writing a new AGENTS.md where none exists, and editing a README section about agent instructions."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/agent-md-refactor/references/harness-loading.md",
+      "line": 12,
+      "evidence": "v2.1.277 or later is a version-sensitive fact; the page is cited and the reader is told to verify, but the pinned threshold has no date checked",
+      "fix": "Add the date that v2.1.277 was checked against https://code.claude.com/docs/en/memory, or replace the pinned version with the instruction to read the live page."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/agent-md-refactor/SKILL.md",
+      "line": 11,
+      "evidence": "When files are unavailable the agent must give candidate commands or topics without inventing contents, but the procedure does not say what to do when the user rejects that assumption and still supplies no file",
+      "fix": "Add the fallback: if the user rejects the unknown-instructions assumption and still provides no file, stop after naming the files to read and do not draft topic files."
+    }
+  ]
+}

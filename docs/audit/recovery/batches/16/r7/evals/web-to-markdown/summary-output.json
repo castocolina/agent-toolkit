@@ -1,0 +1,54 @@
+{
+  "skill": "web-to-markdown",
+  "mode": "output",
+  "pass_rate": 0.8043,
+  "passed": 37,
+  "total": 46,
+  "failures": [
+    {
+      "eval": "explicit-convert",
+      "assertion": "Runs the command shape web2md 'https://example.com/guide' --out ./guide.md, with the URL and the output path as separate quoted arguments and no string interpolation",
+      "evidence": "The proposed command uses a variable for the output path: \"web2md 'https://example.com/guide' --out \"$tmp\"\"."
+    },
+    {
+      "eval": "explicit-convert",
+      "assertion": "Confirms page identity: the title matches when one is available, otherwise the URL's host and the visible heading are checked",
+      "evidence": "The output only says to \"confirm it is the requested page\" without specifying title or host-and-heading checks."
+    },
+    {
+      "eval": "explicit-convert",
+      "assertion": "Applies the pass rule before keeping the result: a heading plus several sentences of body that is not a login, consent, error or navigation-only page; rejects login, consent, error and navigation-only output instead of reporting it as the page",
+      "evidence": "The output excludes \"an error, login page, consent wall, or navigation-only output\" but does not require a heading and several body sentences."
+    },
+    {
+      "eval": "heavy-app-never-idle",
+      "assertion": "Classifies the failure as a navigation timeout, which gets the one retry",
+      "evidence": "The output says, \u201cIf it times out as described, make the single bounded retry,\u201d but does not classify the failure as a navigation timeout."
+    },
+    {
+      "eval": "heavy-app-never-idle",
+      "assertion": "Explains that persistent network activity beyond the idle threshold can keep the default networkidle2 from settling, without claiming it never settles",
+      "evidence": "The output says to retry \u201cwithout waiting for network idle,\u201d but does not explain the idle threshold or persistent network activity."
+    },
+    {
+      "eval": "heavy-app-never-idle",
+      "assertion": "If the retry also fails to produce valid content, reports the extraction failure and its blocker instead of retrying again",
+      "evidence": "The output says to \u201creport the extraction failure\u201d if the retry fails or is incomplete, but does not say to report the blocker."
+    },
+    {
+      "eval": "chrome-not-found",
+      "assertion": "Copies the CLI's stderr message about Chrome not being found into the report",
+      "evidence": "The output says, \"The exact stderr text was not provided, so I can\u2019t reproduce it verbatim.\""
+    },
+    {
+      "eval": "interactive-no-terminal",
+      "assertion": "Explains that --interactive blocks waiting for human input and no attached human-controlled terminal is available",
+      "evidence": "The output says, \u201c`--interactive` requires an attached terminal and a human to complete the login,\u201d but does not explicitly explain that it would block waiting for input or that no human-controlled terminal is available."
+    },
+    {
+      "eval": "login-or-consent-wall",
+      "assertion": "Points to the dedicated --user-data-dir path only if the user wants it, and does not reuse the user's daily browser profile or use --no-sandbox",
+      "evidence": "The output conditionally offers \u201ca dedicated browser profile\u201d and rejects the daily profile, but does not identify a dedicated --user-data-dir path."
+    }
+  ]
+}

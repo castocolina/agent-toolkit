@@ -1,0 +1,77 @@
+{
+  "skill": "general-purpose",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 14,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 15
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/general-purpose.md",
+      "line": 12,
+      "evidence": "Baseline and reproduce: first find the gates (AGENTS.md, CLAUDE.md, Makefile; else the toolchain's test runner), then run them",
+      "fix": "Keep the pre-existing-failure and non-reproducing branches, which the model will not derive. Move the generic 'find AGENTS.md/CLAUDE.md/Makefile and run the test runner' baseline, which current harnesses and models already do, into a skill this plugin bundles and point step 2 at it, or record the removal in docs/audit/recovery/general-purpose/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/general-purpose.md",
+      "line": 18,
+      "evidence": "Write code, comments, docs and commit messages in English, with no Co-Authored-By or session-attribution trailers.",
+      "fix": "The model already writes in English and current harnesses already handle commit attribution. Move this house rule into a skill the plugin bundles, or delete it and add a row to docs/audit/recovery/general-purpose/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "agents/general-purpose.md",
+      "line": 10,
+      "evidence": "You handle multi-step work that no single specialist owns.",
+      "fix": "Before Process step 1, add the decision the model would not derive: own the requirement when no specialist's domain rules or tools cover it, hand off only the bounded part a specialist adds, and never hand the whole request to another general-purpose agent."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/general-purpose.md",
+      "line": 17,
+      "evidence": "Work in the worktree or branch you were given; do not switch checkouts or push unless asked.",
+      "fix": "Move this into NEVER with the failure it prevents: switching checkouts or pushing from a shared worktree drops the caller's uncommitted work and publishes unreviewed commits. Keep the destructive-operation rule where it is."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "agents/general-purpose.md",
+      "line": 12,
+      "evidence": "If it does not reproduce, say so under Remaining blockers with the attempt made; fix from the code only when the defect sits in one code path and a test can fail before the fix, marked unverified, else stop on that requirement only",
+      "fix": "Name the default for a bug that does not reproduce: stop and list the attempt under Remaining blockers. Keep 'fix from the code' only as the escape hatch when the defect is one code path and a failing test can be written first."
+    }
+  ]
+}

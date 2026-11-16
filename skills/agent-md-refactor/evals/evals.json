@@ -1,1 +1,73 @@
-{"skill_name":"agent-md-refactor","evals":[{"id":"bloated-agent-guide","prompt":"Our root AGENTS.md has 180 lines covering project setup, TypeScript, tests, and git conventions. Help me reorganize it without losing useful rules.","expected_output":"A progressive-disclosure refactor plan separating universal root guidance from topic-specific linked documents, with contradiction review and verification.","assertions":["Identifies contradiction resolution before restructuring","Keeps universal essentials in a minimal root and groups other rules into linked topics","Includes link and instruction-preservation verification"]},{"id":"claude-md-conflicts","prompt":"Refactor CLAUDE.md. It says both 'always use semicolons' and 'never use semicolons', has obsolete setup commands, and mixes testing with code style.","expected_output":"Surface the style conflict for user resolution before executing, then categorize and flag obsolete or redundant guidance.","assertions":["Quotes or clearly identifies the semicolon contradiction and asks for resolution","Does not proceed past the conflict as though resolved","Identifies obsolete commands for review or removal"]},{"id":"small-root-file","prompt":"My 12-line AGENTS.md is already concise and only has universal project commands. Should I split it into several files anyway?","expected_output":"Avoid unnecessary fragmentation; explain the skill is for bloated or mixed instruction files and preserve a concise root if no useful split exists.","assertions":["Does not prescribe creating multiple files without need","Recognizes the file is already concise and universal","Avoids claiming the under-50-line target requires further splitting"]}]}
+{
+  "skill_name": "agent-md-refactor",
+  "evals": [
+    {
+      "id": "bloated-agent-guide",
+      "prompt": "Our root AGENTS.md has 180 lines covering project setup, TypeScript, tests, and git conventions. Help me reorganize it without losing useful rules.",
+      "expected_output": "A progressive-disclosure refactor plan separating universal root guidance from topic-specific linked documents, with contradiction review and verification.",
+      "assertions": [
+        "Identifies contradiction resolution before restructuring",
+        "Keeps universal essentials in a minimal root and groups other rules into linked topics",
+        "Includes link and instruction-preservation verification"
+      ]
+    },
+    {
+      "id": "claude-md-conflicts",
+      "prompt": "Refactor CLAUDE.md. It says both 'always use semicolons' and 'never use semicolons', has obsolete setup commands, and mixes testing with code style.",
+      "expected_output": "Surface the style conflict for user resolution before executing, then categorize and flag obsolete or redundant guidance.",
+      "assertions": [
+        "Quotes or clearly identifies the semicolon contradiction and asks for resolution",
+        "Does not proceed past the conflict as though resolved",
+        "Identifies obsolete commands for review or removal"
+      ]
+    },
+    {
+      "id": "small-root-file",
+      "prompt": "My 12-line AGENTS.md is already concise and only has universal project commands. Should I split it into several files anyway?",
+      "expected_output": "Avoid unnecessary fragmentation; explain the skill is for bloated or mixed instruction files and preserve a concise root if no useful split exists.",
+      "assertions": [
+        "Does not prescribe creating multiple files without need",
+        "Recognizes the file is already concise and universal",
+        "Avoids claiming the under-50-line target requires further splitting"
+      ]
+    },
+    {
+      "id": "rules-dir-loads-at-launch",
+      "prompt": "I am splitting my CLAUDE.md. I plan to put the testing rules, which only matter when someone edits tests, in .claude/rules/testing.md and keep a link to it in the root. Is that the right place for a conditional topic file?",
+      "expected_output": "Warn that a file under .claude/rules/ without paths frontmatter loads at launch like the root, so it would lose progressive disclosure; offer a plain .claude/ file with a read condition in the root, or paths frontmatter on the rules file.",
+      "assertions": [
+        "States that a file in .claude/rules/ without paths frontmatter loads at launch, so it would not stay conditional",
+        "Offers either a plain file under .claude/ with an explicit read condition in the root, or paths frontmatter on the rules file",
+        "Does not claim that every file under .claude/ is loaded automatically"
+      ]
+    },
+    {
+      "id": "scoped-exception-and-registry-override",
+      "prompt": "Refactor evals/files/AGENTS.md into a minimal root plus linked topic files. Show me the new root and the topic files, and tell me what you need from me before you start.",
+      "files": [
+        "evals/files/AGENTS.md"
+      ],
+      "expected_output": "Quotes the semicolon conflict and the duplicate test-before-commit rule, asks which semicolon rule wins before extracting, keeps the npm registry override in the short root, and keeps the packages/api console and zod rules scoped to packages/api/ in a linked topic file with a read condition.",
+      "assertions": [
+        "Quotes the 'Always use semicolons' and 'Never use semicolons' lines and asks the user which one wins instead of choosing one",
+        "Keeps the npm instruction with `--registry=https://npm.acme.internal/` in the root as a project-specific override and does not drop it as the npm default",
+        "Keeps the packages/api exception scoped to `packages/api/` (zod validation and console.info logging allowed there) and does not turn it into global guidance or a global rule about console use",
+        "Keeps the root short: project identity, the setup and build/test commands and the registry override, with the other topics moved to linked files that state when to read them",
+        "Reports the duplicate 'Run npm test before committing' and 'Run tests before committing' rules as redundant candidates for review rather than deleting them silently, and lists vague lines such as 'write clean, maintainable code' for review"
+      ]
+    },
+    {
+      "id": "scoped-exception-not-flattened",
+      "prompt": "Move only the API rules from evals/files/AGENTS.md into their own topic file and leave a link in the root. I do not want any behavior to change for the rest of the repo.",
+      "files": [
+        "evals/files/AGENTS.md"
+      ],
+      "expected_output": "A topic file whose rules still apply only under packages/api/, a root link with a read condition naming that directory, and the global console ban left intact.",
+      "assertions": [
+        "The topic file states that its rules apply only under `packages/api/`, including that the no-console lint rule is off there",
+        "The global rule that `console.*` calls are forbidden everywhere else is kept and not weakened or merged into the API rule",
+        "The root link carries an explicit read condition such as reading the file before changing code under `packages/api/`, not a bare link"
+      ]
+    }
+  ]
+}

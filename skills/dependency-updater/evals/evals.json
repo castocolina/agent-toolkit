@@ -3,32 +3,82 @@
   "evals": [
     {
       "id": "casual-safe-updates",
-      "prompt": "my deps are kinda old, can you update the safe ones and flag anything risky?",
-      "expected_output": "A dependency update plan that identifies the ecosystem, applies only safe minor/patch updates, preserves pinned versions, and asks before majors.",
+      "prompt": "my deps are kinda old (see evals/files/casual-safe-updates/), can you update the safe ones and flag anything risky?",
+      "files": [
+        "evals/files/casual-safe-updates/package.json",
+        "evals/files/casual-safe-updates/package-lock.json"
+      ],
+      "expected_output": "A dependency update plan that identifies npm as the owner from package-lock.json, lists the candidates with a proposed target version for each, leaves lodash (exact 4.17.20) unchanged, and asks for approval per target version before any write, including minor and patch updates, with breaking targets asked individually.",
       "assertions": [
-        "Separates patch/minor updates from major updates",
-        "Does not auto-approve major version changes",
-        "Preserves dependencies pinned to exact versions"
+        "Identifies the project as npm (package.json with package-lock.json) and proposes a non-mutating scan or explain step to find candidates before any write",
+        "Leaves `lodash` (the exact version 4.17.20) unchanged and says it stays unless the user asks to move it",
+        "Treats `react` and `react-dom` (^17.0.2) and the 0.x `axios` (~0.21.4) as needing an individual approval, not as safe updates",
+        "Does not write any manifest or lockfile change before the user approves each target version, and does not auto-apply minor or patch updates, noting that even a nominal minor update can break compatibility",
+        "Promises a package-to-exact-target map before any write"
       ]
     },
     {
       "id": "python-audit-plan",
-      "prompt": "In a Python project using pyproject.toml and poetry.lock, outline how to identify outdated packages, update compatible versions, check vulnerabilities, and verify the lockfile without silently taking breaking majors.",
-      "expected_output": "A Python-specific workflow with an outdated scan, conservative updates, vulnerability audit, and lockfile/test verification.",
+      "prompt": "In the Python project under evals/files/python-audit-plan/ (pyproject.toml and poetry.lock), outline how to identify outdated packages, update compatible versions, check vulnerabilities, and verify the lockfile without silently taking breaking majors.",
+      "files": [
+        "evals/files/python-audit-plan/pyproject.toml",
+        "evals/files/python-audit-plan/poetry.lock"
+      ],
+      "expected_output": "A Python-specific workflow that names Poetry as the lock owner, updates one approved package at a time with the owner's resolver, keeps celery (exact 5.2.7) unchanged, audits vulnerabilities, and verifies the lockfile diff and the install.",
       "assertions": [
-        "Identifies pyproject.toml/Poetry as the project context",
-        "Includes a vulnerability audit step",
-        "Includes lockfile and test verification after updates"
+        "Identifies Poetry (pyproject.toml with poetry.lock) as the owning resolver and never substitutes a bare environment `pip install --upgrade`",
+        "Updates one approved package at a time with the owning resolver (`poetry update <package>`, optionally with --dry-run; `pipenv update <pkg>` or `uv lock --upgrade-package <pkg>` are accepted for those lock owners) and not a bare `poetry update` or an environment-only `pip install --upgrade`",
+        "Leaves `celery` (exact 5.2.7) unchanged unless the user asks to move it, and asks for approval before the `pydantic` ^1.10 to 2.x major",
+        "Checks that the poetry.lock diff changes only the approved package and its dependencies and that no major version moved without approval",
+        "Includes a vulnerability audit step and an install/consistency check (`pip check` or the owner's equivalent) plus the project's tests after the lockfile update"
       ]
     },
     {
       "id": "conflicting-node-deps",
-      "prompt": "npm install fails with a peer dependency conflict after a recent change. Don’t recommend deleting the lockfile as a first step; give a diagnosis-first response.",
-      "expected_output": "A diagnosis-first troubleshooting sequence that inspects dependency relationships and versions, then proposes targeted remedies without destructive reset.",
+      "prompt": "npm install fails with a peer dependency conflict after we moved to React 18 (project in evals/files/conflicting-node-deps/). Don’t recommend deleting the lockfile as a first step; give a diagnosis-first response.",
+      "files": [
+        "evals/files/conflicting-node-deps/package.json",
+        "evals/files/conflicting-node-deps/package-lock.json"
+      ],
+      "expected_output": "A diagnosis-first sequence that names react-beautiful-dnd (peer react ^16.8.5 || ^17) as the package that conflicts with react ^18.2.0, starts with the owning manager's explain command, and proposes a targeted change without a destructive reset.",
       "assertions": [
-        "Starts by inspecting the dependency tree or package requirements",
-        "Avoids deleting the lockfile as the initial action",
-        "Suggests a targeted resolution and subsequent install/test verification"
+        "Starts with the owning manager's explain command (`npm explain react`, `npm explain react-beautiful-dnd`, or `pnpm why` for pnpm) before any change, and reads the peer requirement from the fixture to name `react-beautiful-dnd` as the package that does not accept react ^18",
+        "Does not delete package-lock.json or node_modules before that explain output, an approval and a snapshot",
+        "Does not generate a lockfile with a different manager and does not reach for --force or --legacy-peer-deps as the first fix",
+        "Proposes a targeted version change for the named package (for example a release that supports React 18, or a replacement the user approves) and verifies it with the owning manager's install, the tests and a lockfile diff review"
+      ]
+    },
+    {
+      "id": "scoped-taze-write",
+      "prompt": "In my pnpm monorepo (evals/files/scoped-taze-write/) I approved bumping only react and react-dom to the targets listed in approved-targets.md. Apply just those with taze and nothing else.",
+      "files": [
+        "evals/files/scoped-taze-write/pnpm-workspace.yaml",
+        "evals/files/scoped-taze-write/package.json",
+        "evals/files/scoped-taze-write/apps/web/package.json",
+        "evals/files/scoped-taze-write/packages/ui/package.json",
+        "evals/files/scoped-taze-write/approved-targets.md"
+      ],
+      "expected_output": "A package-to-exact-target map (react and react-dom to ^18.3.1 in apps/web and packages/ui), then a scoped taze write with --include naming only react and react-dom, --no-github-actions and --no-node-version, and -r only because the pnpm workspace scope is confirmed, followed by a diff check against the map and pnpm install.",
+      "assertions": [
+        "States the package-to-target map from approved-targets.md (react and react-dom to ^18.3.1) before any write, and says vite, storybook, turbo and typescript are not touched",
+        "Uses taze with --write (or -w) and --include naming only react and react-dom, never a bare write",
+        "Adds --no-github-actions and --no-node-version, or warns that --write/-w can also rewrite GitHub Actions workflows and Node version files",
+        "Uses -r only after confirming the workspace scope from pnpm-workspace.yaml, and notes that react is declared in both apps/web and packages/ui",
+        "Compares the resulting manifest diff with the approved targets and runs `pnpm install` (the owning manager) rather than npm or yarn, then reviews the lockfile diff"
+      ]
+    },
+    {
+      "id": "unattended-candidate-scan",
+      "prompt": "Run a non-interactive scan of the Node project in evals/files/unattended-candidate-scan/ for outdated packages and give me the candidates as JSON. I will approve targets afterwards, so do not change any file.",
+      "files": [
+        "evals/files/unattended-candidate-scan/package.json"
+      ],
+      "expected_output": "A plan, since the model cannot run commands: check the taze prerequisite with the bundled check-tool.sh, run the bundled run-taze.sh from the skill directory with the project as the working directory, report the candidates from the JSON, and apply nothing.",
+      "assertions": [
+        "Proposes checking the prerequisite first with `scripts/check-tool.sh taze` (or handles the JSON error it prints when taze is missing)",
+        "Proposes running the bundled `scripts/run-taze.sh` resolved from the skill directory, with the Node project as the working directory, instead of improvising a taze command",
+        "Passes no --write, -w or other write argument, so the scan changes no manifest or lockfile",
+        "Says the candidates come back in the `candidates` field of the JSON (or the `output` text fallback) and reports them for approval without applying any of them"
       ]
     }
   ]

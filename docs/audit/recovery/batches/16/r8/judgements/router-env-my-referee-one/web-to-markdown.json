@@ -1,0 +1,77 @@
+{
+  "skill": "web-to-markdown",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 18,
+      "evidence": "Step 3 explains that a missing binary has no CLI stderr and that --chrome-path applies only to browser-discovery failures; step 5 repeats both rules: 'when web2md is not installed there is no stderr to copy (step 3)'.",
+      "fix": "Keep missing-binary detection and installation reporting in step 3, and running-binary blocker classification and retry reporting in step 5. Replace duplicated explanations with cross-references while preserving every distinct rule, and record the redistribution in docs/audit/recovery/web-to-markdown/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/web-to-markdown/record.md",
+      "line": null,
+      "evidence": "The dbff837f digest says 'removed units (47, showing 40)'; seven removal items are not displayed. The record's statement that undisplayed tails are covered does not expose their individual digest entries for verification.",
+      "fix": "Supply the complete dbff837f removal digest so each omitted item can be checked against the current content, sections.json and record.md. Preserve the existing recovery rows."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/evals.json",
+      "line": 14,
+      "evidence": "The assertion requires 'a heading plus several sentences of body', whereas SKILL.md step 5 explicitly accepts 'a legitimately short page'. No eval exercises that short-page exception.",
+      "fix": "Align the assertion with identity plus the page's own substantive content rather than a sentence minimum. Add a short but complete page case that must pass and a thin, incomplete extraction case that must enter the bounded retry path."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 65,
+      "evidence": "The Basic Conversion example says 'This will run: web2md ... --out ./article.md', directly publishing the requested file. SKILL.md step 4 requires a temporary path, 'never the final path', and step 5 requires validation before publication. Other README file examples likewise write directly to their destinations.",
+      "fix": "Update the README file-output examples to show extraction into a temporary staging path, validation, and publication only after any required overwrite authorization. Retain the conversion scenarios and commands as staged equivalents, and record the changes in docs/audit/recovery/web-to-markdown/record.md."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 21,
+      "evidence": "Directory output says 'Use a trailing slash for an auto-named output directory', while step 5 requires every file attempt to use 'a temporary path in the destination's directory'. The directory branch does not explain how to preserve title-based naming without letting the CLI publish or overwrite the final file before validation.",
+      "fix": "Specify the directory-output staging branch: extract into a unique staging directory inside the destination, obtain the generated filename there, validate the staged file, resolve destination collisions and overwrite authorization, then publish it. Apply the same staging location to the single bounded retry and clean up only artifacts created by this run."
+    }
+  ]
+}

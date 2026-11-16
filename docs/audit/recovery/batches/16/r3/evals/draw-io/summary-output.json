@@ -1,0 +1,34 @@
+{
+  "skill": "draw-io",
+  "mode": "output",
+  "pass_rate": 0.8276,
+  "passed": 24,
+  "total": 29,
+  "failures": [
+    {
+      "eval": "aws-vpc-subnets",
+      "assertion": "Flags the Amazon EBS row as `[unverified]` (not in the draw.io palette or shape index) and says to look the icon up live in the shape index or draw.io's shape search before using it, instead of presenting `mxgraph.aws4.ebs` as a verified style.",
+      "evidence": "The output contains an \"Amazon EBS&lt;br&gt;volume\" placeholder but no unverified flag or instruction to look up the icon."
+    },
+    {
+      "eval": "compressed-rename",
+      "assertion": "Exports with `convert-drawio-to-png.sh` without `--stage` and checks the resulting PNG visually",
+      "evidence": "The output provides `bash \"$S/convert-drawio-to-png.sh\" \"$src\"` and asks the user to open the PNG, but says \u201cI can\u2019t run the commands or generate the PNG in this environment.\u201d"
+    },
+    {
+      "eval": "refactor-eleven-components",
+      "assertion": "Writes every edge cell after all vertex cells, with `edgeStyle=orthogonalEdgeStyle` and no arrow routed through a box it does not connect",
+      "evidence": "Although the edges follow the vertices, `id=\"webhook-to-validator\"` has `style=\"html=1;endArrow=block;...\"` without `edgeStyle=orthogonalEdgeStyle`."
+    },
+    {
+      "eval": "refactor-eleven-components",
+      "assertion": "Sets `fontFamily=Noto Sans JP` in the style of every text-bearing cell, edges included, and a light `background` on `<mxGraphModel>`",
+      "evidence": "The model has `background=\"#ffffff\"`, but edge styles such as `id=\"webhook-to-validator\"` omit `fontFamily=Noto Sans JP`."
+    },
+    {
+      "eval": "refactor-eleven-components",
+      "assertion": "Compares the node count with the ~12-node split limit and either stages the diagram (context first, then one diagram per group) or keeps one picture with a stated reason",
+      "evidence": "The output contains one `<diagram id=\"notification-refactor\" name=\"Notification pipeline\">` and no node-count comparison or stated reason for keeping one picture."
+    }
+  ]
+}

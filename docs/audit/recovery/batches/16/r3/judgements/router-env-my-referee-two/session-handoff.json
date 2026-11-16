@@ -1,0 +1,104 @@
+{
+  "skill": "session-handoff",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 1,
+      "evidence": "removed units (218, showing 40)",
+      "fix": "The 40 shown paragraphs map to section rows in docs/audit/recovery/session-handoff/record.md and units in sections.json, but 178 of the 218 removed units are neither shown nor given their own rows. Expand the digest or add a record row for each unshown unit so the cut is reviewable."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 57,
+      "evidence": "Read at most the latest plus two predecessors; summarise older links from the oldest one you read instead of walking an unbounded chain.",
+      "fix": "The predecessor is a Markdown link under Handoff Chain, while the template and scaffold do not use that heading. Name the scaffold heading and the Continues from link as the walk source, and say what to do when the link is missing or the file is gone."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 70,
+      "evidence": "The scanner only matches quoted assignments (`api_key = \"...\"`), any `scheme://user:password@` URL",
+      "fix": "Add the scanner's other misses to this gotcha: private-key assignments match without a quoted value, Slack tokens need only a prefix plus one character, and a password containing `/` is not flagged. Keep the existing prefix families and the checked-date credit."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "line": 23,
+      "evidence": "# Handoff: [TASK_TITLE]",
+      "fix": "The scaffold writes Session Metadata fields, a Recent Commits list and a Handoff Chain section that this template omits. Add those three so the file an agent reads when unsure matches the file create_handoff.py writes."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 28,
+      "evidence": "A fact you do not know (was staging deployed? did CI pass?) is written as `Unknown` and asked of the user, never guessed.",
+      "fix": "Give the default order: write `Unknown`, finish and validate the rest of the handoff, then ask the user once with the collected unknowns, instead of leaving the moment of the ask to the agent."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/session-handoff/evals/evals.json",
+      "line": 5,
+      "evidence": "\"expected_output\": \"Corrects \u201crecieves\u201d to \u201creceives\u201d and makes a small-task judgment without being told the answer.\"",
+      "fix": "Replace the no-handoff case with a small-task prompt that does not announce itself as one-line, and assert the agent declines a handoff and names the diff or commit as the record, matching the mode table."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 57,
+      "evidence": "Read the handoff completely, then the predecessor named under Handoff Chain.",
+      "fix": "The scaffold heading is `## Handoff Chain` with `- **Continues from**:`, and neither the template nor a handoff written from it has that heading, so the walk stops. Point the step at the Continues from link, and say to stop when it is None, the file is missing, or two predecessors have been read."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 46,
+      "evidence": "or verify those files against the handoff; then resume",
+      "fix": "FRESH can include up to five changed files and five commits while the printed verdict says Safe to resume. State that the score adds 1 per factor only above those counts, so five files plus five commits is still FRESH, and require the cited-file inspection before the resume rather than offering it as an alternative."
+    }
+  ]
+}

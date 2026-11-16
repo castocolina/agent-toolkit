@@ -11,11 +11,19 @@ metadata:
 ## Constraint-first procedure
 
 1. Inspect the worktree; preserve unrelated edits. Identify the manifest, owning resolver, lockfile, runtime/toolchain envelope, and workspace topology. Multiple manifests may belong to different managers; never infer ownership from file presence alone.
-2. Use the owning manager's constraint grammar to classify each dependency as exact, bounded, or unbounded. Do not infer pinning from `^`/`~`; Python, Ruby, Maven, Go, and .NET have different grammars. For 0.x versions and prerelease tags, even a nominal minor update can break compatibility. Dependencies pinned to an exact version stay unchanged unless the user asks to move them; say so in the plan and report.
+2. Use the owning manager's constraint grammar to classify each dependency as exact, bounded, or unbounded. Do not infer pinning from `^`/`~`; Python, Ruby, Maven, Go, and .NET have different grammars. For 0.x versions and prerelease tags, even a nominal minor update can break compatibility. Dependencies pinned to an exact version stay unchanged unless the user asks to move them; say so in the plan and report. A Go `go.mod` requirement is a minimum-version-selection requirement, a deliberate pin only when the user or a comment says so (https://go.dev/ref/mod#minimal-version-selection, checked 2026-11-15); when unsure, ask the user.
 3. Identify coupled workspace packages and peer/ABI/runtime constraints. Form compatible update cohorts; keep separate versions when consumers need incompatible majors.
 4. Scan candidates, inspect release notes and proposed manifest/lockfile diff, then apply only approved target versions. Obtain approval for every breaking target; package names never imply blanket approval. A bounded set is authorized only when the user explicitly identifies its targets.
 5. Update manifest and lockfile together with the owning resolver. Never use a different manager to generate a lockfile. Without a lockfile, update one approved package at a time and record the exact resolved version.
 6. Run the resolver install/check, applicable tests, type checks, build, and security audit after each cohort. Stop on failure; report the exact failing command and ask before proceeding. Preserve unrelated user changes.
+
+Before any write, produce a reviewable package-to-exact-target map, and say whether each proposal is non-mutating (read from a scan or an explain/tree command) or comes from a resolver-generated diff, which needs a disposable worktree so the real manifest and lockfile stay untouched.
+
+## NEVER
+
+- NEVER run a write-mode taze without `--include`: a mode without it rewrites every package it reaches, including GitHub Actions versions and Node version files, far beyond the approved set.
+- NEVER delete a lockfile or environment before the explain or tree diagnosis, an approval and a snapshot: the reset discards the only reproducible dependency graph and the re-resolved one can differ silently.
+- NEVER let another manager regenerate a lockfile: the resolved graph changes silently and builds stop being reproducible.
 
 ## Non-obvious failure modes
 
@@ -27,9 +35,12 @@ metadata:
 
 ## Supported non-obvious operations
 
-- Node: use `taze` for candidate discovery and scoped writes; recurse only after confirming workspace scope. See [Node workflow](references/node.md).
-- Python: update one package at a time when no lock owner exists; use the detected lock owner otherwise. See [Python workflow](references/python.md).
-- Other managers: use their native resolver and explicit approved versions; see [manager commands](references/managers.md).
+- Node: use `taze` for candidate discovery and scoped writes; recurse only after confirming workspace scope. See [Node workflow](references/node.md). Load node.md only for a Node manifest. The default scoped write is editing the approved exact targets directly in the manifest. The alternative `taze major --write --include pkg1,pkg2 --no-github-actions --no-node-version` (add `-r` only for a confirmed workspace) runs only in a disposable copy of the project: compare its diff with the approved package, workspace path and target map, copy only the matching entries to the real manifest, then resolve with the owning manager and check the complete diff. `-w`/`--write` also rewrites GitHub Actions versions and Node version files unless those two flags are set, and `--include` names only the approved packages.
+- Python: update one package at a time when no lock owner exists; use the detected lock owner otherwise. See [Python workflow](references/python.md). Load python.md only when pip, Poetry, Pipenv or uv owns the graph.
+- Other managers: use their native resolver and explicit approved versions; see [manager commands](references/managers.md). Load managers.md only for Go, Cargo, Bundler, Maven, Gradle or .NET. For a Node task do not load python.md or managers.md.
+- Scripts: resolve them from this skill's directory (the directory that holds this SKILL.md; for an installed skill use `${CLAUDE_PLUGIN_ROOT}/skills/dependency-updater/scripts/` or `$HOME/.claude/skills/dependency-updater/scripts/`, whichever exists), not from the project, and run them with the target project as the working directory.
+- Scripts: for a prerequisite check, read and run `scripts/check-tool.sh <tool> [install-command]` (one JSON line on stdout, diagnostics on stderr, `--help` for usage).
+- Scripts: for an unattended candidate scan of a Node project, run `scripts/run-taze.sh [-r] [taze arguments]` with the project as the working directory (JSON on stdout, diagnostics on stderr, `--help` for usage). A candidate scan puts taze's parsed JSON in the `candidates` field (`{"status":"ok","candidates":{...}}`); when taze's output is not valid JSON it falls back to the text report in the `output` field (`{"status":"ok","output":"..."}`).
 
 ## Recovery and security
 

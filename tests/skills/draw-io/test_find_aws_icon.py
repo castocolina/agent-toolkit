@@ -24,6 +24,21 @@ EXPECTED_RENAMES = {
     "mxgraph.aws4.elb", "mxgraph.aws4.iam",
     "mxgraph.aws4.elasticsearch_service", "mxgraph.aws4.machine_learning",
 }
+# 2026-11-15 corrections from the draw.io AWS4 palette (Sidebar-AWS4.js lines 265-299): the fixture keeps
+# the old names, so the test maps them. Five group rows left the table: subnets and the Availability Zone
+# are recipes or plain rectangles in section 4.3, and two names have no palette equivalent.
+GROUP_FIXES = {
+    "mxgraph.aws4.group_vpc": "mxgraph.aws4.group_vpc2",
+    "mxgraph.aws4.group_aws_account": "mxgraph.aws4.group_account",
+    "mxgraph.aws4.group_elastic_beanstalk_container": "mxgraph.aws4.group_elastic_beanstalk",
+    "mxgraph.aws4.group_auto_scaling": "mxgraph.aws4.group_auto_scaling_group",
+    "mxgraph.aws4.group_step_functions_workflow": "mxgraph.aws4.group_aws_step_functions_workflow",
+}
+GROUP_ROWS_LEFT = {
+    "mxgraph.aws4.group_availability_zone", "mxgraph.aws4.group_public_subnet",
+    "mxgraph.aws4.group_private_subnet", "mxgraph.aws4.group_generic", "mxgraph.aws4.group_server_contents",
+}
+MARK = " [unverified]"
 
 
 def rows(text):
@@ -38,14 +53,43 @@ class FindAwsIconTests(unittest.TestCase):
         cls.before = [tuple(line.split("\t", 1)) for line in FIXTURE.read_text().splitlines()]
 
     def test_all_rows_survive_translation(self):
-        self.assertEqual(len(self.current), 475)
-        self.assertEqual(len(self.before), len(self.current))
-        self.assertEqual([icon for _, icon in self.current], [icon for _, icon in self.before])
+        self.assertEqual(len(self.before), 475)
+        expected = [(name, GROUP_FIXES.get(icon, icon)) for name, icon in self.before if icon not in GROUP_ROWS_LEFT]
+        self.assertEqual(len(self.current), 470)
+        self.assertEqual([icon for _, icon in self.current], [icon for _, icon in expected])
         renamed = {icon for name, icon in self.before if name == "<renamed>"}
         self.assertEqual(renamed, EXPECTED_RENAMES)
-        for (name, icon), (old_name, old_icon) in zip(self.current, self.before):
+        for (name, icon), (old_name, old_icon) in zip(self.current, expected):
             if old_name != "<renamed>":
-                self.assertEqual((name, icon), (old_name, old_icon))
+                # a row may gain a legacy note or the unverified mark, but keeps its name and icon
+                self.assertTrue(name.removesuffix(MARK).startswith(old_name), (name, old_name))
+                self.assertEqual(icon, old_icon)
+
+    def test_unverified_rows_are_marked(self):
+        marked = {icon for name, icon in self.current if name.endswith(MARK)}
+        self.assertEqual(len(marked), 84)
+        for icon in ("ebs", "efs", "iam", "elb", "laptop", "qldb", "msk", "opensearch"):
+            self.assertIn(f"mxgraph.aws4.{icon}", marked)
+        for icon in ("lambda", "s3", "dynamodb", "cloudfront", "api_gateway"):
+            self.assertNotIn(f"mxgraph.aws4.{icon}", marked)
+
+    def test_group_icon_names_are_the_palette_forms(self):
+        icons = {icon for _, icon in self.current}
+        for gone in GROUP_ROWS_LEFT | set(GROUP_FIXES):
+            self.assertNotIn(gone, icons)
+        for icon in GROUP_FIXES.values():
+            self.assertIn(icon, icons)
+        self.assertIn("grIcon=mxgraph.aws4.group_security_group;grStroke=0;strokeColor=#7AA116;fillColor=#F2F6E8;", self.text)
+        self.assertIn("grIcon=mxgraph.aws4.group_security_group;grStroke=0;strokeColor=#00A4A6;fillColor=#E6F6F7;", self.text)
+
+    def test_legacy_services_are_labelled(self):
+        by_icon = {icon: name for name, icon in self.current}
+        self.assertIn("legacy", by_icon["mxgraph.aws4.codewhisperer"])
+        self.assertIn("legacy", by_icon["mxgraph.aws4.qldb"])
+
+    def test_script_prints_the_unverified_mark(self):
+        output = subprocess.run([sys.executable, str(SCRIPT), "Amazon EBS"], capture_output=True, text=True, check=True).stdout
+        self.assertIn("Service: Amazon EBS [unverified]\nresIcon: mxgraph.aws4.ebs\n", output)
 
     def test_expected_renames_are_english(self):
         by_icon = {icon: name for name, icon in self.current}
@@ -70,11 +114,19 @@ class FindAwsIconTests(unittest.TestCase):
         self.assertIsNone(NON_LATIN_RE.search(output))
 
     def test_group_searches_preserve_group_styles(self):
-        for query, icon in [("AWS Cloud", "mxgraph.aws4.group_aws_cloud"), ("VPC", "mxgraph.aws4.group_vpc")]:
+        for query, icon in [("AWS Cloud", "mxgraph.aws4.group_aws_cloud"), ("VPC", "mxgraph.aws4.group_vpc2")]:
             with self.subTest(query=query):
                 output = subprocess.run([sys.executable, str(SCRIPT), query], capture_output=True, text=True, check=True).stdout
                 self.assertIn(f"Style: shape=mxgraph.aws4.group;grIcon={icon};", output)
                 self.assertNotIn(f"Style: shape=mxgraph.aws4.resourceIcon;resIcon={icon};", output)
+
+    def test_auto_scaling_group_uses_group_center_shape(self):
+        output = subprocess.run([sys.executable, str(SCRIPT), "Auto Scaling"], capture_output=True, text=True, check=True).stdout
+        icon = "mxgraph.aws4.group_auto_scaling_group"
+        self.assertIn(f"Style: shape=mxgraph.aws4.groupCenter;grIcon={icon};", output)
+        self.assertNotIn(f"Style: shape=mxgraph.aws4.group;grIcon={icon};", output)
+        result = subprocess.run([sys.executable, str(SCRIPT), "--json", icon], capture_output=True, text=True, check=True)
+        self.assertEqual([d["style"] for d in json.loads(result.stdout)], [f"shape=mxgraph.aws4.groupCenter;grIcon={icon};"])
 
     def test_duplicate_names_retain_distinct_variants(self):
         output = subprocess.run([sys.executable, str(SCRIPT), "Generic database"], capture_output=True, text=True, check=True).stdout
@@ -99,8 +151,8 @@ class FindAwsIconTests(unittest.TestCase):
     def test_json_mode_returns_rows_with_styles(self):
         result = subprocess.run([sys.executable, str(SCRIPT), "--json", "VPC"], capture_output=True, text=True, check=True)
         rows_out = json.loads(result.stdout)
-        self.assertIn({"name": "VPC", "icon": "mxgraph.aws4.group_vpc", "kind": "group",
-                       "style": "shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc;"}, rows_out)
+        self.assertIn({"name": "VPC", "icon": "mxgraph.aws4.group_vpc2", "kind": "group",
+                       "style": "shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc2;"}, rows_out)
         self.assertIn("icon(s) for 'VPC'", result.stderr)
 
     def test_no_match_reports_on_stderr_and_exits_1(self):

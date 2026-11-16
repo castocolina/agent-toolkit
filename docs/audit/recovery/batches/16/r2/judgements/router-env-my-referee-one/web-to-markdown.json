@@ -1,0 +1,86 @@
+{
+  "skill": "web-to-markdown",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 10,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/web-to-markdown/record.md",
+      "line": null,
+      "evidence": "Previous-version digest at dbff837f: \"removed units (42, showing 40)\".",
+      "fix": "Obtain and review the complete digest, including the two omitted units, against the current files and recovery record; restore or record any unexplained removal."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 27,
+      "evidence": "\"Never reuse the user's daily browser profile\" and \"Use --interactive only when an attached human-controlled terminal is available\" give alternatives but do not explain the underlying failure modes.",
+      "fix": "Explain that profile reuse risks exposing or corrupting the user's session and that interactive mode otherwise blocks waiting for human input."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/evals.json",
+      "line": 27,
+      "evidence": "The heavy-app assertion says \"Then adds --wait-for 'main'\" although the procedure permits that selector only when it is known to exist; the implicit-gate case expects a loaded skill to request the phrase for a prompt that should not trigger it.",
+      "fix": "Make the selector assertion conditional on known page structure, and test implicit requests as non-trigger cases rather than requiring the unloaded skill to respond. Add a malformed-scheme or authentication-blocker output case with observable assertions."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/trigger-queries.json",
+      "line": 35,
+      "evidence": "\"Use skill web-to-markdown extract clean Markdown\" is labeled true, but it lacks either exact invocation phrase required by the description and gate.",
+      "fix": "Label this near-miss false or explicitly revise the invocation policy and description to accept that phrasing; add realistic contextual variants around the chosen boundary."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 21,
+      "evidence": "\"under the default --wait-until networkidle2 an app with live connections never settles\" overgeneralizes: networkidle2 can settle with up to two active connections.",
+      "fix": "Say that persistent activity can prevent networkidle2 from settling when it exceeds the idle threshold; retain the bounded timeout retry."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 21,
+      "evidence": "\"confirm the requested page title and substantive main content are present\" rejects otherwise usable pages whose title is absent or not part of the extracted content.",
+      "fix": "Validate substantive content and identity using the title when available, with another page-identity check when it is not; report genuinely ambiguous results instead of automatically rejecting them."
+    }
+  ]
+}

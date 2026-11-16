@@ -16,7 +16,12 @@ t() {
 # Writes a PNG like drawio -e does: IHDR, a zTXt "mxGraphModel" chunk holding the
 # URL-encoded source, IDAT, IEND. Modes: ok, trunc (cut mid-file), nodata (no zTXt),
 # noidat (CRC-valid but no image data), notdrawio (embedded XML is not a draw.io document),
-# zerodim (IHDR width 0).
+# zerodim (IHDR width 0), zlibjunk (CRC-valid IDAT whose data is not a zlib stream),
+# shortidat (a valid zlib stream that inflates to fewer bytes than the IHDR calls for),
+# filterbyte (CRC-valid 1x1 RGB PNG of the right inflated length whose scanline starts with filter byte 5),
+# ihdrpair (bit depth 4 with color type 2, not a valid pair), ihdrcomp (compression method 1),
+# ihdrfmeth (filter method 1), ihdrinterlace (interlace method 2); the four ihdr* fixtures are CRC-valid with
+# otherwise good chunks, so only the IHDR field they name is wrong. Their names avoid "bad", which the stub fails on.
 write_png_maker() {
   cat > "$1/mkpng.py" << 'EOF'
 import struct, sys, urllib.parse, zlib
@@ -25,10 +30,17 @@ def chunk(kind, data):
     return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data))
 body = "<svg/>" if mode == "notdrawio" else open(src, encoding="utf-8").read()
 xml = urllib.parse.quote(body, safe="").encode()
-png = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 0 if mode == "zerodim" else 1, 1, 8, 2, 0, 0, 0))
+depth, ctype, comp, fmeth, interlace = {"ihdrpair": (4, 2, 0, 0, 0), "ihdrcomp": (8, 2, 1, 0, 0), "ihdrfmeth": (8, 2, 0, 1, 0), "ihdrinterlace": (8, 2, 0, 0, 2)}.get(mode, (8, 2, 0, 0, 0))
+png = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 0 if mode == "zerodim" else 1, 1, depth, ctype, comp, fmeth, interlace))
 if mode != "nodata":
     png += chunk(b"zTXt", b"mxGraphModel\0\0" + zlib.compress(xml))
-if mode != "noidat":
+if mode == "zlibjunk":
+    png += chunk(b"IDAT", b"this is not zlib data")
+elif mode == "shortidat":
+    png += chunk(b"IDAT", zlib.compress(b"\0\0"))
+elif mode == "filterbyte":
+    png += chunk(b"IDAT", zlib.compress(b"\x05\0\0\0"))
+elif mode != "noidat":
     png += chunk(b"IDAT", zlib.compress(b"\0\0\0\0"))
 png += chunk(b"IEND", b"")
 open(out, "wb").write(png[: len(png) // 2] if mode == "trunc" else png)
@@ -63,6 +75,13 @@ case "$src" in
   *noidat*) exec python3 "$ROOT/mkpng.py" "$out" noidat "$src" ;;
   *notdrawio*) exec python3 "$ROOT/mkpng.py" "$out" notdrawio "$src" ;;
   *zerodim*) exec python3 "$ROOT/mkpng.py" "$out" zerodim "$src" ;;
+  *zlibjunk*) exec python3 "$ROOT/mkpng.py" "$out" zlibjunk "$src" ;;
+  *shortidat*) exec python3 "$ROOT/mkpng.py" "$out" shortidat "$src" ;;
+  *filterbyte*) exec python3 "$ROOT/mkpng.py" "$out" filterbyte "$src" ;;
+  *ihdrpair*) exec python3 "$ROOT/mkpng.py" "$out" ihdrpair "$src" ;;
+  *ihdrcomp*) exec python3 "$ROOT/mkpng.py" "$out" ihdrcomp "$src" ;;
+  *ihdrfmeth*) exec python3 "$ROOT/mkpng.py" "$out" ihdrfmeth "$src" ;;
+  *ihdrinterlace*) exec python3 "$ROOT/mkpng.py" "$out" ihdrinterlace "$src" ;;
   *slow*) sleep 10 ;;
 esac
 python3 "$ROOT/mkpng.py" "$out" ok "$src"
@@ -205,7 +224,7 @@ EOF
 
 test_broken_png_is_a_failure_and_keeps_previous_png() {
   local name
-  for name in trunc nodata noidat notdrawio zerodim; do
+  for name in trunc nodata noidat notdrawio zerodim zlibjunk shortidat filterbyte ihdrpair ihdrcomp ihdrfmeth ihdrinterlace; do
     setup
     # valid source XML: each fixture would pass in ok mode without its targeted PNG corruption
     cp "$ROOT/work/flow.drawio" "$ROOT/work/$name.drawio"
@@ -217,6 +236,36 @@ test_broken_png_is_a_failure_and_keeps_previous_png() {
     check "continues[$name]" "$(exists "$ROOT/work/flow.drawio.png")" yes
     check "no_temp_left[$name]" "$(find "$ROOT/work" -name '.drawio-export.*' | wc -l | tr -d ' ')" 0
   done
+}
+
+test_dash_leading_input_after_double_dash_is_not_an_option() {
+  local mode
+  for mode in file dark; do
+    setup
+    cp "$ROOT/work/flow.drawio" "$ROOT/work/-diagram.drawio"
+    DRAWIO_BACKGROUND=$mode run -- -diagram.drawio
+    check "exit[$mode]" "$CODE" 0
+    check "png_written[$mode]" "$(head -c 4 "$ROOT/work/-diagram.drawio.png" | tail -c 3)" PNG
+    check "json[$mode]" "$(cat "$ROOT/out")" '[{"drawio":"-diagram.drawio","png":"-diagram.drawio.png","ok":true}]'
+    check "no_temp_left[$mode]" "$(find "$ROOT/work" -name '.drawio-export.*' | wc -l | tr -d ' ')" 0
+  done
+  setup
+  run -- -missing.drawio
+  check missing_exit "$CODE" 1
+  check missing_reports "$(grep -c -- '-missing.drawio: no such file' "$ROOT/err")" 1
+}
+
+test_unreplaceable_destination_is_a_per_file_failure() {
+  setup
+  mkdir "$ROOT/work/flow.drawio.png"
+  cp "$ROOT/work/flow.drawio" "$ROOT/work/second.drawio"
+  run flow.drawio second.drawio
+  check exit "$CODE" 1
+  check reports "$(grep -c 'flow.drawio: cannot replace flow.drawio.png' "$ROOT/err")" 1
+  check destination_untouched "$(find "$ROOT/work/flow.drawio.png" -type f | wc -l | tr -d ' ')" 0
+  check continues "$(head -c 4 "$ROOT/work/second.drawio.png" | tail -c 3)" PNG
+  check json "$(cat "$ROOT/out")" '[{"drawio":"flow.drawio","png":"flow.drawio.png","ok":false},{"drawio":"second.drawio","png":"second.drawio.png","ok":true}]'
+  check no_temp_left "$(find "$ROOT/work" -name '.drawio-export.*' | wc -l | tr -d ' ')" 0
 }
 
 test_timeout_is_a_per_file_failure() {
@@ -279,11 +328,25 @@ test_missing_timeout_fails_before_drawio() {
   (cd "$ROOT/work" && PATH="$ROOT/bin:$ROOT/tools" ROOT="$ROOT" "$BASH" "$CONV" flow.drawio) > "$ROOT/out" 2> "$ROOT/err" && CODE=0 || CODE=$?
   check exit "$CODE" 1
   check reports "$(grep -c 'timeout(1) not found' "$ROOT/err")" 1
+  check json_failure "$(cat "$ROOT/out")" '{"ok":false,"error":"timeout not found"}'
   check no_drawio_call "$(exists "$ROOT/argv")" no
   check previous_png_kept "$(cat "$ROOT/work/flow.drawio.png")" OLD
   (cd "$ROOT/work" && PATH="$ROOT/bin:$ROOT/tools" ROOT="$ROOT" DRAWIO_TIMEOUT=0 "$BASH" "$CONV" flow.drawio) > "$ROOT/out" 2> "$ROOT/err" && CODE=0 || CODE=$?
   check opt_out_exit "$CODE" 0
   check opt_out_exported "$(head -c 4 "$ROOT/work/flow.drawio.png" | tail -c 3)" PNG
+}
+
+test_missing_drawio_prints_a_failure_object() {
+  setup
+  printf 'OLD' > "$ROOT/work/flow.drawio.png"
+  mkdir -p "$ROOT/tools"
+  local tool
+  for tool in python3 mktemp dirname rm mv cat timeout; do ln -s "$(command -v "$tool")" "$ROOT/tools/$tool"; done
+  (cd "$ROOT/work" && PATH="$ROOT/tools" ROOT="$ROOT" "$BASH" "$CONV" flow.drawio) > "$ROOT/out" 2> "$ROOT/err" && CODE=0 || CODE=$?
+  check exit "$CODE" 1
+  check reports "$(grep -c 'drawio CLI not found on PATH' "$ROOT/err")" 1
+  check json_failure "$(cat "$ROOT/out")" '{"ok":false,"error":"drawio not found"}'
+  check previous_png_kept "$(cat "$ROOT/work/flow.drawio.png")" OLD
 }
 
 test_gtimeout_is_used_when_timeout_is_missing() {

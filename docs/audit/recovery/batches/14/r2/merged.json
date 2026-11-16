@@ -1,0 +1,320 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "dependency-updater",
+      "percent": 87.6,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 91.2,
+        "router-env-my-referee-two": 84.0
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 54,
+          "evidence": "Summarize candidates and approvals, changed packages and exact versions, lockfile changes, commands and gate results",
+          "fix": "Keep the dependency-specific reporting requirements but compress the generic reporting instructions; record any removed text in docs/audit/recovery/dependency-updater/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest: removed units (89, showing 40).",
+          "fix": "Review the 49 undisplayed removed units against the current files and record each removal or restoration in docs/audit/recovery/dependency-updater/record.md."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/dependency-updater/evals/evals.json",
+          "line": 6,
+          "evidence": "The five evals provide prompts and assertions but no input files, including the pnpm monorepo and Poetry lockfile cases.",
+          "fix": "Add representative manifest and lockfile fixtures under evals/files/ and reference them from the relevant evals so changes, resolver ownership, and preservation of unrelated dependencies can be verified."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/references/node.md",
+          "line": 23,
+          "evidence": "taze moves a package to the latest version its mode allows, which may differ from the approved target: compare the manifest diff with the approved package-to-target map and edit the entry by hand if it differs.",
+          "fix": "Run floating taze writes only in a disposable worktree; inspect the proposed diff against the approved exact targets before touching the real project. Apply exact approved versions directly in the real manifest, then resolve and verify the lockfile."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/README.md",
+          "line": 80,
+          "evidence": "Go requires an exact version by design | Skip (intentionally pinned)",
+          "fix": "Distinguish Go module requirements and their minimum-version-selection behavior from deliberate policy pins. Allow proposed Go module upgrades when the user requests dependency updates, subject to target approval, and do not classify every go.mod requirement as an intentional pin."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/scripts/run-taze.sh",
+          "line": 34,
+          "evidence": "only the exact flags --write, -w and --json are recognised, so a combined short flag such as -rw counts as a scan",
+          "fix": "Reject ambiguous combined short options or parse them correctly before invoking taze; never classify a potentially mutating invocation as a candidate scan. Add a regression test for -rw and document the accepted arguments."
+        },
+        {
+          "id": "D8-4",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/dependency-updater/references/node.md",
+          "line": 19,
+          "evidence": "plain `taze` only reports bumps inside the ranges already written in the manifest; `taze minor` also shows minor updates beyond the range, and `taze major` includes major updates.",
+          "fix": "For requests to discover all outdated candidates, explicitly run the appropriate non-writing broader scan, such as the installed taze version's major discovery mode, while keeping the default in-range scan for requests limited to current constraints."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 12,
+          "evidence": "removed units (89, showing 40)",
+          "fix": "The shown 40 para and file items are explained by record rows or by section ids in docs/audit/recovery/dependency-updater/sections.json whose units list them; the other 49 were not listed, so add one record row each or restore any substantive one into references/."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/dependency-updater/README.md",
+          "line": 16,
+          "evidence": "This skill eliminates the manual work of checking for outdated packages across different ecosystems while maintaining safety through semantic versioning awareness.",
+          "fix": "Move this self-praise and the generic semver-awareness claim to the end of README.md only if a user asks for the overview, or record the removal in docs/audit/recovery/dependency-updater/record.md; it does not change how an agent updates a lockfile."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 14,
+          "evidence": "Identify coupled workspace packages and peer/ABI/runtime constraints. Form compatible update cohorts",
+          "fix": "Before forming a cohort, ask: which consumers pin an incompatible major, which peer or ABI floor moves with this bump, and which packages must stay on the old major; that thinking step belongs in Constraint-first procedure step 3, with the existing cohort rule kept."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/dependency-updater/references/node.md",
+          "line": 29,
+          "evidence": "Run `npm audit fix --dry-run --json` before any `npm audit fix --force`",
+          "fix": "Add to the NEVER list: NEVER run `npm audit fix --force` before the dry-run, because --force applies semver-major remediations the user has not approved; the dry-run command in references/node.md stays the procedure."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 3,
+          "evidence": "Audit, diagnose, and conservatively update project dependencies and lockfiles across Node, Python, Go, Rust, Ruby, Java, and .NET. Use when asked to update dependencies, find outdated packages, resolve dependency conflicts, or remediate vulnerable packages. Not for runtime upgrades, package publishing, or Renovate configuration.",
+          "fix": "Audit, diagnose, and conservatively update project dependencies and lockfiles across Node (package.json, package-lock.json, pnpm-lock.yaml, yarn.lock), Python (pyproject.toml, poetry.lock, Pipfile.lock, requirements.txt), Go (go.mod), Rust (Cargo.toml, Cargo.lock), Ruby (Gemfile, Gemfile.lock), Java (pom.xml, build.gradle), and .NET (*.csproj). Use when asked to update dependencies, find outdated packages, resolve dependency conflicts, or remediate vulnerable packages, even if the user only says \"deps are old\" or \"npm install fails on a peer\". Not for runtime upgrades, package publishing, or Renovate configuration."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/dependency-updater/SKILL.md",
+          "line": 37,
+          "evidence": "Load managers.md only for Go, Cargo, Bundler, Maven, Gradle or .NET. For a Node task do not load python.md or managers.md.",
+          "fix": "Add the missing exclusion in the same bullet: for a Go, Cargo, Bundler, Maven, Gradle or .NET task, do not load node.md or python.md."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/dependency-updater/references/managers.md",
+          "line": 13,
+          "evidence": "Security scanners are ecosystem-specific: `govulncheck ./...`, `cargo audit`, `bundle-audit check`, `mvn org.owasp:dependency-check-maven:check`, or `dotnet list package --vulnerable`.",
+          "fix": "Replace the equal menu with one default per ecosystem already named in the table (govulncheck for Go, cargo audit for Cargo, bundle-audit check for Bundler, the OWASP goal for Maven, dotnet list package --vulnerable for .NET) and keep \"or the project's already-configured scanner\" as the only escape hatch."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/dependency-updater/evals/evals.json",
+          "line": 1,
+          "evidence": "\"files\" is absent from every eval, and skills/dependency-updater/evals/ has no files/ directory",
+          "fix": "Add evals/files/ with a minimal package.json plus pnpm-workspace fixture and a pyproject.toml plus poetry.lock fixture, and point the scoped-taze-write and python-audit-plan cases at them so the assertions can be checked against those inputs."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/dependency-updater/references/node.md",
+          "line": 21,
+          "evidence": "A write without `--include` touches every package the mode reaches: that is a broad write and is not allowed.",
+          "fix": "State the actual taze behavior in references/node.md: --include filters the report, but a write still rewrites every reached package, so after `taze major --write --include pkg1,pkg2` revert every manifest change outside the approved map before the owning manager install; keep the NEVER on a write with no --include."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/dependency-updater/references/managers.md",
+          "line": 8,
+          "evidence": "`mvn versions:use-dep-version -Dincludes=groupId:artifactId -DdepVersion=version -DforceVersion=true`",
+          "fix": "Read the installed plugin's help or the MojoHaus use-dep-version page before the next edit and record the date in the Credits section of README.md; until then tell the agent to run `mvn versions:help -Ddetail=true -Dgoal=use-dep-version` and use the parameter names that help prints."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/dependency-updater/README.md",
+          "line": 303,
+          "evidence": "Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.",
+          "fix": "Add a docs/audit/upstream-sources.json row for dependency-updater whose credit is Leonardo Flores (@leonardocouy); keep the Credits paragraph unchanged. Do the same for Poetry (https://python-poetry.org/docs/cli/#update), uv (https://docs.astral.sh/uv/concepts/projects/sync/) and Pipenv (https://pipenv.pypa.io/en/latest/commands.html), which references/python.md cites and the registry does not list."
+        }
+      ]
+    },
+    {
+      "name": "general-purpose",
+      "percent": 94.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 96.0,
+        "router-env-my-referee-two": 92.0
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 12,
+          "evidence": "An ambiguous requirement or one with no derivable check: pick the narrowest reading, record it as an assumption, and list it under Remaining blockers for the caller to confirm.",
+          "fix": "For ambiguity that could materially change behavior or cause costly rework, defer that requirement and request clarification through the caller; continue independent work. Reserve the narrowest-reading default for low-risk, reversible choices."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "agents/general-purpose.md",
+          "line": 14,
+          "evidence": "delegate only when its domain rules or tools add something you lack",
+          "fix": "Distinguish main-session execution from subagent execution: Claude Code subagents cannot spawn other subagents. When running as a subagent, implement directly if feasible or return a specialist recommendation and blocker to the caller; use delegation only when the current execution context supports it."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "agents/general-purpose.md",
+          "line": 12,
+          "evidence": "Baseline and reproduce: first find the gates (AGENTS.md, CLAUDE.md, Makefile; else the toolchain's test runner), then run them",
+          "fix": "Keep the pre-existing-failure and non-reproducing branches, which the model will not derive. Move the generic 'find AGENTS.md/CLAUDE.md/Makefile and run the test runner' baseline, which current harnesses and models already do, into a skill this plugin bundles and point step 2 at it, or record the removal in docs/audit/recovery/general-purpose/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 18,
+          "evidence": "Write code, comments, docs and commit messages in English, with no Co-Authored-By or session-attribution trailers.",
+          "fix": "The model already writes in English and current harnesses already handle commit attribution. Move this house rule into a skill the plugin bundles, or delete it and add a row to docs/audit/recovery/general-purpose/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 10,
+          "evidence": "You handle multi-step work that no single specialist owns.",
+          "fix": "Before Process step 1, add the decision the model would not derive: own the requirement when no specialist's domain rules or tools cover it, hand off only the bounded part a specialist adds, and never hand the whole request to another general-purpose agent."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 17,
+          "evidence": "Work in the worktree or branch you were given; do not switch checkouts or push unless asked.",
+          "fix": "Move this into NEVER with the failure it prevents: switching checkouts or pushing from a shared worktree drops the caller's uncommitted work and publishes unreviewed commits. Keep the destructive-operation rule where it is."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "agents/general-purpose.md",
+          "line": 12,
+          "evidence": "If it does not reproduce, say so under Remaining blockers with the attempt made; fix from the code only when the defect sits in one code path and a test can fail before the fix, marked unverified, else stop on that requirement only",
+          "fix": "Name the default for a bug that does not reproduce: stop and list the attempt under Remaining blockers. Keep 'fix from the code' only as the escape hatch when the defect is one code path and a failing test can be written first."
+        }
+      ]
+    },
+    {
+      "name": "skill-judge",
+      "percent": 98.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 98.4,
+        "router-env-my-referee-two": 97.6
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 27,
+          "evidence": "The previous-version digest at dbff837f says \"removed units (312, showing 40)\"; 272 removed units cannot be individually checked from the supplied digest.",
+          "fix": "Provide an untruncated digest for the dbff837f comparison and check each remaining item against the current files and recovery record."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 26,
+          "evidence": "\"If the skill has `scripts/` and only its directory is supplied, `tests/skills/<name>/` was not checked\" conflicts with the same step's instruction to read the repository test when scripts exist. Supplying a directory does not establish that the repository test was unavailable or unchecked.",
+          "fix": "Branch on whether the repository test was actually accessible and checked, not on whether the target was supplied as a directory. Read the test when the repository is accessible; apply the stated D7 limitation only when it cannot be checked."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/skill-judge/evals/trigger-queries.json",
+          "line": 11,
+          "evidence": "26 trigger queries, not about 20 (13 should-trigger, 13 should-not-trigger)",
+          "fix": "Trim evals/trigger-queries.json to about 20 queries, keeping 8-10 should-trigger and 8-10 should-not-trigger, and keep the near-miss negatives (YAML-only lint, PR review, agentskills-research refresh, creating a skill or command)."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/skill-judge/SKILL.md",
+          "line": 27,
+          "evidence": "Step 4 says a prompt from references/judge-prompt.md with no digest needs nothing more, but this prompt is that template, carries two digests, and still requires docs/audit/fixer-rules.md and sections.json",
+          "fix": "In step 4, state that a judge-prompt.md prompt always reads each digest it carries (and the named record, docs/audit/fixer-rules.md, and sections.json when present), and that the no-digest shortcut applies only when the prompt carries none."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

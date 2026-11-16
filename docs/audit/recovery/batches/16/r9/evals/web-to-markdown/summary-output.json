@@ -1,0 +1,44 @@
+{
+  "skill": "web-to-markdown",
+  "mode": "output",
+  "pass_rate": 0.8478,
+  "passed": 39,
+  "total": 46,
+  "failures": [
+    {
+      "eval": "explicit-convert",
+      "assertion": "Recognizes explicit invocation",
+      "evidence": "The output says \u201cI would use this sequence to save the full page content\u201d but does not identify an explicit invocation or acknowledge the explicit-conversion gate."
+    },
+    {
+      "eval": "explicit-convert",
+      "assertion": "Validates the saved file: it is non-empty and holds substantive main content of the requested page, not only navigation",
+      "evidence": "The output requires \u201cthe page\u2019s heading and body\u2014not a login, consent, error, or navigation-only page\u201d but does not explicitly check that the file is non-empty or require substantive main content."
+    },
+    {
+      "eval": "explicit-convert",
+      "assertion": "Confirms page identity: the title matches when one is available, otherwise the URL's host and the visible heading are checked",
+      "evidence": "The output says \u201cverify that its identity matches the requested page\u201d without specifying a title match or the fallback host-and-visible-heading checks."
+    },
+    {
+      "eval": "explicit-convert",
+      "assertion": "Applies the pass rule before keeping the result: a heading plus several sentences of body that is not a login, consent, error or navigation-only page; rejects login, consent, error and navigation-only output instead of reporting it as the page",
+      "evidence": "Although the output requires \u201cthe page\u2019s heading and body\u2014not a login, consent, error, or navigation-only page\u201d before publishing, it does not require several sentences of body content."
+    },
+    {
+      "eval": "heavy-app-never-idle",
+      "assertion": "Explains that persistent network activity beyond the idle threshold can keep the default networkidle2 from settling, without claiming it never settles",
+      "evidence": "The output says only \"This avoids waiting for network idle while giving the app two additional seconds to render\", without explaining persistent network activity or the default networkidle2 threshold."
+    },
+    {
+      "eval": "chrome-not-found",
+      "assertion": "Copies the CLI's stderr message about Chrome not being found into the report",
+      "evidence": "The output quotes only \u201cChrome was not found\u201d and explicitly says \u201cthe full verbatim stderr was not provided, so I cannot reproduce it exactly.\u201d"
+    },
+    {
+      "eval": "several-urls-one-file",
+      "assertion": "Notes that a directory path means one file per URL",
+      "evidence": "The output offers \u201cseparate files in a directory\u201d but does not explicitly state that a directory path means one file per URL."
+    }
+  ]
+}

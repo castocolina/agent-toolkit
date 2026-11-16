@@ -8,7 +8,8 @@
       "assertions": [
         "Names appointment requests and patient/requested-slot/urgency display needs.",
         "Lists accept and decline actions plus loading and empty states.",
-        "Includes uncertainties/questions without specifying endpoint, HTTP method, or field names."
+        "Includes uncertainties/questions without specifying endpoint, HTTP method, or field names.",
+        "Writes each need as a contextual request: a purpose plus a sentence on where it sits in the product and what the user does next, rather than a bare data list."
       ]
     },
     {
@@ -18,7 +19,8 @@
       "assertions": [
         "Covers identity, latest message, unread state, and assignment display.",
         "Lists reply, assign, and resolve actions and all four requested states.",
-        "Includes at least one backend question and no prescribed endpoint or field name."
+        "Includes at least one backend question and no prescribed endpoint or field name.",
+        "Invites backend pushback or alternatives (for example, asks backend to push back or suggest a better approach) and frames the document as a request rather than a demand."
       ]
     },
     {
@@ -29,6 +31,39 @@
         "States overdue invoices and account-owner retry payment as UI needs.",
         "Includes a relevant error or loading state.",
         "Asks an open backend question and specifies no REST route or JSON field."
+      ]
+    },
+    {
+      "id": "update-existing-note",
+      "prompt": "Update the existing requirements note in evals/files/backend-requirements.md. Backend (Dana) answered on 2026-11-09: refunds above 500 need a second approver, and the screen should show a 'needs second approval' badge for those. She did not say what happens when two agents approve the same request at once, or what the approve action shows when the refund is rejected. Also the agents now want a 'reason given' filter on the queue; nobody has said whether the backend can filter.",
+      "expected_output": "The existing note updated in place: prior Discussion Log kept, the new response appended, resolved and open uncertainties classified.",
+      "files": ["evals/files/backend-requirements.md"],
+      "assertions": [
+        "Keeps the existing 2026-11-02 Discussion Log line (oldest-first ordering decision from Dana) unchanged and appends the 2026-11-09 response as a new entry instead of rewriting history.",
+        "Marks the approval-limit uncertainty resolved only for what Dana covered (the second-approver rule and the badge) and keeps the existing oldest-first decision.",
+        "Records the two unanswered outcomes (concurrent approval by two agents, and rejected approval) as open uncertainties, each marked either blocking or safe provisional assumption with the affected screen and action.",
+        "Records the new reason filter as an unknown (can backend filter or not), classified as blocking or safe provisional, without naming an endpoint, HTTP method or field name."
+      ]
+    },
+    {
+      "id": "uncertain-outcome",
+      "prompt": "The order detail screen has a Cancel order button. Warehouse staff sometimes lose connection right after clicking it, so we may not know if the cancel went through, and another agent can change the same order at the same moment. Write the backend requirements for this.",
+      "expected_output": "A requirements note whose Cancel action describes the unknown-outcome and concurrent-change branches instead of assuming success.",
+      "assertions": [
+        "Describes what the user expects when the cancel outcome is unknown (timeout or lost connection) and never reports that unknown outcome as success.",
+        "Describes the rejected result and the result when another agent changed the order at the same moment.",
+        "Marks the ambiguous-result handling as unresolved and asks backend how the UI should reconcile an uncertain cancel, noting that treating it as success or retrying blindly could cause a wrong or duplicate action.",
+        "Classifies this uncertainty as blocking, and prescribes no endpoint path, HTTP method or field name."
+      ]
+    },
+    {
+      "id": "inline-preview-override",
+      "prompt": "Show me an inline preview only (do not save a file yet) of the backend requirements for an address book screen where customers can list, add and remove saved shipping addresses. If I approve it, I will want it saved at docs/backend/address-book.md instead of the usual location.",
+      "expected_output": "The full requirements note shown inline in the reply, with no file written, and the override destination remembered for after approval.",
+      "assertions": [
+        "Shows the full requirements note inline in the reply and does not write a file or claim to have saved one.",
+        "Does not use the default .claude/docs/ai/<feature>/backend-requirements.md location; the only destination mentioned is the requested docs/backend/address-book.md, offered for after approval.",
+        "Covers list, add and remove actions with loading, empty and error states, and includes a question for backend, with no endpoint path or field name."
       ]
     }
   ]

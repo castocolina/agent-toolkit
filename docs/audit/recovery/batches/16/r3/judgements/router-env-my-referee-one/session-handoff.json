@@ -1,0 +1,59 @@
+{
+  "skill": "session-handoff",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": null,
+      "evidence": "Previous-version digest at dbff837f reports \"removed units (218, showing 40)\"; the remaining 178 units are not available in the digest for individual review.",
+      "fix": "Provide the complete removal digest so every omitted unit can be checked against the current files and recovery record."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/session-handoff/evals/evals.json",
+      "line": 19,
+      "evidence": "The resume-chain assertion requires `python3 scripts/list_handoffs.py` and `python3 scripts/check_staleness.py <handoff-file>`, while SKILL.md requires resolving scripts through the skill directory from the project root.",
+      "fix": "Accept commands using the resolved skill-directory path, including `python3 \"$SKILL_DIR/scripts/list_handoffs.py\"` and the equivalent staleness command, so correct executable invocations pass."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 50,
+      "evidence": "RESUME runs the staleness check before the gotcha at line 82 says to confirm that the handoff's `Project:` equals the current checkout; `check_staleness.py` uses the recorded project directory whenever it exists.",
+      "fix": "Before running or accepting a staleness report, compare the handoff's Project path with the intended project root. If they differ, do not trust the report for the current checkout; inspect the current checkout directly or obtain a comparison explicitly targeting it, then continue with the appropriate verification."
+    }
+  ]
+}

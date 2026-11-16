@@ -1,0 +1,104 @@
+{
+  "skill": "web-to-markdown",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 12,
+    "D3": 14,
+    "D4": 12,
+    "D5": 15,
+    "D6": 13,
+    "D7": 10,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 106,
+  "max_total": 125,
+  "percent": 84.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 13,
+      "evidence": "dbff837f digest is cut (removed units (42, showing 40)); sections.json maps every shown dbff837f para id to a record row, and the 5ac41b9a digest's four removed units each have an intended-change row",
+      "fix": "Regenerate the dbff837f digest without the cut and confirm each remaining unit is listed in sections.json units for a row in docs/audit/recovery/web-to-markdown/record.md. Add a row, or restore the content, for any unit that has neither."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 19,
+      "evidence": "Retry once with the most relevant readiness control; if main content remains absent, report the extraction blocker.",
+      "fix": "Before the retry, ask: is the DOM present but the article late (bounded --wait-ms), is a known container missing (--wait-for), or do live connections keep the default networkidle2 from settling (--wait-until domcontentloaded --wait-ms 2000, then --wait-for 'main')? One sentence, so the choice is a diagnosis rather than a menu."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 3,
+      "evidence": "Use only when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown'.",
+      "fix": "Convert http(s) webpage URLs, including JS-rendered pages, to clean Markdown with the locally installed web2md CLI (Puppeteer, Chromium, Readability, Turndown). Use when the user asks to convert, archive or save a webpage, article or docs URL as Markdown, even if they only say 'save this page' or 'turn this URL into markdown', and also when they say 'use the skill web-to-markdown' or 'use a skill web-to-markdown'. Not for local HTML, PDFs, summaries, or general browser automation."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 19,
+      "evidence": "If content is missing, choose a selector known to contain the article using --wait-for '<selector>'; if DOM is present but content renders later, use a bounded --wait-ms.",
+      "fix": "Make the default path one command: retry once with --wait-until domcontentloaded --wait-ms 2000 --wait-for 'main', and change the selector only when the page has no main element. Keep the live-connection explanation and the pointer to web2md --help."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/evals.json",
+      "line": 1,
+      "evidence": "\"assertions\":[\"Recognizes explicit invocation\",\"Uses web2md URL with --out ./guide.md\",\"Includes non-empty output validation\"]",
+      "fix": "Rewrite assertions so a grader can check them from the run: the command is web2md 'https://example.com/guide' --out ./guide.md, the result is checked for the page title and main content rather than only a non-empty file, and login, consent or navigation-only output is rejected. Add one eval for a missing web2md (point at the Installation section of https://github.com/leonardocouy/web2md, invent no path) and one for a login wall (--interactive only with an attached terminal, otherwise a dedicated --user-data-dir or a reported blocker)."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/web-to-markdown/evals/trigger-queries.json",
+      "line": 9,
+      "evidence": "{\"query\":\"Use skill web-to-markdown extract clean Markdown\",\"should_trigger\":true}",
+      "fix": "Replace the two abbreviated positives with full realistic prompts that still name the skill, and add near-miss negatives: a request to summarize a URL with WebFetch, and a request to drive a page with Playwright, neither using the invocation phrase."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 19,
+      "evidence": "confirm the requested page title and substantive main content are present, and reject login, consent, error, or navigation-only output.",
+      "fix": "Add a short check the agent can apply: frontmatter title matches the requested page, the body has article text beyond the title and nav, and a login form, cookie banner, error status or link list with no article is a failed extraction. Then follow the existing retry-once path."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 169,
+      "evidence": "- `--no-sandbox`: Disable sandbox (sometimes required in containers/CI)",
+      "fix": "Change the README bullet to match SKILL.md: never pass --no-sandbox unless the user explicitly authorizes an isolated environment where Chromium's sandbox is unavailable. Leave the Credits section unchanged."
+    }
+  ]
+}

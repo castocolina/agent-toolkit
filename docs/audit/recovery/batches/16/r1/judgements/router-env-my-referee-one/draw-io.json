@@ -1,0 +1,95 @@
+{
+  "skill": "draw-io",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 8
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": null,
+      "evidence": "Previous-version digest dbff837f: removed units (325, showing 40).",
+      "fix": "Provide the complete removal digest so the remaining units can be checked against current destinations and docs/audit/recovery/draw-io/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": null,
+      "evidence": "Previous-version digest 5ac41b9a6037dd7a1c3da2f7816975da7b22d717: removed units (95, showing 40).",
+      "fix": "Provide the complete removal digest so the remaining units can be checked against current destinations and docs/audit/recovery/draw-io/record.md."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/draw-io/scripts/find_aws_icon.py",
+      "line": 23,
+      "evidence": "Every icon starting with group_ gets shape=mxgraph.aws4.group; references/aws-icons.md says the Auto Scaling group uses shape=mxgraph.aws4.groupCenter.",
+      "fix": "Return the palette-correct groupCenter style for group_auto_scaling_group, add a script test for that branch, and keep the catalog and SKILL.md lookup guidance consistent."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 20,
+      "evidence": "The compressed-input command writes to the fixed path in.tmp.drawio before moving it over the original.",
+      "fix": "Create a unique temporary file beside the input, refuse collisions, validate the decoded output, and clean up only the temporary file created by this run before replacing the original."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 20,
+      "evidence": "The decode command requires `timeout 120`, while the export instructions also support macOS `gtimeout`.",
+      "fix": "Select timeout or gtimeout for decoding as the export script does, and explain the missing-tool fallback without changing the original file."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 141,
+      "evidence": "For any named or CJK font, the prescribed check is `fc-list | grep -i \"Noto Sans JP\"`.",
+      "fix": "Check the font actually selected for the diagram, and provide a platform-appropriate fallback when fontconfig is unavailable."
+    },
+    {
+      "id": "D8-5",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": 28,
+      "evidence": "The workflow says to export and visually inspect a PNG and to 'Stop only when every item passes', even for XML-only requests or when drawio is unavailable.",
+      "fix": "Make export and visual inspection conditional on the requested deliverable and available tooling; for XML-only or unavailable-export cases, validate what is possible and disclose that rendering was not checked."
+    }
+  ]
+}

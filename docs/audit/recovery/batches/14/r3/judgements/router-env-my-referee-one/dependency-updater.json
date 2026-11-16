@@ -1,0 +1,77 @@
+{
+  "skill": "dependency-updater",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 9
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": null,
+      "evidence": "Previous-version digest at dbff837f: removed units (89, showing 40).",
+      "fix": "Provide the complete digest and review the omitted removal items against the current files and recovery record."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/dependency-updater/evals/evals.json",
+      "line": 75,
+      "evidence": "The unattended-candidate-scan prompt asks to run a scan, but its expected output is 'A plan, since the model cannot run commands'.",
+      "fix": "Make the expected behavior conditional on tool availability: assert execution and reported JSON when commands are available, and a clearly identified plan or blocker otherwise."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 33,
+      "evidence": "The scoped write example runs 'taze major --write --include pkg1,pkg2' on the project, while references/node.md says taze may choose a version different from the approved target.",
+      "fix": "Default to editing approved exact targets directly, or run taze in a disposable worktree and copy only entries matching the approved package, workspace path and target map. Resolve with the owning manager and check the complete diff before accepting it."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 14,
+      "evidence": "'Dependencies pinned to an exact version stay unchanged' gives no Go-specific qualification, while README.md says a go.mod requirement is a minimum-version-selection requirement and is a deliberate pin only when identified as such.",
+      "fix": "Distinguish Go minimum requirements from deliberate exact pins in the main procedure and route uncertain cases to user confirmation, consistent with README.md."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/dependency-updater/references/node.md",
+      "line": 7,
+      "evidence": "The candidate-discovery example runs only 'taze'; the same file states plain taze reports bumps inside existing manifest ranges, whereas 'taze major' includes major updates.",
+      "fix": "For an unrestricted outdated-package scan, inspect the installed taze help and use an appropriate non-writing mode that includes out-of-range candidates; retain plain taze for an explicitly in-range-only request."
+    }
+  ]
+}

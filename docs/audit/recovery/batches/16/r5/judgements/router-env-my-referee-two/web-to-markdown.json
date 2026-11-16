@@ -1,0 +1,140 @@
+{
+  "skill": "web-to-markdown",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 13,
+    "D4": 11,
+    "D5": 15,
+    "D6": 12,
+    "D7": 11,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 104,
+  "max_total": 125,
+  "percent": 83.2,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 21,
+      "evidence": "See `web2md --help` for supported options.",
+      "fix": "The flag catalog is generic once the CLI is present: keep the one-line pointer to `web2md --help` and record the catalog as redundant, or move a short flag table users ask for by name into references/."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/evals.json",
+      "line": 1,
+      "evidence": "The skill web-to-markdown is not invoked and produces no response",
+      "fix": "The implicit-gate case tests a phrase the description already refuses, so it earns no D7 credit. Tie it to a conversion the skill actually performs, or remove it and add a record row."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 25,
+      "evidence": "If content is missing, rerun once with `--wait-until domcontentloaded --wait-ms 2000`",
+      "fix": "Before step 5, ask: is the failure a timeout, a login or consent wall, or a present DOM with a thin body? Use the one readiness retry only for the first and the third; for a wall, stop and use the dedicated-profile path instead of waiting."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 163,
+      "evidence": "- `--no-sandbox`: Disable sandbox (sometimes required in containers/CI)",
+      "fix": "In Advanced Options, state that `--no-sandbox` also passes `--disable-setuid-sandbox` and must not be the default: untrusted page JavaScript then runs unsandboxed. Point container users at the upstream install note and keep the SKILL.md rule that only an explicit isolated environment may use it."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 3,
+      "evidence": "Use only when the user explicitly says 'use the skill web-to-markdown' or 'use a skill web-to-markdown'; never for implicit requests.",
+      "fix": "Convert http(s) webpage URLs, including JS-rendered pages and batches, to clean Markdown with the locally installed web2md CLI (Puppeteer, Chromium, Readability, Turndown). Use when the user asks to save, archive or print a page as Markdown, even without naming web2md, and also when they say 'use the skill web-to-markdown' or 'use a skill web-to-markdown'. Not for local HTML, PDFs, summaries, or general browser automation."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 24,
+      "evidence": "confirm that substantive main content is present and that the page is the requested one",
+      "fix": "Replace the open-ended content check with a pass rule: keep the result only when it has a heading plus several sentences of body and is not a login, consent, error or navigation-only page; otherwise run the one readiness retry, then report the blocker."
+    },
+    {
+      "id": "D6-2",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 157,
+      "evidence": "- `--wait-until <event>`: Wait for `load`, `domcontentloaded`, `networkidle0`, or `networkidle2` (default: `networkidle2`)",
+      "fix": "State the default as `networkidle2` and name `domcontentloaded` as the only alternative for pages that keep connections open. Leave the other two events to `web2md --help`."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/trigger-queries.json",
+      "line": 11,
+      "evidence": "Convert URL with WebFetch, no skill",
+      "fix": "Replace the terse or self-labeled negatives with realistic near-misses, such as a request to summarize a URL, extract a local HTML file, or drive a login click with no Markdown conversion, and keep the 10 should-trigger queries."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/evals.json",
+      "line": 1,
+      "evidence": "Validates the saved file: it is non-empty and holds substantive main content of the requested page, not only navigation",
+      "fix": "Change the explicit-convert assertion to the step 5 rule: reject login, consent, error and navigation-only output, and do not require a non-empty file check the procedure no longer uses. Add one eval for several URLs with one output file, where the agent must ask before writing."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 90,
+      "evidence": "mkdir -p ./output\nweb2md 'https://example.com/article' --out ./output/",
+      "fix": "Remove the `mkdir -p` lines from the auto-name, interactive and batch examples. The CLI creates the parent directory itself; say that, and keep the trailing-slash `--out` form as the way to auto-name."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 19,
+      "evidence": "Check `command -v web2md`. If missing, point the user to the Installation section",
+      "fix": "Split the two blockers: if `command -v web2md` is empty, point to the Installation section and stop; there is no CLI stderr to copy. Copy stderr only when the binary runs and reports that Chrome was not found, and then tell the user to pass `--chrome-path`."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/README.md",
+      "line": 168,
+      "evidence": "- **YAML Frontmatter** (on by default; `--no-frontmatter` omits it): `title`, `url`, `fetched_at`, `site_name`, `byline`, `lang`, `excerpt`",
+      "fix": "Move the frontmatter field list and the networkidle2 definition behind the existing `web2md --help` and Puppeteer lifecycle pointers, with the source URL and the 2026-11-15 check date kept beside each pointer, so a CLI or Puppeteer release cannot leave a hardcoded value stale."
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "skill": "dependency-updater",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 14,
+    "D4": 15,
+    "D5": 13,
+    "D6": 13,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 113,
+  "max_total": 125,
+  "percent": 90.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/dependency-updater/README.md",
+      "line": 78,
+      "evidence": "The skill automatically identifies your project by scanning for common package files: package.json, requirements.txt, go.mod, Cargo.toml, Gemfile, pom.xml, *.csproj",
+      "fix": "README is repository-required, so keep it, but this detection list restates what the model produces unprompted and contradicts SKILL.md step 1 ('never infer ownership from file presence alone'). Replace it with the lockfile-ownership rule and record the generic list in docs/audit/recovery/dependency-updater/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/dependency-updater/README.md",
+      "line": 217,
+      "evidence": "Use version ranges appropriately - ^ for active libraries, ~ for stable ones, exact for critical dependencies",
+      "fix": "The JSON range recipe and the Do/Avoid slogans are generic npm advice. Move the recipe to references/ only if users ask for an npm range template; otherwise delete it and add a record row. Do not touch the ## Credits section."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 19,
+      "evidence": "NEVER run a write-mode taze without --include: a mode without it rewrites every package it reaches",
+      "fix": "The NEVER list and failure modes are expert-grade. Add one Go gotcha next to step 2: a go.mod requirement is a minimum, not a pin, so treating every requirement as frozen skips upgrades the user never pinned (https://go.dev/ref/mod#minimal-version-selection, already cited)."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/dependency-updater/README.md",
+      "line": 236,
+      "evidence": "rm -rf node_modules package-lock.json / npm cache clean --force / npm install",
+      "fix": "Keep the destructive recipes behind the existing warning, but gate them: 'Load README Emergency Fixes only after explain/tree diagnosis, explicit approval and a snapshot; do not load them while planning a normal update.' Record any recipe you drop."
+    },
+    {
+      "id": "D5-2",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 32,
+      "evidence": "The default scoped write is editing the approved exact targets directly in the manifest. The alternative taze major --write --include ... runs only in a disposable copy",
+      "fix": "SKILL.md repeats the full taze write recipe that references/node.md already gives. Keep the default-versus-alternative choice and the load condition here; move the flag list so it is read only from node.md when a Node manifest is in scope."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 32,
+      "evidence": "The default scoped write is editing the approved exact targets directly in the manifest. The alternative `taze major --write --include pkg1,pkg2 ...` runs only in a disposable copy",
+      "fix": "Make the manifest edit the only write path and demote the taze write to one sentence: use it only when the user asks for taze to write, and then only inside a disposable copy. Two equal write paths for a lockfile mutation is the fragile case."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/dependency-updater/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "{\"query\":\"Add a new React component library to package.json and implement a button.\",\"should_trigger\":false}",
+      "fix": "Add near-miss negatives the description could false-trigger: bumping the Node runtime, editing a Renovate config that mentions dependency updates, and publishing a package after a version bump. The current negatives are mostly unrelated."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/dependency-updater/evals/evals.json",
+      "line": 1,
+      "evidence": "expected_output: A plan, since the model cannot run commands",
+      "fix": "The five evals have realistic prompts, fixtures and verifiable assertions, and tests/skills/dependency-updater smoke-tests both scripts. Add one Go eval whose assertion is that an unmarked go.mod requirement is not skipped as a pin, so the MVS rule is graded."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/dependency-updater/SKILL.md",
+      "line": 32,
+      "evidence": "compare its diff with the approved package, workspace path and target map, copy only the matching entries to the real manifest, then resolve with the owning manager",
+      "fix": "State the mismatch branch: if the disposable diff contains a package, workspace path or target not on the approved map, copy nothing, show the extra entries and stop. The current text tells the agent to copy matches and does not say what to do with the rest."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/dependency-updater/references/node.md",
+      "line": 25,
+      "evidence": "Side effects: --write also updates GitHub Actions versions in .github/workflows and the Node.js version in .nvmrc, .node-version and devEngines.runtime. Keep the write to the manifest with --no-github-actions --no-node-version (or --include)",
+      "fix": "Delete '(or --include)'. The same file says --include limits packages, not those side files, and SKILL.md requires both flags together. Keep the dated taze README URL."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/dependency-updater/README.md",
+      "line": 270,
+      "evidence": "Originally from softaworks/agent-toolkit by @leonardocouy.",
+      "fix": "Keep the credit. The registry row credits only 'softaworks/agent-toolkit'; add @leonardocouy to that row in docs/audit/upstream-sources.json. Do not shorten or remove the Credits section."
+    }
+  ]
+}

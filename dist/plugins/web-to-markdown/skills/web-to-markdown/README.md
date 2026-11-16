@@ -48,16 +48,11 @@ This approach handles modern single-page applications and JavaScript-rendered co
 
 ## Prerequisites
 
-The `web2md` CLI tool must be installed. The skill will check for it and provide installation instructions if needed:
-
-```bash
-cd ~/workspace/softaworks/projects/web2md
-npm install
-npm run build
-npm link
-```
+The `web2md` CLI tool must be installed. The skill checks for it and, if it is missing, points to the install instructions. Follow the Installation section of https://github.com/leonardocouy/web2md (package `@leoflores/web2md`, Node.js >= 20; checked 2026-11-15) with the package manager you prefer.
 
 ## Usage Examples
+
+The commands below are the plain `web2md` invocations. When the agent runs them through this skill it stages file output: it passes `--out` a unique temporary file reserved beside the requested file with `mktemp`, validates the result (SKILL.md step 5), and moves it onto the requested name only after any required overwrite authorization.
 
 ### Basic Conversion
 
@@ -80,9 +75,8 @@ Convert a URL and let the tool name the file based on page title:
 use the skill web-to-markdown to convert https://example.com/article and save to ./output/
 ```
 
-This creates a directory and auto-names the file:
+The CLI creates the parent directory itself (`src/cli.ts` of https://github.com/leonardocouy/web2md, checked 2026-11-15) and auto-names the file from the page title:
 ```bash
-mkdir -p ./output
 web2md 'https://example.com/article' --out ./output/
 ```
 
@@ -113,7 +107,7 @@ mkdir -p ./tmp/web2md-profile
 web2md 'https://example.com/protected-article' --interactive --user-data-dir ./tmp/web2md-profile --out ./output/
 ```
 
-The browser window will appear, allowing you to complete login or verification, then press Enter to continue.
+The browser window will appear, allowing you to complete login or verification, then press Enter to continue. The CLI creates `./output/` itself.
 
 ### Batch Conversion
 
@@ -127,9 +121,8 @@ use the skill web-to-markdown to convert these URLs:
 Save them to ./articles/
 ```
 
-This will create the directory and run separate commands for each URL:
+This will run separate commands for each URL; the CLI creates `./articles/` itself (`src/cli.ts`, checked 2026-11-15). Page titles can repeat, so the skill checks for two pages resolving to the same auto-named path before writing:
 ```bash
-mkdir -p ./articles
 web2md 'https://example.com/article1' --out ./articles/
 web2md 'https://example.com/article2' --out ./articles/
 web2md 'https://example.com/article3' --out ./articles/
@@ -146,7 +139,7 @@ Wait for the main selector to appear
 
 This will run:
 ```bash
-web2md 'https://app.example.com/dashboard' --wait-until domcontentloaded --wait-for 'main' --out ./dashboard.md
+web2md 'https://app.example.com/dashboard' --wait-until domcontentloaded --wait-for 'main' --print
 ```
 
 ## Advanced Options
@@ -155,18 +148,18 @@ The skill supports various options to handle tricky pages:
 
 - `--chrome-path <path>`: Specify Chrome/Chromium location if auto-detection fails
 - `--interactive`: Show browser and pause for manual intervention
-- `--wait-until <event>`: Wait for `load`, `domcontentloaded`, `networkidle0`, or `networkidle2` (default: `networkidle2`)
+- `--wait-until <event>`: Wait for `load`, `domcontentloaded`, `networkidle0`, or `networkidle2`; `web2md --help` shows the live default, and the Puppeteer lifecycle page defines each event, including `networkidle2` (checked 2026-11-15: https://github.com/leonardocouy/web2md src/cli.ts, https://pptr.dev/api/puppeteer.puppeteerlifecycleevent)
 - `--wait-for '<selector>'`: Wait for specific CSS selector to appear
 - `--wait-ms <milliseconds>`: Additional wait time in milliseconds
 - `--headful`: Show browser window (useful for debugging)
-- `--no-sandbox`: Disable sandbox (sometimes required in containers/CI)
+- `--no-sandbox`: Disable Chromium's sandbox, including the setuid sandbox (sometimes required in containers/CI). Never the default: untrusted page JavaScript then runs unsandboxed, so only an explicit isolated environment may use it (the same rule as in SKILL.md; flags checked 2026-11-15, source: src/lib/render.ts of https://github.com/leonardocouy/web2md and https://pptr.dev/troubleshooting)
 - `--user-data-dir <dir>`: Use persistent browser profile (for sessions/logins)
 
 ## Output Format
 
 The generated Markdown includes:
 
-- **YAML Frontmatter** (optional): Title, author, publication date, URL, excerpt
+- **YAML Frontmatter** (on by default; `--no-frontmatter` omits it): run `web2md --help` for the options and see src/lib/frontmatter.ts of https://github.com/leonardocouy/web2md for the field list (checked 2026-11-15)
 - **Main Content**: Article text with preserved formatting
 - **Clean Links**: Properly formatted Markdown links
 - **Images**: Preserved with alt text and captions where available
@@ -184,7 +177,7 @@ The generated Markdown includes:
 - Install Chrome/Chromium or specify path with `--chrome-path`
 
 **Page content incomplete:**
-- Try `--wait-until networkidle2` (waits for network to settle)
+- Try `--wait-until networkidle2` (what it waits for is defined on the Puppeteer lifecycle page linked under Advanced Options)
 - Use `--wait-for '<selector>'` to wait for specific elements
 - Add `--wait-ms 2000` for additional delay
 
@@ -202,3 +195,9 @@ Current version: 0.1.0
 ## Related Tools
 
 For simpler use cases without JavaScript, consider using Claude Code's built-in `WebFetch` tool instead.
+
+## Credits
+
+Adapted from the `claude/web-to-markdown` skill of [leonardocouy/web2md](https://github.com/leonardocouy/web2md) (MIT) by Leonardo Flores (@leonardocouy), through [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit). The `web2md` CLI it drives is that repository's tool, published as `@leoflores/web2md`.
+
+Documentation owners credited (official pages listed in `docs/audit/upstream-sources.json`, checked 2026-11-15): Puppeteer (navigation wait events, sandbox troubleshooting), Anthropic (Claude Code tools reference).

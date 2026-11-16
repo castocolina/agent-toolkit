@@ -1,0 +1,86 @@
+{
+  "skill": "codebase-pattern-finder",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 11,
+      "evidence": "Quote code you did not read in this run, or invent a test when none exists: unverified quotes get copied into new code.",
+      "fix": "Keep the verbatim-quote rule; drop only the reason clause, which restates what the model already knows about copying unverified code, and record that removal in docs/audit/recovery/codebase-pattern-finder/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 31,
+      "evidence": "When examples differ, describe the observed differences factually (for instance offset versus cursor pagination); do not say which is better.",
+      "fix": "The Never list already forbids ranking; delete this restatement, or move the offset-versus-cursor illustration into a bundled skill's references/ if callers ask for a pagination example, and record the removal."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 16,
+      "evidence": "Cover the requested pattern types (feature, structural, integration, testing); if none is named, search one feature pattern plus Testing Patterns only.",
+      "fix": "The four types are named but never defined, so the search order is a checklist without a decision rule. Add one line that says how to tell them apart (feature = same behavior, structural = same file or type shape, integration = a call across a boundary, testing = the tests of that candidate) before the anchor search."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 11,
+      "evidence": "Recommend, rank or call a pattern \"preferred\", \"better\" or \"optimal\": the caller decides, and an agent's guess would be mistaken for a repository convention.",
+      "fix": "The first Never bullet already gives the reason; the next three bullets (critique, unread quotes, reformatting) state the prohibition without a why. Add one clause each: a critique gets copied as a house rule, an unread quote becomes new code, a reformatted snippet is mistaken for the file's style."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 18,
+      "evidence": "Show at most three approaches in file-path order (not by merit); list any further distinct approaches by `file:line` under \"Additional approaches\" without expanding or ranking them. Expand everything only if the caller asks for exhaustive coverage.",
+      "fix": "\"Materially distinct\" and the three-approach cap are two controls on the same choice. Keep the cap as the default and say a variant is distinct only when its control flow or data shape differs, not when only names differ."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/codebase-pattern-finder.md",
+      "line": 19,
+      "evidence": "If still nothing, write one line per pattern type: \"No match for <pattern type> in <scope searched>\", placed under that pattern type's `## Pattern Examples` heading as its only content (omit the other sections for it).",
+      "fix": "That branch never says what to do with the other requested types that did match, and step 1's single-request testing case has no `## Pattern Examples` heading to put the line under. Say: emit the no-match line only for the types that failed, keep the matched types in the normal skeleton, and for a testing-only request put the line under `## Pattern Examples: Testing` with `### Testing Patterns` as its only subsection."
+    }
+  ]
+}

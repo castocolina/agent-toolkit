@@ -27,6 +27,21 @@
       ]
     },
     {
+      "id": "aws-vpc-subnets",
+      "prompt": "Use the supplied `find_aws_icon.py` results fixture to write draw.io XML for an AWS architecture: inside the AWS Cloud a VPC with a public subnet holding an Application Load Balancer and a private subnet holding an Amazon ECS service and an Amazon EBS volume. Light page, Noto Sans JP. Give the XML only; do not claim it was exported.",
+      "expected_output": "Draw.io XML where the VPC and AWS Cloud are group cells with the palette group icons, the two subnets are security-group-icon groups with the public (green) and private (teal) colors instead of an invented subnet icon, the services are children of their subnets, and the EBS icon is flagged as unverified instead of pasted as a verified style.",
+      "assertions": [
+        "Draws the public and private subnets as `shape=mxgraph.aws4.group` cells with `grIcon=mxgraph.aws4.group_security_group;grStroke=0`, public with `strokeColor=#7AA116;fillColor=#F2F6E8` and private with `strokeColor=#00A4A6;fillColor=#E6F6F7`, and does not use `group_public_subnet` or `group_private_subnet`.",
+        "Uses `grIcon=mxgraph.aws4.group_vpc2` for the VPC and `grIcon=mxgraph.aws4.group_aws_cloud` for the AWS Cloud, not `group_vpc`.",
+        "Flags the Amazon EBS row as `[unverified]` (not in the draw.io palette or shape index) and says to look the icon up live in the shape index or draw.io's shape search before using it, instead of presenting `mxgraph.aws4.ebs` as a verified style.",
+        "Uses the fixture `resIcon` identifiers for the Application Load Balancer and Amazon ECS, and gives each service cell its subnet as `parent` with coordinates relative to that subnet.",
+        "Sets `fontFamily=Noto Sans JP` in the style of every text-bearing cell, a light `background`, and does not claim the diagram was exported."
+      ],
+      "files": [
+        "evals/files/aws-vpc-icon-results.txt"
+      ]
+    },
+    {
       "id": "layout-overlap-fix",
       "prompt": "My draw.io diagram (evals/files/broken-group.drawio) has a frame around a group, but moving the frame leaves its services behind and the connector labels are hidden. Fix the XML and tell me how to verify it.",
       "expected_output": "Corrected XML where ecs and rds are children of the subnet frame with coordinates converted to frame-relative values, the edges moved after the vertices with e-https parented to the page, and a re-export plus visual PNG check.",

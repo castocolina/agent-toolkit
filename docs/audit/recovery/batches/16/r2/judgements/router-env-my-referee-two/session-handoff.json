@@ -1,0 +1,104 @@
+{
+  "skill": "session-handoff",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 13,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 14,
+      "evidence": "A handoff is a markdown file in `<project>/.claude/handoffs/` named `YYYY-MM-DD-HHMMSS-<slug>.md` that lets a fresh agent continue without rediscovering context.",
+      "fix": "Drop the opening definition sentence (the model already knows a handoff file is a context transfer) and keep the filename rule, the `$SKILL_DIR` invocation rule and the `--help`/`--json` contract; record the sentence in docs/audit/recovery/session-handoff/record.md."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 74,
+      "evidence": "The scanner only matches quoted assignments (`api_key = \"...\"`), any `scheme://user:password@` URL ... Unquoted assignments pass as clean, so check them by hand",
+      "fix": "Add the two scanner misses the agent will not infer: (1) a URL password containing `/` is not flagged (`user:p/ass@host` never reaches `@`); (2) Slack `xox[baprs]-` requires a hyphen immediately after the prefix, so a real `xoxc-` token is not flagged. Keep the existing unquoted-assignment warning."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/session-handoff/references/handoff-template.md",
+      "line": 5,
+      "evidence": "## Table of Contents",
+      "fix": "Delete the Table of Contents (lines 5-25). The template is one short file loaded only when a section's purpose is unclear; the heading list adds a second copy of headings the agent is about to read. Record the removal."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 55,
+      "evidence": "`git cat-file -e '<baseline>^{commit}'` checks the commit exists; if it is gone (a different clone, a pruned or rewritten history), find the old tip with `git reflog` or ask the user.",
+      "fix": "Split the two causes the skill already names: a different clone has no reflog for that commit, so ask the user for the old tip; use `git reflog` only when this checkout's history was pruned or rewritten. Apply the same split to the Baseline ancestry diverged bullet."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/session-handoff/evals/evals.json",
+      "line": 5,
+      "evidence": "\"assertions\":[\"Includes a command using `scripts/create_handoff.py` with a task slug.\"",
+      "fix": "Change the four command assertions that require a bare `scripts/<name>.py` path so they accept `python3 \"$SKILL_DIR/scripts/<name>.py\"`, the form SKILL.md line 14 says is the one that resolves. Keep asserting the script name, slug, and validate-until-READY behavior."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/session-handoff/evals/trigger-queries.json",
+      "line": 14,
+      "evidence": "{\"query\":\"Fix typo in handoff documentation\",\"should_trigger\":false}",
+      "fix": "Replace that negative with a near-miss that shares the domain but is out of scope, for example editing the handoff template inside this repository rather than saving a coding session. Keep the other negatives."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 38,
+      "evidence": "So missing files and deleted recommended headings alone can reach NEEDS_WORK: 4 missing files plus all 6 headings deleted scores 68.",
+      "fix": "State the interaction the arithmetic hides: a missing required section is also a missing recommended section, so the penalties stack (one required heading gone is -10 and -2). Note that files_missing in --json is capped at 5, so a longer missing list is not the full penalty set."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/session-handoff/SKILL.md",
+      "line": 68,
+      "evidence": "Referenced files resolve against the project root and the handoff's directory only.",
+      "fix": "Say that a chain link written as `./<file>.md` is stored with the `./` and reported missing even when the predecessor sits in the handoff directory (validate_handoff.py extract_file_references; test_deleted_predecessor_link_is_reported_by_validation_and_staleness). Tell the agent to strip a leading `./` before treating the warning as a real missing file."
+    }
+  ]
+}

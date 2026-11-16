@@ -34,3 +34,7 @@ Script tests live in [tests/skills/session-handoff](https://github.com/castocoli
 ```bash
 python3 -m unittest discover -s tests/skills/session-handoff -p 'test_*.py'
 ```
+
+Facts checked against documentation by GitHub (token prefixes), Slack (token prefixes), the Python Software Foundation (Python 3.10 union types) and the Git project (`git status`, `git merge-base`, `git branch`), 2026-11-15.
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.

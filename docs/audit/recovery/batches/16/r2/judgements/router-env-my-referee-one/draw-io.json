@@ -1,0 +1,77 @@
+{
+  "skill": "draw-io",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "high",
+      "file": "skills/draw-io/SKILL.md",
+      "line": null,
+      "evidence": "para:1c4cf640: XML showing a label inset 30px from a frame but still parented to the page. The s043 record explains replacement of the good example, not removal of this distinct bad example.",
+      "fix": "Restore the inset-but-ungrouped XML example in skills/draw-io/references/layout-guidelines.md, or add a valid item-specific explanation to docs/audit/recovery/draw-io/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": null,
+      "evidence": "The dbff837f digest reports 325 removed units but shows only 40.",
+      "fix": "Provide the complete digest so the remaining removals can be judged against the current files and recovery record."
+    },
+    {
+      "id": "D1-3",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/draw-io/SKILL.md",
+      "line": null,
+      "evidence": "The 5ac41b9a6037dd7a1c3da2f7816975da7b22d717 digest reports 97 removed units but shows only 40.",
+      "fix": "Provide the complete digest so the remaining removals can be judged against the current files and recovery record."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "line": 137,
+      "evidence": "The PNG validator checks for an IDAT chunk and its CRC but does not decompress or validate its image data, although it claims to accept only a complete PNG.",
+      "fix": "Validate the PNG image stream and structure with a suitable decoder before replacing the previous output, and add a regression test using CRC-valid but invalid IDAT data."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/draw-io/scripts/convert-drawio-to-png.sh",
+      "line": 182,
+      "evidence": "Under set -e, a failed `mv -f \"$work/out.png\" \"$png\"` exits the script immediately instead of recording the failure, continuing to the next input and emitting the documented JSON results.",
+      "fix": "Handle a failed move as a per-file failure, retain the previous output, continue processing and emit its JSON result; add a test where the destination cannot be replaced."
+    }
+  ]
+}

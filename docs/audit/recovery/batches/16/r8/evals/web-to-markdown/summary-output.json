@@ -1,0 +1,49 @@
+{
+  "skill": "web-to-markdown",
+  "mode": "output",
+  "pass_rate": 0.8261,
+  "passed": 38,
+  "total": 46,
+  "failures": [
+    {
+      "eval": "explicit-convert",
+      "assertion": "Runs the command shape web2md 'https://example.com/guide' --out ./guide.md.web2md-tmp (a temporary path beside the requested ./guide.md, not the final path), with the URL and the output path as separate quoted arguments and no string interpolation, then validates the temporary file and publishes it as ./guide.md",
+      "evidence": "The output uses \u201cweb2md 'https://example.com/guide' --out \"$tmp\"\u201d, interpolating a variable rather than supplying the required literal quoted temporary path."
+    },
+    {
+      "eval": "explicit-convert",
+      "assertion": "Confirms page identity: the title matches when one is available, otherwise the URL's host and the visible heading are checked",
+      "evidence": "The output says to verify that \u201cits title, URL, and substantive body identify the requested guide,\u201d but does not specify title matching or the host-and-visible-heading fallback."
+    },
+    {
+      "eval": "explicit-convert",
+      "assertion": "Applies the pass rule before keeping the result: a heading plus several sentences of body that is not a login, consent, error or navigation-only page; rejects login, consent, error and navigation-only output instead of reporting it as the page",
+      "evidence": "Although the output excludes \u201ca login page, consent wall, error, or navigation-only output,\u201d it never requires a heading plus several sentences of body before publication."
+    },
+    {
+      "eval": "heavy-app-never-idle",
+      "assertion": "Explains that persistent network activity beyond the idle threshold can keep the default networkidle2 from settling, without claiming it never settles",
+      "evidence": "The output only says \"This avoids waiting for network idle and allows a bounded two seconds for rendering,\" without explaining how persistent network activity can prevent the default networkidle2 threshold from being reached."
+    },
+    {
+      "eval": "chrome-not-found",
+      "assertion": "Copies the CLI's stderr message about Chrome not being found into the report",
+      "evidence": "The output says \"The exact stderr text was not provided, so I cannot reproduce it verbatim\" rather than copying the CLI's stderr message."
+    },
+    {
+      "eval": "chrome-not-found",
+      "assertion": "Stops without retrying and without another browser automation stack",
+      "evidence": "Instead of stopping after the blocker and flag guidance, the output proposes another invocation: \"web2md 'https://example.com/docs' --print --chrome-path \\\"$CHROME_PATH\\\"\"."
+    },
+    {
+      "eval": "several-urls-one-file",
+      "assertion": "Notes that a directory path means one file per URL",
+      "evidence": "The output offers \u201cseparate files in a directory\u201d but does not explicitly explain that a directory path means one file per URL."
+    },
+    {
+      "eval": "login-or-consent-wall",
+      "assertion": "Points to the dedicated --user-data-dir path only if the user wants it, and does not reuse the user's daily browser profile or use --no-sandbox",
+      "evidence": "Although the output says, \u201cIf you want to proceed, approve a dedicated browser profile for authentication\u2014never your daily browser profile,\u201d it does not identify the dedicated --user-data-dir path."
+    }
+  ]
+}

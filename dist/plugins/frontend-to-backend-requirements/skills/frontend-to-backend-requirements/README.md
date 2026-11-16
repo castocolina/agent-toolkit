@@ -31,7 +31,7 @@ The skill guides you through documenting your requirements in a structured forma
 5. **Surfaces uncertainties** - Questions and assumptions that need clarification
 6. **Invites collaboration** - Opens discussion for backend input and pushback
 
-All output goes to `.claude/docs/ai/<feature-name>/backend-requirements.md` - no chat output.
+The document is saved to `.claude/docs/ai/<feature-name>/backend-requirements.md` by default; an explicitly requested destination or inline preview is honored, and brief chat confirmations and clarifying questions are fine.
 
 ## Key Features
 
@@ -146,3 +146,7 @@ Good collaboration = frontend describes the problem, backend proposes the soluti
 4. Note any decisions made
 
 The document becomes the source of truth for what was agreed.
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+Frontmatter limits (name, description) follow the [Agent Skills specification](https://agentskills.io/specification) (Agent Skills).

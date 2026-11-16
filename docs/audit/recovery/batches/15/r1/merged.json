@@ -1,0 +1,437 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "agent-md-refactor",
+      "percent": 91.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 93.6,
+        "router-env-my-referee-two": 89.6
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/agent-md-refactor/SKILL.md",
+          "line": null,
+          "evidence": "The dbff837f digest reports \"removed units (74, showing 40)\"; the other 34 removals cannot be checked individually from the supplied digest.",
+          "fix": "Provide the complete digest so every removed unit can be checked against its current destination or recovery-record row."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/agent-md-refactor/evals/evals.json",
+          "line": 1,
+          "evidence": "The bloated-guide and conflict prompts refer to instruction files but supply no input files; their assertions do not check preservation of specific source rules, scopes, and exceptions.",
+          "fix": "Add representative input fixtures and assertions that verify specific rules, scopes, exceptions, and conflict handling in the resulting files. Add more realistic contextual near-misses to the trigger queries."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/agent-md-refactor/SKILL.md",
+          "line": 19,
+          "evidence": "Step 3 keeps \"the package manager only when it is not npm,\" although the opening requires preserving instruction meaning and scope.",
+          "fix": "Keep an explicit npm instruction when it is a project-specific choice or override; remove it only when evidence establishes that it is redundant without changing behavior."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/agent-md-refactor/README.md",
+          "line": 31,
+          "evidence": "The README states that \"the Claude Code docs target under 200 lines per CLAUDE.md\" with a source URL but no date checked.",
+          "fix": "Add the date this vendor guidance was checked alongside the source, or direct readers to the live documentation for the current target."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/agent-md-refactor/SKILL.md",
+          "line": 1,
+          "evidence": "previous-version digest at dbff837f is a cut list (showing 40 of 74 removed units); every shown para id is a unit of a section in docs/audit/recovery/agent-md-refactor/sections.json and each of those sections has an allowed record row",
+          "fix": "No content restore: the shown units are covered by section rows. Replace the truncated digest with the full unit list, or add one record note that the unshown 34 units belong to the same section rows, so the cut is closed."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/agent-md-refactor/SKILL.md",
+          "line": 24,
+          "evidence": "Gotchas cover scope flattening, safety overrides, precedence reversal and .claude/rules launch loading, but not the harness-loading fact that an @path import loads eagerly and so does not cut context cost",
+          "fix": "Add one Gotcha: an @path import loads eagerly with the importing file, so it organises the file but does not cut its context cost; use a plain link with a read condition when the goal is progressive disclosure (the detail stays in references/harness-loading.md)."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/agent-md-refactor/evals/trigger-queries.json",
+          "line": 1,
+          "evidence": "Should-trigger query 'Please review this COPILOT.md for contradictory agent instructions before refactoring' uses a file the skill says Copilot does not read",
+          "fix": "Refactor existing bloated, conflicting, or repetitive AGENTS.md, CLAUDE.md, .github/copilot-instructions.md, and similar coding-agent instruction files into a minimal root plus focused, conditionally loaded topic documents. Use when instructions are too long, inconsistent, hard to maintain, or need progressive disclosure, even when asked to clean up agent config or to refactor a file named COPILOT.md. Not for READMEs, general developer documentation, or creating a new instruction system from scratch."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/agent-md-refactor/SKILL.md",
+          "line": 19,
+          "evidence": "Step 5 says to read references/harness-loading.md before choosing a location, but never says not to load references/templates.md for that decision",
+          "fix": "In step 5, add: read references/harness-loading.md before choosing where a topic file lives; do not load references/templates.md for that decision."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/agent-md-refactor/references/harness-loading.md",
+          "line": 12,
+          "evidence": "AGENTS.md is read by Claude Code only when no CLAUDE.md, .claude/CLAUDE.md or CLAUDE.local.md exists (v2.1.277 or later per the page)",
+          "fix": "Keep the verify-on-the-live-page instruction and drop the pinned version from the sentence the agent acts on, or add the date that exact version threshold was checked beside the URL already cited."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/agent-md-refactor/evals/evals.json",
+          "line": 1,
+          "evidence": "Four evals have realistic prompts and verifiable assertions, but no evals/files/ input and no assertion that a directory-scoped exception keeps its scope",
+          "fix": "Add evals/files/ with a short AGENTS.md fixture that includes a directory-scoped exception, and one assertion that the exception is not flattened into global guidance."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/agent-md-refactor/evals/trigger-queries.json",
+          "line": 1,
+          "evidence": "20 queries, 10 should-trigger and 10 should-not-trigger, but one positive still names COPILOT.md and the negatives are easy (README, standup, commit) rather than near-misses such as writing a new AGENTS.md from scratch",
+          "fix": "Replace the COPILOT.md query with a .github/copilot-instructions.md phrasing, and replace two easy negatives with near-misses: writing a new AGENTS.md where none exists, and editing a README section about agent instructions."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/agent-md-refactor/references/harness-loading.md",
+          "line": 12,
+          "evidence": "v2.1.277 or later is a version-sensitive fact; the page is cited and the reader is told to verify, but the pinned threshold has no date checked",
+          "fix": "Add the date that v2.1.277 was checked against https://code.claude.com/docs/en/memory, or replace the pinned version with the instruction to read the live page."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/agent-md-refactor/SKILL.md",
+          "line": 11,
+          "evidence": "When files are unavailable the agent must give candidate commands or topics without inventing contents, but the procedure does not say what to do when the user rejects that assumption and still supplies no file",
+          "fix": "Add the fallback: if the user rejects the unknown-instructions assumption and still provides no file, stop after naming the files to read and do not draft topic files."
+        }
+      ]
+    },
+    {
+      "name": "backend-to-frontend-handoff-docs",
+      "percent": 90.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-one": 89.6,
+        "router-env-my-referee-two": 90.4
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+          "line": 34,
+          "evidence": "The three NEVER instructions repeat the immediately preceding retry, optimistic UI, and omission/null guidance.",
+          "fix": "Consolidate each warning into its corresponding contract-decision bullet, preserving the conditions and rationale; record the removal of the duplicate paragraph."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+          "line": 14,
+          "evidence": "\u201cresolve discrepancies before writing\u201d does not say how to handle an unresolved conflict between sources.",
+          "fix": "Add a reconciliation step that identifies which source controls actual wire behavior, records conflicting evidence, and marks a claim unresolved when the conflict cannot be established."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+          "line": 34,
+          "evidence": "\u201cNEVER equate omitted and null fields without checking serializer semantics\u201d identifies a pitfall but does not explain the client failure it prevents.",
+          "fix": "Add a concise explanation that treating omission as null can accidentally clear a field or misstate update behavior, and point to tracing both request deserialization and update logic."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/backend-to-frontend-handoff-docs/evals/evals.json",
+          "line": 1,
+          "evidence": "The three output evals use supplied contract facts or missing facts; none supplies backend source files for the route-to-serializer tracing workflow.",
+          "fix": "Add a realistic backend fixture and assertions for traced auth, validation, serializer wire names, and error mapping; include a mismatch between DTO names and serialized fields."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+          "line": 23,
+          "evidence": "\u201cTrace the handler before documenting any endpoint\u201d and \u201cCheck every documented claim against the traced source\u201d conflict with line 12's prompt-grounded fallback when source access is unavailable.",
+          "fix": "Explicitly scope handler tracing and source verification to accessible implementations; for the fallback, verify claims against supplied facts and label the handoff unverified."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "high",
+          "file": "skills/backend-to-frontend-handoff-docs/README.md",
+          "line": 51,
+          "evidence": "The README says a simple CRUD handoff may contain only endpoint, method, and example JSON and that \u201cFrontend can infer the rest,\u201d whereas SKILL.md requires all confirmed integration facts even for simple CRUD.",
+          "fix": "Revise the shortcut and its example to match SKILL.md: allow a compact format but retain confirmed auth, status, errors, and constraints, and mark unknowns rather than inviting inference."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+          "line": 14,
+          "evidence": "Read serializers rather than copying DTO property names from memory.",
+          "fix": "Keep the serializer-versus-DTO rule (the model does not reliably do it); the only redundant token is 'from memory', which the model already treats as unreliable. Leave the rest of Trace before drafting as the domain sequence."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+          "line": 42,
+          "evidence": "Check every documented claim against the traced source.",
+          "fix": "Turn Final verification into a checkbox the agent marks per endpoint (omission/null, auth, each error, retry and transition, pagination, cache), so a multi-endpoint handoff cannot skip a claim."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+          "line": 32,
+          "evidence": "NEVER infer retry safety for mutations without implementation evidence. NEVER suggest optimistic UI for irreversible transitions without reconciliation. NEVER equate omitted and null fields without checking serializer semantics.",
+          "fix": "Add a short Gotchas list of environment facts the contract decisions do not cover: a 404 may hide a forbidden resource (RFC 9110), a 2xx timeout can still mean the mutation committed, and a message string is not a stable discriminator."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+          "line": 38,
+          "evidence": "if the repository has no `.claude/`, use `docs/handoffs/<feature>/api-handoff.md`.",
+          "fix": "Keep both destinations but state the check: look for a `.claude/` directory first and write there; use `docs/handoffs/` only when it is absent."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/backend-to-frontend-handoff-docs/evals/evals.json",
+          "line": 1,
+          "evidence": "\"expected_output\": \"A concise integration handoff that accurately documents business intent, endpoint contract, auth, validation, errors, finality, and useful frontend test cases.\"",
+          "fix": "Add one eval whose prompt supplies both an omitted field and a null field with different meanings, and assert the handoff records them as different; the three current cases never exercise omission-versus-null, retry or pagination."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/backend-to-frontend-handoff-docs/evals/trigger-queries.json",
+          "line": 8,
+          "evidence": "\"query\": \"Write the endpoint documentation the frontend team needs after the backend release.\", \"should_trigger\": true",
+          "fix": "Replace one generic should-trigger query with a prompt that never says handoff, contract or documentation, so the description's unnamed-domain case is actually tested."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/backend-to-frontend-handoff-docs/SKILL.md",
+          "line": 38,
+          "evidence": "For updates, increment a version only if the existing convention does so; inspect existing files first.",
+          "fix": "Name the files to inspect and the default: if `api-handoff.md` is the only file, edit it in place; write `api-handoff-v2.md` only when a versioned sibling already exists."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/backend-to-frontend-handoff-docs/references/api-handoff-template.md",
+          "line": 16,
+          "evidence": "Document the status code the handler actually returns for each failure. RFC 9110 names 422 Unprocessable Content ... and 409 Conflict",
+          "fix": "Move the RFC 422/409 reminder into the Errors bullet as a parenthetical, and keep the rule that the handler's actual status wins, so the note cannot be read as prescribing 422 or 409."
+        }
+      ]
+    },
+    {
+      "name": "frontend-to-backend-requirements",
+      "percent": 86.8,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-one": 88.0,
+        "router-env-my-referee-two": 85.6
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/frontend-to-backend-requirements/SKILL.md",
+          "line": 12,
+          "evidence": "\u201ccapture its purpose, audience/permissions, displayed information and relationships, user actions\u201d is mostly familiar requirements-gathering guidance, although later concurrency and authorization instructions add useful domain judgment.",
+          "fix": "Keep the requirements coverage, but supplement it with concrete lessons from real frontend/backend handoffs, such as how an ambiguous timeout affects retry and reconciliation requirements."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/frontend-to-backend-requirements/SKILL.md",
+          "line": null,
+          "evidence": "Previous-version digest at dbff837f: \u201cremoved units (44, showing 40)\u201d.",
+          "fix": "Inspect the four omitted digest items and restore any unexplained substantive content or add valid item rows to docs/audit/recovery/frontend-to-backend-requirements/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/frontend-to-backend-requirements/SKILL.md",
+          "line": 14,
+          "evidence": "\u201cdescribe what the user expects to happen\u201d and the outcomes for timeout, rejection, and concurrency identifies important cases but gives no worked procedure for translating one into a backend-facing requirement.",
+          "fix": "Add a short example tracing an action through expected outcome, timeout uncertainty, user feedback, and a non-prescriptive backend question."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/frontend-to-backend-requirements/SKILL.md",
+          "line": 26,
+          "evidence": "\u201cNEVER assume ordering, pagination, freshness, or authorization behavior without agreement. NEVER report an unknown action outcome as success.\u201d These specific warnings do not explain their failure modes or what to do instead.",
+          "fix": "Explain that unagreed guarantees can produce misleading UI and unknown outcomes may cause duplicate actions; instruct the writer to mark guarantees unresolved and ask how to reconcile an uncertain result."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/frontend-to-backend-requirements/evals/evals.json",
+          "line": 7,
+          "evidence": "The three output cases check ordinary requirements and some states, but none asserts the timeout/concurrent-change branch, preservation of an existing discussion log, or the default versus explicitly requested output destination.",
+          "fix": "Add realistic edge-case evals with verifiable assertions for uncertain action outcomes, existing discussion history, and destination or inline-preview overrides; add more context-rich trigger queries alongside the terse existing ones."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/frontend-to-backend-requirements/SKILL.md",
+          "line": 1,
+          "evidence": "dbff837f digest: removed units (44, showing 40). The record covers the SKILL.md sections those units belong to, but the cut list itself is reported as one finding.",
+          "fix": "No further restore: each shown unit sits in a recorded section (s016-s031). Keep this cut-list note; do not drop more to shorten the skill."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/frontend-to-backend-requirements/SKILL.md",
+          "line": 11,
+          "evidence": "Gather requirements restates the obvious capture list (purpose, audience, displayed information, actions, loading/empty/error/success) that the model already produces for a requirements brief; the non-obvious parts are the outcome and concurrency rules that follow.",
+          "fix": "Keep the non-obvious rules (unknown/rejected/conflict outcomes, server-side authorization, freshness/order asked rather than assumed). Move the generic capture checklist to templates/backend-requirements.md, which already has those fields, and add a row to docs/audit/recovery/frontend-to-backend-requirements/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/frontend-to-backend-requirements/SKILL.md",
+          "line": 7,
+          "evidence": "The body is a short process (gather, classify, write-and-check) but the decision of what to ask versus what to leave open is declared in one paragraph rather than a branch the agent follows.",
+          "fix": "Before Classify uncertainty, add three questions the agent answers per action: what the user must see to recognize completion, what the UI shows when the outcome is unknown or rejected, and which guarantee (order, freshness, authorization) is unstated. Keep the existing NEVER list."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/frontend-to-backend-requirements/SKILL.md",
+          "line": 27,
+          "evidence": "NEVER items name the failure (locking a poor API, happy-path-only lists, assumed guarantees, reporting unknown as success) but there is no Gotchas section for environment-specific facts.",
+          "fix": "Add a short Gotchas list grounded in this task: a disabled button is not authorization; a timeout is not success; pagination and sort are agreements, not UI defaults. Do not pad it with generic 'be careful' items."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/frontend-to-backend-requirements/SKILL.md",
+          "line": 3,
+          "evidence": "Description has WHAT, WHEN and a Not-for boundary, but keywords are thin: it never names the phrases 'backend requirements', 'API requirements', or 'what data do I need' that the old description and the README use as triggers.",
+          "fix": "Document frontend data needs, user actions, UI states, permissions, and unresolved business rules as a backend-requirements brief, without prescribing the API. Use when a team asks for backend requirements, API requirements, what data a screen needs, or what the backend should provide, even if they only describe a UI. Not for endpoint design, OpenAPI or JSON schemas, database tables, or implementing frontend or backend code."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/frontend-to-backend-requirements/SKILL.md",
+          "line": 31,
+          "evidence": "The template load is gated to the write step, but the instruction does not say to skip it when the user only wants a clarifying question or an inline preview of one screen.",
+          "fix": "Load templates/backend-requirements.md only when writing or updating the requirements file. Do not load it when answering a clarifying question or giving the brief chat confirmation the opening allows."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/frontend-to-backend-requirements/SKILL.md",
+          "line": 9,
+          "evidence": "The default path is clear, but 'honor an explicitly requested destination or inline preview' does not say which wins when the user asks for both a file and an inline preview.",
+          "fix": "Default to writing .claude/docs/ai/<feature>/backend-requirements.md. If the user asks for an inline preview and a file, write the file and then show the preview. If they ask for only a preview, do not create the file."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/frontend-to-backend-requirements/evals/evals.json",
+          "line": 1,
+          "evidence": "Three evals have realistic prompts and verifiable assertions, but none supplies an input file under evals/files/, and no eval checks the blocking-versus-provisional classification or the preserve-discussion-history rule.",
+          "fix": "Add evals/files/ with one existing requirements note that already has a Discussion Log, plus a fourth eval whose prompt updates that file and asserts the prior log line is kept and each unknown is marked blocking or safe provisional."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/frontend-to-backend-requirements/evals/trigger-queries.json",
+          "line": 1,
+          "evidence": "20 queries, 10 should-trigger and 10 should-not-trigger, with near-misses (OpenAPI, REST design, field names). Several positives name the skill almost verbatim ('document backend requirements', 'frontend data-needs brief'), so they do not test a non-obvious trigger.",
+          "fix": "Replace three explicit positives with prompts that describe a screen and ask what to tell backend, without saying 'requirements' or 'data needs', and keep the existing near-miss negatives."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/frontend-to-backend-requirements/SKILL.md",
+          "line": 31,
+          "evidence": "Write and check says to resolve feature identity from the request or repo and ask if ambiguous, but gives no fallback when the repo has several features and the user names none, and the checklist does not say what to do when a screen has no stated error outcome.",
+          "fix": "If the feature name is ambiguous, list the candidate screens you found and ask once; do not invent a path. On the pre-report check, any action with no rejected, timeout, or conflict outcome is explicitly unresolved, not silently marked success."
+        }
+      ]
+    }
+  ],
+  "needs_update": true
+}

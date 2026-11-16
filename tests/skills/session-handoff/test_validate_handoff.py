@@ -113,6 +113,30 @@ class ValidateHandoffTests(unittest.TestCase):
         for url in ("redis://cache:6379/0", "amqp://app@mq:5672/", "postgresql://app:<password>@db/x", "postgres://app:$DB_PASSWORD@db/x"):
             self.assertEqual(module.scan_for_secrets(url), [], url)
 
+    def test_secret_patterns_cover_current_github_slack_and_openai_style_prefixes(self):
+        import importlib.util, sys
+        sys.dont_write_bytecode = True
+        spec = importlib.util.spec_from_file_location("validate_handoff", SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        body = "Ab1Cd2Ef3Gh4Ij5Kl6Mn7Op8"  # fake body, 25 characters; keys are built from fragments at runtime
+        flagged = [
+            "gh" + "p_" + body, "gh" + "o_" + body, "gh" + "u_" + body, "gh" + "s_" + body, "gh" + "r_" + body,
+            "github" + "_pat_" + body + "_" + body,
+            "sk" + "-" + body, "sk" + "-proj-" + body + "_" + body, "sk" + "-ant-api03-" + body + "-" + body,
+            "xo" + "xb-" + "1234-5678-" + body, "xo" + "xp-" + "1234-5678-" + body,
+            "xo" + "xa-" + "1234-" + body, "xo" + "xr-" + "1234-" + body, "xo" + "xs-" + "1234-" + body,
+            "xa" + "pp-" + "1-A0123-" + body, "xw" + "fp-" + "1234-" + body, "xo" + "xe.xapp-" + "1-" + body,
+        ]
+        for key in flagged:
+            self.assertTrue(module.scan_for_secrets(f"Deploy note: {key} was pasted"), key[:8])
+        clean = [
+            "risk-assessment-for-the-billing-handoff", "ask-me-about-the-flask-deployment-later",
+            "ghp_short", "sk-short", "see github_pat_ in the docs", "the xapp- prefix",
+        ]
+        for text in clean:
+            self.assertEqual(module.scan_for_secrets(text), [], text)
+
     def test_blocks_pem_private_keys_with_or_without_type_prefix(self):
         for kind in ("", "ENCRYPTED ", "RSA ", "EC ", "OPENSSH "):
             with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:

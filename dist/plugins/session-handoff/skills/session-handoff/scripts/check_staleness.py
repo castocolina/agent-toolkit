@@ -289,7 +289,18 @@ def check_staleness(handoff_path: str) -> dict:
         if not metadata["created"] or not metadata["baseline_commit"] or changed_files is None:
             result["staleness_level"] = "UNKNOWN"
             result["recommendation"] = "Baseline metadata missing or comparison failed; verify project state manually"
-            result["issues"] = ["Missing timestamp/baseline commit or git comparison unavailable"]
+            # One issue per cause so SKILL.md can give a recovery branch for each.
+            issues = []
+            if not metadata["created"]:
+                issues.append("Missing timestamp: no 'Created: YYYY-MM-DD HH:MM:SS' line in the handoff")
+            if not metadata["baseline_commit"]:
+                issues.append("Missing baseline: no 'Baseline commit:' line in the handoff")
+            elif changed_files is None:
+                issues.append(f"Git comparison failed: baseline {metadata['baseline_commit']} could not be compared with HEAD (commit not found, or git diff/status failed)")
+            # Other missing metadata must not hide a divergence the git comparison did find.
+            if ancestry_diverged and changed_files is not None:
+                issues.append("Baseline ancestry diverged; verify rollback/divergence and review changed files")
+            result["issues"] = issues
             return result
 
         # Check if handoff's modified files still exist
@@ -393,6 +404,19 @@ def main():
   1  STALE
   2  VERY_STALE, UNKNOWN (no baseline, not a git repo, or baseline not an ancestor of HEAD),
      or handoff file not found (message on stderr)
+
+UNKNOWN causes, each named on the Issues line (--json: "issues"):
+  Missing timestamp           no "Created:" line
+  Missing baseline            no "Baseline commit:" line
+  Git comparison failed       the baseline is not a commit here, or git diff/status failed
+  Baseline ancestry diverged  the baseline exists but is not an ancestor of HEAD
+                              (--json: baseline_ancestry_diverged)
+  Project is not a git repository
+
+The report prints the changed-file count, at most 5 recent commits and at most 5
+missing files; --json lists at most 10 changed files and 5 recent commits. For the
+complete lists run git log --oneline <baseline>..HEAD, git diff --stat <baseline>
+and git status --short in the project.
 
 examples:
   python3 scripts/check_staleness.py .claude/handoffs/2026-01-15-143022-auth.md

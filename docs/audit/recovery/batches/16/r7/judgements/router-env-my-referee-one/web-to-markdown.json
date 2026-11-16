@@ -1,0 +1,68 @@
+{
+  "skill": "web-to-markdown",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/web-to-markdown/record.md",
+      "line": 5,
+      "evidence": "The dbff837f digest says \"removed units (47, showing 40)\"; its undisplayed items cannot be individually checked from the supplied digest.",
+      "fix": "Provide the complete digest and check each omitted item against the current files and recovery record."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/web-to-markdown/evals/evals.json",
+      "line": 10,
+      "evidence": "The explicit-convert assertions require \"--out ./guide.md\" and \"a heading plus several sentences\", while the procedure requires temporary output before publication and permits legitimately short pages.",
+      "fix": "Update the assertions to require a temporary first write, validation and authorized publication to ./guide.md; add a short-but-complete page case that must pass."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 21,
+      "evidence": "Step 4 says to run \"web2md '<url>' --out ./page.md\" for a file, but step 5 requires the first attempt to use a temporary path and publish only after validation.",
+      "fix": "Make the file-mode example write to a unique temporary file in the destination directory, then explicitly validate and publish it under the requested name only after any required overwrite authorization."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/web-to-markdown/SKILL.md",
+      "line": 19,
+      "evidence": "For any blocker reported by the running binary, step 3 says to \"tell the user to pass --chrome-path and stop\", even though a blocker may not be a missing browser.",
+      "fix": "Copy the actual stderr and recommend --chrome-path only for browser-discovery failures; report other blockers accurately and apply the timeout retry rule only when the failure is a navigation timeout."
+    }
+  ]
+}

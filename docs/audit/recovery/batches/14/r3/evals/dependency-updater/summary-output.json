@@ -1,0 +1,44 @@
+{
+  "skill": "dependency-updater",
+  "mode": "output",
+  "pass_rate": 0.6957,
+  "passed": 16,
+  "total": 23,
+  "failures": [
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Treats `react` and `react-dom` (^17.0.2) and the 0.x `axios` (~0.21.4) as needing an individual approval, not as safe updates",
+      "evidence": "The output says to \u201cReview together as a peer-compatible cohort\u201d for React and React DOM and to treat Axios as \u201crisky,\u201d but does not require individual approval for each target."
+    },
+    {
+      "eval": "casual-safe-updates",
+      "assertion": "Does not write any manifest or lockfile change before the user approves each target version, and does not auto-apply minor or patch updates, noting that even a nominal minor update can break compatibility",
+      "evidence": "The output promises approval for \u201cany breaking target\u201d and describes changes \u201cAfter an approved cohort,\u201d but does not require approval for every target or note that nominal minor updates can break compatibility."
+    },
+    {
+      "eval": "conflicting-node-deps",
+      "assertion": "Starts with the owning manager's explain command (`npm explain react`, `npm explain react-beautiful-dnd`, or `pnpm why` for pnpm) before any change, and reads the peer requirement from the fixture to name `react-beautiful-dnd` as the package that does not accept react ^18",
+      "evidence": "The checks begin with `git status --short` and include `npm ls react react-dom react-beautiful-dnd --all` before `npm explain react`, although the diagnosis correctly says React 18 does not satisfy `react-beautiful-dnd`\u2019s peer ranges."
+    },
+    {
+      "eval": "scoped-taze-write",
+      "assertion": "States the package-to-target map from approved-targets.md (react and react-dom to ^18.3.1) before any write, and says vite, storybook, turbo and typescript are not touched",
+      "evidence": "The output lists both approved targets and says \u201cNo other direct dependency changes are approved,\u201d but does not name turbo or typescript."
+    },
+    {
+      "eval": "scoped-taze-write",
+      "assertion": "Uses -r only after confirming the workspace scope from pnpm-workspace.yaml, and notes that react is declared in both apps/web and packages/ui",
+      "evidence": "The output reads \u201cpnpm-workspace.yaml\u201d but does not explicitly confirm its workspace scope before using \u201c-r\u201d."
+    },
+    {
+      "eval": "unattended-candidate-scan",
+      "assertion": "Proposes checking the prerequisite first with `scripts/check-tool.sh taze` (or handles the JSON error it prints when taze is missing)",
+      "evidence": "The plan says, \"After reviewing the script and its prerequisites,\" but does not propose running the prerequisite check or handling its JSON error."
+    },
+    {
+      "eval": "unattended-candidate-scan",
+      "assertion": "Says the candidates come back in the `candidates` field of the JSON (or the `output` text fallback) and reports them for approval without applying any of them",
+      "evidence": "The output says \"parsed results appear in `candidates`\" and the text fallback appears in `output`, but does not propose reporting the results for approval."
+    }
+  ]
+}
