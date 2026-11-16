@@ -54,7 +54,7 @@ if (typeof window !== 'undefined') { // Check if we're running in the browser.
 
 Rules that stay in force:
 
-- Keep this in the app entry or root module (`App` or the entry file), never in a leaf component's file: it runs on import.
+- Put the guarded call in a module that the client entry is guaranteed to include and execute (the client entry file, or a module it imports at its top level), never in a leaf component's file: it runs on import. A `typeof window` guard in a module that only executes on the server (a server-only root layout or a server component file) initializes nothing, because the check is false there and the browser never runs that module. When no such client module exists, run the initialization from a client component's Effect with the cached promise (`useEffect(() => { ensureAppInit().catch(reportInitError); }, []);`), which is safe under the Strict Mode replay and remounts.
 - Do not mark the work done before it succeeds. react.dev shows a plain `didInit` flag, and this skill allows that only for synchronous work that cannot fail. For fallible or async work use the cached promise cleared on failure, as in [anti-patterns](anti-patterns.md#initialization-that-must-run-once).
 - Without the `typeof window` guard in a server-rendered app, the initialization throws on the server or runs once per server process instead of once per page load.
 - An Effect on `App` is the alternative that never runs on the server (Effects run only in the browser). Keep the cached promise there too, so the Strict Mode replay does not start the work twice.

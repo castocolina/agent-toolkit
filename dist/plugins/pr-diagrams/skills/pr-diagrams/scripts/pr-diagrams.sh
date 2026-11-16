@@ -149,16 +149,47 @@ png_ok() {
   [ "$sig" = "89504e470d0a1a0a" ]
 }
 
+# Undo the replacement transaction of cmd_render pass 3 (state in the TX_* globals): put every
+# original back, remove outputs that did not exist, drop unused backups. Returns 1 when an
+# original could not be restored; it is then kept at its backup path.
+TX_DESTS=() TX_BAKS=() TX_EXISTED=() TX_MOVED=() TX_LAST=-1
+rollback_render() {
+  local j rc=0
+  for ((j = 0; j <= TX_LAST; j++)); do
+    if [ "${TX_EXISTED[j]}" -eq 0 ]; then
+      rm -f "${TX_DESTS[j]}"
+    elif [ "${TX_MOVED[j]}" -eq 1 ] || { [ "${TX_MOVED[j]}" -eq 2 ] && [ ! -e "${TX_DESTS[j]}" ]; }; then
+      if ! mv -f "${TX_BAKS[j]}" "${TX_DESTS[j]}"; then
+        echo "pr-diagrams: cannot restore ${TX_DESTS[j]}; its original is kept at ${TX_BAKS[j]}" >&2
+        rc=1
+      fi
+    else
+      [ -z "${TX_BAKS[j]}" ] || rm -f "${TX_BAKS[j]}"  # the original was never touched
+    fi
+  done
+  return "$rc"
+}
+
+# Signal trap of the replacement transaction: roll back, then exit 128+signal.
+tx_abort() {
+  echo "pr-diagrams: interrupted; restoring the outputs" >&2
+  rollback_render || true
+  exit "$1"
+}
+
 cmd_render() {
   [ $# -gt 0 ] || die "usage: pr-diagrams.sh render <file.drawio>..."
+  command -v jq >/dev/null 2>&1 || die "jq not found (render builds its JSON manifest with it before it replaces any PNG)"
   local converter=${DRAWIO_CONVERTER:-}
   if [ -z "$converter" ]; then
     command -v drawio >/dev/null 2>&1 || die "drawio CLI not found"
     converter=$(cd "$(dirname "$0")" && pwd)/../../draw-io/scripts/convert-drawio-to-png.sh
   fi
+  # Compare the output names, not the input names: "a" and "a.drawio" both map to a.drawio.png
+  # (the scratch copy and, in one directory, the destination), so they would overwrite each other.
   local seen=() f base i n
   for f in "$@"; do
-    base=$(basename "$f")
+    base=$(basename "$f" .drawio).drawio.png
     n=${#seen[@]}
     for ((i = 0; i < n; i++)); do
       [ "${seen[i]}" = "$base" ] && die "duplicate basename $base: $*"
@@ -196,9 +227,6 @@ cmd_render() {
     cat "$conv_err" >&2
     exit 1
   fi
-  local manifest
-  manifest=$(mktemp); TMPS+=("$manifest")
-  : > "$manifest"
   local f png dest dest_dir tmp
   local dests=() stages=() srcs=() drawios=("$@")
   # Pass 1: preflight every destination before anything is written. Never write
@@ -215,9 +243,18 @@ cmd_render() {
     fi
     dests+=("$dest"); srcs+=("$png")
   done
+  # Build and validate the complete manifest before any output is replaced: a jq
+  # failure then exits nonzero with empty stdout and every output as it was.
+  local n=${#dests[@]} i j manifest lines
+  manifest=$(mktemp); TMPS+=("$manifest")
+  lines=$(mktemp); TMPS+=("$lines")
+  for ((i = 0; i < n; i++)); do
+    jq -nc --arg drawio "${drawios[i]}" --arg png "${dests[i]}" '{drawio: $drawio, png: $png}' >> "$lines" || die "jq failed building the manifest"
+  done
+  jq -s '.' "$lines" > "$manifest" || die "jq failed building the manifest"
+  jq -e --argjson n "$n" 'length == $n' "$manifest" >/dev/null || die "the manifest does not list every output"
   # Pass 2: stage every copy as a temp file in its destination directory (so the
   # final rename replaces the entry itself); a failure here leaves every output as it was.
-  local n=${#dests[@]} i
   for ((i = 0; i < n; i++)); do
     dest_dir=$(dirname "${dests[i]}")
     tmp=$(mktemp "$dest_dir/.pr-diagrams.XXXXXX") || die "cannot create a temp file in $dest_dir"
@@ -225,27 +262,44 @@ cmd_render() {
     cp "${srcs[i]}" "$tmp" || die "cannot stage a copy in $dest_dir"
     chmod 644 "$tmp"
   done
-  # Pass 3: replace the outputs. Keep a backup of each replaced output and, on a
-  # late failure, restore the ones already replaced (remove the ones that did not exist).
-  local bak=$scratch/backup j
-  mkdir -p "$bak"
+  # Pass 3: replace the outputs. Rename each existing output to a backup in its own
+  # directory (a same-filesystem rename copies nothing, so no output is ever
+  # half-written), then rename its staged copy into place. On a failure rename the
+  # backups back (and remove the outputs that did not exist); delete the backups only
+  # after every replacement succeeded.
+  # The transaction state is global so a signal trap can roll it back like an ordinary failure.
+  # TX_EXISTED[i]=1: output i existed (it must come back); TX_MOVED[i]=2: its backup rename
+  # is under way; TX_MOVED[i]=1: it was renamed to TX_BAKS[i]. TX_LAST is the last index started.
+  local failed="" bk
+  TX_DESTS=("${dests[@]}"); TX_BAKS=(); TX_EXISTED=(); TX_MOVED=(); TX_LAST=-1
   for ((i = 0; i < n; i++)); do
-    if [ -e "${dests[i]}" ]; then
-      cp -p "${dests[i]}" "$bak/$i" || die "cannot back up ${dests[i]}"
+    TX_BAKS[i]=""; TX_MOVED[i]=0
+    if [ -e "${dests[i]}" ]; then TX_EXISTED[i]=1; else TX_EXISTED[i]=0; fi
+  done
+  trap 'tx_abort 130' INT
+  trap 'tx_abort 143' TERM
+  trap 'tx_abort 129' HUP
+  for ((i = 0; i < n; i++)); do
+    TX_LAST=$i
+    if [ "${TX_EXISTED[i]}" -eq 1 ]; then
+      dest_dir=$(dirname "${dests[i]}")
+      if ! bk=$(mktemp "$dest_dir/.pr-diagrams.bak.XXXXXX"); then failed="cannot back up ${dests[i]}"; break; fi
+      TX_BAKS[i]=$bk; TX_MOVED[i]=2
+      if ! mv -f "${dests[i]}" "$bk"; then failed="cannot back up ${dests[i]}"; break; fi
+      TX_MOVED[i]=1
     fi
+    if ! mv -f "${stages[i]}" "${dests[i]}"; then failed="cannot replace ${dests[i]}"; break; fi
   done
+  if [ -n "$failed" ]; then
+    rollback_render || die "$failed; some outputs could not be restored (see above)"
+    die "$failed; earlier outputs were restored"
+  fi
+  # Success: disarm the rollback before the backups go, or a late signal would restore old over new.
+  trap - INT TERM HUP
   for ((i = 0; i < n; i++)); do
-    if ! mv -f "${stages[i]}" "${dests[i]}"; then
-      for ((j = 0; j < i; j++)); do
-        if [ -e "$bak/$j" ]; then cp -p "$bak/$j" "${dests[j]}"; else rm -f "${dests[j]}"; fi
-      done
-      die "cannot replace ${dests[i]}; earlier outputs were restored"
-    fi
+    [ -z "${TX_BAKS[i]}" ] || rm -f "${TX_BAKS[i]}"
   done
-  for ((i = 0; i < n; i++)); do
-    jq -nc --arg drawio "${drawios[i]}" --arg png "${dests[i]}" '{drawio: $drawio, png: $png}' >> "$manifest"
-  done
-  jq -s '.' "$manifest"
+  cat "$manifest"
 }
 
 usage_err() { echo "pr-diagrams: $*" >&2; exit 2; }

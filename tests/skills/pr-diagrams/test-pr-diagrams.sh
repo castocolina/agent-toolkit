@@ -508,6 +508,109 @@ test_render_replaces_nothing_when_a_later_destination_fails() {
   chmod 755 "$root/b"
 }
 
+# Symlinks for the tools render needs, with no drawio and a jq that is absent (mode "none") or always fails (mode "fail").
+no_jq_path() { # no_jq_path BIN MODE
+  local bin=$1 tool
+  mkdir -p "$bin"
+  for tool in bash git mktemp cp cat rm chmod mv dirname basename od tr wc head touch mkdir; do
+    ln -sf "$(command -v "$tool")" "$bin/$tool"
+  done
+  if [ "$2" = fail ]; then printf '#!/bin/bash\nexit 1\n' > "$bin/jq"; chmod +x "$bin/jq"; fi
+}
+
+test_render_replaces_nothing_when_jq_is_missing_or_fails() {
+  local root mode; root=$(mktemp -d); TMPS+=("$root")
+  mkdir -p "$root/a"
+  cp "$FIXTURE" "$root/a/one.drawio"
+  printf 'OLD\n' > "$root/a/one.drawio.png"
+  write_converter_stub "$root/conv.sh"
+  for mode in none fail; do
+    no_jq_path "$root/bin-$mode" "$mode"
+    run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" PATH="$root/bin-$mode" -- render "$root/a/one.drawio"
+    check "exit_$mode" "$CODE" 1
+    check "stdout_$mode" "$OUT" ""
+    check "kept_$mode" "$(cat "$root/a/one.drawio.png")" OLD
+    check "no_stage_files_$mode" "$(find "$root/a" -name '.pr-diagrams.*' | wc -l | tr -d ' ')" 0
+    check "msg_$mode" "$(grep -c -E 'jq not found|jq failed building the manifest' "$root/err")" 1
+  done
+}
+
+test_render_restores_earlier_outputs_when_a_replacement_fails() {
+  local root; root=$(mktemp -d); TMPS+=("$root")
+  mkdir -p "$root/a" "$root/b" "$root/bin"
+  cp "$FIXTURE" "$root/a/one.drawio"
+  cp "$FIXTURE" "$root/b/two.drawio"
+  printf 'OLD-A\000\377\nbytes' > "$root/a/one.drawio.png"
+  printf 'OLD-B\000\376\nbytes' > "$root/b/two.drawio.png"
+  cp "$root/a/one.drawio.png" "$root/a.orig"
+  cp "$root/b/two.drawio.png" "$root/b.orig"
+  write_converter_stub "$root/conv.sh"
+  cp "$HERE/fixtures/mv-fail-stub.sh" "$root/bin/mv"
+  chmod +x "$root/bin/mv"
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" PATH="$root/bin:$PATH" REAL_MV="$(command -v mv)" \
+    FAIL_MV_DEST="$root/b/two.drawio.png" MV_LOG="$root/mv.log" -- render "$root/a/one.drawio" "$root/b/two.drawio"
+  check exit "$CODE" 1
+  check stdout "$OUT" ""
+  check msg "$(grep -c 'earlier outputs were restored' "$root/err")" 1
+  # The first output really was replaced before the second rename failed.
+  check first_replaced "$(grep -c -E "/a/\.pr-diagrams\.[A-Za-z0-9]+ $root/a/one\.drawio\.png\$" "$root/mv.log")" 1
+  check first_restored "$(cmp -s "$root/a/one.drawio.png" "$root/a.orig" && echo yes || echo no)" yes
+  check second_restored "$(cmp -s "$root/b/two.drawio.png" "$root/b.orig" && echo yes || echo no)" yes
+  check no_stage_or_backup_files "$(find "$root/a" "$root/b" -name '.pr-diagrams.*' | wc -l | tr -d ' ')" 0
+  # An output that did not exist before is removed again.
+  rm "$root/a/one.drawio.png"
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" PATH="$root/bin:$PATH" REAL_MV="$(command -v mv)" \
+    FAIL_MV_DEST="$root/b/two.drawio.png" -- render "$root/a/one.drawio" "$root/b/two.drawio"
+  check exit_new "$CODE" 1
+  check new_removed "$([ -e "$root/a/one.drawio.png" ] && echo yes || echo no)" no
+  check second_restored_new "$(cmp -s "$root/b/two.drawio.png" "$root/b.orig" && echo yes || echo no)" yes
+  check no_leftovers_new "$(find "$root/a" "$root/b" -name '.pr-diagrams.*' | wc -l | tr -d ' ')" 0
+  # Without the failure both are replaced and no backup is left behind.
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" -- render "$root/a/one.drawio" "$root/b/two.drawio"
+  check exit_ok "$CODE" 0
+  check replaced "$(grep -c -a PNG "$root/a/one.drawio.png" "$root/b/two.drawio.png" | grep -c ':1')" 2
+  check no_leftovers_ok "$(find "$root/a" "$root/b" -name '.pr-diagrams.*' | wc -l | tr -d ' ')" 0
+}
+
+test_render_rejects_inputs_that_map_to_one_png() {
+  local root; root=$(mktemp -d); TMPS+=("$root")
+  # "a" and "a.drawio" differ as basenames but both produce a.drawio.png.
+  cp "$FIXTURE" "$root/a"
+  cp "$FIXTURE" "$root/a.drawio"
+  printf 'OLD\n' > "$root/a.drawio.png"
+  write_converter_stub "$root/conv.sh"
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" -- render "$root/a" "$root/a.drawio"
+  check exit "$CODE" 1
+  check msg "$(grep -c 'duplicate basename' "$root/err")" 1
+  check stdout "$OUT" ""
+  check never_converted "$(grep -c Converting "$root/err")" 0
+  check kept "$(cat "$root/a.drawio.png")" OLD
+  check no_stage_or_backup_files "$(find "$root" -name '.pr-diagrams.*' | wc -l | tr -d ' ')" 0
+}
+
+test_render_restores_outputs_when_terminated_mid_replacement() {
+  local root; root=$(mktemp -d); TMPS+=("$root")
+  mkdir -p "$root/a" "$root/b" "$root/bin"
+  cp "$FIXTURE" "$root/a/one.drawio"
+  cp "$FIXTURE" "$root/b/two.drawio"
+  printf 'OLD-A\000\377\nbytes' > "$root/a/one.drawio.png"
+  printf 'OLD-B\000\376\nbytes' > "$root/b/two.drawio.png"
+  cp "$root/a/one.drawio.png" "$root/a.orig"
+  cp "$root/b/two.drawio.png" "$root/b.orig"
+  write_converter_stub "$root/conv.sh"
+  cp "$HERE/fixtures/mv-term-stub.sh" "$root/bin/mv"
+  chmod +x "$root/bin/mv"
+  # TERM arrives after b/two's original was renamed to its backup, before its staged copy is installed.
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" PATH="$root/bin:$PATH" REAL_MV="$(command -v mv)" \
+    TERM_AFTER_BAK_OF="$root/b/two.drawio.png" -- render "$root/a/one.drawio" "$root/b/two.drawio"
+  check exit "$CODE" 143
+  check stdout "$OUT" ""
+  check msg "$(grep -c 'interrupted; restoring' "$root/err")" 1
+  check first_restored "$(cmp -s "$root/a/one.drawio.png" "$root/a.orig" && echo yes || echo no)" yes
+  check second_restored "$(cmp -s "$root/b/two.drawio.png" "$root/b.orig" && echo yes || echo no)" yes
+  check no_stage_or_backup_files "$(find "$root/a" "$root/b" -name '.pr-diagrams.*' | wc -l | tr -d ' ')" 0
+}
+
 test_render_names_with_spaces_are_not_false_duplicates() {
   local root; root=$(mktemp -d); TMPS+=("$root")
   mkdir -p "$root/a" "$root/b" "$root/c"

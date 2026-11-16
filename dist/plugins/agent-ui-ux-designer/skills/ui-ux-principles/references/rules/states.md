@@ -15,24 +15,33 @@
 
 ## Fix pattern
 
-One request with its pending, empty, error (with retry) and success branches; the `OrderRow` and skeleton rows are in `loading.md`, and the three fragments in `SKILL.md` Patterns come from this shape:
+One request with its pending, empty, error (with retry) and success branches; the `OrderRow` (with its CSS and the reserved delete-control box) and skeleton rows are in `loading.md`, and the three fragments in `SKILL.md` Patterns come from this shape:
 
 ```tsx
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { OrderRow, type Order } from './OrderRow';   // the module of the loading.md fix pattern
+
 type Status = 'loading' | 'error' | 'success';
 
 function Orders() {
   const [status, setStatus] = useState<Status>('loading');
   const [orders, setOrders] = useState<Order[]>([]);
   const [notice, setNotice] = useState('');   // the live region starts empty
+  const latest = useRef(0);                   // id of the newest load; older results are stale
 
-  const load = () => {
+  const load = useCallback(() => {
+    const mine = ++latest.current;
+    const current = () => mine === latest.current;
     fetch('/api/orders')
       .then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
-      .then((data) => { setOrders(data); setStatus('success'); })
-      .catch(() => setStatus('error'));
-  };
-  const retry = () => { setStatus('loading'); load(); };   // clears the error before refetching
-  useEffect(load, []);
+      .then((data) => { if (current()) { setOrders(data); setStatus('success'); } })
+      .catch(() => { if (current()) setStatus('error'); });
+  }, []);
+  const retry = () => { setStatus('loading'); load(); };   // clears the error before refetching; the new load makes the old one stale
+  useEffect(() => {
+    load();
+    return () => { latest.current += 1; };   // unmount, or Strict Mode's first run in development: ignore that result
+  }, [load]);
 
   const remove = (id: string) => {
     if (!window.confirm('Delete this order?')) return;   // the confirm step, or offer an undo
@@ -45,7 +54,11 @@ function Orders() {
   return (
     <section aria-busy={status === 'loading'}>
       <p role="status">{notice}</p>
-      {status === 'loading' && <ul aria-label="Orders">{/* skeleton rows */}</ul>}
+      {status === 'loading' && (
+        <ul aria-label="Orders">
+          {Array.from({ length: 5 }, (_, i) => <OrderRow key={i} />)}   {/* skeleton rows */}
+        </ul>
+      )}
       {status === 'error' && (
         <div role="alert">
           <p>The orders did not load. Your filters are kept.</p>
@@ -57,15 +70,12 @@ function Orders() {
       )}
       {status === 'success' && orders.length > 0 && (
         <ul aria-label="Orders">
-          {orders.map((o) => (
-            <li key={o.id}>
-              {o.customer}
-              <button type="button" aria-label={`Delete order for ${o.customer}`} onClick={() => remove(o.id)}>Delete</button>
-            </li>
-          ))}
+          {orders.map((o) => <OrderRow key={o.id} order={o} onDelete={remove} />)}   {/* same row, CSS and delete box as the skeleton */}
         </ul>
       )}
     </section>
   );
 }
 ```
+
+The `latest` guard drops every load result that is not from the newest request, so a late response (an earlier load, a retry that was replaced, or the first run of Strict Mode's double-invoked effect in development) cannot overwrite the list or bring a deleted row back; `retry` goes through the same `load`.

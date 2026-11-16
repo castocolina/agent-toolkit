@@ -94,11 +94,11 @@
     {
       "id": "ssr-init-guard",
       "prompt": "In our server-rendered Next-style app we call initAnalytics() at the top level of src/app-entry.ts so it runs once per page load, but the server build now crashes with \"window is not defined\". Someone suggested moving it into a useEffect with [] in a leaf component instead. What is the right fix?",
-      "expected_output": "Top-level module code runs on import, on the server too. Guard the browser-only call with typeof window !== 'undefined' and keep it in the app entry module; a leaf component's Effect is the wrong place for an app-wide once-per-load setup. If initAnalytics can fail or is async, do not mark it done before it succeeds (cache the promise, clear it on failure).",
+      "expected_output": "Top-level module code runs on import, on the server too. Guard the browser-only call with typeof window !== 'undefined' and keep it in a module guaranteed to execute in the client (the app entry module only if the client bundle runs it, otherwise a client component's Effect with the cached initialization promise); an arbitrary leaf component's file is the wrong place for an app-wide once-per-load setup. If initAnalytics can fail or is async, do not mark it done before it succeeds (cache the promise, clear it on failure).",
       "assertions": [
         "Explains that top-level module code runs on import, including on the server in a server-rendered app, where window does not exist",
         "Guards the call with typeof window !== 'undefined'",
-        "Keeps the initialization in the app entry module rather than in a leaf component",
+        "Keeps the initialization in a module guaranteed to execute in the client (or in a client component's Effect with the cached initialization promise) rather than in a leaf component's file that may never run there",
         "Says that if the initialization is async or can fail, a done flag must not be set before it succeeds (or a cached promise is cleared on failure)"
       ]
     },
@@ -173,12 +173,13 @@
       "files": [
         "evals/files/useJson.ts"
       ],
-      "expected_output": "The stored result is keyed only by the url, so when the url returns to A the old A result matches again and is returned as current. Give each request an identity that changes on every url change (a generation counter or id bumped during render and stored with the result), or reset the hook state at a keyed boundary, so only the newest request's result matches. Test A to B to A: resolve A, switch to B, switch back to A without resolving anything, assert loading and not A's old data, then resolve the new A request and assert its data.",
+      "expected_output": "The stored result is keyed only by the url, so when the url returns to A the old A result matches again and is returned as current. Give each request an identity that changes on every url change (a generation counter or id bumped during render and stored with the result), or reset the hook state at a keyed boundary, so only the newest request's result matches. Test A to B to A: resolve A, switch to B, switch back to A without resolving anything, assert loading and not A's old data, then resolve the new A request and assert its data. Add a separate rejection test: resolve the new request, reject the old one, and assert the current result stays visible with no stale error before unmounting.",
       "assertions": [
         "Explains that the result is matched by url alone, so returning to /api/a makes the earlier /api/a result look current again",
         "Fixes it with a request-generation identity (counter or id stored with the result and compared in render), or by resetting at a keyed boundary, not by only adding more checks inside the Effect",
         "Keeps the ignore flag and abort cleanup that stop obsolete responses from writing",
-        "Adds an A to B to A test: resolve A, switch to B, switch back to A with nothing resolved, assert loading instead of A's old data, then resolve the new A request"
+        "Adds an A to B to A test: resolve A, switch to B, switch back to A with nothing resolved, assert loading instead of A's old data, then resolve the new A request",
+        "Adds a separate rejection test: resolve the new request, reject the old one, and assert the current result is still visible with no stale error before unmounting"
       ]
     }
   ]
