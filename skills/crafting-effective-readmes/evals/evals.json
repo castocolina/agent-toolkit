@@ -54,12 +54,47 @@
         "evals/files/monorepo/packages-fmt-package.json",
         "evals/files/monorepo/packages-fmt-README.md"
       ],
-      "expected_output": "Revised Install and Usage sections for the package README that install the published @acme/fmt package and run the acme-fmt command, state the Node >=20 requirement, and leave the doctoc region to be regenerated rather than hand-edited.",
+      "expected_output": "Revised Install and Usage sections for the package README that install the package under its manifest name @acme/fmt (publication labeled unverified) and run the acme-fmt command, state the Node >=20 requirement, and leave the doctoc region to be regenerated rather than hand-edited.",
       "assertions": [
-        "Replaces the clone-and-root-npm-install steps with an install of the published package name `@acme/fmt`, explaining that the root `npm install` installs the private workspace rather than the package",
+        "Replaces the clone-and-root-npm-install steps with an install using the derived install name `@acme/fmt` (the manifest `name`), labels registry publication of that name as unverified because the manifest does not establish it, and explains that the root `npm install` installs the private workspace rather than the package",
         "Uses the command name `acme-fmt` from `bin` (not `fmt`) in the usage example",
         "States the Node.js >=20 requirement taken from `engines.node`",
         "Does not hand-edit the lines between the doctoc markers; if headings change, says to rerun doctoc"
+      ]
+    },
+    {
+      "id": "internal-service-readme",
+      "prompt": "Write the README for billing-sync, a service our payments team owns in a private company GitLab project. It reads invoices from the ledger service and publishes them to the reporting service. New hires set it up locally and the on-call engineer needs a troubleshooting section. I do not know the on-call rotation name or the vault path yet. Make it look polished with badges.",
+      "expected_output": "An Internal-layout README with Team and On-call header lines (placeholders for unknown values), upstream and downstream dependencies, an environment variables table with no real values, symptom/cause/fix troubleshooting, and no externally hosted badges.",
+      "assertions": [
+        "Uses the Internal layout and puts Team and On-call lines in the header; the unknown on-call rotation is a visible placeholder, not an invented name",
+        "Lists the ledger service as upstream and the reporting service as downstream",
+        "Presents environment variables as a table of variable, description and where to get the value, with the unknown vault path left as a visible placeholder and no real secret values",
+        "Writes each troubleshooting entry as Symptom, Cause and Fix",
+        "Does not add externally hosted badges (for example shields.io) and gives the reason: external badge services cannot read private repositories and are often blocked by corporate proxies"
+      ]
+    },
+    {
+      "id": "config-readme-why-and-dependencies",
+      "prompt": "Write a README for my ~/.config/nvim directory. It has init.lua, a lua/plugins folder, and a lazy-lock.json that the plugin manager rewrites. Neovim 0.10 and ripgrep must be installed or the fuzzy finder fails. I set it up to keep startup under 50 ms and to work the same on my laptop and desktop. The reader is future me.",
+      "expected_output": "A Config-layout README with a Last reviewed line, a What's Here table, Why This Setup, How to Extend, Dependencies, Gotchas and Sync/Backup content, and no OSS boilerplate.",
+      "assertions": [
+        "Includes a Why This Setup section that states the goals (startup under 50 ms, identical behavior on laptop and desktop)",
+        "Includes a Dependencies section naming Neovim 0.10 and ripgrep as required, with ripgrep tied to the fuzzy finder",
+        "Puts a Last reviewed date line under the title",
+        "Lists init.lua, lua/plugins and lazy-lock.json in a What's Here table and flags lazy-lock.json as written by the plugin manager and not to be hand-edited",
+        "Avoids OSS badges, a License section and contributor boilerplate"
+      ]
+    },
+    {
+      "id": "gitlab-anchor-link",
+      "prompt": "Our README lives on gitlab.com (GitLab 17.2). Its table of contents links to the heading `## Build & Test`. What anchor should the link use, and is it the same on GitHub?",
+      "expected_output": "States that on GitLab 17.0 and later the anchor is #build--test with a double hyphen, the same as GitHub, and that only older self-managed GitLab instances collapse repeated hyphens.",
+      "assertions": [
+        "Gives `#build--test` (two hyphens) as the anchor on GitLab 17.2",
+        "States the anchor is the same on GitHub",
+        "Does not claim that GitLab collapses repeated hyphens into `#build-test` on 17.x",
+        "Mentions that older self-managed GitLab instances may still collapse repeated hyphens, so the host version matters"
       ]
     }
   ]

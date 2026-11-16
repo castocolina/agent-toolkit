@@ -37,3 +37,11 @@ export function OrdersDashboard() {
     </div>
   );
 }
+
+export function OrdersPage() {
+  return (
+    <main>
+      <OrdersDashboard />
+    </main>
+  );
+}

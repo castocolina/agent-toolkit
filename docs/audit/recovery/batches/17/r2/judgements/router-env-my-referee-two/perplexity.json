@@ -1,0 +1,122 @@
+{
+  "skill": "perplexity",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 11,
+    "D3": 12,
+    "D4": 14,
+    "D5": 13,
+    "D6": 13,
+    "D7": 10,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 100,
+  "max_total": 125,
+  "percent": 80.0,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/perplexity/README.md",
+      "line": 1,
+      "evidence": "A comprehensive guide for using Perplexity AI tools effectively within Claude Code. This skill helps you choose the right search and research tool for your needs while avoiding context bloat and unnecessary API calls.",
+      "fix": "The opening, Purpose, Key Features and Summary sections restate the route table and the token-limit policy the model already applies once SKILL.md is loaded. Move any example a user asks for by name into references/ and record each removed paragraph in docs/audit/recovery/perplexity/record.md; keep the Credits section and the tool-call templates."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 1,
+      "evidence": "The first digest lists 53 removed units and shows 40, which is more than the record's section rows explain one by one.",
+      "fix": "Add one record row per omitted para id, or state in the digest that the cut is only a display limit and every omitted id belongs to a section row already judged."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 26,
+      "evidence": "Escalate only when the first result set is empty or inadequate, an explicit need for coverage across multiple source types remains, or material disagreement remains after checking primary sources; split several independent subquestions into separate bounded searches instead of escalating.",
+      "fix": "Add one decision question before escalating: is the gap one missing fact (raise Search limits), several independent questions (split searches), or a sourced explanation (Ask)? Keep the existing defaults."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 34,
+      "evidence": "Snippets can be stale: open the cited page before attributing a claim to it.",
+      "fix": "Name the failure each gotcha prevents: a snippet date that is older than the claim, a citation whose page does not contain the quoted fact, and a query that would send an unreleased identifier off the machine."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 3,
+      "evidence": "Route external web research to Perplexity MCP: perplexity_search for current facts and links (default max_results 3, max_tokens_per_page 512), perplexity_ask for sourced synthesis. Use for general web information, recent news/comparisons/tutorials, or current-information questions. Not for library/framework docs (Context7), Graphite gt CLI help (Graphite MCP), workspace questions (Nx MCP), one supplied URL (URL Crawler), or repository-local lookup.",
+      "fix": "Route external web research to Perplexity MCP: perplexity_search for current facts, links and recent news (default max_results 3, max_tokens_per_page 512), perplexity_ask for a sourced explanation. Use when the user wants sources, a comparison, a tutorial or what is current, even without saying search. Not for library or framework docs (Context7), Graphite gt CLI help, this workspace (Nx MCP), one supplied URL (URL Crawler), or a search inside the repository."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/perplexity/README.md",
+      "line": 47,
+      "evidence": "mcp__perplexity__perplexity_search({ query: \"your search query\", max_results: 3, max_tokens_per_page: 512 })",
+      "fix": "SKILL.md never tells the agent when to open README.md, so the TypeScript call shapes and the worked queries load only by accident. Add one conditional line in Search and escalation: read README.md only when you need the call-shape examples; do not load it for a single routing decision."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 26,
+      "evidence": "Raise Search limits modestly (up to 5 results / 1024 tokens) only when the initial result set is empty or inadequate, then use Ask or WebSearch if available.",
+      "fix": "The same paragraph also escalates for coverage across source types and for disagreement after primary sources, while the next paragraph escalates only for an empty set or disagreement. Make the empty-or-inadequate result the only trigger for 5/1024, and keep source disagreement as a reason to open the cited pages."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/perplexity/evals/evals.json",
+      "line": 1,
+      "evidence": "Six evals assert tool choice and limits, and trigger-queries.json has 10 should-trigger and 10 should-not-trigger queries, but evals/files/ does not exist.",
+      "fix": "Add one edge prompt whose supplied page or search snippet is stale or does not support the claim, with an input file under evals/files/, and assert that the answer qualifies the claim instead of citing it."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 28,
+      "evidence": "For broad investigations, use `/research <topic>` only if configured.",
+      "fix": "State the order when both a configured /research agent and perplexity_search exist: one factual question stays on bounded Search; a requested multi-source report uses /research; if /research is absent, split the report into separate bounded searches and say that /research is not configured."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/perplexity/README.md",
+      "line": 105,
+      "evidence": "**Why**: Extremely high token cost: no fixed token budget; runs take minutes (checked 2026-11-15, https://docs.perplexity.ai/docs/agent-api/presets)",
+      "fix": "Drop the leftover 'Extremely high token cost:' label so the sentence states only the sourced fact already in SKILL.md: the tool has no fixed token budget and a run takes minutes."
+    }
+  ]
+}

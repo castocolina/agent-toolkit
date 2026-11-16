@@ -73,7 +73,7 @@ Notes, one short line each, only when they apply:
 - the text is unchanged or longer because an invariant required it, or it is already minimal ("Kept `should` and the `409` exception; no shorter wording keeps both.", "Already minimal.", "Kept the passive: the source names no actor.");
 - `Needs: <the missing fact>`;
 - Structure: "Removed or renamed headings: ..." with the old anchors;
-- counts, only when asked: one sentence gets "21 → 9 words"; a document gets the total and per-section counts.
+- counts, only when asked: one sentence gets "23 → 11 words"; a document gets the total and per-section counts.
 
 Suggestions use `"<quoted original fragment>" → "<proposed text>" (reason)`. Order them: invariant risks and factual errors first, then cuts by the number of words they save. Stop at about 10 and name the sections where more occur. In Edit and Structure they come after the rewrite, and only for protected quoted material or when the user asks for an explanation of the changes (then at most 5 items); the one-line note limits above apply only when no explanation was asked for.
 
@@ -115,6 +115,6 @@ Load at most the one section that answers the open question; the rules above cov
 | A specific comma, possessive or dangling-participle question | `elements-of-style/02-elementary-rules-of-usage.md`, the matching rule (1-7) | |
 | Formatting numerals, parentheses, quotations or references | `elements-of-style/04-a-few-matters-of-form.md` | |
 | A disputed word ("comprise", "due to", "less/fewer") | `elements-of-style/05-words-and-expressions-commonly-misused.md`; contemporary usage, singular "they" and house style win over its 1918 prescriptions | |
-| A clarity edit where the user names a specific stock pattern to cut (rule of three, negative parallelism, "serves as a testament") | `signs-of-ai-writing.md`, only the section for that pattern under "Regression to the Mean", "Language and Grammar" or "Punctuation and Formatting" | its Markup, Citations and AFC sections: Wikipedia-only |
+| A clarity edit where the user names a specific stock pattern to cut (rule of three, negative parallelism, "serves as a testament") | `signs-of-ai-writing.md`, only the section for that pattern under "Regression to the Mean", "Language and Grammar" or "Punctuation and Formatting" | its Markup and Citations sections and the AFC-draft subsections: Wikipedia-only |
 
 Do NOT load `signs-of-ai-writing.md` for ordinary copyediting, and never load `elements-of-style/01-introductory.md` (it holds no rules). A request only to make a draft sound less AI-written is the humanizer skill's job, not this one.

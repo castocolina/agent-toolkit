@@ -8,7 +8,7 @@
   - Plain CSS: switch the custom properties under `@media (prefers-color-scheme: dark)` or on `[data-theme]` at the root.
   - Tailwind: `dark:` maps to `prefers-color-scheme`; put it on the theme variables, not on each component.
   - MUI: `createTheme({ colorSchemes: { dark: true } })` is the recommended route.
-- `color-scheme: light dark` on `:root` so native controls follow the theme (UNVERIFIED: general CSS practice, not on the pages read).
+- `color-scheme: light dark` on `:root` so native controls follow the theme (MDN: declare `color-scheme` on `:root` to opt the page in; your own elements still need `prefers-color-scheme` or `light-dark()`; Baseline Widely available since January 2022; https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme, checked 2026-11-15).
 
 ## Gotchas
 

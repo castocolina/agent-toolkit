@@ -1,0 +1,39 @@
+{
+  "skill": "react-useeffect",
+  "mode": "output",
+  "pass_rate": 0.9032,
+  "passed": 56,
+  "total": 62,
+  "failures": [
+    {
+      "eval": "partial-reset-casual",
+      "assertion": "Explains the flash: the Effect runs only after the panel has already rendered with the stale selection",
+      "evidence": "The output says the keyed child \u201cresets selection as part of rendering the new thread,\u201d but does not explain when the original Effect runs."
+    },
+    {
+      "eval": "ssr-init-guard",
+      "assertion": "Explains that top-level module code runs on import, including on the server in a server-rendered app, where window does not exist",
+      "evidence": "The output says the module can be \u201cevaluated on the server\u201d and mentions an \u201cimport-time crash,\u201d but does not explicitly explain that top-level code runs on import or that window does not exist on the server."
+    },
+    {
+      "eval": "shared-handler-function",
+      "assertion": "Extracts one function holding the shared logic that both click handlers call",
+      "evidence": "The shared function only calls `showNotification(\"Added to cart\")`, while the output says to \"Keep the existing action logic in each handler.\""
+    },
+    {
+      "eval": "overlapping-id-selection",
+      "assertion": "Says that deriving from a stored ID does not reset when two inboxes share the same message ID, and that this is why m7 stays selected",
+      "evidence": "The output says, \u201cThe key makes A \u2192 B and B \u2192 A both start with no selection, even if both contain \"m7\",\u201d but does not explain why deriving from the stored ID leaves m7 selected."
+    },
+    {
+      "eval": "analytics-replay",
+      "assertion": "Distinguishes this from a reversible resource (listener, connection, instance), where cleanup must undo exactly that setup",
+      "evidence": "The output says \u201cIt\u2019s an irreversible observation, not a resource that cleanup can undo,\u201d but does not explain that cleanup must undo a reversible setup."
+    },
+    {
+      "eval": "fetch-hook-a-b-a",
+      "assertion": "Fixes it with a request-generation identity (counter or id stored with the result and compared in render), or by resetting at a keyed boundary, not by only adding more checks inside the Effect",
+      "evidence": "The output instead says, \"Reset the retained result when the URL changes, during render,\" and its early return before `useEffect` violates the Rules of Hooks."
+    }
+  ]
+}

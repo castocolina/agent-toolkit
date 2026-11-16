@@ -8,7 +8,7 @@ This skill provides clear guidelines for when and how to use Perplexity's search
 
 ## When to Use This Skill
 
-Use Perplexity tools ONLY when users explicitly request:
+Use Perplexity tools based on intent, not only on keywords: sourced explanations and current-information questions qualify. Typical requests:
 - **Search queries**: "search", "find", "look up", "research"
 - **Current information**: "what's the latest", "recent trends"
 - **Generic questions**: Broad topics not covered by specialized tools
@@ -43,13 +43,12 @@ mcp__perplexity__perplexity_search({
 ```
 
 **When to increase limits**:
-Only increase limits if:
-- User explicitly needs comprehensive results
-- Initial search found nothing useful
-- Complex topic requires multiple sources
+Only increase limits if the initial search found nothing useful (an empty or inadequate first result set). This is the only trigger, as in SKILL.md "Search and escalation". These needs do not raise limits:
+- Comprehensive coverage across sources, or a multi-source report: use `/research <topic>` when configured; otherwise split into separate bounded searches and say `/research` is not configured
+- A complex topic with several independent questions: split it into separate bounded searches
 
 ```typescript
-// Increased limits (use sparingly)
+// Increased limits (use sparingly, only after an empty or inadequate first result set)
 mcp__perplexity__perplexity_search({
   query: "complex topic",
   max_results: 5,
@@ -86,7 +85,7 @@ mcp__perplexity__perplexity_ask({
 
 **NEVER use**: `mcp__perplexity__perplexity_research`
 
-**Why**: Extremely high token cost (30-50k tokens)
+**Why**: No fixed token budget; runs take minutes (checked 2026-11-15, https://docs.perplexity.ai/docs/agent-api/presets)
 
 **Use instead**: Researcher agent (`/research <topic>`)
 - Provides multi-source synthesis with citations
@@ -94,15 +93,15 @@ mcp__perplexity__perplexity_ask({
 
 ## Tool Selection Chain
 
-When a user asks a question, follow this priority order:
+Route by request, as in the SKILL.md route table: pick the row that matches the request, not a fixed sequence. Check that the integration is configured before calling it.
 
-1. **Context7 MCP** - Library/framework documentation
-2. **Graphite MCP** - Any `gt` CLI mention
-3. **Nx MCP** - Questions about THIS workspace
-4. **Perplexity Search** - Generic searches
-5. **Perplexity Ask** - Conversational answers
-6. **Researcher agent** - Deep multi-source research
-7. **WebSearch** - Last resort (after Perplexity exhausted)
+- **Context7 MCP** - Library/framework documentation
+- **Graphite MCP** - Any `gt` CLI mention
+- **Nx MCP** - Questions about THIS workspace
+- **Perplexity Search** - Generic searches
+- **Perplexity Ask** - Conversational answers
+- **Researcher agent** - Deep multi-source research (only if configured)
+- **WebSearch** - Fallback when Perplexity results stay empty or inadequate
 
 ## Usage Examples
 
@@ -146,24 +145,24 @@ User: "What are the trade-offs of microservices?"
 
 - **Token budget awareness**: Default to limited results to avoid context bloat
 - **Clear tool boundaries**: Know when to use Perplexity vs. specialized tools
-- **Fallback chain**: Search → Ask → WebSearch (last resort)
+- **Fallback order**: Search → Ask or WebSearch when results stay inadequate
 - **Research delegation**: Use researcher agent for deep dives, not raw Perplexity API
 
 ## Best Practices
 
 1. **Start conservative**: Always use `max_results: 3` and `max_tokens_per_page: 512`
-2. **Check alternatives first**: Try Context7, Graphite MCP, or Nx MCP before Perplexity
-3. **Know your trigger words**: "search", "find", "look up", "research", "latest"
+2. **Check alternatives first**: Check an alternative only when the request matches its route row (library docs, gt CLI, this workspace, one URL); do not call Context7, Graphite or Nx before a general web query.
+3. **Route by intent**: "search", "find", "look up", "research", "latest" are common signals, but sourced explanations and current-information questions qualify too
 4. **Avoid research tool**: Never use `perplexity_research` - use researcher agent instead
-5. **Respect the chain**: Follow the tool selection priority order
+5. **Respect the routes**: Follow the tool selection routes (SKILL.md route table)
 
 ## Common Pitfalls
 
 - Using Perplexity for library docs (use Context7)
 - Using high limits by default (causes context bloat)
 - Using `perplexity_research` directly (use researcher agent)
-- Skipping the tool selection chain
-- Not checking if specialized tools apply first
+- Skipping the tool selection routes
+- Calling Context7, Graphite or Nx before a general web query, or skipping them when the request matches their route row (library docs, gt CLI, this workspace, one URL)
 
 ## Integration with Other Skills
 
@@ -171,7 +170,7 @@ User: "What are the trade-offs of microservices?"
 - **Graphite MCP**: For `gt` CLI operations
 - **Nx MCP**: For workspace-specific queries
 - **Researcher agent**: For deep research tasks
-- **WebSearch**: As absolute last resort fallback
+- **WebSearch**: Fallback when Perplexity results stay empty or inadequate
 
 ## Quick Decision Matrix
 
@@ -183,7 +182,7 @@ User: "What are the trade-offs of microservices?"
 | Find migration guide | Perplexity Search |
 | Explain advisory locks | Perplexity Ask |
 | Deep research report | Researcher agent |
-| Generic web search | WebSearch (last resort) |
+| Generic web search | Perplexity Search (WebSearch if results stay inadequate) |
 
 ## Summary
 
@@ -192,6 +191,12 @@ The Perplexity skill ensures you use Perplexity AI tools effectively and appropr
 - Respect token budgets with conservative limits
 - Defer to specialized tools when appropriate
 - Avoid the expensive research tool
-- Follow the tool selection chain
+- Follow the tool selection routes
 
 By following these guidelines, you'll provide better, faster, and more cost-effective responses to users.
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+Tool facts checked against the documentation of Perplexity AI (MCP server and Agent API presets), Graphite (`gt mcp`), Nx (Nx MCP server) and Context7 (Upstash).

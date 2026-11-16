@@ -1,0 +1,95 @@
+{
+  "skill": "sync-branch",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 14,
+    "D4": 14,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 49,
+      "evidence": "Never use `--force` or `-f`, even after a lease rejection. A background `git fetch` (IDE, cron) moves the remote-tracking ref and silently disarms a bare `--force-with-lease`",
+      "fix": "Keep the background-fetch lease gotcha. Drop the standalone 'never --force' clause (the model already refuses a bare force-push) and record that removal in docs/audit/recovery/sync-branch/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 7,
+      "evidence": "Run each step in order; stop at the first failed check and report it.",
+      "fix": "Before step 1, add the decision the order is protecting: which ref is the true base (fork upstream vs origin), whether the published tip is yours alone, and whether the replay root is fork-point, the pre-fetch old base, or a plain rebase. Then run the numbered steps."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 48,
+      "evidence": "Never `git pull` (it merges or rebases the feature branch's own remote, the wrong upstream), never `git merge` (the merge commit breaks the PR's linear history).",
+      "fix": "Add the missing landmine: NEVER `git rebase --skip` a conflicted commit, because the feature change is dropped and the next push looks clean. Leave the rebase paused and let the user resolve, continue, or abort."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 2,
+      "evidence": "Not for merge-based sync, updating local main, or rebasing a branch others push to.",
+      "fix": "Rebase the current feature branch onto the latest origin/main (or a given target) and update its PR with --force-with-lease. Use when a feature branch or PR is behind, out of date or conflicts with its base, or the user asks to update, catch up or sync a branch, even without the word rebase. Not for merge-based sync, updating local main, creating a branch, or rebasing a branch others push to."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 31,
+      "evidence": "(b) If `fork` is non-empty and differs from `plain`, `fork` is always the newer commit, so list what fork-point would skip",
+      "fix": "Keep the ask, but state the default when the user is not there to answer: stop and change nothing. Skip only on an explicit 'skip'; a plain rebase only on an explicit 'keep'."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 7,
+      "evidence": "if an `upstream` remote exists (`git remote`) and the PR base lives there (`gh pr view --json url,isCrossRepository` when available, taking owner/repo from the PR `url` as the base repository, else ask once), set `base=upstream`",
+      "fix": "Resolve the unmatched case: if `gh` is missing, returns no PR, or errors, or the url's owner/repo matches neither `upstream` nor `origin`, ask once which remote is the base and stop on anything but a named remote. Never guess `upstream` from the remote existing alone."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "commands/sync-branch.md",
+      "line": 15,
+      "evidence": "`git status --porcelain --untracked-files=no` not empty (a modified or staged tracked file): stop",
+      "fix": "Also stop when `git diff --name-only --diff-filter=U` is non-empty or any of `MERGE_HEAD`, `CHERRY_PICK_HEAD`, `REBASE_HEAD` or `BISECT_LOG` exists, before recording state. Step 1 currently lets unmerged index entries and a bisect through to the rebase."
+    }
+  ]
+}

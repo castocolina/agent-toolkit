@@ -1,0 +1,77 @@
+{
+  "skill": "react-useeffect",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 119,
+  "max_total": 125,
+  "percent": 95.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/react-useeffect/SKILL.md",
+      "line": 1,
+      "evidence": "The first digest lists 190 removed units (40 shown), mostly code samples under the old anti-patterns and alternatives headings. sections.json maps those para ids onto s009-s053, and record.md has a valid row for each of those sections, so each unit is explained; the rubric still requires one medium D1 finding for a cut list whose shown count is below its total.",
+      "fix": "No content restore: the shown units are covered by the s009-s053 rows. Keep this cut-list note; do not add another record row per unlisted unit."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/react-useeffect/SKILL.md",
+      "line": 47,
+      "evidence": "Section 4 gates each reference by scenario, but the simple-routing bullet says only 'load neither file' while three references exist, and the anti-patterns, alternatives and restored-patterns bullets never say which of the other files to skip.",
+      "fix": "In section 4, name the files not to load: for a simple routing question, load none of references/anti-patterns.md, references/alternatives.md or references/restored-patterns.md; on the anti-patterns bullet add 'Do NOT load alternatives.md or restored-patterns.md unless the task is also a partial reset, a store snapshot, a pre-19.2 read, a useMemo measurement or module-level init'; mirror that exclusion on the other two bullets."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/react-useeffect/references/alternatives.md",
+      "line": 55,
+      "evidence": "For a store with no change event, the text offers 'for example one setInterval poll (choose the interval; clear it when the last subscriber leaves)' and leaves the interval to the agent.",
+      "fix": "Give one default: poll every 1000ms, notify only when the read value changed, and clear the interval when the subscriber count hits zero; say to use a shorter interval only when the user names a freshness bound."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/react-useeffect/references/alternatives.md",
+      "line": 45,
+      "evidence": "The non-reactive-read fallback shows useLayoutEffect writing latest.current = handler with no dependency array, and the comment says never write ref.current during render. React's documented pattern updates the ref during render (latest.current = handler with no Effect), and the layout Effect rewrites the ref after paint, so a layout effect that runs before it still sees the previous handler.",
+      "fix": "Replace that block with the render-time update: const latest = useRef(handler); latest.current = handler; and call latest.current() only from inside the Effect. Keep the sentence that a reactive value such as roomId stays a dependency. Source the pattern to https://react.dev/reference/react/useEffectEvent (or the react.dev 'separating events from effects' page) and date the check."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/react-useeffect/SKILL.md",
+      "line": 9,
+      "evidence": "The skill is a navigation pattern (a routing table plus a correctness loop that dispatches to three references) and matches it closely, but section 1's routing table, the overlapping-ID paragraph and the shared-handler paragraph sit in the always-loaded file while section 4 says the simple case should load nothing. That is a minor deviation from a minimal router, not a wrong pattern.",
+      "fix": "Leave the table and the loop in SKILL.md; they are the procedure. No structural rewrite."
+    }
+  ]
+}

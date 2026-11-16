@@ -1,0 +1,68 @@
+{
+  "skill": "ascii-ui-mockup-generator",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 23,
+      "evidence": "Show scroll regions with `^`/`v` edge marks and modals as an inner box over the base screen.",
+      "fix": "Move the scroll and modal drawing convention into a skill this plugin bundles (for example references/ascii-conventions.md, preloaded via skills:) so the body keeps only the width, ranking and handoff rules the agent would not derive."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 27,
+      "evidence": "NEVER write implementation code: no layout is picked yet, so code locks in one alternative and is wasted.",
+      "fix": "Add the exception the workflow already allows: NEVER write implementation code before a pick, because it locks one unchosen alternative; after step 6, write code only if the caller asks, and keep the component map as the default handoff."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 15,
+      "evidence": "Classify the dominant task and vary one structural axis per alternative: compare records -> aligned table vs cards; inspect one item -> master/detail if both panes fit the width, else a single detail view; complete a sequence -> wizard if later steps depend on earlier answers, else one form.",
+      "fix": "Keep the table/cards, master-detail and wizard defaults, and add one escape: when the user names a structure outside those three (kanban, split composer, command palette), draw that structure as one of the three alternatives and say which axis it replaces."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "agents/ascii-ui-mockup-generator.md",
+      "line": 15,
+      "evidence": "If the task branch yields only one or two structures, draw the third by varying the other axis (density or navigation) on the best-fit structure, and say so.",
+      "fix": "Name the order: vary navigation first (top, side, none), then density (compact vs spacious) on the best-fit structure, and if both axes are already used, repeat the best-fit structure with the overflow rule applied differently and say which axis was exhausted."
+    }
+  ]
+}

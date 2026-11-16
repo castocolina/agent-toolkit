@@ -1,0 +1,68 @@
+{
+  "skill": "agentskills-research",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 10
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/agentskills-research/evals/evals.json",
+      "line": 225,
+      "evidence": "The combined-one-fails eval requires that the agent \"Leaves the failed source's references and rubric untouched\", although its fixture reports a failed recovery and the separate recovery-failed eval requires restoring the references from backup.",
+      "fix": "Change the combined-failure assertion and expected output to require the backup recovery described by the failure fixture, while still checking that the other fetcher is processed and no unsafe commit occurs."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 8,
+      "evidence": "For an unspecified source the skill says to \"make one commit\", while the individual unchanged and repair-only branches say to stop without committing; the same combined instruction also applies when a fetcher fails.",
+      "fix": "Define combined finalization explicitly: make no commit when both sources are unchanged; preserve the repair-only pending-commit policy; on either failure, report and recover as appropriate and do not commit an inconsistent refresh. Commit once only when the eligible changes and checks have succeeded."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/agentskills-research/references/structure-change.md",
+      "line": 12,
+      "evidence": "For a broken source anchor, the reference says to resume at Source 1 step 3; when the fetcher reports no changed or removed pages and rubric_stale is false, that step selects the no-rubric-edit repair branch instead of fixing the anchor.",
+      "fix": "Add an explicit anchor-only branch that identifies the renamed or missing heading, updates the rubric source anchor and affected criteria as needed, and reruns rubric-check; do not route it through the no-rubric-edit branch."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/agentskills-research/SKILL.md",
+      "line": 41,
+      "evidence": "The Claude Code workflow runs fetch-claude-specs.sh without stating its Bash 4.4+, Git 2.36+, and GNU realpath requirements; those prerequisites are only in README.md, which the workflow does not instruct the agent to read.",
+      "fix": "State the Claude fetcher's prerequisites in the workflow or direct the agent to the prerequisite paragraph in README.md before running it, with a stop-and-report fallback when they are unavailable."
+    }
+  ]
+}

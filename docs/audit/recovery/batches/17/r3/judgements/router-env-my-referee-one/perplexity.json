@@ -1,0 +1,86 @@
+{
+  "skill": "perplexity",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 14,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": null,
+      "evidence": "Previous-version digest at dbff837f: \"removed units (53, showing 40)\".",
+      "fix": "Review the 13 omitted removal items against the current files and docs/audit/recovery/perplexity/record.md; restore substantive unexplained content to references/ or the main workflow as appropriate, or record a valid reason for each removal."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 48,
+      "evidence": "The Gotchas cover stale snippets, unverified citations, and disclosure of search terms, but give little guidance on integration-specific failure modes.",
+      "fix": "Add concrete Perplexity MCP gotchas grounded in observed failures, with the condition, consequence, and recovery action; retain the existing verification and privacy warnings."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 38,
+      "evidence": "\"The only trigger for raising Search limits to 5 results / 1024 tokens is an empty or inadequate first result set.\"",
+      "fix": "Keep conservative defaults but allow an explicitly requested broader result set when the user accepts the additional output, within the live tool schema and applicable budget constraints."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/perplexity/evals/trigger-queries.json",
+      "line": 2,
+      "evidence": "Trigger queries such as \"Latest news on next lunar mission? Sources.\" are largely short and lack realistic task context.",
+      "fix": "Add or enrich trigger queries with varied casual and context-heavy requests, including mixed tasks and realistic near-misses, while retaining both positive and negative cases."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/perplexity/README.md",
+      "line": 45,
+      "evidence": "README says to increase limits when the user explicitly needs comprehensive results or a complex topic requires multiple sources, whereas SKILL.md says an empty or inadequate first result set is the only trigger.",
+      "fix": "Reconcile the README escalation bullets and example with the governing SKILL.md rule, preserving the examples and documenting any changed rule in the recovery record."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 28,
+      "evidence": "\"If WebSearch is also absent, report that no web tool is available\" does not check whether another browser or web-search integration is available.",
+      "fix": "If both Perplexity tools and WebSearch are absent, check for another available appropriate web tool and use it with a disclosed substitution; report that no web tool is available only if none exists."
+    }
+  ]
+}

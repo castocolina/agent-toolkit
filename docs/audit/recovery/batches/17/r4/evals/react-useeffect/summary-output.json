@@ -1,0 +1,34 @@
+{
+  "skill": "react-useeffect",
+  "mode": "output",
+  "pass_rate": 0.9242,
+  "passed": 61,
+  "total": 66,
+  "failures": [
+    {
+      "eval": "init-runs-twice",
+      "assertion": "Gives a new auth session its own initialization (cache keyed by session or dropped on sign-out)",
+      "evidence": "The output says \u201cLogout, account changes, expiry, multiple tabs, or server rendering require coordination in your auth layer,\u201d but does not specify a session-keyed cache or clearing it on sign-out."
+    },
+    {
+      "eval": "partial-reset-casual",
+      "assertion": "Explains the flash: the Effect runs only after the panel has already rendered with the stale selection",
+      "evidence": "The output says, \"That resets it before the new thread is displayed, without an Effect,\" but does not explain when the original Effect runs."
+    },
+    {
+      "eval": "ssr-init-guard",
+      "assertion": "Explains that top-level module code runs on import, including on the server in a server-rendered app, where window does not exist",
+      "evidence": "The output mentions avoiding access to `window` \u201cduring server imports,\u201d but does not explicitly explain that `window` does not exist on the server."
+    },
+    {
+      "eval": "shared-handler-function",
+      "assertion": "Extracts one function holding the shared logic that both click handlers call",
+      "evidence": "The shared function contains only \"showNotification(\"Added to cart\");\", while cart addition is not included."
+    },
+    {
+      "eval": "analytics-replay",
+      "assertion": "Distinguishes this from a reversible resource (listener, connection, instance), where cleanup must undo exactly that setup",
+      "evidence": "The output says, \u201cthere\u2019s no resource for cleanup to undo,\u201d but does not discuss cleanup for a reversible resource."
+    }
+  ]
+}

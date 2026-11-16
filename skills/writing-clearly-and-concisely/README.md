@@ -67,3 +67,6 @@ Add the skill to project knowledge or paste SKILL.md contents into your conversa
 - Adapted from [obra/the-elements-of-style](https://github.com/obra/the-elements-of-style)
 - Writing principles from *The Elements of Style* by William Strunk Jr. (1918)
 - AI pattern research from Wikipedia's field guide to AI-generated content detection: `signs-of-ai-writing.md` is adapted from [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing) by its contributors (WikiProject AI Cleanup), licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); see the page history for authors
+- The public-domain text of *The Elements of Style* in `elements-of-style/` comes from [Project Gutenberg ebook 37134](https://www.gutenberg.org/ebooks/37134) by William Strunk Jr. (public domain in the USA), as packaged by obra/the-elements-of-style. Two entries in `elements-of-style/05-words-and-expressions-commonly-misused.md` (Shall, Will; They) are replaced by modern-usage notes; the original wording is in the Gutenberg text.
+- `signs-of-ai-writing.md` is a snapshot of Wikipedia:Signs of AI writing as copied earlier; the live page has since been restructured. Wikipedia text is licensed CC BY-SA 4.0 under the Wikimedia Foundation Terms of Use.
+- HTTP status examples (`401`, `403`, `409 Conflict`) follow RFC 9110 (IETF).

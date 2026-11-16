@@ -1,0 +1,113 @@
+{
+  "skill": "pr-diagrams",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 14,
+    "D4": 14,
+    "D5": 14,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 57,
+      "evidence": "repo prints <owner>/<repo> parsed from origin (https, git@github.com: and ssh://, optional .git or trailing slash); a non-github.com or unparsable origin exits 1 naming the URL",
+      "fix": "The model already parses those remote forms. Keep only the non-obvious part: on a non-github.com host repo exits 1 and the caller must set REPO=<host>/<owner>/<repo>. Move the URL-form list to references/ if a user asks for it, or record the deletion in docs/audit/recovery/pr-diagrams/record.md."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 83,
+      "evidence": "The publish URL is the absolute form ... the absolute form and GHE are unverified: after the edit, open the PR and check that the image renders.",
+      "fix": "Keep the unverified-absolute-form warning, and add the non-obvious consequence: a private repo or GHE can show a broken image even when the blob URL is correct, so the check is part of publish success, not optional confirmation."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 3,
+      "evidence": "Use when attaching or hosting a diagram image in a PR body, choosing where diagram images live, reusing diagrams in a promotion PR, finding related merged PRs, or reusing reviewers from merged source PRs",
+      "fix": "Render draw.io diagrams to PNGs with the diagram embedded, attach them to a pull request with gh --attach or, on GitHub Enterprise or gh older than 2.101, publish them to the single pr-diagrams branch, find the merged PRs a promotion should reuse, and collect those source PRs' human reviewers for the promotion. Use when attaching or hosting a diagram image in a PR body, choosing where diagram images live, reusing diagrams in a promotion PR, finding related merged PRs, or reusing reviewers from merged source PRs, even without the words \"pr-diagrams\" or \"draw.io\", including a request to create a per-PR image branch. Not for drawing a diagram of a module, creating a pull request, listing the reviewers already requested on a PR (gh pr view), converting a .drawio to a PNG for slides, or editing draw.io XML (draw-io)."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/pr-diagrams/references/pr-body.md",
+      "line": 1,
+      "evidence": "Loaded on demand by the explain-pr-changes command, and by the skill's SKILL.md for the two sections it names.",
+      "fix": "In SKILL.md Reference, name the two headings an agent must not load for the skill's own workflow, None-mode diagram filter and Body templates, next to the existing Do NOT load sentence, so the command-owned blocks are not pulled in with the two gated sections."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 47,
+      "evidence": "On that warning take the branch route (publish) for that PNG instead of --attach.",
+      "fix": "State the default as one route for the whole body: if any rendered PNG warns that it is over 10 MB, publish every image for that PR through branch mode and do not mix --attach with publish URLs in the same body, unless the user explicitly asks to attach only the files under the limit."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/evals/evals.json",
+      "line": 1,
+      "evidence": "Twelve evals cover attach, render, related, reviewers, branch naming and recovery, but none assert the merge-commit stop in Promotion step 3 or the gh-and-origin repository mismatch that makes publish exit 2.",
+      "fix": "Add one eval whose prompt shows empty git rev-list --merges output and asserts the agent stops and asks for --reuse-from rather than reusing the related list, and one whose prompt shows publish exit 2 naming two different repositories and asserts no retry and no hand-built push."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/pr-diagrams/evals/trigger-queries.json",
+      "line": 9,
+      "evidence": "Should-not-trigger queries include draw a diagram, create a pull request, edit mxGraph XML, convert to a PNG for slides, explain the PR, add Mermaid to the README, list requested reviewers and push a feature branch.",
+      "fix": "Add near-misses that share the skill's objects but need a neighbor: comment an existing diagram image on a PR without attaching one, and request reviewers on a promotion PR without collecting them from its source PRs."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/SKILL.md",
+      "line": 29,
+      "evidence": "A standalone caller sets these once; the explain-pr-changes command sets its own: AD, REPO, BASE, HEAD, TITLE.",
+      "fix": "Tell the standalone caller to set and export AD, REPO, BASE, HEAD and TITLE before any later step, and say that references/pr-body.md reads those names. Without them the branch-recovery and title-assembly blocks have unset variables."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/pr-diagrams/references/pr-body.md",
+      "line": 160,
+      "evidence": "Loaded from SKILL.md without the command: ... and the $AD/state.env appends belong to the command; skip them.",
+      "fix": "Replace the command-only state.env sentences in the standalone path with the skill's own recovery: quote gh and publish stderr in the final message, and do not tell a standalone caller to continue to reviewers or append N to a file the skill never creates."
+    }
+  ]
+}

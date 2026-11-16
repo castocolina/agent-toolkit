@@ -3,7 +3,7 @@ description: Rebase the current feature branch onto the latest origin/main (or a
 argument-hint: [target]
 ---
 
-Target = the argument, else `main`; an argument starting with `origin/` or `upstream/` is a remote ref, not a branch: stop and ask for the bare branch name. `base=origin`, except fork PRs: if an `upstream` remote exists (`git remote`) and the PR base lives there (`gh pr view --json baseRepository` when available, else ask once), set `base=upstream` so a stale fork `main` is never the base; pushes still go to `origin`. Run each step in order; stop at the first failed check and report it. Never push after a stop.
+Target = the argument, else `main`; an argument starting with `origin/` or `upstream/` is a remote ref, not a branch: stop and ask for the bare branch name. `base=origin`, except fork PRs: if an `upstream` remote exists (`git remote`) and the PR base lives there (`gh pr view --json url,isCrossRepository` when available, taking owner/repo from the PR `url` as the base repository, else ask once), set `base=upstream` so a stale fork `main` is never the base; pushes still go to `origin`. For a fork PR (`isCrossRepository` true), compare the PR base's owner/repo with the URL of each local remote (`git remote get-url <remote>`): if no remote matches or the identity cannot be established, stop and ask the user to add or name the remote, and never silently use the fork's `origin` as the base. Run each step in order; stop at the first failed check and report it. Never push after a stop.
 
 1. Preconditions, before any mutation:
    - `branch=$(git branch --show-current)`; empty means detached HEAD: stop and say so.

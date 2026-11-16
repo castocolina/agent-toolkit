@@ -7,17 +7,19 @@ description: Refresh the specs that skill-judge scores against. Re-fetches the p
 
 Two sources, two fetchers; run each from this repo's root. A request that names only one source runs only its fetcher (the Agent Skills spec: `fetch-spec.sh` alone; the Claude Code pages: `fetch-claude-specs.sh` alone); with no source named, run both: finish each source's edits, run `build_plugins.py` and `rubric-check` once at the end, and make one commit; if one fetcher exits 1, still run the other and report both results.
 
+Combined finalization (no source named): when both sources are unchanged, make no commit and report both as unchanged. The repair-only pending-commit policy of Source 1 step 3.2 still holds: repaired references are reported as a pending commit and are not committed, even when the other source commits. When either fetcher fails, report it, recover as Failures says, and do not commit an inconsistent refresh. Commit once, at the end, only when every eligible change and check (`build_plugins.py`, `rubric-check`) has succeeded.
+
 ## Source 1: Agent Skills (agentskills.io)
 
-Run from this repo's root. It keeps `skills/skill-judge/references/agentskills/` (verbatim, CC-BY-4.0 copies of the Agent Skills docs and the `skills-ref` validator, pinned in `SOURCE.json`) and `skills/skill-judge/references/rubric.md` in step with github.com/agentskills/agentskills.
+Run from this repo's root. It keeps `skills/skill-judge/references/agentskills/` (verbatim copies of the Agent Skills docs (CC-BY-4.0) and of the `skills-ref` validator (Apache-2.0), pinned in `SOURCE.json`) and `skills/skill-judge/references/rubric.md` in step with github.com/agentskills/agentskills.
 
 ### Workflow
 
 1. Run `bash skills/agentskills-research/scripts/fetch-spec.sh` with no options (`-h` lists them). It prints one JSON object; the branches use `changed`, `removed` (references pruned), `rubric_stale` and `sha` (the pin). `fetch-spec.sh -h` documents the other fields and the overrides. If it exits 1, go to Failures.
-2. If `structure_changed` is true, or `rubric-check` reports a broken source anchor, read `references/structure-change.md` and follow it, then resume at step 3 with the latest fetcher JSON; never take the unchanged early return first. Otherwise, `changed` empty AND `removed` empty AND `rubric_stale` false means report "spec unchanged at <sha>" and stop. Do not edit the rubric.
+2. If `structure_changed` is true, or `rubric-check` reports a broken source anchor, read `references/structure-change.md` and follow it, then resume at step 3 with the latest fetcher JSON; never take the unchanged early return first. Otherwise, `changed` empty AND `removed` empty AND `rubric_stale` false means report "spec unchanged at <sha>" and stop this source's work (in a combined run, continue with Source 2 and apply the combined finalization rule above: no commit when both are unchanged). Do not edit the rubric.
 3. Otherwise pick exactly one branch, first match wins. Docs and the validator both count: a validator-only change never takes the unchanged early return; changed validation behavior is a rule change, comment-only or format-only is editorial (update `spec_sha` only).
    1. `skills/skill-judge/references/rubric.md` missing: restore it with `git checkout -- skills/skill-judge/references/rubric.md` and re-run from step 1; if git has no copy, stop and report.
-   2. `rubric_stale` false (so `changed` or `removed` is non-empty: references repaired or pruned to the pin the rubric already matches): no rule change. Report the repair, leave the rubric alone, and run step 6's checks and report the pending commit without committing.
+   2. `rubric_stale` false (so `changed` or `removed` is non-empty: references repaired or pruned to the pin the rubric already matches): no rule change. Report the repair, leave the rubric alone, and run step 6's checks and report the pending commit without committing (also in a combined run, where only the other source's eligible changes are committed).
    3. `rubric_stale` true (whether or not `changed` is empty): diff from the commit that introduced the rubric's old `spec_sha`, never the working-tree diff alone, which misses rule changes from earlier pins.
       ```bash
       OLD_SHA=$(sed -n 's/^spec_sha:[[:space:]]*//p' skills/skill-judge/references/rubric.md)
@@ -44,7 +46,7 @@ Pins `skills`, `sub-agents` and `plugins-reference` from code.claude.com in `ski
 2. `changed` empty, `profiles_stale` non-empty: an interrupted earlier refresh may have skipped the rule review, so do not just copy digests. Go to step 3. If the comparison finds no rule change, only set `source_digest` and the `command_digest` / `agent_digest` line to `digests[kind]`; otherwise apply step 4. `source_digest` must stay on line 2 of the profile (`source_digest: <digest>`, right after `profile_version`) or `profiles_stale` never clears.
 3. In `kept`, read to its end the union of the `changed` pages and the pages of every `profiles_stale` kind (command = `skills` + `plugins-reference`; agent = `sub-agents` + `plugins-reference`), deduplicated, and compare it with the field tables and rules in `docs/audit/artifact-specs.md`. That file is the only record: no old page is kept.
 4. Judge each change as in Source 1 step 4.
-   - Rule change (a new, removed or changed field, allowed value, limit, validation rule or plugin restriction): rewrite the affected rows and sections of `artifact-specs.md` in our own words (quotes at most 25 words, with the URL); update D4, D5 and D7 of the affected profile(s) (`command.md`, `agent.md`) to match; bump `profile_version` by 1; set `source_digest`; update the provenance header (digest lines and the `<page>: <bytes> bytes, sha256 <hash>` lines).
+   - Rule change (a new, removed or changed field, allowed value, limit, validation rule or plugin restriction): rewrite the affected rows and sections of `artifact-specs.md` in our own words (quotes at most 25 words, with the URL); update D4, D5 and D7 of the affected profile(s) (`command.md`, `agent.md`) to match; bump `profile_version` by 1; set `source_digest`; update the provenance header (digest lines and the `<page>: <bytes> bytes, sha256 <hash>` lines). Take each byte count from the kept page before step 5 deletes it (`wc -c < "$kept/<page>.md"`, run in a script file, not chained) and each sha256 from `pages[page].sha256` in `skills/skill-judge/references/claude-code/SOURCE.json`; set both next to the digest-line update (`SOURCE.json` holds only the url and sha256 per page, and the kept pages exist only until deleted, or longer under `--keep`).
    - Editorial (rewording, same fields and values): update only `source_digest` and the provenance header. No rule row edit, no `profile_version` bump. When unsure, treat as a rule change.
 5. Delete the `kept` directory. Run `python3 scripts/build_plugins.py`, then `python3 scripts/audit/audit.py rubric-check` and require exit 0 before committing; the answer ends with that exit code (expect 0; if you cannot run it, say so and name the command).
 
@@ -54,7 +56,7 @@ Other hosts (opencode, Codex, Cursor) are not pinned.
 
 Never remove or shorten a credit, upstream link or license line. The agentskills docs are CC-BY-4.0: keep their attribution headers and the `license` in `references/agentskills/SOURCE.json`. Keep rule 5 of `skills/skill-judge/references/judge-prompt.md`, which forbids findings that remove attribution. A refresh that drops either is wrong; restore it before committing.
 
-The pin `sha` is also what `uvx --from "git+https://github.com/agentskills/agentskills@<sha>#subdirectory=skills-ref" skills-ref validate <dir>` should use.
+The pin `sha` is also what `uvx --from "git+https://github.com/agentskills/agentskills@<sha>#subdirectory=skills-ref" skills-ref validate <dir>` should use. The validator needs Python 3.11+ (`requires-python = ">=3.11"` in its `pyproject.toml`, checked 2026-11-15); `uvx` fetches a matching interpreter itself.
 
 ## Failures
 

@@ -7,7 +7,7 @@
       "files": [
         "evals/files/dashboard.tsx"
       ],
-      "expected_output": "The eight-row review table and one summary line. Fail: loading (page-level CircularProgress, line 20), responsive (uncapped width 1200 at line 24 on the root, which cannot shrink; the 960 at line 26 is a shrinkable flex child), a11y (unnamed icon-only delete, line 31), states (no error branch at lines 13-16, no empty branch at line 27, delete at line 31 confirms nothing). Pass: hierarchy (no filled button), tokens (no color, type or spacing literal; the widths belong to responsive), consistency (one component library), interaction (MUI IconButton keeps its focus-visible state).",
+      "expected_output": "The eight-row review table and one summary line. Fail: loading (page-level CircularProgress, line 20), responsive (uncapped width 1200 at line 24 on the root, whose parent is the block-level `main` in OrdersPage at line 43, not a flex container, so it cannot shrink; the 960 at line 26 is a shrinkable flex child), a11y (unnamed icon-only delete, line 31), states (no error branch at lines 13-16, no empty branch at line 27, delete at line 31 confirms nothing). Pass: hierarchy (no filled button), tokens (no color, type or spacing literal; the widths belong to responsive), consistency (one component library), interaction (MUI IconButton keeps its focus-visible state).",
       "assertions": [
         "The output contains exactly one markdown table and its header row is `| rule | pass/fail/na | evidence file:line | fix |`",
         "The table has exactly eight data rows, in this order: loading, responsive, hierarchy, tokens, consistency, a11y, states, interaction",
@@ -16,7 +16,7 @@
         "Before the table there is no prose, and after it there is exactly one summary line",
         "Every pass row has `-` in its fix cell, and every fail row has a concrete change in its fix cell",
         "The loading row is fail and its evidence cites dashboard.tsx:20 (the CircularProgress that replaces the whole view)",
-        "The responsive row is fail and its evidence cites dashboard.tsx:24 and the uncapped width 1200 on the root, which is not a flex item and cannot shrink; the 960 on the shrinkable flex child at line 26 is not given as the only cause",
+        "The responsive row is fail and its evidence cites dashboard.tsx:24 and the uncapped width 1200 on the root, whose parent is the block-level `main` in OrdersPage (dashboard.tsx:43, not a flex container) so it cannot shrink; the 960 on the shrinkable flex child at line 26 is not given as the only cause",
         "The hierarchy row is pass and its evidence cites dashboard.tsx:31 or says the view has no filled button; the missing name on the icon button is not given as the hierarchy evidence",
         "The tokens row is pass; the fixed widths are not given as a tokens failure",
         "The consistency row is pass",
@@ -213,6 +213,24 @@
         "The hierarchy fix makes Delete outlined with the danger or error color, and does not make Cancel contained",
         "The repeated contained Add to cart (ProductGrid.tsx:32 or the products.map at :24) is not given as a hierarchy defect",
         "The loading row is na, saying the component makes no request"
+      ]
+    },
+    {
+      "id": "review-flex-root-width",
+      "prompt": "Review ReportPage.tsx. The report panel is 900 px wide; is that a responsive problem?",
+      "files": [
+        "evals/files/ReportPage.tsx"
+      ],
+      "expected_output": "The eight-row review table and one summary line that leads with the answer: the 900 px width is not proven to be a responsive problem from source. Responsive is na, not fail: the ReportPanel root at ReportPage.tsx:5 declares width 900, but it renders as a child of the flex container at ReportPage.tsx:20 (used at line 24) with default flex-shrink 1 and no min-width, so it is a shrinkable flex item (rule 3), and whether the page fits at 320 px needs a render. No row is fail (no request, no button, no color literal, no control without a name).",
+      "assertions": [
+        "The output contains exactly one markdown table and its header row is `| rule | pass/fail/na | evidence file:line | fix |`",
+        "The table has exactly eight data rows, in this order: loading, responsive, hierarchy, tokens, consistency, a11y, states, interaction",
+        "Every verdict cell is exactly pass, fail or na",
+        "Every evidence cell contains `ReportPage.tsx:` followed by a line number, a line range or a note of what is absent",
+        "The responsive row is na, not fail, and its evidence cites ReportPage.tsx:5 (the width 900 on the component root) and ReportPage.tsx:20 or :24 (the flex parent it renders in), and says it needs a 320 px render",
+        "The responsive row does not fail the root because a component root counts as not a flex item",
+        "No row is fail",
+        "The summary line leads with the answer: the 900 px width is not a proven responsive problem because the panel is a shrinkable flex item and only a 320 px render can settle it"
       ]
     }
   ]

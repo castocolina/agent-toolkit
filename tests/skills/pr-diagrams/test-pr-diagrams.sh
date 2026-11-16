@@ -52,26 +52,7 @@ init_repo() {
 write_gh_stub() {
   local root=$1
   mkdir -p "$root/bin" "$root/fixtures"
-  cat > "$root/bin/gh" << 'EOF'
-#!/bin/bash
-printf '%s\n' "$*" >> "$GH_LOG"
-code=${GH_STUB_FAIL_CODE:-} msg=${GH_STUB_FAIL_MSG:-} body=${GH_STUB_FAIL_BODY:-}
-if [ -n "$code" ]; then
-  printf '%s\n' "$body"
-  printf 'gh: %s (HTTP %s)\n' "$msg" "$code" >&2
-  exit 1
-fi
-endpoint=""
-for a in "$@"; do
-  case "$a" in
-    repos/*) endpoint=$a ;;
-  esac
-done
-file=${GH_FIXTURES}/${endpoint//\//__}
-if [ -f "$file" ]; then cat "$file"; exit 0; fi
-echo "stub: no fixture for $endpoint" >&2
-exit 1
-EOF
+  cp "$HERE/fixtures/gh-api-stub.sh" "$root/bin/gh"
   chmod +x "$root/bin/gh"
 }
 
@@ -81,28 +62,8 @@ EOF
 # instead of being masked by a canned exit 0.
 write_converter_stub() {
   local path=$1 mode=${2:-png}
-  cat > "$path" << EOF
-#!/bin/bash
-set -e
-echo "Converting inputs..."
-mode=$mode
-generated=()
-for src in "\$@"; do
-  case "\$src" in
-    *.drawio) out="\${src%.drawio}.drawio.png" ;;
-    *) continue ;;
-  esac
-  case "\$mode" in
-    png) printf '\211PNG\r\n\032\nembedded' > "\$out"; echo "Generated \$out"; generated+=("\$out") ;;
-    none) echo "no output for \$src" ;;
-    bad) printf 'not a png' > "\$out"; echo "Generated \$out"; generated+=("\$out") ;;
-  esac
-done
-if [ -n "\${STUB_CWD_LOG:-}" ]; then
-  printf '%s git=%s\n' "\$PWD" "\$(git rev-parse --is-inside-work-tree 2>/dev/null || echo false)" >> "\$STUB_CWD_LOG"
-fi
-if [ \${#generated[@]} -gt 0 ]; then git add -- "\${generated[@]}"; fi
-EOF
+  cp "$HERE/fixtures/converter-stub.sh" "$path"
+  printf '%s\n' "$mode" > "$path.mode"
   chmod +x "$path"
 }
 
@@ -450,6 +411,29 @@ test_render_rejects_missing_or_invalid_png() {
   check stdout_bad "$OUT" ""
 }
 
+test_render_warns_when_png_exceeds_image_limit() {
+  local root; root=$(mktemp -d); TMPS+=("$root")
+  cp "$FIXTURE" "$root/flow.drawio"
+  write_converter_stub "$root/conv.sh" big
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" -- render "$root/flow.drawio"
+  check exit_big "$CODE" 0
+  check warn_big "$(grep -c '10 MB image limit.*branch mode' "$root/err")" 1
+  check png_kept "$([ -s "$root/flow.drawio.png" ] && echo yes || echo no)" yes
+  write_converter_stub "$root/conv.sh" png
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" -- render "$root/flow.drawio"
+  check exit_small "$CODE" 0
+  check no_warn_small "$(grep -c '10 MB image limit' "$root/err" || true)" 0
+}
+
+test_none_filter_keeps_ordinary_inline_image() {
+  local ad; ad=$(mktemp -d); TMPS+=("$ad")
+  sed -n '/^````bash$/,/^````$/p' "$HERE/../../../skills/pr-diagrams/references/pr-body.md" | sed '1d;$d' > "$ad/filter.sh"
+  cp "$HERE/fixtures/none-filter-body.md" "$ad/body.md"
+  AD="$ad" REPO=owner/repo bash "$ad/filter.sh"
+  check filter_exit "$?" 0
+  check filtered "$(cat "$ad/body.md")" "$(cat "$HERE/fixtures/none-filter-body.expected.md")"
+}
+
 test_render_leaves_caller_index_untouched() {
   init_repo
   cp "$FIXTURE" "$REPO/flow.drawio"
@@ -490,6 +474,141 @@ test_render_refuses_symlink_destination() {
   check sentinel "$([ "$(cat "$root/outside/sentinel.png")" = SENTINEL ] && echo yes || echo no)" yes
   check still_symlink "$([ -L "$root/flow.drawio.png" ] && echo yes || echo no)" yes
   check stdout "$OUT" ""
+}
+
+test_render_replaces_nothing_when_a_later_destination_fails() {
+  local root; root=$(mktemp -d); TMPS+=("$root")
+  mkdir -p "$root/a" "$root/b" "$root/outside"
+  cp "$FIXTURE" "$root/a/one.drawio"
+  cp "$FIXTURE" "$root/b/two.drawio"
+  printf 'OLD\n' > "$root/a/one.drawio.png"
+  printf 'SENTINEL\n' > "$root/outside/sentinel.png"
+  ln -s "$root/outside/sentinel.png" "$root/b/two.drawio.png"
+  write_converter_stub "$root/conv.sh"
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" -- render "$root/a/one.drawio" "$root/b/two.drawio"
+  check exit_symlink "$CODE" 1
+  check msg_symlink "$(grep -c 'symlink' "$root/err")" 1
+  check first_kept "$(cat "$root/a/one.drawio.png")" OLD
+  check sentinel "$(cat "$root/outside/sentinel.png")" SENTINEL
+  check stdout_symlink "$OUT" ""
+  check no_stage_files "$(find "$root/a" "$root/b" -name '.pr-diagrams.*' | wc -l | tr -d ' ')" 0
+  # A later destination directory that is not writable fails the same way.
+  rm "$root/b/two.drawio.png"
+  chmod 555 "$root/b"
+  if [ -w "$root/b" ]; then
+    echo "  SKIP read-only directory is still writable (running as root?)"
+  else
+    run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" -- render "$root/a/one.drawio" "$root/b/two.drawio"
+    check exit_readonly "$CODE" 1
+    check msg_readonly "$(grep -c 'not writable' "$root/err")" 1
+    check first_kept_readonly "$(cat "$root/a/one.drawio.png")" OLD
+    check second_absent "$([ -e "$root/b/two.drawio.png" ] && echo yes || echo no)" no
+    check stdout_readonly "$OUT" ""
+  fi
+  chmod 755 "$root/b"
+}
+
+# Symlinks for the tools render needs, with no drawio and a jq that is absent (mode "none") or always fails (mode "fail").
+no_jq_path() { # no_jq_path BIN MODE
+  local bin=$1 tool
+  mkdir -p "$bin"
+  for tool in bash git mktemp cp cat rm chmod mv dirname basename od tr wc head touch mkdir; do
+    ln -sf "$(command -v "$tool")" "$bin/$tool"
+  done
+  if [ "$2" = fail ]; then printf '#!/bin/bash\nexit 1\n' > "$bin/jq"; chmod +x "$bin/jq"; fi
+}
+
+test_render_replaces_nothing_when_jq_is_missing_or_fails() {
+  local root mode; root=$(mktemp -d); TMPS+=("$root")
+  mkdir -p "$root/a"
+  cp "$FIXTURE" "$root/a/one.drawio"
+  printf 'OLD\n' > "$root/a/one.drawio.png"
+  write_converter_stub "$root/conv.sh"
+  for mode in none fail; do
+    no_jq_path "$root/bin-$mode" "$mode"
+    run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" PATH="$root/bin-$mode" -- render "$root/a/one.drawio"
+    check "exit_$mode" "$CODE" 1
+    check "stdout_$mode" "$OUT" ""
+    check "kept_$mode" "$(cat "$root/a/one.drawio.png")" OLD
+    check "no_stage_files_$mode" "$(find "$root/a" -name '.pr-diagrams.*' | wc -l | tr -d ' ')" 0
+    check "msg_$mode" "$(grep -c -E 'jq not found|jq failed building the manifest' "$root/err")" 1
+  done
+}
+
+test_render_restores_earlier_outputs_when_a_replacement_fails() {
+  local root; root=$(mktemp -d); TMPS+=("$root")
+  mkdir -p "$root/a" "$root/b" "$root/bin"
+  cp "$FIXTURE" "$root/a/one.drawio"
+  cp "$FIXTURE" "$root/b/two.drawio"
+  printf 'OLD-A\000\377\nbytes' > "$root/a/one.drawio.png"
+  printf 'OLD-B\000\376\nbytes' > "$root/b/two.drawio.png"
+  cp "$root/a/one.drawio.png" "$root/a.orig"
+  cp "$root/b/two.drawio.png" "$root/b.orig"
+  write_converter_stub "$root/conv.sh"
+  cp "$HERE/fixtures/mv-fail-stub.sh" "$root/bin/mv"
+  chmod +x "$root/bin/mv"
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" PATH="$root/bin:$PATH" REAL_MV="$(command -v mv)" \
+    FAIL_MV_DEST="$root/b/two.drawio.png" MV_LOG="$root/mv.log" -- render "$root/a/one.drawio" "$root/b/two.drawio"
+  check exit "$CODE" 1
+  check stdout "$OUT" ""
+  check msg "$(grep -c 'earlier outputs were restored' "$root/err")" 1
+  # The first output really was replaced before the second rename failed.
+  check first_replaced "$(grep -c -E "/a/\.pr-diagrams\.[A-Za-z0-9]+ $root/a/one\.drawio\.png\$" "$root/mv.log")" 1
+  check first_restored "$(cmp -s "$root/a/one.drawio.png" "$root/a.orig" && echo yes || echo no)" yes
+  check second_restored "$(cmp -s "$root/b/two.drawio.png" "$root/b.orig" && echo yes || echo no)" yes
+  check no_stage_or_backup_files "$(find "$root/a" "$root/b" -name '.pr-diagrams.*' | wc -l | tr -d ' ')" 0
+  # An output that did not exist before is removed again.
+  rm "$root/a/one.drawio.png"
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" PATH="$root/bin:$PATH" REAL_MV="$(command -v mv)" \
+    FAIL_MV_DEST="$root/b/two.drawio.png" -- render "$root/a/one.drawio" "$root/b/two.drawio"
+  check exit_new "$CODE" 1
+  check new_removed "$([ -e "$root/a/one.drawio.png" ] && echo yes || echo no)" no
+  check second_restored_new "$(cmp -s "$root/b/two.drawio.png" "$root/b.orig" && echo yes || echo no)" yes
+  check no_leftovers_new "$(find "$root/a" "$root/b" -name '.pr-diagrams.*' | wc -l | tr -d ' ')" 0
+  # Without the failure both are replaced and no backup is left behind.
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" -- render "$root/a/one.drawio" "$root/b/two.drawio"
+  check exit_ok "$CODE" 0
+  check replaced "$(grep -c -a PNG "$root/a/one.drawio.png" "$root/b/two.drawio.png" | grep -c ':1')" 2
+  check no_leftovers_ok "$(find "$root/a" "$root/b" -name '.pr-diagrams.*' | wc -l | tr -d ' ')" 0
+}
+
+test_render_rejects_inputs_that_map_to_one_png() {
+  local root; root=$(mktemp -d); TMPS+=("$root")
+  # "a" and "a.drawio" differ as basenames but both produce a.drawio.png.
+  cp "$FIXTURE" "$root/a"
+  cp "$FIXTURE" "$root/a.drawio"
+  printf 'OLD\n' > "$root/a.drawio.png"
+  write_converter_stub "$root/conv.sh"
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" -- render "$root/a" "$root/a.drawio"
+  check exit "$CODE" 1
+  check msg "$(grep -c 'duplicate basename' "$root/err")" 1
+  check stdout "$OUT" ""
+  check never_converted "$(grep -c Converting "$root/err")" 0
+  check kept "$(cat "$root/a.drawio.png")" OLD
+  check no_stage_or_backup_files "$(find "$root" -name '.pr-diagrams.*' | wc -l | tr -d ' ')" 0
+}
+
+test_render_restores_outputs_when_terminated_mid_replacement() {
+  local root; root=$(mktemp -d); TMPS+=("$root")
+  mkdir -p "$root/a" "$root/b" "$root/bin"
+  cp "$FIXTURE" "$root/a/one.drawio"
+  cp "$FIXTURE" "$root/b/two.drawio"
+  printf 'OLD-A\000\377\nbytes' > "$root/a/one.drawio.png"
+  printf 'OLD-B\000\376\nbytes' > "$root/b/two.drawio.png"
+  cp "$root/a/one.drawio.png" "$root/a.orig"
+  cp "$root/b/two.drawio.png" "$root/b.orig"
+  write_converter_stub "$root/conv.sh"
+  cp "$HERE/fixtures/mv-term-stub.sh" "$root/bin/mv"
+  chmod +x "$root/bin/mv"
+  # TERM arrives after b/two's original was renamed to its backup, before its staged copy is installed.
+  run_in "$root" DRAWIO_CONVERTER="$root/conv.sh" PATH="$root/bin:$PATH" REAL_MV="$(command -v mv)" \
+    TERM_AFTER_BAK_OF="$root/b/two.drawio.png" -- render "$root/a/one.drawio" "$root/b/two.drawio"
+  check exit "$CODE" 143
+  check stdout "$OUT" ""
+  check msg "$(grep -c 'interrupted; restoring' "$root/err")" 1
+  check first_restored "$(cmp -s "$root/a/one.drawio.png" "$root/a.orig" && echo yes || echo no)" yes
+  check second_restored "$(cmp -s "$root/b/two.drawio.png" "$root/b.orig" && echo yes || echo no)" yes
+  check no_stage_or_backup_files "$(find "$root/a" "$root/b" -name '.pr-diagrams.*' | wc -l | tr -d ' ')" 0
 }
 
 test_render_names_with_spaces_are_not_false_duplicates() {
@@ -587,6 +706,9 @@ cap() { # cap VERSION URL [env...]; sets OUT CODE ERR
 test_capability_rule() {
   cap 'gh version 2.101.0 (2026-09-15)' https://github.com/o/r; check v2101 "$OUT/$CODE" attach/0
   cap 'gh version 2.100.0' https://github.com/o/r; check v2100 "$OUT/$CODE" branch/0
+  # --attach shipped in 2.99.0; 2.101 is only the tested floor, so the message must not claim the flag is missing.
+  check floor_msg "$(printf '%s' "$ERR" | grep -c 'gh 2.100 is older than the tested floor 2.101: using branch mode')" 1
+  check no_false_claim "$(printf '%s' "$ERR" | grep -c 'no --attach')" 0
   cap 'gh version 3.0.0' https://github.com/o/r; check v3 "$OUT/$CODE" attach/0
   cap 'gh version 2.101.0' https://GitHub.com/o/r/; check upper "$OUT/$CODE" attach/0
   local u
@@ -615,6 +737,10 @@ test_capability_probe_failures_print_branch() {
   done
   cap 'gh version 2.101.0' https://github.com/o/r PR_DIAGRAMS_MODE=bogus
   check bogus "[$OUT]/$CODE" "[]/2"
+  local s; s=$(mktemp -d); TMPS+=("$s"); write_cap_stub "$s"
+  run_in "$s" GH="$s/bin/gh" -- capability extra
+  check stray_arg "[$OUT]/$CODE" "[]/2"
+  check stray_arg_usage "$(printf '%s' "$ERR" | grep -c 'usage: pr-diagrams.sh capability')" 1
 }
 
 test_capability_without_timeout_still_attaches() {

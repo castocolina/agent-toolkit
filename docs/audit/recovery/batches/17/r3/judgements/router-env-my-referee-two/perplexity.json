@@ -1,0 +1,131 @@
+{
+  "skill": "perplexity",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 12,
+    "D3": 12,
+    "D4": 14,
+    "D5": 13,
+    "D6": 13,
+    "D7": 11,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 101,
+  "max_total": 125,
+  "percent": 80.8,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/perplexity/README.md",
+      "line": 1,
+      "evidence": "A comprehensive guide for using Perplexity AI tools effectively within Claude Code. This skill helps you choose the right search and research tool",
+      "fix": "README.md is repository-required, so keep it, but the Purpose, Key Features and Summary sections only restate the route table. Move any line a user asks for by name into skills/perplexity/references/ and record each dropped paragraph in docs/audit/recovery/perplexity/record.md; do not delete the Credits section."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 42,
+      "evidence": "Snippets can be stale: open the cited page before attributing a claim to it.",
+      "fix": "The Gotchas list repeats Search and escalation (stale snippets, unverified citations, search terms leave the workspace). Keep one copy in SKILL.md and record the duplicate lines in docs/audit/recovery/perplexity/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 11,
+      "evidence": "| Request | Route |",
+      "fix": "The route table is the right tool pattern, but several rows name integrations this skill does not operate. Keep the Perplexity branches as the procedure and point the other rows at the skill that owns them, so this skill teaches one decision rather than seven products."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 38,
+      "evidence": "Do not use `mcp__perplexity__perplexity_research` in this environment: it takes only `messages`",
+      "fix": "The prohibition has a real reason. Add the environment-specific failure: the tool name is `mcp__perplexity__...` only when the server is registered as perplexity, so read the live tool list before calling it, and say what to do when the listed name differs."
+    },
+    {
+      "id": "D4-1",
+      "dimension": "D4",
+      "severity": "low",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 3,
+      "evidence": "Route external web research to Perplexity MCP: perplexity_search for current facts and links",
+      "fix": "Route current public facts and links to perplexity_search (start at max_results 3 and max_tokens_per_page 512) and sourced explanations to perplexity_ask. Use for recent news, comparisons, tutorials and current-information questions even when the user does not say search. Not for library or framework docs (Context7), Graphite gt CLI help, this workspace (Nx MCP), one supplied URL (URL Crawler), or repository-local lookup."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 22,
+      "evidence": "Read README.md only when you need the call-shape examples; do not load it for a single routing decision.",
+      "fix": "Move the two TypeScript call shapes out of README.md into skills/perplexity/references/call-shapes.md and change this line to read that file only when composing a perplexity_search or perplexity_ask call. Leave README.md in place; it is repository-required."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 18,
+      "evidence": "If it is unavailable, use an available appropriate tool, say which substitution was made, and report the limitation if no suitable tool exists.",
+      "fix": "Name the substitute per row: library docs with Context7 unavailable go to the vendor's official docs page, not Perplexity; one URL with URL Crawler unavailable uses the harness fetch tool; only a general web query falls through to the other Perplexity tool and then WebSearch."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/perplexity/evals/evals.json",
+      "line": 1,
+      "evidence": "\"assertions\":[\"Selects Perplexity Search\",\"Uses `max_results: 3` and `max_tokens_per_page: 512`\"",
+      "fix": "Add one eval for material disagreement (open the cited pages, then Ask, and do not raise limits) and one for several independent subquestions (split searches). Keep the existing seven cases; they already check the confidential-query and stale-snippet branches."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/perplexity/README.md",
+      "line": 19,
+      "evidence": "- **Deep research** \u2192 Use Researcher agent (`/research`) instead",
+      "fix": "README.md says deep research is never Perplexity, while SKILL.md routes a multi-source report to /research only if configured and otherwise to bounded searches. Change the README bullet to that same branch so the two files do not disagree."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/perplexity/README.md",
+      "line": 40,
+      "evidence": "- User explicitly needs comprehensive results",
+      "fix": "SKILL.md allows a raise to 5 results and 1024 tokens only after an empty or inadequate first result set. Delete the README triggers 'user explicitly needs comprehensive results' and 'complex topic requires multiple sources', or rewrite them to that single trigger, and record the removed lines in docs/audit/recovery/perplexity/record.md."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/perplexity/SKILL.md",
+      "line": 38,
+      "evidence": "a run can use up to 40 tool calls and takes minutes (checked 2026-11-15, https://docs.perplexity.ai/docs/agent-api/presets)",
+      "fix": "The presets page is cited for a 40-tool-call budget that belongs to the MCP server schema. Point the 40-call figure at https://github.com/perplexityai/modelcontextprotocol (src/server.ts) and keep the presets URL only for the missing output-token budget, with the date checked."
+    }
+  ]
+}

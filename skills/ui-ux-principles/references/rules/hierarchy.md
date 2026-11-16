@@ -25,7 +25,7 @@ Apple HIG Buttons allows one or two prominent buttons per view and says to mark 
 
 Use these to improve a screen, not to fail it:
 
-- NN/g, for complex designs: about 3 type sizes, about 3 contrast treatments, about 2 large elements.
+- NN/g, for complex designs: about 3 type sizes and about 3 contrast treatments. The "about 2 large elements" figure is NN/g's general scale guidance, not a complex-design cap (https://www.nngroup.com/articles/visual-hierarchy-ux-definition/, checked 2026-11-15).
 - Squint test: blurred, the primary action and the page title still stand out.
 - Group by proximity first; add a border or background only when spacing does not separate the groups.
 - Delete filler copy ("Welcome to your dashboard") and repeated "Overview" headings.

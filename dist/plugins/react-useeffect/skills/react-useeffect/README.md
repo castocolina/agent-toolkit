@@ -16,6 +16,7 @@ The routing table, correctness loop and NEVER list live in [SKILL.md](SKILL.md);
 - `SKILL.md`: routing table, correctness and test loop, NEVER list, and which reference to load when.
 - `references/anti-patterns.md`: smell catalog for audits (each row links its react.dev section), a complete fetch hook, the initialization cache.
 - `references/alternatives.md`: partial identity reset, external store snapshots, non-reactive reads.
+- `references/restored-patterns.md`: the `useMemo` measuring steps and React Compiler pointer, one function for two handlers that share logic, browser-only module-level initialization.
 
 ## Example prompts
 
@@ -43,3 +44,9 @@ This skill is based on:
 - [React Official Docs: You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
 - [React Official Docs: Synchronizing with Effects](https://react.dev/learn/synchronizing-with-effects)
 - [React Official Docs: Lifecycle of Reactive Effects](https://react.dev/learn/lifecycle-of-reactive-effects)
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+The facts in this skill are checked against documentation owned by react.dev (the React team) and by MDN Web Docs (Mozilla).

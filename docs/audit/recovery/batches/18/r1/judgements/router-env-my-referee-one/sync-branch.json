@@ -1,0 +1,50 @@
+{
+  "skill": "sync-branch",
+  "judge": "router-env-my-referee-one",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "high",
+      "file": "commands/sync-branch.md",
+      "line": 6,
+      "evidence": "`base=origin`, except fork PRs: if an `upstream` remote exists ... and the PR base lives there ... set `base=upstream`",
+      "fix": "For a fork PR, identify the base repository and a matching local remote before selecting the base. If no matching remote exists or its identity cannot be established, stop and ask the user to configure or identify it; do not silently use the fork's origin."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/sync-branch.md",
+      "line": 6,
+      "evidence": "`gh pr view --json url,isCrossRepository` when available",
+      "fix": "Before relying on the version-sensitive `gh pr view` JSON fields, inspect the installed CLI's supported fields, or cite the official `gh pr view` documentation and the date checked alongside the instruction; retain the ask-user fallback if the fields are unavailable."
+    }
+  ]
+}

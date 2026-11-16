@@ -71,6 +71,16 @@
         "No `git rebase`, no `git push` and no automatic stash runs",
         "The final message names the uncommitted change and tells the user to commit or stash first"
       ]
+    },
+    {
+      "id": "fork-pr-upstream-base-from-url",
+      "prompt": "Scenario: current branch `feature/login-form`, clean tree, no argument. `git remote` lists `origin` (the user's fork) and `upstream`. `gh pr view --json url,isCrossRepository` prints `{\"isCrossRepository\":true,\"url\":\"https://github.com/acme/app/pull/42\"}`, and `git remote get-url upstream` prints `https://github.com/acme/app.git`. The branch is already on origin and the user says it is theirs alone. Show the exact ordered git and gh commands you run, with the literal names. You cannot run commands or ask questions. Write the complete commands and file contents exactly as an agent with full access would, using this scenario's values. Where the scenario leaves a detail open, choose a concrete plausible value and state it; never reply that information is missing. End your answer with a section headed exactly 'Final message:' that contains only the user-facing message.",
+      "assertions": [
+        "The `gh pr view` call requests the JSON fields `url,isCrossRepository` and never requests a `baseRepository` field",
+        "The base repository is taken from the owner/repo of the PR `url` (`acme/app`), which matches the `upstream` remote, so the base is `upstream`",
+        "Both `origin` and `upstream` are fetched with `--prune` and the rebase targets `upstream/main`, never `origin/main`",
+        "The push still goes to `origin` with `--force-with-lease` and an explicit expected value, never to `upstream`"
+      ]
     }
   ]
 }

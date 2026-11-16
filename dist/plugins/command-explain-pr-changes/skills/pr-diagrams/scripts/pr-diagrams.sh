@@ -149,16 +149,47 @@ png_ok() {
   [ "$sig" = "89504e470d0a1a0a" ]
 }
 
+# Undo the replacement transaction of cmd_render pass 3 (state in the TX_* globals): put every
+# original back, remove outputs that did not exist, drop unused backups. Returns 1 when an
+# original could not be restored; it is then kept at its backup path.
+TX_DESTS=() TX_BAKS=() TX_EXISTED=() TX_MOVED=() TX_LAST=-1
+rollback_render() {
+  local j rc=0
+  for ((j = 0; j <= TX_LAST; j++)); do
+    if [ "${TX_EXISTED[j]}" -eq 0 ]; then
+      rm -f "${TX_DESTS[j]}"
+    elif [ "${TX_MOVED[j]}" -eq 1 ] || { [ "${TX_MOVED[j]}" -eq 2 ] && [ ! -e "${TX_DESTS[j]}" ]; }; then
+      if ! mv -f "${TX_BAKS[j]}" "${TX_DESTS[j]}"; then
+        echo "pr-diagrams: cannot restore ${TX_DESTS[j]}; its original is kept at ${TX_BAKS[j]}" >&2
+        rc=1
+      fi
+    else
+      [ -z "${TX_BAKS[j]}" ] || rm -f "${TX_BAKS[j]}"  # the original was never touched
+    fi
+  done
+  return "$rc"
+}
+
+# Signal trap of the replacement transaction: roll back, then exit 128+signal.
+tx_abort() {
+  echo "pr-diagrams: interrupted; restoring the outputs" >&2
+  rollback_render || true
+  exit "$1"
+}
+
 cmd_render() {
   [ $# -gt 0 ] || die "usage: pr-diagrams.sh render <file.drawio>..."
+  command -v jq >/dev/null 2>&1 || die "jq not found (render builds its JSON manifest with it before it replaces any PNG)"
   local converter=${DRAWIO_CONVERTER:-}
   if [ -z "$converter" ]; then
     command -v drawio >/dev/null 2>&1 || die "drawio CLI not found"
     converter=$(cd "$(dirname "$0")" && pwd)/../../draw-io/scripts/convert-drawio-to-png.sh
   fi
+  # Compare the output names, not the input names: "a" and "a.drawio" both map to a.drawio.png
+  # (the scratch copy and, in one directory, the destination), so they would overwrite each other.
   local seen=() f base i n
   for f in "$@"; do
-    base=$(basename "$f")
+    base=$(basename "$f" .drawio).drawio.png
     n=${#seen[@]}
     for ((i = 0; i < n; i++)); do
       [ "${seen[i]}" = "$base" ] && die "duplicate basename $base: $*"
@@ -187,33 +218,88 @@ cmd_render() {
     if ! png_ok "$png"; then
       echo "pr-diagrams: $f: no valid PNG (missing, empty, or not a PNG)" >&2
       missing=1
+    elif [ "$(wc -c < "$png")" -gt 10485760 ]; then
+      # Pointer, not a promise: GitHub documents "10MB for images and gifs" (Docs, Attaching files, checked 2026-11-15).
+      echo "pr-diagrams: $f: PNG is over GitHub's 10 MB image limit, an --attach upload can fail with no PR created; use branch mode (publish) for it" >&2
     fi
   done
   if [ "$missing" -ne 0 ]; then
     cat "$conv_err" >&2
     exit 1
   fi
-  local manifest
-  manifest=$(mktemp); TMPS+=("$manifest")
-  : > "$manifest"
   local f png dest dest_dir tmp
+  local dests=() stages=() srcs=() drawios=("$@")
+  # Pass 1: preflight every destination before anything is written. Never write
+  # through an existing destination symlink: refuse instead of following it.
   for f in "$@"; do
     png=$scratch/$(basename "$f" .drawio).drawio.png
     dest_dir=$(dirname "$f")
     dest=$dest_dir/$(basename "$png")
-    # Never write through an existing destination symlink: refuse instead of
-    # following it, and copy through a temp file in the destination directory
-    # so the final rename replaces the entry itself.
     if [ -L "$dest" ]; then
       die "refusing to overwrite a symlinked destination: $dest"
     fi
-    tmp=$(mktemp "$dest_dir/.pr-diagrams.XXXXXX") || die "cannot create a temp file in $dest_dir"
-    cp "$png" "$tmp"
-    chmod 644 "$tmp"
-    mv -f "$tmp" "$dest"
-    jq -nc --arg drawio "$f" --arg png "$dest" '{drawio: $drawio, png: $png}' >> "$manifest"
+    if [ ! -d "$dest_dir" ] || [ ! -w "$dest_dir" ]; then
+      die "destination directory is not writable: $dest_dir"
+    fi
+    dests+=("$dest"); srcs+=("$png")
   done
-  jq -s '.' "$manifest"
+  # Build and validate the complete manifest before any output is replaced: a jq
+  # failure then exits nonzero with empty stdout and every output as it was.
+  local n=${#dests[@]} i j manifest lines
+  manifest=$(mktemp); TMPS+=("$manifest")
+  lines=$(mktemp); TMPS+=("$lines")
+  for ((i = 0; i < n; i++)); do
+    jq -nc --arg drawio "${drawios[i]}" --arg png "${dests[i]}" '{drawio: $drawio, png: $png}' >> "$lines" || die "jq failed building the manifest"
+  done
+  jq -s '.' "$lines" > "$manifest" || die "jq failed building the manifest"
+  jq -e --argjson n "$n" 'length == $n' "$manifest" >/dev/null || die "the manifest does not list every output"
+  # Pass 2: stage every copy as a temp file in its destination directory (so the
+  # final rename replaces the entry itself); a failure here leaves every output as it was.
+  for ((i = 0; i < n; i++)); do
+    dest_dir=$(dirname "${dests[i]}")
+    tmp=$(mktemp "$dest_dir/.pr-diagrams.XXXXXX") || die "cannot create a temp file in $dest_dir"
+    TMPS+=("$tmp"); stages+=("$tmp")
+    cp "${srcs[i]}" "$tmp" || die "cannot stage a copy in $dest_dir"
+    chmod 644 "$tmp"
+  done
+  # Pass 3: replace the outputs. Rename each existing output to a backup in its own
+  # directory (a same-filesystem rename copies nothing, so no output is ever
+  # half-written), then rename its staged copy into place. On a failure rename the
+  # backups back (and remove the outputs that did not exist); delete the backups only
+  # after every replacement succeeded.
+  # The transaction state is global so a signal trap can roll it back like an ordinary failure.
+  # TX_EXISTED[i]=1: output i existed (it must come back); TX_MOVED[i]=2: its backup rename
+  # is under way; TX_MOVED[i]=1: it was renamed to TX_BAKS[i]. TX_LAST is the last index started.
+  local failed="" bk
+  TX_DESTS=("${dests[@]}"); TX_BAKS=(); TX_EXISTED=(); TX_MOVED=(); TX_LAST=-1
+  for ((i = 0; i < n; i++)); do
+    TX_BAKS[i]=""; TX_MOVED[i]=0
+    if [ -e "${dests[i]}" ]; then TX_EXISTED[i]=1; else TX_EXISTED[i]=0; fi
+  done
+  trap 'tx_abort 130' INT
+  trap 'tx_abort 143' TERM
+  trap 'tx_abort 129' HUP
+  for ((i = 0; i < n; i++)); do
+    TX_LAST=$i
+    if [ "${TX_EXISTED[i]}" -eq 1 ]; then
+      dest_dir=$(dirname "${dests[i]}")
+      if ! bk=$(mktemp "$dest_dir/.pr-diagrams.bak.XXXXXX"); then failed="cannot back up ${dests[i]}"; break; fi
+      TX_BAKS[i]=$bk; TX_MOVED[i]=2
+      if ! mv -f "${dests[i]}" "$bk"; then failed="cannot back up ${dests[i]}"; break; fi
+      TX_MOVED[i]=1
+    fi
+    if ! mv -f "${stages[i]}" "${dests[i]}"; then failed="cannot replace ${dests[i]}"; break; fi
+  done
+  if [ -n "$failed" ]; then
+    rollback_render || die "$failed; some outputs could not be restored (see above)"
+    die "$failed; earlier outputs were restored"
+  fi
+  # Success: disarm the rollback before the backups go, or a late signal would restore old over new.
+  trap - INT TERM HUP
+  for ((i = 0; i < n; i++)); do
+    [ -z "${TX_BAKS[i]}" ] || rm -f "${TX_BAKS[i]}"
+  done
+  cat "$manifest"
 }
 
 usage_err() { echo "pr-diagrams: $*" >&2; exit 2; }
@@ -269,7 +355,7 @@ cmd_capability() {
     echo "pr-diagrams: cannot parse gh version [$ver], using branch" >&2; echo branch; return 0
   fi
   if [ "${BASH_REMATCH[1]}" -lt 2 ] || { [ "${BASH_REMATCH[1]}" -eq 2 ] && [ "${BASH_REMATCH[2]}" -lt 101 ]; }; then
-    echo "pr-diagrams: gh ${BASH_REMATCH[1]}.${BASH_REMATCH[2]} has no --attach, using branch" >&2; echo branch; return 0
+    echo "pr-diagrams: gh ${BASH_REMATCH[1]}.${BASH_REMATCH[2]} is older than the tested floor 2.101: using branch mode" >&2; echo branch; return 0
   fi
   rc=0
   origin_target || O_ARG=""  # no parsable origin: fall back to gh's own repository
@@ -309,7 +395,7 @@ cmd_publish() {
   done
   local stray
   stray=$( { git for-each-ref --format='%(refname:short)' 'refs/heads/pr-diagrams-*' 'refs/heads/pr-diagrams/*'
-             git ls-remote --heads origin 'pr-diagrams-*' 'pr-diagrams/*' | sed 's|.*refs/heads/||'; } | tr '\n' ' ')
+             git ls-remote origin 'refs/heads/pr-diagrams-*' 'refs/heads/pr-diagrams/*' | sed 's|.*refs/heads/||'; } | tr '\n' ' ')
   [ -z "$stray" ] || usage_err "stray branch(es), only 'pr-diagrams' is allowed: $stray"
   local rurl
   origin_target || usage_err "cannot determine origin's repository from its URL"
@@ -324,7 +410,7 @@ cmd_publish() {
   git worktree add -q --detach --no-checkout "$dir/wt" HEAD || die "cannot create worktree"
   WT=$dir/wt
   for attempt in 1 2; do
-    if [ -n "$(git ls-remote --heads origin refs/heads/pr-diagrams)" ]; then
+    if [ -n "$(git ls-remote origin refs/heads/pr-diagrams)" ]; then
       git fetch -q origin refs/heads/pr-diagrams || die "fetch of pr-diagrams failed"
       parent=$(git rev-parse FETCH_HEAD)
     fi
@@ -343,7 +429,7 @@ cmd_help() {
   printf '%s\n' \
     'usage: pr-diagrams.sh <subcommand> [args]' \
     '' \
-    '  capability                              print attach or branch, always exit 0' \
+    '  capability                              print attach or branch; exit 0 for every probe outcome, 2 for a usage error (stray argument or invalid PR_DIAGRAMS_MODE)' \
     '  render <file.drawio>...                 stdout [{"drawio","png"}]; each PNG embeds its diagram, next to its source' \
     '  publish <N> <png>...                    commit <N>/<name> on branch pr-diagrams; stdout one {"png","url"} line per file' \
     '  related <base> <head> [--exclude-pr N]  stdout [{"pr","title","head_ref","base_ref","merged_at"}], merged PRs, newest first' \
