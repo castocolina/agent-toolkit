@@ -1,0 +1,95 @@
+{
+  "skill": "writing-clearly-and-concisely",
+  "judge": "router-env-my-referee-two",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 12,
+    "D4": 15,
+    "D5": 14,
+    "D6": 14,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/writing-clearly-and-concisely/SKILL.md",
+      "line": 111,
+      "evidence": "Load at most the one section that answers the open question; the rules above cover ordinary tightening without any reference. When context is tight, read only that section and edit locally.",
+      "fix": "The model already knows to load less when context is tight. Delete that second sentence and record the removal in docs/audit/recovery/writing-clearly-and-concisely/record.md; keep the load table, which gates the files."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "medium",
+      "file": "skills/writing-clearly-and-concisely/SKILL.md",
+      "line": 104,
+      "evidence": "NEVER lists three failures the checkpoints do not catch, but there is no Gotchas section for environment-specific facts that defy assumptions.",
+      "fix": "Add a short Gotchas section after NEVER naming only failures this skill actually meets: a rewrite that is no shorter still counts as done when an invariant required it; a heading's text is its anchor, so renaming it breaks inbound links; a cleaned-up error string no longer matches the log. Do not pad it with items the task never meets."
+    },
+    {
+      "id": "D5-1",
+      "dimension": "D5",
+      "severity": "low",
+      "file": "skills/writing-clearly-and-concisely/SKILL.md",
+      "line": 117,
+      "evidence": "The composition row says to read elements-of-style/03 and then 'the matching rule (8-9 paragraphs, 10 active voice, 13 needless words, 16 related words, 18 emphasis)' and to skip the other rules, but names no heading text to stop at.",
+      "fix": "Name the heading to read and the next heading to stop before, for example Rule 13 through the line before Rule 14, so the agent does not load the rest of the file."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/writing-clearly-and-concisely/SKILL.md",
+      "line": 79,
+      "evidence": "Notes, one short line each, only when they apply, then later 'In Edit and Structure they come after the rewrite, and only for protected quoted material or when the user asks for an explanation of the changes (then at most 5 items); the one-line note limits above apply only when no explanation was asked for.'",
+      "fix": "State one default: after an Edit or Structure rewrite, emit only the one-line notes that apply, and add the quoted-fragment suggestion list only for protected quoted material or when the user asked why, capped at 5. Leave the Flag branch's separate cap of about 10."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/writing-clearly-and-concisely/evals/trigger-queries.json",
+      "line": 1,
+      "evidence": "Ten should-trigger and ten should-not-trigger queries, but the negatives are far misses (diagnose a slow query, translate to French, count words, summarize a log, fix a syntax error, write unit tests, check for leaked secrets, explain a re-render, extract error strings). Only 'my status report sounds like ChatGPT wrote it' is a near miss.",
+      "fix": "Replace several obvious negatives with near misses that share this skill's words but belong elsewhere: a request to humanize a draft without cutting meaning, a request to write a README from scratch for a product the user describes, and a request to copyedit code comments or a docstring. Keep the count near 10 and 10."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/writing-clearly-and-concisely/SKILL.md",
+      "line": 12,
+      "evidence": "Pick the branch maps a long document that repeats itself to Structure, and Structure step 1 says the default when the user did not authorise restructuring is to keep every heading and consolidate only the prose inside each section.",
+      "fix": "Add a row or a sentence: a long document that repeats itself but whose request does not say restructure, reorganize or merge goes to Edit, section by section, and Structure's merge is used only when the user authorises it. State that an unauthorised merge is the failure NEVER already names."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/writing-clearly-and-concisely/SKILL.md",
+      "line": 64,
+      "evidence": "Draft branch step 2 specifies an error message (quote the failing identifier, name the fix, add Needs: remediation, no apology), but steps 1 and 3 are the only instructions for a README, policy, UI string or report.",
+      "fix": "Add one Draft line for non-error prose: one fact per sentence, every specific through the claims checkpoint, brand voice only from a supplied sample, and end with Needs: lines for anything missing. Do not add a template menu."
+    }
+  ]
+}

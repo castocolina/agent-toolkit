@@ -1,0 +1,24 @@
+{
+  "skill": "sync-branch",
+  "mode": "output",
+  "pass_rate": 0.8846,
+  "passed": 23,
+  "total": 26,
+  "failures": [
+    {
+      "eval": "default-target-main",
+      "assertion": "The push is `git push --force-with-lease=\"refs/heads/feature/login-form:<sha>\" origin feature/login-form`, where `<sha>` is the remote tip recorded before the rebase (explicit lease), and comes last",
+      "evidence": "The push uses the previously recorded `$remote` as an explicit lease, but is followed by `git log --oneline origin/main..feature/login-form` and `git rev-parse HEAD`."
+    },
+    {
+      "eval": "explicit-target-develop",
+      "assertion": "The rebase command is `git rebase origin/develop`",
+      "evidence": "The output shows `git rebase \"$base/$target\"`."
+    },
+    {
+      "eval": "fork-pr-upstream-base-from-url",
+      "assertion": "The base repository is taken from the owner/repo of the PR `url` (`acme/app`), which matches the `upstream` remote, so the base is `upstream`",
+      "evidence": "The output says, \"The given PR URL and upstream URL identify the same repository, so the base is `upstream/main`,\" but does not show `acme/app` or how the owner/repo was extracted."
+    }
+  ]
+}
