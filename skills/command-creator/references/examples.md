@@ -70,7 +70,9 @@ gt submit --stack --publish --no-edit
 
 - `--stack`: submit the entire stack (upstack and downstack)
 - `--publish`: publish any draft PRs
-- `--no-edit`: use commit messages as PR titles and descriptions without prompting
+- `--no-edit`: does not edit PR fields inline
+
+Flags per https://graphite.com/docs/command-reference, checked 2026-11-13; confirm with `gt submit --help` before reusing.
 
 If the submit fails or times out, run `gt log short` and check the PRs it lists before anything else: some may already be created or updated. Report what is there and ask before running the submit again.
 
@@ -144,6 +146,8 @@ Run `make all-ci` and fix failures until it exits 0 or you are stuck.
 | test | pytest failures with test names | read the test and the source; fix the source unless the test itself is wrong |
 
 Always re-run the full `make all-ci`, not a single check: a format fix can break lint.
+
+The `make` targets belong to the project that owns this example; the ruff flags follow https://docs.astral.sh/ruff/linter/ and https://docs.astral.sh/ruff/formatter/ (checked 2026-11-13); confirm with `ruff check --help` and `ruff format --help` before reusing them.
 
 ## Stopping policy
 

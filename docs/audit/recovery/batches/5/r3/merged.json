@@ -1,0 +1,230 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "daily-meeting-update",
+      "percent": 98.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 97.6,
+        "router-env-my-referee-two": 99.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: \"removed units (144, showing 40)\". All 40 shown items resolve to valid rows in docs/audit/recovery/daily-meeting-update/record.md through sections.json, but the other 104 removed units were not shown, so they could not be checked",
+          "fix": "Regenerate the digest without the cut, or with a higher limit, so every removed unit can be checked. For each unit no section row covers, restore it (into references/ when it is domain-specific, a template users ask for or a tested example; into the main file only when the procedure depends on it) or add a row for it to docs/audit/recovery/daily-meeting-update/record.md"
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 34,
+          "evidence": "\"`TZ=ZONE python3 \"${CLAUDE_SKILL_DIR}/scripts/claude_digest.py\" --date DAY --format json`\". The skill covers Windows for the window one-liner (\"plus the `tzdata` package on Windows\"), but the digest branch relies on a POSIX `TZ=` prefix, and claude_digest.py calls `astimezone()` with no argument. On Windows, Python does not apply an IANA `TZ` value that way, so the digest silently splits days in the system zone instead of ZONE",
+          "fix": "Add one sentence after the table: \"On Windows, a `TZ=` prefix is not applied: run the digest only when the system time zone equals ZONE, otherwise say in one line that session days may be off and confirm the picked sessions with the user.\""
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/daily-meeting-update/evals/evals.json",
+          "line": 7,
+          "evidence": "\"id\":\"approved-integration-merge\" asserts the blog session is omitted and PR #420 stays out of Yesterday, but no assertion checks that an unpicked session is omitted silently (never named, counted or explained) or that a review with no submittedAt is asked about instead of placed by search updated",
+          "fix": "Add one eval whose digest has an unpicked session and whose review object has no submittedAt, asserting the reply neither names nor counts that session and asks about the review rather than filing it under Reviews"
+        }
+      ]
+    },
+    {
+      "name": "domain-name-brainstormer",
+      "percent": 96.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.0,
+        "router-env-my-referee-two": 96.0
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/domain-name-brainstormer/record.md",
+          "line": null,
+          "evidence": "Digest at dbff837f is a cut list: 'removed units (111, showing 40)'. Each of the 40 shown para ids maps through sections.json (s001-s032) to a record row with an allowed (fate, value, decision) combination, and no drop row covers substantive content. The other 71 units were not listed in the digest, so they could only be checked through the section rows.",
+          "fix": "Rerun the digest without truncation, or list all 111 para ids, so each unit can be matched to its record row directly. If a unit has no covering section row, add a row for it to docs/audit/recovery/domain-name-brainstormer/record.md. Content stays where it is."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 34,
+          "evidence": "Procedure step 5 holds the label definitions, the curl command, a classification table and one very long WHOIS-fallback paragraph ('WHOIS fallback for a TLD without RDAP (...): `timeout 20 whois -h whois.iana.org <tld>` ... never retry in a loop. For each checked name record the source ...'). The tool-style lookup procedure sits inside the process list and breaks its rhythm.",
+          "fix": "Split the WHOIS-fallback paragraph into short numbered sub-steps: IANA lookup, then the registry server query, then the reply-to-label mapping, then the no-tool and throttle fallbacks. Keep every fact and every date in SKILL.md step 5 and drop nothing."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/evals/evals.json",
+          "line": null,
+          "evidence": "Six evals cover defaults, bilingual screening, honest status, pasted RDAP, budget without a quote and the sample. None covers Procedure step 4 ('When the first choice is taken'), even though the description triggers on 'replacing a taken first choice' and trigger-queries.json has a Rosie's Crumb Co. query for it. Eval ids 'casual-climate-names' and 'short-ai-names' also do not match their prompts.",
+          "fix": "Add an eval with a prompt such as 'rosiescrumb.com is registered by a local wedding florist; should we use rosiescrumb.co or pick a new name?'. Assert that the answer applies step 4's keep-or-rename test and warns that traffic and email typed to .com will reach the holder. Rename the two ids to match their prompts, for example 'casual-energy-names' and 'bilingual-learning-names'."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/references/example.md",
+          "line": 11,
+          "evidence": "The example cuts 'sharecode' because it 'reads as two common words, so it is hard to tell apart from others'. That is not one of Procedure step 2's cut criteria (more than one plausible spelling, an unwanted meaning or sound, an established same-category brand nearby), so an agent following the example applies a rule SKILL.md does not state.",
+          "fix": "Restate the sharecode cut in terms of a step 2 criterion, for example 'sharecode (an established same-category brand nearby, like codeshare)'. Alternatively, add 'too generic to stand out among same-category names' to step 2's cut list in SKILL.md so the example and the procedure agree."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 11,
+          "evidence": "Ask first only when the answer would change the shortlist: a non-English target language, a hard budget, or a word that must appear or must not.",
+          "fix": "Move the three ask-first triggers into Procedure step 1 as the filter questions, and leave Defaults as the assumption line only; record the move in docs/audit/recovery/domain-name-brainstormer/record.md."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 3,
+          "evidence": "Not for DNS, email, hosting or transfers on a domain already owned, naming without domains, social handles, or legal trademark clearance.",
+          "fix": "Brainstorm, screen and rank brandable domain names (.com, .io, .app, .dev and other TLDs) for apps, products, companies and personal brands, and report registration status honestly via RDAP/WHOIS lookups. Use when naming a project, launching or rebranding, asking \"is this domain available\", or replacing a taken first choice, even if the user only describes the business. Not for DNS, email, hosting or transfers on a domain already owned, naming without domains, social handles, or legal trademark clearance. Also use when the user pastes RDAP or WHOIS output, asks which shortlisted names can be bought, or wants a sample shortlist."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/evals/evals.json",
+          "line": 4,
+          "evidence": "\"prompt\": \"Brainstorm 12 short, easy-to-spell names for a Spanish-English language-learning product. Prefer .com and .app; group candidates by TLD and explain your top three.\"",
+          "fix": "Change the short-ai-names prompt to \"Brainstorm 12 short names... Prefer .com and .app\" and drop \"group candidates by TLD\" and \"explain your top three\" so the grouping, the Spanish-and-English screen and the HSTS note are produced by the skill rather than the prompt; keep the existing assertions."
+        }
+      ]
+    },
+    {
+      "name": "game-changing-features",
+      "percent": 94.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 93.6,
+        "router-env-my-referee-two": 95.2
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: 'removed units (160, showing 40)'. All 40 shown items map through sections.json to valid record rows or to content found in references/ideation-lenses.md, README.md or SKILL.md. The other 120 units were not shown, so they could not be checked one by one.",
+          "fix": "Re-run the removal check with the full unit list (no cut). Confirm that every remaining para: id maps to a section row in docs/audit/recovery/game-changing-features/record.md. Add a row for any id that has no row."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 36,
+          "evidence": "Gotchas lines 'Code is not availability...', 'Roadmaps go stale...', 'Registered accounts overstate reach...', 'A checked-in flag file is often only the default...' and 'Telemetry event names change...' repeat the checks already listed in the fifth NEVER item ('NEVER call a capability live, unused, or a new build from a flag file, a zero telemetry count, a registered-account total or a roadmap line...').",
+          "fix": "Shorten the fifth NEVER item to the rule and its reason, and point to the Gotchas for the checks: 'NEVER call a capability live, unused, or a new build from a single flag file, telemetry count, account total or roadmap line: each misleads in a way the Gotchas below describe.' Keep the detail in Gotchas. Nothing is lost, so no record row is needed."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 24,
+          "evidence": "Step 4.3 puts four label tests (Do Now, Do Next, Explore, Backlog), the capacity fallback and the 'recommendations, not commitments' rule into one paragraph: 'Prioritize: exactly one idea in the session is **Do Now**, ... when capacity is unstated, keep the \"No Do Now yet\" line and mark the rest Backlog.' This weakens the Process pattern's checkpoints.",
+          "fix": "Split step 4.3 into a short sub-list with one line per label (Do Now / Do Next / Explore / Backlog) plus one line for the 'capacity unstated' fallback. Keep every rule word for word, so no content is removed."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/game-changing-features/evals/evals.json",
+          "line": null,
+          "evidence": "The evidence-repo-session eval expects 'streak reminders as shipped (CHANGELOG.md 2.3.0, flags.yaml at 100%)' and 'shared challenges as built but unreleased'. SKILL.md's template Baseline example rows (lines 34-35) already contain those exact facts. Separately, category-coverage lists 'files': ['references/ideation-lenses.md'], which is the skill's own reference, not an input file under evals/files/.",
+          "fix": "Change the habit-repo fixture (for example rename the features, change the versions, or set a different stale-roadmap item) so the eval tests the Gotchas reasoning, not copying of the template rows. In category-coverage, replace the files entry with a real input under evals/files/, or drop the field because the prompt needs no input file."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 24,
+          "evidence": "'Do Next is the next-highest idea whose test fits a stated later window'. I followed this branch for each eval prompt (team size given, no later window given): the branch can never fire, so every non-Do-Now, non-Massive idea falls to Backlog, and the 'Do Next' label in the template and the README is never reached.",
+          "fix": "Define a default window when none is stated, for example: 'Do Next is the next-highest idea whose cheapest test fits the stated later window, or, when none is stated, the next quarter at the stated team size; say which window you used in Scope and assumptions.'"
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/game-changing-features/references/ideation-lenses.md",
+          "line": 30,
+          "evidence": "Category coverage check: Speed \"What takes too long?\" with example \"Instant search, predictive loading\" through Access \"Who cannot use this yet?\"",
+          "fix": "Keep the ten-category coverage check (it is the restored forced-coverage procedure), but replace the generic example column with one line that each example must name the step removed or the group unlocked, so the table does not restate prompts the model already produces."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 20,
+          "evidence": "\"Read references/ideation-lenses.md here: run its category coverage check, use its per-scale questions and unstick prompts when candidates run dry, and apply its mindset rules.\"",
+          "fix": "Split the load: always read the category coverage check and mindset rules at Discover; load Discovery questions by scale and Prompts to unstick thinking only when the candidate list stalls; load Evaluation lenses only when step 4.2 says two scores are close, and say not to load those sections otherwise."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/game-changing-features/evals/evals.json",
+          "line": 5,
+          "evidence": "casual-strategy, precise-roadmap, feature-request and category-coverage assert \"highest-scoring idea\" and \"cheapest test fits the stated team\" with no expected scores, no formula inputs, and no numeric team capacity.",
+          "fix": "For each of those four evals, add an expected ranking worked from the step 4.2 formula (reach, evidence, effort, adoption cost) plus the capacity the prompt states, so the Do Now assertion is checkable rather than a judgment call."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 22,
+          "evidence": "\"exactly one idea in the session is Do Now, the highest-scoring idea across all tiers whose cheapest test fits the team's stated capacity (ties go to the higher tier)\"",
+          "fix": "State the order when both score and tier tie (for example the cheapest test, then the idea listed first), and say what \"fits\" means for a stated headcount with no time window (for example a Small-effort test fits, a Large one does not unless the prompt gives a window)."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

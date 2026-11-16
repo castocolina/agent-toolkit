@@ -42,3 +42,9 @@ before the split, that check could only be tested through the handler.
 
 - `references/se-principles.md` -- Diff signals mapped to candidate lessons, with the evidence each needs
 - `references/anti-patterns.md` -- Anti-pattern signals and their false positives
+
+## Credits
+
+Based on the original skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit/tree/main/skills/lesson-learned) (PR #11) by Matt White, via softaworks/agent-toolkit; this version is rewritten.
+
+The git commands and behaviors in `SKILL.md` follow the documentation of the Git project ([git-log](https://git-scm.com/docs/git-log), [git-diff](https://git-scm.com/docs/git-diff), [git-show](https://git-scm.com/docs/git-show), [git-status](https://git-scm.com/docs/git-status), [git-symbolic-ref](https://git-scm.com/docs/git-symbolic-ref), [git-rev-parse](https://git-scm.com/docs/git-rev-parse)), checked 2026-11-07.

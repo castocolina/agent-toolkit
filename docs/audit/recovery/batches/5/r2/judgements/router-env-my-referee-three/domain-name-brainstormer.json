@@ -1,0 +1,77 @@
+{
+  "skill": "domain-name-brainstormer",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 118,
+  "max_total": 125,
+  "percent": 94.4,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": null,
+      "evidence": "Previous-version digest at dbff837f: 'removed units (111, showing 40)'. The digest is cut off. All 40 items it shows map through sections.json to valid rows in docs/audit/recovery/domain-name-brainstormer/record.md (s001-s032), but the other 71 could not be checked from the digest.",
+      "fix": "Regenerate the digest without the cut, for example with `python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/domain-name-brainstormer/SKILL.md --judge direct --digest-dir <dir>`. Then confirm that every para: unit listed under s001-s032 in sections.json is covered by its section row in record.md, and add a para: row for any unit no section row explains."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 18,
+      "evidence": "'Rank the survivors by the user's stated priorities; default order is spelling reliability, then memorability, then descriptiveness, then TLD fit.' The process pattern has no explicit checkpoint between generating names, looking them up and building the table.",
+      "fix": "Add one gate sentence to step 5 without removing anything: 'Do not build the Output table until every shortlisted candidate has exactly one of the three labels and, if checked, a source and UTC time.' This makes the generate-screen-lookup-report sequence a checked process."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/evals/evals.json",
+      "line": 4,
+      "evidence": "Two eval ids do not match their prompts: id 'casual-climate-names' is an energy-tracking app prompt, and 'short-ai-names' is a Spanish-English language-learning prompt. Also, 'sample-shortlist-honesty' lists 'references/example.md' as an input file, although eval inputs belong in evals/files/.",
+      "fix": "Rename the ids to match their prompts, for example 'casual-energy-app-names' and 'bilingual-language-app-names'. Drop the skill's own reference file from the sample eval's `files`; the skill loads it itself, and the eval should test that it does."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 32,
+      "evidence": "'| `429`, `5xx`, `000` (no connection) or a timeout | `unverified`; stop querying, no retry |'. The scope of 'stop querying' is unclear. references/example.md keeps querying rdap.org for snipply.io after a 429 from pubapi.registry.google, so an agent cannot tell whether a 429 halts all lookups or only that server.",
+      "fix": "Change the cell to '`unverified`; stop querying that server for the rest of the session, no retry; lookups to other registry servers may continue'. This matches what references/example.md shows."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/domain-name-brainstormer/SKILL.md",
+      "line": 60,
+      "evidence": "Credit: '**Inspired by:** Ben Aiad's use case from Lenny's Newsletter'. Source check: docs/audit/upstream-sources.json has rows for this skill crediting Ben Aiad, softaworks/agent-toolkit and every documentation owner named in README.md, so nothing is missing.",
+      "fix": "No change needed. Keep the credit lines in SKILL.md and README.md as they are."
+    }
+  ]
+}

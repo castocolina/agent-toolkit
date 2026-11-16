@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": "stakeholder-delay",
-      "prompt": "Email non-technical stakeholders: critical payment issue delays release one week to March 15; QA retests Thursday, update Friday.",
+      "prompt": "hey, can you turn this into an email for Priya and the sales leads? they're not technical. my rough draft: 'release slips a week to March 15 because we hit a critical payment issue. QA retests Thursday, I will update everyone Friday.' thanks",
       "expected_output": "Concise email with subject, delay upfront, clear reason, actions.",
       "assertions": [
         "Informative subject",
@@ -13,7 +13,7 @@
     },
     {
       "id": "async-chat",
-      "prompt": "Slack Morgan: deployment permission denied on deploy.sh line 42; checked permissions; ask if seen it.",
+      "prompt": "can you turn this into a Slack message to Morgan? my draft: 'deploy is broken, permission denied on deploy.sh line 42. i already checked the file permissions. have you seen this before?' make it so Morgan can answer without a call",
       "expected_output": "Self-contained async-friendly message with error, attempted check, question.",
       "assertions": [
         "Includes error and `deploy.sh` line 42",
@@ -26,9 +26,10 @@
       "prompt": "30-minute agenda to decide whether reporting DB migrates this quarter; product and engineering, no deep dive.",
       "expected_output": "Time-boxed agenda with objective and explicit decision.",
       "assertions": [
-        "Objective names the decision and its owner",
+        "Objective names the decision, and its owner is a role or marked Proposed",
         "Agenda item minutes sum to exactly 30",
-        "Audience calibrated and outcome explicit"
+        "Lists product and engineering as the attending roles",
+        "Final agenda item is the decision itself (confirm the decision and next owners), not another discussion topic"
       ]
     },
     {
@@ -39,7 +40,96 @@
         "States that the cause is not yet known",
         "States that the new release date is not yet known",
         "Does not invent urgency, cause, date, metrics, or promise",
-        "Includes an informative subject and a concrete next-update action only if supplied or clearly marked as proposed"
+        "Subject says the release is delayed",
+        "Any next-update promise or investigation claim is absent or marked Proposed"
+      ]
+    },
+    {
+      "id": "what-why-how",
+      "prompt": "Structure a short note for my team with the frame this skill uses: the release slips one week because of a payment bug; QA retests Thursday and I update stakeholders Friday.",
+      "expected_output": "A note organized as What, Why and How with the supplied facts only.",
+      "assertions": [
+        "Names or clearly separates the three parts What, Why and How",
+        "What states the one-week delay; Why states the payment bug; How states the Thursday retest and Friday update",
+        "Adds no cause, metric, or commitment beyond the facts supplied"
+      ]
+    },
+    {
+      "id": "review-request-no-deadline",
+      "prompt": "Write an email asking Dana to review my design doc for the new billing export (link: https://docs.example.com/billing-export). I want feedback on the retry strategy. I have not decided when I need it.",
+      "files": [
+        "references/email-templates.md"
+      ],
+      "expected_output": "A review request with what it is, the link, the specific feedback wanted, and the timeline left unspecified rather than invented.",
+      "assertions": [
+        "Informative subject naming the document and the review request",
+        "Includes the link and names the retry strategy as the feedback wanted",
+        "Does not invent a deadline and does not claim 'no rush' as the sender's statement; the timeline is left unspecified or flagged for the sender to fill"
+      ]
+    },
+    {
+      "id": "retro-4ls",
+      "prompt": "Plan a 60-minute sprint retrospective for my team using the 4Ls format, with timings.",
+      "files": [
+        "references/meeting-structures.md"
+      ],
+      "expected_output": "A five-phase retrospective agenda with the book's phase names, 4Ls prompts with the variant stated, and minutes marked as adaptable.",
+      "assertions": [
+        "Uses the five phases Set the Stage, Gather Data, Generate Insights, Decide What to Do and Close the Retrospective",
+        "Lists the 4Ls as Loved, Loathed, Longed for and Learned, or names the older Liked, Learned, Lacked, Longed for variant, and says which wording it uses",
+        "Phase minutes sum to exactly 60 and are presented as typical values to adapt, not fixed rules"
+      ]
+    },
+    {
+      "id": "team-norms",
+      "prompt": "Write communication norms for our distributed team of eight across Lisbon, New York and Singapore. We use Slack and email.",
+      "files": [
+        "references/remote-async-communication.md"
+      ],
+      "expected_output": "A norms document whose response times are examples to adapt, with urgent matters routed through the documented escalation path and time zones written unambiguously.",
+      "assertions": [
+        "Response times are marked as example values or placeholders for the team to agree, not stated as standards",
+        "Urgent matters go through the team's documented paging or escalation path, not through '@here' or a phone call alone",
+        "Time zones are written as a zone name plus a UTC offset or left as placeholders, and 'EOD' is not used without a zone"
+      ]
+    },
+    {
+      "id": "node-version-example",
+      "prompt": "Rewrite for non-technical stakeholders: 'We upgraded to Node 20 last quarter.' Do not add benefits we have not measured.",
+      "files": [
+        "references/jargon-simplification.md"
+      ],
+      "expected_output": "A plain rewrite that keeps the supplied version, claims no unmeasured benefit, and does not call Node 20 current or supported.",
+      "assertions": [
+        "States that the service now runs on the supplied Node version without claiming speed, security or reliability gains",
+        "Does not describe Node 20 as current, latest, or supported; if it mentions support status, it says Node 20 reached end of life on 2026-04-30 or tells the reader to check the Node.js release schedule"
+      ]
+    },
+    {
+      "id": "forwarded-thread",
+      "prompt": "our team has been going back and forth in an internal thread about how the outage hit a few big customers and who is to blame. the vendor (Acme Support) now needs to know about the outage. can i just forward that thread to them with a quick note on top?",
+      "expected_output": "Advises against forwarding the internal thread and drafts a fresh message to the vendor with only the relevant facts.",
+      "assertions": [
+        "Drafts a fresh message instead of forwarding the thread",
+        "States the earlier internal discussion would be exposed"
+      ]
+    },
+    {
+      "id": "credentials-in-channel",
+      "prompt": "nobody on my team can figure out why the export job fails, so i want to paste the full error log into #general. it has our production API key in it and a few customer rows. that's fine right?",
+      "expected_output": "Declines to paste the credential or customer data into a broad channel and offers a safe alternative.",
+      "assertions": [
+        "Refuses to paste the credential or customer data into the broad channel",
+        "Offers a redacted summary plus a link to access-controlled evidence"
+      ]
+    },
+    {
+      "id": "eod-timezone",
+      "prompt": "write a quick message to Jonas in Berlin and Sam in Seattle asking them to send me the vendor comparison. i need it by EOD.",
+      "expected_output": "A request that replaces EOD with an explicit date, time and zone, or asks which zone applies, without inventing a deadline.",
+      "assertions": [
+        "Replaces EOD with an explicit date, time and time zone or asks which zone applies",
+        "Does not invent a deadline"
       ]
     }
   ]

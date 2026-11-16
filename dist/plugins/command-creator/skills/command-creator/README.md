@@ -32,6 +32,10 @@ command-creator/
 
 The worked examples in `references/examples.md` are real commands from the erk project, adapted here.
 
+This skill is adapted from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit/tree/main/skills/command-creator), whose command-creator skill and examples come from the erk project (dagster-io/erk).
+
+The documentation its facts were checked against belongs to its owners: the Claude Code docs to Anthropic, the `gt` command reference to Graphite, the Ruff docs to Astral, and the erk project to Dagster Labs (dagster-io/erk).
+
 ## References
 
 - [Claude Code skills and commands](https://code.claude.com/docs/en/skills)

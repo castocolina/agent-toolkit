@@ -106,7 +106,7 @@ Add skills to project knowledge or paste SKILL.md contents into the conversation
 
 | Category | Skill | Description |
 |----------|-------|-------------|
-| 🤖 AI Tools | [codex](skills/codex/README.md) | Advanced code analysis with GPT-5.2 |
+| 🤖 AI Tools | [codex](skills/codex/README.md) | Run OpenAI Codex CLI for code analysis, refactoring and automated edits |
 | 🤖 AI Tools | [gemini](skills/gemini/README.md) | Large-scale review (200k+ context) |
 | 🤖 AI Tools | [perplexity](skills/perplexity/README.md) | Web search & research |
 | 🔮 Meta | [agent-md-refactor](skills/agent-md-refactor/README.md) | Refactor bloated agent instruction files |
@@ -186,7 +186,7 @@ Reusable workflows invoked with `/command-name`:
 
 | Command | Description |
 |---------|-------------|
-| `/codex-plan` | Create implementation plans using Codex 5.2 |
+| `/codex-plan` | Prepare a prompt so you can run Codex yourself and get an implementation plan |
 | `/compose-email` | Draft professional emails |
 | `/explain-changes-mental-model` | Build mental model of code changes |
 | `/explain-pr-changes` | Generate PR summaries |
@@ -194,7 +194,7 @@ Reusable workflows invoked with `/command-name`:
 | `/sync-skills-readme` | Update README skills table |
 | `/viral-tweet` | Optimize tweet ideas for X engagement |
 
-Command credits: viral-tweet is adapted from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit/blob/main/commands/viral-tweet.md) by Leonardo Flores (@leonardocouy), via softaworks/agent-toolkit.
+Command credits: viral-tweet is adapted from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit/blob/main/commands/viral-tweet.md) by Leonardo Flores (@leonardocouy), via softaworks/agent-toolkit. codex-plan is adapted from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit/blob/main/commands/codex-plan.md) by Leonardo Flores (@leonardocouy), via softaworks/agent-toolkit.
 
 ---
 

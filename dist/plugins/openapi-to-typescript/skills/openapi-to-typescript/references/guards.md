@@ -113,7 +113,7 @@ Returning `true` on a revisit is sound only for the same schema, which is why `p
 
 ## Mutation tests
 
-Run in a scratch file outside the repository (Node 23.6+ runs `.ts` directly; otherwise compile with `tsc` first), then delete it. For each guard, one valid sample must return `true`, including `null` wherever the type has `| null` (`tag: null`, `status: null`), and each of these that applies must return `false`:
+Run in a scratch file outside the repository (Node runs `.ts` directly when type stripping is on, which is the default from v22.18.0 and v23.6.0; check `node --version`, and see https://nodejs.org/api/typescript.html, checked 2026-11-07, for the current version table; otherwise compile with `tsc` first), then delete it. For each guard, one valid sample must return `true`, including `null` wherever the type has `| null` (`tag: null`, `status: null`), and each of these that applies must return `false`:
 
 - a present optional property of the wrong type (`tag: 5`) or present as `undefined` (`tag: undefined`)
 - `null` in a property that is not nullable, including the cases where `nullable: true` has no effect: an `enum` that does not list `null`, `nullable` beside a `$ref`, and `nullable` without a same-schema `type` (`level`, `owner`, `lead` above)

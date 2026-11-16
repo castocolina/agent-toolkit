@@ -68,6 +68,25 @@ function Products() {
 - Type the root context once with `createRootRouteWithContext<{ queryClient: QueryClient; auth: Auth }>()({ ... })`; `createRouter` then requires a matching `context`.
 - With TanStack Query, `useSuspenseQuery` (not `useQuery`) after `ensureQueryData` gives non-optional `data`.
 
+## 5. Update search with a functional updater
+
+Give `useNavigate` the route it renders under, then pass `search` as a function of the previous search. `prev` and the returned object are checked against that route's `validateSearch`, so a wrong key or value type fails to compile and the other params survive the update:
+
+```tsx
+// src/routes/products.tsx
+const navigate = useNavigate({ from: Route.fullPath });
+
+const setCategory = (category: string) =>
+  navigate({ search: (prev) => ({ ...prev, category, page: 1 }) });  // keep sortBy, reset page
+
+const setSort = (sortBy: 'price' | 'name') =>
+  navigate({ search: (prev) => ({ ...prev, sortBy }) });             // sortBy: 'rating' is a type error
+
+<Link from={Route.fullPath} search={(prev) => ({ ...prev, page: prev.page + 1 })}>Next</Link>  // `to` may be omitted when `from` is set
+```
+
+Without `from` the router cannot assume the current route, so `prev` has every key optional and `{ ...prev, page: 1 }` fails against a route whose keys are required (here `sortBy`). In a shared component rendered under several routes, read with `useSearch({ strict: false })` (section 2) and navigate with an explicit `to` and a `search` object that sets every required key. Spread `prev` rather than passing a fresh object, or every param not named is dropped. Sources: https://tanstack.com/router/latest/docs/framework/react/guide/search-params (sections on `useNavigate`, `Link` and `strict: false`), checked 2026-11-07; the snippet type-checked under `strict` with `@tanstack/react-router` 1.170.46 and a registered router.
+
 ## Type helpers
 
 Prefer narrowed helpers over bare ones: `LinkProps` without type arguments resolves against every route. Use `as const satisfies LinkProps` (or `LinkProps<RegisteredRouter, '/posts'>`) for reusable link objects, or `ValidateLinkOptions` in a wrapper component's props so its `to` stays checked.

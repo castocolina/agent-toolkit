@@ -37,6 +37,10 @@ cp -r skills/openapi-to-typescript ~/.claude/skills/
 
 Output evals and trigger queries are in `evals/`; the eval input specs are in `evals/files/`.
 
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+Spec and tool facts were checked against the official documentation of the OpenAPI Initiative (OpenAPI 3.0.3, 3.1.0), SmartBear (Swagger 2.0), the IETF (RFC 6901), Ecma International (ECMAScript), JSON Schema, Microsoft (TypeScript), Node.js, npm, FastAPI, springdoc and NestJS.
+
 ## License
 
 Part of the Softaworks Agent Skills collection.

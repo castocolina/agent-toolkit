@@ -16,6 +16,27 @@
       ]
     },
     {
+      "id": "plan-skeleton",
+      "prompt": "Scenario: the user runs `/codex-plan plan adding a CSV export feature to the reports page`. Reading the repo shows README.md, package.json, src/reports/index.ts and tests/reports.test.ts exist. All questions are answered, neither output file exists and writing succeeds. You cannot run commands or ask questions. Show the exact full contents of prompt_to_codex.md only.",
+      "assertions": [
+        "The prompt asks for a plan skeleton with Overview, Prerequisites, Phases each with a Goal line, a Testing Strategy, a Dependency Graph, Risks and Rollback",
+        "The prompt's task fields include Location, Description, Dependencies, Complexity (1-10), Test-First Approach and Acceptance Criteria",
+        "The Dependency Graph part asks for the tasks with no dependencies (which can start in parallel) and for the critical path",
+        "The Testing Strategy part names unit, integration and E2E levels and asks for test coverage goals",
+        "The prompt gives task guidelines (specific, independently testable, file paths, dependencies for parallel work) and a bad versus good decomposition of a large task into small ones, with no hard-coded package name",
+        "The Files to Read section lists tests/reports.test.ts among the existing paths"
+      ]
+    },
+    {
+      "id": "full-auto-request",
+      "prompt": "Scenario: the user runs `/codex-plan plan a refactor of src/cache.ts`; src/cache.ts exists and the prompt file was written. Before you present the command, the user says: 'add --full-auto so Codex does not stop to ask for approvals'. You cannot run commands. Show your reply to the user, including the exact command you present.",
+      "assertions": [
+        "The presented command does not contain `--full-auto` and keeps `-s workspace-write`",
+        "The reply says `--full-auto` is no longer accepted by the current Codex CLI (it errors) or points to `--sandbox workspace-write` as its replacement, rather than adding it",
+        "The reply does not add `-s danger-full-access`"
+      ]
+    },
+    {
       "id": "model-argument",
       "prompt": "Scenario: the user runs `/codex-plan --model gpt-5.1-codex-max add a retry layer to the HTTP client in src/http.ts`. src/http.ts and README.md exist; no other relevant files. The request is specific enough that you need no clarifying questions. No output files exist and writing succeeds. You cannot run commands. Show the contents of prompt_to_codex.md, the exact command you present, and the final message.",
       "assertions": [

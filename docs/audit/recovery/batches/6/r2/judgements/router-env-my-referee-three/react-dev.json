@@ -1,0 +1,104 @@
+{
+  "skill": "react-dev",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/react-dev/record.md",
+      "line": null,
+      "evidence": "previous-version digest react-dev at dbff837f: 'removed units (463, showing 40)'. All 40 shown items map through sections.json to valid record rows, but 423 removed units were not shown and could not be checked one by one.",
+      "fix": "Re-run the removal check with the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/react-dev/SKILL.md ...) so every para: item is checked against record.md. Where a unit has no row, either restore it (into references/ if it is domain-specific) or add a row for it to docs/audit/recovery/react-dev/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/react-dev/SKILL.md",
+      "line": 16,
+      "evidence": "'0. Before touching anything, run `git status --porcelain`...' The React 19 migration procedure is nested inside '## 1. Pin versions', and the React 19 upgrade breaks sit apart from it in Gotchas (line 123) and again in react-19-patterns.md's Migration checklist.",
+      "fix": "Keep the migration steps in one place and keep every step. Either give the migration its own sub-heading under section 1 that the line-123 gotcha and react-19-patterns.md point to, or move the full steps to react-19-patterns.md's Migration checklist and leave a one-line pointer in section 1. Record the move in docs/audit/recovery/react-dev/record.md."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/react-dev/evals/evals.json",
+      "line": 166,
+      "evidence": "\"files\": [\"references/react-router.md\"]. Evals rr7-app-load-context, rr7-middleware-migration, route-handle-breadcrumbs, tanstack-search-updater and imperative-handle-ref pass the skill's own reference as an input file instead of a user fixture.",
+      "fix": "Replace these entries with user-side fixtures under evals/files/ (for example a server.ts with getLoadContext, a root.tsx using useMatches, a products route file), or drop the files field. A with-skill vs without-skill run then measures whether the skill loads the right reference, instead of handing the answer to the run."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/react-dev/references/hooks.md",
+      "line": 10,
+      "evidence": "'| `useRef<number>()` | allowed, `MutableRefObject<number \\| undefined>` | type error: an argument is required |'. This @types/react 19 behavior table has no source URL and no date checked.",
+      "fix": "Add the source and date under the table, for example 'Source: https://react.dev/blog/2024/04/25/react-19-upgrade-guide (TypeScript changes: useRef requires an argument, ref mutability), checked <date>'."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/react-dev/examples/generic-components.md",
+      "line": 17,
+      "evidence": "'## Choose the inference source with `NoInfer` (TypeScript 5.4+)'. This and the 5.0/5.3 minimums for const type parameters (line 61) are minimum versions with no source URL or date.",
+      "fix": "Cite https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-4.html (NoInfer) and the 5.0 and 5.3 release notes (const type parameters, readonly constraint), each with the date checked."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/react-dev/examples/server-components.md",
+      "line": 23,
+      "evidence": "'Check the installed version: Next 14 and earlier pass plain objects; 15.0 to 15.4 need the explicit Promise-typed props'. These are version boundaries with no source URL or date (only the 15.5 typegen fact in SKILL.md is sourced).",
+      "fix": "Add 'Source: https://nextjs.org/docs/app/api-reference/file-conventions/page (params and searchParams are Promises from v15), checked <date>' after the paragraph."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/react-dev/references/event-handlers.md",
+      "line": 32,
+      "evidence": "'| `wheel`, `touchstart` and `touchmove` are registered as passive | `e.preventDefault()` in `onWheel` is ignored...'. This and the other 'Since React 17' rows have no source URL or date.",
+      "fix": "Add a source line under the table: 'Source: https://legacy.reactjs.org/blog/2020/10/20/react-v17.html (event delegation on the root, onScroll no longer bubbles, passive touch and wheel listeners), checked <date>'."
+    },
+    {
+      "id": "D8-5",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/react-dev/references/react-19-patterns.md",
+      "line": 174,
+      "evidence": "'2. Run the codemod exactly as the SKILL.md React 19 gotcha says'. The gotcha (SKILL.md line 123) has no codemod commands and itself says 'The migration order and codemods are in step 1.'",
+      "fix": "Point straight to the commands: '2. Run the codemod exactly as SKILL.md section 1 (migration step 2) says (pinned version, real source roots, opt-in transforms for ref-callback returns and `ReactElement` props).'"
+    }
+  ]
+}

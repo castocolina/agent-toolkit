@@ -1,0 +1,95 @@
+{
+  "skill": "codex",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 14,
+    "D2": 12,
+    "D3": 13,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 13,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 107,
+  "max_total": 125,
+  "percent": 85.6,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/codex/SKILL.md",
+      "line": null,
+      "evidence": "Digest for dbff837f: \"removed units (44, showing 40)\". The 40 shown items are all explained by record rows, but 4 items are not listed, so the judge cannot check them.",
+      "fix": "Regenerate the digest with all 44 units and check each of the 4 hidden items against docs/audit/recovery/codex/record.md or sections.json. Restore any unexplained item or add a row for it to docs/audit/recovery/codex/record.md."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/codex/SKILL.md",
+      "line": 58,
+      "evidence": "\"Never send stderr to `/dev/null`: it carries the only failure diagnostics (see Run for separate logs).\" The same rule is already in Run (line 34), and `--full-auto` is explained twice (lines 25, 57). The --last/session-ownership check also appears twice (lines 38, 40).",
+      "fix": "Keep each rule once, with its reason. Merge the Authorization bullets into one-line pointers or delete them, and merge the two --last paragraphs in Resume. Record any removal in docs/audit/recovery/codex/record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/codex/SKILL.md",
+      "line": 14,
+      "evidence": "\"Resolve model and effort. Resolve task intent, model, and effort (high for architecture/refactor/security, ...\" The step repeats itself, and the Preflight list buries the decisions and the plain steps at the same level.",
+      "fix": "Rewrite step 3.2 as \"Resolve model and effort: high for architecture/refactor/security, medium for features/bugs, low for formatting/docs. Omit -m unless the user names a model...\". Keep each step to one decision."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/codex/SKILL.md",
+      "line": 32,
+      "evidence": "\"Put flags before the `resume` subcommand.\" There is no stated failure mode. The verified fact in docs/audit/recovery/codex/facts.md that `resume` rejects `-s` and `-C` with `unexpected argument` is not in the skill.",
+      "fix": "Add one gotcha line: \"`codex exec resume` rejects `-s` and `-C` (unexpected argument on codex-cli 0.162.1, checked 2026-11-07); run from the intended directory instead.\""
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/codex/SKILL.md",
+      "line": 14,
+      "evidence": "\"pass a model only when the user names one or the task needs a specific one... Ask only when an unresolved choice affects the result.\" \"The task needs a specific one\" and \"unresolved choice\" are vague for a step that is otherwise exact.",
+      "fix": "Make the default explicit: use the configured default model and the effort from the mapping, and ask only when the user's request conflicts with the configured default or names an effort the model does not support."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/codex/evals/evals.json",
+      "line": null,
+      "evidence": "The 7 evals cover read-only, edit, resume, flags, the Git gate and a failed version check. None covers the cross-project `--last` fallback to a session id, or a network need that should use the narrow workspace-write network setting before `danger-full-access`. Several trigger queries are short with no file paths or context (for example \"Create an architecture diagram of the Codex CLI integration.\").",
+      "fix": "Add two evals (resume from another project using a session id, and a network-required task that checks the narrow setting is tried first). Replace the easy negatives with near-misses that carry context, such as a path and a request to explain a codex exec error without running it."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/codex/SKILL.md",
+      "line": 25,
+      "evidence": "\"add `--approve-for-me` (it routes approval requests through automatic review inside the workspace-write sandbox)\". This is a version-sensitive CLI flag with no source URL or check date in the skill. Preflight 2 reads --help only when support is uncertain, and the flag's source and date are in facts.md only. Facts not verified online.",
+      "fix": "Add the source and date next to the flag, for example \"(`codex exec --help`, codex-cli 0.162.1; https://learn.chatgpt.com/docs/cli/reference, checked 2026-11-07)\". Or require running `codex exec --help` to confirm the flag exists before using it."
+    }
+  ]
+}

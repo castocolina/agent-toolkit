@@ -1,0 +1,86 @@
+{
+  "skill": "codex-plan",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 16,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 13,
+    "D7": 15,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 114,
+  "max_total": 125,
+  "percent": 91.2,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": null,
+      "evidence": "Digest at dbff837f is a cut list: 'removed units (96, showing 40)'. Every shown item maps to a section row in docs/audit/recovery/codex-plan/record.md through sections.json, and each row is a combination fixer-rules.md allows. The 56 hidden units could not be checked one by one.",
+      "fix": "Regenerate the digest without the cap, or confirm that all 96 units fall under sections s001-s015 of docs/audit/recovery/codex-plan/sections.json, so every removed unit can be checked against its record row"
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 77,
+      "evidence": "'Add these task guidelines to the prompt: each task is specific and actionable, has clear inputs and outputs, is independently testable...' These are generic planning advice the model already produces unprompted.",
+      "fix": "Keep the restored template (record row s011, restore-references). Shorten the guidelines to the parts the skeleton does not already carry: parallel-ready dependencies and test-first. Record any wording that is removed in docs/audit/recovery/codex-plan/record.md"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 34,
+      "evidence": "Workflow step 6 puts a fenced code block and four separate paragraphs (flag sources, --skip-git-repo-check, run directory, wait instruction) inside one numbered item. This breaks the ordered phase list, so step 7 renders detached from steps 1-6.",
+      "fix": "Keep step 6 to one line ('Show the command, then stop.'). Move the command block and its flag notes into a '### Command' subsection right after the Workflow list, and point step 6 to it, so steps 1-7 stay one unbroken checklist"
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 104,
+      "evidence": "The Gotchas list covers sandbox flags, secrets and relative paths, but not the argv size limit of '\"$(cat prompt_to_codex.md)\"'. A very large prompt can fail with 'Argument list too long' before Codex starts.",
+      "fix": "Add a gotcha: 'The prompt is passed as one argv string; keep it compact (paths and reasons, not pasted file contents), because a prompt past the shell ARG_MAX limit fails with \"Argument list too long\" before Codex runs.'"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 29,
+      "evidence": "The baseline one-liner has three '<plan file>' placeholders and one '<literal path>' placeholder in a pipefail pipeline. The agent must hand-substitute them, identically, both in step 5 and again in step 7. This is low freedom in form, but substitution mistakes are easy and would silently change the comparison.",
+      "fix": "Have step 3 also fix the exact pathspec string (for example ':(exclude)codex-plan-2.md'). Tell the agent to copy the completed line verbatim from its step-5 Bash call into step 7, changing only the output path, so both runs are byte-identical"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 32,
+      "evidence": "Unborn-repo branch: 'record only git status --porcelain=v1 -uall ... step 7 then runs this same reduced line; then a printed failure message always means verification is unavailable'. The reduced line has no '|| echo \"baseline failed...\"' clause, so no failure message can be printed. Tracing the branch, failure detection does not resolve.",
+      "fix": "Give the reduced line its own fallback: 'git status --porcelain=v1 -uall -- . \":(exclude)<plan file>\" > \"<literal path>\" || echo \"baseline failed: change verification unavailable\"'. Put this unborn-repo case in a separate sub-bullet of step 5"
+    }
+  ]
+}

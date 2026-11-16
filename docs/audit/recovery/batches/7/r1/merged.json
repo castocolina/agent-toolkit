@@ -1,0 +1,188 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codex-plan",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 85,
+          "evidence": "Add these task guidelines to the prompt: each task is specific and actionable, has clear inputs and outputs, is independently testable, names file paths and code locations...",
+          "fix": "Keep this restored text, because record row s011 restores it. Trim only the generic adjectives (\"specific and actionable\", \"clear inputs and outputs\") that the skeleton's task fields already enforce, and keep the parts that are not generic: the bad/good decomposition and test-first. Add a record row for any wording you drop."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": null,
+          "evidence": "previous-version digest: codex-plan at dbff837f \u2014 removed units (96, showing 40)",
+          "fix": "Generate the digest again without the cut, or check the 56 hidden units against the section rows in docs/audit/recovery/codex-plan/record.md and sections.json. All 40 shown units map to valid rows (s001-s015)."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 32,
+          "evidence": "Run `git rev-parse --verify -q HEAD` first: if it prints nothing (unborn repo), skip this line and record only `git status --porcelain=v1 -uall`",
+          "fix": "Put the precondition before the baseline command in step 5, in this order: (a) `git rev-parse --is-inside-work-tree`, (b) `git rev-parse --verify -q HEAD`, (c) mktemp, (d) the baseline line. The steps should run in the order they are written."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "commands/codex-plan.md",
+          "line": 29,
+          "evidence": "git ls-files -o --exclude-standard -z -- . \":(exclude)<plan file>\" | xargs -0 -r sha256sum",
+          "fix": "Add a Gotcha: `sha256sum` and `xargs -r` are GNU tools. On macOS, use `shasum -a 256` (and `xargs` without `-r` on older BSD) so the baseline still works and does not fall back to 'verification unavailable'."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 32,
+          "evidence": "skip this line and record only `git status --porcelain=v1 -uall`, saying verification is limited to it",
+          "fix": "In the unborn-repo branch, keep the exclusion: `git status --porcelain=v1 -uall -- . \":(exclude)<plan file>\"`. Then say that step 7 runs this same reduced line. Without the exclusion, the new plan file is always flagged as a change and the branch never resolves."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 36,
+          "evidence": "codex exec -s workspace-write -c model_reasoning_effort=high [-m <id>] \"$(cat prompt_to_codex.md)\"",
+          "fix": "Give the source for `model_reasoning_effort=high`: add 'see https://learn.chatgpt.com/docs/config-file/config-reference, checked 2026-11-07' (accepted values depend on the model). Or tell the agent to check `codex exec --help` before showing the command."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 39,
+          "evidence": "Add `--skip-git-repo-check` only when `git rev-parse --is-inside-work-tree` fails.",
+          "fix": "Add a source and date for this vendor CLI flag: '(https://learn.chatgpt.com/docs/non-interactive-mode, checked 2026-11-07)'. Or have the agent confirm it with `codex exec --help`."
+        },
+        {
+          "id": "D8-4",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "commands/codex-plan.md",
+          "line": 103,
+          "evidence": "`--output-last-message` saves Codex's final reply, not `codex-plan.md`; do not use it to claim the plan exists.",
+          "fix": "Add the source and date for this flag's behaviour: '(`codex exec --help`; https://learn.chatgpt.com/docs/non-interactive-mode, checked 2026-11-07)'."
+        }
+      ]
+    },
+    {
+      "name": "openapi-to-typescript",
+      "percent": 97.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: 'removed units (135, showing 40)'. All 40 listed units resolve, through sections.json, to valid record.md rows (s001-s036). The other 95 units could not be checked one by one.",
+          "fix": "Regenerate the digest without a cut (or with a higher limit) so every removed unit can be checked against docs/audit/recovery/openapi-to-typescript/record.md. Add a row for any unit that has none."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/openapi-to-typescript/SKILL.md",
+          "line": 192,
+          "evidence": "'FastAPI 0.99.0 and later emit `openapi: 3.1.0` by default (its release notes: \"Upgrade OpenAPI 3.1.0, this uses JSON Schema 2020-12\")'. This is a vendor version fact with no source URL and no checked date. The springdoc gotcha right after it gives both.",
+          "fix": "Add the source and date inline, as in the springdoc line: '... (its release notes: \"Upgrade OpenAPI 3.1.0, this uses JSON Schema 2020-12\"; https://fastapi.tiangolo.com/release-notes/, checked <date>)'. The URL is the one already registered in docs/audit/upstream-sources.json."
+        }
+      ]
+    },
+    {
+      "name": "requirements-clarity",
+      "percent": 96.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/requirements-clarity/record.md",
+          "line": null,
+          "evidence": "Digest at dbff837f: 'removed units (207, showing 40)'. The cut list hides 167 items from this check. All 40 shown items, and para:126dfd1d from the 7a1edfc digest, have valid rows in record.md: allowed combinations under fixer-rules.md, s010/s011/s012/s021 restored in references/clarification-examples.md and SKILL.md step 2, s013/s025/s027/s030 are user-accepted drops.",
+          "fix": "Re-run the removal check with the full digest (no cut) so every para: unit from the 207 can be checked against its section row in record.md and sections.json. Add a row in docs/audit/recovery/requirements-clarity/record.md for any unit no section row covers."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/requirements-clarity/SKILL.md",
+          "line": 21,
+          "evidence": "'Stop asking after 3 rounds that together gained under 10 points, or after a round the user did not answer'",
+          "fix": "Say which 3 rounds count, for example: 'Stop asking when the last 3 rounds together gained under 10 points'. The window is then explicit and the stopping procedure works the same in every session."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/requirements-clarity/evals/evals.json",
+          "line": 11,
+          "evidence": "vague-login assertion 'Identifies missing auth/context decisions' (also clear-bug 'Mentions test for 401 behavior') is too vague to grade objectively, while the other evals' assertions are specific",
+          "fix": "Replace it with an observable check, for example 'Names at least two open product decisions for login (such as which sign-in methods are in launch scope or what happens after repeated failed attempts) and does not ask for the stack when a repository is available'."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/requirements-clarity/references/clarification-examples.md",
+          "line": 3,
+          "evidence": "Reference says 'Read this when writing a first or second clarification response', but SKILL.md line 56 says 'Read [the clarification examples] when writing your first clarification response'",
+          "fix": "Make the two triggers agree. Either change SKILL.md line 56 to 'when writing your first or second clarification response' (the file includes a round 2 example), or change the reference's opening line to match SKILL.md."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

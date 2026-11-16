@@ -1,0 +1,104 @@
+{
+  "skill": "command-creator",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 116,
+  "max_total": 125,
+  "percent": 92.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/command-creator/record.md",
+      "line": null,
+      "evidence": "Digest dbff837f: \"removed units (618, showing 40)\". Only 40 of the 618 units were listed. All 40 listed items are explained by record rows (s001-s114 rows, units mapped through sections.json), and the d4ad4291 digest's one removed unit (para:c5ab52eb, the $0 sentence) is reworded at SKILL.md line 78 with a dated source. The other 578 could not be checked.",
+      "fix": "Run the full removal check on the complete digest. Add a row to docs/audit/recovery/command-creator/record.md for every unit not already covered by a section row."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/command-creator/references/examples.md",
+      "line": null,
+      "evidence": "The submit-stack \"Example Output\" block (\"\u2713 Found .PLAN.md - using plan context ... dot-agent-claude-folder-support\") is erk-specific illustrative output that adds no decision. The Usage and Error Handling blocks in Example 4 restate generic behaviour.",
+      "fix": "Keep the examples as credited erk material, but trim the sample terminal output to the lines that show the SUCCESS/STUCK or post-failure check, and record any removal in record.md."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 14,
+      "evidence": "Workflow step 2 inlines a 3-option collision template and several branches (skill vs command, update path) inside a seven-step list, so it reads as a Process skill with a Tool-style detour.",
+      "fix": "Keep the template, but move the long reply block under its own short heading (for example \"## Name collision reply\") that step 2 points to, so the seven steps stay scannable."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": null,
+      "evidence": "\"NEVER add a global override (a `git config --global` change, a user-level settings edit) the user did not ask for\" is generic and rarely met by a command-file writer. The strongest gotchas (bang-line state change, unquoted shell splice, blind retry, silent shadowing, dropped frontmatter) carry the specific, non-obvious reasons.",
+      "fix": "Tie the global-override item to a concrete command-writing case, such as a generated body that runs `git config --global`, or fold it into the existing authorization gotcha."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 78,
+      "evidence": "\"...tell users to quote a multi-word value; when a value may contain spaces and you cannot rely on quoting, take `$ARGUMENTS` whole... confirm the indexing there before relying on `$0` versus `$1`\" leaves the agent to decide in a fragile area.",
+      "fix": "State one default: use `arguments:` only for single-token values and `$ARGUMENTS` whole for anything that may hold spaces. Keep the doc link as the escape hatch."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/command-creator/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "The 18 queries (10 should-trigger, 8 should-not-trigger) include no should-trigger query for updating an existing command, although the description says \"Create or update\" and evals.json has an approved-update case.",
+      "fix": "Add one should-trigger query such as \"my /deploy-preview command should run the tests first, can you change it?\" and one near-miss negative (for example, a request to explain what an existing command does)."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/command-creator/references/examples.md",
+      "line": null,
+      "evidence": "\"`make fix` (runs `uv run ruff check --fix --unsafe-fixes`)\" and \"`ruff format --check`\" are vendor CLI flags stated with no source URL or check date, and no instruction to read them live.",
+      "fix": "Add the source and date after the table (https://docs.astral.sh/ruff/linter/ and https://docs.astral.sh/ruff/formatter/, checked <date>), or say to confirm with `ruff check --help`."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 14,
+      "evidence": "Step 2: \"say a skill fits better (out of scope here) and stop without writing. If the user still wants a command, write one...\" The stop and the continue branch are not sequenced. The agent has to guess whether to wait for the user's answer first.",
+      "fix": "Reword it as: say a skill fits better, ask whether to proceed with a command that calls the scripts by path, and write nothing until the user answers."
+    }
+  ]
+}

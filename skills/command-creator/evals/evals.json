@@ -92,6 +92,17 @@
       "files": [
         "evals/files/update/command-deploy-preview.md"
       ]
+    },
+    {
+      "id": "description-angle-brackets",
+      "prompt": "Create a project command /checkout-pr that takes a PR number and checks that PR out locally. I want the description to read exactly like the usage line: `Check out PR <number> locally`.",
+      "expected_output": "Writes `.claude/commands/checkout-pr.md` whose `description` holds no `<` or `>` (Claude Code shows them as `&lt;` and `&gt;`), using a square-bracket placeholder such as `[number]` or no placeholder, and keeps the angle-bracket form only in `argument-hint`, with an explanation of why the description was changed.",
+      "assertions": [
+        "The `description` value contains no `<` and no `>` character (a square-bracket placeholder such as `[number]`, or none, replaces `<number>`)",
+        "Tells the user that `<` and `>` in a `description` display as `&lt;` and `&gt;`, which is why the description differs from the requested wording",
+        "If the command has an `argument-hint`, the placeholder for the PR number may appear there in angle brackets (for example `<number>`), because `argument-hint` is not affected",
+        "Writes `.claude/commands/checkout-pr.md` with `---` on line 1 and a body that checks the PR number argument is present before using it"
+      ]
     }
   ]
 }

@@ -1,0 +1,50 @@
+{
+  "skill": "daily-meeting-update",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest at dbff837f: \"removed units (144, showing 40)\". All 40 shown items resolve to valid rows in docs/audit/recovery/daily-meeting-update/record.md through sections.json, but the other 104 removed units were not shown, so they could not be checked",
+      "fix": "Regenerate the digest without the cut, or with a higher limit, so every removed unit can be checked. For each unit no section row covers, restore it (into references/ when it is domain-specific, a template users ask for or a tested example; into the main file only when the procedure depends on it) or add a row for it to docs/audit/recovery/daily-meeting-update/record.md"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 34,
+      "evidence": "\"`TZ=ZONE python3 \"${CLAUDE_SKILL_DIR}/scripts/claude_digest.py\" --date DAY --format json`\". The skill covers Windows for the window one-liner (\"plus the `tzdata` package on Windows\"), but the digest branch relies on a POSIX `TZ=` prefix, and claude_digest.py calls `astimezone()` with no argument. On Windows, Python does not apply an IANA `TZ` value that way, so the digest silently splits days in the system zone instead of ZONE",
+      "fix": "Add one sentence after the table: \"On Windows, a `TZ=` prefix is not applied: run the digest only when the system time zone equals ZONE, otherwise say in one line that session days may be off and confirm the picked sessions with the user.\""
+    }
+  ]
+}

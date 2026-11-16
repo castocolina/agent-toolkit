@@ -1,0 +1,224 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codex",
+      "percent": 88.8,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 88.8
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/codex/record.md",
+          "line": null,
+          "evidence": "previous-version digest: codex at dbff837f lists 'removed units (44, showing 40)', so 4 removed units were not shown. Every listed item has a valid record row (s008-s015 and the README para rows), and the s009/s014 restore-main rows are restored in SKILL.md lines 22 and 24.",
+          "fix": "Rebuild the digest with no cap (or read docs/audit/recovery/codex/sections.json units for s009, s011 and s012) and confirm each of the 4 unshown units is covered by a section row in docs/audit/recovery/codex/record.md. Add a para:<id> row for any unit that is not."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 38,
+          "evidence": "Never interpolate task text directly into shell syntax. Use a safely quoted argument or stdin to avoid command expansion.",
+          "fix": "This is generic shell-safety advice that models already apply, and Resume (line 32) already says it. Merge the two into the single Resume sentence. Keep the rule there, and record the merged bullet in docs/audit/recovery/codex/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "medium",
+          "file": "skills/codex/SKILL.md",
+          "line": 12,
+          "evidence": "Resolve task intent, model, and effort (high for architecture/refactor/security, medium for features/bugs, low for formatting/docs). Omit `-m` ... Ask only when an unresolved choice affects the result. Confirm required permissions before execution.",
+          "fix": "Split Preflight 3 into ordered steps: (a) pick the sandbox, (b) resolve model and effort, (c) get authorization for gated flags, (d) assemble the command (flags, then `resume`, then the prompt), (e) run it and capture logs, (f) report model, effort, sandbox and whether edits happened. This makes the existing content a Tool-pattern workflow with checkpoints. Nothing is removed."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 39,
+          "evidence": "Preserve warnings and partial results in the report. State model/effort/sandbox and whether edits actually occurred; do not imply completion from a launched process alone.",
+          "fix": "This is a reporting rule, not a gotcha. Move it into the Run or report step, and keep the Gotchas list to traps like `--last` picking another project's session and `--full-auto` being rejected. Add any further Codex-specific trap you have hit, with its reason."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/codex/SKILL.md",
+          "line": 20,
+          "evidence": "Network: network need is not permission for broad filesystem access. Use the narrowest supported network/workspace configuration.",
+          "fix": "Network access is the fragile, high-consequence case, so name the exact narrower option and where to confirm it, for example: 'Check `codex exec --help` and the config reference for the workspace-write network setting (e.g. `-c sandbox_workspace_write.network_access=true`). Use it with `--sandbox workspace-write` before considering danger-full-access.' Add the source URL and the date it was checked."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/codex/evals/evals.json",
+          "line": 1,
+          "evidence": "All five prompts are precise and spell the setup out ('which is a Git repository', 'Show the appropriate command'). None is casual, and none covers a failing run (non-zero exit or a missing CLI). Trigger queries carry no paths, typos or personal context.",
+          "fix": "Add a casual prompt (e.g. 'yo get codex to look at why tests/test_api.py keeps flaking') and an edge case where `codex --version` fails, with assertions that the agent stops, reports the error and does not guess flags. Give a few trigger queries realistic file paths and casual wording."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/codex/SKILL.md",
+          "line": 32,
+          "evidence": "Use `codex exec resume --last` only after confirming the most recent session belongs to the intended repository/task ... Example shape: `codex exec resume --last`",
+          "fix": "When this branch is followed, there is no way to do the confirmation and no full command. Add how to check the session (for example list recent sessions via the CLI's resume picker or session store, as `codex exec resume --help` documents, and match the working directory). Add a complete example with stdin, e.g. `codex exec resume --last <<'EOF' ... EOF >codex.stdout.log 2>codex.stderr.log`, plus a fallback of resuming by session id when `--last` belongs to another project."
+        }
+      ]
+    },
+    {
+      "name": "command-creator",
+      "percent": 97.6,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 97.6
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/command-creator/record.md",
+          "line": null,
+          "evidence": "previous-version digest command-creator at dbff837f: \"removed units (618, showing 40)\". The digest is cut, so only 40 of 618 removed units could be checked. All 40 shown are explained by section rows in record.md through sections.json (for example s091 not-lost, s088 intended-change safety-fix, s060 user-accepted drop, s072 drop wrong).",
+          "fix": "Re-run the removal check without the cut, for example python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/command-creator/SKILL.md with a larger unit limit. Then add a row to docs/audit/recovery/command-creator/record.md for each para: unit that no current section row covers, or restore that content into references/ when it is a template or tested example."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/command-creator/evals/evals.json",
+          "line": null,
+          "evidence": "No eval covers the Workflow step 2 branch \"If the workflow needs bundled scripts or reference files, say a skill fits better (out of scope here) and stop without writing\". The 8 evals cover location, arguments, quoting, collision, update and description, but not this stop-without-writing decision.",
+          "fix": "Add an eval such as \"make a /lint-report command that runs our parse_lint.py helper and the style rules in docs/style.md; neither exists yet\". Its assertions: the answer says a skill fits better and writes nothing, or, if the user insists, writes a command that calls the script by path and flags the missing script as a manual step."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 53,
+          "evidence": "\"name an agent type that exists (built-ins: `Explore`, `Plan`, `general-purpose`; check the environment for custom ones)\". This list of built-in agent types is a vendor value that changes between releases. It has no source URL or checked date at this line, and nothing tells the agent to read it live.",
+          "fix": "Add the source and date: \"(built-ins per https://code.claude.com/docs/en/sub-agents, checked 2026-11-07: `Explore`, `Plan`, `general-purpose`; confirm the live list there and check the environment for custom ones)\"."
+        }
+      ]
+    },
+    {
+      "name": "professional-communication",
+      "percent": 84.0,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 84.0
+      },
+      "missing_judges": [
+        "router-env-my-referee-two"
+      ],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: \"removed units (394, showing 40)\". All 40 shown items, and both items in the d4ad4291 digest, have valid rows in docs/audit/recovery/professional-communication/record.md. The other 354 could not be checked.",
+          "fix": "Rerun the removal check with the full unit list, or confirm that every one of the 394 para: ids maps to a section row in docs/audit/recovery/professional-communication/sections.json that has a valid row in record.md. Restore any unexplained unit (into references/ when it is domain-specific or a template users ask for), or add a row for it to docs/audit/recovery/professional-communication/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 11,
+          "evidence": "\"Three golden rules: a clear subject or purpose, scannable formatting (bullets, headlines), and the key message first.\" The model applies this unprompted. The audience line 25 (\"identify recipient, desired outcome...\") is also mostly activation.",
+          "fix": "Keep the What-Why-How definition: the record row s022 says compose-email and the coach agent depend on it. The golden-rules sentence is already in README.md (\u00a7 Three Golden Rules), so it can move there: delete it from SKILL.md and add a para: row to docs/audit/recovery/professional-communication/record.md. Use the freed line for a non-obvious rule, such as when What-Why-How gives way to impact-first ordering."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 13,
+          "evidence": "\"## Route by goal\" gives the fields for each message type but no drafting sequence: no gather facts \u2192 pick channel \u2192 choose ordering \u2192 draft \u2192 check unknowns.",
+          "fix": "Add a 4-step sequence above Route by goal: (1) list the supplied facts and mark unknowns, (2) pick the channel with the lightest-channel rule, (3) pick the ordering (What-Why-How by default, impact-first for escalations), (4) draft, then check every date, number, owner and promise against step 1."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 30,
+          "evidence": "\"Never send incident urgency through an unmonitored channel\" and \"Do not paste credentials, customer data, or sensitive logs into broad channels\" state no reason or failure mode, and reviewers would call them obvious.",
+          "fix": "Give each item the failure it prevents. Example: \"Never route incident urgency through a channel nobody is paged for: a post in #eng at 02:00 can sit unread until morning while the on-call pager stays silent.\" Add gotchas this skill really meets, with their reasons. Example: forwarding an internal thread to an external stakeholder exposes the earlier internal discussion below the new message."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "medium",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 3,
+          "evidence": "The description does not mention the restored scope (standups, retrospectives, 1:1s, code review walkthroughs, review/help/intro emails, team norms). It gives no implicit triggers and does not draw a line against the near neighbours writing-clearly-and-concisely and feedback-mastery.",
+          "fix": "Draft and improve software-team emails, Slack/Teams messages, stakeholder status updates, escalations, review or help requests, meeting agendas (standup, sprint planning, retrospective, 1:1, design or code review), meeting summaries and team communication norms. Use when translating technical work for non-technical audiences without inventing metrics, making an async request actionable, choosing a channel across time zones, or structuring a project update, even if the user only says 'make this clearer' or 'tell the execs'. Not for performance-review coaching or difficult feedback (feedback-mastery), sales copy, legal documents, sentence-level style edits (writing-clearly-and-concisely), or actually scheduling meetings."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 16,
+          "evidence": "The Route by goal bullets (Escalation, Status update, Request) do not point to the matching template. Only the separate \"Load by deliverable\" section at line 38 does, and it is keyed to \"Before sending email\", so an escalation drafted for Slack may skip references/email-templates.md.",
+          "fix": "Add the load trigger to each route bullet. Example: \"Escalation: ... Use the Escalation pattern in references/email-templates.md for email or chat.\" Do the same for Status and Decision request."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/professional-communication/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "Should-trigger queries are terse fragments with no context (\"Escalate production issue; lead with impact.\"). Several negatives test nothing (\"Fictional dialogue between coworkers.\", \"Translate paragraph from French to English.\", \"Personal thank-you note to family member.\"). No query covers standups, retros, 1:1s or team norms. In evals.json, \"Audience calibrated and outcome explicit\" is not verifiable.",
+          "fix": "Replace the three far-off negatives with near-misses: a sentence-level style edit (writing-clearly-and-concisely), giving a peer difficult feedback (feedback-mastery), and a README/API doc. Rewrite 4 positives with realistic context (names, paths, a pasted draft), including one each for a 4Ls retro agenda and team response-time norms. Split the vague agenda assertion into \"Names who attends from product and engineering\" and \"Final agenda item states the decision outcome\"."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 11,
+          "evidence": "\"Organize any message as What ... Why ... How\" conflicts with line 16, \"Escalation: lead with user/business impact\", and line 21, \"lead with impact and end with the single decision needed\". For an escalating request, the What-first frame and the impact-first route give different orderings, and the skill does not say which one wins.",
+          "fix": "State the precedence in the Frame section: \"What-Why-How is the default; for escalations, lead with impact (Why), then the decision needed (What), then mitigation and owner (How).\" Add a final check line: \"Before returning the draft, check every date, number, owner and promise against the facts supplied, and mark the rest Proposed: or unknown.\""
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

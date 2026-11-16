@@ -1,0 +1,329 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "daily-meeting-update",
+      "percent": 98.4,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 96.8,
+        "router-env-my-referee-two": 100.0
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/daily-meeting-update/record.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: 'removed units (144, showing 40)'",
+          "fix": "The digest is cut, so the 104 unlisted units could not be checked against the record. Before the next judgment, regenerate the digest with every removed unit listed (or raise the show limit). Then confirm that each unit maps to a row in record.md, either through a section id in sections.json or through its own para: row."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/references/output-template.md",
+          "line": 11,
+          "evidence": "'PR you opened inside the window | `**Opened:**`, only when the user says so or its creation time is known; otherwise ask', but the SKILL.md line 32 query fetches only 'number,title,state,mergedAt,headRefName,reviews,url'. No query ever returns a creation time, so this branch always ends in asking.",
+          "fix": "Add createdAt to the gh pr view field list in SKILL.md step 2.4: `gh pr view NUMBER --repo OWNER/REPO --json number,title,state,createdAt,mergedAt,headRefName,reviews,url`. Then a PR counts as opened in the window when createdAt falls in [START, END)."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 30,
+          "evidence": "'gh search prs --author @me --repo OWNER/REPO --updated \">=START\" --json number,title,state,isDraft,url' and the Gotchas claim that gh search prs reports state as open, closed or merged. These vendor CLI flags and values carry no source URL or check date in the skill. README only says 'checked against the official documentation of ... GitHub (gh CLI)'.",
+          "fix": "After the table, add '(gh flags and state values checked <date>: https://cli.github.com/manual/gh_search_prs, https://cli.github.com/manual/gh_pr_view)'. Alternatively, have the agent run `gh search prs --help` before the first query."
+        },
+        {
+          "id": "D8-3",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/daily-meeting-update/SKILL.md",
+          "line": 42,
+          "evidence": "'`issue list --jql` and `--plain` exist only in jira-cli, so run `jira version` first and use the CLI only when it prints `(Version=\"\u2026\"`'. These are jira-cli flags and output format, with no source URL or check date.",
+          "fix": "Append '(checked <date>: https://github.com/ankitpokhrel/jira-cli, https://github.com/go-jira/jira)' to this Gotchas bullet. Keep the jira version check, which already reads the version live."
+        }
+      ]
+    },
+    {
+      "name": "domain-name-brainstormer",
+      "percent": 92.0,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 95.2,
+        "router-env-my-referee-two": 88.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: \"removed units (111, showing 40)\". All 40 listed items map through sections.json to valid record rows (s001-s032), but the other 71 items were not shown, so this check could not cover them.",
+          "fix": "Re-run the removal check with the full digest (python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/domain-name-brainstormer/SKILL.md ...). Confirm that each of the 111 units maps to a section row in docs/audit/recovery/domain-name-brainstormer/record.md, and add a row for any unit that does not."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 20,
+          "evidence": "\"5. **Report status from a lookup or not at all.**\" This step holds the label list, the curl command, a four-row classification table and the WHOIS fallback. It is a Tool-pattern block inside a Process/Mindset skill, so step 5 is several times longer than steps 1-4 and 6-7.",
+          "fix": "Keep the three labels and the rule \"label from a lookup or unverified\" in step 5. Move the curl command, the classification table and the WHOIS fallback verbatim to references/lookup.md, which step 5 reads \"when a shell or fetch tool is available\". Record the move as a `redistributed references/lookup.md` row in docs/audit/recovery/domain-name-brainstormer/record.md."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/evals/evals.json",
+          "line": 17,
+          "evidence": "\"id\": \"short-ai-names\" is the id of an eval whose prompt is about a Spanish-English language-learning product on .com and .app. Nothing in it concerns AI or .ai, so the id misleads anyone reading grading results.",
+          "fix": "Rename the id to \"bilingual-language-app-names\" (or similar) to match the prompt. Leave the prompt and assertions unchanged."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 25,
+          "evidence": "\"Verisign closes the connection on a 404 and curl prints error 56 after `404 https://rdap.verisign.com/...`\". This is a vendor server behaviour that can change between releases. Unlike the IANA bootstrap fact (which gives its URL and \"October 2026\"), it has no source URL and no date checked.",
+          "fix": "Append the source and date to the sentence, for example \"(observed against rdap.verisign.com, checked <date>; see docs/audit/recovery/domain-name-brainstormer/facts.md)\". Alternatively, reword it as a live instruction: \"classify from the printed `%{http_code} %{url_effective}` whatever curl's exit code\". Keep the classify-on-non-zero-exit rule either way."
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 19,
+          "evidence": "Spread candidates across distinct naming directions (compound, affix, evocative real word, coined blend)",
+          "fix": "Keep the one-pass screen (one spelling, unwanted meanings, nearby brands, word splits). Move the four naming-direction labels to references/example.md, which already groups by them, and record the move in docs/audit/recovery/domain-name-brainstormer/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 15,
+          "evidence": "Procedure is a linear 1-7 list with no thinking prompt before generation or ranking",
+          "fix": "Add one expert prompt before step 2, in the skill's own terms: before generating, ask which word the user must say aloud, which meaning must never appear, and which existing brand the name must not sit next to."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 39,
+          "evidence": "Gotchas covers 'available', prices, confusables and HSTS, but not the WHOIS no-record variants the procedure itself flags",
+          "fix": "Add one Gotcha: a WHOIS line that is not an explicit no-record reply (for example .mx Object_Not_Found wording the listed phrases do not name) stays unverified; only the replies named in step 5 count as not found in registry."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 3,
+          "evidence": "description names .com, .io, .app, .dev and RDAP/WHOIS, but not the WHOIS-only TLDs the body treats specially (.co, .de, .es, .mx)",
+          "fix": "Brainstorm, screen and rank brandable domain names (.com, .io, .app, .dev, and WHOIS-only TLDs such as .co) for apps, products, companies and personal brands, and report registration status honestly via RDAP/WHOIS lookups. Use when naming a project, launching or rebranding, asking \"is this domain available\", or replacing a taken first choice, even if the user only describes the business. Not for DNS, email, hosting or transfers on a domain already owned, naming without domains, social handles, or legal trademark clearance."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 18,
+          "evidence": "a budget cap (checked in step 6) are filters, not ranking weights. A name that fails one is cut",
+          "fix": "In step 1, say a budget cap filters only when the user supplied a registrar checkout quote; otherwise it is not a cut, and step 6's unverified budget-fit label is the only outcome."
+        },
+        {
+          "id": "D6-2",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 29,
+          "evidence": "run curl -sS -L --connect-timeout 5 --max-time 20 -o rdap.json -w '%{http_code} %{url_effective}'",
+          "fix": "Keep the exact curl invocation. Add one line: if the shell has no curl, use the same URL with the harness fetch tool and still apply the printed-result table; if that tool hides the status code or the final host, label the name unverified."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/evals/evals.json",
+          "line": 4,
+          "evidence": "expected_output: A set of relevant, pronounceable name candidates across suitable TLDs, with honest limits on live availability claims",
+          "fix": "Rewrite casual-climate-names expected_output to the procedure's actual product: assumptions stated, candidates grouped by naming direction, ranked table with pronunciation, rationale, risk, TLD fit, status label and RDAP URL, and a registrar-checkout close. Add one assertion that the table has those columns."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/domain-name-brainstormer/SKILL.md",
+          "line": 20,
+          "evidence": "Cut any candidate that has more than one plausible spelling when heard",
+          "fix": "Qualify the cut: drop a name with two equally likely spellings and no tie-breaker; keep a name whose intended spelling is the common one and record the rival spelling in the spelling-or-confusion-risk column, as the example does for snippetbox (snippit) and quillbin."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/domain-name-brainstormer/references/example.md",
+          "line": 13,
+          "evidence": "devpaste.com status not found in registry, rationale Familiar from the pastebin habit",
+          "fix": "In the example, mark devpaste.com as cut or explain the tie-breaker, so the worked example does not keep a name step 2's 'more than one plausible spelling when heard' rule would remove."
+        }
+      ]
+    },
+    {
+      "name": "game-changing-features",
+      "percent": 92.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8,
+        "router-env-my-referee-two": 92.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": null,
+          "evidence": "previous-version digest at dbff837f: \"removed units (160, showing 40)\". All 40 shown items map to valid section rows in docs/audit/recovery/game-changing-features/record.md through sections.json, but the other 120 could not be checked.",
+          "fix": "Re-run the dbff837f digest without the cut and confirm each of the 160 units maps to a valid row in docs/audit/recovery/game-changing-features/record.md. For any unit with no valid row, restore the content (into references/ideation-lenses.md when it is ideation material) or add a para:<id> row."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 23,
+          "evidence": "Step 4.2 packs five things into one bullet: the score formula, the unknown-reach rule, the unscored fallback, the strategic-bet override and the pointer to the Frequency and Defensibility lenses.",
+          "fix": "Split step 4.2 into sub-bullets: (a) the formula, (b) what to do when reach is unknown, (c) when a strategic bet may override the score, (d) when to read the lenses for a close score. Keep all of the wording. This keeps the Process pattern's checkpoints easy to scan."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 20,
+          "evidence": "\"Read [references/ideation-lenses.md](references/ideation-lenses.md) here\" loads the whole file at Discover, including the Rank-only section 'Evaluation lenses: Frequency and Defensibility'. Step 4.2 loads that section again only when two ideas score close.",
+          "fix": "At Discover, say to read only the Mindset rules, Category coverage check, Discovery questions and Unstick prompts sections. Leave the Evaluation lenses section to the step 4.2 trigger, so the read at each step matches what that step uses."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 23,
+          "evidence": "\"reach share (percentage points, 0-100) \u00d7 evidence (1 hypothesis, 2 one source, 3 two agreeing sources) / (effort S=1, M=2, L=3 + adoption cost ...)\". This puts a precise number on ideation, which is judgement work. Only strategic bets have a stated way out.",
+          "fix": "Add one sentence after the formula: the score orders ideas within a tier but does not decide for you. When the formula's order goes against the cited evidence, keep the evidence-led order and write the reason in the Deciding trade-off cell."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/game-changing-features/evals/evals.json",
+          "line": 38,
+          "evidence": "The category-coverage eval lists \"files\": [\"references/ideation-lenses.md\"]. That is the skill's own reference, not an eval input under evals/files/, so the eval feeds the skill to itself and does not test that the Discover step loads it.",
+          "fix": "Remove the files entry from the category-coverage eval, since it has no input files. Add an assertion that the session shows the ten-category coverage, which proves the Discover step read references/ideation-lenses.md."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 42,
+          "evidence": "The single-feature branch requires \"exactly one Do Now\". Step 4.3 (line 24) says that when capacity is unstated or no test fits, write \"No Do Now yet\". If a single-feature request gives no team capacity, the two rules conflict.",
+          "fix": "In the single-feature paragraph, replace \"exactly one Do Now\" with \"exactly one Do Now, or 'No Do Now yet' under step 4.3's capacity rule\"."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 23,
+          "evidence": "The evidence scale is \"1 hypothesis, 2 one source, 3 two agreeing sources\". Gotchas line 58 says disagreeing sources should be reported and turned into a validation question, but no score is given for an idea whose sources disagree.",
+          "fix": "Add to step 4.2: \"Sources that disagree score evidence 1 and the conflict becomes the idea's validation question (see Gotchas).\""
+        },
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/game-changing-features/references/ideation-lenses.md",
+          "line": 24,
+          "evidence": "Examples column restates obvious instances of each category: Instant search, predictive loading; Auto-scheduling, smart defaults; Recommendations, anomaly detection; Sharing, comments, real-time editing; Dashboards, progress tracking; Animations, celebrations, polish",
+          "fix": "Keep the ten category questions (the coverage check the Discover step depends on). Replace the example cell with a non-obvious mechanism the model would not invent, or drop only that cell and record the removal in docs/audit/recovery/game-changing-features/record.md; do not delete the category table."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "medium",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 44,
+          "evidence": "NEVER list has four specific rules with reasons, but the environment-specific landmines (flag files are not production, telemetry renames, registered vs active, stale roadmaps, conflicting sources) live in Gotchas with no NEVER-grade failure mode for mis-citing them",
+          "fix": "Add one NEVER that cites the Gotchas: NEVER call a capability live, unused, or a new build from a flag file, a zero telemetry count, a registered-account total or a roadmap line without the environment, tracking-plan, active-user or changelog check that Gotchas names, because each of those sources systematically lies."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 22,
+          "evidence": "Step 4.3 says every idea other than Do Now is Do Next, Explore or Backlog, each with its reason, but never defines how to choose among those three labels",
+          "fix": "Give one default: Do Next is the next idea whose cheapest test fits capacity after Do Now; Explore is a higher tier whose test does not fit or whose evidence is 1; Backlog is everything else. Keep the reason cell so a close call can override the default."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/game-changing-features/evals/evals.json",
+          "line": 5,
+          "evidence": "casual-strategy, precise-roadmap, feature-request and category-coverage assert no implementation code and hypothesis labels, but none checks the ranking formula (reach share times evidence divided by effort plus adoption cost), the hypothesis: prefix, citation resolution, or that Do Now is the highest-scoring idea whose test fits capacity",
+          "fix": "Add assertions the output can be checked against: one idea only is Do Now and it is the highest-scoring idea whose cheapest test fits the stated team; every number not taken from the prompt is prefixed hypothesis:; the feature-request eval's comparison table has exactly the columns Idea, Priority, Mechanism and impact, Reach, Effort, Next test."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 30,
+          "evidence": "The full-session template ends after Validation questions, while the single-feature branch (lines 42-42) requires Scope, Baseline, a different comparison table and Validation questions, and step 4.3's No Do Now yet outcome has no row in either template",
+          "fix": "Add the single-feature table (Idea, Priority, Mechanism and impact, Reach, Effort, Next test) as a second fenced template, and one template line for the No Do Now yet case: the missing capacity constraint and the cheapest question or test that resolves it."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/game-changing-features/SKILL.md",
+          "line": 16,
+          "evidence": "Baseline says list the folders under .claude/docs/ai/ and reuse the one whose prior session names the same product, but does not say what to do when two folders both match or when the directory cannot be listed",
+          "fix": "State the branch: if listing fails, use the kebab-case product slug and say the prior-session search was skipped; if two folders match, reuse the one with the newest session and name the other as not reused."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

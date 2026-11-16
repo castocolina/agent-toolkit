@@ -1,0 +1,77 @@
+{
+  "skill": "game-changing-features",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/game-changing-features/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest at dbff837f: 'removed units (160, showing 40)'. All 40 shown items map through sections.json to valid record rows or to content found in references/ideation-lenses.md, README.md or SKILL.md. The other 120 units were not shown, so they could not be checked one by one.",
+      "fix": "Re-run the removal check with the full unit list (no cut). Confirm that every remaining para: id maps to a section row in docs/audit/recovery/game-changing-features/record.md. Add a row for any id that has no row."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/game-changing-features/SKILL.md",
+      "line": 36,
+      "evidence": "Gotchas lines 'Code is not availability...', 'Roadmaps go stale...', 'Registered accounts overstate reach...', 'A checked-in flag file is often only the default...' and 'Telemetry event names change...' repeat the checks already listed in the fifth NEVER item ('NEVER call a capability live, unused, or a new build from a flag file, a zero telemetry count, a registered-account total or a roadmap line...').",
+      "fix": "Shorten the fifth NEVER item to the rule and its reason, and point to the Gotchas for the checks: 'NEVER call a capability live, unused, or a new build from a single flag file, telemetry count, account total or roadmap line: each misleads in a way the Gotchas below describe.' Keep the detail in Gotchas. Nothing is lost, so no record row is needed."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/game-changing-features/SKILL.md",
+      "line": 24,
+      "evidence": "Step 4.3 puts four label tests (Do Now, Do Next, Explore, Backlog), the capacity fallback and the 'recommendations, not commitments' rule into one paragraph: 'Prioritize: exactly one idea in the session is **Do Now**, ... when capacity is unstated, keep the \"No Do Now yet\" line and mark the rest Backlog.' This weakens the Process pattern's checkpoints.",
+      "fix": "Split step 4.3 into a short sub-list with one line per label (Do Now / Do Next / Explore / Backlog) plus one line for the 'capacity unstated' fallback. Keep every rule word for word, so no content is removed."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/game-changing-features/evals/evals.json",
+      "line": null,
+      "evidence": "The evidence-repo-session eval expects 'streak reminders as shipped (CHANGELOG.md 2.3.0, flags.yaml at 100%)' and 'shared challenges as built but unreleased'. SKILL.md's template Baseline example rows (lines 34-35) already contain those exact facts. Separately, category-coverage lists 'files': ['references/ideation-lenses.md'], which is the skill's own reference, not an input file under evals/files/.",
+      "fix": "Change the habit-repo fixture (for example rename the features, change the versions, or set a different stale-roadmap item) so the eval tests the Gotchas reasoning, not copying of the template rows. In category-coverage, replace the files entry with a real input under evals/files/, or drop the field because the prompt needs no input file."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/game-changing-features/SKILL.md",
+      "line": 24,
+      "evidence": "'Do Next is the next-highest idea whose test fits a stated later window'. I followed this branch for each eval prompt (team size given, no later window given): the branch can never fire, so every non-Do-Now, non-Massive idea falls to Backlog, and the 'Do Next' label in the template and the README is never reached.",
+      "fix": "Define a default window when none is stated, for example: 'Do Next is the next-highest idea whose cheapest test fits the stated later window, or, when none is stated, the next quarter at the stated team size; say which window you used in Scope and assumptions.'"
+    }
+  ]
+}

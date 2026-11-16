@@ -1,0 +1,68 @@
+{
+  "skill": "lesson-learned",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/lesson-learned/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest at dbff837f: 'removed units (93, showing 40)'. The list is cut, so 53 removed units could not be checked against docs/audit/recovery/lesson-learned/record.md. Every one of the 40 shown units maps through sections.json to a valid record row.",
+      "fix": "Run the judge again with the full digest (no cut list) so that every removed unit is checked against the record. Add a record row for any unit that turns out to be unexplained."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/lesson-learned/SKILL.md",
+      "line": 21,
+      "evidence": "| Last N commits, or recent work on the base branch | `git log -p --first-parent -n <N>` (default N=5) |",
+      "fix": "Keep the row, because the default N=5 and the --first-parent choice belong to the skill. In the table, put the non-obvious parts first: the base detection, --first-parent for merges and --untracked-files=all. That way the standard git log/diff invocations, which the model already knows, carry less weight. Move content only; delete nothing."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/lesson-learned/evals/evals.json",
+      "line": null,
+      "evidence": "The six evals cover the casual question, extraction, the rename, the range, untracked files and no changes. None covers a merge commit (`git show --first-parent`) or feature-branch base detection with a dirty tree. Those are the two Git gotchas most likely to go wrong. Also, casual-reflection lists 'references/se-principles.md' as an input file, but it is a skill file, not an input.",
+      "fix": "Add one eval under evals/files/ with a merge-commit `git show` output that is empty as a combined diff, plus the --first-parent version. Assert that the lesson comes from the --first-parent diff, not 'no changes'. Remove references/se-principles.md from the files list in casual-reflection."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/lesson-learned/SKILL.md",
+      "line": 50,
+      "evidence": "Line 16 says 'Run `git status --short` first.' Line 50 says 'Quick conversational question: ... Mention commands you would run in a sentence, if at all ... with no diff to read, make it conditional'. Line 26 says 'If nothing is in scope, say there is no change evidence and stop'. The skill does not say whether a quick question with no pasted diff should run git, use the user's description as evidence, or stop.",
+      "fix": "Add one sentence under 'Choose the evidence scope': 'If the user only describes a change in words and you cannot run git, treat the description as unverified evidence: answer in the conversational form with conditional claims. Use \"stop\" only when git ran and showed nothing in scope.'"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "skill": "daily-meeting-update",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 12
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 121,
+  "max_total": 125,
+  "percent": 96.8,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/daily-meeting-update/record.md",
+      "line": null,
+      "evidence": "previous-version digest at dbff837f: 'removed units (144, showing 40)'",
+      "fix": "The digest is cut, so the 104 unlisted units could not be checked against the record. Before the next judgment, regenerate the digest with every removed unit listed (or raise the show limit). Then confirm that each unit maps to a row in record.md, either through a section id in sections.json or through its own para: row."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/references/output-template.md",
+      "line": 11,
+      "evidence": "'PR you opened inside the window | `**Opened:**`, only when the user says so or its creation time is known; otherwise ask', but the SKILL.md line 32 query fetches only 'number,title,state,mergedAt,headRefName,reviews,url'. No query ever returns a creation time, so this branch always ends in asking.",
+      "fix": "Add createdAt to the gh pr view field list in SKILL.md step 2.4: `gh pr view NUMBER --repo OWNER/REPO --json number,title,state,createdAt,mergedAt,headRefName,reviews,url`. Then a PR counts as opened in the window when createdAt falls in [START, END)."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 30,
+      "evidence": "'gh search prs --author @me --repo OWNER/REPO --updated \">=START\" --json number,title,state,isDraft,url' and the Gotchas claim that gh search prs reports state as open, closed or merged. These vendor CLI flags and values carry no source URL or check date in the skill. README only says 'checked against the official documentation of ... GitHub (gh CLI)'.",
+      "fix": "After the table, add '(gh flags and state values checked <date>: https://cli.github.com/manual/gh_search_prs, https://cli.github.com/manual/gh_pr_view)'. Alternatively, have the agent run `gh search prs --help` before the first query."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/daily-meeting-update/SKILL.md",
+      "line": 42,
+      "evidence": "'`issue list --jql` and `--plain` exist only in jira-cli, so run `jira version` first and use the CLI only when it prints `(Version=\"\u2026\"`'. These are jira-cli flags and output format, with no source URL or check date.",
+      "fix": "Append '(checked <date>: https://github.com/ankitpokhrel/jira-cli, https://github.com/go-jira/jira)' to this Gotchas bullet. Keep the jira version check, which already reads the version live."
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codex",
+      "percent": 84.8,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 84.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/codex/SKILL.md",
+          "line": null,
+          "evidence": "Digest for dbff837f is a cut list: \"removed units (44, showing 40)\". The 40 shown items all have valid rows in docs/audit/recovery/codex/record.md or are covered by section-id rows via sections.json units. The 4 hidden items could not be checked.",
+          "fix": "Regenerate the digest with the full list of 44 removed units and confirm the 4 hidden ones have record rows (`para:` or section-id rows) in docs/audit/recovery/codex/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 25,
+          "evidence": "The `--full-auto` rejection appears in Run (line 25) and again in Authorization and gotchas. The `/dev/null` warning is also stated twice (Run and Gotchas).",
+          "fix": "Keep each fact once. Keep the Gotchas bullet and replace the Run copy with a pointer. Record any text removed in docs/audit/recovery/codex/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 14,
+          "evidence": "\"Resolve task intent, model, and effort. ... As one decision: use the configured default model and the effort from the mapping; ask only when ...\" Step 3.2 restates the same decision twice in different words. The Preflight is otherwise a mechanical checklist with little expert reasoning (what could go wrong if the wrong sandbox or session is chosen).",
+          "fix": "Merge step 3.2 into one decision rule. Add one \"before running, ask: what is the worst that can be touched if the sandbox, session or directory is wrong?\" framing line."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": null,
+          "evidence": "The Gotchas bullets mostly repeat rules already in Run and Resume. Gotchas that defy assumption (`--skip-git-repo-check` must be repeated on `resume`, `resume` takes no `-s`/`-C`, `--last` is cwd-scoped) live in other sections.",
+          "fix": "Consolidate these environment-specific facts into the Authorization and gotchas list, each with its reason, and point the earlier sections to them."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 3,
+          "evidence": "description: \"Run or resume OpenAI Codex CLI tasks with `codex exec` ... Use when asked to invoke Codex for review, debugging, ...\" It opens with the capability, not an imperative trigger, and does not cover requests that never say \"Codex\", such as \"get a second opinion from the OpenAI agent\".",
+          "fix": "Use when the user asks to run, resume or continue an OpenAI Codex CLI session (`codex exec`, `codex exec resume`) for read-only review, debugging, refactoring or automated edits, even if they only say \"get codex to look at X\" or \"continue the last codex run\". Choose the narrowest sandbox and report model, effort, sandbox and whether edits occurred. Not for installing the CLI, configuring credentials, conceptual explanations, summarizing prior output without invocation, or other vendors' CLIs."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 28,
+          "evidence": "Long dense paragraphs carry repeated inline provenance such as \"Checked 2026-11-07 against codex-cli 0.162.1 and https://...\", \"(checked 2026-11-08 against codex-cli 0.162.1)\" and \"(checked with `codex exec resume --help`, codex-cli 0.162.1, 2026-11-13)\", which bloat the body.",
+          "fix": "Move the source and date notes to a single \"Sources checked\" line at the end of SKILL.md or to README.md. Keep the commands inline. Credits stay untouched."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 14,
+          "evidence": "\"Ask only when an unresolved choice affects the result\" leaves unclear which choices count. The effort mapping (high/medium/low) is a default, but the escape conditions are vague.",
+          "fix": "Name the ask triggers explicitly, for example: ask only for an unnamed model that conflicts with the configured default, or for an effort level the model does not support."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/codex/evals/evals.json",
+          "line": null,
+          "evidence": "The `resume-other-project` and `network-needed` evals have only 2 terse assertions each (\"Does not use --last blindly\"). Trigger queries are short generic phrasings with no file paths, personal context or typos.",
+          "fix": "Expand those assertions to verifiable checks, such as the exact resume-by-id command shape and the `sandbox_workspace_write.network_access` key. Add trigger queries with realistic context: paths, casual phrasing, near-misses that say \"codex\" but need something else."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": null,
+          "evidence": "Resume says \"Pass the follow-up as a single-quoted final argument\", but the complete example uses double quotes (`\"Continue the review and list only new findings.\"`). Run says \"Put flags before the `resume` subcommand\" while Resume says `resume` takes no `-s` or `-C`. Facts not verified online.",
+          "fix": "Make the quoting instruction and the example agree. State once which flags may precede `resume` (only `--skip-git-repo-check`, outside Git) and that sandbox and directory are inherited."
+        }
+      ]
+    },
+    {
+      "name": "professional-communication",
+      "percent": 84.8,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 84.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": null,
+          "evidence": "Digest dbff837f is a cut list: 'removed units (394, showing 40)'. The 40 shown items all have record rows, or their content sits in a current file. The other 354 could not be checked.",
+          "fix": "Re-run the judge with the full digest (python3 scripts/audit/audit.py judge-prompt ... --digest-dir <dir>) and check the remaining 354 units against docs/audit/recovery/professional-communication/record.md and sections.json."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 57,
+          "evidence": "\"use the five phase names from the reference verbatim (Derby and Larsen, Agile Retrospectives), including Close the Retrospective, never shortened to Close\"; line 52: \"name the decision and its owner by the role the request gives (for example the product and engineering leads), marked proposed if no person is named\"",
+          "fix": "These two lines mirror the retro-4ls and agenda eval assertions without serving the skill's purpose. Put the phase-name rule in references/meeting-structures.md, where the table already prints the names. Make the role-owner rule generic: 'name the owner by role, or mark Proposed'. Do not remove the Derby and Larsen credit; keep it in the reference or move it to the end of the body."
+        },
+        {
+          "id": "D1-3",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 52,
+          "evidence": "The unknown-facts rule appears three times: line 24 (Final check), line 42 (Audience and accuracy checks, 'Decision rule for unknown facts'), and line 52 (the paragraph after Gotchas, 'When a fact is unknown...').",
+          "fix": "Keep the rule once, at line 42, and point to it from the other two places. Record the removal of the duplicate sentences in docs/audit/recovery/professional-communication/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 11,
+          "evidence": "Procedure steps 1-6 are pointers such as \"Pick the channel (see Channel)\" and \"Load the matching reference\", so they add no new thinking, and the ordering of steps 3 and 4 is not explained.",
+          "fix": "Add one 'before X, ask' line per step. For example, step 1: 'Which facts block the message?' Step 3: 'Who must act, and by when?'"
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 52,
+          "evidence": "The Gotchas section has specific, reasoned items (EOD, unmonitored channel, credentials, forwarded thread, evidence trap). It then ends with a rules paragraph that is not a gotcha and repeats line 42.",
+          "fix": "Move line 52 into 'Audience and accuracy checks' as one sentence and keep Gotchas to environment facts. Add one gotcha for a known failure, such as a draft inventing 'I'm investigating' or an update promise."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/professional-communication/references/email-templates.md",
+          "line": null,
+          "evidence": "The reference points to another reference: \"see `remote-async-communication.md`, Meeting decision rule\". meeting-structures.md also points to `email-templates.md`.",
+          "fix": "Route these through SKILL.md 'Load by deliverable', or inline a one-line summary of the rule. Keep references one level deep from SKILL.md."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 36,
+          "evidence": "\"Pick the channel in this order: incident, then formal or external (email), then a document, then chat. Default to the lightest channel the recipient reads daily\". The 'document' step has no condition in SKILL.md, and the order puts chat last while 'lightest' implies chat first.",
+          "fix": "State the condition for each rung in one line ('document: options or evidence to compare'; 'chat: short coordination'). Make chat the explicit fallback, and drop or reconcile the 'lightest channel' sentence."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/professional-communication/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "12 should-trigger and 10 should-not-trigger queries. Several negatives are far from the skill's scope (\"Generate legal vendor contract.\", \"Press release for consumer product.\") and several positives are terse.",
+          "fix": "Cut the positives to about 9. Replace the easy negatives with near-misses, for example a request to schedule a meeting in Outlook, a README rewrite, or a grammar-only edit with file paths and context. Fix the eval 'files' entries that point at references/ instead of evals/files/."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 5,
+          "evidence": "SKILL.md line 36 and references/remote-async-communication.md both define the channel rules. SKILL.md gives escalation precedence only in lines 22 and 36 ('For a request that is also an escalation, lead with impact'). It has no fallback when no monitored incident path is known.",
+          "fix": "Add one line: if the on-call path is unknown, ask the user for it and do not guess. Point to the channel table in remote-async-communication.md instead of restating it."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

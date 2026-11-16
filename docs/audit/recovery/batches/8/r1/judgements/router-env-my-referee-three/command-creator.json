@@ -1,0 +1,59 @@
+{
+  "skill": "command-creator",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 14,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 122,
+  "max_total": 125,
+  "percent": 97.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/command-creator/record.md",
+      "line": null,
+      "evidence": "previous-version digest command-creator at dbff837f: \"removed units (618, showing 40)\". The digest is cut, so only 40 of 618 removed units could be checked. All 40 shown are explained by section rows in record.md through sections.json (for example s091 not-lost, s088 intended-change safety-fix, s060 user-accepted drop, s072 drop wrong).",
+      "fix": "Re-run the removal check without the cut, for example python3 scripts/audit/audit.py judge-prompt --kind skill --artifact skills/command-creator/SKILL.md with a larger unit limit. Then add a row to docs/audit/recovery/command-creator/record.md for each para: unit that no current section row covers, or restore that content into references/ when it is a template or tested example."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/command-creator/evals/evals.json",
+      "line": null,
+      "evidence": "No eval covers the Workflow step 2 branch \"If the workflow needs bundled scripts or reference files, say a skill fits better (out of scope here) and stop without writing\". The 8 evals cover location, arguments, quoting, collision, update and description, but not this stop-without-writing decision.",
+      "fix": "Add an eval such as \"make a /lint-report command that runs our parse_lint.py helper and the style rules in docs/style.md; neither exists yet\". Its assertions: the answer says a skill fits better and writes nothing, or, if the user insists, writes a command that calls the script by path and flags the missing script as a manual step."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/command-creator/SKILL.md",
+      "line": 53,
+      "evidence": "\"name an agent type that exists (built-ins: `Explore`, `Plan`, `general-purpose`; check the environment for custom ones)\". This list of built-in agent types is a vendor value that changes between releases. It has no source URL or checked date at this line, and nothing tells the agent to read it live.",
+      "fix": "Add the source and date: \"(built-ins per https://code.claude.com/docs/en/sub-agents, checked 2026-11-07: `Explore`, `Plan`, `general-purpose`; confirm the live list there and check the environment for custom ones)\"."
+    }
+  ]
+}

@@ -1,0 +1,281 @@
+{
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "complete": true,
+  "skills": [
+    {
+      "name": "codex",
+      "percent": 85.6,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 85.6
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/codex/SKILL.md",
+          "line": null,
+          "evidence": "Digest for dbff837f: \"removed units (44, showing 40)\". The 40 shown items are all explained by record rows, but 4 items are not listed, so the judge cannot check them.",
+          "fix": "Regenerate the digest with all 44 units and check each of the 4 hidden items against docs/audit/recovery/codex/record.md or sections.json. Restore any unexplained item or add a row for it to docs/audit/recovery/codex/record.md."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 58,
+          "evidence": "\"Never send stderr to `/dev/null`: it carries the only failure diagnostics (see Run for separate logs).\" The same rule is already in Run (line 34), and `--full-auto` is explained twice (lines 25, 57). The --last/session-ownership check also appears twice (lines 38, 40).",
+          "fix": "Keep each rule once, with its reason. Merge the Authorization bullets into one-line pointers or delete them, and merge the two --last paragraphs in Resume. Record any removal in docs/audit/recovery/codex/record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 14,
+          "evidence": "\"Resolve model and effort. Resolve task intent, model, and effort (high for architecture/refactor/security, ...\" The step repeats itself, and the Preflight list buries the decisions and the plain steps at the same level.",
+          "fix": "Rewrite step 3.2 as \"Resolve model and effort: high for architecture/refactor/security, medium for features/bugs, low for formatting/docs. Omit -m unless the user names a model...\". Keep each step to one decision."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 32,
+          "evidence": "\"Put flags before the `resume` subcommand.\" There is no stated failure mode. The verified fact in docs/audit/recovery/codex/facts.md that `resume` rejects `-s` and `-C` with `unexpected argument` is not in the skill.",
+          "fix": "Add one gotcha line: \"`codex exec resume` rejects `-s` and `-C` (unexpected argument on codex-cli 0.162.1, checked 2026-11-07); run from the intended directory instead.\""
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/codex/SKILL.md",
+          "line": 14,
+          "evidence": "\"pass a model only when the user names one or the task needs a specific one... Ask only when an unresolved choice affects the result.\" \"The task needs a specific one\" and \"unresolved choice\" are vague for a step that is otherwise exact.",
+          "fix": "Make the default explicit: use the configured default model and the effort from the mapping, and ask only when the user's request conflicts with the configured default or names an effort the model does not support."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/codex/evals/evals.json",
+          "line": null,
+          "evidence": "The 7 evals cover read-only, edit, resume, flags, the Git gate and a failed version check. None covers the cross-project `--last` fallback to a session id, or a network need that should use the narrow workspace-write network setting before `danger-full-access`. Several trigger queries are short with no file paths or context (for example \"Create an architecture diagram of the Codex CLI integration.\").",
+          "fix": "Add two evals (resume from another project using a session id, and a network-required task that checks the narrow setting is tried first). Replace the easy negatives with near-misses that carry context, such as a path and a request to explain a codex exec error without running it."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/codex/SKILL.md",
+          "line": 25,
+          "evidence": "\"add `--approve-for-me` (it routes approval requests through automatic review inside the workspace-write sandbox)\". This is a version-sensitive CLI flag with no source URL or check date in the skill. Preflight 2 reads --help only when support is uncertain, and the flag's source and date are in facts.md only. Facts not verified online.",
+          "fix": "Add the source and date next to the flag, for example \"(`codex exec --help`, codex-cli 0.162.1; https://learn.chatgpt.com/docs/cli/reference, checked 2026-11-07)\". Or require running `codex exec --help` to confirm the flag exists before using it."
+        }
+      ]
+    },
+    {
+      "name": "command-creator",
+      "percent": 92.8,
+      "grade": "A",
+      "judges": {
+        "router-env-my-referee-three": 92.8
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "docs/audit/recovery/command-creator/record.md",
+          "line": null,
+          "evidence": "Digest dbff837f: \"removed units (618, showing 40)\". Only 40 of the 618 units were listed. All 40 listed items are explained by record rows (s001-s114 rows, units mapped through sections.json), and the d4ad4291 digest's one removed unit (para:c5ab52eb, the $0 sentence) is reworded at SKILL.md line 78 with a dated source. The other 578 could not be checked.",
+          "fix": "Run the full removal check on the complete digest. Add a row to docs/audit/recovery/command-creator/record.md for every unit not already covered by a section row."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/command-creator/references/examples.md",
+          "line": null,
+          "evidence": "The submit-stack \"Example Output\" block (\"\u2713 Found .PLAN.md - using plan context ... dot-agent-claude-folder-support\") is erk-specific illustrative output that adds no decision. The Usage and Error Handling blocks in Example 4 restate generic behaviour.",
+          "fix": "Keep the examples as credited erk material, but trim the sample terminal output to the lines that show the SUCCESS/STUCK or post-failure check, and record any removal in record.md."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 14,
+          "evidence": "Workflow step 2 inlines a 3-option collision template and several branches (skill vs command, update path) inside a seven-step list, so it reads as a Process skill with a Tool-style detour.",
+          "fix": "Keep the template, but move the long reply block under its own short heading (for example \"## Name collision reply\") that step 2 points to, so the seven steps stay scannable."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": null,
+          "evidence": "\"NEVER add a global override (a `git config --global` change, a user-level settings edit) the user did not ask for\" is generic and rarely met by a command-file writer. The strongest gotchas (bang-line state change, unquoted shell splice, blind retry, silent shadowing, dropped frontmatter) carry the specific, non-obvious reasons.",
+          "fix": "Tie the global-override item to a concrete command-writing case, such as a generated body that runs `git config --global`, or fold it into the existing authorization gotcha."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 78,
+          "evidence": "\"...tell users to quote a multi-word value; when a value may contain spaces and you cannot rely on quoting, take `$ARGUMENTS` whole... confirm the indexing there before relying on `$0` versus `$1`\" leaves the agent to decide in a fragile area.",
+          "fix": "State one default: use `arguments:` only for single-token values and `$ARGUMENTS` whole for anything that may hold spaces. Keep the doc link as the escape hatch."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/command-creator/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "The 18 queries (10 should-trigger, 8 should-not-trigger) include no should-trigger query for updating an existing command, although the description says \"Create or update\" and evals.json has an approved-update case.",
+          "fix": "Add one should-trigger query such as \"my /deploy-preview command should run the tests first, can you change it?\" and one near-miss negative (for example, a request to explain what an existing command does)."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "medium",
+          "file": "skills/command-creator/references/examples.md",
+          "line": null,
+          "evidence": "\"`make fix` (runs `uv run ruff check --fix --unsafe-fixes`)\" and \"`ruff format --check`\" are vendor CLI flags stated with no source URL or check date, and no instruction to read them live.",
+          "fix": "Add the source and date after the table (https://docs.astral.sh/ruff/linter/ and https://docs.astral.sh/ruff/formatter/, checked <date>), or say to confirm with `ruff check --help`."
+        },
+        {
+          "id": "D8-2",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/command-creator/SKILL.md",
+          "line": 14,
+          "evidence": "Step 2: \"say a skill fits better (out of scope here) and stop without writing. If the user still wants a command, write one...\" The stop and the continue branch are not sequenced. The agent has to guess whether to wait for the user's answer first.",
+          "fix": "Reword it as: say a skill fits better, ask whether to proceed with a command that calls the scripts by path, and write nothing until the user answers."
+        }
+      ]
+    },
+    {
+      "name": "professional-communication",
+      "percent": 82.4,
+      "grade": "B",
+      "judges": {
+        "router-env-my-referee-three": 82.4
+      },
+      "missing_judges": [],
+      "disagreement": false,
+      "synced": false,
+      "waived": false,
+      "skills_ref_valid": null,
+      "check_issues": [],
+      "findings": [
+        {
+          "id": "D1-1",
+          "dimension": "D1",
+          "severity": "medium",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": null,
+          "evidence": "The dbff837f digest is a cut list: 'removed units (394, showing 40)'. All 40 shown items trace to a valid record row, a restored template or a named destination, but the other 354 could not be checked.",
+          "fix": "Re-run the removal check with the full digest (all 394 units) and confirm each unit has a record.md row or a named destination. Add a row to docs/audit/recovery/professional-communication/record.md for any unit that has none."
+        },
+        {
+          "id": "D1-2",
+          "dimension": "D1",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 19,
+          "evidence": "Organize any message as **What** ... **Why** ... **How** ... Three golden rules: a clear subject or purpose, scannable formatting (bullets, headlines), and the key message first.",
+          "fix": "The model already knows this frame and these rules. Keep it to one line as an activation cue, because the agent and command files name What-Why-How. Keep the expert content: the unknown-fact rules, the Gotchas and the escalation precedence."
+        },
+        {
+          "id": "D2-1",
+          "dimension": "D2",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 10,
+          "evidence": "3. Pick the channel (see the channel paragraph after Route by goal).",
+          "fix": "Name the target as a heading, for example '## Channel', and point to it. The channel logic is now an unlabeled paragraph, which weakens the procedure and the pattern fit."
+        },
+        {
+          "id": "D3-1",
+          "dimension": "D3",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 49,
+          "evidence": "When a fact is unknown (cause, date, owner), say it is unknown and do not promise a future update... The decision rule for unknown facts is in Audience and accuracy checks.",
+          "fix": "This restates line 39 outside the Gotchas list. Fold it into one NEVER-style gotcha with the reason: an invented promise gets repeated upstream as a commitment. Do not remove the content; merge it and record the merge."
+        },
+        {
+          "id": "D4-1",
+          "dimension": "D4",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 3,
+          "evidence": "Description is a long list of artifact types and exclusions (about 900 characters), close to the 1024 limit.",
+          "fix": "Draft and improve software-team emails, Slack/Teams messages, stakeholder status updates, escalations, review and help requests, meeting agendas (standup, planning, retro, 1:1, design or code review), meeting summaries and team communication norms. Use when translating technical work for non-technical audiences without inventing metrics, making an async request actionable, or choosing a channel across time zones, even if the user only says 'make this clearer' or 'tell the execs'. Not for difficult feedback (feedback-mastery), sales copy, legal documents, sentence-level style edits (writing-clearly-and-concisely) or scheduling meetings."
+        },
+        {
+          "id": "D5-1",
+          "dimension": "D5",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 54,
+          "evidence": "print the five retrospective phase names exactly as in the reference: Set the Stage, Gather Data, Generate Insights, Decide What to Do, Close the Retrospective, never shortened to Close.",
+          "fix": "The loading bullet now carries content that already sits in references/meeting-structures.md. Keep the trigger condition and shorten the bullet to 'use the reference's phase names verbatim'. Do not delete the reference table."
+        },
+        {
+          "id": "D6-1",
+          "dimension": "D6",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 54,
+          "evidence": "never shortened to Close",
+          "fix": "Mandating exact wording of a low-fragility label is over-constrained next to the creative drafting freedom elsewhere. Say 'use the book's phase names' and give the reason, which is the Derby and Larsen source. Keep exactness only for facts, dates and owners."
+        },
+        {
+          "id": "D7-1",
+          "dimension": "D7",
+          "severity": "medium",
+          "file": "skills/professional-communication/evals/trigger-queries.json",
+          "line": null,
+          "evidence": "22 queries, 12 should-trigger and 10 should-not-trigger. Many are terse fragments such as 'Write cold sales email to prospects.' with no file paths or personal context. Only a few negatives are near-misses.",
+          "fix": "Rebalance to about 10 and 10. Rewrite the fragments with realistic context (names, tools, a manager's request). Add near-miss negatives such as 'schedule a recurring 1:1 in Outlook' and 'write release notes for the changelog'."
+        },
+        {
+          "id": "D7-2",
+          "dimension": "D7",
+          "severity": "low",
+          "file": "skills/professional-communication/evals/evals.json",
+          "line": null,
+          "evidence": "Assertions such as 'Informative subject' and 'Asks direct question' are vague. The nine evals contain few unknown-fact and no unsafe-channel edge cases beyond unknown-delay.",
+          "fix": "Make assertions verifiable ('subject names the release and the delay'). Add edge-case evals for the forwarded-thread, credentials-in-channel and EOD-timezone gotchas."
+        },
+        {
+          "id": "D8-1",
+          "dimension": "D8",
+          "severity": "low",
+          "file": "skills/professional-communication/SKILL.md",
+          "line": 33,
+          "evidence": "Default to the lightest channel the recipient reads daily; use email for external or formal records... For a request that is also an escalation, lead with impact and end with the single decision needed.",
+          "fix": "Give this paragraph a heading and a short decision order: incident, then formal or external, then document, then chat. The rule 'lead with impact and end with the single decision' also appears at line 21 and in the email-templates tail; keep it in one place."
+        }
+      ]
+    }
+  ],
+  "needs_update": false
+}

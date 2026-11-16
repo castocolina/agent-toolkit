@@ -43,3 +43,10 @@ jira/
 - [Jira Cloud REST API v3](https://developer.atlassian.com/cloud/jira/platform/rest/v3/intro/)
 - [Jira Software Cloud (Agile) REST API](https://developer.atlassian.com/cloud/jira/software/rest/intro/)
 - [Atlassian Document Format](https://developer.atlassian.com/cloud/jira/platform/apis/document/structure/)
+- Mike Cohn, [User Stories](https://www.mountaingoatsoftware.com/agile/user-stories) (Mountain Goat Software): the story statement template behind `story-anatomy.md`
+
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
+CLI flags and syntax in `references/commands.md` were checked against the jira-cli v1.7.0 help output and its README and agent skill (ankitpokhrel); MCP and REST facts against Atlassian's published documentation.

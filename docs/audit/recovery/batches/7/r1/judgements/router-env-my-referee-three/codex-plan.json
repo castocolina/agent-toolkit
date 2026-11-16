@@ -1,0 +1,104 @@
+{
+  "skill": "codex-plan",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 17,
+    "D2": 13,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 11
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 115,
+  "max_total": 125,
+  "percent": 92.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 85,
+      "evidence": "Add these task guidelines to the prompt: each task is specific and actionable, has clear inputs and outputs, is independently testable, names file paths and code locations...",
+      "fix": "Keep this restored text, because record row s011 restores it. Trim only the generic adjectives (\"specific and actionable\", \"clear inputs and outputs\") that the skeleton's task fields already enforce, and keep the parts that are not generic: the bad/good decomposition and test-first. Add a record row for any wording you drop."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": null,
+      "evidence": "previous-version digest: codex-plan at dbff837f \u2014 removed units (96, showing 40)",
+      "fix": "Generate the digest again without the cut, or check the 56 hidden units against the section rows in docs/audit/recovery/codex-plan/record.md and sections.json. All 40 shown units map to valid rows (s001-s015)."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 32,
+      "evidence": "Run `git rev-parse --verify -q HEAD` first: if it prints nothing (unborn repo), skip this line and record only `git status --porcelain=v1 -uall`",
+      "fix": "Put the precondition before the baseline command in step 5, in this order: (a) `git rev-parse --is-inside-work-tree`, (b) `git rev-parse --verify -q HEAD`, (c) mktemp, (d) the baseline line. The steps should run in the order they are written."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "commands/codex-plan.md",
+      "line": 29,
+      "evidence": "git ls-files -o --exclude-standard -z -- . \":(exclude)<plan file>\" | xargs -0 -r sha256sum",
+      "fix": "Add a Gotcha: `sha256sum` and `xargs -r` are GNU tools. On macOS, use `shasum -a 256` (and `xargs` without `-r` on older BSD) so the baseline still works and does not fall back to 'verification unavailable'."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 32,
+      "evidence": "skip this line and record only `git status --porcelain=v1 -uall`, saying verification is limited to it",
+      "fix": "In the unborn-repo branch, keep the exclusion: `git status --porcelain=v1 -uall -- . \":(exclude)<plan file>\"`. Then say that step 7 runs this same reduced line. Without the exclusion, the new plan file is always flagged as a change and the branch never resolves."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 36,
+      "evidence": "codex exec -s workspace-write -c model_reasoning_effort=high [-m <id>] \"$(cat prompt_to_codex.md)\"",
+      "fix": "Give the source for `model_reasoning_effort=high`: add 'see https://learn.chatgpt.com/docs/config-file/config-reference, checked 2026-11-07' (accepted values depend on the model). Or tell the agent to check `codex exec --help` before showing the command."
+    },
+    {
+      "id": "D8-3",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 39,
+      "evidence": "Add `--skip-git-repo-check` only when `git rev-parse --is-inside-work-tree` fails.",
+      "fix": "Add a source and date for this vendor CLI flag: '(https://learn.chatgpt.com/docs/non-interactive-mode, checked 2026-11-07)'. Or have the agent confirm it with `codex exec --help`."
+    },
+    {
+      "id": "D8-4",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "commands/codex-plan.md",
+      "line": 103,
+      "evidence": "`--output-last-message` saves Codex's final reply, not `codex-plan.md`; do not use it to claim the plan exists.",
+      "fix": "Add the source and date for this flag's behaviour: '(`codex exec --help`; https://learn.chatgpt.com/docs/non-interactive-mode, checked 2026-11-07)'."
+    }
+  ]
+}

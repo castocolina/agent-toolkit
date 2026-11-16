@@ -22,15 +22,16 @@ Run `git status --short` first. Then:
 | Last N commits, or recent work on the base branch | `git log -p --first-parent -n <N>` (default N=5) |
 | Revision range (`A..B`) | `git log -p --first-parent <range>` on the endpoints given; add no base |
 | Specific commit | `git show <sha>`; for a merge commit, `git show --first-parent <sha>` |
-| Working changes | `git diff`, `git diff --cached`, and every `??` path from `git status` |
+| Working changes | `git diff`, `git diff --cached`, and every `??` path from `git status --short --untracked-files=all` |
 
-If the user pasted a log or diff, read it instead of running these. An explicitly requested commit or range is used exactly as given, with no working changes added. For a default or whole-branch reflection, include uncommitted and `??` work alongside the branch commits and say so. On the base branch, a dirty tree means working changes first; add the last 5 commits only when the user asks about recent work; a clean base branch means the last 5 commits. If nothing is in scope, say there is no change evidence and stop; do not invent a lesson.
+If the user pasted a log or diff, read it instead of running these. An explicitly requested commit or range is used exactly as given, with no working changes added. For a default or whole-branch reflection, include uncommitted and `??` work alongside the branch commits and say so. On the base branch, a dirty tree means working changes first; add the last 5 commits only when the user asks about recent work; a clean base branch means the last 5 commits. If nothing is in scope, say there is no change evidence and stop; do not invent a lesson. When the user only describes a change in words and git cannot run, treat the description as unverified evidence and answer in the conversational form with conditional claims; "stop" applies only when git ran and showed nothing in scope.
 
 For a diff over 500 lines, read `--stat` first, then the high-signal hunks. Read an unchanged caller, contract or test only when a claim needs it, and say why you widened the scope.
 
 ## Git gotchas
 
 - `??` files are new files that neither `git diff` nor `git diff --cached` shows. Missing them is how "no changes" gets reported for a repo full of new work. Status already hides ignored files.
+- Plain `git status --short` collapses a new untracked directory into one `?? dir/` line, so the files inside stay unread. `--untracked-files=all` lists each file ("Also show individual files in untracked directories"; https://git-scm.com/docs/git-status, checked 2026-11-07; reproduced in a throwaway repo: `?? newdir/` versus `?? newdir/a.txt` and `?? newdir/sub/b.txt`). The first-line `git status --short` can stay for a quick look, but read the paths from the `all` form.
 - `git show <merge>` prints a combined diff that is empty for a clean merge, so a merge looks like it changed nothing. Plain `git log -p` also skips merge diffs; `--first-parent` shows what the merge brought in.
 - Two dots on a diff (`git diff <base>..HEAD`) also shows base-only commits, reversed. Use three dots for branch work.
 
@@ -47,6 +48,7 @@ For a diff over 500 lines, read `--stat` first, then the high-signal hunks. Read
 Every answer has three parts: what changed (files or commits you read, with a short code or test reference), why it matters (the observable consequence and counterfactual), and one next-time practice. Name a principle only when step 5 passed. Default to one lesson; add at most two more for independent concerns. If the changes are trivial or the evidence is thin, say so.
 
 - Written report or notes: a `## Lesson: <principle or plain description>` heading, then **What changed:**, **Why it matters:**, **Next time:**.
+- Each additional lesson (at most two, independent concerns) goes after the main one in this compact form: `**Also worth noting:** [Principle or plain label]: [one sentence of evidence]`. The same evidence rule holds: a principle name appears only when its row's evidence check passed; otherwise use a plain label.
 - Quick conversational question: one or two short paragraphs of plain prose, with no headings, code blocks or lists. Mention commands you would run in a sentence, if at all. End with one concrete next-time practice drawn from the evidence you have; with no diff to read, make it conditional ("if the diff shows X, do Y"). Never reply only with a request for more input.
 
 ## NEVER

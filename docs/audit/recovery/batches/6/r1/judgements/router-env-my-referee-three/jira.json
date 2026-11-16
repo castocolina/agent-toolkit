@@ -1,0 +1,95 @@
+{
+  "skill": "jira",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 18,
+    "D2": 13,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 14,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 117,
+  "max_total": 125,
+  "percent": 93.6,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "skills/jira/SKILL.md",
+      "line": null,
+      "evidence": "previous-version digest jira at dbff837f: 'removed units (351, showing 40)'. All 40 shown items are explained by record.md rows or sections.json units. The other 311 could not be checked from the digest.",
+      "fix": "Regenerate the dbff837f digest without the cut, or check the 311 unshown units against docs/audit/recovery/jira/record.md and sections.json. Add a row for any unit that no section-id row covers."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/jira/SKILL.md",
+      "line": 42,
+      "evidence": "'Show the exact change: original versus new text, the exact command or tool call, and side effects' and 'Get approval for that exact change' are generic approval steps a capable model mostly applies already.",
+      "fix": "Keep the Jira-specific reasons (watchers notified, one-way transitions, no undo, displayed payloads were not executed). Tighten the generic show-and-approve wording to one clause. Remove nothing without a record row."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/jira/SKILL.md",
+      "line": 49,
+      "evidence": "'**Story or task:** creating one or rewriting its description, also read references/story-anatomy.md ... For a draft card, the reply opens with the three bold As a / I want / so that lines ... Sprint: the next future sprint, never the active one ... Do not load story-anatomy.md for bugs...' puts loading rules, an output template and a sprint policy in one paragraph.",
+      "fix": "Split the paragraph into three short bullets: (1) when to load story-anatomy.md and when not to, (2) the draft-card opening format, (3) the sprint default. That keeps the Process pattern readable without moving content out of SKILL.md."
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "medium",
+      "file": "skills/jira/SKILL.md",
+      "line": 49,
+      "evidence": "'Sprint: the next future sprint, never the active one'. references/story-anatomy.md rule 6 says 'Never the active sprint unless the user explicitly asks', so SKILL.md drops the escape hatch.",
+      "fix": "Sprint: the next future sprint by default, never the active one unless the user explicitly asks (adding scope changes a running sprint's commitment); state that reason and write the chosen sprint id into the command."
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/jira/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "Some queries read like spec phrasing, not user messages: 'Design a Jira workflow policy in prose without accessing an instance', 'Implement a fix from a pasted bug report without looking up or changing any Jira issue'. 'Create GitHub issue #42 for the failing test' is an easy negative.",
+      "fix": "Rewrite these as realistic near-misses with casual wording and context, for example: 'my PM pasted the bug from PROJ-55 below, just patch checkout.ts, dont touch jira'. Keep the 10/10 split."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/jira/SKILL.md",
+      "line": 59,
+      "evidence": "'REST GET /rest/api/3/search/jql (Cloud; the old /search is being removed)' is a version-sensitive endpoint fact with no source URL or check date. The DC half of the same line carries a date.",
+      "fix": "Add the official source and the date checked, for example '(Cloud, VERIFIED in the v3 OpenAPI spec, developer.atlassian.com/cloud/jira/platform/rest/v3/, checked <date>)', or tell the agent to confirm the endpoint live."
+    },
+    {
+      "id": "D8-2",
+      "dimension": "D8",
+      "severity": "low",
+      "file": "skills/jira/SKILL.md",
+      "line": 41,
+      "evidence": "Step 1 is one sentence with nested parentheses: transitions, a multi-hop route from a trusted workflow graph, getJiraWorkflows disabled by default, the CLI-only REST listing and required create fields. The transition branch is hard to follow at a glance.",
+      "fix": "Split step 1 into sub-bullets: edit (fetch the issue), move (list transitions; if the target is missing, one approved hop at a time; CLI-only setups use REST per mcp.md Transitions row), create (required fields from createmeta). Keep every clause."
+    }
+  ]
+}

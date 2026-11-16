@@ -7,12 +7,12 @@ Read this only when creating a story or task, or rewriting its description. Evid
 These are the owner's house rules, not industry or Atlassian rules. Apply them by default; the user can override any of them for one card.
 
 1. **Statement first, three lines, bold parts:** As a **<role>**, I want **<what>**, so that **<why>**.
-2. **Role is a real end-user persona of the product** (Finance Analyst, Support Agent), never "user", "developer" or "system". Mike Cohn's template allows any user, customer or system, so this rule is stricter than the source (VERIFIED, mountaingoatsoftware.com/agile/user-stories).
+2. **Role is a real end-user persona of the product** (Finance Analyst, Support Agent), never "user", "developer" or "system". Mike Cohn's page says most stories are written from the view of a user or customer, and some from that of a stakeholder, another system or someone else who benefits, so this rule is stricter than the source (VERIFIED, mountaingoatsoftware.com/agile/user-stories, re-read 2026-11-07).
 3. **"so that" names the goal or decision the persona gains**, not a restatement of the feature ("so that I can export" is weak). One goal per card; split otherwise.
 4. **Sections, in this order:** Problem, Proposed solution, Business benefits (a revenue or cost estimate, or the words "needs data" with what data), Technical benefits, Acceptance criteria (checklist or Given/When/Then), Definition of Done, Out of scope, Risks, References (repos, scripts, Confluence pages, diagrams, docs, related cards).
 5. **Always link an epic.** Find candidates, propose the best match and get approval; if none fits, ask. Never create the card unlinked without saying so.
 6. **Sprint = the next future sprint, or the one after if the user says so. Never the active sprint** unless the user explicitly asks: adding scope to a running sprint changes its commitment.
-7. **Assignee = the creator** (the authenticated user), sent explicitly. Never rely on the project default: it can only be the project lead or unassigned (SOURCED, Atlassian KB "unable to change the default assignee field"), so an omitted assignee usually lands on the lead.
+7. **Assignee = the creator** (the authenticated user), sent explicitly. Never rely on the project default: it can only be the project lead or unassigned (SOURCED, Atlassian KB "unable to change the default assignee field", checked 2026-11-07), so an omitted assignee usually lands on the lead.
 
 ## The statement per deployment
 
@@ -48,13 +48,13 @@ Pitfalls: `**text**` in wiki markup is not bold (stray asterisks, UNVERIFIED but
 
 ## Setting epic, sprint and assignee
 
-Discover field ids with `GET /rest/api/{2|3}/field` (Sprint has schema custom `com.pyxis.greenhopper.jira:gh-sprint`, SOURCED) and confirm they are on the create screen with `GET /rest/api/{2|3}/issue/createmeta/{project}/issuetypes/{issueTypeId}` (or MCP `getJiraIssueTypeMetaWithFields`).
+Discover field ids with `GET /rest/api/{2|3}/field` (Sprint has schema custom `com.pyxis.greenhopper.jira:gh-sprint`, SOURCED: community and KB snippets, not in the Cloud spec, checked 2026-11-07) and confirm they are on the create screen with `GET /rest/api/{2|3}/issue/createmeta/{project}/issuetypes/{issueTypeId}` (or MCP `getJiraIssueTypeMetaWithFields`).
 
 **Creator.** Always resolve it from the token that will write, on every backend including the CLI: Cloud `GET /rest/api/3/myself`, then `"assignee":{"accountId":"..."}` (VERIFIED); DC `GET /rest/api/2/myself`, then `"assignee":{"name":"..."}` (UNVERIFIED this session). CLI: `jira me` only prints the configured login, a hint that a DC Bearer token need not match, so confirm it against `myself` before passing it to `-a` (VERIFIED, jira-cli source). MCP: the current-user tool, then its account id.
 
 **Epic.** Search candidates with JQL `project = KEY AND issuetype = Epic AND statusCategory != Done`. Set it as the parent (SKILL.md gotcha), per deployment:
 - Cloud: `"parent":{"key":"EPIC-1"}` on create or edit. Atlassian deprecated Epic Link and Parent Link in Cloud create/update endpoints (company-managed projects) and made `parent` the field for both company-managed and team-managed projects (VERIFIED, developer community deprecation notice 54048; the notice excludes Server/DC).
-- DC: the custom field named "Epic Link" holds the epic key: `"customfield_NNNNN":"EPIC-1"` (SOURCED, JSWSERVER-13517).
+- DC: the custom field named "Epic Link" holds the epic key: `"customfield_NNNNN":"EPIC-1"` (SOURCED, JSWSERVER-13517, checked 2026-11-07).
 - CLI: `-P EPIC-1` on create or edit, then re-read the parent; fallback `jira epic add EPIC-1 KEY` (commands.md has the caveats).
 
 **Sprint.**

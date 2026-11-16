@@ -1,0 +1,104 @@
+{
+  "skill": "professional-communication",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 15,
+    "D2": 12,
+    "D3": 14,
+    "D4": 15,
+    "D5": 15,
+    "D6": 14,
+    "D7": 12,
+    "D8": 13
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 110,
+  "max_total": 125,
+  "percent": 88.0,
+  "grade": "B",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/professional-communication/record.md",
+      "line": null,
+      "evidence": "Digest at dbff837f: 'removed units (394, showing 40)'. All 40 listed items resolve through sections.json to valid record rows or to restored content, but the other 354 were not shown and could not be checked.",
+      "fix": "Regenerate the dbff837f digest without the cut (or split it by file) so every removed unit can be checked against record.md. Add a row to docs/audit/recovery/professional-communication/record.md for any unit no section row covers."
+    },
+    {
+      "id": "D1-2",
+      "dimension": "D1",
+      "severity": "low",
+      "file": "skills/professional-communication/SKILL.md",
+      "line": 11,
+      "evidence": "'Three golden rules: a clear subject or purpose, scannable formatting (bullets, headlines), and the key message first.' Generic writing advice the model applies unprompted. The Audience and accuracy checks line 29 is also mostly activation content.",
+      "fix": "Keep What-Why-How (commands/compose-email.md depends on it). Fold the three golden rules into the Route by goal leads, for example 'key message first = the route's first field', so the line adds a domain mapping. Do not delete it; if you shorten it, add a row to docs/audit/recovery/professional-communication/record.md (README.md keeps the full rules)."
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "medium",
+      "file": "skills/professional-communication/SKILL.md",
+      "line": 9,
+      "evidence": "The steps are spread across Frame (line 15 'Final check'), Route by goal, Audience and accuracy checks (line 29 'Before drafting...') and Load by deliverable. The skill never gives them as one ordered sequence.",
+      "fix": "Add a short ordered procedure near the top: 1) list the facts supplied and the unknowns; 2) pick the route by goal; 3) pick the channel; 4) load the matching reference; 5) draft with What-Why-How or the escalation order; 6) run the Final check. Keep the existing text and point each step to its section."
+    },
+    {
+      "id": "D3-1",
+      "dimension": "D3",
+      "severity": "low",
+      "file": "skills/professional-communication/SKILL.md",
+      "line": 33,
+      "evidence": "'\"EOD\" is ambiguous across time zones; use an explicit date, time, and zone or ask which zone applies.' Unlike the other gotchas, this one does not say what goes wrong.",
+      "fix": "Add the consequence, for example: 'a Singapore reader's EOD lands before a New York sender's workday starts, so the deadline is missed with nobody at fault.'"
+    },
+    {
+      "id": "D6-1",
+      "dimension": "D6",
+      "severity": "low",
+      "file": "skills/professional-communication/SKILL.md",
+      "line": 25,
+      "evidence": "The channel has a clear default ('Default to the lightest channel the recipient reads daily'), but length and register (executive brevity vs peer detail) have none. commands/compose-email.md defaults to 'under 150 words'.",
+      "fix": "Add one default with an escape hatch, for example: 'Default to under 150 words and one ask for stakeholder or executive updates; go longer only when the facts supplied need it.'"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/professional-communication/evals/evals.json",
+      "line": null,
+      "evidence": "Several prompts read like notes, not real user messages ('Email non-technical stakeholders: critical payment issue delays release one week to March 15; QA retests Thursday, update Friday.'). 'files' lists the skill's own references (\"references/email-templates.md\") instead of input files. 'Informative subject' is a vague assertion.",
+      "fix": "Rewrite 2-3 prompts as casual messages with real context (names, a pasted draft to improve). Put pasted drafts or notes in evals/files/ and list those under 'files'. Make 'Informative subject' checkable, for example 'Subject names the release and the delay'."
+    },
+    {
+      "id": "D7-2",
+      "dimension": "D7",
+      "severity": "low",
+      "file": "skills/professional-communication/evals/trigger-queries.json",
+      "line": null,
+      "evidence": "Most should-trigger queries are short and full of keywords ('Escalate production issue; lead with impact.', 'Project status report with progress, risks, next steps.'). Few test cases where the user describes the need without naming the domain.",
+      "fix": "Replace 3-4 terse positives with realistic queries that don't name the domain, for example 'my VP keeps asking what the migration means for Q3, here's what eng told me: ...'. Keep the strong near-miss negatives."
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/professional-communication/SKILL.md",
+      "line": 39,
+      "evidence": "The unknown-fact rule appears three times with different actions: line 15 'mark anything else `Proposed:` or unknown', line 29 'marked as unknown or ask a targeted question', line 39 'say it is unknown ... label any proposed next step or owner \"Proposed:\"'. Following the branch 'deadline missing' gives ask, mark unknown or propose, and nothing says which.",
+      "fix": "Add one decision rule in Audience and accuracy checks: 'Ask a targeted question when the missing fact blocks the message (recipient, the ask itself); otherwise draft with it marked unknown, or as \"Proposed:\" when you suggest a value.' Point lines 15 and 39 to it."
+    }
+  ]
+}

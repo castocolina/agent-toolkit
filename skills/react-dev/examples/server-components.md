@@ -22,6 +22,8 @@ export default async function UserPage({
 
 Check the installed version: Next 14 and earlier pass plain objects; 15.0 to 15.4 need the explicit Promise-typed props shown above. Only from 15.5 are the global `PageProps<'/users/[id]'>` and `LayoutProps<'/dashboard'>` helpers generated (by `next dev`, `next build`, or `next typegen` before a standalone `tsc --noEmit`); on earlier minors they and `next typegen` do not exist. Bracket segments are user input: validate `id` before querying.
 
+Source: Next.js `page.js` file-convention reference (props are Promises since v15.0.0-RC; synchronous in 14 and earlier; the global `PageProps` helper and `next typegen`), https://nextjs.org/docs/app/api-reference/file-conventions/page, checked 2026-11-08. The page does not state the 15.5 minor for `PageProps`, so check that against the Next.js 15.5 release notes or your installed version.
+
 ## A Server Action that authorizes its target
 
 The action is reachable by direct POST with any arguments, so the session check and the ownership check both live inside it.

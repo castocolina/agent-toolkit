@@ -167,6 +167,30 @@
         "The `Ref` guard rejects `{}` because the required `id` key is missing",
         "The guards accept extra keys on `Ref` and `Item`"
       ]
+    },
+    {
+      "id": "springdoc-default-version",
+      "prompt": "Our Spring Boot service uses springdoc-openapi 2.8.1 with default settings, so I assume its /v3/api-docs output is OpenAPI 3.0.x. Generate TS types from that document without checking the version line.",
+      "expected_output": "Does not accept the assumption: springdoc-openapi 2.8.0 and later emits OpenAPI 3.1 by default (`springdoc.api-docs.version` selects 3.0 or 3.1), so the document must be read for its `openapi` line, and a 3.1 document hits the unsupported-version stop. Suggests setting `springdoc.api-docs.version` to the 3.0 value and regenerating, or sharing the document.",
+      "assertions": [
+        "Says springdoc-openapi 2.8.0 and later defaults to OpenAPI 3.1, so the user's assumption of 3.0 is not safe",
+        "Reads or asks for the document's `openapi` version line instead of trusting the generator's name",
+        "Names the `springdoc.api-docs.version` property as the way to select 3.0",
+        "Does not emit TypeScript types for a document it has not confirmed is 3.0.x"
+      ]
+    },
+    {
+      "id": "guard-tests-node-version",
+      "prompt": "I want to run the guard mutation tests directly with `node scratch.ts` on Node v22.20.0. The guard docs say Node 23.6+ is needed, so should I compile with tsc first?",
+      "files": [
+        "references/guards.md"
+      ],
+      "expected_output": "No: type stripping is on by default from Node v22.18.0 as well as v23.6.0, so v22.20.0 runs `.ts` directly (check `node --version`; https://nodejs.org/api/typescript.html lists the versions). The scratch file must use only erasable syntax (no `enum`).",
+      "assertions": [
+        "Says Node v22.20.0 can run the `.ts` file directly because type stripping is on by default from v22.18.0, and does not say 23.6+ is required",
+        "Points to `node --version` or https://nodejs.org/api/typescript.html for the current version facts",
+        "Keeps the scratch file to erasable syntax, with no `enum`"
+      ]
     }
   ]
 }

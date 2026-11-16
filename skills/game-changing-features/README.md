@@ -34,6 +34,10 @@ on active users rather than signups, and saves the result as
 
 Each run writes the next unused session number; earlier sessions are never overwritten. Without file access, the full report comes back in the reply with its intended path.
 
+## Credits
+
+Originally from [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit) by @leonardocouy.
+
 ## Installation
 
 **Claude Code:**

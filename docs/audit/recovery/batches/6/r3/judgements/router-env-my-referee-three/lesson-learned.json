@@ -1,0 +1,68 @@
+{
+  "skill": "lesson-learned",
+  "judge": "router-env-my-referee-three",
+  "rubric_version": 5,
+  "spec_sha": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+  "scores": {
+    "D1": 19,
+    "D2": 14,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 13,
+    "D8": 14
+  },
+  "max": {
+    "D1": 20,
+    "D2": 15,
+    "D3": 15,
+    "D4": 15,
+    "D5": 15,
+    "D6": 15,
+    "D7": 15,
+    "D8": 15
+  },
+  "total": 120,
+  "max_total": 125,
+  "percent": 96.0,
+  "grade": "A",
+  "findings": [
+    {
+      "id": "D1-1",
+      "dimension": "D1",
+      "severity": "medium",
+      "file": "docs/audit/recovery/lesson-learned/record.md",
+      "line": null,
+      "evidence": "Digest at dbff837f: 'removed units (93, showing 40)'. All 40 listed para items map through sections.json to valid record rows (s003-s033), but the other 53 removed units could not be checked",
+      "fix": "Re-run the digest without truncation (or point the judge at the full digest file) so every removed unit can be matched to its record.md row; add a row in docs/audit/recovery/lesson-learned/record.md for any unit that has none"
+    },
+    {
+      "id": "D2-1",
+      "dimension": "D2",
+      "severity": "low",
+      "file": "skills/lesson-learned/SKILL.md",
+      "line": 41,
+      "evidence": "'Rank them by observable consequence and evidence strength; a demonstrated trade-off beats a neat principle match.' There is no tie-break when a success candidate and a warning candidate are equally strong, but the Load rule (line 13) loads anti-patterns.md only when the lesson is a warning, so two runs can pick different lessons and load different files",
+      "fix": "Add one clause to step 2: 'On a tie, prefer the candidate with test evidence; if both have it, lead with what the change got right and give the warning as the Also worth noting line (read anti-patterns.md for it).'"
+    },
+    {
+      "id": "D7-1",
+      "dimension": "D7",
+      "severity": "medium",
+      "file": "skills/lesson-learned/evals/evals.json",
+      "line": null,
+      "evidence": "Six evals cover a casual question, a pasted diff, a rename, a range, untracked files and no changes. None covers the feature-branch base detection (symbolic-ref, then main/master, then the last-5 fallback) or the merge-commit gotcha ('git show <merge> prints a combined diff that is empty for a clean merge'). Eval 'casual-reflection' also lists references/se-principles.md under files, but that is a skill file, not an input",
+      "fix": "Add an eval with a fixture git log showing a clean merge commit that asserts the answer uses --first-parent evidence and does not report 'no changes', plus one where the repo has no origin/HEAD and only a master branch, asserting the stated base is master. Drop references/se-principles.md from the casual-reflection files list"
+    },
+    {
+      "id": "D8-1",
+      "dimension": "D8",
+      "severity": "medium",
+      "file": "skills/lesson-learned/SKILL.md",
+      "line": 21,
+      "evidence": "'Feature branch (default off the base branch) | Base: `git symbolic-ref --short refs/remotes/origin/HEAD`...'. Followed the branch: nothing says how to tell whether HEAD is on the base branch (for example by comparing `git branch --show-current` with the base), and a detached HEAD (CI checkout, mid-rebase) matches neither the feature-branch row nor the base-branch rule on line 27",
+      "fix": "Add to the scope paragraph: 'Compare `git branch --show-current` with the base; an empty result means detached HEAD: use `git log -p --first-parent -n 5` and say the HEAD was detached.'"
+    }
+  ]
+}

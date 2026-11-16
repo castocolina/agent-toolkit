@@ -27,14 +27,19 @@ Mention the target languages, a budget cap and any word that must or must not ap
 | File | Purpose |
 |------|---------|
 | `SKILL.md` | Defaults, the generate-screen-rank procedure, status labels, lookup fallbacks and gotchas |
+| `references/example.md` | A filled-in shortlist in the output format, with illustrative statuses |
 | `evals/` | Output evals, trigger queries and a pasted-RDAP fixture |
 
 ## Install
 
 Claude Code: `cp -r skills/domain-name-brainstormer ~/.claude/skills/`
 
-claude.ai: add `SKILL.md` to project knowledge or paste it into the conversation. Live lookups need network access to `rdap.org` and the registry RDAP servers; add them at `claude.ai/settings/capabilities`.
+claude.ai: add `SKILL.md` to project knowledge or paste it into the conversation. Live lookups need network access to `rdap.org` and the registry RDAP servers; add them in your capabilities settings (`claude.ai/settings/capabilities`; Team and Enterprise owners manage allowed domains in organization settings, and labels change between plans and releases, see [Anthropic's Help Center](https://support.claude.com/en/articles/12111783-create-and-edit-files-with-claude), checked 2026-11-07).
 
 ## Credits
 
 Inspired by Ben Aiad's use case from Lenny's Newsletter.
+
+Based on the original skill in [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit/tree/main/skills/domain-name-brainstormer); this version is rewritten.
+
+Documentation owners credited (official pages listed in `docs/audit/upstream-sources.json`, checked 2026-11-07): RDAP.org, IANA, ICANN, Google Registry, Google Chrome team, Chromium, Unicode Consortium, Dynadot, Anthropic.
