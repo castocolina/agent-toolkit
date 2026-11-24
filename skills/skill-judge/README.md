@@ -21,6 +21,7 @@ Trigger phrases: "judge this skill", "review my SKILL.md", "audit this skill", "
 
 ## How It Works
 
+0. When the session that wrote the target is asked to judge it, the skill dispatches an independent judge (a cross-AI subprocess on another model family, else a fresh-context subagent) and stops rather than judging inline.
 1. The skill reads `references/rubric.md` (rubric v5) and every pinned spec file the rubric cites, in full. These reads are mandatory on every run.
 2. It reads the target `SKILL.md` and, when a dimension needs them, `evals/` (inputs in `evals/files/`), `scripts/`, the repository's `tests/skills/<name>/` (script tests, not shipped with the skill) and referenced files.
 3. It checks removals and sources: each item of the previous-version digest (from `audit.py judge-prompt`) that no recovery record row explains is a high finding, and every reference must resolve and every version-sensitive fact be read live or carry its source and date. Content added only to satisfy the rubric or an eval, and not the skill's purpose, earns no credit.
